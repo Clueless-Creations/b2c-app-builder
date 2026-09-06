@@ -1,0 +1,644 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:b2c:business-schema",
+  "title": "B2C Mobile Business Design Room State",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "updatedAt",
+    "business",
+    "theme",
+    "designRoom",
+    "surfaces"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "updatedAt": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}(?:T[\\d:.+-]+Z?)?$"
+    },
+    "business": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "slug",
+        "stage",
+        "positioning",
+        "targetAudience"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "slug": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "stage": {
+          "type": "string",
+          "enum": [
+            "concept",
+            "research",
+            "design",
+            "build",
+            "prelaunch",
+            "launch",
+            "postlaunch"
+          ]
+        },
+        "positioning": {
+          "type": "string"
+        },
+        "targetAudience": {
+          "type": "string"
+        }
+      }
+    },
+    "theme": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "provisional",
+            "draft",
+            "approved"
+          ]
+        }
+      }
+    },
+    "designBrief": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source"
+      ],
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "productType": {
+          "type": "string"
+        },
+        "recommendedStyle": {
+          "type": "string"
+        },
+        "paletteMood": {
+          "type": "string"
+        },
+        "typographyMood": {
+          "type": "string"
+        },
+        "keyEffects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "antiPatterns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "audienceFacts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "appsTheyLove": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "antiReferences": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "motionNotes": {
+          "type": "string"
+        },
+        "generatedAt": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "designRoom": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "contractPath",
+        "renderPath"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "not_started",
+            "mutating",
+            "rendered",
+            "blocked"
+          ]
+        },
+        "contractPath": {
+          "type": "string",
+          "const": "DESIGN.md"
+        },
+        "renderPath": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "surfaces": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "webFunnels",
+        "landingPages",
+        "marketingAssets",
+        "mobileApp",
+        "appStore"
+      ],
+      "properties": {
+        "webFunnels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/surface"
+          }
+        },
+        "landingPages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/surface"
+          }
+        },
+        "marketingAssets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/surface"
+          }
+        },
+        "mobileApp": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "stack",
+            "platforms",
+            "screens",
+            "flows"
+          ],
+          "properties": {
+            "stack": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]*$"
+            },
+            "platforms": {
+              "description": "Target operating systems for the mobile app. Record the implementation framework in stack.",
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "enum": [
+                  "ios",
+                  "android"
+                ]
+              }
+            },
+            "screens": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/surface"
+              }
+            },
+            "flows": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/flow"
+              }
+            }
+          }
+        },
+        "appStore": {
+          "$ref": "#/$defs/appStore"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "surface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "status",
+        "purpose",
+        "decisions",
+        "tokenReferences"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "not_started",
+            "draft",
+            "ready",
+            "blocked",
+            "not_needed"
+          ]
+        },
+        "purpose": {
+          "type": "string"
+        },
+        "decisions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tokenReferences": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^(color|font|radius|space|motion)\\.[A-Za-z0-9.]+$"
+          }
+        }
+      }
+    },
+    "flow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "status",
+        "steps",
+        "tokenReferences"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "not_started",
+            "draft",
+            "ready",
+            "blocked",
+            "not_needed"
+          ]
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tokenReferences": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "appStore": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "defaultProductPage",
+        "customProductPages",
+        "productPageOptimizationTests",
+        "inAppEvents"
+      ],
+      "properties": {
+        "defaultProductPage": {
+          "$ref": "#/$defs/productPage"
+        },
+        "customProductPages": {
+          "type": "array",
+          "maxItems": 70,
+          "items": {
+            "$ref": "#/$defs/customProductPage"
+          }
+        },
+        "productPageOptimizationTests": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/productPageOptimizationTest"
+          }
+        },
+        "inAppEvents": {
+          "type": "array",
+          "maxItems": 15,
+          "items": {
+            "$ref": "#/$defs/inAppEvent"
+          }
+        }
+      }
+    },
+    "productPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "positioning",
+        "screenshotCount",
+        "appPreviewCount",
+        "promotionalText",
+        "keywords"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "not_started",
+            "draft",
+            "ready",
+            "in_review",
+            "approved",
+            "published",
+            "blocked",
+            "not_needed"
+          ]
+        },
+        "positioning": {
+          "type": "string"
+        },
+        "screenshotCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "appPreviewCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "promotionalText": {
+          "type": "string",
+          "maxLength": 170
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "customProductPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "status",
+        "positioning",
+        "screenshotCount",
+        "appPreviewCount",
+        "promotionalText",
+        "keywords",
+        "audience",
+        "trafficSource",
+        "measurementPlan",
+        "shareUrl"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "not_started",
+            "draft",
+            "ready",
+            "in_review",
+            "approved",
+            "published",
+            "blocked",
+            "not_needed"
+          ]
+        },
+        "positioning": {
+          "type": "string"
+        },
+        "screenshotCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "appPreviewCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "promotionalText": {
+          "type": "string",
+          "maxLength": 170
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "audience": {
+          "type": "string"
+        },
+        "trafficSource": {
+          "type": "string"
+        },
+        "measurementPlan": {
+          "type": "string"
+        },
+        "shareUrl": {
+          "type": "string"
+        },
+        "deepLink": {
+          "type": "string"
+        }
+      }
+    },
+    "productPageOptimizationTest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "status",
+        "hypothesis",
+        "trafficAllocationPercent",
+        "durationDays",
+        "treatments",
+        "winnerConfidence"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "not_started",
+            "draft",
+            "running",
+            "complete",
+            "applied",
+            "blocked"
+          ]
+        },
+        "hypothesis": {
+          "type": "string"
+        },
+        "trafficAllocationPercent": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "durationDays": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 90
+        },
+        "treatments": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "changedAssets"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9-]*$"
+              },
+              "changedAssets": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "app_icon",
+                    "screenshots",
+                    "app_previews"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "winnerConfidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "inAppEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "referenceName",
+        "status",
+        "purpose",
+        "schedule",
+        "deepLink",
+        "requiresIap",
+        "mediaStatus"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "referenceName": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "in_review",
+            "approved",
+            "published",
+            "past",
+            "blocked"
+          ]
+        },
+        "purpose": {
+          "type": "string"
+        },
+        "schedule": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "startsAt",
+            "endsAt"
+          ],
+          "properties": {
+            "startsAt": {
+              "type": "string"
+            },
+            "endsAt": {
+              "type": "string"
+            }
+          }
+        },
+        "deepLink": {
+          "type": "string"
+        },
+        "requiresIap": {
+          "type": "boolean"
+        },
+        "mediaStatus": {
+          "type": "string",
+          "enum": [
+            "not_started",
+            "draft",
+            "ready",
+            "blocked"
+          ]
+        }
+      }
+    }
+  }
+}

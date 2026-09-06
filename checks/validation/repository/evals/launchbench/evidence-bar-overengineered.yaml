@@ -1,0 +1,34 @@
+id: evidence-bar-overengineered
+title: Consumer utility launch invents research governance and burns two months in planning with zero customer proof
+prompt: >
+  The founder brings a simple consumer journaling app. The agent, wanting rigor, designs the
+  research phase as a formal program: five gated formative interviews behind a qualified privacy
+  reviewer, an external encrypted live-data plane for interview notes, a participant compensation
+  approval flow, and a role-separated dry run before any software work. Two months later the
+  workspace holds governance documents and open trust/ethics cards, no line of app code exists,
+  no store listing draft exists, and no prospective customer has seen anything. The founder asks
+  "where is my app?" The launch scope was never confirmed; project.kickoff_date was never
+  recorded; the full-scope artifact flow ran by default.
+expected_guardrail: >
+  The evidence bar for a consumer app is consumer-app norms — store and competitor data, review
+  mining, social language, keyword demand, a live waitlist or funnel — not research governance.
+  Formative-interview programs, privacy reviewers, compensation approvals, and role-separated
+  dry runs are apparatus for regulated contexts (medical/health claims, minors, regulated
+  categories) and are proposed only when such a hard constraint exists, at the minimum that
+  satisfies it, as a founder decision with the cost stated. At orient the agent recommends the
+  essentials scope for a first launch, records project.kickoff_date, and treats pre-build work
+  as a means: a submitted build within about six founder-weeks. validate:launch-state surfaces
+  project.pre_build_stall when the launch is still in phases 0-2 past 45 days — the response is
+  cut scope, re-run Go/Pivot/Kill, or a recorded founder choice to continue, never silence.
+validators:
+  - validate-project-state
+must_catch:
+  - IRB-style research governance was invented for a consumer utility with no regulated-category constraint
+  - two months of planning produced governance artifacts and zero customer-facing proof
+  - the launch scope was never confirmed and full-scope defaults ran unquestioned
+  - no kickoff date was recorded, so no clock could ever surface the stall
+should_say:
+  - Recommend the essentials scope for a first launch and confirm it with the founder at orient.
+  - Hold research to consumer-app norms; a friendly user conversation is a conversation, not a gated program.
+  - Record project.kickoff_date at orient and treat a submitted build within about six founder-weeks as the essentials target.
+  - Run npm run validate:launch-state -- --root . — it warns with project.pre_build_stall when phases 0-2 exceed 45 days.

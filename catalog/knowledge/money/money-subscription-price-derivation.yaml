@@ -1,0 +1,41 @@
+schema_version: 1.0.0
+id: reference.money.subscription-price-derivation
+title: Subscription Price Derivation
+domain_id: domain.money
+document_path: knowledge/money/subscription-price-derivation.md
+load_when: before deriving subscription territory prices from another plan; when PRICE_DERIVATION.md
+  needs dry-run, founder apply, and provider readback
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.money.revenue-monetization
+    - workflow.store.asc-cli-automation
+  context_pack_ids:
+    - context.money
+applicability_notes: Dry-run is mandatory. A multiplier is not approval. Missing territories stay
+  blockers.
+sources:
+  - id: github-com-rorkai-app-store-connect-cli-releases-4-9-0-pricing-derive
+    name: github.com
+    source_type: official_docs
+    url: https://github.com/rorkai/App-Store-Connect-CLI/releases/tag/4.9.0
+    review_cadence_days: 7
+    claim_scope: Rork asc 4.9.0 adds experimental asc subscriptions pricing derive with --dry-run.
+    last_review_date: 2026-08-24
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-appstoreconnectapi-configuring-subscription-prices
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/appstoreconnectapi/configuring-subscription-prices-across-territories
+    review_cadence_days: 7
+    claim_scope: Apple API guidance for configuring subscription prices across territories.
+    last_review_date: 2026-08-24
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-manage-subscriptions-manage-pricing
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/manage-subscriptions/manage-pricing-for-auto-renewable-subscriptions
+    review_cadence_days: 7
+    claim_scope: Apple help for auto-renewable subscription pricing, including future price changes.
+    last_review_date: 2026-08-24
+    reviewer: b2c-maintainers

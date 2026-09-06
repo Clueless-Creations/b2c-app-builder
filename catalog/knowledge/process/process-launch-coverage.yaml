@@ -1,0 +1,18 @@
+schema_version: 1.0.0
+id: reference.process.launch-coverage
+title: Launch Coverage
+domain_id: domain.process
+document_path: knowledge/process/launch-coverage.md
+load_when: '"what else is missing", "launch readiness"; moving from planning to build or submission'
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.process.provider-proof-verification
+    - workflow.process.launch-trace-and-build-contracts
+    - workflow.process.launchbench-failure-cards-coverage-audit
+    - workflow.orchestration.full-launch-program
+    - workflow.orchestration.full-launch-closeout
+  context_pack_ids:
+    - context.machine
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

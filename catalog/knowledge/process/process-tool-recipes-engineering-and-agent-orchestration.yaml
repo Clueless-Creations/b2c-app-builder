@@ -1,0 +1,32 @@
+schema_version: 1.0.0
+id: reference.process.tool-recipes.engineering-and-agent-orchestration
+title: Engineering And Agent Orchestration
+domain_id: domain.process
+document_path: knowledge/process/tool-recipes/engineering-and-agent-orchestration.md
+load_when: routing engineering work through CE skills, parallel-agent rules, the three engineering record contracts, and
+  choosing MCP, CLI, or skill-pack shape for a new third-party tool — routed from tool-recipes.md
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.engineering.engineering-orchestration-ce-production-readiness
+  context_pack_ids:
+    - context.engineering
+sources:
+  - id: cc-bruniaux-com-ecosystem-mcp-vs-cli
+    name: cc.bruniaux.com
+    source_type: website
+    url: https://cc.bruniaux.com/ecosystem/mcp-vs-cli/
+    review_cadence_days: 30
+    claim_scope: The MCP-versus-CLI selection questions (end user, driving model, call-level observability, schema
+      churn), grounding the Choosing MCP, CLI, Or Skill For A New Tool subsection.
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers
+  - id: github-com-florianbruniaux-claude-code-ultimate-guide-tools-reference
+    name: github.com
+    source_type: github
+    url: https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/guide/core/tools-reference.md
+    review_cadence_days: 30
+    claim_scope: The Monitor tool's background-watch/streaming behavior and its unavailability on Bedrock, Vertex AI,
+      and Foundry, grounding the Monitor recommendation in Delegate.
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers

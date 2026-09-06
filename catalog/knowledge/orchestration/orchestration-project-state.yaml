@@ -1,0 +1,25 @@
+schema_version: 1.0.0
+id: reference.orchestration.project-state
+title: Project State
+domain_id: domain.orchestration
+document_path: knowledge/orchestration/project-state.md
+load_when: reading state/business-state.json to resume runtime work, or changing runtime state through the reducer —
+  the durable state schema, reducer contract, and continuation rules; author product scope and decisions in product.yaml
+  and render PRODUCT.md; load together with parallel-agent-orchestration.md when dispatching subagents
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.orchestration.session-continuity-resume
+    - workflow.orchestration.orient-scaffold-and-state-cockpit-upkeep
+    - workflow.engineering.engineering-orchestration-ce-production-readiness
+  context_pack_ids:
+    - context.orchestration
+sources:
+  - id: research-trychroma-com-context-rot
+    name: Context rot
+    source_type: paper
+    url: https://research.trychroma.com/context-rot
+    review_cadence_days: 30
+    claim_scope: Basis for the Update Cadence bullet on saving state before the runtime nears auto-compact.
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers

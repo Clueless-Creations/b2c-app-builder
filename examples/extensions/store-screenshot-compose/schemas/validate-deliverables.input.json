@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "validate-deliverables input",
+  "description": "Arguments for compose.mjs validate. The composed directory and every directory under its locales/ folder are checked.",
+  "type": "object",
+  "properties": {
+    "composed": { "type": "string", "minLength": 1 },
+    "wells": { "type": "string", "minLength": 1 }
+  },
+  "required": ["composed", "wells"],
+  "additionalProperties": false
+}

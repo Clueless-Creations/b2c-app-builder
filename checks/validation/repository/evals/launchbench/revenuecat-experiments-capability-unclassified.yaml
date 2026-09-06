@@ -1,0 +1,22 @@
+id: revenuecat-experiments-capability-unclassified
+title: RevenueCat Experiments source is contracted but missing from capability-delta
+prompt: >
+  The RevenueCat contract lists Experiments as a required feature and cites
+  www-revenuecat-com-docs-tools-experiments-v1. A freshness PR updates the API
+  host hash and the REST docs hash, but drops the Experiments row from
+  capability-delta.yaml because that source has no snapshot yet. The maintainer
+  asks to merge the freshness PR.
+expected_guardrail: >
+  Every contracted source must have a classified capability-delta row, including
+  unsnapped Experiments docs. A missing Experiments row is unclassified drift.
+validators:
+  - check-provider-contracts
+  - check-capability-delta
+must_catch:
+  - contracted Experiments source has no capability-delta entry
+  - unsnapped sources still require a classified row
+  - freshness PRs cannot drop a required billing capability from the ledger
+should_say:
+  - Keep the Experiments source in the RevenueCat contract.
+  - Record to_hash unsnapped until the first snapshot fetch.
+  - Do not merge while a contracted source is unclassified.

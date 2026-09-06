@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "1.0.0",
+  "updatedAt": "",
+  "appId": "new-business",
+  "environment": "development",
+  "identityBoundary": {
+    "mappingStore": "app_provider_boundary",
+    "capturePolicy": "opaque_subject_ref_only",
+    "deletionOwner": "u22_erasure_transition"
+  },
+  "definitions": [
+    {
+      "id": "activation",
+      "revision": 1,
+      "name": "Activation",
+      "objective": {
+        "id": "objective.activation",
+        "title": "Reach first valuable result",
+        "valueLoop": "creation"
+      },
+      "eventSchemaVersion": "activation.v1",
+      "numerator": "activated_users",
+      "denominator": "new_users",
+      "units": "ratio",
+      "applicability": {
+        "applies": false,
+        "reason": "Install this optional template only after the business names its activation event."
+      },
+      "owner": "product"
+    }
+  ],
+  "experiments": [],
+  "conversions": []
+}

@@ -1,0 +1,344 @@
+schema_version: 1.0.0
+id: reference.engineering.xcodebuildmcp-testing
+title: XcodeBuildMCP Testing
+domain_id: domain.engineering
+document_path: knowledge/engineering/xcodebuildmcp-testing.md
+load_when: first for any "run the app", "check this screen", "walk this flow", "reproduce this bug", screenshot,
+  screen-recording, or device-automation request on a local Mac — the Route Ladder starts at the zero-setup
+  in-app iOS Simulator before XcodeBuildMCP CLI/MCP or MobAI
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.engineering.native-ios-proof-route-ladder
+  context_pack_ids:
+    - context.device
+applicability_notes: Also covers Codex Desktop native iOS tools, SnapshotPreviews exports, serve-sim streaming,
+  and simulator/device screenshots.
+sources:
+  - id: code-claude-com-docs-en-desktop-ios-simulator
+    name: Claude Code Desktop iOS Simulator pane
+    source_type: official_docs
+    url: https://code.claude.com/docs/en/desktop-ios-simulator
+    review_cadence_days: 7
+    claim_scope: Official documentation for the in-app iOS Simulator pane — the rung-0 path-of-least-resistance
+      native iOS proof route. Carries the version/plan/policy gates, the local-session-only constraint, the
+      per-device consent and screenshot-retention rules, and the simulated-devices-only limitation. Public beta,
+      so re-check gates before promising the route.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: code-claude-com-docs-en-computer-use
+    name: Claude Code CLI computer use
+    source_type: official_docs
+    url: https://code.claude.com/docs/en/computer-use
+    review_cadence_days: 7
+    claim_scope: Official documentation for how the Claude Code CLI reaches the iOS Simulator (screen control via
+      the built-in computer-use MCP server) when there is no desktop pane. Research preview with heavier
+      plan/permission gating than the pane.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: learn-chatgpt-com-use-cases-ios-simulator-bug-debugging
+    name: Codex iOS Simulator debugging loop
+    source_type: official_docs
+    url: https://learn.chatgpt.com/use-cases/ios-simulator-bug-debugging
+    review_cadence_days: 7
+    claim_scope: Official OpenAI use-case doc for Codex's in-app iOS Simulator reproduce-debug-verify loop, its
+      XcodeBuildMCP plus build-ios-apps prerequisites, capability list, and best practices. Canonical URL; the
+      developers.openai.com/codex form redirects here.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: learn-chatgpt-com-use-cases-collections-native-development
+    name: Codex native development collection
+    source_type: official_docs
+    url: https://learn.chatgpt.com/use-cases/collections/native-development
+    review_cadence_days: 30
+    claim_scope: Official OpenAI collection of Codex iOS/macOS native development use cases and the Build iOS Apps /
+      Build macOS Apps plugins.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: github-com-openai-plugins-build-ios-apps
+    name: Codex Build iOS Apps plugin
+    source_type: github
+    url: https://github.com/openai/plugins/tree/main/plugins/build-ios-apps
+    review_cadence_days: 7
+    claim_scope: Codex plugin that wires XcodeBuildMCP and ships the iOS debugger agent plus simulator-browser,
+      performance-trace, memory-leak, App Intents, and SwiftUI skills. Check its skill list before adding
+      serve-sim or tracing tools separately.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: github-com-getsentry-xcodebuildmcp
+    name: XcodeBuildMCP
+    source_type: github
+    url: https://github.com/getsentry/XcodeBuildMCP
+    review_cadence_days: 7
+    claim_scope: Selected help-first tool routing and capture guidance only. Upstream binaries, templates,
+      third-party packages and THIRD_PARTY_LICENSES components are not redistributed.
+    last_review_date: 2026-09-06
+    reviewer: b2c-contributor source review
+    publisher: Cameron Cooke
+    revision: e6ef59b49b44012c824f0a0de261c96142e37390
+    retrieved_at: 2026-09-06T15:57:57.050471Z
+    upstream_id: sentry-xcodebuildmcp
+    selectors: &a2
+      - README.md
+      - skills/xcodebuildmcp/SKILL.md
+      - skills/xcodebuildmcp-cli/SKILL.md
+    rights:
+      status: verified
+      spdx: MIT
+      evidence: catalog/upstreams/notices/sentry-xcodebuildmcp.txt
+      evidence_sha256: fef28fc4165c72b1f0e4ce94654ba44ad7ff7d5d2538b3d01e66e9cc5be3c4f6
+      notes: Selected guidance adapted; unimported assets and executable dependencies retain separate review
+        requirements.
+  - id: xcodebuildmcp-com-docs-cli
+    name: xcodebuildmcp.com
+    source_type: docs
+    url: https://xcodebuildmcp.com/docs/cli
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: xcodebuildmcp-com-docs-clients
+    name: xcodebuildmcp.com
+    source_type: docs
+    url: https://xcodebuildmcp.com/docs/clients
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: xcodebuildmcp-com-docs-configuration
+    name: xcodebuildmcp.com
+    source_type: docs
+    url: https://xcodebuildmcp.com/docs/configuration
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: xcodebuildmcp-com-docs-installation
+    name: xcodebuildmcp.com
+    source_type: docs
+    url: https://xcodebuildmcp.com/docs/installation
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: xcodebuildmcp-com-docs-privacy
+    name: xcodebuildmcp.com
+    source_type: docs
+    url: https://xcodebuildmcp.com/docs/privacy
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: xcodebuildmcp-com-docs-setup
+    name: xcodebuildmcp.com
+    source_type: docs
+    url: https://xcodebuildmcp.com/docs/setup
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: xcodebuildmcp-com-docs-skills
+    name: xcodebuildmcp.com
+    source_type: docs
+    url: https://xcodebuildmcp.com/docs/skills
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: xcodebuildmcp-com-docs-tools
+    name: xcodebuildmcp.com
+    source_type: docs
+    url: https://xcodebuildmcp.com/docs/tools
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: xcodebuildmcp-com-docs-troubleshooting
+    name: xcodebuildmcp.com
+    source_type: docs
+    url: https://xcodebuildmcp.com/docs/troubleshooting
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: xcodebuildmcp-com-docs-workflows
+    name: xcodebuildmcp.com
+    source_type: docs
+    url: https://xcodebuildmcp.com/docs/workflows
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: github-com-getsentry-snapshotpreviews
+    name: SnapshotPreviews
+    source_type: github
+    url: https://github.com/getsentry/SnapshotPreviews
+    review_cadence_days: 7
+    claim_scope: Selected preview-export procedures and dependency awareness only. No package source, binary
+      targets, transitive dependencies or example app are incorporated.
+    last_review_date: 2026-09-06
+    reviewer: b2c-contributor source review
+    publisher: Emerge Tools
+    revision: 856a1c1585e31d4113c019050d6d0712cf6ddadc
+    retrieved_at: 2026-09-06T15:57:58.988151Z
+    upstream_id: sentry-snapshotpreviews
+    selectors: &a1
+      - README.md
+      - Package.swift
+    rights:
+      status: verified
+      spdx: MIT
+      evidence: catalog/upstreams/notices/sentry-snapshotpreviews.txt
+      evidence_sha256: d0404079f9a0cfade1fa38c8d4809834851886212359b7ac9d5a20470f719e07
+      notes: Selected guidance adapted; unimported assets and executable dependencies retain separate review
+        requirements.
+  - id: github-com-emerge-tools-snapshotpreviews
+    name: SnapshotPreviews
+    source_type: github
+    url: https://github.com/getsentry/SnapshotPreviews
+    review_cadence_days: 7
+    claim_scope: Selected preview-export procedures and dependency awareness only. No package source, binary
+      targets, transitive dependencies or example app are incorporated.
+    last_review_date: 2026-09-06
+    reviewer: b2c-contributor source review
+    publisher: Emerge Tools
+    revision: 856a1c1585e31d4113c019050d6d0712cf6ddadc
+    retrieved_at: 2026-09-06T15:57:58.988151Z
+    upstream_id: sentry-snapshotpreviews
+    selectors: *a1
+    rights:
+      status: verified
+      spdx: MIT
+      evidence: catalog/upstreams/notices/sentry-snapshotpreviews.txt
+      evidence_sha256: d0404079f9a0cfade1fa38c8d4809834851886212359b7ac9d5a20470f719e07
+      notes: Selected guidance adapted; unimported assets and executable dependencies retain separate review
+        requirements.
+  - id: github-com-evanbacon-serve-sim
+    name: serve-sim
+    source_type: github
+    url: https://github.com/EvanBacon/serve-sim
+    review_cadence_days: 7
+    claim_scope: Selected simulator viewing and control guidance only. No Swift helper, injected library, source
+      package, camera integration or external dependency is incorporated. Root LICENSE has no project-specific
+      copyright line; package metadata names Evan Bacon.
+    last_review_date: 2026-09-06
+    reviewer: b2c-contributor source review
+    publisher: Evan Bacon
+    revision: 0ee6fbde40a6b5840d0c6e0379f544feb9fa246b
+    retrieved_at: 2026-09-06T15:58:00.701780Z
+    upstream_id: evanbacon-serve-sim
+    selectors: &a3
+      - packages/serve-sim/README.md
+      - packages/serve-sim/package.json
+    rights:
+      status: verified
+      spdx: Apache-2.0
+      evidence: catalog/upstreams/notices/evanbacon-serve-sim.txt
+      evidence_sha256: 9024cdf56dfe7e66523698a9f63d3a0061eb15f43bd5ea8e3833a56017ae37fd
+      notes: Selected guidance adapted; unimported assets and executable dependencies retain separate review
+        requirements.
+  - id: developer-apple-com-documentation-xcode-testing
+    name: Apple Xcode testing overview
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/xcode/testing
+    review_cadence_days: 30
+    claim_scope: Official Apple overview for unit, integration, UI, performance, and device testing strategy.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-xcode-organizing-tests
+    name: Apple test plan guidance
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/xcode/organizing-tests-to-improve-feedback
+    review_cadence_days: 30
+    claim_scope: Official Apple guidance for test plans, device configurations, languages, and staged feedback.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-accessibility-audits
+    name: Apple app accessibility audits
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/accessibility/performing-accessibility-audits-for-your-app
+    review_cadence_days: 30
+    claim_scope: Official Apple accessibility audit guidance used by the native launch-critical matrix.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-xcode-testing-localizations
+    name: Apple localization testing
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/xcode/testing-localizations-when-running-your-app
+    review_cadence_days: 30
+    claim_scope: Official Apple guidance for running locale and language variants during app testing.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-xcode-performance-tests
+    name: Apple performance testing
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/xcode/writing-and-running-performance-tests
+    review_cadence_days: 30
+    claim_scope: Official Apple guidance for performance tests and baselines in the native release matrix.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+derivations:
+  - source_ids:
+      - github-com-getsentry-xcodebuildmcp
+    relationship: adapted
+    baseline: e6ef59b49b44012c824f0a0de261c96142e37390
+    selectors: *a2
+    rationale: Reconcile existing selected guidance with the reviewed source while preserving builder artifact
+      ownership, host selection, authority and evidence semantics.
+    omissions:
+      - The upstream preference for XcodeBuildMCP over raw native tools does not override explicit business
+        bindings or adequate host-native tools. No global install or skill init runs during source adoption.
+      - Tool discovery and screenshot capture are not proof of current app correctness, provider behavior, store
+        readiness or independent design acceptance.
+    reviewer: b2c-contributor source review
+    reviewed_at: 2026-09-06
+    notice: catalog/upstreams/notices/sentry-xcodebuildmcp.txt
+    evaluation: npm run test:fixtures -- screenshot-upstreams
+  - source_ids:
+      - github-com-getsentry-snapshotpreviews
+    relationship: adapted
+    baseline: 856a1c1585e31d4113c019050d6d0712cf6ddadc
+    selectors: *a1
+    rationale: Reconcile existing selected guidance with the reviewed source while preserving builder artifact
+      ownership, host selection, authority and evidence semantics.
+    omissions:
+      - PreviewLayoutTest exercises layout without producing PNGs; SnapshotTest can produce captures. Neither
+        establishes a real onboarding session, live data, purchases, or whole-business readiness.
+      - PreviewGallery is optional internal tooling, not a production app feature. Select dependency revisions
+        and inspect binary/transitive license and compatibility requirements separately.
+    reviewer: b2c-contributor source review
+    reviewed_at: 2026-09-06
+    notice: catalog/upstreams/notices/sentry-snapshotpreviews.txt
+    evaluation: npm run test:fixtures -- screenshot-upstreams
+  - source_ids:
+      - github-com-emerge-tools-snapshotpreviews
+    relationship: adapted
+    baseline: 856a1c1585e31d4113c019050d6d0712cf6ddadc
+    selectors: *a1
+    rationale: Reconcile existing selected guidance with the reviewed source while preserving builder artifact
+      ownership, host selection, authority and evidence semantics.
+    omissions:
+      - PreviewLayoutTest exercises layout without producing PNGs; SnapshotTest can produce captures. Neither
+        establishes a real onboarding session, live data, purchases, or whole-business readiness.
+      - PreviewGallery is optional internal tooling, not a production app feature. Select dependency revisions
+        and inspect binary/transitive license and compatibility requirements separately.
+    reviewer: b2c-contributor source review
+    reviewed_at: 2026-09-06
+    notice: catalog/upstreams/notices/sentry-snapshotpreviews.txt
+    evaluation: npm run test:fixtures -- screenshot-upstreams
+  - source_ids:
+      - github-com-evanbacon-serve-sim
+    relationship: adapted
+    baseline: 0ee6fbde40a6b5840d0c6e0379f544feb9fa246b
+    selectors: *a3
+    rationale: Reconcile existing selected guidance with the reviewed source while preserving builder artifact
+      ownership, host selection, authority and evidence semantics.
+    omissions:
+      - Use an explicitly selected simulator and local scoped endpoint; do not attach to every booted device or
+        expose a LAN/tunnel by default. Inspect actual host and Xcode requirements.
+      - Camera injection, webcam capture, host accessibility changes, remote exposure and stopping other
+        sessions require their own authority. Streaming does not certify provider state or signing readiness.
+    reviewer: b2c-contributor source review
+    reviewed_at: 2026-09-06
+    notice: catalog/upstreams/notices/evanbacon-serve-sim.txt
+    evaluation: npm run test:fixtures -- screenshot-upstreams

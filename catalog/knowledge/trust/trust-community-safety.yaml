@@ -1,0 +1,28 @@
+schema_version: 1.0.0
+id: reference.trust.community-safety
+title: Community And User Safety
+domain_id: domain.trust
+document_path: knowledge/trust/community-safety.md
+load_when: when users can create, share, discover, or message content
+lifecycle: active
+bindings:
+  workflow_ids: [workflow.trust.community-and-user-safety]
+  context_pack_ids: [context.trust]
+applicability_notes: Required for social, chat, creator, and other user-generated-content products.
+sources:
+  - id: apple-app-review-guidelines
+    name: Apple App Review Guidelines
+    source_type: official_policy
+    url: https://developer.apple.com/app-store/review/guidelines/
+    review_cadence_days: 14
+    claim_scope: Supports moderation, reporting, blocking, and contact requirements.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: google-play-ugc-policy
+    name: Google Play user-generated content policy
+    source_type: official_policy
+    url: https://support.google.com/googleplay/android-developer/answer/12923286?hl=en
+    review_cadence_days: 14
+    claim_scope: Supports moderation, reporting, blocking, and age-appropriate controls.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

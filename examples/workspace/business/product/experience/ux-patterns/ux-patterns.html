@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UX Pattern Board</title>
+  <style>
+    :root {
+      --bg: #f7f3ec;
+      --ink: #161512;
+      --muted: #686159;
+      --panel: #fffdfa;
+      --line: #d8d0c3;
+      --accent: #0c7c59;
+      --warn: #a05a00;
+      --bad: #b3261e;
+      --radius: 8px;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 ui-sans-serif, system-ui, sans-serif; }
+    header { padding: 28px; border-bottom: 1px solid var(--line); background: linear-gradient(120deg, #fffdfa, #e5f1ea); }
+    h1 { margin: 0 0 8px; font-size: clamp(30px, 5vw, 56px); line-height: .96; letter-spacing: 0; }
+    h2 { margin: 0 0 14px; font-size: 20px; }
+    h3 { margin: 0 0 8px; font-size: 15px; }
+    main { padding: 24px; display: grid; gap: 18px; }
+    section { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; overflow: auto; }
+    .meta { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+    .pill { border: 1px solid var(--line); border-radius: 999px; padding: 6px 10px; background: #fff; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+    .card { border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; background: #fff; min-height: 132px; }
+    .flow { display: grid; grid-template-columns: repeat(4, minmax(160px, 1fr)); gap: 10px; min-width: 720px; }
+    .step { border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; background: #fff; position: relative; }
+    .step strong { display: block; margin-bottom: 6px; color: var(--accent); }
+    table { width: 100%; border-collapse: collapse; min-width: 760px; }
+    th, td { text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); padding: 10px; }
+    th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+    ul { margin: 0; padding-left: 18px; }
+    .warn { color: var(--warn); }
+    .bad { color: var(--bad); }
+    @media (max-width: 720px) { header, main { padding: 16px; } .flow, table { min-width: 640px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>UX Pattern Board</h1>
+    <div class="meta">
+      <span class="pill">Source: Refero or approved fallback</span>
+      <span class="pill">Output: UX_PATTERNS.md</span>
+      <span class="pill">Tokens: DESIGN.md</span>
+      <span class="pill">Scope: web + mobile flows</span>
+    </div>
+  </header>
+  <main>
+    <section>
+      <h2>Critical Pattern Inventory</h2>
+      <div class="grid">
+        <article class="card"><h3>Onboarding</h3><p>Value first, meaningful questions, attribution in first third, plan summary, compliant review prompt, paywall, activation.</p></article>
+        <article class="card"><h3>Paywall</h3><p>Clear package choices, restore purchases, privacy/terms, loading prices, purchase error, entitlement success.</p></article>
+        <article class="card"><h3>Settings</h3><p>Subscription management, restore, support, privacy, terms, account deletion, auth recovery.</p></article>
+        <article class="card"><h3>States</h3><p>Loading, empty, error, offline, permission denied, premium locked, restored purchase, destructive confirm.</p></article>
+      </div>
+    </section>
+    <section>
+      <h2>Mobile Onboarding Flow</h2>
+      <div class="flow">
+        <div class="step"><strong>1. Promise</strong>Product demo or clear value moment before asking questions.</div>
+        <div class="step"><strong>2. Questions</strong>Only ask what changes personalization, attribution, setup, or lifecycle messaging.</div>
+        <div class="step"><strong>3. Attribution</strong>Required source key plus other text, analytics, person property, backend persistence.</div>
+        <div class="step"><strong>4. Plan</strong>Reflect answers back and show the next unlocked value.</div>
+        <div class="step"><strong>5. Review</strong>Only after a real delight moment and through platform APIs.</div>
+        <div class="step"><strong>6. Paywall</strong>Value-first purchase path with restore and legal links.</div>
+        <div class="step"><strong>7. Offer</strong>Transparent dismissal offer or reverse trial when approved.</div>
+        <div class="step"><strong>8. Activate</strong>First useful task after purchase or before paywall when strategy requires it.</div>
+      </div>
+    </section>
+    <section>
+      <h2>State Matrix</h2>
+      <table>
+        <thead><tr><th>State</th><th>UX Rule</th><th>Proof</th></tr></thead>
+        <tbody>
+          <tr><td>Loading</td><td>Stable layout, no jumping controls.</td><td>Screenshot or UI test</td></tr>
+          <tr><td>Empty</td><td>One primary action and realistic example content.</td><td>HTML proof</td></tr>
+          <tr><td>Error</td><td>Explain what failed, whether work is safe, and retry/support path.</td><td>E2E failure path</td></tr>
+          <tr><td>Offline</td><td>Cached state when possible and retry path.</td><td>Network test</td></tr>
+          <tr><td>Premium locked</td><td>Value, price path, restore, and legal links.</td><td>Sandbox purchase test</td></tr>
+        </tbody>
+      </table>
+    </section>
+    <section>
+      <h2>Bug Traps</h2>
+      <ul>
+        <li>Attribution screen exists but does not persist to analytics, person, and backend.</li>
+        <li>Paywall hides restore purchases or renewal terms.</li>
+        <li>Permission prompt appears before the user understands why.</li>
+        <li>Web purchase does not grant mobile entitlement.</li>
+        <li>HTML proof drifts from DESIGN.md tokens.</li>
+        <li>Android UX is marked ready from iOS-only references without Android-native verification.</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>

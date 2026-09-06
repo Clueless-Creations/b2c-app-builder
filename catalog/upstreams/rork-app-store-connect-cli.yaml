@@ -1,0 +1,208 @@
+schema_version: 1
+id: rork-app-store-connect-cli
+project: App Store Connect CLI (asc)
+canonical_url: https://github.com/rorkai/App-Store-Connect-CLI
+homepage: https://asccli.sh
+aliases:
+  - asc
+  - asccli
+  - rorkai/App-Store-Connect-CLI
+transfers: []
+authors:
+  - name: Rudrank Riyam
+    role: original author and copyright holder (LICENSE, 2026)
+maintainers:
+  - name: Rork (github.com/rorkai)
+    role: maintaining organization and release publisher
+copyright: Copyright (c) 2026 Rudrank Riyam
+license:
+  spdx: MIT
+  status: verified
+  evidence_url: https://github.com/rorkai/App-Store-Connect-CLI/blob/main/LICENSE
+  evidence_sha256: 56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b
+  reviewed_revision: main@3a2318a756f78ef6d2d9101f68124ce26cbb056c (2026-09-05); release 4.11.0 tag shares the same LICENSE text
+  notice_file: catalog/upstreams/notices/rork-app-store-connect-cli.txt
+  scope: Root LICENSE of the CLI repository. The builder distributes no copied CLI source; the notice is retained because the executable is a direct upstream relationship and the command procedures are adapted from its documentation.
+  notes: GitHub reports license key mit for this repository. The Homebrew formula also records MIT. Neither is legal advice.
+source_ids:
+  - github-com-rorkai-app-store-connect-cli
+  - github-com-rorkai-app-store-connect-cli-releases-4-9-0
+  - github-com-rorkai-app-store-connect-cli-license
+  - asccli-sh
+relationships:
+  - kind: external-executable
+    consumption: The `asc` executable found on the host PATH runs App Store Connect reads, validation, dry runs, and founder-gated store actions. It is not package-managed by the builder and no workspace pin freezes it.
+    local_owners:
+      - adapters/app-review/asc-provider.ts
+      - adapters/app-review/capability.ts
+      - adapters/app-review/mandate.ts
+      - adapters/app-review/types.ts
+      - catalog/providers/apple-asc.yaml
+    tests:
+      - checks/validation/business/store/check-asc-command-contract.ts
+      - checks/validation/repository/fixtures/agent-operations.fixtures.ts
+      - checks/validation/repository/evals/launchbench/asc-flag-drift-runtime.yaml
+      - checks/validation/repository/evals/launchbench/asc-stale-command-guidance.yaml
+    upstream_paths:
+      - README.md
+      - LICENSE
+      - releases
+    pin_authority: PATH lookup at execution time (`which asc`); recorded as a host observation, never as a lock. Homebrew and the release binary can differ on one machine.
+  - kind: adapted-method
+    consumption: Command procedures, the auth ladder, safe automation boundaries, and the verified command cookbook are reauthored from the CLI README, local `asc --help` output, and release notes into the builder's own vocabulary.
+    local_owners:
+      - knowledge/store/app-store-connect-cli.md
+      - catalog/knowledge/store/store-app-store-connect-cli.yaml
+      - knowledge/store/app-review-observe.md
+      - knowledge/store/app-review-remediate.md
+      - knowledge/store/app-review-resubmit.md
+    tests:
+      - checks/validation/business/store/check-asc-command-contract.ts
+    upstream_paths:
+      - README.md
+    pin_authority: knowledge manifest last_review_date and the reviewed baselines below
+baselines:
+  reviewed_source:
+    revision: "4.4.3"
+    observed_at: "2026-08-17"
+    by: b2c-maintainers
+    note: Local `asc --help` of the installed 4.4.3 binary and the GitHub source read on 2026-08-17 (knowledge/store/app-store-connect-cli.md, Current Sources To Refresh).
+  reviewed_guidance:
+    revision: "4.9.0"
+    observed_at: "2026-08-24"
+    by: b2c-maintainers
+    note: Release notes for 4.9.0 reviewed for metadata validate, metadata push --dry-run, and web agreements status (catalog/knowledge/store/store-app-review-observe.yaml). Releases 4.9.1 through 4.11.0 are observed, not reviewed.
+support:
+  policy: Executable guidance is stored per exact reviewed revision. Any other installed version re-verifies each command with `asc <cmd> --help` before first use (Verified Command Cookbook rule). A passing live probe proves the probed tokens on the probed binary only, never a version range. Major versions below 4 are unsupported.
+  versions:
+    - range: "4.4.3"
+      status: supported
+      evidence:
+        - knowledge/store/app-store-connect-cli.md Verified Command Cookbook (local --help, 2026-08-17)
+    - range: ">=4.5.0 <5.0.0"
+      status: untested
+      evidence:
+        - check:asc-command-contract probes whichever asc is first on PATH; a pass on 4.11.0 (2026-09-05) proves the probed help tokens only
+    - range: "<4.0.0"
+      status: unsupported
+      evidence:
+        - check-asc-command-contract.ts warns asc_command_contract.live_cli_stale
+  operations:
+    - id: asc.auth.status
+      title: asc auth status --validate / asc auth doctor
+      keywords: [auth, login, keychain, profile]
+      owners: [knowledge/store/app-store-connect-cli.md]
+    - id: asc.apps.view
+      title: asc apps list / asc apps view --id
+      keywords: [apps]
+      owners: [checks/validation/business/store/check-asc-command-contract.ts]
+    - id: asc.status
+      title: asc status --app
+      keywords: [status]
+      owners: [checks/validation/business/store/check-asc-command-contract.ts]
+    - id: asc.review.status
+      title: asc review status / doctor / submissions-list
+      keywords: [review, submission]
+      owners: [adapters/app-review/asc-provider.ts, catalog/providers/apple-asc.yaml]
+    - id: asc.metadata.validate
+      title: asc metadata pull / validate / push --dry-run
+      keywords: [metadata, localizations]
+      owners: [catalog/providers/apple-asc.yaml]
+    - id: asc.web.agreements.status
+      title: asc web agreements status (observe only)
+      keywords: [agreements]
+      owners: [catalog/providers/apple-asc.yaml, adapters/app-review/mandate.ts]
+    - id: asc.web.review.show
+      title: asc web auth status / asc web review list / show
+      keywords: [web auth, web review, web-session]
+      owners: [adapters/app-review/asc-provider.ts]
+    - id: asc.screenshots.validate
+      title: asc screenshots sizes / validate; upload after founder approval
+      keywords: [screenshot, screenshots]
+      owners: [knowledge/store/app-store-connect-cli.md]
+    - id: asc.diff.localizations
+      title: asc diff localizations
+      keywords: [diff, localizations]
+      owners: [checks/validation/business/store/check-asc-command-contract.ts]
+    - id: asc.age-rating.audit
+      title: asc age-rating audit
+      keywords: [age-rating, age rating]
+      owners: [knowledge/store/age-rating-questionnaire.md]
+    - id: asc.optimize.keywords
+      title: asc optimize keywords rank / discover / score
+      keywords: [optimize, keyword]
+      owners: [knowledge/store/aso-apple-keyword-evidence.md]
+    - id: asc.subscriptions.pricing.derive
+      title: asc subscriptions pricing derive --dry-run
+      keywords: [subscriptions, pricing]
+      owners: [knowledge/money/subscription-price-derivation.md]
+    - id: asc.telemetry.status
+      title: asc telemetry status
+      keywords: [telemetry]
+      owners: [knowledge/store/app-store-connect-cli.md]
+    - id: asc.testflight.read
+      title: asc testflight feedback list / crashes list
+      keywords: [testflight, tester, crash]
+      owners: [knowledge/store/app-store-connect-cli.md]
+    - id: asc.validate
+      title: asc validate --app --version|--version-id
+      keywords: [validate]
+      owners: [checks/validation/business/store/check-asc-command-contract.ts]
+    - id: asc.webhooks.read
+      title: asc webhooks list / view / ping / deliveries
+      keywords: [webhook, webhooks]
+      owners: [adapters/app-review/capability.ts]
+    - id: asc.install-skills
+      title: asc install-skills (founder-approved; pinned skill pack)
+      keywords: [install-skills, skills]
+      owners: [knowledge/store/app-store-connect-cli.md]
+  unsupported_operations:
+    - id: asc.web.agreements.accept
+      reason: Account Holder action. Never run from an App Review observe mandate; interactive founder confirmation and provider readback are required.
+    - id: asc.webhooks.serve
+      reason: Fixture-only. Production ingress goes through `b2c app-review-ingress`; --allow-remote and --exec on a public bind are refused.
+    - id: asc.apps.get
+      reason: Known-invalid command form. check:asc-command-contract fails closed when it appears in stored guidance.
+    - id: asc.validate.app-store-version
+      reason: Known-invalid subcommand form. Use --version or --version-id with --app.
+  platforms:
+    - macOS arm64 (observed host)
+    - macOS amd64, Linux amd64/arm64, Windows amd64 (release assets exist; not exercised by the builder)
+adaptations:
+  - id: forbidden-command-forms
+    description: Stored guidance must not contain `asc apps get` or `asc validate app-store-version`; the contract check fails closed when either appears.
+    owner: checks/validation/business/store/check-asc-command-contract.ts
+    intentional: true
+  - id: observe-mandate-refusals
+    description: The App Review observe mandate refuses submit, cancel, agreement acceptance, and webhook serving regardless of what the CLI allows.
+    owner: adapters/app-review/mandate.ts
+    intentional: true
+  - id: confirm-plus-founder-gate
+    description: Mutating commands need both the CLI `--confirm` flag and explicit founder approval; omitting `--confirm` is an error, not a dry run.
+    owner: knowledge/store/app-store-connect-cli.md
+    intentional: true
+  - id: never-source-credential-env
+    description: Credential env files are never sourced; profiles or extracted single values are used instead.
+    owner: knowledge/store/app-store-connect-cli.md
+    intentional: true
+  - id: telemetry-disclosure
+    description: The `asc telemetry status` output is recorded as evidence because the CLI sends pseudonymous usage telemetry by default.
+    owner: knowledge/store/app-store-connect-cli.md
+    intentional: true
+  - id: skill-pack-subordinate
+    description: Skill pack guidance is subordinate reference material routed by name; no upstream SKILL.md becomes a top-level builder skill.
+    owner: knowledge/store/app-store-connect-cli.md
+    intentional: true
+host_probe:
+  command: asc
+  args: ["--version"]
+  version_pattern: "^(\\d+\\.\\d+\\.\\d+)"
+review:
+  owner: b2c-maintainers
+  cadence_days: 7
+  last_review: "2026-09-05"
+  status: current
+credits:
+  acknowledge: true
+  use: direct
+  summary: Automates App Store Connect reads, validation, dry runs, and founder-gated store actions through the installed asc executable. The builder adapts its command procedures and refuses the commands it does not support.

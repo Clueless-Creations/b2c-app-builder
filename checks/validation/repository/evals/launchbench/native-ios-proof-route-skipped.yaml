@@ -1,0 +1,20 @@
+id: native-ios-proof-route-skipped
+title: iOS readiness ignores Codex Desktop native tools and overclaims simulator proof
+prompt: >
+  The agent is in Codex Desktop on an iOS app. Native iOS/XcodeBuildMCP tools are exposed, but the agent shells out to a generic xcodebuild command, skips session_show_defaults, never records project/workspace, scheme, simulator, screenshot/log paths, or provider pairing, and marks production readiness complete. For CLI users it mentions SnapshotPreviews and serve-sim but records no TEST_RUNNER_SNAPSHOTS_EXPORT_DIR, preview URL/port, booted simulator, or limitations. It also implies simulator success means App Store readiness.
+expected_guardrail: >
+  Load xcodebuildmcp-testing.md. In Codex Desktop, use exposed native iOS/XcodeBuildMCP tools first: call session_show_defaults before build/run/test and record build_run_sim/test/screenshot/log evidence. For CLI proof, record SnapshotPreviews PNG/JSON exports and serve-sim booted-simulator URL/port when used. Pair app proof with operations/PROVIDER_PROOF.md and keep simulator/preview proof separate from store/APPLE_SIGNING.md distribution readiness.
+validators:
+  - check-native-ios-proof
+must_catch:
+  - Codex Desktop native iOS route was skipped even though tools were exposed
+  - session_show_defaults and exposed MCP tool proof are missing
+  - SnapshotPreviews needs TEST_RUNNER_SNAPSHOTS_EXPORT_DIR PNG/JSON proof and preview-only limitation
+  - serve-sim needs a booted simulator plus preview URL/port and limitation
+  - simulator/preview proof does not prove provider behavior or App Store distribution readiness
+  - native readiness needs a launch-critical .xctestplan matrix for core journey, account, purchase/restore/refund, permissions, offline/retry, accessibility, locale/appearance, performance, and Release-device coverage
+  - a done engineering lane needs existing xcresult, screenshot/video, log, JSON, or provider-correlation evidence paths
+should_say:
+  - Open native-ios-proof-route-skipped.
+  - Run check:native-ios before iOS readiness claims, and keep store/APPLE_SIGNING.md's distribution-gate evidence current.
+  - Update engineering/PRODUCTION_READINESS.md, SCREENSHOTS.md, operations/PROVIDER_PROOF.md, and store/APPLE_SIGNING.md with the separated proof.

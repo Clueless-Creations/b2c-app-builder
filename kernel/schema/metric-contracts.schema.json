@@ -1,0 +1,601 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:b2c:core:metric-contracts-schema",
+  "title": "Metric contracts",
+  "description": "Authored metric, experiment, and identity-boundary contracts. Metric definitions own interpretation (ARCH-07). Comparison requires explicit currency, cohort, version, maturity, and exposure semantics (ARCH-12).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "updatedAt",
+    "appId",
+    "environment",
+    "identityBoundary",
+    "definitions",
+    "experiments",
+    "conversions"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "updatedAt": {
+      "$ref": "#/$defs/optionalDateTime"
+    },
+    "appId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "environment": {
+      "type": "string",
+      "minLength": 1
+    },
+    "identityBoundary": {
+      "$ref": "#/$defs/identityBoundary"
+    },
+    "definitions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/definition"
+      }
+    },
+    "experiments": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/experiment"
+      }
+    },
+    "conversions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/conversion"
+      }
+    },
+    "marketExperiments": {
+      "type": "array",
+      "items": {
+        "$ref": "urn:b2c:core:market-experiment-schema"
+      }
+    }
+  },
+  "$defs": {
+    "optionalDateTime": {
+      "anyOf": [
+        {
+          "const": ""
+        },
+        {
+          "type": "string",
+          "format": "date-time"
+        }
+      ]
+    },
+    "dateTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "valueLoop": {
+      "enum": [
+        "creation",
+        "delivery",
+        "capture",
+        "reinvestment"
+      ]
+    },
+    "canonicalMetricId": {
+      "enum": [
+        "activation",
+        "d7_retention",
+        "d30_retention",
+        "trial_starts",
+        "mrr",
+        "churn",
+        "store_conversion",
+        "crash_free_sessions"
+      ]
+    },
+    "metricId": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/canonicalMetricId"
+        },
+        {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9_.-]*$"
+        }
+      ]
+    },
+    "identityBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mappingStore",
+        "capturePolicy",
+        "deletionOwner"
+      ],
+      "properties": {
+        "mappingStore": {
+          "const": "app_provider_boundary"
+        },
+        "capturePolicy": {
+          "const": "opaque_subject_ref_only"
+        },
+        "deletionOwner": {
+          "const": "u22_erasure_transition"
+        }
+      }
+    },
+    "objective": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "valueLoop"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "valueLoop": {
+          "$ref": "#/$defs/valueLoop"
+        }
+      }
+    },
+    "window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "start",
+        "end",
+        "timezone"
+      ],
+      "properties": {
+        "start": {
+          "type": "string",
+          "minLength": 1
+        },
+        "end": {
+          "type": "string",
+          "minLength": 1
+        },
+        "timezone": {
+          "type": "string",
+          "minLength": 1
+        },
+        "maturity": {
+          "enum": [
+            "immature",
+            "mature"
+          ]
+        }
+      }
+    },
+    "applicability": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "applies"
+          ],
+          "properties": {
+            "applies": {
+              "const": true
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "applies",
+            "reason"
+          ],
+          "properties": {
+            "applies": {
+              "const": false
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "window",
+        "baseline"
+      ],
+      "properties": {
+        "window": {
+          "type": "string",
+          "minLength": 1
+        },
+        "baseline": {
+          "const": "previous_window"
+        },
+        "flagWhen": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "deltaPct": {
+              "type": "number"
+            },
+            "below": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "pullSpec": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "provider"
+          ],
+          "properties": {
+            "provider": {
+              "const": "posthog"
+            },
+            "event": {
+              "type": "string"
+            },
+            "funnelSteps": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "window": {
+              "type": "string"
+            },
+            "cohort": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "provider"
+          ],
+          "properties": {
+            "provider": {
+              "const": "revenuecat"
+            },
+            "entitlementIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "productIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "chartMetric": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "provider"
+          ],
+          "properties": {
+            "provider": {
+              "const": "sentry"
+            },
+            "project": {
+              "type": "string"
+            },
+            "environment": {
+              "type": "string"
+            },
+            "releaseHealthField": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "provider"
+          ],
+          "properties": {
+            "provider": {
+              "const": "app-store-connect"
+            },
+            "report": {
+              "type": "string"
+            },
+            "field": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "provider"
+          ],
+          "properties": {
+            "provider": {
+              "const": "google-play"
+            },
+            "report": {
+              "type": "string"
+            },
+            "field": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "provider",
+            "instructions"
+          ],
+          "properties": {
+            "provider": {
+              "const": "manual"
+            },
+            "instructions": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "definition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "revision",
+        "name",
+        "objective",
+        "eventSchemaVersion",
+        "numerator",
+        "units",
+        "applicability",
+        "owner"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/metricId"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "objective": {
+          "$ref": "#/$defs/objective"
+        },
+        "eventSchemaVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "numerator": {
+          "type": "string",
+          "minLength": 1
+        },
+        "denominator": {
+          "type": "string"
+        },
+        "units": {
+          "type": "string",
+          "minLength": 1
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "amountUnits": {
+          "type": "string"
+        },
+        "amountTreatment": {
+          "enum": [
+            "gross",
+            "net"
+          ]
+        },
+        "refundTreatment": {
+          "type": "string"
+        },
+        "costKind": {
+          "enum": [
+            "actual",
+            "estimated"
+          ]
+        },
+        "cohortId": {
+          "type": "string"
+        },
+        "window": {
+          "$ref": "#/$defs/window"
+        },
+        "exclusions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "timezone": {
+          "type": "string"
+        },
+        "provider": {
+          "enum": [
+            "posthog",
+            "revenuecat",
+            "app-store-connect",
+            "google-play",
+            "sentry",
+            "manual"
+          ]
+        },
+        "pullSpec": {
+          "$ref": "#/$defs/pullSpec"
+        },
+        "comparison": {
+          "$ref": "#/$defs/comparison"
+        },
+        "applicability": {
+          "$ref": "#/$defs/applicability"
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "experiment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "revision",
+        "hypothesis",
+        "treatment",
+        "assignmentUnit",
+        "assignmentOwner",
+        "eligibility",
+        "exposureRule",
+        "decisionHorizon",
+        "primaryMetricDefinitionId",
+        "primaryMetricDefinitionRevision",
+        "guardrails",
+        "stoppingPolicy"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "hypothesis": {
+          "type": "string",
+          "minLength": 1
+        },
+        "treatment": {
+          "type": "string",
+          "minLength": 1
+        },
+        "assignmentUnit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "assignmentOwner": {
+          "type": "string",
+          "minLength": 1
+        },
+        "eligibility": {
+          "type": "string",
+          "minLength": 1
+        },
+        "exposureRule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "decisionHorizon": {
+          "type": "string",
+          "minLength": 1
+        },
+        "primaryMetricDefinitionId": {
+          "$ref": "#/$defs/metricId"
+        },
+        "primaryMetricDefinitionRevision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "guardrails": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "stoppingPolicy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requiredObservationWindow": {
+          "type": "string"
+        },
+        "eligiblePopulation": {
+          "type": "string"
+        },
+        "exposedPopulation": {
+          "type": "string"
+        },
+        "minimumUsableSample": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "allowedMissingJoinCoverage": {
+          "type": "string"
+        }
+      }
+    },
+    "conversion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fromCurrency",
+        "toCurrency",
+        "rate",
+        "asOf"
+      ],
+      "properties": {
+        "fromCurrency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "toCurrency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "rate": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "asOf": {
+          "$ref": "#/$defs/dateTime"
+        }
+      }
+    }
+  }
+}

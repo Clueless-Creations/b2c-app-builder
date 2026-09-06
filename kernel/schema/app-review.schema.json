@@ -1,0 +1,1504 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:b2c:core:app-review-schema",
+  "title": "App Review state with capped resubmission",
+  "description": "Durable App Review mandate, capability receipt, three-layer Apple state, quarantined rejection packet, signed webhook ingress, typed classification, bounded remediation, and Phase 4 capped resubmission. Unknown provider states stay unknown_provider_state and never collapse into one approved boolean. A webhook envelope is a wake-up signal. It is not layer truth. Bounded remediation may change consumer-repo files and inspect a new archive. Resubmission needs an exact standing envelope, an already-uploaded build, and provider readback. Observe mandates still refuse asc review submit.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "updatedAt",
+    "mandate",
+    "capabilityReceipt",
+    "events",
+    "currentCase",
+    "webhookIngress"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.4.0"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "mandate": {
+      "$ref": "#/$defs/mandate"
+    },
+    "capabilityReceipt": {
+      "$ref": "#/$defs/capabilityReceipt"
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/event"
+      }
+    },
+    "currentCase": {
+      "$ref": "#/$defs/case"
+    },
+    "webhookIngress": {
+      "$ref": "#/$defs/webhookIngress"
+    }
+  },
+  "$defs": {
+    "mandate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mandateId",
+        "mode",
+        "status",
+        "appleTeamId",
+        "appId",
+        "bundleId",
+        "platform",
+        "marketingVersion",
+        "startedAt",
+        "expiresAt",
+        "forbiddenCommands"
+      ],
+      "properties": {
+        "mandateId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mode": {
+          "enum": [
+            "observe",
+            "resubmit"
+          ]
+        },
+        "status": {
+          "enum": [
+            "active",
+            "expired",
+            "revoked"
+          ]
+        },
+        "appleTeamId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "appId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bundleId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "platform": {
+          "enum": [
+            "IOS",
+            "MAC_OS",
+            "TV_OS",
+            "VISION_OS"
+          ]
+        },
+        "marketingVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "forbiddenCommands": {
+          "type": "array",
+          "minItems": 4,
+          "items": {
+            "enum": [
+              "asc web agreements accept",
+              "asc webhooks serve",
+              "asc webhooks serve --allow-remote",
+              "asc review submit",
+              "asc publish appstore --submit"
+            ]
+          }
+        },
+        "maxCycles": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "resubmitEnvelope": {
+          "$ref": "#/$defs/resubmitEnvelope"
+        }
+      }
+    },
+    "capabilityReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observedCliVersion",
+        "probedAt",
+        "capabilities",
+        "schemas",
+        "failClosed",
+        "webSession"
+      ],
+      "properties": {
+        "observedCliVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "probedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "capabilities": {
+          "type": "array",
+          "minItems": 6,
+          "items": {
+            "$ref": "#/$defs/capabilityProbe"
+          }
+        },
+        "schemas": {
+          "type": "array",
+          "minItems": 4,
+          "items": {
+            "$ref": "#/$defs/schemaProbe"
+          }
+        },
+        "failClosed": {
+          "type": "boolean"
+        },
+        "webSession": {
+          "$ref": "#/$defs/webSessionReceipt"
+        }
+      }
+    },
+    "webSessionReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capabilities",
+        "failClosed"
+      ],
+      "properties": {
+        "capabilities": {
+          "type": "array",
+          "minItems": 3,
+          "items": {
+            "$ref": "#/$defs/webSessionProbe"
+          }
+        },
+        "failClosed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "capabilityProbe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "available",
+        "shapeOk",
+        "evidence"
+      ],
+      "properties": {
+        "id": {
+          "enum": [
+            "asc.version",
+            "asc.capabilities",
+            "asc.review.status",
+            "asc.metadata.validate",
+            "asc.metadata.push.dry_run",
+            "asc.web.agreements.status"
+          ]
+        },
+        "available": {
+          "type": "boolean"
+        },
+        "shapeOk": {
+          "type": "boolean"
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "webSessionProbe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "available",
+        "shapeOk",
+        "evidence"
+      ],
+      "properties": {
+        "id": {
+          "enum": [
+            "asc.web.auth.status",
+            "asc.web.review.list",
+            "asc.web.review.show"
+          ]
+        },
+        "available": {
+          "type": "boolean"
+        },
+        "shapeOk": {
+          "type": "boolean"
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "schemaProbe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "available"
+      ],
+      "properties": {
+        "id": {
+          "enum": [
+            "APP_STORE_VERSION_APP_VERSION_STATE_UPDATED",
+            "AppStoreVersion",
+            "ReviewSubmission",
+            "ReviewSubmissionItem"
+          ]
+        },
+        "available": {
+          "type": "boolean"
+        }
+      }
+    },
+    "layer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "layer",
+        "rawValue",
+        "providerObjectId",
+        "observedAt",
+        "cliVersion",
+        "schemaId",
+        "normalized"
+      ],
+      "properties": {
+        "layer": {
+          "enum": [
+            "app_version",
+            "review_submission",
+            "submission_item"
+          ]
+        },
+        "rawValue": {
+          "type": "string",
+          "minLength": 1
+        },
+        "providerObjectId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "cliVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "schemaId": {
+          "enum": [
+            "APP_STORE_VERSION_APP_VERSION_STATE_UPDATED",
+            "AppStoreVersion",
+            "ReviewSubmission",
+            "ReviewSubmissionItem"
+          ]
+        },
+        "normalized": {
+          "$ref": "#/$defs/normalized"
+        }
+      }
+    },
+    "normalized": {
+      "enum": [
+        "prepare",
+        "ready_for_review",
+        "waiting_for_review",
+        "in_review",
+        "waiting_for_export_compliance",
+        "invalid_binary",
+        "rejected",
+        "metadata_rejected",
+        "developer_rejected",
+        "pending_developer_release",
+        "pending_apple_release",
+        "processing",
+        "ready_for_distribution",
+        "ready_for_sale",
+        "removed",
+        "replaced",
+        "accepted",
+        "unresolved_issues",
+        "canceling",
+        "completing",
+        "complete",
+        "unknown_provider_state"
+      ]
+    },
+    "agreement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rawStatus",
+        "pending",
+        "normalized"
+      ],
+      "properties": {
+        "rawStatus": {
+          "type": "string"
+        },
+        "pending": {
+          "type": "boolean"
+        },
+        "normalized": {
+          "enum": [
+            "none",
+            "pending",
+            "unknown"
+          ]
+        }
+      }
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "eventId",
+        "mandateId",
+        "kind",
+        "providerTimestamp",
+        "recordedAt",
+        "snapshotFingerprint",
+        "layers",
+        "agreement"
+      ],
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mandateId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "observation",
+            "duplicate_ignored",
+            "out_of_order_ignored",
+            "capability_probe",
+            "packet_recorded",
+            "handoff_recorded",
+            "webhook_accepted",
+            "webhook_duplicate_ignored",
+            "webhook_unknown_payload",
+            "plan_recorded",
+            "implementation_applied",
+            "verification_recorded",
+            "archive_inspected",
+            "parked",
+            "resubmit_authorized",
+            "resubmit_recorded",
+            "resubmit_timeout_readback",
+            "cycle_opened",
+            "cycle_exhausted",
+            "review_accepted"
+          ]
+        },
+        "providerEventId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "providerTimestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "recordedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "snapshotFingerprint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "layers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/layer"
+          }
+        },
+        "agreement": {
+          "$ref": "#/$defs/agreement"
+        }
+      }
+    },
+    "blocker": {
+      "enum": [
+        "none",
+        "unknown_provider_state",
+        "capability_missing",
+        "capability_shape_changed",
+        "founder_action_required",
+        "web_session_required",
+        "evidence_incomplete",
+        "unresolved_issues",
+        "rejected",
+        "metadata_rejected",
+        "invalid_binary",
+        "pending_developer_release"
+      ]
+    },
+    "authReadiness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "publicApiReady",
+        "webSessionReady",
+        "webSessionStatus",
+        "handoff",
+        "probedAt"
+      ],
+      "properties": {
+        "publicApiReady": {
+          "type": "boolean"
+        },
+        "webSessionReady": {
+          "type": "boolean"
+        },
+        "webSessionStatus": {
+          "enum": [
+            "resumable",
+            "missing",
+            "expired",
+            "unknown"
+          ]
+        },
+        "handoff": {
+          "enum": [
+            "none",
+            "web_session_required",
+            "public_api_required"
+          ]
+        },
+        "probedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "classification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "confidence",
+        "citedFingerprints",
+        "affectedItemIds",
+        "newBuildRequired",
+        "implementationStatus",
+        "rationaleKind"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "none",
+            "metadata_rejected",
+            "invalid_binary",
+            "missing_review_information",
+            "privacy_data_disclosure",
+            "payments_subscriptions",
+            "login_review_access",
+            "legal_policy",
+            "product_scope_disagreement",
+            "unclear_conflicting"
+          ]
+        },
+        "confidence": {
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "citedFingerprints": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "affectedItemIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "newBuildRequired": {
+          "type": "boolean"
+        },
+        "implementationStatus": {
+          "enum": [
+            "not_started",
+            "planned",
+            "applied",
+            "verified",
+            "parked",
+            "verification_rejected"
+          ]
+        },
+        "rationaleKind": {
+          "enum": [
+            "layer_state",
+            "structured_reason",
+            "unclear"
+          ]
+        }
+      }
+    },
+    "messageEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "messageId",
+        "threadId",
+        "fromReviewer",
+        "bodyFingerprint",
+        "bodyByteLength",
+        "attachmentIds",
+        "rejectionIds"
+      ],
+      "properties": {
+        "messageId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "threadId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fromReviewer": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "bodyFingerprint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bodyByteLength": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "attachmentIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rejectionIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "reasonEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reasonId",
+        "summaryFingerprint",
+        "relatedItemIds"
+      ],
+      "properties": {
+        "reasonId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "guidelineSection": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reasonCode": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summaryFingerprint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "relatedItemIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "attachmentEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attachmentId",
+        "sourceType",
+        "originalFileNameFingerprint",
+        "storedRelativePath",
+        "sha256",
+        "byteLength",
+        "downloadFailed",
+        "pathRejected"
+      ],
+      "properties": {
+        "attachmentId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "originalFileNameFingerprint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "storedRelativePath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "minLength": 1
+        },
+        "byteLength": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "downloadFailed": {
+          "type": "boolean"
+        },
+        "pathRejected": {
+          "type": "boolean"
+        }
+      }
+    },
+    "rejectionPacket": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "packetId",
+        "appId",
+        "submissionId",
+        "selection",
+        "selectionIsDurable",
+        "retrievedAt",
+        "cliVersion",
+        "packetFingerprint",
+        "incomplete",
+        "threads",
+        "messages",
+        "reasons",
+        "attachments"
+      ],
+      "properties": {
+        "packetId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "appId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "submissionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "selection": {
+          "enum": [
+            "explicit",
+            "latest-unresolved",
+            "latest",
+            "unknown"
+          ]
+        },
+        "selectionIsDurable": {
+          "type": "boolean"
+        },
+        "retrievedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "cliVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "packetFingerprint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "incomplete": {
+          "type": "boolean"
+        },
+        "incompleteReason": {
+          "enum": [
+            "web_session_missing",
+            "web_session_capability",
+            "packet_mismatch",
+            "download_failed",
+            "untrusted_path"
+          ]
+        },
+        "evidenceDirectory": {
+          "type": "string",
+          "minLength": 1
+        },
+        "threads": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "threadId",
+              "messageIds"
+            ],
+            "properties": {
+              "threadId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "messageIds": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/messageEvidence"
+          }
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/reasonEvidence"
+          }
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/attachmentEvidence"
+          }
+        }
+      }
+    },
+    "webhookOperationProbe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "available",
+        "shapeOk",
+        "evidence"
+      ],
+      "properties": {
+        "id": {
+          "enum": [
+            "asc.webhooks.list",
+            "asc.webhooks.view",
+            "asc.webhooks.ping",
+            "asc.webhooks.deliveries"
+          ]
+        },
+        "available": {
+          "type": "boolean"
+        },
+        "shapeOk": {
+          "type": "boolean"
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "webhookOperations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capabilities",
+        "failClosed"
+      ],
+      "properties": {
+        "capabilities": {
+          "type": "array",
+          "minItems": 4,
+          "items": {
+            "$ref": "#/$defs/webhookOperationProbe"
+          }
+        },
+        "failClosed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "webhookRegistration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resourceId",
+        "eventTypes",
+        "enabled",
+        "urlDigest",
+        "observedAt"
+      ],
+      "properties": {
+        "resourceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "eventTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "urlDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "webhookLastEnvelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "providerEventId",
+        "eventType",
+        "providerTimestamp",
+        "rawBodySha256",
+        "receivedAt",
+        "secretId"
+      ],
+      "properties": {
+        "providerEventId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "eventType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "providerTimestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "rawBodySha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "receivedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "secretId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "webhookIngress": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "health",
+        "operations",
+        "acceptedEventIds"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "poll_only",
+            "signed_receiver"
+          ]
+        },
+        "health": {
+          "enum": [
+            "poll_only",
+            "unregistered",
+            "healthy",
+            "silent",
+            "unknown_payload"
+          ]
+        },
+        "operations": {
+          "$ref": "#/$defs/webhookOperations"
+        },
+        "acceptedEventIds": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "registration": {
+          "$ref": "#/$defs/webhookRegistration"
+        },
+        "lastVerifiedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastEnvelope": {
+          "$ref": "#/$defs/webhookLastEnvelope"
+        }
+      }
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "caseId",
+        "mandateId",
+        "cycleNumber",
+        "status",
+        "blocker",
+        "appVersion",
+        "submissionItems",
+        "lastEventId",
+        "lastProviderTimestamp",
+        "authReadiness",
+        "classification"
+      ],
+      "properties": {
+        "caseId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mandateId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parentCaseId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cycleNumber": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "status": {
+          "enum": [
+            "observing",
+            "blocked",
+            "closed"
+          ]
+        },
+        "blocker": {
+          "$ref": "#/$defs/blocker"
+        },
+        "appVersion": {
+          "$ref": "#/$defs/layer"
+        },
+        "reviewSubmission": {
+          "$ref": "#/$defs/layer"
+        },
+        "submissionItems": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/layer"
+          }
+        },
+        "lastEventId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lastProviderTimestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "authReadiness": {
+          "$ref": "#/$defs/authReadiness"
+        },
+        "rejectionPacket": {
+          "$ref": "#/$defs/rejectionPacket"
+        },
+        "classification": {
+          "$ref": "#/$defs/classification"
+        },
+        "remediation": {
+          "$ref": "#/$defs/remediation"
+        },
+        "resubmission": {
+          "$ref": "#/$defs/resubmission"
+        }
+      }
+    },
+    "consumerPatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "relativePath",
+        "kind",
+        "contents"
+      ],
+      "properties": {
+        "relativePath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "create",
+            "replace"
+          ]
+        },
+        "contents": {
+          "type": "string"
+        }
+      }
+    },
+    "remediationPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "planId",
+        "route",
+        "disposition",
+        "newBinaryRequired",
+        "affectedPaths",
+        "patches",
+        "testsAndValidators",
+        "authorizationNeeded",
+        "rollback"
+      ],
+      "properties": {
+        "planId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "route": {
+          "enum": [
+            "none",
+            "same_build_metadata",
+            "new_binary",
+            "review_notes",
+            "review_access",
+            "parked"
+          ]
+        },
+        "disposition": {
+          "enum": [
+            "implement",
+            "park"
+          ]
+        },
+        "parkReason": {
+          "enum": [
+            "legal_policy",
+            "product_scope",
+            "privacy_promise",
+            "payments",
+            "unclear",
+            "protected_policy"
+          ]
+        },
+        "newBinaryRequired": {
+          "type": "boolean"
+        },
+        "citedGuideline": {
+          "type": "string",
+          "minLength": 1
+        },
+        "affectedPaths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "patches": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/consumerPatch"
+          }
+        },
+        "testsAndValidators": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "authorizationNeeded": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "rollback": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "remediationOccurrence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "workflowId",
+        "occurrenceId",
+        "attemptNumber",
+        "attemptIds",
+        "status"
+      ],
+      "properties": {
+        "workflowId": {
+          "const": "workflow.store.app-review-remediate"
+        },
+        "occurrenceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "attemptNumber": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "attemptIds": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "status": {
+          "enum": [
+            "authorized",
+            "running",
+            "proved",
+            "exhausted",
+            "refused"
+          ]
+        }
+      }
+    },
+    "consumerImplementation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceRevision",
+        "appliedPaths",
+        "appliedAt",
+        "producerSessionId"
+      ],
+      "properties": {
+        "sourceRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "appliedPaths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "appliedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "producerSessionId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "archiveInspection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "archiveRelativePath",
+        "bundleId",
+        "marketingVersion",
+        "buildNumber",
+        "infoPlistSha256",
+        "inspectedAt"
+      ],
+      "properties": {
+        "archiveRelativePath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bundleId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "marketingVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "buildNumber": {
+          "type": "string",
+          "minLength": 1
+        },
+        "infoPlistSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "inspectedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "metadataPreflight": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "validatePassed",
+        "dryRunPassed",
+        "evidenceFingerprint"
+      ],
+      "properties": {
+        "validatePassed": {
+          "type": "boolean"
+        },
+        "dryRunPassed": {
+          "type": "boolean"
+        },
+        "evidenceFingerprint": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "verificationRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "producerSessionId",
+        "verifierSessionId",
+        "accepted",
+        "recordedAt"
+      ],
+      "properties": {
+        "producerSessionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "verifierSessionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "accepted": {
+          "type": "boolean"
+        },
+        "recordedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "remediation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "plan",
+        "occurrence"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "not_started",
+            "planned",
+            "applied",
+            "verified",
+            "parked",
+            "verification_rejected"
+          ]
+        },
+        "plan": {
+          "$ref": "#/$defs/remediationPlan"
+        },
+        "occurrence": {
+          "$ref": "#/$defs/remediationOccurrence"
+        },
+        "consumer": {
+          "$ref": "#/$defs/consumerImplementation"
+        },
+        "archive": {
+          "$ref": "#/$defs/archiveInspection"
+        },
+        "metadataPreflight": {
+          "$ref": "#/$defs/metadataPreflight"
+        },
+        "verification": {
+          "$ref": "#/$defs/verificationRecord"
+        }
+      }
+    },
+    "resubmitEnvelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "appId",
+        "appStoreVersionId",
+        "marketingVersion",
+        "maxCycles",
+        "alreadyUploaded",
+        "confirm",
+        "authorizedAt",
+        "authorizedBy"
+      ],
+      "properties": {
+        "appId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "appStoreVersionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "marketingVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "maxCycles": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "alreadyUploaded": {
+          "type": "boolean"
+        },
+        "confirm": {
+          "const": true
+        },
+        "authorizedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "authorizedBy": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "resubmitOccurrence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "workflowId",
+        "occurrenceId",
+        "cycleNumber",
+        "status"
+      ],
+      "properties": {
+        "workflowId": {
+          "const": "workflow.store.app-review-resubmit"
+        },
+        "occurrenceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cycleNumber": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "status": {
+          "enum": [
+            "authorized",
+            "running",
+            "proved",
+            "exhausted",
+            "refused"
+          ]
+        }
+      }
+    },
+    "resubmission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "envelope",
+        "envelopeFingerprint",
+        "occurrence"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "not_started",
+            "authorized",
+            "awaiting_readback",
+            "submitted",
+            "timed_out",
+            "accepted",
+            "rejected_again",
+            "exhausted",
+            "refused"
+          ]
+        },
+        "envelope": {
+          "$ref": "#/$defs/resubmitEnvelope"
+        },
+        "envelopeFingerprint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "occurrence": {
+          "$ref": "#/$defs/resubmitOccurrence"
+        },
+        "command": {
+          "type": "string",
+          "minLength": 1
+        },
+        "submittedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "timeoutAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "readbackAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

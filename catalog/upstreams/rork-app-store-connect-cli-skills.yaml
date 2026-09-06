@@ -1,0 +1,100 @@
+schema_version: 1
+id: rork-app-store-connect-cli-skills
+project: App Store Connect CLI skills (asc skill pack)
+canonical_url: https://github.com/rorkai/app-store-connect-cli-skills
+aliases:
+  - asc-skills
+  - rorkai/app-store-connect-cli-skills
+transfers: []
+authors:
+  - name: Rudrank Riyam
+    role: original author and copyright holder (LICENSE, 2026)
+maintainers:
+  - name: Rork (github.com/rorkai)
+    role: maintaining organization; community-maintained, unofficial, not affiliated with Apple
+copyright: Copyright (c) 2026 Rudrank Riyam
+license:
+  spdx: MIT
+  status: verified
+  evidence_url: https://github.com/rorkai/app-store-connect-cli-skills/blob/main/LICENSE
+  evidence_sha256: 56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b
+  reviewed_revision: main@f52c4f04323bb2dfb21ca8be82e6494e9cd0b4d8 (2026-09-05)
+  notice_file: catalog/upstreams/notices/rork-app-store-connect-cli-skills.txt
+  scope: Root LICENSE of the skills repository. The builder copies no SKILL.md text; it routes selected skill names as subordinate guidance.
+source_ids:
+  - github-com-rorkai-app-store-connect-cli-skills
+relationships:
+  - kind: selected-skill-guidance
+    consumption: Selected skill names (asc-cli-usage, asc-metadata-sync, asc-shots-pipeline, asc-screenshot-resize, asc-release-flow, asc-submission-health, asc-revenuecat-catalog-sync, asc-analytics-reports, asc-ad-hoc-distribution, and the rest of the routed list) are loaded as subordinate reference material when a store workflow selects them. Installation happens only with founder approval through `asc install-skills` (pinned by the CLI to a reviewed commit) or `npx skills add`. No SKILL.md is auto-installed as a top-level builder skill.
+    local_owners:
+      - knowledge/store/app-store-connect-cli.md
+      - catalog/knowledge/store/store-app-store-connect-cli.yaml
+    tests:
+      - checks/validation/business/store/check-asc-command-contract.ts
+    upstream_paths:
+      - README.md
+      - "*/SKILL.md"
+    pin_authority: "`asc install-skills` lock (reviewed commit e30039abddbe388179324d0f9cdccb66c3843115 per the CLI README on 2026-09-05); `npx skills add` carries no pin"
+baselines:
+  reviewed_guidance:
+    revision: unrecorded
+    observed_at: "2026-08-18"
+    by: b2c-maintainers
+    note: The routed skill list was reviewed on 2026-08-18 without recording the repository commit. The commit is unknown; it is not inferred from the current main head.
+support:
+  policy: Skill guidance is advice. It never marks a lane done, never overrides the builder's own reference on conflict, and loads only for the store workflows that name it. Guidance changes upstream are reviewed by mapped semantic comparison, not text merge.
+  versions:
+    - range: main (unpinned by the builder)
+      status: untested
+      evidence:
+        - The builder records no commit for its reviewed routing; the CLI's own install lock pins the pack it installs.
+  operations:
+    - id: asc-cli-usage
+      title: canonical commands, flags, output, pagination, auth
+      keywords: [asc-cli-usage, cli usage]
+    - id: asc-metadata-sync
+      title: metadata/localization pull, validate, dry-run, apply
+      keywords: [asc-metadata-sync, metadata]
+    - id: asc-screenshot-resize
+      title: current screenshot size matrix, alpha stripping, resize, validation
+      keywords: [asc-screenshot-resize, screenshot]
+    - id: asc-shots-pipeline
+      title: simulator screenshot capture, framing, staged upload (koubou pinned upstream)
+      keywords: [asc-shots-pipeline, shots, koubou]
+    - id: asc-release-flow
+      title: readiness, staging, validation, submission blockers
+      keywords: [asc-release-flow, release]
+    - id: asc-submission-health
+      title: preflight, digital-goods readiness, review monitoring
+      keywords: [asc-submission-health, submission]
+    - id: asc-revenuecat-catalog-sync
+      title: reconcile ASC products with RevenueCat
+      keywords: [asc-revenuecat-catalog-sync, revenuecat]
+    - id: asc-analytics-reports
+      title: private analytics report discovery, download, integrity verification
+      keywords: [asc-analytics-reports, analytics]
+    - id: asc-ad-hoc-distribution
+      title: experimental private iOS distribution with plan-hash approval
+      keywords: [asc-ad-hoc-distribution, ad-hoc]
+  unsupported_operations:
+    - id: asc-wall-submit
+      reason: Public submission to the Wall of Apps is a founder-approved public action; the builder never automates it.
+  platforms: []
+adaptations:
+  - id: routed-by-name-only
+    description: The builder names skills to load; it does not copy their instructions into the knowledge corpus.
+    owner: knowledge/store/app-store-connect-cli.md
+    intentional: true
+  - id: builder-reference-wins
+    description: Where a skill's guidance conflicts with knowledge/store/app-store-connect-cli.md, the builder reference wins.
+    owner: knowledge/engineering/external-skill-packs.md
+    intentional: true
+review:
+  owner: b2c-maintainers
+  cadence_days: 7
+  last_review: "2026-09-05"
+  status: current
+credits:
+  acknowledge: true
+  use: adapted
+  summary: Community skill pack for the asc CLI. The builder routes selected skills by name as subordinate guidance and installs the pack only with founder approval.

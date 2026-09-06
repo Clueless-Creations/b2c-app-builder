@@ -1,0 +1,23 @@
+schema_version: 1.0.0
+id: reference.process.tool-recipes.funnel-domain-and-privacy
+title: Funnel Domain And Privacy
+domain_id: domain.process
+document_path: knowledge/process/tool-recipes/funnel-domain-and-privacy.md
+load_when: privacy/terms research minimums, domain/email routing setup, or landing-funnel verification — routed from
+  tool-recipes.md; complements the trust and growth rows
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.growth.pre-launch-funnel-landing-waitlist
+    - workflow.growth.landing-funnel-publication-and-live-proof
+  context_pack_ids: []
+sources:
+  - id: github-com-vercel-satori
+    name: github.com
+    source_type: github
+    url: https://github.com/vercel/satori
+    review_cadence_days: 30
+    claim_scope: Build-time OG image generation from live content, grounding the OG-image staleness and
+      stray-static-file-shadowing checks added to Landing Funnel Verification.
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers

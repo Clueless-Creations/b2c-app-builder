@@ -1,0 +1,30 @@
+schema_version: 1
+id: apple-asc
+version: "1.0.0"
+kind: store_cli
+title: Apple App Store Connect CLI
+capability_receipt: app_review_asc
+source_ids:
+  - developer-apple-com-help-app-store-connect-manage-builds-upload-builds
+features:
+  - id: asc.version
+    required: true
+    notes: Observed asc CLI version from Slice 0 capability receipt.
+  - id: asc.capabilities
+    required: true
+    notes: asc capabilities listing from Slice 0 capability receipt.
+  - id: asc.review.status
+    required: true
+    notes: Observe-only review status command from Slice 0.
+  - id: asc.metadata.validate
+    required: true
+    notes: Metadata validate command from Slice 0 capability receipt.
+  - id: asc.metadata.push.dry_run
+    required: true
+    notes: Metadata push dry-run command from Slice 0 capability receipt.
+  - id: asc.web.agreements.status
+    required: true
+    notes: Observe-only agreements status from Slice 0. Accept remains forbidden.
+deprecations: []
+machine_readable_feeds: []
+review_cadence_days: 7

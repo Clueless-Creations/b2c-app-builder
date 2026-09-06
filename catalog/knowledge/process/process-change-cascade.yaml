@@ -1,0 +1,17 @@
+schema_version: 1.0.0
+id: reference.process.change-cascade
+title: Change Cascade
+domain_id: domain.process
+document_path: knowledge/process/change-cascade.md
+load_when: after any change to a launched or near-launch app's features, copy, brand vocabulary, pricing, products,
+  design, or data behavior
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.process.change-cascade
+    - workflow.operations.post-launch-operations
+    - workflow.engineering.source-change-manifest
+  context_pack_ids:
+    - context.process
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

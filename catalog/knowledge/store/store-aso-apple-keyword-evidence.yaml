@@ -1,0 +1,44 @@
+schema_version: 1.0.0
+id: reference.store.aso-apple-keyword-evidence
+title: ASO Apple Keyword Evidence
+domain_id: domain.store
+document_path: knowledge/store/aso-apple-keyword-evidence.md
+load_when: before initial listing keywords and weekly post-launch ASO; when STORE_OPS.md needs official
+  Apple rank, discover, and score evidence
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.store.aso-and-store-ops
+    - workflow.store.asc-cli-automation
+    - workflow.operations.post-launch-operations
+  context_pack_ids:
+    - context.store
+applicability_notes: Prefer unauthenticated rank. Keep unavailable as unavailable. Do not auto-apply
+  metadata.
+sources:
+  - id: github-com-rorkai-app-store-connect-cli-releases-4-9-0-optimize
+    name: github.com
+    source_type: official_docs
+    url: https://github.com/rorkai/App-Store-Connect-CLI/releases/tag/4.9.0
+    review_cadence_days: 7
+    claim_scope: Rork asc 4.9.0 adds optimize keywords rank, discover, and score from official Apple
+      data.
+    last_review_date: 2026-08-24
+    reviewer: b2c-maintainers
+  - id: github-com-rorkai-app-store-connect-cli-optimize-loop
+    name: github.com
+    source_type: github
+    url: https://github.com/rorkai/App-Store-Connect-CLI
+    review_cadence_days: 7
+    claim_scope: Rork asc CLI repository for App Store Connect automation and optimize keyword
+      commands.
+    last_review_date: 2026-08-24
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-reference-platform-version-information
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/reference/app-information/platform-version-information
+    review_cadence_days: 7
+    claim_scope: Apple platform metadata and keyword field constraints for App Store listings.
+    last_review_date: 2026-08-24
+    reviewer: b2c-maintainers

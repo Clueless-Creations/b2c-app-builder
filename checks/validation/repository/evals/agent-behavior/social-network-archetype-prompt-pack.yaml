@@ -1,0 +1,21 @@
+id: social-network-archetype-prompt-pack
+title: Social-platform request detects the archetype and routes the prompt pack
+prompt: "I want to build a social network for indie game developers — people post updates, follow each other, and have a feed."
+expected_route: "Detect the social/community app archetype, load social-network.md, confirm content format / primary surface / optional systems / niche via AskUserQuestion, record the archetype as a product decision in product.yaml, then route the bundled boilerplate prompt pack (schema first, then auth, feed, profiles) instead of improvising the schema and feed."
+must_use:
+  - "social-network.md"
+  - "surfaces/starters/social-network"
+  - "AskUserQuestion"
+  - "product.yaml"
+must_catch:
+  - "the request is a social/community platform archetype with a known build sequence"
+  - "content format (text/image/video-first) and primary surface (web vs native) change the schema, feed, design, and store path"
+  - "the prompt pack feeds the research, 11-star, design, security, revenue, and growth lanes — it does not bypass them"
+  - "database schema is built first; Row Level Security is part of the security lane"
+should_say:
+  - "confirm the archetype and variant with the founder before writing schema"
+  - "build one core system at a time, test it, then move on"
+  - "use the bundled boilerplate prompts in dependency order"
+forbidden:
+  - "improvise a brand-new schema while ignoring the social-network prompt pack"
+  - "skip the AskUserQuestion archetype confirmation"

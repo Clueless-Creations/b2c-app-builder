@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>App Store Listing Packet</title>
+  <style>
+    :root {
+      --bg: #f6f2ea;
+      --panel: #fffdf8;
+      --ink: #151515;
+      --muted: #665f56;
+      --line: #d8d0c4;
+      --ready: #0c7c59;
+      --blocked: #b3261e;
+      --review: #946200;
+      --accent: #2447d8;
+      --radius: 8px;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 ui-sans-serif, system-ui, sans-serif; }
+    header { padding: 24px; border-bottom: 1px solid var(--line); background: linear-gradient(110deg, #fffdf8, #eaf0ff); }
+    h1 { margin: 0 0 8px; font-size: clamp(28px, 5vw, 52px); line-height: 1; letter-spacing: 0; }
+    h2 { margin: 0 0 12px; font-size: 18px; }
+    h3 { margin: 0 0 6px; font-size: 14px; }
+    main { padding: 20px; display: grid; gap: 16px; }
+    section { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; overflow: auto; }
+    .meta, .tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+    .pill, button { border: 1px solid var(--line); border-radius: 999px; padding: 7px 10px; background: #fff; color: var(--ink); }
+    button { cursor: pointer; font: inherit; }
+    button.active { border-color: var(--accent); color: var(--accent); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+    .card { border: 1px solid var(--line); border-radius: var(--radius); background: #fff; padding: 14px; }
+    table { border-collapse: collapse; width: 100%; min-width: 900px; }
+    th, td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: top; text-align: left; }
+    th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+    .copy { display: flex; gap: 8px; align-items: start; justify-content: space-between; }
+    code { white-space: pre-wrap; overflow-wrap: anywhere; }
+    .status { font-weight: 700; }
+    .ready { color: var(--ready); }
+    .blocked { color: var(--blocked); }
+    .review { color: var(--review); }
+    .hidden { display: none; }
+    @media (max-width: 760px) { header, main { padding: 14px; } table { min-width: 760px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>App Store Listing Packet</h1>
+    <div class="meta">
+      <span class="pill">Docs: pending refresh</span>
+      <span class="pill">Bundle: {{IOS_BUNDLE_ID}}</span>
+      <span class="pill">Locale: en-US</span>
+      <span class="pill">Founder gates visible</span>
+    </div>
+  </header>
+  <main>
+    <nav class="tabs" aria-label="Packet sections">
+      <button class="active" data-tab="listing">Listing</button>
+      <button data-tab="asc">ASC CLI</button>
+      <button data-tab="privacy">Privacy</button>
+      <button data-tab="pricing">Pricing</button>
+      <button data-tab="growth">Growth Surfaces</button>
+      <button data-tab="assets">Screenshots</button>
+    </nav>
+
+    <section id="listing">
+      <h2>Default Product Page</h2>
+      <table>
+        <thead><tr><th>Click Path</th><th>Field</th><th>Limit</th><th>Paste Value</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Apps &gt; App Information</td><td>Name</td><td>30 chars</td><td class="copy"><code>Pending</code><button>Copy</button></td><td class="status blocked">blocked</td></tr>
+          <tr><td>Apps &gt; App Information</td><td>Subtitle</td><td>30 chars</td><td class="copy"><code>Pending</code><button>Copy</button></td><td class="status blocked">blocked</td></tr>
+          <tr><td>iOS App &lt;Version&gt;</td><td>Promotional Text</td><td>170 chars</td><td class="copy"><code>Pending</code><button>Copy</button></td><td class="status blocked">blocked</td></tr>
+          <tr><td>iOS App &lt;Version&gt;</td><td>Description</td><td>4000 chars</td><td class="copy"><code>Pending</code><button>Copy</button></td><td class="status blocked">blocked</td></tr>
+          <tr><td>iOS App &lt;Version&gt;</td><td>Keywords</td><td>100 bytes</td><td class="copy"><code>Pending</code><button>Copy</button></td><td class="status blocked">blocked</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="asc" class="hidden">
+      <h2>ASC CLI Route</h2>
+      <table>
+        <thead><tr><th>Surface</th><th>Route</th><th>Proof</th><th>Gate</th></tr></thead>
+        <tbody>
+          <tr><td>App creation</td><td><code>app-store-connect-cli.md</code> + <code>asc-app-create-ui</code> when needed</td><td>auth, account role, agreements, bundle ID, SKU, app name preflight</td><td>approval before create</td></tr>
+          <tr><td>ID resolution</td><td><code>asc-id-resolver</code></td><td>app ID, version ID, app-info ID, version localization ID</td><td>read-only</td></tr>
+          <tr><td>Metadata</td><td><code>asc-metadata-sync</code></td><td><code>metadata validate + push --dry-run</code></td><td>approval before push</td></tr>
+          <tr><td>Localization</td><td><code>asc-localize-metadata</code></td><td>field limits and locale keyword review</td><td>approval before upload</td></tr>
+          <tr><td>Screenshots</td><td><code>asc-screenshot-resize</code> + <code>asc-shots-pipeline</code></td><td>size, alpha, device type, version localization ID</td><td>approval before upload</td></tr>
+          <tr><td>Pricing</td><td><code>asc-ppp-pricing</code></td><td>base territory, summary, import dry-run</td><td>approval before price changes</td></tr>
+          <tr><td>Subscriptions</td><td><code>asc-subscription-localization</code> + <code>asc-revenuecat-catalog-sync</code></td><td>display names, product IDs, entitlement map</td><td>approval before create/update</td></tr>
+          <tr><td>TestFlight</td><td><code>asc-testflight-orchestration</code></td><td>groups, testers, build state, external beta review blockers</td><td>approval before external distribution</td></tr>
+          <tr><td>Review status</td><td><code>asc-submission-health</code> + <code>asc-release-flow</code></td><td><code>asc validate</code>, digital goods, App Privacy advisory, review status</td><td>approval before submit/release</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="privacy" class="hidden">
+      <h2>App Privacy</h2>
+      <div class="grid">
+        <article class="card"><h3>Worksheet</h3><p>Use <code>app-privacy-questionnaire.html</code> to review Apple data types, linked/tracking answers, vendors, purposes, and proof.</p></article>
+        <article class="card"><h3>Policy Rule</h3><p>Answers come from data inventory and third-party SDK behavior, not generic policy copy.</p></article>
+        <article class="card"><h3>Publish Gate</h3><p>Founder approves before App Privacy responses are published in App Store Connect.</p></article>
+      </div>
+    </section>
+
+    <section id="pricing" class="hidden">
+      <h2>Pricing And Products</h2>
+      <table>
+        <thead><tr><th>Product</th><th>ASC Product ID</th><th>Price</th><th>RevenueCat</th><th>Web Funnel</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Monthly</td><td>Pending</td><td>Pending</td><td><code>premium / default / monthly</code></td><td>Pending</td><td class="status blocked">blocked</td></tr>
+          <tr><td>Annual</td><td>Pending</td><td>Pending</td><td><code>premium / default / annual</code></td><td>Pending</td><td class="status blocked">blocked</td></tr>
+          <tr><td>Lifetime</td><td>Pending</td><td>Pending</td><td><code>premium / default / lifetime</code></td><td>Optional</td><td class="status review">optional</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="growth" class="hidden">
+      <h2>Growth Surfaces</h2>
+      <div class="grid">
+        <article class="card"><h3>Custom Product Pages</h3><p>Map every page to audience, channel, keyword set, screenshots, deep link, campaign, measurement, and founder approval.</p></article>
+        <article class="card"><h3>In-App Events</h3><p>Use only for real in-app content with schedule, badge, media, deep link, localization, and review readiness.</p></article>
+        <article class="card"><h3>Localization</h3><p>Localize metadata and screenshots together. Add cultural proof before upload.</p></article>
+      </div>
+    </section>
+
+    <section id="assets" class="hidden">
+      <h2>Screenshots And Marketing Assets</h2>
+      <div class="grid">
+        <article class="card"><h3>Proof Layer</h3><p>Raw captures come from real app UI via MobAI, native iOS tooling, or approved fallback, then feed composed final store artwork.</p></article>
+        <article class="card"><h3>Composition</h3><p><code>SCREENSHOTS.md</code> tracks iPhone, iPad, and Play wells with headline, copy overlay, frame route, source UI, and final upload path.</p></article>
+        <article class="card"><h3>Icon &amp; Preview</h3><p>App Icon and App Preview routes stay tied to <code>DESIGN.md</code>, real footage, thumbnail QA, and founder approval before upload.</p></article>
+        <article class="card"><h3>Upload Gate</h3><p>Final files must list dimensions, device well, locale, alpha/color-space validation, status, and visual QA proof.</p></article>
+      </div>
+    </section>
+  </main>
+  <script>
+    const buttons = [...document.querySelectorAll("button[data-tab]")];
+    const sections = [...document.querySelectorAll("main > section")];
+    buttons.forEach((button) => button.addEventListener("click", () => {
+      buttons.forEach((item) => item.classList.toggle("active", item === button));
+      sections.forEach((section) => section.classList.toggle("hidden", section.id !== button.dataset.tab));
+    }));
+    document.querySelectorAll(".copy button").forEach((button) => button.addEventListener("click", async () => {
+      const text = button.parentElement.querySelector("code").textContent;
+      await navigator.clipboard.writeText(text);
+      button.textContent = "Copied";
+      setTimeout(() => { button.textContent = "Copy"; }, 900);
+    }));
+  </script>
+</body>
+</html>

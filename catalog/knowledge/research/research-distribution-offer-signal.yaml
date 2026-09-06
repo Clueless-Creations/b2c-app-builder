@@ -1,0 +1,31 @@
+schema_version: 1.0.0
+id: reference.research.distribution-offer-signal
+title: Distribution, Offer, And Signal Validation
+domain_id: domain.research
+document_path: knowledge/research/distribution-offer-signal.md
+load_when: before a Go, Pivot, or Kill decision; when founder posts, transcripts, reviews, interviews, support records,
+  or prior launch material can inform the business; before automating a value-producing business loop
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.research.research-backed-spec
+    - workflow.growth.launch-narrative-and-cadence
+    - workflow.growth.ugc-creator-engine
+    - workflow.operations.post-launch-operations
+    - workflow.engineering.app-quality-and-vitals
+    - workflow.research.spec-red-team-audit
+  context_pack_ids:
+    - context.research
+applicability_notes: Apply the pre-build distribution and offer rules to every business. Require a signal-corpus artifact;
+  when no reusable founder or market source material exists, record an explicit not-applicable status with an authored reason instead of fabricating rows. Apply content, automation, and beta sections only when their activities exist.
+sources:
+  - id: eptwts-signal-knowledgebase
+    name: EP's Signal Knowledgebase
+    source_type: founder_corpus_case_study
+    url: https://www.eptwts.com/
+    review_cadence_days: 30
+    claim_scope: Primary example of corpus compression, dated inline claims, question-led publishing, portable Markdown,
+      distribution hypotheses, owned-channel guidance, and manual-before-automation guidance. Treat business claims as
+      personal hypotheses, not verified facts. Do not transfer deceptive, unsafe, or platform-circumvention tactics.
+    last_review_date: 2026-08-20
+    reviewer: b2c-maintainers

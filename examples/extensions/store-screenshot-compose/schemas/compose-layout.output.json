@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "compose-layout output",
+  "type": "object",
+  "properties": {
+    "ok": { "const": true },
+    "mode": { "const": "compose" },
+    "notCaptureEvidence": { "const": true },
+    "outDir": { "type": "string", "minLength": 1 },
+    "provenance": { "const": "provenance.json" },
+    "locale": { "type": "string", "pattern": "^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$" },
+    "outputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "width": { "type": "integer", "minimum": 1 },
+          "height": { "type": "integer", "minimum": 1 },
+          "well": { "type": "string", "minLength": 1 },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+        },
+        "required": ["path", "width", "height", "well", "sha256"],
+        "additionalProperties": false
+      }
+    },
+    "warnings": { "type": "array", "items": { "type": "string" } }
+  },
+  "required": ["ok", "mode", "notCaptureEvidence", "outDir", "provenance", "locale", "outputs", "warnings"],
+  "additionalProperties": false
+}

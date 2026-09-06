@@ -1,0 +1,11 @@
+id: agent-behavior-evals-missing
+title: Agent routing behavior has no eval definitions
+prompt: "Trust LaunchBench only for stale-skill, CE, onboarding, Design Room, and provider-proof behavior."
+expected_guardrail: "The skill must include agent behavior eval definitions for routing choices that deterministic validators cannot simulate alone."
+validators:
+  - run-agent-evals
+must_catch:
+  - "behavior eval definitions are missing"
+  - "routing cannot be prose-only"
+should_say:
+  - "add evals/agent-behavior cases"

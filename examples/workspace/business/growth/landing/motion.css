@@ -1,0 +1,405 @@
+/*
+ * Landing motion utilities — js-gated, token-driven, reduced-motion-safe.
+ *
+ * Load AFTER design-system/tokens.css (the promoted brand tokens). Every
+ * duration/easing here reads a --motion-* token; rebrand by re-promoting
+ * tokens, never by editing this file.
+ *
+ * The progressive-enhancement contract:
+ *   1. Reveal states only apply under html.js — with JavaScript off, nothing
+ *      is hidden and the page reads as a plain document.
+ *   2. prefers-reduced-motion collapses every animation to its final, calm
+ *      state: durations zero out and transforms are removed.
+ */
+
+/* ── Reveal (in-view entrance) ─────────────────────────────────────────── */
+
+.js .lm-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity var(--motion-duration-reveal) var(--motion-easing-emphasis),
+    transform var(--motion-duration-reveal) var(--motion-easing-emphasis);
+  transition-delay: calc(var(--lm-stagger-index, 0) * var(--motion-stagger));
+}
+
+.js .lm-reveal.lm-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Word-by-word hero stagger: spans are created only after html.js is set, so
+ * crawlers and no-JS readers always see the intact headline text. */
+.js .lm-word {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.6em);
+  animation: lm-word-in var(--motion-duration-reveal) var(--motion-easing-emphasis) forwards;
+  animation-delay: calc(var(--lm-stagger-index, 0) * var(--motion-stagger));
+}
+
+@keyframes lm-word-in {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── Marquee (seamless loop, pause on hover) ───────────────────────────── */
+
+.lm-marquee {
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+}
+
+.lm-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: lm-marquee var(--motion-duration-cinematic) linear infinite;
+  /* The track duplicates its content once; 50% translate = one seamless loop.
+   * Slow the loop per-launch with --lm-marquee-multiplier, not raw ms. */
+  animation-duration: calc(var(--motion-duration-cinematic) * var(--lm-marquee-multiplier, 16));
+}
+
+.lm-marquee:hover .lm-marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes lm-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ── Gradient morph (CTA / hero mesh) ──────────────────────────────────── */
+
+.lm-gradient-morph {
+  animation: lm-hue var(--motion-duration-cinematic) var(--motion-easing) infinite alternate;
+}
+
+@keyframes lm-hue {
+  to {
+    filter: hue-rotate(18deg);
+  }
+}
+
+/* ── Geometry-driven scrollytelling ───────────────────────────────────── */
+
+.lm-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.lm-scrolly {
+  --lm-scrolly-rule: color-mix(in srgb, currentColor 22%, transparent);
+  --lm-scrolly-paper: var(--color-surface, Canvas);
+  --lm-scrolly-accent: var(--color-accent, currentColor);
+  --lm-scrolly-heading-columns: minmax(0, 1fr) minmax(16rem, 0.8fr);
+  --lm-scrolly-layout-columns: minmax(0, 1fr) minmax(18rem, 0.8fr);
+  --lm-scrolly-layout-gap: clamp(2rem, 6vw, 6.5rem);
+  --lm-scrolly-stage-height: min(68svh, 44rem);
+  --lm-scrolly-step-columns: 2.75rem minmax(0, 1fr);
+  --lm-scrolly-step-title-size: clamp(1.8rem, 3.6vw, 3.6rem);
+  --lm-scrolly-short-columns: minmax(0, 1fr) minmax(8rem, 0.36fr);
+  position: relative;
+  padding-block: clamp(4.5rem, 9vw, 9rem);
+  border-block-start: 1px solid var(--lm-scrolly-rule);
+  isolation: isolate;
+}
+
+.lm-scrolly-heading {
+  display: grid;
+  grid-template-columns: var(--lm-scrolly-heading-columns);
+  gap: clamp(1.25rem, 4vw, 4rem);
+  align-items: end;
+  margin-block-end: clamp(2.5rem, 6vw, 5.5rem);
+}
+
+.lm-scrolly-heading > * {
+  margin: 0;
+}
+
+.lm-scrolly-heading > p {
+  max-width: 44ch;
+  justify-self: end;
+  text-wrap: pretty;
+}
+
+.lm-scrolly-layout {
+  display: grid;
+  grid-template-columns: var(--lm-scrolly-layout-columns);
+  gap: var(--lm-scrolly-layout-gap);
+  align-items: start;
+}
+
+.lm-scrolly-pin {
+  position: sticky;
+  /* Hosts with a sticky header must set --lm-scrolly-sticky-top to the
+   * measured header offset plus any safe-area inset. */
+  top: var(--lm-scrolly-sticky-top, clamp(1rem, 7svh, 5rem));
+  min-width: 0;
+  margin: 0;
+}
+
+.lm-scrolly-stage {
+  position: relative;
+  min-height: 30rem;
+  height: var(--lm-scrolly-stage-height);
+  overflow: hidden;
+  border: 1px solid var(--lm-scrolly-rule);
+  background: var(--lm-scrolly-paper);
+  contain: layout paint style;
+}
+
+.lm-scrolly-stage::after {
+  position: absolute;
+  z-index: 2;
+  content: "";
+  pointer-events: none;
+}
+
+.lm-scrolly-stage::after {
+  inset-inline: 5%;
+  inset-block-end: 4%;
+  height: 2px;
+  background: var(--lm-scrolly-accent);
+  transform: scaleX(max(0.025, var(--scene-p, 1)));
+  transform-origin: left center;
+}
+
+.lm-scrolly:dir(rtl) .lm-scrolly-stage::after {
+  transform-origin: right center;
+}
+
+.lm-scrolly-visual {
+  position: absolute;
+  inset: 0;
+  min-width: 0;
+  opacity: var(--lm-visual-p, 0);
+  pointer-events: none;
+  will-change: auto;
+}
+
+/* SSR/no-JS hosts publish one complete active visual. The controller switches
+ * data-scene-motion to scroll before --lm-visual-p owns interpolation. */
+.lm-scrolly[data-scene-motion="static"] .lm-scrolly-visual[data-scene-visual-active="true"]:not([data-scene-visual-omitted="true"]) {
+  opacity: 1;
+}
+
+.lm-scrolly[data-scene-lifecycle="active"] .lm-scrolly-visual {
+  will-change: opacity;
+}
+
+.lm-scrolly[data-scene-lifecycle="suspended"] .lm-scrolly-visual,
+.lm-scrolly[data-scene-lifecycle="suspended"] .lm-scrolly-visual * {
+  animation-play-state: paused !important;
+}
+
+.lm-scrolly-visual > * {
+  width: 100%;
+  height: 100%;
+}
+
+.lm-scrolly-pin figcaption {
+  max-width: 58ch;
+  margin-block-start: 0.85rem;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  opacity: 0.72;
+}
+
+.lm-scrolly-steps {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lm-scrolly-steps > li {
+  display: grid;
+  grid-template-columns: var(--lm-scrolly-step-columns);
+  gap: 1rem;
+  min-height: max(72svh, 36rem);
+  padding-block: clamp(4rem, 10svh, 7rem);
+  align-content: center;
+  border-block-start: 1px solid var(--lm-scrolly-rule);
+}
+
+.lm-scrolly-steps > li:last-child {
+  border-block-end: 1px solid var(--lm-scrolly-rule);
+}
+
+.lm-scrolly-step-marker {
+  display: grid;
+  grid-template-rows: auto minmax(3rem, 1fr);
+  justify-items: center;
+  gap: 0.75rem;
+  align-self: stretch;
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.12em;
+}
+
+.lm-scrolly-step-marker i {
+  display: block;
+  width: 1px;
+  height: 100%;
+  min-height: 3rem;
+  background: var(--lm-scrolly-rule);
+  transform: scaleY(0.18);
+  transform-origin: top;
+}
+
+.lm-scrolly-steps > li[aria-current="step"] .lm-scrolly-step-marker {
+  color: var(--lm-scrolly-accent);
+}
+
+.lm-scrolly-steps > li[aria-current="step"] .lm-scrolly-step-marker i {
+  background: var(--lm-scrolly-accent);
+  transform: scaleY(max(0.18, var(--beat-t, 1)));
+}
+
+.lm-scrolly-step-label {
+  margin: 0 0 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.lm-scrolly-steps h3 {
+  max-width: 15ch;
+  margin: 0;
+  font-size: var(--lm-scrolly-step-title-size);
+  line-height: 0.98;
+  text-wrap: balance;
+}
+
+.lm-scrolly-steps h3 + p {
+  max-width: 38ch;
+  margin-block: 1rem 0;
+  line-height: 1.65;
+  text-wrap: pretty;
+}
+
+/* Save-Data is an asset policy, not a motion preference. Authors mark only a
+ * heavy image/video layer; its adjacent HTML/SVG/poster fallback keeps moving. */
+.lm-scrolly[data-scene-save-data="true"] [data-scene-heavy-media] {
+  display: none !important;
+}
+
+@media (max-width: 799px) {
+  .lm-scrolly {
+    --lm-scrolly-stage-height: clamp(13rem, 43svh, 23rem);
+    --lm-scrolly-step-columns: 2.25rem minmax(0, 1fr);
+    --lm-scrolly-step-title-size: clamp(1.75rem, 9vw, 3.2rem);
+    padding-block: clamp(3.5rem, 15vw, 6rem);
+  }
+
+  .lm-scrolly-heading {
+    display: block;
+    margin-block-end: 2rem;
+  }
+
+  .lm-scrolly-heading > p {
+    margin-block-start: 1rem;
+  }
+
+  .lm-scrolly-layout {
+    display: block;
+  }
+
+  /* Mobile is recomposed as a compact pinned evidence plate above the prose,
+   * not a scaled two-column desktop scene. The lower guide lets the reader see
+   * the next beat before the plate changes. */
+  .lm-scrolly-pin {
+    z-index: 3;
+    top: var(--lm-scrolly-sticky-top, max(0.5rem, env(safe-area-inset-top)));
+    padding: 0.5rem;
+    border-block-end: 1px solid var(--lm-scrolly-rule);
+    background: var(--lm-scrolly-paper);
+  }
+
+  .lm-scrolly-stage {
+    min-height: 0;
+  }
+
+  .lm-scrolly-pin figcaption {
+    margin: 0.55rem 0.25rem 0;
+    font-size: 0.68rem;
+  }
+
+  .lm-scrolly-steps {
+    position: relative;
+    z-index: 2;
+  }
+
+  .lm-scrolly-steps > li {
+    min-height: max(68svh, 28rem);
+    padding-block: clamp(4rem, 12svh, 7rem);
+  }
+}
+
+@media (max-width: 799px) and (max-height: 620px) {
+  .lm-scrolly {
+    --lm-scrolly-stage-height: max(9rem, 34svh);
+  }
+
+  .lm-scrolly-pin {
+    display: grid;
+    grid-template-columns: var(--lm-scrolly-short-columns);
+    gap: 0.65rem;
+    align-items: end;
+  }
+
+  .lm-scrolly-stage {
+    height: var(--lm-scrolly-stage-height);
+  }
+
+  .lm-scrolly-pin figcaption {
+    display: block;
+    margin: 0;
+    padding-block-end: 0.35rem;
+    line-height: 1.35;
+  }
+
+  .lm-scrolly-steps > li {
+    min-height: max(74svh, 24rem);
+  }
+}
+
+/* ── Reduced-motion collapse: the calm final state, immediately ────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .js .lm-reveal,
+  .js .lm-word {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    animation: none;
+  }
+
+  .lm-marquee-track,
+  .lm-gradient-morph {
+    animation: none;
+  }
+
+  .lm-scrolly-visual {
+    opacity: 0;
+    will-change: auto;
+  }
+
+  .lm-scrolly-visual[data-scene-visual-active="true"] {
+    opacity: 1;
+  }
+
+  .lm-scrolly-step-marker i {
+    transform: scaleY(1);
+  }
+}

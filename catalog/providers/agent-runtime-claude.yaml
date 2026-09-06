@@ -1,0 +1,17 @@
+schema_version: 1
+id: agent-runtime-claude
+version: "1.0.0"
+kind: agent_runtime
+title: Claude Code agent runtime
+source_ids:
+  - claude-com-claude-code
+features:
+  - id: skill_install
+    required: true
+    notes: Claude Code must install the B2C App Builder skill client at the pinned version.
+  - id: cli
+    required: true
+    notes: The claude CLI is a supported worker that B2C App Builder orchestrates.
+deprecations: []
+machine_readable_feeds: []
+review_cadence_days: 7

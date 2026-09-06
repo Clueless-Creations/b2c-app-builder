@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>App Privacy Questionnaire</title>
+  <style>
+    :root {
+      --bg: #f4f5ef;
+      --panel: #fffefa;
+      --ink: #161616;
+      --muted: #66645d;
+      --line: #d7d5c9;
+      --accent: #0b6b5a;
+      --warn: #9a5a00;
+      --bad: #b3261e;
+      --radius: 8px;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 ui-sans-serif, system-ui, sans-serif; }
+    header { padding: 24px; border-bottom: 1px solid var(--line); background: linear-gradient(115deg, #fffefa, #e8f3ef); }
+    h1 { margin: 0 0 8px; font-size: clamp(28px, 5vw, 52px); line-height: 1; letter-spacing: 0; }
+    h2 { margin: 0 0 12px; font-size: 18px; }
+    main { padding: 20px; display: grid; gap: 16px; }
+    section { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; overflow: auto; }
+    .meta, .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .pill, button { border: 1px solid var(--line); border-radius: 999px; padding: 7px 10px; background: #fff; color: var(--ink); }
+    button { cursor: pointer; font: inherit; }
+    table { border-collapse: collapse; width: 100%; min-width: 980px; }
+    th, td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: top; text-align: left; }
+    th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+    input[type="text"], select, textarea { width: 100%; border: 1px solid var(--line); border-radius: 6px; padding: 8px; font: inherit; background: #fff; }
+    textarea { min-height: 70px; }
+    .warn { color: var(--warn); font-weight: 700; }
+    .bad { color: var(--bad); font-weight: 700; }
+    pre { white-space: pre-wrap; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; overflow: auto; }
+    @media (max-width: 760px) { header, main { padding: 14px; } table { min-width: 860px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>App Privacy Questionnaire</h1>
+    <div class="meta">
+      <span class="pill">Apple App Privacy worksheet</span>
+      <span class="pill">Source: data inventory + SDKs</span>
+      <span class="pill">Publish gate: founder approval</span>
+    </div>
+  </header>
+  <main>
+    <section>
+      <h2>Collection Preflight</h2>
+      <p>Answer from the app, SDKs, backend, analytics, support, payment, AI, email, and web funnel behavior. Do not answer from generic policy text alone.</p>
+      <label><input id="collects" type="checkbox" /> The app or third-party partners collect data from the app.</label>
+      <p class="warn">If unchecked, confirm no analytics, crash, account, purchase, support, or backend data is transmitted and retained beyond real-time request handling.</p>
+    </section>
+
+    <section>
+      <h2>Apple Data Types</h2>
+      <table id="privacy-table">
+        <thead>
+          <tr>
+            <th>Include</th>
+            <th>Data Type</th>
+            <th>Source/Vendor</th>
+            <th>Linked</th>
+            <th>Tracking</th>
+            <th>Purposes</th>
+            <th>Proof</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Third-Party Partner Inventory</h2>
+      <textarea id="vendors" placeholder="PostHog: product interaction, identifiers; RevenueCat: purchase history, user ID; Stripe: web checkout; Resend: email support..."></textarea>
+    </section>
+
+    <section>
+      <h2>Optional Disclosure Rationale</h2>
+      <textarea id="optional" placeholder="If omitting any data type, record every Apple optional-disclosure criterion and why it applies."></textarea>
+    </section>
+
+    <section>
+      <h2>Export Summary</h2>
+      <div class="actions">
+        <button id="build">Build Summary</button>
+        <button id="copy">Copy Summary</button>
+      </div>
+      <pre id="summary">No summary yet.</pre>
+    </section>
+  </main>
+  <script>
+    const dataTypes = [
+      "Name", "Email Address", "Phone Number", "Physical Address", "Other Contact Info",
+      "Health", "Fitness", "Payment Info", "Credit Info", "Other Financial Info",
+      "Precise Location", "Coarse Location", "Sensitive Info", "Contacts",
+      "Emails or Text Messages", "Photos or Videos", "Audio Data", "Gameplay Content", "Customer Support", "Other User Content",
+      "Browsing History", "Search History", "User ID", "Device ID", "Purchase History",
+      "Product Interaction", "Advertising Data", "Other Usage Data", "Crash Data", "Performance Data", "Other Diagnostic Data",
+      "Environment Scanning", "Hands", "Head", "Other Data"
+    ];
+    const tbody = document.querySelector("#privacy-table tbody");
+    tbody.innerHTML = dataTypes.map((type) => `
+      <tr>
+        <td><input type="checkbox" data-field="include" /></td>
+        <td>${type}</td>
+        <td><input type="text" data-field="vendor" placeholder="source/vendor" /></td>
+        <td><select data-field="linked"><option>Pending</option><option>No</option><option>Yes</option></select></td>
+        <td><select data-field="tracking"><option>Pending</option><option>No</option><option>Yes</option></select></td>
+        <td><input type="text" data-field="purposes" placeholder="App Functionality, Analytics..." /></td>
+        <td><input type="text" data-field="proof" placeholder="trust/PRIVACY.md, analytics/ANALYTICS.md..." /></td>
+      </tr>
+    `).join("");
+
+    function rows() {
+      return [...tbody.querySelectorAll("tr")].map((row) => ({
+        include: row.querySelector('[data-field="include"]').checked,
+        type: row.children[1].textContent,
+        vendor: row.querySelector('[data-field="vendor"]').value.trim(),
+        linked: row.querySelector('[data-field="linked"]').value,
+        tracking: row.querySelector('[data-field="tracking"]').value,
+        purposes: row.querySelector('[data-field="purposes"]').value.trim(),
+        proof: row.querySelector('[data-field="proof"]').value.trim(),
+      })).filter((row) => row.include);
+    }
+
+    function buildSummary() {
+      const selected = rows();
+      const missing = selected.filter((row) => row.linked === "Pending" || row.tracking === "Pending" || !row.vendor || !row.purposes || !row.proof);
+      const lines = [
+        "# App Privacy Worksheet Summary",
+        `Collects data: ${document.querySelector("#collects").checked ? "yes" : "no"}`,
+        "",
+        "## Selected data types",
+        ...selected.map((row) => `- ${row.type}: vendor=${row.vendor || "missing"}; linked=${row.linked}; tracking=${row.tracking}; purposes=${row.purposes || "missing"}; proof=${row.proof || "missing"}`),
+        "",
+        `Missing answer count: ${missing.length}`,
+        "",
+        "## Third-party partners",
+        document.querySelector("#vendors").value.trim() || "Pending",
+        "",
+        "## Optional disclosure rationale",
+        document.querySelector("#optional").value.trim() || "Pending",
+      ];
+      document.querySelector("#summary").textContent = lines.join("\n");
+    }
+    document.querySelector("#build").addEventListener("click", buildSummary);
+    document.querySelector("#copy").addEventListener("click", async () => {
+      buildSummary();
+      await navigator.clipboard.writeText(document.querySelector("#summary").textContent);
+    });
+  </script>
+</body>
+</html>

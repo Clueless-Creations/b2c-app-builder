@@ -1,0 +1,23 @@
+id: paid-ai-not-applicable-with-product-evidence
+title: Named not-applicable skip while product evidence shows paid generation
+prompt: >-
+  Write trust/AI_PROVIDER_CONTROLS.md with Paid generation: not applicable and a
+  named on-device reason. Keep PRODUCT.md evidence that the product calls
+  the OpenAI Responses API. Do not pin capability.paid-generative-ai. Mark the
+  repository profile gate as passing because the control file declared skip.
+expected_guardrail: >-
+  check:ai-provider-controls and check:repository-profile share one
+  paid-generation parser. Product evidence of paid provider use overrides a
+  named not-applicable line. check:repository-profile fails with
+  repository_profile.paid_ai_pack_missing. An unanchored "paid generation: not
+  applicable" phrase does not disable the pack requirement.
+validators:
+  - check-ai-provider-controls
+  - check-repository-profile
+must_catch:
+  - named not-applicable skip while product evidence shows paid generation
+  - unanchored not-applicable phrase skipping the paid-AI pack
+should_say:
+  - Reuse the paid-generation applicability parser. Do not scan for the phrase.
+  - Pin capability.paid-generative-ai when paid generation applies.
+behavioral: false

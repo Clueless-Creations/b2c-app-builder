@@ -1,0 +1,34 @@
+schema_version: 1.0.0
+id: reference.process.learning-capture
+title: Learning Capture
+domain_id: domain.process
+document_path: knowledge/process/learning-capture.md
+load_when: capturing a reusable maintainer learning or refreshing the learning corpus — grounding rules, evidence citations,
+  and refresh verdicts
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.machine.learning-capture-maintainer
+    - workflow.machine.learning-corpus-refresh-maintainer
+  context_pack_ids: []
+applicability_notes: The contract for knowledge/<domain>/learnings documents. Load before writing or auditing a learning;
+  check:learning-grounding enforces the document shape this contract defines.
+sources:
+  - id: github-com-florianbruniaux-claude-code-ultimate-guide-observability
+    name: github.com
+    source_type: github
+    url: https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/guide/ops/observability.md
+    review_cadence_days: 30
+    claim_scope: The three session-friction patterns (repeated reads, repeated failing command, heavy repeated edits)
+      that signal a missing or stale knowledge section, grounding the Signals A Learning Is Missing subsection.
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers
+  - id: github-com-florianbruniaux-claude-code-ultimate-guide-memory-systems
+    name: github.com
+    source_type: github
+    url: https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/guide/core/memory-systems.md
+    review_cadence_days: 30
+    claim_scope: Claude Code's native Auto-Memory mechanism and its per-user, gitignored MEMORY.md scope, grounding
+      the Auto-Memory boundary subsection.
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers

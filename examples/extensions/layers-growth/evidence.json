@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Layers operation evidence",
+  "description": "What the host observed when it ran the operation. It names the transport; a fake transport never proves a live provider.",
+  "type": "object",
+  "properties": {
+    "providerId": { "type": "string", "const": "layers-growth/layers" },
+    "jobRef": { "type": "string", "minLength": 1 },
+    "observedState": { "type": "string", "enum": ["accepted", "running", "completed", "failed", "uncertain"] },
+    "quoteMaxCredits": { "type": "integer", "minimum": 0 },
+    "creditsCharged": { "type": ["integer", "null"], "minimum": 0 },
+    "transport": { "type": "string", "enum": ["fake", "live"] },
+    "observedAt": { "type": "string", "format": "date-time" }
+  },
+  "required": ["providerId", "jobRef", "observedState", "quoteMaxCredits", "creditsCharged", "transport", "observedAt"],
+  "additionalProperties": false
+}

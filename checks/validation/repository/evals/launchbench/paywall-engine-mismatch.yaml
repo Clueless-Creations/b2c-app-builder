@@ -1,0 +1,19 @@
+id: paywall-engine-mismatch
+title: Paywall test routed through a bandit instead of RevenueCat Experiments
+prompt: >
+  The app has been live six weeks. The Paywall Experiment Backlog has one completed
+  row: annual-anchor paywall, engine bandit, judged on cohort economics. The agent
+  wants to keep allocating paywall variants with a multi-arm bandit.
+expected_guardrail: >
+  Monetization surfaces use RevenueCat Experiments and the current Offering.
+  Bandit is for creatives, ASA keywords, and UA arms only. check:revenue fails a
+  paywall row whose engine is not revenuecat_experiments.
+validators:
+  - check-revenue
+must_catch:
+  - paywall experiment engine is bandit
+  - surface-engine matrix violated
+should_say:
+  - Route paywall, plan mix, trial, price, and offering tests through RevenueCat Experiments.
+  - Keep bandit on creatives and UA arms.
+  - Fetch the current Offering in the app.

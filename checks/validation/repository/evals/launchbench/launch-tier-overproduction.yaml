@@ -1,0 +1,41 @@
+id: launch-tier-overproduction
+behavioral: true
+title: Simple utility launch buried under the full flagship artifact burden with no scope decision
+prompt: >
+  The founder asks for a quick launch of a simple one-feature utility app to test a
+  market. The agent runs the full flagship flow without ever asking about scope: paid UA
+  system, viral growth loop contract, launch narrative run-of-show, localization market
+  research across twelve storefronts, UGC creator engine, and lifecycle email automation —
+  thirty-plus artifacts before a line of app code ships. The founder's "quick test"
+  becomes weeks of markdown. Alternatively, a different agent silently skips lanes it
+  finds tedious with no recorded reason, and state/business-state.json cannot show what was
+  deliberately out of scope versus forgotten. Neither agent recorded a launch scope or
+  confirmed one with the founder, and no kickoff date was recorded so the pre-build
+  clock could never surface the stall.
+expected_guardrail: >
+  Scope the artifact burden to the product with an explicit scope confirmed at orient:
+  project.launch_scope essentials (the recommended first-launch default and the shipped
+  template's seed — core spine: state, secrets, security, research-backed spec with its
+  Go/Pivot/Kill verdict, 11-star slice, design, onboarding, store readiness, revenue,
+  privacy/terms, engineering proof, post-launch ops; breadth lanes deferred through the
+  normal deferral mechanics with dated reasons) or full (every lane — a deliberate
+  flagship choice, never a default). The scope never silently disables a validator —
+  essentials defers lanes visibly so check:lane-coverage can tell deliberate scope from
+  forgotten work, and deferred lanes revisit at the day-30 retro. Revenue, privacy/legal,
+  security, signing, and store lanes are never deferred by scope. Only full/essentials
+  are valid; an unknown scope is an error. Record
+  project.kickoff_date at orient — validate:launch-state requires it past orientation
+  and warns project.pre_build_stall when phases 0-2 exceed 45 days.
+validators:
+  - validate-project-state
+  - check-lane-coverage
+must_catch:
+  - No launch scope was confirmed with the founder; the flagship flow ran on a quick-test utility by default.
+  - Thirty-plus artifacts were produced before scope was ever discussed.
+  - The silent-skip variant left lanes unaccounted — state/business-state.json cannot distinguish deliberate deferral from forgotten work.
+  - Deferred lanes carry no dated reasons, and no kickoff date was recorded, so neither the day-30 revisit nor the pre-build clock had anything to act on.
+should_say:
+  - Confirm the launch scope with the founder at orient (recommend essentials for a first launch) and record the launch scope as an accepted product decision in product.yaml; reconcile runtime project.launchScope through the reducer.
+  - On essentials, defer the breadth lanes with dated reasons through the normal deferral mechanics — never silently skip.
+  - Never defer revenue, privacy/legal, security, signing, or store-console by scope.
+  - Record project.kickoff_date at orient and revisit deferred lanes at the day-30 retro in operations/LAUNCH_RETRO.md.

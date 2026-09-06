@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "b2c.native-local-proof/v1",
+  "recordedAt": "2026-09-05T15:32:11.211822+00:00",
+  "toolchain": {
+    "xcode": "26.6",
+    "xcodeBuild": "17F113",
+    "swift": "6.3.3",
+    "simulatorSdk": "26.5",
+    "target": "arm64-apple-ios16.0-simulator"
+  },
+  "inputs": {
+    "native/Package.swift": "566173b1fb43494f589d885380f1e97b17d20a6f8a4a4b8a06f4a53efa2639d6",
+    "native/Package.resolved": "460d2b97b1c09fb49c3e0ac22940b7239e8eb1b392cca228349446c7a532169e",
+    "native/Sources/MonetizationCore/EntitlementState.swift": "dee10d8a1b56967d1004a603404bef1fe47c6291c572ba1a3079c9bdd347c60c",
+    "native/Sources/MonetizationNative/RevenueCatController.swift": "fc6fd35df2571ba46437eb445e3b84f19438dc37be8cf1fcf0651761b97f19ae",
+    "native/Tests/MonetizationCoreTests/EntitlementStateTests.swift": "0f9d71beee0033238bef6dce9ef007d0a154665ddd50545bcfa1e7ae9ebeff37"
+  },
+  "checks": {
+    "portableStateTests": {
+      "status": "passed",
+      "count": 3,
+      "runtime": "macOS; iOS adapter excluded"
+    },
+    "iosSdkCompilation": {
+      "status": "passed",
+      "kind": "Swift module and object compilation",
+      "target": "arm64 iOS simulator",
+      "artifacts": {
+        "Modules/MonetizationNative.swiftmodule": "d82552cf32272b3031c61ede6e743f7eced80d896a93896945c6d2f5388d923e",
+        "MonetizationNative.build/RevenueCatController.swift.o": "99e63ae763c230118ee64a6912abd81cd5f2261655a858dd8ed83c640e82289d"
+      }
+    }
+  },
+  "limits": {
+    "linkedApp": "not_built",
+    "deviceBehavior": "not_observed",
+    "sandboxProviderRoundTrip": "not_observed",
+    "liveReadiness": "not_observed"
+  },
+  "commands": [
+    "swift test --package-path native --scratch-path <scratch>",
+    "swift build --package-path native --scratch-path <scratch> --triple arm64-apple-ios16.0-simulator --sdk <iPhoneSimulator.sdk> --product MonetizationNative"
+  ]
+}

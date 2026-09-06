@@ -1,0 +1,20 @@
+schema_version: 1.0.0
+id: reference.design.quality-lens
+title: Quality Lens
+domain_id: domain.design
+document_path: knowledge/design/quality-lens.md
+load_when: judging whether a design-room output is actually good, not just present — the 11-star taste filter,
+  anti-generic checks, and inspiration sources applied during a design-room mutation (distinct from design-room.md's
+  protocol and surfaces-b2c.md's schemas)
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.design.design-room
+    - workflow.store.store-screenshots-production
+    - workflow.engineering.engineering-orchestration-ce-production-readiness
+    - workflow.design.design-system-audit
+    - workflow.growth.landing-funnel-audit
+  context_pack_ids:
+    - context.design
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

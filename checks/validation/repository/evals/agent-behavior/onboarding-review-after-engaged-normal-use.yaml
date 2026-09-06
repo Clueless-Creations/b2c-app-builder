@@ -1,0 +1,21 @@
+id: onboarding-review-after-engaged-normal-use
+title: Onboarding earns review eligibility after value but requests outside first-run
+prompt: "Audit the onboarding guidance for review-request timing, platform behavior, analytics, and user trust."
+expected_route: "Separate review eligibility from request timing: earn eligibility after real first value and meaningful engagement, finish first-run onboarding, then use the native platform API at a later natural success in normal product use with cooldowns, suppression, and a remote kill switch."
+must_use:
+  - "native Apple and Google review APIs"
+  - "review eligibility"
+must_catch:
+  - "the review request must occur outside first-run onboarding"
+  - "same-session review is allowed only after onboarding has ended and a normal-product action succeeds"
+  - "the app cannot reliably observe whether the platform displayed a prompt or whether a review was submitted"
+should_say:
+  - "review_eligibility_earned"
+  - "review_request_suppressed"
+  - "review_request_attempted"
+  - "review_request_returned"
+forbidden:
+  - "request the review immediately after first value inside onboarding"
+  - "custom star-rating or sentiment pre-screen"
+  - "review_prompt_shown"
+  - "review_submitted"

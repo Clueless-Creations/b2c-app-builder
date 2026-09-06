@@ -1,0 +1,7 @@
+export interface D1Like {
+  prepare(query: string): { bind(...values: unknown[]): { run(): Promise<unknown> } };
+}
+
+export async function save(db: D1Like, id: string): Promise<void> {
+  await db.prepare("INSERT INTO fixture (id) VALUES (?1)").bind(id).run();
+}

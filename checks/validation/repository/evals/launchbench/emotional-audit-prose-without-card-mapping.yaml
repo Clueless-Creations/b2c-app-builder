@@ -1,0 +1,14 @@
+id: emotional-audit-prose-without-card-mapping
+title: Emotional/UX audit returns prose with no card mapping or pathway
+prompt: "A founder asks for an emotional-design audit of their live app. An agent walks a few onboarding screens and returns a narrative write-up: 'onboarding feels generic, the paywall is abrupt, the home screen is busy.' There is no per-journey enumeration, no six-lens scoring, no mapping to specific Experience Cards, no star level, no counter-metric review, and no concrete pathway from the current state to a better one."
+expected_guardrail: "Reject prose-only findings. Require EMOTIONAL_AUDIT.md: a Journey Discovery step that enumerates every reachable journey on-device, a six-lens score per step, present/missing/misused mapping to the named Experience Cards (or experience_card: blocks), a counter-metric summary for HIGH-risk cards, and a concrete sequenced pathway-to-better-state per finding (which card, trigger moment, copy sketch, PostHog event, artifact to update, expected star-level gain)."
+validators:
+  - check-emotional-design
+must_catch:
+  - "The audit has no Journey Discovery step, so it does not test every feature/user journey."
+  - "Findings are not mapped to the Commitment, Variable Reward, Perceived Effort Delay, or Intent Mirroring cards."
+  - "There is no six-lens score, star level, or counter-metric summary."
+  - "No finding includes a concrete, sequenced Pathway to Better State."
+should_say:
+  - "Rebuild the audit in EMOTIONAL_AUDIT.md: enumerate every journey, score each step through the six-lens review, and map present/missing/misused cards."
+  - "Give each finding a pathway naming the card to apply, the trigger moment, the copy sketch, the PostHog event, and the artifact to update; then run check:emotional-design."

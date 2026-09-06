@@ -1,0 +1,16 @@
+schema_version: 1.0.0
+id: reference.process.learnings.audit-runs-from-repo-root
+title: Run The Maintainer Audit From The Repository Root
+domain_id: domain.process
+document_path: knowledge/process/learnings/audit-runs-from-repo-root.md
+load_when: running the maintainer audit or reading its results while inside skill/ — repo-only steps run only from the repository
+  root
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.machine.skill-runtime-sync-and-version-discipline-maintainer
+  context_pack_ids: []
+applicability_notes: Captured maintainer learning. The audit acceptance loop in the runtime-sync node depends on running from
+  the correct layout.
+sources: []
+source_exemption: Internal operating learning grounded in repository citations; no external factual claims.

@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:b2c:core:current-truth-schema",
+  "title": "Reducer-owned current truth",
+  "description": "The reducer's freshness-aware truth document. Evidence is append-only. Claims name the current status of each graph node. Status and readiness reports read from this document.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "updatedAt", "revision", "lastReceiptId", "lastReconcileInputHash", "evidence", "claims"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "updatedAt": { "$ref": "#/$defs/dateTime" },
+    "revision": { "type": "integer", "minimum": 0 },
+    "lastReceiptId": { "type": ["string", "null"], "minLength": 1 },
+    "lastReconcileInputHash": { "type": ["string", "null"], "minLength": 1 },
+    "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidence" } },
+    "claims": { "type": "array", "items": { "$ref": "#/$defs/claim" } }
+  },
+  "$defs": {
+    "dateTime": { "type": "string", "format": "date-time" },
+    "authority": { "enum": ["provider_readback", "store_receipt", "operator_attestation", "derived_projection"] },
+    "claimStatus": { "enum": ["active", "superseded", "expired", "unresolved"] },
+    "blockerKind": { "enum": ["none", "missing_proof", "expired_proof", "unreachable_proof", "conflict"] },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "graphNodeId", "claimId", "authority", "observedAt", "reachable", "payloadHash", "accepted", "summary"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "graphNodeId": { "type": "string", "minLength": 1 },
+        "claimId": { "type": "string", "minLength": 1 },
+        "authority": { "$ref": "#/$defs/authority" },
+        "observedAt": { "$ref": "#/$defs/dateTime" },
+        "expiresAt": { "$ref": "#/$defs/dateTime" },
+        "reachable": { "type": "boolean" },
+        "payloadHash": { "type": "string", "minLength": 1 },
+        "accepted": { "type": "boolean" },
+        "summary": { "type": "string", "minLength": 1 },
+        "receiptId": { "type": "string", "minLength": 1 }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claimId", "graphNodeId", "status", "currentEvidenceId", "supersededEvidenceIds", "blockerKind", "summary"],
+      "properties": {
+        "claimId": { "type": "string", "minLength": 1 },
+        "graphNodeId": { "type": "string", "minLength": 1 },
+        "status": { "$ref": "#/$defs/claimStatus" },
+        "currentEvidenceId": { "type": ["string", "null"], "minLength": 1 },
+        "supersededEvidenceIds": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "blockerKind": { "$ref": "#/$defs/blockerKind" },
+        "summary": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+schema_version: 1.0.0
+id: reference.engineering.backend-data-contract
+title: Backend Data Contract
+domain_id: domain.engineering
+document_path: knowledge/engineering/backend-data-contract.md
+load_when: before engineering/TECH_SPEC.md data/API sections harden; before archetype schema/auth prompts run; when the
+  founder wants Firebase or a custom backend instead of the Supabase default; auditing an existing data layer
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.engineering.backend-data-contract
+  context_pack_ids:
+    - context.engineering
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

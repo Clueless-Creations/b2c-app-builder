@@ -1,0 +1,21 @@
+id: ai-chat-companion-archetype-prompt-pack
+title: AI-chat request detects the archetype and routes the prompt pack
+prompt: "I want to build an AI companion app — users chat with an AI character that remembers them across conversations."
+expected_route: "Detect the AI-chat/companion archetype, load ai-chat-companion.md, confirm chat type / primary surface / modality / memory depth / safety scope via AskUserQuestion, record the archetype as a product decision in product.yaml, then route the bundled prompt pack (schema, auth, chat core loop, model integration) and treat safety as a launch gate — instead of improvising the schema and a client-side model call."
+must_use:
+  - "ai-chat-companion.md"
+  - "surfaces/starters/ai-chat-companion"
+  - "AskUserQuestion"
+  - "product.yaml"
+must_catch:
+  - "the request is an AI-chat/companion archetype with a known build sequence"
+  - "the Claude API key must stay server-side and current model IDs come from the claude-api skill, not memory"
+  - "safety and moderation (and age gating for companion apps) is a launch gate, not optional"
+  - "long-term memory is sensitive personal data and must be user-editable with privacy/deletion handling"
+should_say:
+  - "confirm the chat type and modality with the founder before building"
+  - "build one core system at a time, test it, then move on"
+  - "reconcile usage caps and pricing with the revenue lane"
+forbidden:
+  - "call the Claude API directly from the client with an exposed key"
+  - "skip the AskUserQuestion archetype confirmation"

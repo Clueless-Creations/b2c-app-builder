@@ -1,0 +1,7 @@
+# Support case extension
+
+This contributor package declares a support triage operation with its own input, output, and evidence schemas. The conformance scenario copies it outside the repository, installs an immutable snapshot, removes the source, resolves the recipe, and loads its snapshotted `pack.yaml` through the existing catalog pack parser and composer. Its role prompt is also a pinned knowledge resource. Context paths refer directly to the immutable snapshot under `.b2c-launch/packages/<digest>/`. Activation does not overwrite workspace prompts or references.
+
+The host explicitly registers a route for the selected implementation and package digest. Package metadata never registers executable code. The route returns a draft and fake transport evidence; the host independently reads that transport, validates the pinned schemas, and writes the two declared workflow artifacts. Before invoking the route, the host durably records intent in the declared receipt artifact. A repeated request reuses its current matching completed receipt. An interrupted effect leaves an intent that requires readback before any retry. Partial, stale, mismatched, or unobserved results refuse further effects.
+
+Run `node --import tsx checks/verification/scenarios/extension-conformance.ts`. This proves deterministic local package conformance, not a live support integration or a complete business launch. SDK, platform, configuration, authority, and provider readiness remain separate.

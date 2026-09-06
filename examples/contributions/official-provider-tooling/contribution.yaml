@@ -1,0 +1,300 @@
+apiVersion: b2c.contribution/v1
+id: official-provider-tooling
+goal: Adapt reviewed official RevenueCat and PostHog procedures without importing provider authority; preserve upstream
+  tracking and notices.
+scope: contribution
+routing:
+  intendedTarget: Selected knowledge references and upstream metadata
+  effect: Authored guidance and provenance only; no external provider setup
+  verdict: contribution
+  reason: Uses existing contribution, knowledge, package-notice and authority contracts.
+createdAt: 2026-09-06T14:00:00Z
+synthetic: false
+sources:
+  - id: revenuecat-ai-toolkit
+    kind: repository
+    title: RevenueCat AI Toolkit
+    canonicalUrl: https://github.com/RevenueCat/ai-toolkit
+    publisher: RevenueCat
+    revision: b9b77b12da33213c9c2e750b06cd6270c1d8ed65
+    retrievedAt: 2026-09-06T13:59:33.574497Z
+    reviewedAt: 2026-09-06
+    retrieval:
+      status: complete
+      method: Reviewed selected files in retained source archive at exact commit
+    rights:
+      status: verified
+      spdx: MIT
+      scope: Root LICENSE; only the listed upstream paths were adopted. Dependencies, linked material, and bundled third-party
+        content need separate review.
+      evidence: notices/revenuecat-ai-toolkit.txt
+      evidenceSha256: 2e92c72a8e13012a7f53d2bebbee52ab1a1c06cf652092faecf4523a5bc23e3f
+    selectors:
+      - README.md
+      - revenuecat/skills/create-revenuecat-project/SKILL.md
+      - revenuecat/skills/integrate-revenuecat/SKILL.md
+      - revenuecat/skills/revenuecat-identify-user/SKILL.md
+      - revenuecat/skills/revenuecat-purchase-flow/SKILL.md
+      - revenuecat/skills/revenuecat-entitlements-gate/SKILL.md
+      - revenuecat/skills/revenuecat-cli/SKILL.md
+    registrySourceId: github-com-revenuecat-ai-toolkit
+    upstreamId: revenuecat-ai-toolkit
+  - id: revenuecat-cli
+    kind: repository
+    title: RevenueCat CLI
+    canonicalUrl: https://github.com/RevenueCat/cli
+    publisher: RevenueCat
+    revision: 1a3d2820b3166dd6d4cc4775902e43eeeab5f004
+    retrievedAt: 2026-09-06T13:59:35.856259Z
+    reviewedAt: 2026-09-06
+    retrieval:
+      status: complete
+      method: Reviewed selected files in retained source archive at exact commit
+    rights:
+      status: verified
+      spdx: MIT
+      scope: Root LICENSE; only the listed upstream paths were adopted. Dependencies, linked material, and bundled third-party
+        content need separate review.
+      evidence: notices/revenuecat-cli.txt
+      evidenceSha256: 2a966901053e26d85533a8fb524aacf4894911220a41f326c9637ab821029523
+    selectors:
+      - README.md
+    registrySourceId: github-com-revenuecat-cli
+    upstreamId: revenuecat-cli
+  - id: posthog-wizard
+    kind: repository
+    title: PostHog wizard
+    canonicalUrl: https://github.com/PostHog/wizard
+    publisher: PostHog
+    revision: 41c12328636f46a517777b17359dd8f5b3d14d96
+    retrievedAt: 2026-09-06T13:59:44.598491Z
+    reviewedAt: 2026-09-06
+    retrieval:
+      status: complete
+      method: Reviewed selected files in retained source archive at exact commit
+    rights:
+      status: verified
+      spdx: MIT
+      scope: Root LICENSE; only the listed upstream paths were adopted. Dependencies, linked material, and bundled third-party
+        content need separate review.
+      evidence: notices/posthog-wizard.txt
+      evidenceSha256: 6dd6cb84dae639a6d710f4217f507a1f590864cd2c4699557a8380b0a7254d27
+    selectors:
+      - README.md
+      - src/lib/programs
+      - src/lib/agent
+    registrySourceId: github-com-posthog-wizard
+    upstreamId: posthog-wizard
+  - id: posthog-context-mill
+    kind: repository
+    title: PostHog context mill
+    canonicalUrl: https://github.com/PostHog/context-mill
+    publisher: PostHog
+    revision: bbc88864bf8ba2efac43bb4c2782e4406bc0dfa6
+    retrievedAt: 2026-09-06T13:59:41.931798Z
+    reviewedAt: 2026-09-06
+    retrieval:
+      status: complete
+      method: Reviewed selected files in retained source archive at exact commit
+    rights:
+      status: unknown
+      spdx: NOASSERTION
+      scope: No root license file was found at the inspected revision. No source, skill text, examples, or build output is
+        copied or adapted.
+    selectors:
+      - README.md
+      - context/skills
+      - scripts
+    registrySourceId: github-com-posthog-context-mill
+    upstreamId: posthog-context-mill
+units:
+  - id: revenuecat-ai-toolkit-guidance
+    kind: knowledge
+    title: RevenueCat AI Toolkit adoption
+    upstream:
+      sourceId: revenuecat-ai-toolkit
+      selector: Reviewed paths listed in source record
+    target:
+      kind: existing-reference
+      path: knowledge/money/revenuecat-agent-tooling.md
+      id: reference.money.revenuecat-agent-tooling
+    disposition: adapt
+    status: proposed
+    rationale: Selected procedures inform knowledge/money/revenuecat-agent-tooling.md. Original notices are retained; no
+      whole-project integration or live support is claimed.
+    verification:
+      - npm run test:fixtures -- official-upstreams
+    selection: selected-method
+    omitted:
+      - Global installation, live credentials and automatic business adoption.
+  - id: revenuecat-cli-guidance
+    kind: knowledge
+    title: RevenueCat CLI adoption
+    upstream:
+      sourceId: revenuecat-cli
+      selector: Reviewed paths listed in source record
+    target:
+      kind: existing-reference
+      path: knowledge/money/revenuecat-agent-tooling.md
+      id: reference.money.revenuecat-agent-tooling
+    disposition: adapt
+    status: proposed
+    rationale: Selected procedures inform knowledge/money/revenuecat-agent-tooling.md. Original notices are retained; no
+      whole-project integration or live support is claimed.
+    verification:
+      - npm run test:fixtures -- official-upstreams
+    selection: selected-method
+    omitted:
+      - Global installation, live credentials and automatic business adoption.
+  - id: posthog-wizard-guidance
+    kind: knowledge
+    title: PostHog wizard adoption
+    upstream:
+      sourceId: posthog-wizard
+      selector: Reviewed paths listed in source record
+    target:
+      kind: existing-reference
+      path: knowledge/data/posthog-agent-tooling.md
+      id: reference.data.posthog-agent-tooling
+    disposition: adapt
+    status: proposed
+    rationale: Selected procedures inform knowledge/data/posthog-agent-tooling.md. Original notices are retained; no
+      whole-project integration or live support is claimed.
+    verification:
+      - npm run test:fixtures -- official-upstreams
+    selection: selected-method
+    omitted:
+      - Global installation, live credentials and automatic business adoption.
+  - id: posthog-context-mill-guidance
+    kind: knowledge
+    title: PostHog context mill adoption
+    upstream:
+      sourceId: posthog-context-mill
+      selector: Reviewed paths listed in source record
+    target:
+      kind: document
+      path: docs/upstreams/official-agent-tooling.md
+    disposition: defer
+    status: deferred
+    rationale: Tracked candidate only; not claimed as powering the builder until rights and adoption are reviewed.
+    verification:
+      - npm run test:fixtures -- official-upstreams
+    selection: reference-only
+    omitted:
+      - Global installation, live credentials and automatic business adoption.
+derivations:
+  - target: knowledge/money/revenuecat-agent-tooling.md
+    sourceIds:
+      - revenuecat-ai-toolkit
+    relationship: adapted
+    baseline: b9b77b12da33213c9c2e750b06cd6270c1d8ed65
+    selectors:
+      - README.md
+      - revenuecat/skills/create-revenuecat-project/SKILL.md
+      - revenuecat/skills/integrate-revenuecat/SKILL.md
+      - revenuecat/skills/revenuecat-identify-user/SKILL.md
+      - revenuecat/skills/revenuecat-purchase-flow/SKILL.md
+      - revenuecat/skills/revenuecat-entitlements-gate/SKILL.md
+      - revenuecat/skills/revenuecat-cli/SKILL.md
+    rationale: Retain useful official procedures; preserve canonical product, consent, identity, analytics and acceptance owners.
+    omissions:
+      - Automatic setup, broad upstream agent authority and live-support claims.
+    reviewer: b2c-contributor source review
+    reviewedAt: 2026-09-06
+    evaluation: npm run test:fixtures -- official-upstreams
+    notice: notices/revenuecat-ai-toolkit.txt
+  - target: knowledge/money/revenuecat-agent-tooling.md
+    sourceIds:
+      - revenuecat-cli
+    relationship: adapted
+    baseline: 1a3d2820b3166dd6d4cc4775902e43eeeab5f004
+    selectors:
+      - README.md
+    rationale: Retain useful official procedures; preserve canonical product, consent, identity, analytics and acceptance owners.
+    omissions:
+      - Automatic setup, broad upstream agent authority and live-support claims.
+    reviewer: b2c-contributor source review
+    reviewedAt: 2026-09-06
+    evaluation: npm run test:fixtures -- official-upstreams
+    notice: notices/revenuecat-cli.txt
+  - target: knowledge/data/posthog-agent-tooling.md
+    sourceIds:
+      - posthog-wizard
+    relationship: adapted
+    baseline: 41c12328636f46a517777b17359dd8f5b3d14d96
+    selectors:
+      - README.md
+      - src/lib/programs
+      - src/lib/agent
+    rationale: Retain useful official procedures; preserve canonical product, consent, identity, analytics and acceptance owners.
+    omissions:
+      - Automatic setup, broad upstream agent authority and live-support claims.
+    reviewer: b2c-contributor source review
+    reviewedAt: 2026-09-06
+    evaluation: npm run test:fixtures -- official-upstreams
+    notice: notices/posthog-wizard.txt
+evaluations:
+  - id: revenuecat-ai-toolkit-boundaries
+    unitId: revenuecat-ai-toolkit-guidance
+    kind: counterexample
+    description: Refuse incomplete provenance or unrelated notices; retain independent identity, privacy, setup and
+      acceptance boundaries.
+    mustFail:
+      - Accepted contribution without exact source baseline
+      - Notice from another upstream
+      - Installing all upstream skills as part of discovery
+    mustPass:
+      - Complete source-specific adoption record with no provider execution
+    path: checks/verification/fixtures/official-upstreams.fixtures.ts
+  - id: revenuecat-cli-boundaries
+    unitId: revenuecat-cli-guidance
+    kind: counterexample
+    description: Refuse incomplete provenance or unrelated notices; retain independent identity, privacy, setup and
+      acceptance boundaries.
+    mustFail:
+      - Accepted contribution without exact source baseline
+      - Notice from another upstream
+      - Installing all upstream skills as part of discovery
+    mustPass:
+      - Complete source-specific adoption record with no provider execution
+    path: checks/verification/fixtures/official-upstreams.fixtures.ts
+  - id: posthog-wizard-boundaries
+    unitId: posthog-wizard-guidance
+    kind: counterexample
+    description: Refuse incomplete provenance or unrelated notices; retain independent identity, privacy, setup and
+      acceptance boundaries.
+    mustFail:
+      - Accepted contribution without exact source baseline
+      - Notice from another upstream
+      - Installing all upstream skills as part of discovery
+    mustPass:
+      - Complete source-specific adoption record with no provider execution
+    path: checks/verification/fixtures/official-upstreams.fixtures.ts
+notices:
+  - sourceId: revenuecat-ai-toolkit
+    spdx: MIT
+    copyright: Copyright (c) 2024 RevenueCat
+    noticePath: notices/revenuecat-ai-toolkit.txt
+    covers:
+      - knowledge/money/revenuecat-agent-tooling.md
+  - sourceId: revenuecat-cli
+    spdx: MIT
+    copyright: Copyright (c) 2024-2026 RevenueCat
+    noticePath: notices/revenuecat-cli.txt
+    covers:
+      - knowledge/money/revenuecat-agent-tooling.md
+  - sourceId: posthog-wizard
+    spdx: MIT
+    copyright: Copyright (c) 2025 PostHog
+    noticePath: notices/posthog-wizard.txt
+    covers:
+      - knowledge/data/posthog-agent-tooling.md
+requiredChecks:
+  - npm run test:fixtures -- official-upstreams
+  - npm run check:upstreams
+  - npm run check:credits
+missingCoreMechanism:
+  present: false
+uncertainties:
+  - No live provider or installed SDK support verified.
+  - Context mill is deferred for rights review and is not imported.

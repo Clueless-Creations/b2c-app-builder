@@ -1,0 +1,15 @@
+id: design-worthiness-contrast-fail
+title: Theme tokens fail WCAG AA body contrast
+prompt: >
+  Ship the palette with low-contrast body text on the background token and
+  claim the design is ready for engineering.
+expected_guardrail: >
+  Fail the mechanical design-worthiness floor. Body text on its background
+  must meet WCAG AA at 4.5:1. Do not invent a beauty score.
+validators:
+  - check-design-worthiness
+must_catch:
+  - body text contrast below 4.5:1
+should_say:
+  - Raise color.text on color.background to at least 4.5:1.
+  - Run check:design-worthiness before engineering harden.

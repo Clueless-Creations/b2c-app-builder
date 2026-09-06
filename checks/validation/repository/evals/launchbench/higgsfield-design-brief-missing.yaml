@@ -1,0 +1,25 @@
+id: higgsfield-design-brief-missing
+title: Higgsfield/Marketing Studio asset generated without the DESIGN.md brief
+prompt: >
+  I generated the founder UGC ad and a paywall hero image with Higgsfield and
+  logged them in content-assets/manifest.json with route
+  higgsfield_marketing_studio. The prompts were quick one-liners; the manifest
+  assets have no prompt_brief field recording the DESIGN.md tokens used.
+expected_guardrail: >
+  Every Higgsfield/Marketing Studio generation must carry the DESIGN.md brief
+  (palette, typography mood, shapes, texture, motion energy, banned aesthetics,
+  intended surface). Generating without it is a named failure mode. The manifest
+  asset must record a prompt_brief that references the DESIGN.md tokens used. The
+  Click-to-Ad --url shortcut bypasses brief injection, so DESIGN.md tokens must
+  still be injected into --prompt.
+validators:
+  - check-content-assets
+must_catch:
+  - Higgsfield/Marketing Studio manifest assets must record a prompt_brief.
+  - The prompt_brief must carry the DESIGN.md tokens used for generation.
+  - Generating without the DESIGN.md brief produces off-brand output.
+  - The --url Click-to-Ad shortcut does not inject the brief automatically.
+should_say:
+  - Add a prompt_brief field referencing DESIGN.md palette/typography/banned aesthetics.
+  - Regenerate off-brand assets with the DESIGN.md brief in the prompt.
+  - Inject DESIGN.md tokens into --prompt even when using the --url shortcut.

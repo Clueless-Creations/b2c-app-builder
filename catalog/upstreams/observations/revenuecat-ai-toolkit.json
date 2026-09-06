@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "upstreamId": "revenuecat-ai-toolkit",
+  "checkedAt": "2026-09-06T13:59:33.574497Z",
+  "method": "manual",
+  "latestStable": {
+    "tag": "v2.2.0",
+    "publishedAt": "2026-08-28T10:13:37Z",
+    "assets": []
+  },
+  "prereleases": [],
+  "branchHead": {
+    "branch": "main",
+    "sha": "b9b77b12da33213c9c2e750b06cd6270c1d8ed65",
+    "committedAt": "2026-08-28T10:13:27Z"
+  },
+  "releasesSinceBaseline": [],
+  "licenseSha256": "2e92c72a8e13012a7f53d2bebbee52ab1a1c06cf652092faecf4523a5bc23e3f",
+  "licenseChanged": false,
+  "archived": false,
+  "host": null,
+  "unknowns": [
+    "Maintainer-assembled from the retained read-only GitHub archive intake; release list covers one page, not full history.",
+    "No host executable, provider session, SDK integration, or release asset binary was tested.",
+    "No release-to-commit ancestry comparison was made; releases since the reviewed source are not asserted."
+  ]
+}

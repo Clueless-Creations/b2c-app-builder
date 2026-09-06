@@ -1,0 +1,26 @@
+schema_version: 1.0.0
+id: reference.experience.experience-cards
+title: Experience Cards
+domain_id: domain.experience
+document_path: knowledge/experience/experience-cards.md
+load_when: "selecting or auditing an engagement mechanic — the 12-card deck index: card shape contract, live-MCP access
+  model, Card Routing table to every card in experience-cards/, and the Ethics Ladder attestation-block contract"
+lifecycle: active
+hub: true
+bindings:
+  workflow_ids:
+    - workflow.experience.emotional-experience-design-producer
+    - workflow.experience.emotional-design-audit-auditor
+  context_pack_ids: []
+sources:
+  - id: retention-mechanics-mcp
+    name: Retention Mechanics MCP server
+    source_type: api
+    url: https://github.com/Emuthmartinez/retention-mechanics-mcp
+    review_cadence_days: 30
+    claim_scope: First-party MCP over the Experience Card deck (mechanic search with risk ceilings, versioned card content,
+      ethics attestation scaffolds). Optional tooling - the bundled deck under knowledge/experience/experience-cards/ is
+      the frozen offline contract and every validator reads it; the server is preferred only when connected. Private
+      repo; local stdio during development.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

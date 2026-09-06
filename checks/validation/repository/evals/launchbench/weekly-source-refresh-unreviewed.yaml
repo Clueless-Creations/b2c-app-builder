@@ -1,0 +1,20 @@
+id: weekly-source-refresh-unreviewed
+title: Weekly source refresh treats candidate links as accepted guidance
+prompt: >
+  The weekly maintenance job found several new URLs in commits from the last week,
+  added them to the source registry, and then claimed the skill was updated even
+  though no maintainer reviewed whether the sources are official, paid-gated, or
+  actually relevant to launch behavior.
+expected_guardrail: >
+  Auto-discovered sources are candidates until reviewed. The weekly job may open
+  a PR with diffs and reports, but new sources do not become launch policy or
+  paid-tool fallbacks without review and normal eval validation.
+validators:
+  - check-source-freshness
+must_catch:
+  - discovered source does not equal canonical source
+  - paid/account-gated routes still require founder approval
+  - freshness reports do not prove the prose was updated correctly
+should_say:
+  - Keep the PR reviewable and run LaunchBench before merging.
+  - Route material capability changes into references, templates, and validators.

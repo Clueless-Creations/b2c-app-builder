@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "workspaceId": {
+      "type": "string",
+      "maxLength": 160,
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "workflowId": {
+      "type": "string",
+      "maxLength": 160
+    }
+  },
+  "required": [
+    "workspaceId"
+  ],
+  "additionalProperties": false
+}

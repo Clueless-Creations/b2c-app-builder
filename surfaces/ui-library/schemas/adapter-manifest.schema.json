@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:b2c-app-builder:schema:adapter-manifest",
+  "title": "Native component adapter manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "adapter", "implementations"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": "1.0.0" },
+    "adapter": { "$ref": "#/$defs/adapter" },
+    "implementations": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/implementation" }
+    }
+  },
+  "$defs": {
+    "adapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "stack", "language", "displayName"],
+      "properties": {
+        "id": { "$ref": "#/$defs/slug" },
+        "stack": { "$ref": "#/$defs/slug" },
+        "language": { "$ref": "#/$defs/slug" },
+        "displayName": { "$ref": "#/$defs/text" }
+      }
+    },
+    "implementation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contractId", "maturity", "source", "proof"],
+      "properties": {
+        "contractId": { "$ref": "#/$defs/id" },
+        "maturity": { "enum": ["implemented", "verified", "stable"] },
+        "source": { "$ref": "#/$defs/source" },
+        "previewPath": { "$ref": "#/$defs/path" },
+        "proof": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/proof" }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "maturity": { "enum": ["verified", "stable"] } },
+            "required": ["maturity"]
+          },
+          "then": {
+            "properties": { "proof": { "minItems": 1 } }
+          }
+        }
+      ]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "symbols"],
+      "properties": {
+        "path": { "$ref": "#/$defs/path" },
+        "symbols": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/symbol" }
+        }
+      }
+    },
+    "proof": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "path"],
+      "properties": {
+        "kind": { "$ref": "#/$defs/slug" },
+        "path": { "$ref": "#/$defs/path" },
+        "note": { "$ref": "#/$defs/text" }
+      }
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*$"
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "path": {
+      "type": "string",
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\).+$"
+    },
+    "symbol": {
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

@@ -1,0 +1,217 @@
+# cascade-edges.yaml — the Change Cascade Map as data.
+#
+# knowledge/process/change-cascade.md renders this same map as a table for humans.
+# This file is what check:change-cascade reads, so "check and update or
+# justify" stops being an honour system.
+#
+# Trust boundary, same as laneDependencies in tooling/lib/launch-state.ts:
+# this file ships WITH THE SKILL and is never copied into a business repo. A
+# launch run records touched surfaces through the reducer in state/business-state.json
+# at `lanes.post_launch_ops.changeCascade`; it cannot edit the edge set that grades it.
+#
+# When change-cascade.md's table changes, change this file in the same edit.
+# Every surface id used below must exist in `surfaces`.
+
+schema_version: "2"
+
+# The surface inventory a B2C mobile launch maintains
+# (change-cascade.md "Surface Inventory").
+surfaces:
+  app_in_app:
+    label: "App (in-app)"
+    covers: "onboarding copy/flow, core feature UI + copy, paywall copy + plan labels, settings, empty/error states, push/notification copy"
+  asc_listing:
+    label: "App Store Connect listing"
+    covers: "name, subtitle, promotional text, description, keyword field, What's New, screenshots + caption overlays, App Preview, App Icon, in-app events, custom product pages, and every localization of all of the above"
+  google_play_listing:
+    label: "Google Play listing"
+    covers: "name, short and full descriptions, screenshots, feature graphic, promo video, custom store listings, promotional content, and localizations"
+  asc_products:
+    label: "App Store Connect products"
+    covers: "IAP/subscription display names + descriptions, promoted-IAP promotional images, pricing, intro/trial offers, App Review Information notes"
+    evidence_dimensions: [product]
+  google_play_products:
+    label: "Google Play products"
+    covers: "one-time products and subscriptions, base plans, offers, localized names and descriptions, prices, tags, and review notes"
+    evidence_dimensions: [product, locale]
+  revenuecat_billing:
+    label: "RevenueCat / billing"
+    covers: "offering/package/product display names, paywall configuration, entitlement identifiers, Stripe/web-funnel product copy and prices"
+  landing_web:
+    label: "Landing / web"
+    covers: "hero, method/how-it-works, optional web onboarding, FAQ, pricing, footer, app screenshots, metadata, Open Graph, JSON-LD, robots.txt, llms.txt, and sitemap.xml"
+    evidence_dimensions: [locale]
+  landing_onboarding:
+    label: "Landing onboarding"
+    covers: "web qualification/onboarding steps, questions, branching, consent, completion state, and handoff into install, waitlist, or purchase"
+  seo_geo:
+    label: "SEO / GEO"
+    covers: "target keywords, citability content, brand-entity signals"
+  lifecycle_email:
+    label: "Lifecycle email"
+    covers: "transactional + lifecycle templates, brand tokens, plan/price/feature mentions"
+  analytics:
+    label: "Analytics"
+    covers: "event names, funnel/dashboard definitions, attribution sources"
+  legal:
+    label: "Legal"
+    covers: "privacy policy, terms, App Privacy answers, Data safety"
+  content_ugc_ads:
+    label: "Content / UGC / ads"
+    covers: "ad creative, demo videos, screenshots reused in ads, creator scripts"
+    evidence_dimensions: [asset]
+
+# Change type -> surfaces that must be updated or explicitly justified as
+# unaffected. Mirrors the change-cascade.md "Change Cascade Map" rows; the
+# `mirrors` field names the row so drift between the two is visible.
+change_types:
+  design_contract_lock:
+    label: "Design contract accepted"
+    mirrors: "Design contract accepted"
+    cascade_to:
+      - app_in_app
+      - asc_listing
+      - google_play_listing
+      - asc_products
+      - google_play_products
+      - revenuecat_billing
+      - landing_web
+      - landing_onboarding
+      - seo_geo
+      - lifecycle_email
+      - analytics
+      - legal
+      - content_ugc_ads
+    notes: "create the baseline as soon as DESIGN.md is accepted; build the local landing site while app implementation runs; mark price and product surfaces unaffected or blocked when they do not apply yet"
+
+  feature_change:
+    label: "Feature added / changed / removed"
+    mirrors: "Feature added / changed / removed"
+    cascade_to:
+      - app_in_app
+      - asc_listing
+      - google_play_listing
+      - landing_web
+      - landing_onboarding
+      - seo_geo
+      - lifecycle_email
+      - analytics
+      - legal
+      - content_ugc_ads
+    notes: "legal only when the change introduces new data collection or a new SDK — justify it as unaffected otherwise"
+
+  lexicon_change:
+    label: "Core copy / feature name / brand vocabulary change"
+    mirrors: "Core copy / feature name / brand vocabulary change (lexicon)"
+    cascade_to:
+      - app_in_app
+      - asc_listing
+      - google_play_listing
+      - asc_products
+      - google_play_products
+      - revenuecat_billing
+      - landing_web
+      - landing_onboarding
+      - lifecycle_email
+      - content_ugc_ads
+    notes: "run the Lexicon Lock sweep from flow-traceability.md — grep every surface that names the term and update them together, including landing component files, <meta> description, and JSON-LD description/FAQ blocks"
+
+  onboarding_change:
+    label: "Onboarding flow change"
+    mirrors: "Onboarding flow change"
+    cascade_to:
+      - app_in_app
+      - asc_listing
+      - google_play_listing
+      - analytics
+      - landing_web
+      - landing_onboarding
+    notes: "asc_listing covers the screenshot set and App Preview when they show onboarding; analytics covers activation events/funnels and review-prompt timing"
+
+  pricing_change:
+    label: "Paywall / pricing / plan / trial change"
+    mirrors: "Paywall / pricing / plan / trial change"
+    cascade_to:
+      - app_in_app
+      - asc_listing
+      - google_play_listing
+      - asc_products
+      - google_play_products
+      - revenuecat_billing
+      - landing_web
+      - legal
+      - lifecycle_email
+      - analytics
+    notes: "legal covers auto-renew and price disclosure in terms; lifecycle_email covers trial/renewal/win-back"
+
+  visual_change:
+    label: "Visual / UI / design-token change"
+    mirrors: "Visual / UI / design-token change"
+    cascade_to:
+      - app_in_app
+      - asc_listing
+      - google_play_listing
+      - landing_web
+      - lifecycle_email
+      - content_ugc_ads
+    notes: "app_in_app is the change itself, not a downstream effect — the in-app UI updates first, everything else re-renders or re-describes it; store screenshots and App Preview need a re-render, not a doc edit; App Icon too when the brand mark changed"
+
+  iap_product_change:
+    label: "New / renamed IAP or subscription product"
+    mirrors: "New / renamed IAP or subscription product"
+    cascade_to:
+      - revenuecat_billing
+      - asc_products
+      - google_play_products
+      - asc_listing
+      - google_play_listing
+      - app_in_app
+      - legal
+      - analytics
+    notes: "asc_products carries the promoted-IAP promotional image (unique per product, never the app icon) and the App Review Information notes; asc_listing is check-and-justify because the app description, keyword field, or in-app-event copy sometimes names the plan/tier — usually unaffected, but the product name change makes it worth a look rather than an assumption"
+
+  privacy_change:
+    label: "Privacy / data / SDK change"
+    mirrors: "Privacy / data / SDK change"
+    cascade_to:
+      - app_in_app
+      - asc_listing
+      - google_play_listing
+      - asc_products
+      - google_play_products
+      - legal
+      - analytics
+      - landing_web
+      - lifecycle_email
+      - content_ugc_ads
+    notes: 'app_in_app covers PrivacyInfo.xcprivacy and required-reason APIs; legal covers App Privacy answers, Play Data safety, privacy policy and terms; asc_products covers App Review notes for external services; asc_listing is check-and-justify because the app description or keyword field can carry a privacy claim (e.g. "no ads", "no tracking") that a new SDK invalidates'
+
+  domain_brand_change:
+    label: "Domain / brand / company-name change"
+    mirrors: "Domain / brand / company-name change"
+    cascade_to:
+      - app_in_app
+      - asc_listing
+      - google_play_listing
+      - asc_products
+      - google_play_products
+      - revenuecat_billing
+      - landing_web
+      - seo_geo
+      - lifecycle_email
+      - content_ugc_ads
+      - legal
+    notes: "everything in lexicon_change plus email sender domains, legal entity references, landing footer, and App Store seller/marketing URLs"
+
+  generated_asset_change:
+    label: "Change affecting generated assets"
+    mirrors: "Design token / feature / copy / pricing change affecting generated assets"
+    cascade_to:
+      - content_ugc_ads
+      - asc_listing
+      - google_play_listing
+      - asc_products
+      - google_play_products
+      - lifecycle_email
+      - landing_web
+    notes: "generated assets embed tokens, feature names, copy, and pricing at generation time — regenerate per the Generated-Asset Regeneration table in change-cascade.md, record each new asset in CONTENT_ASSETS.md, and mark prior entries status:superseded. Generated output is supporting art only and never substitutes for truthful real app UI"

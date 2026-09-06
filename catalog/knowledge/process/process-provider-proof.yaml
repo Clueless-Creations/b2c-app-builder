@@ -1,0 +1,17 @@
+schema_version: 1.0.0
+id: reference.process.provider-proof
+title: Provider Proof
+domain_id: domain.process
+document_path: knowledge/process/provider-proof.md
+load_when: before marking any provider-backed lane (analytics/revenue/email/store/security/eng) done — evidence rules
+  and the minimum PROVIDER_PROOF.md ledger row shape
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.process.provider-proof-verification
+    - workflow.store.google-play-testing-track-standing-envelope
+    - workflow.data.analytics-and-attribution-blueprint
+  context_pack_ids:
+    - context.operations
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

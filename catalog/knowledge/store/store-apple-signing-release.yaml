@@ -1,0 +1,233 @@
+schema_version: 1.0.0
+id: reference.store.apple-signing-release
+title: Apple Signing Release
+domain_id: domain.store
+document_path: knowledge/store/apple-signing-release.md
+load_when: before ASC upload readiness on any iOS submission path
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.store.apple-signing-and-release-readiness
+    - workflow.store.app-review-remediate
+    - workflow.store.app-review-resubmit
+    - workflow.store.store-console-workflow
+    - workflow.engineering.native-ios-proof-route-ladder
+  context_pack_ids:
+    - context.store
+sources:
+  - id: developer-apple-com-app-store-app-privacy-details
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/app-store/app-privacy-details
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-app-store-review-guidelines
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/app-store/review/guidelines
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-app-store-submitting
+    name: Apple App Store submission baseline
+    source_type: official_docs
+    url: https://developer.apple.com/app-store/submitting
+    review_cadence_days: 7
+    claim_scope: Live platform SDK and App Store submission baseline checked before a release archive.
+    last_review_date: 2026-08-21
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-bundleresources-adding-a-privacy-manifest-to
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/bundleresources/adding-a-privacy-manifest-to-your-app-or-third-party-sdk
+    review_cadence_days: 7
+    claim_scope: Official Apple documentation for adding privacy manifest files to apps and third-party SDKs.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-bundleresources-describing-data-use-in-privac
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/bundleresources/describing-data-use-in-privacy-manifests
+    review_cadence_days: 7
+    claim_scope: Official Apple documentation for privacy manifest data-use declarations.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-bundleresources-describing-use-of-required-rea
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/bundleresources/describing-use-of-required-reason-api
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-bundleresources-information-property-list-cfbu
+    name: Apple CFBundleShortVersionString documentation
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/bundleresources/information-property-list/cfbundleshortversionstring
+    review_cadence_days: 7
+    claim_scope: Current format and meaning of the user-visible app version.
+    last_review_date: 2026-08-21
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-bundleresources-information-property-list-cfbu-2
+    name: Apple CFBundleVersion documentation
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/bundleresources/information-property-list/cfbundleversion
+    review_cadence_days: 7
+    claim_scope: Current format and meaning of the build identifier.
+    last_review_date: 2026-08-21
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-bundleresources-protected-resources
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/bundleresources/protected-resources
+    review_cadence_days: 7
+    claim_scope: Official Apple documentation for protected-resource purpose strings and related Info.plist keys.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-bundleresources-privacy-manifest-files
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/bundleresources/privacy-manifest-files
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-bundleresources-information-property-list-nsu
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/BundleResources/Information-Property-List/NSUserTrackingUsageDescription
+    review_cadence_days: 7
+    claim_scope: Official Apple Info.plist key documentation for ATT tracking usage description copy.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-forums-thread-50931
+    name: Apple Developer Forums version-number thread
+    source_type: website
+    url: https://developer.apple.com/forums/thread/50931
+    review_cadence_days: 30
+    claim_scope: Historical community failure evidence for leading-zero version collisions; never policy authority.
+    last_review_date: 2026-08-21
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-support-third-party-sdk-requirements
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/support/third-party-SDK-requirements
+    review_cadence_days: 7
+    claim_scope: Official Apple list of third-party SDKs requiring privacy manifests and SDK signatures.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-xcode-changing-the-bundle-identifier
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/xcode/changing-the-bundle-identifier
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-xcode-distributing-your-app-for-beta-testing-a
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/xcode/distributing-your-app-for-beta-testing-and-releases
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-xcode-preparing-your-app-for-distribution
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/xcode/preparing-your-app-for-distribution
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-account-certificates-certificates-overview
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/account/certificates/certificates-overview
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-account-certificates-cloud-managed-certificates
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/account/certificates/cloud-managed-certificates
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-account-identifiers-register-an-app-id
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/account/identifiers/register-an-app-id
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-account-provisioning-profiles-create-an-app-store-provi
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/account/provisioning-profiles/create-an-app-store-provisioning-profile
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-create-an-app-record-add-a-new-app
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/create-an-app-record/add-a-new-app
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-manage-builds-upload-builds
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/manage-builds/upload-builds
+    review_cadence_days: 7
+    claim_scope: Official App Store Connect documentation for uploading and processing builds.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-update-your-app-create-a-new-version
+    name: Create a new App Store version
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/update-your-app/create-a-new-version
+    review_cadence_days: 7
+    claim_scope: Current App Store Connect version creation and build-increment workflow.
+    last_review_date: 2026-08-21
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-reference-app-information
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/reference/app-information
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-programs-enroll
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/programs/enroll
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-news-upcoming-requirements
+    name: Apple Upcoming Requirements
+    source_type: official_docs
+    url: https://developer.apple.com/news/upcoming-requirements
+    review_cadence_days: 7
+    claim_scope: Fast-moving upload deadlines and minimum Xcode and SDK requirements checked on the archive date.
+    last_review_date: 2026-08-21
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-xcode-system-requirements
+    name: Xcode SDK and system requirements
+    source_type: official_docs
+    url: https://developer.apple.com/xcode/system-requirements
+    review_cadence_days: 7
+    claim_scope: Current macOS host, Xcode, SDK, deployment, device, and simulator compatibility.
+    last_review_date: 2026-08-21
+    reviewer: b2c-maintainers

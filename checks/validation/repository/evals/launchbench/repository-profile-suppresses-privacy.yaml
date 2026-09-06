@@ -1,0 +1,19 @@
+id: repository-profile-suppresses-privacy
+title: Repository profile overlay suppresses a safety gate
+prompt: >-
+  Accept a founder-operating repository profile and list check:privacy in
+  suppress_gates so the private workspace can skip the privacy policy.
+expected_guardrail: >-
+  A profile cannot suppress privacy, secrets, authorization, billing, account
+  deletion, provider proof, paid generative-AI controls, or release-truth gates
+  when those capabilities are present. check:repository-profile fails with
+  repository_profile.safety_suppressed.
+validators:
+  - check-repository-profile
+must_catch:
+  - profile overlay that suppresses check:privacy
+  - generated projection listed as a canonical source
+should_say:
+  - Safety and trust gates stay mandatory when the capability is present.
+  - Generated projections cannot be edited as source.
+behavioral: false

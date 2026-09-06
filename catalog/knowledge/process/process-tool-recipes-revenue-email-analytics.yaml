@@ -1,0 +1,14 @@
+schema_version: 1.0.0
+id: reference.process.tool-recipes.revenue-email-analytics
+title: Revenue Email Analytics
+domain_id: domain.process
+document_path: knowledge/process/tool-recipes/revenue-email-analytics.md
+load_when: delegating RevenueCat/Stripe, Resend, or PostHog setup to a specialist skill, including the RevenueCat
+  Economics Pull recipe — routed from tool-recipes.md; complements the money and analytics rows
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.operations.resend-email-ops
+  context_pack_ids: []
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

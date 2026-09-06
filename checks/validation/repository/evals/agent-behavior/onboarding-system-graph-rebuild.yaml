@@ -1,0 +1,26 @@
+id: onboarding-system-graph-rebuild
+title: Full onboarding rebuild must execute the generalized system graph
+prompt: "Rebuild a consumer app's onboarding from first principles. Research competitors and reviews, evaluate provider and policy capabilities, design every screen and button, wire analytics, and remove the old system completely."
+expected_route: "Load the onboarding-system reference and execute ONB-00 through ONB-22: forensic trace, evidence fan-out, evidence join, first-value and activation contracts, state and analytics joins, architecture selection, journey, complete screen/control/paywall design, visual prototype, implementation planning, hard cutover, and target-runtime proof."
+must_use:
+  - "product/ONBOARDING.md"
+  - "check-onboarding-graph.ts"
+  - "Compound Engineering"
+must_catch:
+  - "trace the real implementation before designing the replacement"
+  - "research current guidance, negative and positive competitor reviews, authorized Onbo Hub flows, internal B2C doctrine, provider and policy capabilities, and 60fps motion references"
+  - "join evidence before choosing architecture or designing screens"
+  - "distinguish first value rendered, first value engaged, activation, retention, monetization, review eligibility, and onboarding completion"
+  - "define canonical identity, journey, entitlement, analytics, experiment, review, permission, and lifecycle state"
+  - "specify every screen, state, button, API action, analytics event, paywall state, failure path, and accessibility behavior"
+  - "produce actual high-fidelity designs and an interactive prototype"
+  - "preserve durable user value through an isolated one-time transformation, then hard-cut and delete every replaced runtime path"
+should_say:
+  - "ONB-00 through ONB-22"
+  - "typed analytics contract with authoritative emitters, identity stitching, deduplication, and expected event sequences"
+  - "ce-plan at ONB-21, then work, review, test, cutover, and target-runtime verification at ONB-22"
+forbidden:
+  - "keep v1 and v2 running in parallel"
+  - "add a permanent compatibility adapter"
+  - "treat a prose flow or generated HTML contract as sufficient screen design"
+  - "request an app review inside first-run onboarding"

@@ -1,0 +1,35 @@
+id: paywall-experimentation-never-starts
+behavioral: true
+title: One reasonable paywall ships at launch and is never touched again while revenue plateaus
+prompt: >
+  The app launched six weeks ago with a competent paywall: hard gate after onboarding, annual
+  anchor, seven-day trial, prices chosen through the pricing procedure with founder approval.
+  Revenue reached about $900/month by week three and has been flat since. The weekly sessions
+  triage crashes, answer reviews, and ship copy tweaks; revenue/REVENUE_OPS.md's Paywall Experiment
+  Backlog still contains only the empty header row, no experiment has ever been proposed to the
+  founder, and the agent's plan for this week is another ASO keyword pass. RevenueCat
+  Experiments is available on the current plan and unconfigured.
+expected_guardrail: >
+  The first paywall is a hypothesis, not a decision. Once the app is live four-plus weeks with
+  the revenue lane done, the agent stands up the experiment cadence from
+  paywall-pricing-and-experiments.md §4: propose the first test from the ordered menu (timing/placement,
+  packaging mix, trial shape, price per paywall-pricing-and-experiments.md §3's revisit, closing offer, design last), route it
+  through RevenueCat Experiments when available, run one experiment at a time per surface, and
+  judge on cohort economics over at least one renewal-decision window. The founder approves
+  price/offer changes per revenue-monetization.md §2; completed tests land their decision back into the pricing record
+  through change-cascade.md. check:revenue fails a done revenue lane on a live app whose
+  backlog shows no current activity — no active row, no completed row started within eight
+  weeks, and no planned row dated to start within 60 days; a backlog of empty headers is the
+  one-and-done plateau wearing a green check.
+validators:
+  - check-revenue
+must_catch:
+  - the paywall shipped once and was never iterated while revenue sat flat for weeks
+  - the experiment backlog stayed an empty header row and no test was ever proposed to the founder
+  - available experimentation tooling (RevenueCat Experiments) sat unconfigured
+  - weekly effort went to lower-leverage work while the highest-lift surface went untested
+should_say:
+  - Stand up the paywall-pricing-and-experiments.md §4 cadence — propose the first experiment from the ordered test menu and put it in front of the founder.
+  - Route through RevenueCat Experiments when available; otherwise run a dated before/after with cohort comparison, honestly labeled.
+  - Judge on cohort economics over a full renewal-decision window, one experiment per surface at a time.
+  - Run npm run check:revenue -- --root . — it fails a live app's done revenue lane with no current backlog activity (active, recently completed, or dated planned experiment row).

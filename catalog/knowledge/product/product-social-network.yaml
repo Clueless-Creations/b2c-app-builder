@@ -1,0 +1,14 @@
+schema_version: 1.0.0
+id: reference.product.social-network
+title: Social Network
+domain_id: domain.product
+document_path: knowledge/product/social-network.md
+load_when: '"build a social network", an X/Instagram/TikTok clone, "a community app for <niche>"; before specing schema,
+  auth, feed, profiles, search, DMs, monetization, or invites'
+lifecycle: active
+bindings:
+  workflow_ids: []
+  context_pack_ids:
+    - context.archetypes
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

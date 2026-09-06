@@ -1,0 +1,200 @@
+apiVersion: b2c.extension/v1
+id: layers-growth/package
+version: 1.0.0
+hostApiVersion: b2c/v1
+title: Layers Growth draft creative loop (hosted provider, fake transport)
+dependencies: []
+imports: []
+resources:
+  - id: layers-growth/draft-input
+    path: draft-input.json
+    kind: schema
+    mediaType: application/json
+  - id: layers-growth/read-input
+    path: read-input.json
+    kind: schema
+    mediaType: application/json
+  - id: layers-growth/output
+    path: output.json
+    kind: schema
+    mediaType: application/json
+  - id: layers-growth/evidence
+    path: evidence.json
+    kind: schema
+    mediaType: application/json
+  - id: layers-growth/integration
+    path: integration.md
+    kind: knowledge
+    mediaType: text/markdown
+  - id: layers-growth/pack
+    path: pack.yaml
+    kind: catalog-pack
+    mediaType: application/yaml
+  - id: layers-growth/notice-layers-mcp
+    path: LICENSE-layers-mcp.txt
+    kind: notice
+    mediaType: text/plain
+providers:
+  - id: layers-growth/layers
+    version: 1.0.0
+    title: Layers Growth (hosted)
+    description: Hosted, credit-metered growth service for TikTok reached through the layers CLI stdio proxy after a separately authorized business sign-in.
+capabilities:
+  - id: layers-growth/creative
+    version: 1.0.0
+    title: Draft creative generation and job reads
+    description: Render a draft creative from an accepted product brief, then read the job and its result. Drafts are never delivered or published by this capability.
+    targets:
+      - platform: host
+        runtime: node22
+    knowledge:
+      - layers-growth/integration
+    operations:
+      - id: layers-growth/creative.draft-creative
+        title: Render a draft creative
+        inputSchema: layers-growth/draft-input
+        outputSchema: layers-growth/output
+        evidenceSchema: layers-growth/evidence
+        effect: spend
+        acceptance:
+          - A quote for the exact arguments, in credits, fits inside the approved credits before any charged call.
+          - The provider project binding equals the workspace's selected connection.
+          - The job reference and observed state come from the transport, and an uncertain response is reconciled before any replay.
+          - A draft is remote state and consumed credits; it is not a publication.
+      - id: layers-growth/creative.get-job
+        title: Read a job
+        inputSchema: layers-growth/read-input
+        outputSchema: layers-growth/output
+        evidenceSchema: layers-growth/evidence
+        effect: observe
+        acceptance:
+          - The job state is read from the provider by reference. Reads are free and change nothing.
+      - id: layers-growth/creative.get-result
+        title: Read a completed result
+        inputSchema: layers-growth/read-input
+        outputSchema: layers-growth/output
+        evidenceSchema: layers-growth/evidence
+        effect: observe
+        acceptance:
+          - A result is an artifact only when the job completed and the artifact carries a sha256. A pending or running job is refused.
+implementations:
+  - id: layers-growth/draft-creative
+    version: 1.0.0
+    operation: layers-growth/creative.draft-creative
+    provider: layers-growth/layers
+    description: render_content through the layers CLI stdio proxy, quoted first, recorded in the job ledger.
+    targets:
+      - platform: host
+        runtime: node22
+    mode: host-tool
+    sdkRange: "*"
+    limitations:
+      - No live call has been tested. Fixtures use a fake transport only.
+      - Provider idempotency for render_content is unverified. An uncertain response is reconciled by job reference before any replay.
+      - Delivery, paid campaigns, managed accounts, and measurement installation are out of scope.
+      - Service terms are unreviewed. The repository license does not license the hosted service.
+    knowledge:
+      - layers-growth/integration
+    connectionRequired: true
+    maturity: experimental
+  - id: layers-growth/get-job
+    version: 1.0.0
+    operation: layers-growth/creative.get-job
+    provider: layers-growth/layers
+    description: Free job read by reference.
+    targets:
+      - platform: host
+        runtime: node22
+    mode: host-tool
+    sdkRange: "*"
+    limitations:
+      - No live call has been tested. Fixtures use a fake transport only.
+      - Delivery, paid campaigns, managed accounts, and measurement installation are out of scope.
+    knowledge:
+      - layers-growth/integration
+    connectionRequired: true
+    maturity: experimental
+  - id: layers-growth/get-result
+    version: 1.0.0
+    operation: layers-growth/creative.get-result
+    provider: layers-growth/layers
+    description: Free read of a completed render result by job reference.
+    targets:
+      - platform: host
+        runtime: node22
+    mode: host-tool
+    sdkRange: "*"
+    limitations:
+      - No live call has been tested. Fixtures use a fake transport only.
+      - Provider idempotency is unverified; the result read is the readback that precedes any replay.
+      - Delivery, paid campaigns, managed accounts, and measurement installation are out of scope.
+    knowledge:
+      - layers-growth/integration
+    connectionRequired: true
+    maturity: experimental
+recipes:
+  - id: layers-growth/draft-loop
+    version: 1.0.0
+    title: Draft, read the job, read the result
+    description: Render one draft creative, read its job, read its result. Review and publication stay outside the recipe.
+    targets:
+      - platform: host
+        runtime: node22
+    workflows:
+      - workflow.layers-growth-draft-creative
+      - workflow.layers-growth-get-job
+      - workflow.layers-growth-get-result
+    operations:
+      - operation: layers-growth/creative.draft-creative
+        implementation: layers-growth/draft-creative
+        required: true
+        workflowIds:
+          - workflow.layers-growth-draft-creative
+        workflowContexts:
+          - workflowId: workflow.layers-growth-draft-creative
+            instructions: neutral
+            roleInstructions: neutral
+            neutralReferenceIds: []
+            providerReferenceIds: []
+            neutralContextPackIds: []
+            providerContextPackIds: []
+      - operation: layers-growth/creative.get-job
+        implementation: layers-growth/get-job
+        required: true
+        workflowIds:
+          - workflow.layers-growth-get-job
+        workflowContexts:
+          - workflowId: workflow.layers-growth-get-job
+            instructions: neutral
+            roleInstructions: neutral
+            neutralReferenceIds: []
+            providerReferenceIds: []
+            neutralContextPackIds: []
+            providerContextPackIds: []
+      - operation: layers-growth/creative.get-result
+        implementation: layers-growth/get-result
+        required: true
+        workflowIds:
+          - workflow.layers-growth-get-result
+        workflowContexts:
+          - workflowId: workflow.layers-growth-get-result
+            instructions: neutral
+            roleInstructions: neutral
+            neutralReferenceIds: []
+            providerReferenceIds: []
+            neutralContextPackIds: []
+            providerContextPackIds: []
+    policy:
+      maxRepairAttempts: 1
+      independentReview: true
+catalogPacks:
+  - layers-growth/pack
+thirdParty:
+  - id: layers-growth/third-party-layers-mcp
+    project: layers/mcp
+    upstream: https://github.com/layers/mcp
+    license: MIT
+    copyright: Copyright (c) 2026 Layers
+    notice: layers-growth/notice-layers-mcp
+    covers:
+      - layers-growth/integration

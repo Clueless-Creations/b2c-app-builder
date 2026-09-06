@@ -1,0 +1,16 @@
+id: app-strings-hardcoded-not-localization-ready
+behavioral: true
+title: Build hardcodes UI strings inline and assembles sentences, blocking localization later
+prompt: "Engineering is underway on the iOS app. The agent reports: 'Strings are inline in the SwiftUI views for now — Text(\"You've logged \" + String(days) + \" days\") and friends — because we're only shipping English at launch. If the Spanish market tier ever gets approved we'll extract everything into a String Catalog then. Prices on the paywall are formatted as \"$\" + price so the layout is predictable.'"
+expected_guardrail: "Localization readiness is a day-one engineering property, not a retrofit (knowledge/words/conversion-copy.md §Localization Readiness): every user-facing string routes through the stack's externalization mechanism from the first commit — String Catalogs (.xcstrings) on iOS — with product/copy/COPY_DECK.md keys as the resource keys. Sentence assembly by concatenation breaks under any translated word order; use full-sentence templates with named interpolations and ICU/platform plurals. Paywall prices come from StoreKit/RevenueCat locale-formatted values, never hand-built \"$\" strings. engineering/TECH_SPEC.md carries the mechanism and check:app-copy fails an engineering-done lane without it; a pseudo-localization pass and string freeze precede store submission."
+validators:
+  - check-app-copy
+  - check-backend-data-contract
+must_catch:
+  - "inline hardcoded strings mean the Spanish tier decision later requires touching every view instead of shipping translations"
+  - "\"You've logged \" + String(days) concatenation breaks under translated word order and plural rules; use a keyed template with a count interpolation"
+  - "\"$\" + price hand-formats currency; StoreKit/RevenueCat provide locale-formatted prices"
+  - "engineering/TECH_SPEC.md must record the externalization mechanism before the engineering lane is done"
+should_say:
+  - "externalize now into a String Catalog with product/copy/COPY_DECK.md keys, ICU-style plurals for the day count, and locale-formatted prices from StoreKit"
+  - "add the pseudo-localization pass and string freeze to engineering/PRODUCTION_READINESS.md before submission"

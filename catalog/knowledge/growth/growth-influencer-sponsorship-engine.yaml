@@ -1,0 +1,15 @@
+schema_version: 1.0.0
+id: reference.growth.influencer-sponsorship-engine
+title: Influencer Sponsorship Engine
+domain_id: domain.growth
+document_path: knowledge/growth/influencer-sponsorship-engine.md
+load_when: before sponsoring established creators who already have an audience to integrate the app into their own
+  content — sponsorship DMs/deal calls, flat/CPM/view-guarantee structures, brand-account credibility, meme/topic-page
+  amplification, or per-deal payback tracking
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.growth.ugc-creator-engine
+  context_pack_ids: []
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

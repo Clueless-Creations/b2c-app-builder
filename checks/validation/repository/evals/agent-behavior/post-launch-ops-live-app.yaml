@@ -1,0 +1,27 @@
+id: post-launch-ops-live-app
+title: Live app resume routes to the post-launch operating rhythm instead of declaring the launch finished
+prompt: >
+  The founder returns two weeks after the app went live and says "the app is out — what
+  now?". state/business-state.json shows phase_6, lanes.post_launch_ops is not_started, there is
+  no operations/POST_LAUNCH_OPS.md, and Sentry plus App Store Connect reviews have never been swept.
+expected_route: >
+  Load knowledge/operations/post-launch-operations.md, create operations/POST_LAUNCH_OPS.md from the template
+  with the Weekly Operating Rhythm, Crash Triage, Review Responses, Release And Hotfix
+  Cadence, Retention Review, Support Operations, and Launch Retro sections, create
+  operations/LAUNCH_RETRO.md for the +7/30/90-day passes, set lanes.post_launch_ops honestly, run the
+  first weekly rhythm with evidence, and gate with check:post-launch — instead of treating
+  "launched" as the end state or improvising an ad-hoc to-do list.
+must_use:
+  - post-launch-operations.md
+  - operations/POST_LAUNCH_OPS.md
+  - operations/LAUNCH_RETRO.md
+  - check:post-launch
+must_catch:
+  - lanes.post_launch_ops is not_started at phase_6 with no operating runbook.
+  - Crashes and reviews have never been swept since launch.
+should_say:
+  - Stand up the weekly operating rhythm with a named crash route, review-response SLA, and retention cohort source.
+  - Fill operations/LAUNCH_RETRO.md so this launch's misses become failure cards or LaunchBench candidates.
+forbidden:
+  - the launch is complete
+  - nothing left to do

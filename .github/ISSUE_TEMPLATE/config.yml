@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Setup and contribution guide
+    url: https://github.com/Clueless-Creations/b2c-app-builder/blob/main/CONTRIBUTING.md
+    about: Install the toolkit, make a focused change, and record local evidence.
+  - name: Validator reference
+    url: https://github.com/Clueless-Creations/b2c-app-builder/blob/main/docs/validators.md
+    about: Find the check that owns a product or runtime contract.
+  - name: Report a security vulnerability
+    url: https://github.com/Clueless-Creations/b2c-app-builder/security/advisories/new
+    about: Send security reports through the private channel.

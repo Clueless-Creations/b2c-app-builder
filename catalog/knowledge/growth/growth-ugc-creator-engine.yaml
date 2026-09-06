@@ -1,0 +1,17 @@
+schema_version: 1.0.0
+id: reference.growth.ugc-creator-engine
+title: UGC Creator Engine
+domain_id: domain.growth
+document_path: knowledge/growth/ugc-creator-engine.md
+load_when: before founder-run creator operations on new niche accounts the program controls — TikTok/Reels/Shorts UGC,
+  founder-led format-discovery experiments, hired micro-creator sourcing/contracts/payments, or post-launch social
+  distribution where the algorithm, not an existing audience, is the distribution engine
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.growth.ugc-creator-engine
+    - workflow.growth.fastlane-growth-ops
+  context_pack_ids:
+    - context.growth
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

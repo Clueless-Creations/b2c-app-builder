@@ -1,0 +1,26 @@
+schema_version: 1.0.0
+id: reference.growth.geo-seo
+title: GEO/SEO
+domain_id: domain.growth
+document_path: knowledge/growth/geo-seo.md
+load_when: before the first file edit, not the deploy — any landing page file, component copy, screenshot metadata,
+  policy page, robots.txt, llms.txt, sitemap.xml, schema, or metadata; also before publishing, AI-crawler access, or
+  brand/entity signals
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.growth.geo-seo-public-visibility
+    - workflow.growth.landing-funnel-publication-and-live-proof
+    - workflow.growth.landing-funnel-audit
+  context_pack_ids:
+    - context.growth
+    - context.launch-surfaces
+sources:
+  - id: github-com-zubair-trabzada-geo-seo-claude
+    name: github.com
+    source_type: github
+    url: https://github.com/zubair-trabzada/geo-seo-claude
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

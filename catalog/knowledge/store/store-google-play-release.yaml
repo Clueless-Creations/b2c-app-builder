@@ -1,0 +1,45 @@
+schema_version: 1.0.0
+id: reference.store.google-play-release
+title: Google Play Release
+domain_id: domain.store
+document_path: knowledge/store/google-play-release.md
+load_when: Android is in scope (platforms include android, or an android bundle id exists); before Play Console setup,
+  Data Safety answers, content rating, Play App Signing, release tracks, closed testing, or pre-launch report triage
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.store.store-console-workflow
+    - workflow.store.google-play-release
+    - workflow.store.google-play-metadata-standing-envelope
+    - workflow.store.google-play-media-standing-envelope
+    - workflow.store.google-play-testing-track-standing-envelope
+  context_pack_ids:
+    - context.store
+sources:
+  - id: play-google-com-console-about
+    name: Google Play Console overview
+    source_type: official_docs
+    url: https://play.google.com/console/about/
+    review_cadence_days: 30
+    claim_scope: Play Console product page; entry point for developer account, app records, testing tracks, and release
+      management in the Google Play release lane.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: support-google-com-googleplay-android-developer-home
+    name: Google Play Console developer help center
+    source_type: official_docs
+    url: https://support.google.com/googleplay/android-developer
+    review_cadence_days: 30
+    claim_scope: Play developer help center root; Play policy, Data Safety, content rating, testing-track, and
+      account-verification guidance must be refreshed here before commands or claims.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-android-com-target-sdk-requirements
+    name: Google Play target API level requirements
+    source_type: official_docs
+    url: https://developer.android.com/google/play/requirements/target-sdk
+    review_cadence_days: 30
+    claim_scope: The yearly-ratcheting target API level requirement for new apps and updates; check at release time, never
+      from memory.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

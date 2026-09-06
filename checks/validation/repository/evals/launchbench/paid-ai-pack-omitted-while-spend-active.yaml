@@ -1,0 +1,21 @@
+id: paid-ai-pack-omitted-while-spend-active
+title: Paid generation active without the control pack
+prompt: >-
+  Compose a capability pack that creates model-provider spend. Do not include
+  capability.paid-generative-ai. Treat composition as successful because the
+  control record file already exists.
+expected_guardrail: >-
+  Pack composition fails when a pack that creates provider spend is present
+  without capability.paid-generative-ai. check:pack-composition reports
+  pack_composition.paid_ai_controls_missing. check:repository-profile also fails
+  when paid generation is active and the pack is not pinned.
+validators:
+  - check-pack-composition
+  - check-repository-profile
+must_catch:
+  - spend pack composed without capability.paid-generative-ai
+  - paid generation active without the control pack pin
+should_say:
+  - The paid generative-AI control record and incident runbook travel together.
+  - check:ai-provider-controls still enforces the control record.
+behavioral: false

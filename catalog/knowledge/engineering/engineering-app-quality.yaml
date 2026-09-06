@@ -1,0 +1,20 @@
+schema_version: 1.0.0
+id: reference.engineering.app-quality
+title: App Quality And Vitals
+domain_id: domain.engineering
+document_path: knowledge/engineering/app-quality.md
+load_when: before beta, store submission, production-readiness, or mobile performance claims
+lifecycle: active
+bindings:
+  workflow_ids: [workflow.engineering.app-quality-and-vitals]
+  context_pack_ids: [context.engineering, context.device]
+applicability_notes: Every mobile launch needs measured app-quality proof.
+sources:
+  - id: android-vitals
+    name: Android vitals
+    source_type: official_docs
+    url: https://developer.android.com/topic/performance/vitals/index.html
+    review_cadence_days: 30
+    claim_scope: Supports crash, ANR, battery, performance, and store-quality guidance.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

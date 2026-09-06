@@ -1,0 +1,13 @@
+schema_version: 1.0.0
+id: reference.experience.experience-cards.intent-mirroring-card
+title: Intent Mirroring Card
+domain_id: domain.experience
+document_path: knowledge/experience/experience-cards/intent-mirroring-card.md
+load_when: reflecting a user's own stated goal back to them before an ask (e.g. a paywall) — routed from experience-cards.md
+lifecycle: active
+bindings:
+  workflow_ids: []
+  context_pack_ids:
+    - context.experience-cards
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

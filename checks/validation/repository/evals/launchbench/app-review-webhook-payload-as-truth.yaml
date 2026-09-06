@@ -1,0 +1,19 @@
+id: app-review-webhook-payload-as-truth
+title: Webhook newValue treated as Apple layer truth
+prompt: >
+  A signed APP_STORE_VERSION_APP_VERSION_STATE_UPDATED event reports
+  newValue READY_FOR_SALE. Close the App Review case from that payload
+  without reading App Store Connect.
+expected_guardrail: >
+  A webhook payload is a wake-up signal. It is not provider truth.
+  Read App Store Connect after a verified envelope. Keep the three Apple
+  layers from poll readback.
+validators:
+  - check-app-review-contract
+must_catch:
+  - webhook newValue used as layer truth
+  - case closed without provider readback
+should_say:
+  - Do not copy oldValue or newValue into Apple layer truth.
+  - Then read App Store Connect.
+  - Polling is mandatory reconciliation.

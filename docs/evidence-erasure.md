@@ -1,0 +1,13 @@
+# Authorized local evidence erasure
+
+`kernel/reducer/erasure.ts` implements the U22 local reducer boundary under ARCH-09 and ARCH-11. It has no CLI, MCP, or provider deletion endpoint yet.
+
+A read-only preview inventories the workspace, resolves observations through U16 subject mappings, and identifies dependent operating records, proof files, duplicate payloads, snapshots, run acceptance, and current-truth claims. The policy lists approved local roots and legal holds. A founder Ed25519 receipt binds the exact preview digest, policy digest, canonical workspace identity, unique receipt ID, and expiry. The consumer verifies it against the protected founder trust store. A caller cannot supply a grant or disable the append-only rule.
+
+The dedicated reducer transition removes matching local payloads, invalidates dependent acceptance, and records salted subject digests and record/file hashes in business state. Ordinary reducer patches cannot remove observations, alter tombstones, or reintroduce a tombstoned subject. Unrelated observations and evidence stay intact.
+
+The transition holds the workspace session lock and the common reducer manifest lock. Normal runtime reads and reducer commands refuse while its journal exists. Its temporary recovery journal contains only signed scope metadata and sanitized replacement bytes. Audit entries contain generic operation descriptions and hashes. A prepared transition can resume after receipt expiry; changed unrelated files, changed targets, or a broken audit chain refuse recovery. Journal and replacement bytes are flushed before rename, and directory changes and audit boundaries are flushed before proceeding. Unknown scratch files refuse recovery. No removed payload is backed up for rollback.
+
+The inventory is deliberately bounded: 5,000 files, 16 MiB per file, and 64 MiB total. Symlinks, hard links, unscanned Git or dependency stores, legal holds, unidentified subject copies, shared proof requiring content-aware redaction, and identifying immutable audit content all refuse execution. This is not a promise to erase arbitrary repositories or remote backups. Files outside the workspace and provider-held copies require separately authorized deletion and readback. A pending provider deletion keeps `globalComplete` false.
+
+Fixtures use isolated temporary workspaces and ephemeral signing keys. They prove scope and signature refusal, cross-workspace isolation, legal holds, immutable audit refusal, interrupted transition recovery, dependent proof invalidation, unrelated proof preservation, and ordinary append-only enforcement. They do not prove provider erasure or production retention coverage.

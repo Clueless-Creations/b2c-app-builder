@@ -1,0 +1,38 @@
+schema_version: 1
+reviewed_at: "2026-08-24"
+entries:
+  - provider_id: revenuecat
+    source_id: api-revenuecat-com
+    from_hash: c627fed44bd28fe8a5480c99a9931cda8e3a4dca7ef38d084e927b7313ff62f3
+    to_hash: c71fd8eebdf3e0c33a979bbb35d3046a0730f395e21438b94e14b5b0f69f4c19
+    classification: ignore
+    summary: API origin page chrome changed. B2C App Builder still calls REST API v2 offerings and entitlements.
+    migration: none
+  - provider_id: revenuecat
+    source_id: www-revenuecat-com-docs-api-v1
+    from_hash: d84c363c16334dde0057a3090df4a4c739b0de6faec84c7b8bcc4c0033b5d953
+    to_hash: d84c363c16334dde0057a3090df4a4c739b0de6faec84c7b8bcc4c0033b5d953
+    classification: ignore
+    summary: REST API v1 docs hash is unchanged. Keep current probe and proof guidance.
+    migration: none
+  - provider_id: revenuecat
+    source_id: www-revenuecat-com-docs-tools-experiments-v1
+    from_hash: unsnapped
+    to_hash: unsnapped
+    classification: docs
+    summary: Experiments v1 docs are contracted. No snapshot row exists yet. Classify on first fetch.
+    migration: none
+  - provider_id: agent-runtime-claude
+    source_id: claude-com-claude-code
+    from_hash: c33fd1af5779903945c41bda4526e72aff31ffbd405b0e804eadb0914cdd5c82
+    to_hash: 999a5aacdea1a0968df9b5f5771a4a22003728a786fc1fcc0f8ee29210217c8d
+    classification: ignore
+    summary: Claude Code product page chrome changed. Skill-client install path and pin rules stay.
+    migration: none
+  - provider_id: apple-asc
+    source_id: developer-apple-com-help-app-store-connect-manage-builds-upload-builds
+    from_hash: 3c93c30a6e76c1a11db6f8e919d86047251f6dd53d4df1bd16479b192556b2d6
+    to_hash: a7f28429ed420f684e5f7fa8ec8e0354d22e927795b6b23b8bf9625320f45d4d
+    classification: ignore
+    summary: Upload-builds help chrome changed. Slice 0 ASC capability receipt still names the observe commands.
+    migration: none

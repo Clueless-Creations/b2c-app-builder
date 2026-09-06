@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Standout Moment</title>
+  <style>
+    :root {
+      --bg: #f7f2e8;
+      --paper: #fffdf8;
+      --ink: #171513;
+      --muted: #665f56;
+      --line: #d8cbb9;
+      --accent: #e84f5f;
+      --accent-2: #0f7f6f;
+      --gold: #bb7a17;
+      --bad: #9f2f24;
+      --shadow: 0 18px 45px rgba(42, 31, 18, 0.12);
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background:
+        linear-gradient(135deg, rgba(232, 79, 95, 0.08), transparent 32%),
+        radial-gradient(circle at top right, rgba(15, 127, 111, 0.16), transparent 34%),
+        var(--bg);
+      color: var(--ink);
+      font: 15px/1.45 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    header {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 34px 0 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.2rem, 6vw, 5rem);
+      line-height: 0.95;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: 1.1rem;
+      letter-spacing: 0;
+    }
+
+    p { color: var(--muted); margin: 0; }
+
+    .subtitle {
+      margin-top: 12px;
+      max-width: 760px;
+      font-size: 1.05rem;
+    }
+
+    main {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 12px 0 48px;
+      display: grid;
+      gap: 18px;
+    }
+
+    section {
+      background: rgba(255, 253, 248, 0.94);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      overflow: auto;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      padding: 6px 10px;
+      font-size: 0.82rem;
+    }
+
+    .ladder {
+      position: relative;
+      display: grid;
+      gap: 0;
+      min-width: 760px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 160px 70px minmax(320px, 1fr) 210px;
+      gap: 16px;
+      min-height: 88px;
+      align-items: start;
+      border-bottom: 1px solid rgba(216, 203, 185, 0.75);
+      padding: 14px 0;
+    }
+
+    .row:last-child { border-bottom: 0; }
+
+    .label {
+      display: flex;
+      gap: 10px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .mark {
+      width: 12px;
+      height: 18px;
+      border-radius: 2px;
+      background: var(--gold);
+      flex: 0 0 auto;
+      margin-top: 2px;
+    }
+
+    .stars {
+      position: relative;
+      display: grid;
+      place-items: center;
+    }
+
+    .stars::before {
+      content: "";
+      position: absolute;
+      top: -24px;
+      bottom: -24px;
+      left: 50%;
+      width: 2px;
+      transform: translateX(-50%);
+      background: var(--line);
+      z-index: 0;
+    }
+
+    .badge {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--accent);
+      font-weight: 800;
+      box-shadow: 0 6px 18px rgba(232, 79, 95, 0.35);
+    }
+
+    .scene strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--ink);
+    }
+
+    .reaction {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .feasible {
+      margin: 6px 0;
+      border: 1px dashed rgba(232, 79, 95, 0.7);
+      background: rgba(232, 79, 95, 0.06);
+      border-radius: var(--radius);
+      padding: 8px 12px;
+      color: var(--accent);
+      font-weight: 800;
+      text-align: right;
+      min-width: 760px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      padding: 14px;
+      min-height: 128px;
+    }
+
+    .card strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--accent-2);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 820px;
+      background: #fff;
+    }
+
+    th, td {
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--line);
+      padding: 10px;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.92em;
+    }
+
+    @media (max-width: 760px) {
+      header, main { width: min(100% - 24px, 1120px); }
+      section { padding: 14px; }
+      .subtitle { font-size: 0.98rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>The Standout Moment</h1>
+    <p class="subtitle">Imagine the version of this app someone would tell a friend about. Then decide what we can actually build, and ship the smallest first version that still earns the story.</p>
+    <div class="meta">
+      <span class="pill">Source: 11_STAR_EXPERIENCE.md</span>
+      <span class="pill">Trace: state/LAUNCH_TRACE.md</span>
+      <span class="pill">Product: PRODUCT.md</span>
+      <span class="pill">Build: engineering/TECH_SPEC.md</span>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <h2>From Worst To Best</h2>
+      <div class="ladder" aria-label="experience ladder, worst to best">
+        <div class="row">
+          <div class="label"><span class="mark"></span><span>Refund me</span></div>
+          <div class="stars"><span class="badge">1</span></div>
+          <div class="scene"><strong>The app breaks trust.</strong><p>The promise fails, the user feels misled, or recovery is unclear.</p></div>
+          <div class="reaction">Emotion: regret. Lesson: define what must never ship.</div>
+        </div>
+        <div class="row">
+          <div class="label"><span class="mark"></span><span>It technically works</span></div>
+          <div class="stars"><span class="badge">2</span></div>
+          <div class="scene"><strong>The task completes with friction.</strong><p>The user waits, guesses, retries, or wonders whether the result is trustworthy.</p></div>
+          <div class="reaction">Emotion: tolerance. Lesson: remove avoidable drag.</div>
+        </div>
+        <div class="row">
+          <div class="label"><span class="mark"></span><span>Expected experience</span></div>
+          <div class="stars"><span class="badge">5</span></div>
+          <div class="scene"><strong>The app does what it says.</strong><p>The baseline product promise works, but nobody would describe it as special.</p></div>
+          <div class="reaction">Emotion: neutral. Lesson: this is the floor.</div>
+        </div>
+        <div class="feasible">Line Of Feasibility: V1 should usually live between 6 and 7 stars.</div>
+        <div class="row">
+          <div class="label"><span class="mark"></span><span>Better than expected</span></div>
+          <div class="stars"><span class="badge">6</span></div>
+          <div class="scene"><strong>The product reflects the user.</strong><p>Inputs come back as a useful next step, clear explanation, or confidence-building result.</p></div>
+          <div class="reaction">Emotion: relief. Lesson: polish plus relevance creates trust.</div>
+        </div>
+        <div class="row">
+          <div class="label"><span class="mark"></span><span>Way beyond</span></div>
+          <div class="stars"><span class="badge">7</span></div>
+          <div class="scene"><strong>The next best step feels prepared.</strong><p>The user sees a result, recommendation, or path that feels context-aware and personal.</p></div>
+          <div class="reaction">Emotion: "made for me." Lesson: this is the V1 magic candidate.</div>
+        </div>
+        <div class="row">
+          <div class="label"><span class="mark"></span><span>Impossible concierge</span></div>
+          <div class="stars"><span class="badge">10</span></div>
+          <div class="scene"><strong>A human team manually creates the perfect result.</strong><p>Every detail is anticipated, customized, checked, and delivered with no user effort.</p></div>
+          <div class="reaction">Emotion: amazement. Lesson: find the service blueprint.</div>
+        </div>
+        <div class="row">
+          <div class="label"><span class="mark"></span><span>Absurd extreme</span></div>
+          <div class="stars"><span class="badge">11</span></div>
+          <div class="scene"><strong>The problem disappears like magic.</strong><p>The outcome is so complete and surprising that the user wants to tell everyone.</p></div>
+          <div class="reaction">Emotion: evangelism. Lesson: name the real ambition.</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>V1 Scalable Slice</h2>
+      <div class="grid">
+        <article class="card"><strong>Magical Moment</strong><p>Name the one moment V1 must prove, using product-specific language from research.</p></article>
+        <article class="card"><strong>Scalable Behavior</strong><p>Define what the app can do with software, data, content, or light manual help.</p></article>
+        <article class="card"><strong>Proof</strong><p>Connect the moment to analytics, device flow, backend/provider state, and founder-visible evidence.</p></article>
+      </div>
+    </section>
+
+    <section>
+      <h2>Carrying It Into Every Screen</h2>
+      <table>
+        <thead><tr><th>Surface</th><th>The Question To Answer</th><th>Output</th></tr></thead>
+        <tbody>
+          <tr><td>Product</td><td>What result would the user retell?</td><td><code>PRODUCT.md</code>, <code>state/LAUNCH_TRACE.md</code></td></tr>
+          <tr><td>Onboarding</td><td>What makes the user feel understood early?</td><td><code>product/ONBOARDING.md</code>, <code>product/onboarding.html</code></td></tr>
+          <tr><td>Paywall</td><td>What makes purchase feel like unlocking momentum?</td><td><code>revenue/REVENUE_OPS.md</code>, <code>design.md</code></td></tr>
+          <tr><td>Paid UA</td><td>What tiny paid creative can truthfully preview the V1 magic and be measured against revenue?</td><td><code>PAID_UA.md</code>, <code>CONTENT_ASSETS.md</code>, <code>analytics/ANALYTICS.md</code></td></tr>
+          <tr><td>Viral Growth</td><td>What product moment would make sharing or referral feel natural?</td><td><code>VIRAL_GROWTH.md</code>, <code>analytics/ANALYTICS.md</code></td></tr>
+          <tr><td>Ad</td><td>What tiny experience can the ad deliver by itself?</td><td><code>growth/UGC_PLAYBOOK.md</code>, <code>CONTENT_ASSETS.md</code></td></tr>
+          <tr><td>App Store</td><td>What three frames prove the magic?</td><td><code>APP_STORE_LISTING.md</code>, <code>SCREENSHOTS.md</code></td></tr>
+          <tr><td>Engineering</td><td>What state, data, API, permissions, and fixtures make it real?</td><td><code>engineering/TECH_SPEC.md</code>, <code>engineering/ENGINEERING_PLAN.md</code></td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,62 @@
+schema_version: 1
+id: posthog-context-mill
+project: PostHog context mill
+canonical_url: https://github.com/PostHog/context-mill
+aliases: [PostHog/context-mill]
+authors:
+  - name: PostHog
+    role: publishing organization; individual source authors retained upstream
+maintainers:
+  - name: PostHog
+    role: upstream maintaining organization
+license:
+  spdx: NOASSERTION
+  status: unknown
+  reviewed_revision: bbc88864bf8ba2efac43bb4c2782e4406bc0dfa6
+  scope: No root license file was found at the inspected revision. No source, skill text, examples, or build output is copied or adapted.
+  notes: Tracking-only candidate. Public visibility and the wizard license do not license this separate repository or its generated bundles.
+source_ids: [github-com-posthog-context-mill]
+relationships:
+  - kind: selected-skill-guidance
+    consumption: Track the skill catalog as an unadopted upstream candidate. Local documentation records the rights hold; no skill content is shipped.
+    local_owners: [docs/upstreams/official-agent-tooling.md]
+    tests: [checks/verification/fixtures/official-upstreams.fixtures.ts]
+    upstream_paths: [README.md, context/skills, scripts]
+    pin_authority: Reviewed commit below and the builder package content digest identify the authored guidance; host executables and remotely downloaded skills remain separate compatibility dependencies.
+baselines:
+  reviewed_source:
+    revision: bbc88864bf8ba2efac43bb4c2782e4406bc0dfa6
+    observed_at: "2026-09-06"
+    by: b2c-contributor source review
+    note: Read-only archive inspected; branch head rechecked via GitHub. This is source review, not a binary execution test.
+support:
+  policy: Discovery and update tracking only. Adoption is deferred pending rights review for the selected skill and its fetched/generated dependencies.
+  versions:
+    - range: bbc88864bf8ba2efac43bb4c2782e4406bc0dfa6
+      status: untested
+      evidence: ["Source inspection only; no live execution or broad SDK-version support claim."]
+  operations: []
+  unsupported_operations:
+    - id: automatic-setup
+      reason: Installing, authenticating, disclosing source, changing credentials or remote configuration require explicit scoped authority.
+    - id: unreviewed-upstream-features
+      reason: New upstream features require a reviewed integration change and tests, not an automatic tool grant.
+  platforms: []
+adaptations:
+  - id: builder-contracts-win
+    description: Keep product, identity, consent, measurement, evidence, and execution authority with the existing builder owners. Upstream agents never become acceptance authorities.
+    owner: docs/upstreams/official-agent-tooling.md
+    intentional: true
+review:
+  owner: b2c-maintainers
+  cadence_days: 7
+  last_review: "2026-09-06"
+  status: deferred
+  deferral:
+    reason: No verified license for the selected skill repository or its generated content.
+    reconsider_when: Upstream provides an applicable license or explicit permission and selected output dependencies are reviewed.
+    owner: b2c-maintainers
+credits:
+  acknowledge: false
+  use: inspiration
+  summary: Tracked candidate only; not claimed as powering the builder until rights and adoption are reviewed.

@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "upstreamId": "rork-app-store-connect-cli",
+  "checkedAt": "2026-09-05T22:06:00.000Z",
+  "method": "manual",
+  "latestStable": {
+    "tag": "4.11.0",
+    "publishedAt": "2026-08-29T10:09:07Z",
+    "assets": [
+      {
+        "name": "asc_4.11.0_checksums.txt",
+        "sha256": "3fd036048559a07684cea47c1f447b010978365e9c9970e89d1803ec52d82f7e",
+        "bytes": 451
+      },
+      {
+        "name": "asc_4.11.0_linux_amd64",
+        "sha256": "5b963646eb39d51f8b1ac44466bf5e23fc2e41ae25debaa1b221c883a17a8591",
+        "bytes": 53563554
+      },
+      {
+        "name": "asc_4.11.0_linux_arm64",
+        "sha256": "aa81ffabd8c755ad2aae6ff9b79267d4523bcecc5c1f9c7f4abe33b8b52ad774",
+        "bytes": 48693410
+      },
+      {
+        "name": "asc_4.11.0_macOS_amd64",
+        "sha256": "276b0ca833041294983fa2506e428b2a5ad29915a141b709251ea90e4a4ef3b4",
+        "bytes": 54628208
+      },
+      {
+        "name": "asc_4.11.0_macOS_arm64",
+        "sha256": "b928a12dec6be975271a2d374ba811717447a211089c6c89d3318d32c61c8202",
+        "bytes": 49344576
+      },
+      {
+        "name": "asc_4.11.0_windows_amd64.exe",
+        "sha256": "bff86fc63a40924b71800e78486512ca3a7e55c7a60be17031d70a1019398403",
+        "bytes": 54329344
+      }
+    ]
+  },
+  "prereleases": [],
+  "branchHead": {
+    "branch": "main",
+    "sha": "3a2318a756f78ef6d2d9101f68124ce26cbb056c",
+    "committedAt": "2026-09-05T21:19:48Z"
+  },
+  "releasesSinceBaseline": [
+    {
+      "tag": "4.11.0",
+      "publishedAt": "2026-08-29T10:09:07Z",
+      "summary": "apps wall: add TapTape in [link]; fix(docs): preserve help output with cold Go cache in [link]; build(deps): bump github.com/aws/aws-sdk-go-v2 from 1.43.6 to 1.43.7 in [link]; build(deps): bump github.com/aws/smithy-go from 1.27.8 to 1.27.10 in [link]; build(deps): bump github.com/aws/aws-sdk-go-v2/credentials from 1.19.36 to 1.19.37 in [link]; build(deps): bump github.com/aws/aws-sdk-go-v2/service/s3 from 1.107.1 to 1.107.3 in [link]; build(deps): bump github.com/bitrise-io/go-utils/v2 from 2.0.0-alpha.37 to 2.0.0-alpha.38 in [link]; fix(notify): keep Slack validation diagnostics concise in [link]; fix(telemetry): classify snitch descriptions as leaf calls in [link]; Add deep submission validation in [link]; apps wall: add Somilo in [link]; @superkam made their first contribution in [link]; @nogu66 made their first contribution in [link]"
+    },
+    {
+      "tag": "4.10.0",
+      "publishedAt": "2026-08-27T10:01:52Z",
+      "summary": "apps wall: add Ordsnok - Snoop for words in [link]; apps wall: add takt - car glance in [link]; fix(json): preserve sparse resource attribute presence in [link]; feat(product-pages): expose custom page query controls in [link]; feat(app-events): expose list query controls in [link]; fix(cli): sanitize usage diagnostics for terminal output in [link]; fix(signing): guard pagination cycles during fetch in [link]; fix(upload): reject zero-length asset operations in [link]; fix(analytics): paginate reports from continuation URLs in [link]; feat(iap): add v2 list query filters in [link]; fix(cli): classify list validation as usage errors in [link]; feat(bundle-ids): expose list query controls in [link]; test(metadata): stabilize pagination deadline check in [link]; feat(certificates): expose list query controls in [link]; fix(json): preserve null sparse resource attributes in [link]; fix(screenshots): paginate complete screenshot collections in [link]; feat(xcode-cloud): expose CI product list query controls in [link]; feat(versions): add --latest to reduce to the newest version per platform in [link]; Add TestFlight group creation controls in [link]; feat(profiles): expose list query controls in [link]; feat(subscriptions): expose price list query controls in [link]; test(telemetry): remove Windows timing flake in [link]; feat(testflight): expose beta group list query controls in [link]; feat(users): expose list query controls in [link]; (7 lines omitted from summary)"
+    },
+    {
+      "tag": "4.9.4",
+      "publishedAt": "2026-08-26T17:23:46Z",
+      "summary": "fix(xcode): accept project paths with trailing separators in [link]; fix(app-clips): reject repeated CSV mutation flags in [link]; fix(apps): preserve partial published audits in [link]; fix(users): confirm visible app replacement in [link]; fix(auth): normalize stored profile names in [link]"
+    },
+    {
+      "tag": "4.9.3",
+      "publishedAt": "2026-08-26T08:17:52Z",
+      "summary": "apps wall: add Otis — A friend to your stocks in [link]; fix(subscriptions): validate price-point stream output flags in [link]; fix(itunes): honor ratings histogram cancellation in [link]; fix(reports): reject symlinked file parents in [link]; fix(game-center): confirm relationship replacements in [link]; fix(testflight): preserve tester metric payloads in [link]; fix(encryption): reject repeated build IDs in [link]; @iamngoni made their first contribution in [link]"
+    },
+    {
+      "tag": "4.9.2",
+      "publishedAt": "2026-08-25T11:05:11Z",
+      "summary": "apps wall: add Quit Caffeine: Stop Coffee in [link]; apps wall: add Focus & Streak: That One Thing in [link]; apps wall: add Baby Sleep Sounds - Dozy in [link]; apps wall: add MultiPods Audio in [link]; apps wall: add QELM in [link]; apps wall: add Convusic in [link]; fix(itunes): cap oversized Retry-After delays in [link]; fix(sandbox): preserve list filters across pagination in [link]; fix(web): explain missing company name on app create in [link]; fix(subscriptions): reconcile setup price mutations in [link]; docs: the app-scoped builds endpoint hides the latest build in [link]; fix(cli): keep known flag parse errors concise in [link]; fix(builds): reject filters combined with next cursor in [link]; docs(skills): personalize wall approvals and codify protected-merge cycle in [link]; @kempsu made their first contribution in [link]; @dcodeu made their first contribution in [link]; @vsanthanam made their first contribution in [link]"
+    },
+    {
+      "tag": "4.9.1",
+      "publishedAt": "2026-08-24T14:49:02Z",
+      "summary": "fix(cli): classify usage errors in top failure-parameter blind spots in [link]; Make build upload failures actionable in [link]; fix(testflight): make post-upload test-notes failures recoverable in [link]; fix(builds): match equivalent X.Y and X.Y.0 pre-release versions in [link]; fix: ergonomics for the two most-failed required flags in [link]; fix(asc): explain agreement-blocked 403 responses in [link]; docs(cli): teach the discovery loop on the root help screen in [link]; test: add shared off-test-goroutine assertion helper and convert the concurrency-sensitive suites in [link]; fix(previews): pin preview upload order and report partial results in [link]; fix(itunes): retry rate-limited public App Store reads in [link]; test(pricing): adapt merged availability fixtures in [link]"
+    }
+  ],
+  "licenseSha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
+  "licenseChanged": false,
+  "archived": false,
+  "host": {
+    "observedAt": "2026-09-05T21:50:00.000Z",
+    "executables": [
+      {
+        "path": "~/.local/bin/asc",
+        "version": "4.11.0",
+        "sha256": "b928a12dec6be975271a2d374ba811717447a211089c6c89d3318d32c61c8202",
+        "pathOrder": 0,
+        "manager": "manual install (matches the 4.11.0 macOS arm64 release asset digest)"
+      },
+      {
+        "path": "/opt/homebrew/bin/asc",
+        "version": "2.8.1",
+        "sha256": null,
+        "pathOrder": 1,
+        "manager": "homebrew (installed keg 2.8.1; formula stable 4.11.0 on 2026-09-05)"
+      }
+    ],
+    "selected": "~/.local/bin/asc"
+  },
+  "unknowns": [
+    "The Homebrew keg checksum was not computed; only its `brew list --versions` output was observed.",
+    "Windows and Linux release assets were not exercised.",
+    "Releases 4.9.1 through 4.11.0 are observed, not reviewed; their impact on stored guidance is unclassified.",
+    "Assembled by a maintainer from GitHub API responses retrieved with curl on 2026-09-05; not written by upstream-check --write. Re-run upstream-check --fetch --observe-host --write to replace it."
+  ]
+}

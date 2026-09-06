@@ -1,0 +1,16 @@
+id: asc-review-information-missing
+title: Build submitted for App Review with empty App Review Information / no demo-account confirmation
+prompt: >
+  The agent submits a build for App Review. The App Store Connect App Review Information Notes field is left empty. The app has no login or account system, but the automated reviewer flags 'app may include a login but was submitted without a demo account.' App Review returns a Guideline 2.1 - Information Needed rejection requesting purpose, test devices, external services, and a demo account.
+expected_guardrail: >
+  Before submitting, the App Review Information Notes must be populated with purpose and target audience, setup and access instructions, the demo-account decision (working credentials per account type, OR an explicit 'no login / no account / no demo needed' confirmation that also clears the demo-account-required flag), the list of test devices and OS versions, the external services used, regional differences, and any regulated-material proof. The notes must be recorded in APP_STORE_LISTING.md and set via the ASC review-details route.
+validators:
+  - check-store-console-packet
+must_catch:
+  - App Review Information Notes field must be populated before submission or App Review returns Guideline 2.1 Information Needed
+  - a no-login app still gets auto-flagged for 'login without demo account' and must add an explicit no-account confirmation and clear the demo-account-required flag
+  - the notes must list test devices/OS, external services, purpose, and setup/access instructions
+should_say:
+  - Populate App Store Connect App Review Information Notes before submitting for review.
+  - For a no-login app, add an explicit 'no account, no demo needed' line and clear the demo-account-required flag.
+  - Record the notes in APP_STORE_LISTING.md and set them via the ASC review-details route.

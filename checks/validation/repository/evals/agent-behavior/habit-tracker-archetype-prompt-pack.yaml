@@ -1,0 +1,22 @@
+id: habit-tracker-archetype-prompt-pack
+title: Habit-tracker request detects the archetype and routes the prompt pack
+prompt: "I want to build a habit tracker for runners — daily training habits, streaks, and reminders that get people out the door."
+expected_route: "Detect the habit-tracker archetype, load habit-tracker.md, confirm habit model / primary surface / optional systems / niche via one batched AskUserQuestion, record the archetype as a product decision in product.yaml, copy the runnable starter as the floor, then route the bundled prompt pack in order (schema, auth + timezone, check-in core loop, reminders + streaks) with the streak ethics contract treated as a ship gate — instead of improvising the schema and a client-side streak counter."
+must_use:
+  - "habit-tracker.md"
+  - "surfaces/starters/habit-tracker"
+  - "AskUserQuestion"
+  - "product.yaml"
+must_catch:
+  - "the request is a habit-tracker archetype with a known build sequence and a runnable starter as the floor"
+  - "the streak is a HIGH-risk Streak/Loss-Aversion card requiring an ethics attestation, a free escape hatch (streak freeze/repair), a counter-metric, and no guilt/confirmshaming notification copy"
+  - "streaks must be timezone/DST-correct: timezone captured at signup, local dates and streaks computed server-side, never a client-side or stored mutable counter"
+  - "the pack feeds the launch lanes (11-star, emotional design, security RLS, revenue, analytics) — it does not bypass them"
+should_say:
+  - "confirm the habit model and primary surface with the founder before building — habit apps live on phones, and native reminders/widgets pull toward the Apple/Play lanes"
+  - "build one core system at a time, test it, then move on"
+  - "surface the revenue-lane SOSA benchmarks (hard paywall, annual-led plans, trial length) as defaults to test, founder-gated — and never paywall the streak escape hatch"
+forbidden:
+  - "improvise the database schema or streak logic while ignoring the prompt pack and starter"
+  - "skip the AskUserQuestion archetype confirmation"
+  - "ship streak mechanics without the ethics attestation and free recovery path"

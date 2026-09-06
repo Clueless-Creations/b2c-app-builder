@@ -1,0 +1,32 @@
+{
+  "name": "@b2c/app",
+  "version": "0.211.2",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "types": "npm run check:wrangler-pin && wrangler types worker-configuration.d.ts",
+    "typecheck": "npm run check:wrangler-pin && wrangler types worker-configuration.d.ts --check && tsc --noEmit",
+    "test:unit": "node --import tsx --test test/*.test.ts",
+    "test:integration": "node --import tsx --test test/integration/*.test.ts",
+    "check": "npm run lint:tenant && npm run typecheck && npm run test:unit && npm run test:integration",
+    "lint:tenant": "node --import tsx ../knowledge-mcp/tools/check-tenant-isolation.ts --root . --allow interest/repository.ts --allow test/support/d1.ts",
+    "check:wrangler-pin": "node -e \"const want=require('./package.json').devDependencies.wrangler;let got=null;try{got=require('wrangler/package.json').version}catch{}if(got===want)process.exit(0);console.error('\\\\nwrangler '+(got||'not installed')+' resolved, but '+want+' is pinned.\\\\n'+'Run: npm ci --prefix hosted/builder-console\\\\n'+'Do NOT regenerate the types to make this go away. A different wrangler bundles a different '+'workerd, so regenerating REPLACES worker-configuration.d.ts with stale runtime types -- '+'thousands of deletions -- while looking like a routine fix. If you ever do regenerate, '+'read git diff --stat before committing.\\\\n');process.exit(1)\"",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "jose": "6.2.10",
+    "posthog-node": "^5.51.6",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260901.1",
+    "@types/node": "^26.2.0",
+    "miniflare": "5.20260826.0-alpha",
+    "tsx": "^4.23.1",
+    "typescript": "7.0.2",
+    "wrangler": "4.127.0"
+  }
+}

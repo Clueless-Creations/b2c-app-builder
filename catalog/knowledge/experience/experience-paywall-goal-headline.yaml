@@ -1,0 +1,37 @@
+schema_version: 1.0.0
+id: reference.experience.paywall-goal-headline
+title: Paywall Goal Headline
+domain_id: domain.experience
+document_path: knowledge/experience/paywall-goal-headline.md
+load_when: before paywall copy lock; when onboarding goals must interpolate an honest headline and
+  a skipped-goal fallback
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.experience.onboarding-conversion
+    - workflow.experience.onboarding-system.onb-17-screen-control-paywall-contract
+    - workflow.money.experimentation
+  context_pack_ids:
+    - context.experience
+    - context.money
+applicability_notes: Default starter contract. Interpolate only the selected goal key. A skipped
+  goal uses the fallback template. Do not invent an outcome.
+sources:
+  - id: www-revenuecat-com-docs-tools-offering-metadata
+    name: www.revenuecat.com
+    source_type: official_docs
+    url: https://www.revenuecat.com/docs/tools/offering-metadata
+    review_cadence_days: 30
+    claim_scope: Offering metadata is a custom JSON object on an Offering. Use it for remote
+      paywall strings without an app release.
+    last_review_date: 2026-08-26
+    reviewer: b2c-maintainers
+  - id: www-revenuecat-com-docs-tools-paywalls-displaying-paywalls
+    name: www.revenuecat.com
+    source_type: official_docs
+    url: https://www.revenuecat.com/docs/tools/paywalls/displaying-paywalls
+    review_cadence_days: 30
+    claim_scope: RevenueCat Paywalls accept customVariables at present time so the selected
+      onboarding goal can bind into headline copy.
+    last_review_date: 2026-08-26
+    reviewer: b2c-maintainers

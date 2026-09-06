@@ -1,0 +1,117 @@
+{
+  "rubric_version": "1.2",
+  "generated_at": "2026-06-05T12:00:00Z",
+  "pass_threshold": 0.65,
+  "high_dimension_minimum": 2,
+  "builder": {
+    "agent": "design-guru",
+    "session_id": "session-abc123"
+  },
+  "grader": {
+    "agent": "marketing-guru",
+    "session_id": "session-def456"
+  },
+  "grading_pass": {
+    "separate_pass": true,
+    "started_at": "2026-06-05T14:00:00Z",
+    "method": "vision"
+  },
+  "slots": [
+    {
+      "slot": 1,
+      "locale": "en-US",
+      "device_well": "iphone-69",
+      "final_png": "screenshots/final/en-US/iphone-69/slot-1.png",
+      "graded_at": "2026-06-05T14:00:00Z",
+      "rubric_version": "1.2",
+      "dimensions": {
+        "thumbnail_legibility": 3,
+        "hook_first": 3,
+        "truthfulness": 3,
+        "one_idea_per_slot": 2,
+        "brand_token_fidelity": 2,
+        "aso_keyword_reinforcement": 2,
+        "emotional_north_star": 2,
+        "localization_quality": null
+      },
+      "grader_notes": "All three high dimensions land cleanly. Headline reads at 40px in the thumbnail test; hook-first ordering confirmed by showing the main payoff moment on slot 1; pricing claim in the copy matches revenue/REVENUE_OPS.md v1.2. One-idea: the framing is tight. Brand tokens matched against DESIGN.md commit 7f3a. ASO keyword 'task planner' visible in headline and 'focus timer' in sub-copy. Emotional beat: decisiveness confirmed by independent reviewer. Score reflects a strong deck.",
+      "observed_evidence": "Headline reads 'Plan Your Day in Seconds' in 28pt white bold on #1A1A2E navy; app icon centered top at ~24px; no sub-headline visible at thumbnail.",
+      "weighted_score": 0.88,
+      "pass": true,
+      "override": null
+    },
+    {
+      "slot": 2,
+      "locale": "en-US",
+      "device_well": "iphone-69",
+      "final_png": "screenshots/final/en-US/iphone-69/slot-2.png",
+      "graded_at": "2026-06-05T14:05:00Z",
+      "rubric_version": "1.2",
+      "dimensions": {
+        "thumbnail_legibility": 2,
+        "hook_first": 2,
+        "truthfulness": 3,
+        "one_idea_per_slot": 2,
+        "brand_token_fidelity": 2,
+        "aso_keyword_reinforcement": 1,
+        "emotional_north_star": 1,
+        "localization_quality": null
+      },
+      "grader_notes": "Legibility meets threshold at 60px but not 40px — secondary text is tight on small thumbs. Truthfulness strong: all visible UI exists in the shipped build, pricing matches. ASO keyword reinforcement is weak; only a secondary keyword appears in body copy, not headline. Emotional beat is present but subtle. Recommend copy pass to surface primary keyword in headline before v2.",
+      "observed_evidence": "Sub-headline reads 'Track Every Habit' in 18pt on a purple-to-navy gradient (#2D2D5E bottom); bottom third shows a streak-counter widget with a green flame icon.",
+      "weighted_score": 0.71,
+      "pass": true,
+      "override": null
+    },
+    {
+      "slot": 3,
+      "locale": "en-US",
+      "device_well": "iphone-69",
+      "final_png": "screenshots/final/en-US/iphone-69/slot-3.png",
+      "graded_at": "2026-06-05T14:10:00Z",
+      "rubric_version": "1.2",
+      "dimensions": {
+        "thumbnail_legibility": 1,
+        "hook_first": 2,
+        "truthfulness": 2,
+        "one_idea_per_slot": 2,
+        "brand_token_fidelity": 2,
+        "aso_keyword_reinforcement": 2,
+        "emotional_north_star": 1,
+        "localization_quality": null
+      },
+      "grader_notes": "Legibility below threshold — headline font size drops below 14sp equivalent at 60px thumbnail. Hook-first and truthfulness both meet floor. Weighted score 0.59 does not clear 0.65 threshold. Founder override filed: v1.0 conversion data needed before redesign investment. Will revisit in post-launch PPO cycle.",
+      "observed_evidence": "Headline reads 'Focus Mode Active' in 11–12pt equivalent; a circular countdown timer occupies the center 40% of the frame; background is solid #1A1A2E with no gradient.",
+      "weighted_score": 0.59,
+      "pass": false,
+      "override": {
+        "by": "founder",
+        "reason": "Shipping with current legibility score; will revisit in v1.1 after first conversion data arrives.",
+        "at": "2026-06-05T13:00:00Z"
+      }
+    },
+    {
+      "slot": 1,
+      "locale": "ja",
+      "device_well": "iphone-69",
+      "final_png": "screenshots/final/ja/iphone-69/slot-1.png",
+      "graded_at": "2026-06-05T14:20:00Z",
+      "rubric_version": "1.2",
+      "dimensions": {
+        "thumbnail_legibility": 3,
+        "hook_first": 3,
+        "truthfulness": 3,
+        "one_idea_per_slot": 2,
+        "brand_token_fidelity": 2,
+        "aso_keyword_reinforcement": 2,
+        "emotional_north_star": 2,
+        "localization_quality": 2
+      },
+      "grader_notes": "Japanese deck reviewed by native-speaker contractor. Thumbnail legibility confirmed at 40px — katakana headline is 24sp equivalent and distinguishable. Hook ordering matches en-US master deck. Truthfulness: all claims re-checked against ja App Store pricing. Localization: RTL not applicable; copy reviewed by native speaker, no awkward phrases. One minor stylistic note: the sub-copy in slot-1 could be tightened by removing the formal honorific but it reads naturally at the target demographic.",
+      "observed_evidence": "Headline reads '毎日を秒で計画する' in white katakana on dark navy; CTA button at bottom reads '無料で始める' in 16pt; icon placement identical to en-US master.",
+      "weighted_score": 0.85,
+      "pass": true,
+      "override": null
+    }
+  ]
+}

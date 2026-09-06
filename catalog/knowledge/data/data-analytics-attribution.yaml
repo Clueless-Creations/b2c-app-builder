@@ -1,0 +1,177 @@
+schema_version: 1.0.0
+id: reference.data.analytics-attribution
+title: Analytics And Attribution
+domain_id: domain.data
+document_path: knowledge/data/analytics-attribution.md
+load_when: before onboarding, paywalls, funnels, store CTAs, referrals, lifecycle email, UGC/Fastlane campaigns, paid
+  UA, or any builder prompt that names events; before PostHog setup, dashboards, deep links, feature flags, experiments,
+  or session replay
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.operations.resend-email-ops
+    - workflow.data.analytics-and-attribution-blueprint
+    - workflow.growth.pre-launch-funnel-landing-waitlist
+    - workflow.experience.onboarding-system.onb-09-evidence-join
+    - workflow.experience.onboarding-system.onb-12-state-identity-contract
+    - workflow.experience.onboarding-system.onb-13-analytics-experiments
+    - workflow.experience.onboarding-system.onb-18-visual-design-prototype
+    - workflow.experience.onboarding-system.onb-19-implementation-cutover-contract
+    - workflow.experience.onboarding-system.onb-20-adversarial-qa
+    - workflow.experience.onboarding-conversion
+  context_pack_ids:
+    - context.launch-surfaces
+    - context.data
+sources:
+  - id: posthog-com-docs-cdp
+    name: posthog.com
+    source_type: docs
+    url: https://posthog.com/docs/cdp
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: posthog-com-docs-data-anonymous-vs-identified-events
+    name: posthog.com
+    source_type: docs
+    url: https://posthog.com/docs/data/anonymous-vs-identified-events
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: posthog-com-docs-data-events
+    name: posthog.com
+    source_type: docs
+    url: https://posthog.com/docs/data/events
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: posthog-com-docs-data-persons
+    name: posthog.com
+    source_type: docs
+    url: https://posthog.com/docs/data/persons
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: posthog-com-docs-experiments
+    name: posthog.com
+    source_type: docs
+    url: https://posthog.com/docs/experiments
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: posthog-com-docs-feature-flags
+    name: posthog.com
+    source_type: docs
+    url: https://posthog.com/docs/feature-flags
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: posthog-com-docs-libraries-android
+    name: posthog.com
+    source_type: docs
+    url: https://posthog.com/docs/libraries/android
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: posthog-com-docs-libraries-flutter
+    name: posthog.com
+    source_type: docs
+    url: https://posthog.com/docs/libraries/flutter
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: posthog-com-docs-libraries-ios
+    name: posthog.com
+    source_type: docs
+    url: https://posthog.com/docs/libraries/ios
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: posthog-com-docs-libraries-react-native
+    name: posthog.com
+    source_type: docs
+    url: https://posthog.com/docs/libraries/react-native
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: posthog-com-docs-product-analytics
+    name: posthog.com
+    source_type: docs
+    url: https://posthog.com/docs/product-analytics
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: posthog-com-docs-product-analytics-capture-events
+    name: posthog.com
+    source_type: docs
+    url: https://posthog.com/docs/product-analytics/capture-events
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: posthog-com-docs-product-analytics-installation
+    name: posthog.com
+    source_type: docs
+    url: https://posthog.com/docs/product-analytics/installation
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: posthog-com-docs-session-replay
+    name: posthog.com
+    source_type: docs
+    url: https://posthog.com/docs/session-replay
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: posthog-com-docs-session-replay-privacy
+    name: posthog.com
+    source_type: docs
+    url: https://posthog.com/docs/session-replay/privacy
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: posthog-com-docs-surveys
+    name: posthog.com
+    source_type: docs
+    url: https://posthog.com/docs/surveys
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: posthog-com-docs-web-analytics
+    name: posthog.com
+    source_type: docs
+    url: https://posthog.com/docs/web-analytics
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: posthog-com-tutorials-event-tracking-guide
+    name: posthog.com
+    source_type: website
+    url: https://posthog.com/tutorials/event-tracking-guide
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: posthog-com-tutorials-performance-marketing
+    name: posthog.com
+    source_type: website
+    url: https://posthog.com/tutorials/performance-marketing
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

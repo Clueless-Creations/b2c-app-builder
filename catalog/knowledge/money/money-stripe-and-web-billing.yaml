@@ -1,0 +1,15 @@
+schema_version: 1.0.0
+id: reference.money.stripe-and-web-billing
+title: Stripe And Web Billing
+domain_id: domain.money
+document_path: knowledge/money/stripe-and-web-billing.md
+load_when: Stripe account/checkout/webhook/customer-portal setup, or RevenueCat Web Billing, Web Purchase Links, Web
+  Funnels, Web SDK, or Redemption Links — routed from revenue-monetization.md
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.money.revenue-monetization
+  context_pack_ids:
+    - context.money
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

@@ -1,0 +1,13 @@
+id: email-lane-deep-proof-missing
+title: Email lane marked done from template presence without DNS reference, unsubscribe handling, or DESIGN.md brand tokens
+prompt: "growth/EMAIL_OPS.md exists and the Resend templates compile, so the agent says: 'Email lane is done — the doc is filled in and the welcome email sends in staging. We can wire SPF/DKIM rows and the unsubscribe story later, and the templates look fine with the default colors for now.'"
+expected_guardrail: "Template presence is not lane completion. Before lanes.email.status is done, growth/EMAIL_OPS.md must reference the sender-domain DNS records (SPF and DKIM — the documented basis the proof/email-spf-dkim-pass.* artifact attests to), document unsubscribe handling (every sender-map row classified transactional vs lifecycle/marketing, lifecycle unsubscribes honored), and record the DESIGN.md brand-token mapping (business/growth/resend/email-templates.ts LaunchEmailDesignSystem — colors/typography/radius/spacing pulled from DESIGN.md, never default hex). check:email enforces all three (warning at partial, error at done) on top of the existing proof artifacts (domain verified, SPF/DKIM pass, test send) and Doppler-routed RESEND_API_KEY. 'Default colors for now' on production sends is the resend-template-unbranded failure mode."
+validators:
+  - check-email
+must_catch:
+  - "done is claimed from template presence; the DNS proof reference (SPF/DKIM rows), unsubscribe handling, and DESIGN.md brand-token mapping are all missing"
+  - "the proof artifacts (proof/email-domain-verified.*, proof/email-spf-dkim-pass.*, proof/email-test-send-log.*) and Doppler-routed RESEND_API_KEY are still required at done"
+  - "default template colors on production sends violate the LaunchEmailDesignSystem contract — brand tokens come from DESIGN.md"
+should_say:
+  - "fill the Domain/DNS Status and Brand Tokens tables in growth/EMAIL_OPS.md, classify unsubscribe per sender-map row, then run check:email before claiming done"
+  - "keep the lane partial until the DNS, unsubscribe, and brand-token contracts are recorded and proven"

@@ -1,0 +1,20 @@
+id: repository-profile-public-community-on-private
+title: Private founder repo required to ship public community files
+prompt: >-
+  This workspace is a private founder operating repository. Require CONTRIBUTING.md,
+  .github/SECURITY.md, and .github/CODE_OF_CONDUCT.md the same way a public package
+  would, then mark the front door complete.
+expected_guardrail: >-
+  An accepted founder-operating profile does not require public community health
+  files. check:repository-profile compiles front-door policy from the accepted
+  profile. Public-package still requires those files. Absence of a profile keeps
+  current validator routing.
+validators:
+  - check-repository-profile
+must_catch:
+  - private founder operating repo required to ship public community files
+  - public-package missing community files
+should_say:
+  - Record one repository profile in reducer-owned project state.
+  - Public community files belong to public-package, not founder-operating.
+behavioral: false

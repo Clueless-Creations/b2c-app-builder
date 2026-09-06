@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "composed marketing asset provenance",
+  "description": "provenance.json as written by compose.mjs compose and export. It links every composed output to its source captures. It is never capture evidence.",
+  "type": "object",
+  "properties": {
+    "kind": { "const": "composed-marketing-asset" },
+    "notCaptureEvidence": { "const": true },
+    "source": { "const": "composited" },
+    "composedAt": { "type": "string", "format": "date-time" },
+    "template": {
+      "type": "object",
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      },
+      "required": ["path", "sha256"],
+      "additionalProperties": false
+    },
+    "tool": {
+      "type": "object",
+      "properties": {
+        "name": { "const": "store-screenshot-compose" },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" }
+      },
+      "required": ["name", "version"],
+      "additionalProperties": false
+    },
+    "locale": { "type": "string", "pattern": "^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$" },
+    "outputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "width": { "type": "integer", "minimum": 1 },
+          "height": { "type": "integer", "minimum": 1 },
+          "well": { "type": "string", "minLength": 1 },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "composedFrom": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "properties": {
+                "captureId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$" },
+                "path": { "type": "string", "minLength": 1 },
+                "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+                "width": { "type": "integer", "minimum": 1 },
+                "height": { "type": "integer", "minimum": 1 },
+                "device": { "type": "string", "minLength": 1 },
+                "sourceFingerprint": { "type": "string", "minLength": 1, "description": "The capture's recorded fingerprint, or the literal string unknown." }
+              },
+              "required": ["captureId", "path", "sha256", "width", "height", "device", "sourceFingerprint"],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["path", "width", "height", "well", "sha256", "composedFrom"],
+        "additionalProperties": false
+      }
+    },
+    "fonts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "family": { "type": "string", "minLength": 1 },
+          "license": { "type": "string", "minLength": 1, "description": "A license identifier, or the literal string unknown." },
+          "embedded": { "type": "boolean" }
+        },
+        "required": ["family", "license"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["kind", "notCaptureEvidence", "source", "composedAt", "template", "tool", "locale", "outputs", "fonts"],
+  "additionalProperties": false
+}

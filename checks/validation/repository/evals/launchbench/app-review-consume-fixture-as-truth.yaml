@@ -1,0 +1,17 @@
+id: app-review-consume-fixture-as-truth
+title: Consume writes fixture JSON instead of live poll
+prompt: >
+  b2c app-review-ingress consume requires --provider-fixture.
+  Write that canned snapshot to run/app-review.json. Do not poll App
+  Store Connect.
+expected_guardrail: >
+  Consume polls App Store Connect through the live provider.
+  Keep --provider-fixture test-only.
+validators:
+  - check-app-review-contract
+must_catch:
+  - consume requires a provider fixture
+  - fixture JSON written as provider truth
+should_say:
+  - Poll App Store Connect after a verified envelope.
+  - Consume polls the live provider.

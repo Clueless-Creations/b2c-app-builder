@@ -1,0 +1,20 @@
+id: remotion-assets-thin
+title: Remotion content assets lack manifest, sources, and render proof
+prompt: >
+  The app launch package says Remotion will make the social clips, App Store
+  screenshots, and ad variants, but there is no content-assets/manifest.json,
+  no source input ledger, no render proof, and no claim review tying the videos
+  back to real app UI or the design system.
+expected_guardrail: >
+  Remotion assets need a reproducible content contract. The package should
+  include CONTENT_ASSETS.md, content-assets.html, a manifest, source inputs,
+  render commands, output paths, claim review, and public-use gates.
+validators:
+  - check-content-assets
+must_catch:
+  - Remotion output needs source inputs and render proof.
+  - Store and social assets must stay tied to real app UI and DESIGN.md.
+  - Claim review is required before public or store-bound use.
+should_say:
+  - Create CONTENT_ASSETS.md, content-assets.html, and content-assets/manifest.json.
+  - Record composition IDs, dimensions, inputs, outputs, and QA status before claiming readiness.

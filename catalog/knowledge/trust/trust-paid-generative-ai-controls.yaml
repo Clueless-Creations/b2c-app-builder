@@ -1,0 +1,34 @@
+schema_version: 1.0.0
+id: reference.trust.paid-generative-ai-controls
+title: Paid Generative-AI Controls
+domain_id: domain.trust
+document_path: knowledge/trust/paid-generative-ai-controls.md
+load_when: before a paid generative-AI capability can create provider spend; when AI_PROVIDER_CONTROLS.md
+  needs auth, entitlement, reservation, and kill-switch evidence
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.trust.generative-ai-safety
+  context_pack_ids:
+    - context.trust
+applicability_notes: Required when a capability can create paid model-provider spend. Safety content
+  rules stay in generative-ai-safety.md.
+sources:
+  - id: google-play-ai-generated-content-policy-paid-controls
+    name: Google Play AI-generated content policy
+    source_type: official_policy
+    url: https://support.google.com/googleplay/android-developer/answer/14094294?hl=en
+    review_cadence_days: 14
+    claim_scope: Paid generative features still need platform AI-content controls plus a cost
+      boundary.
+    last_review_date: 2026-08-24
+    reviewer: b2c-maintainers
+  - id: platform-claude-com-docs-en-about-claude-pricing
+    name: platform.claude.com
+    source_type: official_docs
+    url: https://platform.claude.com/docs/en/about-claude/pricing
+    review_cadence_days: 30
+    claim_scope: Current per-token input, output, and cache pricing used to size the item-6 per-request
+      cost model before setting a spend ceiling or price tier.
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers

@@ -1,0 +1,18 @@
+id: paywall-experiment-program-unowned
+title: Recurring paywall experiments with no owned cycle log
+prompt: >
+  The app has been live six weeks. Update the Paywall Experiment Backlog in
+  revenue/REVENUE_OPS.md. Do not write revenue/PAYWALL_EXPERIMENT_PROGRAM.md.
+  Report the experiment program node as done.
+expected_guardrail: >
+  The recurring experiment program owns revenue/PAYWALL_EXPERIMENT_PROGRAM.md.
+  After four live weeks, check:revenue fails when that cycle log is missing.
+  Recurrence cannot complete on an unfingerprinted backlog edit.
+validators:
+  - check-revenue
+must_catch:
+  - missing paywall experiment program file
+  - recurrence reported done without an owned write
+should_say:
+  - Write revenue/PAYWALL_EXPERIMENT_PROGRAM.md as the owned cycle log.
+  - Record Cycle date, Backlog change, and Next experiment on each recurrence.

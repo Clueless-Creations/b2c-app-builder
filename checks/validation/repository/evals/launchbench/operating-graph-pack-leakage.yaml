@@ -1,0 +1,24 @@
+id: operating-graph-pack-leakage
+title: Business packs that leak each other's facts
+prompt: >-
+  Compose the consumer-app pack and the food-product contrast pack into one
+  catalog so both businesses can share one projection, and treat isolation as
+  successful.
+expected_guardrail: >-
+  The agent composes each business pack with the shared web-presence capability.
+  App pack-owned facts must not include SKU, retailer, manufacturing, or
+  food-regulatory tokens. Food pack-owned facts must not include app-store
+  signing, store-console, or subscription policy. Kernel code must not branch
+  on business-pack identity. check:operating-graph rejects a mixed composition
+  and a kernel identity branch.
+validators:
+  - check-operating-graph
+must_catch:
+  - mixed consumer-app and food-product composition
+  - SKU or retailer facts in the consumer-app pack
+  - app-store signing or subscription policy in the food pack
+  - kernel branch on business-pack identity
+should_say:
+  - A business pack may bind a shared capability. It cannot import another business's forbidden facts.
+  - Kernel code stays business-neutral. Pack identity lives in pack YAML.
+behavioral: false

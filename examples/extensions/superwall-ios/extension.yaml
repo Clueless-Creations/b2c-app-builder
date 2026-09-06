@@ -1,0 +1,174 @@
+{
+  "apiVersion": "b2c.extension/v1",
+  "id": "superwall-ios/package",
+  "version": "1.0.0",
+  "hostApiVersion": "b2c/v1",
+  "title": "Superwall RevenueCat iOS example",
+  "dependencies": [],
+  "imports": [],
+  "resources":
+    [
+      { "id": "superwall-ios/input", "path": "input.json", "kind": "schema", "mediaType": "application/json" },
+      { "id": "superwall-ios/output", "path": "output.json", "kind": "schema", "mediaType": "application/json" },
+      { "id": "superwall-ios/evidence", "path": "evidence.json", "kind": "schema", "mediaType": "application/json" },
+      { "id": "superwall-ios/knowledge", "path": "integration.md", "kind": "knowledge", "mediaType": "text/markdown" },
+      { "id": "superwall-ios/pack", "path": "pack.yaml", "kind": "catalog-pack", "mediaType": "application/yaml" },
+      { "id": "superwall-ios/package", "path": "native/Package.swift", "kind": "adapter", "mediaType": "text/plain" },
+      { "id": "superwall-ios/state", "path": "native/Sources/MonetizationCore/EntitlementState.swift", "kind": "adapter", "mediaType": "text/plain" },
+      {
+        "id": "superwall-ios/controller",
+        "path": "native/Sources/MonetizationNative/RevenueCatController.swift",
+        "kind": "adapter",
+        "mediaType": "text/plain",
+      },
+      { "id": "superwall-ios/tests", "path": "native/Tests/MonetizationCoreTests/EntitlementStateTests.swift", "kind": "adapter", "mediaType": "text/plain" },
+      { "id": "superwall-ios/dependency-lock", "path": "native/Package.resolved", "kind": "lockfile", "mediaType": "application/json" },
+      { "id": "superwall-ios/dependency-checksums", "path": "dependency-checksums.json", "kind": "lockfile", "mediaType": "application/json" },
+    ],
+  "capabilities":
+    [
+      {
+        "id": "superwall-ios/monetization",
+        "version": "1.0.0",
+        "title": "Native monetization composition",
+        "knowledge": ["superwall-ios/knowledge"],
+        "operations":
+          [
+            {
+              "id": "superwall-ios/monetization.present-paywall",
+              "title": "present-paywall",
+              "inputSchema": "superwall-ios/input",
+              "outputSchema": "superwall-ios/output",
+              "evidenceSchema": "superwall-ios/evidence",
+              "effect": "mutate",
+              "acceptance": ["Correct selected provider ownership and current identity.", "Local conformance never substitutes for sandbox receipts."],
+            },
+            {
+              "id": "superwall-ios/monetization.purchase",
+              "title": "purchase",
+              "inputSchema": "superwall-ios/input",
+              "outputSchema": "superwall-ios/output",
+              "evidenceSchema": "superwall-ios/evidence",
+              "effect": "spend",
+              "acceptance": ["Correct selected provider ownership and current identity.", "Local conformance never substitutes for sandbox receipts."],
+            },
+            {
+              "id": "superwall-ios/monetization.read-entitlement",
+              "title": "read-entitlement",
+              "inputSchema": "superwall-ios/input",
+              "outputSchema": "superwall-ios/output",
+              "evidenceSchema": "superwall-ios/evidence",
+              "effect": "observe",
+              "acceptance": ["Correct selected provider ownership and current identity.", "Local conformance never substitutes for sandbox receipts."],
+            },
+          ],
+      },
+    ],
+  "implementations":
+    [
+      {
+        "id": "superwall-ios/present-paywall",
+        "version": "1.0.0",
+        "operation": "superwall-ios/monetization.present-paywall",
+        "targets": [{ "platform": "ios", "runtime": "swiftui" }],
+        "mode": "manual",
+        "sdkRange": "*",
+        "limitations": ["Explicit native integration; no registered host execution route or sandbox receipts."],
+        "knowledge": [],
+        "connectionRequired": true,
+        "maturity": "experimental",
+      },
+      {
+        "id": "superwall-ios/purchase",
+        "version": "1.0.0",
+        "operation": "superwall-ios/monetization.purchase",
+        "targets": [{ "platform": "ios", "runtime": "swiftui" }],
+        "mode": "manual",
+        "sdkRange": "*",
+        "limitations": ["Explicit native integration; no registered host execution route or sandbox receipts."],
+        "knowledge": [],
+        "connectionRequired": true,
+        "maturity": "experimental",
+      },
+      {
+        "id": "superwall-ios/read-entitlement",
+        "version": "1.0.0",
+        "operation": "superwall-ios/monetization.read-entitlement",
+        "targets": [{ "platform": "ios", "runtime": "swiftui" }],
+        "mode": "manual",
+        "sdkRange": "*",
+        "limitations": ["Explicit native integration; no registered host execution route or sandbox receipts."],
+        "knowledge": [],
+        "connectionRequired": true,
+        "maturity": "experimental",
+      },
+    ],
+  "recipes":
+    [
+      {
+        "id": "superwall-ios/composition",
+        "version": "1.0.0",
+        "title": "Superwall presentation with RevenueCat authority",
+        "workflows": ["workflow.superwall-ios-present-paywall", "workflow.superwall-ios-purchase", "workflow.superwall-ios-read-entitlement"],
+        "operations":
+          [
+            {
+              "operation": "superwall-ios/monetization.present-paywall",
+              "implementation": "superwall-ios/present-paywall",
+              "required": true,
+              "workflowIds": ["workflow.superwall-ios-present-paywall"],
+              "workflowContexts":
+                [
+                  {
+                    "workflowId": "workflow.superwall-ios-present-paywall",
+                    "instructions": "neutral",
+                    "roleInstructions": "neutral",
+                    "neutralReferenceIds": [],
+                    "providerReferenceIds": [],
+                    "neutralContextPackIds": [],
+                    "providerContextPackIds": [],
+                  },
+                ],
+            },
+            {
+              "operation": "superwall-ios/monetization.purchase",
+              "implementation": "superwall-ios/purchase",
+              "required": true,
+              "workflowIds": ["workflow.superwall-ios-purchase"],
+              "workflowContexts":
+                [
+                  {
+                    "workflowId": "workflow.superwall-ios-purchase",
+                    "instructions": "neutral",
+                    "roleInstructions": "neutral",
+                    "neutralReferenceIds": [],
+                    "providerReferenceIds": [],
+                    "neutralContextPackIds": [],
+                    "providerContextPackIds": [],
+                  },
+                ],
+            },
+            {
+              "operation": "superwall-ios/monetization.read-entitlement",
+              "implementation": "superwall-ios/read-entitlement",
+              "required": true,
+              "workflowIds": ["workflow.superwall-ios-read-entitlement"],
+              "workflowContexts":
+                [
+                  {
+                    "workflowId": "workflow.superwall-ios-read-entitlement",
+                    "instructions": "neutral",
+                    "roleInstructions": "neutral",
+                    "neutralReferenceIds": [],
+                    "providerReferenceIds": [],
+                    "neutralContextPackIds": [],
+                    "providerContextPackIds": [],
+                  },
+                ],
+            },
+          ],
+        "policy": { "maxRepairAttempts": 2, "independentReview": true },
+      },
+    ],
+  "catalogPacks": ["superwall-ios/pack"],
+}

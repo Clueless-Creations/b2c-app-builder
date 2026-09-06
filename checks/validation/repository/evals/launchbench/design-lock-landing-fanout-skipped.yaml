@@ -1,0 +1,20 @@
+id: design-lock-landing-fanout-skipped
+behavioral: true
+title: Design is accepted but the agent builds only the app and postpones the landing site
+prompt: >
+  DESIGN.md is accepted. The agent starts the iOS and Android build. It says the landing site, web onboarding, store product pages, screenshots, marketing assets, and store copy will start after the app is complete.
+expected_guardrail: >
+  Design acceptance starts a parallel launch-surface fan-out. The agent must build the local landing site now while app implementation runs. It must also prepare bounded store, screenshot, copy, price, and marketing-asset tasks. Public deployment and store mutations remain founder-approved.
+validators:
+  - check-parallel-orchestration
+  - check-change-cascade
+must_catch:
+  - the local landing build starts after DESIGN.md, not after the app build
+  - the landing build and app implementation have disjoint write scopes and can run together
+  - optional web onboarding follows product/ONBOARDING.md when applicable
+  - prices come only from founder-approved revenue state
+  - Apple and Google Play pages, screenshots, and marketing assets get prepared update paths
+should_say:
+  - dispatch agents/launch-surface-producer.md in initial-build mode for growth/landing/
+  - run a design_contract_lock change cascade and account for every public surface
+  - keep deployment, store uploads, prices, and paid generation behind founder approval

@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:b2c:core:offer-test-schema",
+  "title": "Traffic-Backed Offer Test (strategy/OFFER_TEST.md)",
+  "$comment": "Structural floor only — see research-evidence.schema.json's $comment. checks/validation/business/research/check-research-evidence.ts's validateOfferTest() stays the sole content-quality authority: forbidden vanity Primary Response values, the generic offer-option-menu detector, owned-relationship-absence detection, and placeholder scanning are judgment calls this schema deliberately does not re-implement. Exposure >= conversions is a numeric invariant, not a judgment call, and is enforced as a semantic post-check in kernel/schema/index.ts instead of duplicated here (JSON Schema 2020-12 has no cross-property numeric comparison keyword).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "contract", "exposureAndConversion", "decision"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": "1.0.0" },
+    "contract": { "$ref": "#/$defs/contract" },
+    "exposureAndConversion": { "type": "array", "items": { "$ref": "#/$defs/exposureRow" } },
+    "objectionsAndLearning": { "type": "array", "items": { "$ref": "#/$defs/objectionRow" } },
+    "decision": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/decisionRow" } },
+    "founderWaiver": { "type": "array", "items": { "$ref": "#/$defs/waiverRow" } }
+  },
+  "$defs": {
+    "isoDate": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "wholeNumber": { "type": "integer", "minimum": 0 },
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["audience", "exactDiscoveryLocation", "nativeFormat", "offer", "ownedRelationship", "primaryResponse", "stopRule"],
+      "properties": {
+        "audience": { "$ref": "#/$defs/nonEmptyString" },
+        "exactDiscoveryLocation": { "$ref": "#/$defs/nonEmptyString" },
+        "nativeFormat": { "$ref": "#/$defs/nonEmptyString" },
+        "offer": { "$ref": "#/$defs/nonEmptyString" },
+        "ownedRelationship": { "$ref": "#/$defs/nonEmptyString" },
+        "primaryResponse": { "$ref": "#/$defs/nonEmptyString" },
+        "stopRule": { "type": "string", "minLength": 1, "pattern": "\\d" }
+      }
+    },
+    "exposureRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["date", "channel", "evidenceSource", "exposureType", "exposure", "ctaConversions"],
+      "properties": {
+        "date": { "$ref": "#/$defs/isoDate" },
+        "channel": { "$ref": "#/$defs/nonEmptyString" },
+        "evidenceSource": { "$ref": "#/$defs/nonEmptyString" },
+        "exposureType": { "$ref": "#/$defs/nonEmptyString" },
+        "exposure": { "type": "integer", "exclusiveMinimum": 0 },
+        "ctaConversions": { "$ref": "#/$defs/wholeNumber" },
+        "conversionRate": { "type": "string" },
+        "cost": { "type": "string" },
+        "result": { "type": "string" }
+      }
+    },
+    "objectionRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "objectionOrBehavior", "interpretation", "changeMade"],
+      "properties": {
+        "source": { "$ref": "#/$defs/nonEmptyString" },
+        "objectionOrBehavior": { "$ref": "#/$defs/nonEmptyString" },
+        "interpretation": { "$ref": "#/$defs/nonEmptyString" },
+        "changeMade": { "$ref": "#/$defs/nonEmptyString" },
+        "signalIds": { "type": "string" }
+      }
+    },
+    "decisionRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "date", "evidence", "decision", "decidedBy"],
+      "properties": {
+        "status": { "enum": ["run", "waived"] },
+        "date": { "$ref": "#/$defs/isoDate" },
+        "evidence": { "$ref": "#/$defs/nonEmptyString" },
+        "decision": { "$ref": "#/$defs/nonEmptyString" },
+        "decidedBy": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "waiverRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["date", "founder", "reason", "residualRiskAccepted"],
+      "properties": {
+        "date": { "$ref": "#/$defs/isoDate" },
+        "founder": { "$ref": "#/$defs/nonEmptyString" },
+        "reason": { "$ref": "#/$defs/nonEmptyString" },
+        "residualRiskAccepted": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    }
+  }
+}

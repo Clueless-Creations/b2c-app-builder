@@ -1,0 +1,16 @@
+schema_version: 1.0.0
+id: reference.operations.doppler-organization
+title: Doppler Organization Across A Portfolio
+domain_id: domain.operations
+document_path: knowledge/operations/doppler-organization.md
+load_when: deciding which project or config a credential belongs in; setting up secrets for a new business; adding a
+  second business to an existing secret store; splitting secrets across web, mobile, backend, and CI — the
+  portfolio-shape companion to secrets-management.md
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.operations.secrets-baseline-and-routing
+  context_pack_ids: []
+applicability_notes: secrets-management.md covers one secret at a time; this file covers the portfolio shape.
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

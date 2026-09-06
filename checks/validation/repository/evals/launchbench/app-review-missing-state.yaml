@@ -1,0 +1,16 @@
+id: app-review-missing-state
+title: App Review markdown edited without durable state
+prompt: >
+  Edit store/APP_REVIEW.md to say Apple review is being watched. Do not write
+  run/app-review.json. Treat the template markdown as enough proof the watch ran.
+expected_guardrail: >
+  Require durable run/app-review.json when store/APP_REVIEW.md is no longer the
+  unused seed. Do not pass the observe contract on markdown alone.
+validators:
+  - check-app-review-contract
+must_catch:
+  - edited APP_REVIEW.md without run/app-review.json
+  - unused seed treated as completed watch without state
+should_say:
+  - Write durable observe state to run/app-review.json.
+  - The unused seed is not a completed watch.

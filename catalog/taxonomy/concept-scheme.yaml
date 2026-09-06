@@ -1,0 +1,978 @@
+# SKOS concept scheme (YAML encoding).
+# Work-vocabulary thesaurus: catalog IDs, enumerations, and kernel terms.
+# Not the world ontology (catalog/ontology/). Not a second catalog.
+# No broader/narrower across facets.
+# Runtime agents must not query this file. check:catalog is the only reader.
+schema_version: 1
+id: b2c:scheme.catalog
+uri: https://b2c-app-builder.dev/ns/catalog
+pref_label: B2C App Builder catalog concepts
+definition: Preferred labels, aliases, orthogonal facets, and homonym groups for
+  catalog IDs and kernel terms. This is the map-of-the-work vocabulary, not the
+  consumer-app world ontology. The catalog remains the runtime definition graph.
+hidden_labels:
+  - semantic similarity router
+  - run attempt as work order
+  - markdown context map as authority
+  - second engine
+  - primitives repository
+  - kernel-only domain union
+facets:
+  - id: facet.area
+    pref_label: Area
+    definition: Grouping of domains for launch-matrix presentation. Not a grant axis
+      and not a workstream.
+  - id: facet.domain
+    pref_label: Domain
+    definition: Grant authority and knowledge partition. Founder grants and workflow
+      ownership key off this facet.
+  - id: facet.lane
+    pref_label: Lane
+    definition: Business-state workstream with durable status in reducer state. Orthogonal
+      to domain even when English names collide.
+  - id: facet.phase
+    pref_label: Phase
+    definition: Time order in a launch. Orthogonal to domain, lane, and area.
+  - id: facet.context
+    pref_label: Context pack
+    definition: Specialist prompt bundle of knowledge references. Not a capability
+      pack and not a knowledge package.
+  - id: facet.role
+    pref_label: Role
+    definition: Specialist who owns a workflow node.
+  - id: facet.unit
+    pref_label: Business unit
+    definition: Copy-layer grouping over grantable domains. Selecting a unit writes
+      the same grant level to every member domain.
+  - id: facet.kind
+    pref_label: Catalog node kind
+    definition: The ten catalog ID prefixes plus pack and profile kinds.
+  - id: facet.status
+    pref_label: Status
+    definition: Shared run-node and lane status vocabulary.
+  - id: facet.action
+    pref_label: Action class
+    definition: Autonomy action class on a workflow node.
+  - id: facet.record
+    pref_label: Operating record
+    definition: Reducer-owned operating-model record kinds.
+  - id: facet.kernel
+    pref_label: Kernel term
+    definition: Approved public vocabulary that is not a catalog node.
+concepts:
+  - id: kind.area
+    kind: kind
+    facet_id: facet.kind
+    pref_label: area
+    definition: Catalog grouping of domains.
+  - id: kind.domain
+    kind: kind
+    facet_id: facet.kind
+    pref_label: domain
+    definition: Grant and knowledge partition.
+  - id: kind.phase
+    kind: kind
+    facet_id: facet.kind
+    pref_label: phase
+    definition: Launch time order.
+  - id: kind.lane
+    kind: kind
+    facet_id: facet.kind
+    pref_label: lane
+    definition: Business-state workstream.
+  - id: kind.role
+    kind: kind
+    facet_id: facet.kind
+    pref_label: role
+    definition: Specialist roster role.
+  - id: kind.context
+    kind: kind
+    facet_id: facet.kind
+    pref_label: context
+    alt_labels: [context pack, pack]
+    definition: Role-level knowledge bundle.
+  - id: kind.reference
+    kind: kind
+    facet_id: facet.kind
+    pref_label: reference
+    alt_labels: [knowledge package, pack]
+    definition: Manifest-backed knowledge document.
+  - id: kind.workflow
+    kind: kind
+    facet_id: facet.kind
+    pref_label: workflow
+    definition: Executable catalog node.
+  - id: kind.artifact
+    kind: kind
+    facet_id: facet.kind
+    pref_label: artifact
+    definition: Declared workflow output path.
+  - id: kind.gate
+    kind: kind
+    facet_id: facet.kind
+    pref_label: gate
+    definition: Deterministic check command.
+  - id: kind.capability-pack
+    kind: kind
+    facet_id: facet.kind
+    pref_label: capability pack
+    alt_labels: [capability, pack]
+    definition: Additive catalog pack that extends capabilities.
+  - id: kind.business-pack
+    kind: kind
+    facet_id: facet.kind
+    pref_label: business pack
+    alt_labels: [pack]
+    definition: Additive catalog pack for a business archetype.
+  - id: kind.launch-profile
+    kind: kind
+    facet_id: facet.kind
+    pref_label: launch profile
+    alt_labels: [profile]
+    definition: Launch breadth selection (essentials or full).
+  - id: kind.repository-profile
+    kind: kind
+    facet_id: facet.kind
+    pref_label: repository profile
+    alt_labels: [profile]
+    definition: Workspace or repository kind.
+  - id: area.operating-system
+    kind: area
+    facet_id: facet.area
+    pref_label: Operating System
+  - id: area.business-operations-trust
+    kind: area
+    facet_id: facet.area
+    pref_label: Business Operations And Trust
+  - id: area.product-experience
+    kind: area
+    facet_id: facet.area
+    pref_label: Product And Experience
+  - id: area.build-release
+    kind: area
+    facet_id: facet.area
+    pref_label: Build And Release
+  - id: area.growth-revenue
+    kind: area
+    facet_id: facet.area
+    pref_label: Growth And Revenue
+    alt_labels: [growth]
+  - id: area.skill-maintenance
+    kind: area
+    facet_id: facet.area
+    pref_label: Skill Maintenance
+  - id: domain.process
+    kind: domain
+    facet_id: facet.domain
+    pref_label: Running The Launch
+  - id: domain.orchestration
+    kind: domain
+    facet_id: facet.domain
+    pref_label: Driving The Work
+  - id: domain.operations
+    kind: domain
+    facet_id: facet.domain
+    pref_label: Running The Business
+    alt_labels: [operations]
+  - id: domain.research
+    kind: domain
+    facet_id: facet.domain
+    pref_label: Market Research
+    alt_labels: [research]
+  - id: domain.product
+    kind: domain
+    facet_id: facet.domain
+    pref_label: What You're Building
+    alt_labels: [product]
+  - id: domain.experience
+    kind: domain
+    facet_id: facet.domain
+    pref_label: How The App Feels
+    alt_labels: [experience]
+  - id: domain.design
+    kind: domain
+    facet_id: facet.domain
+    pref_label: Look And Feel
+    alt_labels: [design]
+  - id: domain.words
+    kind: domain
+    facet_id: facet.domain
+    pref_label: Every Word A User Reads
+  - id: domain.engineering
+    kind: domain
+    facet_id: facet.domain
+    pref_label: Building The App
+    alt_labels: [engineering]
+  - id: domain.store
+    kind: domain
+    facet_id: facet.domain
+    pref_label: App Store And Google Play
+    alt_labels: [store]
+  - id: domain.money
+    kind: domain
+    facet_id: facet.domain
+    pref_label: Pricing And Getting Paid
+  - id: domain.growth
+    kind: domain
+    facet_id: facet.domain
+    pref_label: Marketing And Growth
+    alt_labels: [growth, GTM, acquisition]
+  - id: domain.data
+    kind: domain
+    facet_id: facet.domain
+    pref_label: Analytics And Tracking
+  - id: domain.trust
+    kind: domain
+    facet_id: facet.domain
+    pref_label: Privacy, Security, And Legal
+  - id: domain.machine
+    kind: domain
+    facet_id: facet.domain
+    pref_label: The Skill's Own Upkeep
+  - id: lane.paid-tool-routing
+    kind: lane
+    facet_id: facet.lane
+    pref_label: Paid-tool routing
+  - id: lane.secrets
+    kind: lane
+    facet_id: facet.lane
+    pref_label: Secrets
+  - id: lane.security
+    kind: lane
+    facet_id: facet.lane
+    pref_label: Security
+  - id: lane.research
+    kind: lane
+    facet_id: facet.lane
+    pref_label: Research
+    alt_labels: [research]
+  - id: lane.traceability
+    kind: lane
+    facet_id: facet.lane
+    pref_label: Traceability
+  - id: lane.experience
+    kind: lane
+    facet_id: facet.lane
+    pref_label: Experience
+    alt_labels: [experience]
+  - id: lane.product
+    kind: lane
+    facet_id: facet.lane
+    pref_label: Product
+    alt_labels: [product]
+  - id: lane.design
+    kind: lane
+    facet_id: facet.lane
+    pref_label: Design
+    alt_labels: [design]
+  - id: lane.emotional-design
+    kind: lane
+    facet_id: facet.lane
+    pref_label: Emotional design
+  - id: lane.content-assets
+    kind: lane
+    facet_id: facet.lane
+    pref_label: Content assets
+  - id: lane.analytics-attribution
+    kind: lane
+    facet_id: facet.lane
+    pref_label: Analytics and attribution
+  - id: lane.paid-user-acquisition
+    kind: lane
+    facet_id: facet.lane
+    pref_label: Paid user acquisition
+  - id: lane.onboarding
+    kind: lane
+    facet_id: facet.lane
+    pref_label: Onboarding
+  - id: lane.revenue
+    kind: lane
+    facet_id: facet.lane
+    pref_label: Revenue
+  - id: lane.store-console
+    kind: lane
+    facet_id: facet.lane
+    pref_label: Store console
+    alt_labels: [store]
+  - id: lane.apple-signing
+    kind: lane
+    facet_id: facet.lane
+    pref_label: Apple signing
+  - id: lane.privacy-legal
+    kind: lane
+    facet_id: facet.lane
+    pref_label: Privacy and legal
+  - id: lane.email
+    kind: lane
+    facet_id: facet.lane
+    pref_label: Email
+  - id: lane.orchestration
+    kind: lane
+    facet_id: facet.lane
+    pref_label: Orchestration
+  - id: lane.engineering
+    kind: lane
+    facet_id: facet.lane
+    pref_label: Engineering
+    alt_labels: [engineering]
+  - id: lane.growth
+    kind: lane
+    facet_id: facet.lane
+    pref_label: Growth
+    alt_labels: [growth]
+  - id: lane.post-launch-ops
+    kind: lane
+    facet_id: facet.lane
+    pref_label: Post-launch operations
+    alt_labels: [operations]
+  - id: phase.0-orient
+    kind: phase
+    facet_id: facet.phase
+    pref_label: Founder-zero orient and scaffold
+    alt_labels: ["0"]
+  - id: phase.0b
+    kind: phase
+    facet_id: facet.phase
+    pref_label: Paid-tool access and fallback routing
+    alt_labels: ["0b"]
+  - id: phase.0c
+    kind: phase
+    facet_id: facet.phase
+    pref_label: Secrets baseline
+    alt_labels: ["0c"]
+  - id: phase.1
+    kind: phase
+    facet_id: facet.phase
+    pref_label: Research-backed product
+    alt_labels: ["1", research]
+  - id: phase.1b
+    kind: phase
+    facet_id: facet.phase
+    pref_label: Analytics and attribution blueprint
+    alt_labels: ["1b"]
+  - id: phase.1c
+    kind: phase
+    facet_id: facet.phase
+    pref_label: 11-star experience and product brainstorm
+    alt_labels: ["1c"]
+  - id: phase.1d
+    kind: phase
+    facet_id: facet.phase
+    pref_label: Paid user acquisition system
+    alt_labels: ["1d"]
+  - id: phase.1e
+    kind: phase
+    facet_id: facet.phase
+    pref_label: Viral growth loop contract
+    alt_labels: ["1e"]
+  - id: phase.1f
+    kind: phase
+    facet_id: facet.phase
+    pref_label: Launch trace and build contracts
+    alt_labels: ["1f"]
+  - id: phase.1g
+    kind: phase
+    facet_id: facet.phase
+    pref_label: Security architecture
+    alt_labels: ["1g"]
+  - id: phase.2
+    kind: phase
+    facet_id: facet.phase
+    pref_label: Brand and design
+    alt_labels: ["2", design]
+  - id: phase.3
+    kind: phase
+    facet_id: facet.phase
+    pref_label: Launch dossier and store operations
+    alt_labels: ["3", store]
+  - id: phase.3b
+    kind: phase
+    facet_id: facet.phase
+    pref_label: Revenue and monetization operations
+    alt_labels: ["3b"]
+  - id: phase.4
+    kind: phase
+    facet_id: facet.phase
+    pref_label: Pre-launch funnel
+    alt_labels: ["4"]
+  - id: phase.5
+    kind: phase
+    facet_id: facet.phase
+    pref_label: Builder and agent handoff
+    alt_labels: ["5"]
+  - id: phase.5b
+    kind: phase
+    facet_id: facet.phase
+    pref_label: Engineering orchestration and production readiness
+    alt_labels: ["5b", engineering]
+  - id: phase.5c
+    kind: phase
+    facet_id: facet.phase
+    pref_label: Security release gate
+    alt_labels: ["5c"]
+  - id: phase.6
+    kind: phase
+    facet_id: facet.phase
+    pref_label: Post-launch UGC and Fastlane growth engine
+    alt_labels: ["6", growth]
+  - id: phase.6b
+    kind: phase
+    facet_id: facet.phase
+    pref_label: Post-launch operations
+    alt_labels: ["6b", operations]
+  - id: context.founder-language
+    kind: context
+    facet_id: facet.context
+    pref_label: Always-on founder language
+  - id: context.process
+    kind: context
+    facet_id: facet.context
+    pref_label: Launch process
+  - id: context.orchestration
+    kind: context
+    facet_id: facet.context
+    pref_label: Orchestration
+  - id: context.operations
+    kind: context
+    facet_id: facet.context
+    pref_label: Founder-zero operations
+    alt_labels: [operations]
+  - id: context.research
+    kind: context
+    facet_id: facet.context
+    pref_label: Research
+    alt_labels: [research]
+  - id: context.product
+    kind: context
+    facet_id: facet.context
+    pref_label: Product
+    alt_labels: [product]
+  - id: context.archetypes
+    kind: context
+    facet_id: facet.context
+    pref_label: Matched product archetype
+  - id: context.experience
+    kind: context
+    facet_id: facet.context
+    pref_label: Experience
+    alt_labels: [experience]
+  - id: context.design
+    kind: context
+    facet_id: facet.context
+    pref_label: Design
+    alt_labels: [design]
+  - id: context.experience-cards
+    kind: context
+    facet_id: facet.context
+    pref_label: Implemented emotional experience cards
+  - id: context.words
+    kind: context
+    facet_id: facet.context
+    pref_label: Words
+  - id: context.engineering
+    kind: context
+    facet_id: facet.context
+    pref_label: Engineering
+    alt_labels: [engineering]
+  - id: context.device
+    kind: context
+    facet_id: facet.context
+    pref_label: Device and accessibility proof
+  - id: context.store
+    kind: context
+    facet_id: facet.context
+    pref_label: Stores
+    alt_labels: [store]
+  - id: context.growth
+    kind: context
+    facet_id: facet.context
+    pref_label: Growth
+    alt_labels: [growth]
+  - id: context.launch-surfaces
+    kind: context
+    facet_id: facet.context
+    pref_label: Cross-surface launch production
+  - id: context.data
+    kind: context
+    facet_id: facet.context
+    pref_label: Analytics
+  - id: context.money
+    kind: context
+    facet_id: facet.context
+    pref_label: Revenue
+  - id: context.trust
+    kind: context
+    facet_id: facet.context
+    pref_label: Trust
+  - id: context.machine
+    kind: context
+    facet_id: facet.context
+    pref_label: Skill maintenance
+  - id: role.orchestrator
+    kind: role
+    facet_id: facet.role
+    pref_label: Orchestrator
+  - id: role.operator-readiness
+    kind: role
+    facet_id: facet.role
+    pref_label: Operator readiness
+  - id: role.research-strategist
+    kind: role
+    facet_id: facet.role
+    pref_label: Research strategist
+    alt_labels: [research]
+  - id: role.product-leader
+    kind: role
+    facet_id: facet.role
+    pref_label: Product leader
+    alt_labels: [product]
+  - id: role.design-guru
+    kind: role
+    facet_id: facet.role
+    pref_label: Design guru
+    alt_labels: [design]
+  - id: role.copy-specialist
+    kind: role
+    facet_id: facet.role
+    pref_label: Copy specialist
+  - id: role.marketing-guru
+    kind: role
+    facet_id: facet.role
+    pref_label: Marketing guru
+    alt_labels: [growth]
+  - id: role.launch-surface-producer
+    kind: role
+    facet_id: facet.role
+    pref_label: Launch surface producer
+  - id: role.mobile-engineer
+    kind: role
+    facet_id: facet.role
+    pref_label: Mobile engineer
+    alt_labels: [engineering]
+  - id: role.backend-infrastructure-engineer
+    kind: role
+    facet_id: facet.role
+    pref_label: Backend infrastructure engineer
+    alt_labels: [engineering]
+  - id: role.accessibility-device-qa
+    kind: role
+    facet_id: facet.role
+    pref_label: Accessibility and device QA
+  - id: role.security-architect
+    kind: role
+    facet_id: facet.role
+    pref_label: Security architect
+  - id: role.engineering-leader
+    kind: role
+    facet_id: facet.role
+    pref_label: Engineering leader
+    alt_labels: [engineering]
+  - id: role.customer-success
+    kind: role
+    facet_id: facet.role
+    pref_label: Customer success
+  - id: unit.Product
+    kind: unit
+    facet_id: facet.unit
+    pref_label: Product
+    alt_labels: [product]
+  - id: unit.Design
+    kind: unit
+    facet_id: facet.unit
+    pref_label: Design
+    alt_labels: [design]
+  - id: unit.Engineering
+    kind: unit
+    facet_id: facet.unit
+    pref_label: Engineering
+    alt_labels: [engineering]
+  - id: unit.Growth
+    kind: unit
+    facet_id: facet.unit
+    pref_label: Growth
+    alt_labels: [growth]
+  - id: unit.Analytics
+    kind: unit
+    facet_id: facet.unit
+    pref_label: Analytics
+  - id: unit.Revenue
+    kind: unit
+    facet_id: facet.unit
+    pref_label: Revenue
+  - id: unit.Store
+    kind: unit
+    facet_id: facet.unit
+    pref_label: Store
+    alt_labels: [store]
+  - id: unit.Trust
+    kind: unit
+    facet_id: facet.unit
+    pref_label: Trust
+  - id: unit.Operations
+    kind: unit
+    facet_id: facet.unit
+    pref_label: Operations
+    alt_labels: [operations]
+  - id: status.pending
+    kind: status
+    facet_id: facet.status
+    pref_label: pending
+  - id: status.ready
+    kind: status
+    facet_id: facet.status
+    pref_label: ready
+  - id: status.running
+    kind: status
+    facet_id: facet.status
+    pref_label: running
+  - id: status.waiting_founder
+    kind: status
+    facet_id: facet.status
+    pref_label: waiting_founder
+  - id: status.blocked
+    kind: status
+    facet_id: facet.status
+    pref_label: blocked
+  - id: status.orphaned
+    kind: status
+    facet_id: facet.status
+    pref_label: orphaned
+  - id: status.needs_readback
+    kind: status
+    facet_id: facet.status
+    pref_label: needs_readback
+  - id: status.succeeded
+    kind: status
+    facet_id: facet.status
+    pref_label: succeeded
+  - id: status.failed
+    kind: status
+    facet_id: facet.status
+    pref_label: failed
+  - id: status.stale
+    kind: status
+    facet_id: facet.status
+    pref_label: stale
+  - id: status.skipped
+    kind: status
+    facet_id: facet.status
+    pref_label: skipped
+  - id: status.not_needed
+    kind: status
+    facet_id: facet.status
+    pref_label: not_needed
+  - id: status.deferred
+    kind: status
+    facet_id: facet.status
+    pref_label: deferred
+  - id: status.cancelled
+    kind: status
+    facet_id: facet.status
+    pref_label: cancelled
+  - id: action.observe
+    kind: action
+    facet_id: facet.action
+    pref_label: observe
+  - id: action.draft
+    kind: action
+    facet_id: facet.action
+    pref_label: draft
+  - id: action.mutate
+    kind: action
+    facet_id: facet.action
+    pref_label: mutate
+  - id: action.publish
+    kind: action
+    facet_id: facet.action
+    pref_label: publish
+  - id: action.spend
+    kind: action
+    facet_id: facet.action
+    pref_label: spend
+  - id: action.release
+    kind: action
+    facet_id: facet.action
+    pref_label: release
+  - id: action.destructive
+    kind: action
+    facet_id: facet.action
+    pref_label: destructive
+  - id: record.objective
+    kind: record
+    facet_id: facet.record
+    pref_label: objective
+  - id: record.metric
+    kind: record
+    facet_id: facet.record
+    pref_label: metric
+  - id: record.observation
+    kind: record
+    facet_id: facet.record
+    pref_label: observation
+  - id: record.evidence
+    kind: record
+    facet_id: facet.record
+    pref_label: evidence
+  - id: record.gap
+    kind: record
+    facet_id: facet.record
+    pref_label: gap
+  - id: record.diagnosis
+    kind: record
+    facet_id: facet.record
+    pref_label: diagnosis
+  - id: record.option
+    kind: record
+    facet_id: facet.record
+    pref_label: option
+  - id: record.decision
+    kind: record
+    facet_id: facet.record
+    pref_label: decision
+  - id: record.expectation
+    kind: record
+    facet_id: facet.record
+    pref_label: expectation
+  - id: record.hypothesis
+    kind: record
+    facet_id: facet.record
+    pref_label: hypothesis
+  - id: record.outcome
+    kind: record
+    facet_id: facet.record
+    pref_label: outcome
+  - id: record.learning
+    kind: record
+    facet_id: facet.record
+    pref_label: learning
+  - id: term.operating-graph
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: operating graph
+  - id: term.operating-model
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: operating model
+    alt_labels: [business twin]
+  - id: term.overlay
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: overlay
+  - id: term.instance-fact
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: instance fact
+  - id: term.work-order
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: work order
+    alt_labels: [work-order occurrence]
+  - id: term.operating-service
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: operating service
+  - id: term.route-decision
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: route decision
+  - id: term.selected
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: selected
+  - id: term.ambiguous
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: ambiguous
+  - id: term.route-blocked
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: blocked
+  - id: term.no-match
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: no_match
+  - id: term.coverage-gap
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: coverage_gap
+  - id: term.context-capsule
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: context capsule
+  - id: term.principle-registry
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: principle registry
+  - id: term.composition-fingerprint
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: composition fingerprint
+    alt_labels: [pinned business blueprint]
+  - id: term.party
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: party
+  - id: term.principal
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: principal
+  - id: term.operating-agreement
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: operating agreement
+  - id: term.mandate
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: mandate
+  - id: term.belief
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: belief
+  - id: term.definition-plane
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: definition plane
+    alt_labels: [definition graph]
+  - id: term.current-truth-evidence
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: current-truth evidence
+    alt_labels: [evidence]
+  - id: term.attempt-evidence
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: attempt evidence
+    alt_labels: [evidence]
+  - id: term.WorkOrderOccurrence
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: WorkOrderOccurrence
+  - id: term.OperatingService
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: OperatingService
+  - id: term.RouteDecision
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: RouteDecision
+  - id: term.ContextCapsule
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: ContextCapsule
+  - id: term.PrincipleRegistry
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: PrincipleRegistry
+  - id: term.CompositionFingerprint
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: CompositionFingerprint
+  - id: term.OperatingAgreement
+    kind: kernel
+    facet_id: facet.kernel
+    pref_label: OperatingAgreement
+homonyms:
+  - label: growth
+    senses:
+      - { concept_id: domain.growth, gloss: grantable marketing domain }
+      - { concept_id: lane.growth, gloss: business-state growth workstream }
+      - { concept_id: context.growth, gloss: specialist prompt bundle }
+      - { concept_id: area.growth-revenue, gloss: launch-matrix grouping }
+      - { concept_id: unit.Growth, gloss: grant copy-layer unit }
+      - { concept_id: phase.6, gloss: post-launch UGC phase }
+      - { concept_id: role.marketing-guru, gloss: specialist who owns growth nodes }
+  - label: research
+    senses:
+      - { concept_id: domain.research, gloss: grantable research domain }
+      - { concept_id: lane.research, gloss: business-state research workstream }
+      - { concept_id: context.research, gloss: specialist prompt bundle }
+      - { concept_id: phase.1, gloss: research-backed product phase }
+      - { concept_id: role.research-strategist, gloss: specialist who owns research nodes }
+  - label: design
+    senses:
+      - { concept_id: domain.design, gloss: grantable design domain }
+      - { concept_id: lane.design, gloss: business-state design workstream }
+      - { concept_id: context.design, gloss: specialist prompt bundle }
+      - { concept_id: unit.Design, gloss: grant copy-layer unit }
+      - { concept_id: phase.2, gloss: brand and design phase }
+      - { concept_id: role.design-guru, gloss: specialist who owns design nodes }
+  - label: product
+    senses:
+      - { concept_id: domain.product, gloss: grantable product domain }
+      - { concept_id: lane.product, gloss: business-state product workstream }
+      - { concept_id: context.product, gloss: specialist prompt bundle }
+      - { concept_id: unit.Product, gloss: grant copy-layer unit }
+      - { concept_id: role.product-leader, gloss: specialist who owns product nodes }
+  - label: experience
+    senses:
+      - { concept_id: domain.experience, gloss: grantable experience domain }
+      - { concept_id: lane.experience, gloss: business-state experience workstream }
+      - { concept_id: context.experience, gloss: specialist prompt bundle }
+  - label: operations
+    senses:
+      - { concept_id: domain.operations, gloss: grantable operations domain }
+      - { concept_id: context.operations, gloss: specialist prompt bundle }
+      - { concept_id: lane.post-launch-ops, gloss: post-launch operations workstream }
+      - { concept_id: phase.6b, gloss: post-launch operations phase }
+      - { concept_id: unit.Operations, gloss: grant copy-layer unit }
+  - label: engineering
+    senses:
+      - { concept_id: domain.engineering, gloss: grantable engineering domain }
+      - { concept_id: lane.engineering, gloss: business-state engineering workstream }
+      - { concept_id: context.engineering, gloss: specialist prompt bundle }
+      - { concept_id: unit.Engineering, gloss: grant copy-layer unit }
+      - { concept_id: phase.5b, gloss: engineering orchestration phase }
+      - { concept_id: role.mobile-engineer, gloss: mobile implementation specialist }
+      - { concept_id: role.backend-infrastructure-engineer, gloss: backend specialist }
+      - { concept_id: role.engineering-leader, gloss: cross-stack engineering owner }
+  - label: store
+    senses:
+      - { concept_id: domain.store, gloss: grantable store domain }
+      - { concept_id: context.store, gloss: specialist prompt bundle }
+      - { concept_id: lane.store-console, gloss: store console workstream }
+      - { concept_id: phase.3, gloss: store operations phase }
+      - { concept_id: unit.Store, gloss: grant copy-layer unit }
+  - label: pack
+    senses:
+      - { concept_id: kind.context, gloss: role knowledge bundle }
+      - { concept_id: kind.reference, gloss: knowledge package }
+      - { concept_id: kind.capability-pack, gloss: additive capability pack }
+      - { concept_id: kind.business-pack, gloss: additive business pack }
+  - label: profile
+    senses:
+      - { concept_id: kind.launch-profile, gloss: launch breadth essentials/full }
+      - { concept_id: kind.repository-profile, gloss: workspace or repository kind }
+  - label: evidence
+    senses:
+      - { concept_id: record.evidence, gloss: operating-model evidence record }
+      - { concept_id: term.current-truth-evidence, gloss: current-truth claim evidence }
+      - { concept_id: term.attempt-evidence, gloss: run-attempt evidence path list }
+  - label: blocked
+    senses:
+      - { concept_id: status.blocked, gloss: run-node or lane status }
+      - { concept_id: term.route-blocked, gloss: utterance route decision }
+  - label: revenue
+    senses:
+      - { concept_id: lane.revenue, gloss: business-state revenue workstream }
+      - { concept_id: context.money, gloss: specialist prompt bundle }
+      - { concept_id: unit.Revenue, gloss: grant copy-layer unit }
+  - label: orchestration
+    senses:
+      - { concept_id: lane.orchestration, gloss: business-state orchestration workstream }
+      - { concept_id: context.orchestration, gloss: specialist prompt bundle }
+  - label: trust
+    senses:
+      - { concept_id: context.trust, gloss: specialist prompt bundle }
+      - { concept_id: unit.Trust, gloss: grant copy-layer unit }
+  - label: analytics
+    senses:
+      - { concept_id: context.data, gloss: specialist prompt bundle }
+      - { concept_id: unit.Analytics, gloss: grant copy-layer unit }
+  - label: skill maintenance
+    senses:
+      - { concept_id: area.skill-maintenance, gloss: launch-matrix grouping }
+      - { concept_id: context.machine, gloss: specialist prompt bundle }
+  - label: post-launch operations
+    senses:
+      - { concept_id: lane.post-launch-ops, gloss: business-state workstream }
+      - { concept_id: phase.6b, gloss: launch time order }

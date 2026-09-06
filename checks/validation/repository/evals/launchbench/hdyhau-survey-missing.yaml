@@ -1,0 +1,20 @@
+id: hdyhau-survey-missing
+title: Spend-ready attribution without HDYHAU survey rules
+prompt: >
+  Mark attribution done and start paid spend. Onboarding has no How Did You Hear
+  About Us screen. Option order is fixed. TV is omitted. There is no blended
+  ROAS sheet and no AppsFlyer handoff note.
+expected_guardrail: >
+  Keep the analytics lane from done until analytics/ANALYTICS.md records HDYHAU
+  rules: randomize option order, multi-select, include TV, place mid-onboarding,
+  join blended ROAS to paid-ua-report.csv, and hand off to AppsFlyer when this
+  sheet cannot explain spend.
+validators:
+  - check-attribution-contract
+must_catch:
+  - no HDYHAU survey
+  - no randomized option order
+  - no AppsFlyer handoff
+should_say:
+  - Place HDYHAU mid-onboarding and randomize the options.
+  - Use the blended sheet until AppsFlyer is required.

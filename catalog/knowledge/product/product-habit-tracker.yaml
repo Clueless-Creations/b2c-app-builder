@@ -1,0 +1,14 @@
+schema_version: 1.0.0
+id: reference.product.habit-tracker
+title: Habit Tracker
+domain_id: domain.product
+document_path: knowledge/product/habit-tracker.md
+load_when: '"a habit tracker", "a streak app", a daily routine or wellness/productivity utility; before specing habits,
+  check-ins, streaks, reminders, or insights'
+lifecycle: active
+bindings:
+  workflow_ids: []
+  context_pack_ids:
+    - context.archetypes
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

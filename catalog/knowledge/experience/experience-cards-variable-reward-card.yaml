@@ -1,0 +1,14 @@
+schema_version: 1.0.0
+id: reference.experience.experience-cards.variable-reward-card
+title: Variable Reward Card
+domain_id: domain.experience
+document_path: knowledge/experience/experience-cards/variable-reward-card.md
+load_when: "HIGH-risk: an unpredictable-positive-outcome mechanic (reveal, spin, box); pins a canonical motion-contract
+  spring; escape hatch and counter-metric required — routed from experience-cards.md"
+lifecycle: active
+bindings:
+  workflow_ids: []
+  context_pack_ids:
+    - context.experience-cards
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

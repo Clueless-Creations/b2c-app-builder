@@ -1,0 +1,37 @@
+schema_version: 1.0.0
+id: reference.growth.fastlane-growth-ops
+title: Fastlane Growth Ops
+domain_id: domain.growth
+document_path: knowledge/growth/fastlane-growth-ops.md
+load_when: after launch approval or public beta; on any usefastlane.ai request — workspace setup, social connections,
+  Blitz campaigns, generated organic content, scheduling, canceling posts, short-form analytics
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.growth.fastlane-growth-ops
+  context_pack_ids: []
+sources:
+  - id: app-usefastlane-ai-guide
+    name: app.usefastlane.ai
+    source_type: website
+    url: https://app.usefastlane.ai/guide
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: app-usefastlane-ai-home
+    name: app.usefastlane.ai
+    source_type: website
+    url: https://app.usefastlane.ai/home
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developers-usefastlane-ai
+    name: developers.usefastlane.ai
+    source_type: website
+    url: https://developers.usefastlane.ai/
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

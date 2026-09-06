@@ -1,0 +1,10 @@
+{
+  "version": "v1",
+  "minPrecision": 1,
+  "minRecall": 1,
+  "maxConfusionRate": 0,
+  "maxAmbiguityRate": 0.25,
+  "maxNoMatchRate": 0.25,
+  "maxBlockedRate": 0.25,
+  "maxCoverageGapRate": 0.25
+}

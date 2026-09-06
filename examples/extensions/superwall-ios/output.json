@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status", "entitlementAuthority", "assignmentOwner"],
+  "properties": {
+    "status": {
+      "enum": ["unknown", "inactive", "active"]
+    },
+    "entitlementAuthority": {
+      "const": "revenuecat"
+    },
+    "assignmentOwner": {
+      "const": "superwall"
+    }
+  }
+}

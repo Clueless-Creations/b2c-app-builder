@@ -1,0 +1,23 @@
+schema_version: 1.0.0
+id: reference.orchestration.full-launch-program
+title: Full Launch Program
+domain_id: domain.orchestration
+document_path: knowledge/orchestration/full-launch-program.md
+load_when: a founder asks for a complete end-to-end consumer delivery (app, full web funnel, store packet, analytics,
+  trust, revenue, growth) carried to Submit-for-Review ready; when opening, resuming, or closing
+  workflow.orchestration.full-launch-program; when checking the definition of done
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.orchestration.full-launch-program
+    - workflow.orchestration.full-launch-closeout
+    - workflow.orchestration.session-continuity-resume
+  context_pack_ids:
+    - context.orchestration
+applicability_notes: The program is the loadable replacement for a pasted launch prompt. It adds a mandate record, the
+  isolated-review edges, the reference-pack edge, and the closeout gates on top of the existing catalog nodes. It adds
+  no second router, catalog, planner, or state store. Workspace identities belong in operations/LAUNCH_PROGRAM.md and
+  reducer-owned state, never in this reference.
+sources: []
+source_exemption: This package contains internal operating guidance that sequences existing catalog nodes and gates. It
+  makes no factual claim about a third-party product.

@@ -1,0 +1,205 @@
+schema_version: 1.0.0
+id: reference.operations.resend-email-ops
+title: Resend Email Ops
+domain_id: domain.operations
+document_path: knowledge/operations/resend-email-ops.md
+load_when: before Resend, API keys, transactional email, lifecycle automations, broadcasts, contacts/topics, webhooks,
+  inbound email, unsubscribe, deliverability, or templates
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.operations.resend-email-ops
+  context_pack_ids: []
+sources:
+  - id: resend-com-docs
+    name: resend.com
+    source_type: docs
+    url: https://resend.com/docs
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: resend-com-docs-api-reference-emails
+    name: resend.com
+    source_type: docs
+    url: https://resend.com/docs/api-reference/emails
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: resend-com-docs-dashboard-api-keys-introduction
+    name: resend.com
+    source_type: docs
+    url: https://resend.com/docs/dashboard/api-keys/introduction
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: resend-com-docs-dashboard-audiences-contacts
+    name: resend.com
+    source_type: docs
+    url: https://resend.com/docs/dashboard/audiences/contacts
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: resend-com-docs-dashboard-audiences-introduction
+    name: resend.com
+    source_type: docs
+    url: https://resend.com/docs/dashboard/audiences/introduction
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: resend-com-docs-dashboard-automations-introduction
+    name: resend.com
+    source_type: docs
+    url: https://resend.com/docs/dashboard/automations/introduction
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: resend-com-docs-dashboard-broadcasts-introduction
+    name: resend.com
+    source_type: docs
+    url: https://resend.com/docs/dashboard/broadcasts/introduction
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: resend-com-docs-dashboard-domains-cloudflare
+    name: resend.com
+    source_type: docs
+    url: https://resend.com/docs/dashboard/domains/cloudflare
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: resend-com-docs-dashboard-domains-dmarc
+    name: resend.com
+    source_type: docs
+    url: https://resend.com/docs/dashboard/domains/dmarc
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: resend-com-docs-dashboard-domains-introduction
+    name: resend.com
+    source_type: docs
+    url: https://resend.com/docs/dashboard/domains/introduction
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: resend-com-docs-dashboard-domains-regions
+    name: resend.com
+    source_type: docs
+    url: https://resend.com/docs/dashboard/domains/regions
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: resend-com-docs-dashboard-domains-tracking
+    name: resend.com
+    source_type: docs
+    url: https://resend.com/docs/dashboard/domains/tracking
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: resend-com-docs-dashboard-emails-add-unsubscribe-to-transactional-emails
+    name: resend.com
+    source_type: docs
+    url: https://resend.com/docs/dashboard/emails/add-unsubscribe-to-transactional-emails
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: resend-com-docs-dashboard-emails-idempotency-keys
+    name: resend.com
+    source_type: docs
+    url: https://resend.com/docs/dashboard/emails/idempotency-keys
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: resend-com-docs-dashboard-receiving-custom-domains
+    name: resend.com
+    source_type: docs
+    url: https://resend.com/docs/dashboard/receiving/custom-domains
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: resend-com-docs-dashboard-receiving-introduction
+    name: resend.com
+    source_type: docs
+    url: https://resend.com/docs/dashboard/receiving/introduction
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: resend-com-docs-dashboard-topics-introduction
+    name: resend.com
+    source_type: docs
+    url: https://resend.com/docs/dashboard/topics/introduction
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: resend-com-docs-knowledge-base-how-to-handle-api-keys
+    name: resend.com
+    source_type: docs
+    url: https://resend.com/docs/knowledge-base/how-to-handle-api-keys
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: resend-com-docs-llms-txt
+    name: resend.com
+    source_type: docs
+    url: https://resend.com/docs/llms.txt
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: resend-com-docs-send-with-nextjs
+    name: resend.com
+    source_type: docs
+    url: https://resend.com/docs/send-with-nextjs
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: resend-com-docs-webhooks-introduction
+    name: resend.com
+    source_type: docs
+    url: https://resend.com/docs/webhooks/introduction
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: resend-com-docs-webhooks-verify-webhooks-requests
+    name: resend.com
+    source_type: docs
+    url: https://resend.com/docs/webhooks/verify-webhooks-requests
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: revenuecat-com-docs-api-v2
+    name: www.revenuecat.com
+    source_type: docs
+    url: https://www.revenuecat.com/docs/api-v2
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: revenuecat-com-docs-dashboard-and-metrics-customer-history-active-entitlements
+    name: www.revenuecat.com
+    source_type: docs
+    url: https://www.revenuecat.com/docs/dashboard-and-metrics/customer-history/active-entitlements
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

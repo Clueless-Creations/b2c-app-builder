@@ -1,0 +1,43 @@
+schema_version: 1.0.0
+id: reference.trust.security-release-hardening
+title: Security Release Hardening
+domain_id: domain.trust
+document_path: knowledge/trust/security-release-hardening.md
+load_when: before threat modeling, hardening, scans, or any security-readiness claim — Default Output contract, OWASP
+  MASVS/ASVS and platform security basis, paid-tool routing with fallbacks, mobile hardening checklists, and
+  revenue/entitlement abuse controls feeding trust/SECURITY.md
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.trust.security-architecture-and-release-gate
+  context_pack_ids:
+    - context.trust
+sources:
+  - id: github-com-florianbruniaux-claude-code-ultimate-guide-pre-commit-secrets
+    name: github.com
+    source_type: github
+    url: https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/v3.43.0/examples/hooks/bash/pre-commit-secrets.sh
+    review_cadence_days: 30
+    claim_scope: Pre-commit hook pattern (`gitleaks protect --staged`) that blocks a secret before
+      the commit rather than catching it only in a later CI scan.
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers
+  - id: github-com-florianbruniaux-claude-code-ultimate-guide-support-csm-agent
+    name: github.com
+    source_type: github
+    url: https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/guide/workflows/support-csm-agent.md
+    review_cadence_days: 30
+    claim_scope: Read-replica, scoped-key, parameterized-query, and human-review pattern for an
+      agent's live backend or CRM diagnostic access.
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers
+  - id: arxiv-org-abs-2604-19049
+    name: Refute-or-Promote
+    source_type: paper
+    url: https://arxiv.org/abs/2604.19049
+    review_cadence_days: 30
+    claim_scope: Basis for the "agreement is not proof" note — the 31-day, seven-target campaign where ten
+      independent reviewers unanimously endorsed a non-existent padding-oracle vulnerability, killed only
+      by a proof-of-concept run.
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers

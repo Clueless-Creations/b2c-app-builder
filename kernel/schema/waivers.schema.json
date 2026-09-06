@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:b2c:core:waivers-schema",
+  "title": "Protected-Class Waivers",
+  "$comment": "Extends gate-ledger 2.0.0's action-class vocabulary (KTD4). R8's six protected classes enter as protectedCategory, a tag layered onto actionClass, not a new gateClass value. A waiver is founder opt-in only (createdBy is const founder) and always carries scope, caps, budgetPeriod, expiry, undoContract, and auditRef.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "updatedAt", "waivers"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": "1.0.0" },
+    "updatedAt": { "$ref": "#/$defs/dateTime" },
+    "waivers": { "$ref": "#/$defs/waiverList" }
+  },
+  "$defs": {
+    "dateTime": { "type": "string", "format": "date-time" },
+    "optionalDateTime": { "anyOf": [{ "const": "" }, { "$ref": "#/$defs/dateTime" }] },
+    "undoContract": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "undoAction"],
+          "properties": {
+            "kind": { "const": "literal_undo" },
+            "undoAction": { "type": "string", "minLength": 20 },
+            "undoVerifiedPath": { "type": "string" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "irreversibilityAcknowledgment", "mitigationSteps"],
+          "properties": {
+            "kind": { "const": "mitigation" },
+            "irreversibilityAcknowledgment": { "type": "string", "minLength": 20 },
+            "mitigationSteps": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 }
+          }
+        }
+      ]
+    },
+    "caps": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxPerAction", "maxPerPeriod"],
+      "properties": {
+        "maxPerAction": { "type": "number", "exclusiveMinimum": 0 },
+        "maxPerPeriod": { "type": "number", "exclusiveMinimum": 0 },
+        "currency": { "type": "string" }
+      }
+    },
+    "waiver": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "domainId",
+        "actionClass",
+        "protectedCategory",
+        "scope",
+        "caps",
+        "budgetPeriod",
+        "expiry",
+        "undoContract",
+        "auditRef",
+        "status",
+        "createdAt",
+        "createdBy"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "domainId": { "type": "string", "pattern": "^domain\\.(?!process$|orchestration$|machine$)[a-z][a-z0-9-]*$" },
+        "actionClass": { "enum": ["mutate", "publish", "spend", "release", "destructive"] },
+        "protectedCategory": { "enum": ["spend", "credentials_access", "legal_pricing", "public_actions", "release", "destructive"] },
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["resourcePattern", "description"],
+          "properties": {
+            "resourcePattern": { "type": "string", "minLength": 1 },
+            "description": { "type": "string", "minLength": 20 }
+          }
+        },
+        "caps": { "$ref": "#/$defs/caps" },
+        "budgetPeriod": { "enum": ["daily", "weekly", "monthly", "per_run"] },
+        "expiry": { "$ref": "#/$defs/dateTime" },
+        "undoContract": { "$ref": "#/$defs/undoContract" },
+        "auditRef": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["active", "expired", "revoked"] },
+        "createdAt": { "$ref": "#/$defs/dateTime" },
+        "createdBy": { "const": "founder" },
+        "lastVerifiedAt": { "$ref": "#/$defs/optionalDateTime" }
+      }
+    },
+    "waiverList": { "type": "array", "items": { "$ref": "#/$defs/waiver" } }
+  }
+}

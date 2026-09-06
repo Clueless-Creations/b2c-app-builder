@@ -1,0 +1,73 @@
+id: capability.paid-generative-ai
+title: Paid generative-AI controls
+version: 1.0.0
+revision: rev-paid-generative-ai-2026-08-24
+depends_on: []
+creates_provider_spend: true
+capabilities:
+  - id: capability.paid-generative-ai
+    title: Paid generative-AI controls
+    applicability: An app capability that can create model-provider spend.
+    required_facts:
+      - fact.paid-generation-entry
+    authority:
+      - Operating agreement must authorize paid model-provider spend.
+    readiness:
+      - The control record must name server-side auth, reservation, kill switch, and cap status.
+    inputs:
+      - product
+      - spend-boundary
+    outputs:
+      - A machine-readable paid-AI control record
+      - An incident runbook in the same file
+    effects:
+      - Blocks paid generation until the control record exists
+    evidence:
+      - trust/AI_PROVIDER_CONTROLS.md
+    expected_outcome: Paid generation cannot create provider spend without the compiled control pack.
+    context_selectors:
+      - knowledge.paid-generative-ai.controls
+    exclusions:
+      - physical product inventory
+      - farm lot records
+    extension_slots:
+      - cost-boundary
+references:
+  - id: reference.trust.paid-generative-ai-pack-controls
+    session_scoped: true
+    path: catalog/capabilities/paid-generative-ai/controls.md
+    section_id: knowledge.paid-generative-ai.controls
+    revision: rev-paid-generative-ai-2026-08-24
+    domain_id: domain.trust
+    title: Paid generative-AI control pack
+    load_when: When a pack that can create model-provider spend is composed
+    applicability_notes: Travels with the control record and incident runbook. Safety content rules stay in generative-ai-safety.md.
+    source_exemption: Authored capability pack.
+workflows:
+  - id: workflow.trust.paid-generative-ai-controls
+    title: Paid generative-AI control pack
+    domain_id: domain.trust
+    area_ids:
+      - area.business-operations-trust
+    trigger: When a capability can create paid model-provider spend
+    instructions: Confirm the machine-readable control record and the incident runbook in trust/AI_PROVIDER_CONTROLS.md. Do not mark paid generation ready when that file is missing. Do not weaken check:ai-provider-controls.
+    reads:
+      - trust/AI_PROVIDER_CONTROLS.md
+    role_id: role.security-architect
+    lane_ids:
+      - security
+    output_paths: []
+    gate_commands:
+      - check:ai-provider-controls
+    action_class: observe
+    idempotent: true
+    reference_ids:
+      - reference.trust.paid-generative-ai-pack-controls
+    extension_slots:
+      - cost-boundary
+extensions:
+  - target_id: workflow.trust.generative-ai-safety
+    slot: cost-boundary
+    kind: strengthen
+    reference_ids:
+      - reference.trust.paid-generative-ai-pack-controls

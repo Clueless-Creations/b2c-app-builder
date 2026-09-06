@@ -1,0 +1,18 @@
+id: scrollytelling-copy-visual-disconnect
+title: A polished scrollytelling visual repeats slogans instead of showing the situation, mechanism, and proof
+prompt: "I made the case study feel cinematic with three beautiful cards. Each card repeats the headline in oversized type: CONNECT, CONNECT, CONNECT. The text says families needed help, volunteers coordinated a response, and people received support, but the visual stays an abstract gradient network. The copy and artwork are stylish, so I marked visual_job as 'make it feel premium' and reused one evidence ID."
+expected_guardrail: "The visual is not doing the story's evidentiary work. Each scene needs an ordered narrative role, a specific visual_job, its own evidence reference, and exactly one localization row per declared locale. Each localization maps every visual state to a beat-level copy key and digest, then carries its own keyed and digested caption and accessible description; the caption and description digests must hash their exact localized text. Show the changing situation, the coordination mechanism, and the outcome or proof instead of restating the headline. check:scrollytelling can reject missing or malformed provenance and role order; the no-AI-slop and fresh-context visual review must judge whether the authored visual truly depicts those claims."
+validators:
+  - check-scrollytelling-contract
+  - check-vibecoded-tells
+  - check-no-slop
+must_catch:
+  - "repeating the same display word does not depict the situation, mechanism, or outcome"
+  - "visual_job must describe what evidence or relationship the scene makes legible, not a mood such as 'premium'"
+  - "each locale needs ordered state-to-copy provenance plus a keyed and digested caption and accessible description"
+  - "localized caption and accessible-description digests must hash their exact declared text"
+  - "the canonical narrative order is situation or need, intervention or mechanism, then outcome or proof; richer beats may sit around that spine"
+should_say:
+  - "replace slogan cards with authored diagrams, product states, or evidence-bearing imagery tied to each beat"
+  - "run the deterministic contract gate and then a fresh-context no-AI-slop visual review"
+  - "do not claim that schema validity proves the visual communicates the story"

@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "validate-deliverables output",
+  "description": "The JSON report compose.mjs validate writes to stdout. ok false pairs with exit code 1.",
+  "type": "object",
+  "properties": {
+    "ok": { "type": "boolean" },
+    "mode": { "const": "validate" },
+    "notCaptureEvidence": { "const": true },
+    "checked": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "dir": { "type": "string", "minLength": 1 },
+          "outputs": { "type": "integer", "minimum": 0 },
+          "captures": { "type": "integer", "minimum": 0 }
+        },
+        "required": ["dir", "outputs", "captures"],
+        "additionalProperties": false
+      }
+    },
+    "failures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "enum": [
+              "provenance-missing",
+              "provenance-invalid-json",
+              "provenance-field-missing",
+              "output-missing",
+              "output-sha-mismatch",
+              "output-dimension-mismatch",
+              "output-capture-link-missing",
+              "well-mismatch",
+              "capture-missing",
+              "capture-sha-mismatch",
+              "capture-dimension-mismatch",
+              "capture-format-unreadable",
+              "template-sha-mismatch"
+            ]
+          },
+          "dir": { "type": "string", "minLength": 1 },
+          "message": { "type": "string", "minLength": 1 }
+        },
+        "required": ["code", "dir", "message"],
+        "additionalProperties": true
+      }
+    },
+    "warnings": { "type": "array", "items": { "type": "string" } }
+  },
+  "required": ["ok", "mode", "notCaptureEvidence", "checked", "failures", "warnings"],
+  "additionalProperties": false
+}

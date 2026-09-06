@@ -1,0 +1,28 @@
+schema_version: 1.0.0
+id: reference.engineering.accessibility-readiness
+title: Accessibility Readiness
+domain_id: domain.engineering
+document_path: knowledge/engineering/accessibility-readiness.md
+load_when: before accessibility declarations, beta readiness, or store submission
+lifecycle: active
+bindings:
+  workflow_ids: [workflow.engineering.accessibility-common-task-proof]
+  context_pack_ids: [context.device]
+applicability_notes: Every mobile launch needs common-task accessibility proof.
+sources:
+  - id: apple-accessibility-nutrition-labels
+    name: Apple Accessibility Nutrition Labels
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/manage-app-accessibility/overview-of-accessibility-nutrition-labels/
+    review_cadence_days: 30
+    claim_scope: Supports device-specific declarations and common-task accessibility testing.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: android-core-app-quality
+    name: Android core app quality
+    source_type: official_docs
+    url: https://developer.android.com/develop/adaptive-apps/quality-guidelines/core-app-quality
+    review_cadence_days: 30
+    claim_scope: Supports Android accessibility and core quality requirements.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

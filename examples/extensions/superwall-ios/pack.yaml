@@ -1,0 +1,56 @@
+{
+  "id": "business-pack.superwall-ios",
+  "title": "Superwall iOS composition",
+  "version": "1.0.0",
+  "revision": "superwall-ios-1",
+  "roles":
+    [
+      {
+        "id": "role.superwall-ios",
+        "name": "Native monetization integrator",
+        "prompt_path": "integration.md",
+        "scope": "Integrate explicit purchase and entitlement authority",
+        "capability_ids": ["manual"],
+        "output_path_prefixes": ["monetization/"],
+      },
+    ],
+  "workflows":
+    [
+      {
+        "id": "workflow.superwall-ios-present-paywall",
+        "title": "Present paywall",
+        "domain_id": "domain.engineering",
+        "area_ids": ["area.product-experience"],
+        "trigger": "Explicit native monetization operation requested",
+        "instructions": "Use the selected native contract and preserve current entitlement authority. Require applicable approval before provider effects.",
+        "role_id": "role.superwall-ios",
+        "output_paths": ["monetization/present-paywall-result.json", "monetization/present-paywall-receipt.json"],
+        "action_class": "draft",
+        "idempotent": false,
+      },
+      {
+        "id": "workflow.superwall-ios-purchase",
+        "title": "Purchase",
+        "domain_id": "domain.engineering",
+        "area_ids": ["area.product-experience"],
+        "trigger": "Explicit native monetization operation requested",
+        "instructions": "Use the selected native contract and preserve current entitlement authority. Require applicable approval before provider effects.",
+        "role_id": "role.superwall-ios",
+        "output_paths": ["monetization/purchase-result.json", "monetization/purchase-receipt.json"],
+        "action_class": "spend",
+        "idempotent": false,
+      },
+      {
+        "id": "workflow.superwall-ios-read-entitlement",
+        "title": "Read entitlement",
+        "domain_id": "domain.engineering",
+        "area_ids": ["area.product-experience"],
+        "trigger": "Explicit native monetization operation requested",
+        "instructions": "Use the selected native contract and preserve current entitlement authority. Require applicable approval before provider effects.",
+        "role_id": "role.superwall-ios",
+        "output_paths": ["monetization/read-entitlement-result.json", "monetization/read-entitlement-receipt.json"],
+        "action_class": "observe",
+        "idempotent": false,
+      },
+    ],
+}

@@ -1,0 +1,64 @@
+# Enforces the twelve-month analytics retention policy recorded in
+# hosted/builder-console/analytics/LEGITIMATE_INTERESTS_ASSESSMENT.md by running
+# tooling/prune-posthog-persons.ts with --apply once a month. PostHog's own retention guarantee is
+# a floor, not a ceiling, so the deletion has to come from this side.
+#
+# Credentials: POSTHOG_PERSONAL_API_KEY (repository secret; a PostHog personal API key scoped to
+# person:write and query:read, created in the PostHog UI — there is no API for creating one) and
+# POSTHOG_PROJECT_ID (repository variable). A scheduled or --apply run with the key missing
+# fails loudly here rather than relying on the script's own exit 0 for missing credentials, so a
+# silently skipped month cannot look like a clean run.
+name: Prune PostHog persons (retention)
+
+# Manual-only in the public repository. The monthly schedule needs POSTHOG_PERSONAL_API_KEY,
+# which is operator configuration rather than source, so a scheduled run here would fail by
+# design every month. Re-arm the schedule wherever the prune actually runs.
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Delete (true) or dry-run (false)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: prune-posthog
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  prune:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      APPLY: ${{ github.event_name == 'schedule' || inputs.apply == true }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+      - run: npm ci
+      - name: Refuse an apply run without the key
+        if: env.APPLY == 'true'
+        env:
+          POSTHOG_PERSONAL_API_KEY: ${{ secrets.POSTHOG_PERSONAL_API_KEY }}
+        run: |
+          if [ -z "$POSTHOG_PERSONAL_API_KEY" ]; then
+            echo "::error::POSTHOG_PERSONAL_API_KEY is not set; the retention prune did not run."
+            exit 1
+          fi
+      - name: Prune (dry-run unless APPLY)
+        env:
+          POSTHOG_PERSONAL_API_KEY: ${{ secrets.POSTHOG_PERSONAL_API_KEY }}
+          POSTHOG_PROJECT_ID: ${{ vars.POSTHOG_PROJECT_ID }}
+        run: |
+          if [ "$APPLY" = "true" ]; then
+            npm run app:prune-posthog -- --apply
+          else
+            npm run app:prune-posthog
+          fi

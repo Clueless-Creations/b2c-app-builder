@@ -1,0 +1,15 @@
+schema_version: 1.0.0
+id: reference.product.product-moat
+title: Product Moat
+domain_id: domain.product
+document_path: knowledge/product/product-moat.md
+load_when: before the spec or launch surfaces harden — the moat and defensibility test for what makes this app hard
+  to copy; see eleven-star-experience.md for the 11-Star Run Protocol itself
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.research.research-backed-spec
+  context_pack_ids:
+    - context.product
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

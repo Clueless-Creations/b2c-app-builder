@@ -1,0 +1,5 @@
+{
+  "apiVersion": "b2c/v1",
+  "recipe": { "id": "b2c/mobile-app-capture", "version": "1.0.0" },
+  "target": { "platform": "ios", "runtime": "swiftui" }
+}

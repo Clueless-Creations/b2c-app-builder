@@ -1,0 +1,57 @@
+{
+  "$schema": "../schemas/adapter-manifest.schema.json",
+  "schemaVersion": "1.0.0",
+  "adapter": {
+    "id": "swiftui",
+    "stack": "swiftui",
+    "language": "swift",
+    "displayName": "SwiftUI"
+  },
+  "implementations": [
+    {
+      "contractId": "interaction.press-feedback",
+      "maturity": "implemented",
+      "source": {
+        "path": "examples/workspace/business/design/system/PremiumCraft.swift",
+        "symbols": ["PremiumPressStyle", "premiumPress"]
+      },
+      "proof": []
+    },
+    {
+      "contractId": "feedback.haptics",
+      "maturity": "implemented",
+      "source": {
+        "path": "examples/workspace/business/design/system/PremiumCraft.swift",
+        "symbols": ["Haptics", "sensoryFeedback"]
+      },
+      "proof": []
+    },
+    {
+      "contractId": "input.keyboard-behavior",
+      "maturity": "implemented",
+      "source": {
+        "path": "examples/workspace/business/design/system/PremiumCraft.swift",
+        "symbols": ["premiumInteractiveKeyboardDismiss", "dismissKeyboardOnTap", "swipeFocusGesture", "KeyboardDoneToolbar"]
+      },
+      "proof": []
+    },
+    {
+      "contractId": "feedback.skeleton",
+      "maturity": "implemented",
+      "source": {
+        "path": "examples/workspace/business/design/system/PremiumCraft.swift",
+        "symbols": ["ShimmerModifier", "skeleton"]
+      },
+      "proof": []
+    },
+    {
+      "contractId": "feedback.empty-state",
+      "maturity": "implemented",
+      "source": {
+        "path": "examples/workspace/business/design/system/PremiumCraft.swift",
+        "symbols": ["EmptyStateView"]
+      },
+      "proof": []
+    }
+  ]
+}

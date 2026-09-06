@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "type": "string",
+      "const": "b2c/v1"
+    },
+    "recipe": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 160,
+          "pattern": "^[a-z][a-z0-9-]*\\/[a-z][a-z0-9.-]*$"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        }
+      },
+      "required": [
+        "id",
+        "version"
+      ],
+      "additionalProperties": false
+    },
+    "target": {
+      "type": "object",
+      "properties": {
+        "platform": {
+          "type": "string",
+          "enum": [
+            "ios",
+            "android",
+            "web",
+            "host"
+          ]
+        },
+        "runtime": {
+          "type": "string",
+          "maxLength": 64,
+          "pattern": "^[a-z][a-z0-9-]*$"
+        }
+      },
+      "required": [
+        "platform",
+        "runtime"
+      ],
+      "additionalProperties": false
+    },
+    "bindings": {
+      "default": {},
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "maxLength": 160,
+        "pattern": "^[a-z][a-z0-9-]*\\/[a-z][a-z0-9.-]*$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "maxLength": 160,
+                "pattern": "^[a-z][a-z0-9-]*\\/[a-z][a-z0-9.-]*$"
+              },
+              "version": {
+                "type": "string",
+                "pattern": "^\\d+\\.\\d+\\.\\d+$"
+              }
+            },
+            "required": [
+              "id",
+              "version"
+            ],
+            "additionalProperties": false
+          },
+          "connection": {
+            "type": "string",
+            "maxLength": 160,
+            "pattern": "^connection:[a-z][a-z0-9._-]*$"
+          }
+        },
+        "required": [
+          "provider"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "apiVersion",
+    "recipe",
+    "target"
+  ],
+  "additionalProperties": false
+}

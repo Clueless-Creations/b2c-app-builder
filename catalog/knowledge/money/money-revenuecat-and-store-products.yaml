@@ -1,0 +1,16 @@
+schema_version: 1.0.0
+id: reference.money.revenuecat-and-store-products
+title: RevenueCat And Store Products
+domain_id: domain.money
+document_path: knowledge/money/revenuecat-and-store-products.md
+load_when: RevenueCat project/product/entitlement/offering setup, App Store or Play product gates, MISSING_METADATA or
+  RevenueCat product-type reconciliation, paywall smoke proof, or promotional IAP/subscription art — routed from
+  revenue-monetization.md
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.money.revenue-monetization
+  context_pack_ids:
+    - context.money
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

@@ -1,0 +1,89 @@
+schema_version: 1.0.0
+id: reference.orchestration.dynamic-workflows
+title: Dynamic Workflows
+domain_id: domain.orchestration
+document_path: knowledge/orchestration/dynamic-workflows.md
+load_when: a stage needs dozens-to-hundreds of agents, a codified quality pattern (adversarial verification, tournament,
+  loop-until-done), or a run you want to read and rerun; documents a Claude Code preview feature — refresh the source
+  basis before trusting a named flag/API
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.orchestration.orient-scaffold-and-state-cockpit-upkeep
+  context_pack_ids:
+    - context.orchestration
+sources:
+  - id: code-claude-com-docs-en-workflows
+    name: Claude Code dynamic workflows
+    source_type: official_docs
+    url: https://code.claude.com/docs/en/workflows
+    review_cadence_days: 7
+    claim_scope: Official Claude Code documentation for Dynamic Workflows (ultracode, the agent/parallel/pipeline API,
+      limits, and save/ship-as-skill) used for the Claude-side pre-build stages.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: claude-com-blog-introducing-dynamic-workflows-in-claude-code
+    name: Introducing dynamic workflows in Claude Code
+    source_type: official_docs
+    url: https://claude.com/blog/introducing-dynamic-workflows-in-claude-code
+    review_cadence_days: 7
+    claim_scope: Official Anthropic launch writeup for Dynamic Workflows; basis for the failure-mode framing and pattern
+      catalog in dynamic-workflows.md.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: code-claude-com-docs-en-sub-agents
+    name: Claude Code subagents
+    source_type: official_docs
+    url: https://code.claude.com/docs/en/sub-agents
+    review_cadence_days: 7
+    claim_scope: Official Claude Code subagent documentation for context preservation, tool limitation, and reusable specialists.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: martinfowler-com-articles-202508-ai-thoughts
+    name: Martin Fowler on agentic AI exfiltration risk
+    source_type: website
+    url: https://martinfowler.com/articles/202508-ai-thoughts.html
+    review_cadence_days: 30
+    claim_scope: Basis for the quarantine-pattern extension to any live loop that reads untrusted content before acting.
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers
+  - id: github-com-florianbruniaux-claude-code-ultimate-guide-iterative-refinement
+    name: Claude Code ultimate guide, iterative refinement
+    source_type: github
+    url: https://raw.githubusercontent.com/FlorianBruniaux/claude-code-ultimate-guide/main/guide/workflows/iterative-refinement.md
+    review_cadence_days: 30
+    claim_scope: Basis for the Loop-until-done stop-the-line rule (failed-attempt cap, decompose, escalate, failure card).
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers
+  - id: github-com-florianbruniaux-claude-code-ultimate-guide-known-issues
+    name: Claude Code ultimate guide, known issues
+    source_type: github
+    url: https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/guide/core/known-issues.md
+    review_cadence_days: 30
+    claim_scope: Basis for the CLAUDE_CODE_ATTRIBUTION_HEADER=false cache-invalidation workaround in Token Discipline.
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers
+  - id: arxiv-org-abs-2607-22585
+    name: Controlled study of harness and orchestration-strategy cost
+    source_type: paper
+    url: https://arxiv.org/abs/2607.22585
+    review_cadence_days: 30
+    claim_scope: Basis for the "watch cost, not only pass rate" note (40x cost spread, under-8-point pass-rate gap).
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers
+  - id: arxiv-org-abs-2203-11171
+    name: Self-consistency and candidate-verification discipline
+    source_type: paper
+    url: https://arxiv.org/abs/2203.11171
+    review_cadence_days: 30
+    claim_scope: Basis for the Candidate Discipline subsection (rubric freezing, re-scoring, synthesis-as-new-candidate).
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers
+  - id: anthropic-com-engineering-harness-design-long-running-apps
+    name: Anthropic harness design for long-running agents
+    source_type: official_docs
+    url: https://www.anthropic.com/engineering/harness-design-long-running-apps
+    review_cadence_days: 30
+    claim_scope: Basis for the measured self-preferential-bias failure and fix (game-editor task, independent evaluator).
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers

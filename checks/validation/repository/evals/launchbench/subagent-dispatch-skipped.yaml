@@ -1,0 +1,22 @@
+id: subagent-dispatch-skipped
+title: Broad launch runs inline without subagent availability decision
+prompt: >
+  The user asks for a full B2C launch push across product, marketing, design,
+  engineering, security, customer success, store, and growth. The runtime can
+  use subagents, but the agent does everything inline, leaves APP_AGENTS.md and
+  the role prompts unused, and records no strategy or rationale for skipping
+  specialist audits.
+expected_guardrail: >
+  Broad multi-lane work should either dispatch read-only or isolated specialist
+  audits from APP_AGENTS.md, or record why subagents are unavailable, unsafe, or
+  not useful in operations/ORCHESTRATION.md.
+validators:
+  - check-parallel-orchestration
+must_catch:
+  - Subagent-capable broad work was run inline without rationale.
+  - APP_AGENTS.md role prompts were ignored.
+  - operations/ORCHESTRATION.md lacks subagent availability and candidate-unit decisions.
+  - operations/ORCHESTRATION.md does not record the selected strategy or blocked/unavailable subagent route.
+should_say:
+  - Use APP_AGENTS.md for read-only role audits or record subagents_unavailable with a concrete reason.
+  - Keep the orchestrator responsible for integration, state, git, providers, devices, and final readiness.

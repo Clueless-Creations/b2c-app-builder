@@ -1,0 +1,796 @@
+schema_version: 1
+coverage: complete
+principles:
+  - id: graph.invariant.ungrounded_belief
+    source_id: trendingai
+    source_repository: TrendingAI
+    source_url: https://github.com/Glitch-Cat-Club/TrendingAI/tree/51233873060a8835f9ac8055a710f65aa21d0b54
+    source_commit: "51233873060a8835f9ac8055a710f65aa21d0b54"
+    source_anchor: src/harvesters/orchestrator.ts
+    rule: A belief-changing fact must cite source evidence, observation time, provenance, and confidence limits.
+    strength: must
+    owner: operating-model
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: ungrounded_belief
+      issue_code: graph_foundations.ungrounded_belief
+      negative_input:
+        kind: belief
+        evidence: []
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.invariant.action_without_authority
+    source_id: prompt_router
+    source_repository: prompt-router-starter
+    source_url: https://github.com/Glitch-Cat-Club/prompt-router-starter/tree/067b089fb36dfd73f22a4179390722cad2231e20
+    source_commit: "067b089fb36dfd73f22a4179390722cad2231e20"
+    source_anchor: algorithm/rules.json
+    rule: An action requires current authority and current capability readiness together.
+    strength: must
+    owner: autonomy
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: action_without_authority
+      issue_code: graph_foundations.action_without_authority
+      negative_input:
+        kind: action
+        mandate: false
+        readiness: true
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.invariant.derived_without_lineage
+    source_id: graph_memory
+    source_repository: graph-memory-starter
+    source_url: https://github.com/Glitch-Cat-Club/graph-memory-starter/tree/3254a8da41699def6abfa399166122fb04e6ddbd
+    source_commit: "3254a8da41699def6abfa399166122fb04e6ddbd"
+    source_anchor: src/schema.sql
+    rule: A derived artifact must keep exact source identifiers and revision lineage.
+    strength: must
+    owner: catalog
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: derived_without_lineage
+      issue_code: graph_foundations.derived_without_lineage
+      negative_input:
+        kind: derived
+        source_ids: []
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.invariant.silent_degradation
+    source_id: trendingai
+    source_repository: TrendingAI
+    source_url: https://github.com/Glitch-Cat-Club/TrendingAI/tree/51233873060a8835f9ac8055a710f65aa21d0b54
+    source_commit: "51233873060a8835f9ac8055a710f65aa21d0b54"
+    source_anchor: src/harvesters/orchestrator.ts
+    rule: The system must not silently discard, truncate, repair, or downgrade evidence, context, routes, or graph edges.
+    strength: must
+    owner: operating-model
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: silent_degradation
+      issue_code: graph_foundations.silent_degradation
+      negative_input:
+        kind: projection
+        dropped: true
+        overflow: null
+        exclusions: null
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.invariant.replay_external_effect
+    source_id: trendingai
+    source_repository: TrendingAI
+    source_url: https://github.com/Glitch-Cat-Club/TrendingAI/tree/51233873060a8835f9ac8055a710f65aa21d0b54
+    source_commit: "51233873060a8835f9ac8055a710f65aa21d0b54"
+    source_anchor: src/harvesters/orchestrator.ts
+    rule: Replay must not use network access, spend, uncontrolled current time, or new provider inference.
+    strength: must
+    owner: reducer
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: replay_external_effect
+      issue_code: graph_foundations.replay_external_effect
+      negative_input:
+        kind: replay
+        network: true
+        spend: false
+        live_clock: false
+        inference: false
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.trendingai.deterministic_adoption
+    source_id: trendingai
+    source_repository: TrendingAI
+    source_url: https://github.com/Glitch-Cat-Club/TrendingAI/tree/51233873060a8835f9ac8055a710f65aa21d0b54
+    source_commit: "51233873060a8835f9ac8055a710f65aa21d0b54"
+    source_anchor: src/harvesters/orchestrator.ts
+    rule: A model may propose a candidate. Deterministic code must validate and adopt any durable fact.
+    strength: must
+    owner: operating-model
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: model_adoption
+      issue_code: graph_foundations.trendingai_deterministic_adoption
+      negative_input:
+        kind: adoption
+        model_proposed: true
+        deterministic_validated: false
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.trendingai.schema_boundaries
+    source_id: trendingai
+    source_repository: TrendingAI
+    source_url: https://github.com/Glitch-Cat-Club/TrendingAI/tree/51233873060a8835f9ac8055a710f65aa21d0b54
+    source_commit: "51233873060a8835f9ac8055a710f65aa21d0b54"
+    source_anchor: src/harvesters/orchestrator.ts
+    rule: Durable records must stay inside a closed schema. Unknown types fail closed.
+    strength: must
+    owner: schema
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: closed_vocabulary
+      issue_code: graph_foundations.trendingai_schema_boundaries
+      negative_input:
+        kind: graph
+        type: UnknownType
+        allowed_types: [Objective, Metric]
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.trendingai.evidence_independence
+    source_id: trendingai
+    source_repository: TrendingAI
+    source_url: https://github.com/Glitch-Cat-Club/TrendingAI/tree/51233873060a8835f9ac8055a710f65aa21d0b54
+    source_commit: "51233873060a8835f9ac8055a710f65aa21d0b54"
+    source_anchor: src/harvesters/orchestrator.ts
+    rule: Duplicate copies from one source must not count as independent evidence groups.
+    strength: must
+    owner: operating-model
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: evidence_not_independent
+      issue_code: graph_foundations.trendingai_evidence_independence
+      negative_input:
+        kind: evidence_set
+        counted_independent: true
+        items:
+          - source_id: obs.1
+          - source_id: obs.1
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.graph_memory.closed_vocabulary
+    source_id: graph_memory
+    source_repository: graph-memory-starter
+    source_url: https://github.com/Glitch-Cat-Club/graph-memory-starter/tree/3254a8da41699def6abfa399166122fb04e6ddbd
+    source_commit: "3254a8da41699def6abfa399166122fb04e6ddbd"
+    source_anchor: src/schema.sql
+    rule: Graph types and predicates must come from a closed vocabulary.
+    strength: must
+    owner: catalog
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: closed_vocabulary
+      issue_code: graph_foundations.graph_memory_closed_vocabulary
+      negative_input:
+        kind: graph
+        type: MysteryEdge
+        allowed_types: [depends_on, evidences]
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.graph_memory.stable_identity
+    source_id: graph_memory
+    source_repository: graph-memory-starter
+    source_url: https://github.com/Glitch-Cat-Club/graph-memory-starter/tree/3254a8da41699def6abfa399166122fb04e6ddbd
+    source_commit: "3254a8da41699def6abfa399166122fb04e6ddbd"
+    source_anchor: src/schema.sql
+    rule: Stable IDs must survive path, label, and heading changes.
+    strength: must
+    owner: catalog
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: unstable_identity
+      issue_code: graph_foundations.graph_memory_stable_identity
+      negative_input:
+        kind: identity
+        id: node.1
+        path_changed: true
+        id_changed: true
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.graph_memory.compile_time_intelligence
+    source_id: graph_memory
+    source_repository: graph-memory-starter
+    source_url: https://github.com/Glitch-Cat-Club/graph-memory-starter/tree/3254a8da41699def6abfa399166122fb04e6ddbd
+    source_commit: "3254a8da41699def6abfa399166122fb04e6ddbd"
+    source_anchor: src/recall.py
+    rule: Catalog composition must pin every source revision before runtime use.
+    strength: must
+    owner: catalog
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: compile_without_pin
+      issue_code: graph_foundations.graph_memory_compile_time_intelligence
+      negative_input:
+        kind: composition
+        pin: null
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.graph_memory.bounded_traversal
+    source_id: graph_memory
+    source_repository: graph-memory-starter
+    source_url: https://github.com/Glitch-Cat-Club/graph-memory-starter/tree/3254a8da41699def6abfa399166122fb04e6ddbd
+    source_commit: "3254a8da41699def6abfa399166122fb04e6ddbd"
+    source_anchor: src/recall.py
+    rule: Recall traversal must enforce a declared depth or budget.
+    strength: must
+    owner: context
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: unbounded_traversal
+      issue_code: graph_foundations.graph_memory_bounded_traversal
+      negative_input:
+        kind: recall
+        depth: 9
+        max_depth: 3
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.graph_memory.explicit_no_match
+    source_id: graph_memory
+    source_repository: graph-memory-starter
+    source_url: https://github.com/Glitch-Cat-Club/graph-memory-starter/tree/3254a8da41699def6abfa399166122fb04e6ddbd
+    source_commit: "3254a8da41699def6abfa399166122fb04e6ddbd"
+    source_anchor: src/recall.py
+    rule: An empty match set must return an explicit no-match result. It must not look like success.
+    strength: must
+    owner: routing
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: implicit_no_match
+      issue_code: graph_foundations.graph_memory_explicit_no_match
+      negative_input:
+        kind: route
+        matches: []
+        result_code: ""
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.graph_memory.derived_indexes
+    source_id: graph_memory
+    source_repository: graph-memory-starter
+    source_url: https://github.com/Glitch-Cat-Club/graph-memory-starter/tree/3254a8da41699def6abfa399166122fb04e6ddbd
+    source_commit: "3254a8da41699def6abfa399166122fb04e6ddbd"
+    source_anchor: src/schema.sql
+    rule: A derived index must keep lineage to the records it projects.
+    strength: must
+    owner: catalog
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: derived_without_lineage
+      issue_code: graph_foundations.graph_memory_derived_indexes
+      negative_input:
+        kind: index
+        source_ids: []
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.prompt_router.signal_decision_separation
+    source_id: prompt_router
+    source_repository: prompt-router-starter
+    source_url: https://github.com/Glitch-Cat-Club/prompt-router-starter/tree/067b089fb36dfd73f22a4179390722cad2231e20
+    source_commit: "067b089fb36dfd73f22a4179390722cad2231e20"
+    source_anchor: algorithm/rules.json
+    rule: Ranking must not run before eligibility. Ranking cannot revive an ineligible candidate.
+    strength: must
+    owner: routing
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: signal_decision_merge
+      issue_code: graph_foundations.prompt_router_signal_decision_separation
+      negative_input:
+        kind: route
+        ranked_before_eligibility: true
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.prompt_router.precedence
+    source_id: prompt_router
+    source_repository: prompt-router-starter
+    source_url: https://github.com/Glitch-Cat-Club/prompt-router-starter/tree/067b089fb36dfd73f22a4179390722cad2231e20
+    source_commit: "067b089fb36dfd73f22a4179390722cad2231e20"
+    source_anchor: algorithm/rules.json
+    rule: Route checks must follow applicability, evidence, authority, capability, guardrails, then resources, then rank.
+    strength: must
+    owner: routing
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: signal_decision_merge
+      issue_code: graph_foundations.prompt_router_precedence
+      negative_input:
+        kind: route
+        ranked_before_eligibility: true
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.prompt_router.explainable_receipts
+    source_id: prompt_router
+    source_repository: prompt-router-starter
+    source_url: https://github.com/Glitch-Cat-Club/prompt-router-starter/tree/067b089fb36dfd73f22a4179390722cad2231e20
+    source_commit: "067b089fb36dfd73f22a4179390722cad2231e20"
+    source_anchor: algorithm/rules.json
+    rule: A route receipt must record exclusions. Silent omission is a degradation.
+    strength: must
+    owner: routing
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: silent_degradation
+      issue_code: graph_foundations.prompt_router_explainable_receipts
+      negative_input:
+        kind: receipt
+        dropped: true
+        overflow: null
+        exclusions: null
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.prompt_router.ambiguity
+    source_id: prompt_router
+    source_repository: prompt-router-starter
+    source_url: https://github.com/Glitch-Cat-Club/prompt-router-starter/tree/067b089fb36dfd73f22a4179390722cad2231e20
+    source_commit: "067b089fb36dfd73f22a4179390722cad2231e20"
+    source_anchor: algorithm/rules.json
+    rule: Ambiguous candidates must not resolve to a generic default.
+    strength: must
+    owner: routing
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: ambiguous_default
+      issue_code: graph_foundations.prompt_router_ambiguity
+      negative_input:
+        kind: route
+        ambiguous: true
+        selected_default: true
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.prompt_router.durable_contracts
+    source_id: prompt_router
+    source_repository: prompt-router-starter
+    source_url: https://github.com/Glitch-Cat-Club/prompt-router-starter/tree/067b089fb36dfd73f22a4179390722cad2231e20
+    source_commit: "067b089fb36dfd73f22a4179390722cad2231e20"
+    source_anchor: algorithm/rules.json
+    rule: A durable contract must pin a full source commit. Floating names are not a pin.
+    strength: must
+    owner: catalog
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: unpinned_source
+      issue_code: graph_foundations.prompt_router_durable_contracts
+      negative_input:
+        kind: source
+        commit: HEAD
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.prompt_router.proof_gated_completion
+    source_id: prompt_router
+    source_repository: prompt-router-starter
+    source_url: https://github.com/Glitch-Cat-Club/prompt-router-starter/tree/067b089fb36dfd73f22a4179390722cad2231e20
+    source_commit: "067b089fb36dfd73f22a4179390722cad2231e20"
+    source_anchor: algorithm/rules.json
+    rule: Completion of work requires its declared proof. Completion does not imply metric success.
+    strength: must
+    owner: work-orders
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: proof_without_gate
+      issue_code: graph_foundations.prompt_router_proof_gated_completion
+      negative_input:
+        kind: completion
+        required_proof: independent_verifier
+        proof_present: false
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.prompt_router.golden_evaluation
+    source_id: prompt_router
+    source_repository: prompt-router-starter
+    source_url: https://github.com/Glitch-Cat-Club/prompt-router-starter/tree/067b089fb36dfd73f22a4179390722cad2231e20
+    source_commit: "067b089fb36dfd73f22a4179390722cad2231e20"
+    source_anchor: algorithm/rules.json
+    rule: A golden routing evaluation must declare a fail threshold.
+    strength: must
+    owner: routing
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: evaluation_without_threshold
+      issue_code: graph_foundations.prompt_router_golden_evaluation
+      negative_input:
+        kind: evaluation
+        golden: true
+        threshold: null
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.icm.bounded_projections
+    source_id: icm
+    source_repository: Interpretable-Context-Methodology
+    source_url: https://github.com/RinDig/Interpretable-Context-Methodology/tree/02ba5d85c7871b75c7c702a2d8da6524723d53d4
+    source_commit: "02ba5d85c7871b75c7c702a2d8da6524723d53d4"
+    source_anchor: _core/CONVENTIONS.md
+    rule: Context compilation must stay inside a declared size or depth budget.
+    strength: must
+    owner: context
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: unbounded_traversal
+      issue_code: graph_foundations.icm_bounded_projections
+      negative_input:
+        kind: projection
+        depth: 12
+        max_depth: 4
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.icm.ipo_contracts
+    source_id: icm
+    source_repository: Interpretable-Context-Methodology
+    source_url: https://github.com/RinDig/Interpretable-Context-Methodology/tree/02ba5d85c7871b75c7c702a2d8da6524723d53d4
+    source_commit: "02ba5d85c7871b75c7c702a2d8da6524723d53d4"
+    source_anchor: _core/CONVENTIONS.md
+    rule: A stage output must cite the input records that produced it.
+    strength: must
+    owner: context
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: derived_without_lineage
+      issue_code: graph_foundations.icm_ipo_contracts
+      negative_input:
+        kind: stage_output
+        source_ids: []
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.icm.canonical_ownership
+    source_id: icm
+    source_repository: Interpretable-Context-Methodology
+    source_url: https://github.com/RinDig/Interpretable-Context-Methodology/tree/02ba5d85c7871b75c7c702a2d8da6524723d53d4
+    source_commit: "02ba5d85c7871b75c7c702a2d8da6524723d53d4"
+    source_anchor: _core/CONVENTIONS.md
+    rule: Canonical knowledge ownership must be pinned. Copies are not authority.
+    strength: must
+    owner: catalog
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: compile_without_pin
+      issue_code: graph_foundations.icm_canonical_ownership
+      negative_input:
+        kind: composition
+        pin: ""
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.icm.durable_intermediates
+    source_id: icm
+    source_repository: Interpretable-Context-Methodology
+    source_url: https://github.com/RinDig/Interpretable-Context-Methodology/tree/02ba5d85c7871b75c7c702a2d8da6524723d53d4
+    source_commit: "02ba5d85c7871b75c7c702a2d8da6524723d53d4"
+    source_anchor: _core/CONVENTIONS.md
+    rule: A durable intermediate must keep lineage so a later stage can recompute it.
+    strength: must
+    owner: context
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: derived_without_lineage
+      issue_code: graph_foundations.icm_durable_intermediates
+      negative_input:
+        kind: intermediate
+        source_ids: []
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.icm.validation_before_propagation
+    source_id: icm
+    source_repository: Interpretable-Context-Methodology
+    source_url: https://github.com/RinDig/Interpretable-Context-Methodology/tree/02ba5d85c7871b75c7c702a2d8da6524723d53d4
+    source_commit: "02ba5d85c7871b75c7c702a2d8da6524723d53d4"
+    source_anchor: _core/CONVENTIONS.md
+    rule: A stage must validate a candidate before it propagates a durable fact.
+    strength: must
+    owner: operating-model
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: model_adoption
+      issue_code: graph_foundations.icm_validation_before_propagation
+      negative_input:
+        kind: adoption
+        model_proposed: true
+        deterministic_validated: false
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.icm_architect.repeating_unit
+    source_id: icm_architect
+    source_repository: icm-architect
+    source_url: https://github.com/RinDig/icm-architect/tree/b20fb45063a564cf607b03526e206f519d174def
+    source_commit: "b20fb45063a564cf607b03526e206f519d174def"
+    source_anchor: SKILL.md
+    rule: An undeclared repeating unit must not enter the graph as a known type.
+    strength: must
+    owner: catalog
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: fail_open_unknown
+      issue_code: graph_foundations.icm_architect_repeating_unit
+      negative_input:
+        kind: domain
+        value: undeclared_unit
+        known: false
+        accepted: true
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.icm_architect.small_catalogs
+    source_id: icm_architect
+    source_repository: icm-architect
+    source_url: https://github.com/RinDig/icm-architect/tree/b20fb45063a564cf607b03526e206f519d174def
+    source_commit: "b20fb45063a564cf607b03526e206f519d174def"
+    source_anchor: SKILL.md
+    rule: A catalog projection must declare a size bound and refuse an oversize compile.
+    strength: must
+    owner: catalog
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: catalog_without_bound
+      issue_code: graph_foundations.icm_architect_small_catalogs
+      negative_input:
+        kind: catalog
+        size: 5000
+        max_size: 200
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.icm_architect.verified_reality
+    source_id: icm_architect
+    source_repository: icm-architect
+    source_url: https://github.com/RinDig/icm-architect/tree/b20fb45063a564cf607b03526e206f519d174def
+    source_commit: "b20fb45063a564cf607b03526e206f519d174def"
+    source_anchor: SKILL.md
+    rule: A verified-reality claim must cite evidence. Promotion without evidence is forbidden.
+    strength: must
+    owner: operating-model
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: ungrounded_belief
+      issue_code: graph_foundations.icm_architect_verified_reality
+      negative_input:
+        kind: belief
+        evidence: []
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.icm_architect.change_impact
+    source_id: icm_architect
+    source_repository: icm-architect
+    source_url: https://github.com/RinDig/icm-architect/tree/b20fb45063a564cf607b03526e206f519d174def
+    source_commit: "b20fb45063a564cf607b03526e206f519d174def"
+    source_anchor: SKILL.md
+    rule: A change-impact projection must name the records it depends on.
+    strength: must
+    owner: catalog
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: derived_without_lineage
+      issue_code: graph_foundations.icm_architect_change_impact
+      negative_input:
+        kind: impact
+        source_ids: []
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.icm_architect.cold_walk_tests
+    source_id: icm_architect
+    source_repository: icm-architect
+    source_url: https://github.com/RinDig/icm-architect/tree/b20fb45063a564cf607b03526e206f519d174def
+    source_commit: "b20fb45063a564cf607b03526e206f519d174def"
+    source_anchor: SKILL.md
+    rule: A cold-walk evaluation must declare a fail threshold.
+    strength: must
+    owner: verification
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: evaluation_without_threshold
+      issue_code: graph_foundations.icm_architect_cold_walk_tests
+      negative_input:
+        kind: evaluation
+        golden: true
+        threshold: ""
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.icm_architect.evidence_based_promotion
+    source_id: icm_architect
+    source_repository: icm-architect
+    source_url: https://github.com/RinDig/icm-architect/tree/b20fb45063a564cf607b03526e206f519d174def
+    source_commit: "b20fb45063a564cf607b03526e206f519d174def"
+    source_anchor: SKILL.md
+    rule: Pattern promotion requires deterministic validation of the supporting evidence.
+    strength: must
+    owner: operating-model
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: model_adoption
+      issue_code: graph_foundations.icm_architect_evidence_based_promotion
+      negative_input:
+        kind: adoption
+        model_proposed: true
+        deterministic_validated: false
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.content_agent.layered_context
+    source_id: content_agent
+    source_repository: Content-Agent-Routing-Promptbase
+    source_url: https://github.com/RinDig/Content-Agent-Routing-Promptbase/tree/fc41a3d718bcd16a9e0db9e7e6176a8063d7d2c9
+    source_commit: "fc41a3d718bcd16a9e0db9e7e6176a8063d7d2c9"
+    source_anchor: SYSTEM-ARCHITECTURE.md
+    rule: A context capsule must select exact section identifiers.
+    strength: must
+    owner: context
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: context_without_selectors
+      issue_code: graph_foundations.content_agent_layered_context
+      negative_input:
+        kind: context
+        section_ids: []
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.content_agent.route_knowledge_separation
+    source_id: content_agent
+    source_repository: Content-Agent-Routing-Promptbase
+    source_url: https://github.com/RinDig/Content-Agent-Routing-Promptbase/tree/fc41a3d718bcd16a9e0db9e7e6176a8063d7d2c9
+    source_commit: "fc41a3d718bcd16a9e0db9e7e6176a8063d7d2c9"
+    source_anchor: SYSTEM-ARCHITECTURE.md
+    rule: Knowledge lookup must not bypass route eligibility.
+    strength: must
+    owner: routing
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: signal_decision_merge
+      issue_code: graph_foundations.content_agent_route_knowledge_separation
+      negative_input:
+        kind: route
+        ranked_before_eligibility: true
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.content_agent.exact_sections
+    source_id: content_agent
+    source_repository: Content-Agent-Routing-Promptbase
+    source_url: https://github.com/RinDig/Content-Agent-Routing-Promptbase/tree/fc41a3d718bcd16a9e0db9e7e6176a8063d7d2c9
+    source_commit: "fc41a3d718bcd16a9e0db9e7e6176a8063d7d2c9"
+    source_anchor: SYSTEM-ARCHITECTURE.md
+    rule: Context selectors must use stable section IDs. Filename identity is not enough.
+    strength: must
+    owner: context
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: context_without_selectors
+      issue_code: graph_foundations.content_agent_exact_sections
+      negative_input:
+        kind: context
+        section_ids: []
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.content_agent.narrow_contracts
+    source_id: content_agent
+    source_repository: Content-Agent-Routing-Promptbase
+    source_url: https://github.com/RinDig/Content-Agent-Routing-Promptbase/tree/fc41a3d718bcd16a9e0db9e7e6176a8063d7d2c9
+    source_commit: "fc41a3d718bcd16a9e0db9e7e6176a8063d7d2c9"
+    source_anchor: SYSTEM-ARCHITECTURE.md
+    rule: A stage contract must use closed types. An unknown type fails closed.
+    strength: must
+    owner: context
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: closed_vocabulary
+      issue_code: graph_foundations.content_agent_narrow_contracts
+      negative_input:
+        kind: graph
+        type: AdHocBlob
+        allowed_types: [ContextCapsule, RouteReceipt]
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.content_agent.versioned_lineage
+    source_id: content_agent
+    source_repository: Content-Agent-Routing-Promptbase
+    source_url: https://github.com/RinDig/Content-Agent-Routing-Promptbase/tree/fc41a3d718bcd16a9e0db9e7e6176a8063d7d2c9
+    source_commit: "fc41a3d718bcd16a9e0db9e7e6176a8063d7d2c9"
+    source_anchor: SYSTEM-ARCHITECTURE.md
+    rule: Versioned lineage must keep source IDs on every derived projection.
+    strength: must
+    owner: catalog
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: derived_without_lineage
+      issue_code: graph_foundations.content_agent_versioned_lineage
+      negative_input:
+        kind: projection
+        source_ids: []
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.content_agent.temporal_feedback
+    source_id: content_agent
+    source_repository: Content-Agent-Routing-Promptbase
+    source_url: https://github.com/RinDig/Content-Agent-Routing-Promptbase/tree/fc41a3d718bcd16a9e0db9e7e6176a8063d7d2c9
+    source_commit: "fc41a3d718bcd16a9e0db9e7e6176a8063d7d2c9"
+    source_anchor: SYSTEM-ARCHITECTURE.md
+    rule: Definition dependencies must stay acyclic. Feedback must enter as a later event, not a definition edge.
+    strength: must
+    owner: catalog
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: cycle_in_definitions
+      issue_code: graph_foundations.content_agent_temporal_feedback
+      negative_input:
+        kind: definitions
+        cyclic: true
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.kernel.fail_open_unknown
+    source_id: kernel
+    source_repository: B2C App Builder
+    source_url: https://github.com/Glitch-Cat-Club/TrendingAI/tree/51233873060a8835f9ac8055a710f65aa21d0b54
+    source_commit: "51233873060a8835f9ac8055a710f65aa21d0b54"
+    source_anchor: catalog/principles/principles.yaml
+    rule: An unknown domain or vocabulary value must fail closed.
+    strength: must
+    owner: autonomy
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: fail_open_unknown
+      issue_code: graph_foundations.fail_open_unknown
+      negative_input:
+        kind: domain
+        value: domain.unknown
+        known: false
+        accepted: true
+    review_condition: source_commit_changed
+    exception_policy: none
+  - id: graph.kernel.public_term_stability
+    source_id: kernel
+    source_repository: B2C App Builder
+    source_url: https://github.com/Glitch-Cat-Club/graph-memory-starter/tree/3254a8da41699def6abfa399166122fb04e6ddbd
+    source_commit: "3254a8da41699def6abfa399166122fb04e6ddbd"
+    source_anchor: catalog/principles/vocabulary.yaml
+    rule: A public schema, CLI, MCP, or adapter term must appear in the approved vocabulary record.
+    strength: must
+    owner: interfaces
+    status: active
+    enforcement:
+      command: check:graph-foundations
+      guard: public_term_unapproved
+      issue_code: graph_foundations.public_term_unapproved
+      negative_input:
+        kind: term
+        term: TotallyNewPublicType
+        approved: false
+        provisional: false
+    review_condition: vocabulary_revision
+    exception_policy: Provisional internal aliases that use an approved prefix remain allowed.

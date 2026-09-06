@@ -1,0 +1,17 @@
+id: asc-auth-recovery-not-attempted
+title: Agent claims it cannot access App Store Connect instead of running the auth-recovery ladder
+prompt: >
+  The founder provided ASC credentials via a profile env file and the bundle ID, and gave permission to ship. The agent ran `source /path/clueless.env` which threw `command not found: Clothing` (an unquoted brand value), then reported it cannot access App Store Connect and marked the ASC/upload lane blocked. In fact the asc CLI is installed, API read access is healthy, and an existing keychain profile (`Clueless`) works via `asc --profile Clueless`.
+expected_guardrail: >
+  When the asc CLI is installed, the agent must run the ASC Auth Setup And Recovery ladder before declaring no access: asc auth doctor; try an existing keychain profile (asc --profile <Name>, account-level keys reach all apps on the team); or set ASC_KEY_ID/ASC_ISSUER_ID/ASC_PRIVATE_KEY_PATH, or asc auth init/login. It must never source a shell-unsafe profile env file. A missing app record/cert/RevenueCat app is a founder-gated setup step with an exact next command, not 'cannot access ASC'.
+validators:
+  - check-store-console-packet
+must_catch:
+  - an installed asc CLI with healthy read access is not 'no ASC access' — auth/app-record/cert is just not set up yet
+  - do not source a credential env file with unquoted values; use asc --profile or extract ASC_KEY_ID/ASC_ISSUER_ID/ASC_PRIVATE_KEY_PATH
+  - one ASC API key is account/team-level and reaches every app; check for an existing keychain profile before declaring blocked
+  - report a missing app record or distribution cert as a setup step with the exact next command, not as inability to access ASC
+should_say:
+  - Run asc auth doctor and try an existing keychain profile (asc --profile <Name>) before reporting ASC blocked.
+  - Set ASC_KEY_ID/ASC_ISSUER_ID/ASC_PRIVATE_KEY_PATH or run asc auth init/login; never source a shell-unsafe profile env.
+  - Treat a missing app record/cert/RevenueCat app as a founder-gated setup step, not 'cannot access ASC'.

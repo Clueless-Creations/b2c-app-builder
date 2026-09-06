@@ -1,0 +1,25 @@
+schema_version: 1.0.0
+id: reference.growth.paid-user-acquisition
+title: Paid User Acquisition
+domain_id: domain.growth
+document_path: knowledge/growth/paid-user-acquisition.md
+load_when: before paid ads, Apple Search Ads, Meta/TikTok/Google campaigns, custom product page campaign routing,
+  MMP/ad-network SDK choices, paid creative tests, or spend-readiness claims
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.operations.post-launch-operations
+    - workflow.store.aso-and-store-ops
+    - workflow.growth.paid-user-acquisition-system
+  context_pack_ids:
+    - context.growth
+sources:
+  - id: revenuecat-com-blog-growth-how-to-build-a-ua-system-when-youre-a-one-person-team
+    name: www.revenuecat.com
+    source_type: website
+    url: https://www.revenuecat.com/blog/growth/how-to-build-a-ua-system-when-youre-a-one-person-team
+    review_cadence_days: 7
+    claim_scope: "RevenueCat growth article used for the solo-founder paid UA system: one channel, creative production,
+      tracking baseline, blended report, RevenueCat LTV/CPA review, and cadence."
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

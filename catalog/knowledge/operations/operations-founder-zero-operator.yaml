@@ -1,0 +1,64 @@
+schema_version: 1.0.0
+id: reference.operations.founder-zero-operator
+title: Founder-Zero Operator
+domain_id: domain.operations
+document_path: knowledge/operations/founder-zero-operator.md
+load_when: always for dispatched business workers; especially every broad launch start, account/social/Doppler
+  bootstrap, founder uncertainty, or attempted checklist handoff
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.operations.founder-zero-operator-bootstrap
+    - workflow.operations.agent-operations-ledger
+  context_pack_ids:
+    - context.founder-language
+    - context.operations
+sources:
+  - id: docs-doppler-com-docs-cli
+    name: docs.doppler.com
+    source_type: docs
+    url: https://docs.doppler.com/docs/cli
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: docs-doppler-com-docs-service-tokens
+    name: docs.doppler.com
+    source_type: docs
+    url: https://docs.doppler.com/docs/service-tokens
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: help-x-com-x-delegate
+    name: X Delegate access
+    source_type: official_docs
+    url: https://help.x.com/en/managing-your-account/how-to-use-the-delegate-feature
+    review_cadence_days: 30
+    claim_scope: Official X guidance for revocable admin/contributor access without sharing the owner password.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: facebook-com-page-access
+    name: Meta Page and business access
+    source_type: official_docs
+    url: https://www.facebook.com/help/289207354498410?locale=en_GB
+    review_cadence_days: 30
+    claim_scope: Official Meta guidance for Page full, partial, and task access; current UI and Business Portfolio state still win.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: tiktok-business-center-members
+    name: TikTok Business Center member access
+    source_type: official_docs
+    url: https://ads.tiktok.com/help/article/add-users-tiktok-business-center?lang=en
+    review_cadence_days: 30
+    claim_scope: Official TikTok guidance for Admin/Standard roles and asset-level permissions.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: youtube-channel-permissions
+    name: YouTube channel permissions
+    source_type: official_docs
+    url: https://support.google.com/youtube/answer/9481328?co=GENIE.Platform%3DDesktop&hl=en-EN
+    review_cadence_days: 30
+    claim_scope: Official YouTube guidance for managing a channel without sharing the Google Account login.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

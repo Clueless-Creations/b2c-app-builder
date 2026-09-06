@@ -1,0 +1,69 @@
+schema_version: 1.0.0
+id: reference.design.refero-ux-patterns
+title: Refero UX Patterns
+domain_id: domain.design
+document_path: knowledge/design/refero-ux-patterns.md
+load_when: before using Refero, replacing Refero with a free pattern route, creating UX_PATTERNS.md, drawing web/mobile
+  flow maps, or auditing pattern coverage
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.design.ux-patterns-refero
+  context_pack_ids: []
+sources:
+  - id: api-refero-design-mcp
+    name: api.refero.design
+    source_type: website
+    url: https://api.refero.design/mcp
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: doc-refero-design-llms-txt
+    name: doc.refero.design
+    source_type: website
+    url: https://doc.refero.design/llms.txt
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: doc-refero-design-mcp-data-model
+    name: doc.refero.design
+    source_type: website
+    url: https://doc.refero.design/mcp/data-model
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: doc-refero-design-mcp-examples
+    name: doc.refero.design
+    source_type: website
+    url: https://doc.refero.design/mcp/examples
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: doc-refero-design-mcp-getting-started
+    name: doc.refero.design
+    source_type: website
+    url: https://doc.refero.design/mcp/getting-started
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: doc-refero-design-mcp-tools
+    name: doc.refero.design
+    source_type: website
+    url: https://doc.refero.design/mcp/tools
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: doc-refero-design-skill-overview
+    name: doc.refero.design
+    source_type: website
+    url: https://doc.refero.design/skill/overview
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

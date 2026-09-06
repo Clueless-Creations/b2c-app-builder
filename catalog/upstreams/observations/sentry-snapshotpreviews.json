@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "upstreamId": "sentry-snapshotpreviews",
+  "checkedAt": "2026-09-06T15:57:58.988151Z",
+  "method": "manual",
+  "latestStable": {
+    "tag": "v0.18.0",
+    "publishedAt": "2026-07-07T21:08:30Z",
+    "assets": []
+  },
+  "prereleases": [],
+  "branchHead": null,
+  "releasesSinceBaseline": [],
+  "licenseSha256": "d0404079f9a0cfade1fa38c8d4809834851886212359b7ac9d5a20470f719e07",
+  "licenseChanged": false,
+  "archived": null,
+  "host": null,
+  "unknowns": [
+    "Assembled from bounded GitHub metadata and selected immutable source files. Release list is one page, not complete history.",
+    "The captured review records the resolved source commit; the default branch name and release ancestry are not retained as a separate branch-head claim.",
+    "No upstream executable, editor export, native device run, paid API or live business was tested."
+  ]
+}

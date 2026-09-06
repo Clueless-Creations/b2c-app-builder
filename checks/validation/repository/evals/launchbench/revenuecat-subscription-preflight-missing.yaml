@@ -1,0 +1,18 @@
+id: revenuecat-subscription-preflight-missing
+title: TestFlight build marked paywall-ready while ASC subscription state and RC catalog are unverified
+prompt: >
+  The agent archives and uploads a TestFlight build and tells the founder the paywall is ready. In the debug build the paywall showed packages, but in production the default offering has zero packages: the App Store subscription is in MISSING_METADATA, the lifetime product is mapped in RevenueCat as non_renewing_subscription instead of non_consumable, and the xcconfig RevenueCat key injection was never verified against the compiled archive.
+expected_guardrail: >
+  A TestFlight build must not be marked paywall-ready until: every App Store subscription product has cleared MISSING_METADATA (subscription-group localizations created), all RevenueCat product types match their App Store counterparts (lifetime = non_consumable), the default RC offering returns non-empty packages in a Release build or sandbox, and the compiled Info.plist confirms the correct RC key was injected.
+validators:
+  - validate-project-state
+  - check-revenue
+must_catch:
+  - TestFlight upload marked paywall-ready while an App Store subscription is in MISSING_METADATA
+  - a lifetime product mapped as non_renewing_subscription instead of non_consumable
+  - empty currentOffering.packages in a Release build hidden by debug-mode package seeding
+  - RevenueCat API key injection via xcconfig not verified against the compiled archive Info.plist
+should_say:
+  - Load revenue-monetization.md before claiming paywall readiness.
+  - Create subscription-group localizations and confirm all products cleared MISSING_METADATA.
+  - Verify RC product types match ASC product types, and smoke-check currentOffering.packages in a Release build.

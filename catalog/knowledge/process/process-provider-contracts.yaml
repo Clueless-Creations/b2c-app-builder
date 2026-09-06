@@ -1,0 +1,16 @@
+schema_version: 1.0.0
+id: reference.process.provider-contracts
+title: Provider Contracts
+domain_id: domain.process
+document_path: knowledge/process/provider-contracts.md
+load_when: when a freshness PR classifies a provider hash change or a runtime pin drifts
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.machine.source-freshness-maintenance-maintainer
+    - workflow.machine.skill-runtime-sync-and-version-discipline-maintainer
+    - workflow.process.provider-proof-verification
+  context_pack_ids:
+    - context.process
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

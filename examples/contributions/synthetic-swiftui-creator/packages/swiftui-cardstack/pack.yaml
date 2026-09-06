@@ -1,0 +1,39 @@
+# SYNTHETIC FIXTURE: not a real creator's repository
+id: business-pack.swiftui-cardstack
+title: Card stack presentation
+version: 1.0.0
+revision: swiftui-cardstack-1
+domains:
+  - id: domain.swiftui-cardstack
+    name: Card stack presentation
+    area_ids: [area.swiftui-cardstack]
+    grantable: true
+    operator_group: Engineering
+areas:
+  - id: area.swiftui-cardstack
+    name: Card stack presentation
+    description: Present a stack of cards in a SwiftUI screen and review the result.
+    domain_ids: [domain.swiftui-cardstack]
+roles:
+  - id: role.swiftui-cardstack
+    name: Card stack presenter
+    prompt_path: role.md
+    scope: Present and review the card stack
+    capability_ids:
+      - manual
+    output_path_prefixes:
+      - design/cardstack/
+workflows:
+  - id: workflow.swiftui-cardstack-present
+    title: Present a card stack
+    domain_id: domain.swiftui-cardstack
+    area_ids:
+      - area.swiftui-cardstack
+    trigger: A screen needs a card stack
+    instructions: Present the card stack with the requested count and record a rendered review. Do not report a pass without the review.
+    role_id: role.swiftui-cardstack
+    output_paths:
+      - design/cardstack/result.json
+      - design/cardstack/receipt.json
+    action_class: draft
+    idempotent: true

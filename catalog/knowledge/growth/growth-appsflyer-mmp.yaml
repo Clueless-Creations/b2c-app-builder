@@ -1,0 +1,33 @@
+schema_version: 1.0.0
+id: reference.growth.appsflyer-mmp
+title: AppsFlyer MMP
+domain_id: domain.growth
+document_path: knowledge/growth/appsflyer-mmp.md
+load_when: before the first paid dollar; when paid UA needs the AppsFlyer SDK, RevenueCat
+  $appsflyerId bridge, and spend-ready MMP proof
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.growth.paid-user-acquisition-system
+  context_pack_ids:
+    - context.growth
+applicability_notes: Default MMP when paid UA is in scope. Do not replace RevenueCat as
+  subscription truth. A dated founder MMP waiver table is the only alternative stack.
+sources:
+  - id: www-revenuecat-com-docs-integrations-attribution-appsflyer
+    name: www.revenuecat.com
+    source_type: official_docs
+    url: https://www.revenuecat.com/docs/integrations/attribution/appsflyer
+    review_cadence_days: 30
+    claim_scope: RevenueCat AppsFlyer integration. Set $appsflyerId before trial or purchase so
+      server-to-server lifecycle events reach AppsFlyer.
+    last_review_date: 2026-08-24
+    reviewer: b2c-maintainers
+  - id: dev-appsflyer-com-hc-docs-ios-sdk
+    name: dev.appsflyer.com
+    source_type: official_docs
+    url: https://dev.appsflyer.com/hc/docs/ios-sdk
+    review_cadence_days: 30
+    claim_scope: AppsFlyer iOS SDK install and init order used by the spend-ready MMP path.
+    last_review_date: 2026-08-24
+    reviewer: b2c-maintainers

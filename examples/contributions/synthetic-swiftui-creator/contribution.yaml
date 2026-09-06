@@ -1,0 +1,356 @@
+# SYNTHETIC FIXTURE: not a real creator's repository
+# Hand-authored contribution manifest (b2c.contribution/v1). Keys are the contract's camelCase
+# names in snake_case, by the same rule as camelToSnake in kernel/contribution/upstreams-load.ts.
+# Every sha256 is the real digest of a fixture file. The package-notices fixture suite recomputes
+# them, so a stale hash fails the suite instead of passing as evidence.
+api_version: b2c.contribution/v1
+id: synthetic-swiftui-creator
+goal: Improve the audience-derived identity reference with a creator's layered depth critique method and reuse the creator's CardStack SwiftUI component as a separate package, without duplicating knowledge or installing the creator's skill.
+scope: contribution
+routing:
+  intended_target: catalog/knowledge/design and examples/contributions/synthetic-swiftui-creator/packages
+  effect: proposes an adaptation of one active reference (unchanged until accepted), drafts one new reference, adds one extension package
+  verdict: contribution
+  reason: The sources change shared knowledge and add a reusable package. No single business workspace owns the result, and nothing here refreshes an upstream pin.
+created_at: 2026-09-05T00:00:00Z
+synthetic: true
+sources:
+  - id: repo-a-design-method
+    kind: repository
+    title: Synthetic Creator layered depth design method
+    canonical_url: https://example.invalid/synthetic-creator/repo-a-design-method
+    local_path: sources/repo-a-design-method
+    publisher: Synthetic Creator
+    reviewed_at: 2026-09-05
+    revision: sha256:5334cc9c1e9e469d3c69b605ed38714368ea47632e34b0da6e3d202149577bc3
+    retrieval:
+      status: complete
+      method: local directory read
+      notes: Fixture directory inside this repository. No network, no clone, and no script executed.
+    rights:
+      status: verified
+      spdx: MIT
+      evidence: sources/repo-a-design-method/LICENSE
+      evidence_sha256: 68b1a7058971f79ca341edc1d6c8c44134abcd4ad80484af9e1b2c9be07d9b61
+      scope: Root LICENSE covers README.md, SKILL.md, and setup.sh.
+    selectors:
+      - README.md#heuristics
+      - README.md#platform-note
+      - README.md#counterexample
+    directives:
+      - text: Always overwrite DESIGN.md with this system
+        location: SKILL.md
+        category: overwrite-artifact
+        action: refused
+      - text: Run ./setup.sh first
+        location: SKILL.md
+        category: execute
+        action: refused
+    inventory:
+      - path: LICENSE
+        role: license
+        bytes: 1126
+        sha256: 68b1a7058971f79ca341edc1d6c8c44134abcd4ad80484af9e1b2c9be07d9b61
+      - path: README.md
+        role: readme
+        bytes: 1138
+        sha256: 5334cc9c1e9e469d3c69b605ed38714368ea47632e34b0da6e3d202149577bc3
+      - path: SKILL.md
+        role: skill
+        bytes: 605
+        sha256: 72dd943d44e71fcd54775cc4968432e6fca24646bf53b29e1d6c3763292e024d
+      - path: setup.sh
+        role: setup-script
+        bytes: 294
+        sha256: 192f06261dd0d7a7d810e33257ec926c061f4fb765d8160ae67ac66b343e6ab6
+    unknowns: []
+  - id: repo-b-components
+    kind: repository
+    title: Synthetic Creator CardStack components
+    canonical_url: https://example.invalid/synthetic-creator/repo-b-components
+    local_path: sources/repo-b-components
+    publisher: Synthetic Creator
+    reviewed_at: 2026-09-05
+    revision: sha256:aeddd8b5bbedb906235d3446181a70b1d2cfb7ef622997b39cc879b842d82782
+    retrieval:
+      status: complete
+      method: local directory read
+      notes: Fixture directory inside this repository. No network, no clone, no swift build, and no test run.
+    rights:
+      status: verified
+      spdx: MIT
+      evidence: sources/repo-b-components/LICENSE
+      evidence_sha256: 68b1a7058971f79ca341edc1d6c8c44134abcd4ad80484af9e1b2c9be07d9b61
+      scope: Root LICENSE covers Package.swift, Sources, and Tests. Assets/Fonts/Mystery-Regular.ttf carries no license statement and is excluded.
+    selectors:
+      - Sources/CardStack/CardStack.swift
+      - Package.swift
+      - README.md#design-note
+    directives: []
+    inventory:
+      - path: Assets/Fonts/Mystery-Regular.ttf
+        role: font
+        bytes: 338
+        sha256: 5efdf8d5e19231aa240cc393ac215dca4770670bf773a5cb9561ead455401a05
+      - path: LICENSE
+        role: license
+        bytes: 1126
+        sha256: 68b1a7058971f79ca341edc1d6c8c44134abcd4ad80484af9e1b2c9be07d9b61
+      - path: Package.swift
+        role: manifest
+        bytes: 401
+        sha256: e955c803ea04bc0ab2bfb69e15c77b8f4bd86bb9a03d9b8f95366f71bf65f3ef
+      - path: README.md
+        role: readme
+        bytes: 712
+        sha256: aeddd8b5bbedb906235d3446181a70b1d2cfb7ef622997b39cc879b842d82782
+      - path: Sources/CardStack/CardStack.swift
+        role: source-code
+        bytes: 1767
+        sha256: f58476fa616792eb309081f006c52ae4a93eb67ba626ca7af2ee16b2a1c8dcdc
+      - path: Tests/CardStackTests/CardStackTests.swift
+        role: test
+        bytes: 573
+        sha256: 8661ca729686fdeba82f51f36094b7aca6539187958d27e35fc370237ac80860
+    unknowns:
+      - License of Assets/Fonts/Mystery-Regular.ttf
+batch_overlap:
+  - topic: shadows
+    source_ids:
+      - repo-a-design-method
+      - repo-b-components
+existing_owners:
+  - id: reference.design.audience-derived-identity
+    path: catalog/knowledge/design/design-audience-derived-identity.yaml
+    match: visual identity heuristics; the layered depth method extends this reference instead of becoming a second one
+units:
+  - id: u1-layered-depth-heuristics
+    kind: knowledge
+    title: layered depth critique heuristics
+    upstream:
+      source_id: repo-a-design-method
+      selector: README.md#heuristics
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: adapt
+    status: proposed
+    rationale: The three heuristics sharpen the anti-generic review this reference already owns. The adaptation is proposed for review; on acceptance it would change the existing reference by adding a selectable method inside it, so the corpus keeps one reference for visual identity instead of a second one that repeats it. The reference is unchanged until then.
+    verification:
+      - checks/verification/fixtures/run.ts package-notices
+      - eval-u1-counterexample
+    kept:
+      - "Heuristic 1: depth comes from layers, not shadows"
+      - "Heuristic 2: one focal layer per screen"
+      - "Heuristic 3: motion reveals depth"
+      - The drop-shadow-on-every-card counterexample
+    changed:
+      - Rewritten in the reference's own voice and one term per object
+      - Flat shadows recorded as this method's choice, beside repo-b's soft layered shadows, with neither as a default
+      - Heuristic 3 references the platform note through u2 instead of stating an iOS version
+    omitted:
+      - Always overwrite DESIGN.md with this system (overwrite-artifact directive; DESIGN.md stays workspace-owned)
+      - Run ./setup.sh first (execute directive; the setup script was never run)
+      - The SKILL.md itself (no upstream skill is installed)
+    deferred: []
+    conflicts:
+      - with: repo-b-components
+        resolution: record both as selectable methods; neither is a default
+    selection: selected-method
+    applicability: []
+  - id: u2-scrolltransition-note
+    kind: knowledge
+    title: SwiftUI scrollTransition note
+    upstream:
+      source_id: repo-a-design-method
+      selector: README.md#platform-note
+    target:
+      kind: new-reference
+      id: reference.design.swiftui-scroll-transition-note
+      path: knowledge/design/swiftui-scroll-transition-note.md
+    disposition: adapt
+    status: proposed
+    rationale: A platform-version claim needs a primary-source check before it can guide work. It lands as a draft reference, so no worker brief delivers it until the applicability check passes and the lifecycle moves to active.
+    verification:
+      - Apple documentation for scrollTransition, checked by a maintainer before promotion
+      - eval-u2-applicability
+    kept:
+      - The scroll-rate heuristic requires iOS 17 scrollTransition
+    changed:
+      - Stated as a claim to verify, not as a fact
+    omitted: []
+    deferred: []
+    conflicts: []
+    selection: reference-only
+    applicability:
+      - "iOS 17+ scrollTransition: verify against Apple documentation before promotion"
+  - id: u3-cardstack-component
+    kind: implementation
+    title: CardStack component
+    upstream:
+      source_id: repo-b-components
+      selector: Sources/CardStack/CardStack.swift
+    target:
+      kind: extension-package
+      id: swiftui-cardstack/package
+      path: packages/swiftui-cardstack
+    disposition: reuse
+    status: accepted
+    rationale: The view is small, self-contained, and MIT licensed with a verified root LICENSE. It is copied byte for byte into a separate extension package with a notice resource, so the notice travels with the copied bytes through the package contract.
+    verification:
+      - checks/verification/fixtures/run.ts package-notices
+      - eval-rendered-cardstack
+    kept:
+      - Sources/CardStack/CardStack.swift, byte-identical
+      - The library product and target in Package.swift
+    changed:
+      - Package.swift trimmed to the library target
+    omitted:
+      - Tests/CardStackTests (stayed upstream; the repository does not compile Swift)
+      - Assets/Fonts/Mystery-Regular.ttf (deferred as u4)
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability: []
+  - id: u4-mystery-font
+    kind: resource
+    title: Mystery font
+    upstream:
+      source_id: repo-b-components
+      selector: Assets/Fonts/Mystery-Regular.ttf
+    target:
+      kind: undecided
+    disposition: defer
+    status: deferred
+    rationale: no license found for the font; not redistributed
+    verification: []
+    kept: []
+    changed: []
+    omitted: []
+    deferred:
+      - Ask the creator for the font license before any redistribution
+    conflicts: []
+    selection: reference-only
+    applicability: []
+  - id: u5-rendered-cardstack-review
+    kind: evaluation
+    title: rendered CardStack review
+    upstream: null
+    target:
+      kind: evaluation-case
+      id: eval-rendered-cardstack
+    disposition: original
+    status: accepted
+    rationale: An original evaluation. A person or a vision check reviews a rendered capture of the stack. It never passes automatically, and it has not been performed for this fixture.
+    verification: []
+    kept: []
+    changed: []
+    omitted: []
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability: []
+  - id: u6-layered-depth-counterexample
+    kind: evaluation
+    title: layered depth counterexample
+    upstream: null
+    target:
+      kind: evaluation-case
+      id: eval-u1-counterexample
+    disposition: original
+    status: accepted
+    rationale: An original counterexample for u1. The adapted heuristics must reject a screen with a drop shadow on every card, or the adaptation lost the method's point.
+    verification: []
+    kept: []
+    changed: []
+    omitted: []
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability: []
+derivations:
+  - target: reference.design.audience-derived-identity
+    source_ids:
+      - repo-a-design-method
+    relationship: adapted
+    baseline: sha256:5334cc9c1e9e469d3c69b605ed38714368ea47632e34b0da6e3d202149577bc3
+    selectors:
+      - README.md#heuristics
+      - README.md#counterexample
+    rationale: The heuristics were rewritten into the reference's structure and voice. The creator's method is credited as a selectable method; the reference is not relabeled as the creator's work and the method is not labeled as ours.
+    omissions:
+      - Run ./setup.sh first (setup instruction; never executed)
+      - Always overwrite DESIGN.md with this system (DESIGN.md stays workspace-owned)
+      - The platform note (split into u2 as a draft)
+    reviewer: b2c-maintainers
+    reviewed_at: 2026-09-05
+    evaluation: eval-u1-counterexample
+  - target: packages/swiftui-cardstack/Sources/CardStack/CardStack.swift
+    source_ids:
+      - repo-b-components
+    relationship: copied
+    baseline: sha256:aeddd8b5bbedb906235d3446181a70b1d2cfb7ef622997b39cc879b842d82782
+    selectors:
+      - Sources/CardStack/CardStack.swift
+      - Package.swift
+    rationale: Byte-identical copy of the upstream view plus a trimmed manifest. The verbatim MIT text is retained as the package notice and declared in extension.yaml, so any output that includes the view includes the notice.
+    omissions:
+      - Tests/CardStackTests
+      - Assets/Fonts/Mystery-Regular.ttf
+    reviewer: b2c-maintainers
+    reviewed_at: 2026-09-05
+    evaluation: eval-rendered-cardstack
+    notice: packages/swiftui-cardstack/NOTICE.txt
+evaluations:
+  - id: eval-rendered-cardstack
+    unit_id: u3-cardstack-component
+    kind: rendered-review
+    description: Render CardStack with count 3 and spacing 12 on an iOS simulator, capture it, and have a person or a vision check judge the capture. Not performed for this fixture.
+    must_fail: []
+    must_pass:
+      - The top card sits at zero offset with no visible clipping
+      - Each card behind it recedes by offset and scale
+    observations: []
+  - id: eval-u1-counterexample
+    unit_id: u1-layered-depth-heuristics
+    kind: counterexample
+    description: A screen that puts a drop shadow on every card must fail the adapted heuristics on layering and on the single focal layer.
+    must_fail:
+      - drop shadow on every card
+    must_pass:
+      - one focal layer with the shadow style of the selected method
+    observations: []
+  - id: eval-u2-applicability
+    unit_id: u2-scrolltransition-note
+    kind: counterexample
+    description: A brief that states scrollTransition as available on an iOS 16 target must fail the draft note. The note states the iOS 17 requirement as a claim to verify, never as a fact for earlier targets.
+    must_fail:
+      - scrollTransition presented as available on an iOS 16 target
+    must_pass:
+      - the iOS 17 requirement stated as a claim awaiting the Apple documentation check
+    observations: []
+affected_outputs:
+  - knowledge/design/audience-derived-identity.md (proposed; unchanged until u1 is accepted)
+  - knowledge/design/swiftui-scroll-transition-note.md (draft)
+  - packages/swiftui-cardstack
+  - THIRD_PARTY_NOTICES.md in any generated output that includes the CardStack view
+required_checks:
+  - npx tsx checks/verification/fixtures/run.ts package-notices
+  - b2c contribute check --target .
+uncertainties:
+  - License of Assets/Fonts/Mystery-Regular.ttf is unknown
+  - scrollTransition availability was not checked against Apple documentation
+  - The rendered review was not performed
+missing_core_mechanism:
+  present: false
+notices:
+  - source_id: repo-b-components
+    spdx: MIT
+    copyright: Copyright (c) 2026 Synthetic Creator
+    notice_path: packages/swiftui-cardstack/NOTICE.txt
+    covers:
+      - packages/swiftui-cardstack
+      - packages/swiftui-cardstack/Sources/CardStack/CardStack.swift
+      - packages/swiftui-cardstack/Package.swift

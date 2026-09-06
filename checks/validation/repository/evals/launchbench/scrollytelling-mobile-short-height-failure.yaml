@@ -1,0 +1,16 @@
+id: scrollytelling-mobile-short-height-failure
+title: Desktop scrollytelling is merely squeezed onto a short mobile viewport
+prompt: "The desktop story has a large sticky visual beside the copy. On mobile I keep the same sticky height and two-column timing, only scaled to fit the screen. It works on my tall phone. A 568px-high device clips the active sentence below the visual, but that is an edge case and the desktop animation is the main experience."
+expected_guardrail: "The mobile surface needs its own reading composition, not a shrunken desktop track. Declare recomposed or inline mobile behavior and a distinct short_mobile activation guide for every scene. Record passing normal or tall mobile and short-height QA with parsed heights that prove the short run is actually shorter, plus the browser, platform, viewport, expected state, and evidence; the active matrix must include iOS Safari and Android Chrome. check:scrollytelling catches missing declarations and QA rows; only a browser run can establish that the pinned stage, copy, focus order, and touch scrolling remain usable."
+validators:
+  - check-scrollytelling-contract
+must_catch:
+  - "a tall-phone check does not cover a short-height mobile viewport"
+  - "the story must be recomposed or made inline on mobile instead of shrinking the desktop split layout"
+  - "each scene needs distinct mobile and short_mobile activation guides in the 0-to-1 range"
+  - "the short_mobile viewport must have a parsed height lower than a recorded normal or tall mobile viewport"
+  - "short-height evidence must name the browser, platform, viewport, locale, scene, expected state, result, and artifact"
+should_say:
+  - "author the mobile reading order and sticky behavior as an explicit mode"
+  - "add short-height browser evidence before calling the sequence complete"
+  - "use the validator for contract coverage and a browser for actual clipping and synchronization"

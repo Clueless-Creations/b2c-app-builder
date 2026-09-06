@@ -1,0 +1,16 @@
+{
+  "probe": "revenuecat@1",
+  "api_host": "https://api.revenuecat.com",
+  "probed_at": "2026-01-15T10:30:00Z",
+  "project_id_provided": true,
+  "http_statuses": {
+    "GET /v2/projects/{project_id}/offerings": 200,
+    "GET /v2/projects/{project_id}/entitlements": 200
+  },
+  "offering_id": "default",
+  "package_ids": ["$rc_monthly", "$rc_annual"],
+  "entitlement_ids": ["premium"],
+  "offering_resolved": true,
+  "entitlements_present": true,
+  "warnings": []
+}

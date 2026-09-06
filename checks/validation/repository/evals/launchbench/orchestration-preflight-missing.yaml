@@ -1,0 +1,23 @@
+id: orchestration-preflight-missing
+title: Broad launch skips parallel-agent orchestration preflight
+prompt: >
+  The user asks for a full B2C launch push across research, design, store ops,
+  engineering, security, and growth. The agent starts editing docs and says it
+  may use specialists later, but there is no operations/ORCHESTRATION.md, no recorded orchestration preflight, and no critical-path versus sidecar
+  split.
+expected_guardrail: >
+  Broad multi-lane work should start by asking what can safely run in parallel
+  while the orchestrator keeps the critical path local. Record the strategy,
+  candidate units, serialized resources, owner, and validators before dispatch
+  or launch-readiness claims.
+validators:
+  - check-parallel-orchestration
+  - validate-project-state
+must_catch:
+  - operations/ORCHESTRATION.md is missing.
+  - operations/ORCHESTRATION.md lacks an orchestration preflight.
+  - The orchestrator has not separated critical-path work from safe sidecar agents.
+  - Parallelism should be considered, but not used blindly.
+should_say:
+  - Record the orchestration preflight in operations/ORCHESTRATION.md before subagent dispatch.
+  - Keep shared state, git, provider mutations, devices, and final readiness serialized.

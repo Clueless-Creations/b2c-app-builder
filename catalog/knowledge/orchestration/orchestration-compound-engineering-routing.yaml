@@ -1,0 +1,30 @@
+schema_version: 1.0.0
+id: reference.orchestration.compound-engineering-routing
+title: Compound Engineering Routing
+domain_id: domain.orchestration
+document_path: knowledge/orchestration/compound-engineering-routing.md
+load_when: choosing which compound-engineering (CE) skill to invoke for a build stage — the freshness/plan/work/review/
+  test/proof loop, generated builder prompts, parallel agents, and worktrees
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.engineering.engineering-orchestration-ce-production-readiness
+  context_pack_ids:
+    - context.orchestration
+sources:
+  - id: github-com-everyinc-compound-engineering-plugin-releases
+    name: Compound Engineering plugin releases
+    source_type: release_feed
+    url: https://github.com/EveryInc/compound-engineering-plugin/releases
+    review_cadence_days: 7
+    claim_scope: Tracks latest Compound Engineering plugin releases for ce-update and local freshness checks.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: code-claude-com-docs-en-settings
+    name: Claude Code settings
+    source_type: official_docs
+    url: https://code.claude.com/docs/en/settings
+    review_cadence_days: 30
+    claim_scope: Basis for the worktree.symlinkDirectories setting recommended before ce-worktree on a large node_modules tree.
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers

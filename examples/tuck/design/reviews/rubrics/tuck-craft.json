@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "id": "rubric.tuck.craft.1",
+  "frozenAt": "2026-09-04T17:18:20.514Z",
+  "references": [
+    {
+      "id": "reference.seat-visual",
+      "url": "https://developer.apple.com/news/?id=z12xq8fa",
+      "artifact": {
+        "path": "design/reference-packs/runtime/seat.jpeg",
+        "sha256": "e432b939e20650334307fd8de0d4ab57eb858252f0fe294a4061913cb933c151"
+      },
+      "kind": "visual",
+      "observation": "The inspected theater image connects expressive outlined objects, concise feedback, and a visible arrangement. Transfer state clarity and coherent drawing, never the characters or scene."
+    },
+    {
+      "id": "reference.grug-mechanism",
+      "url": "https://developer.apple.com/news/?id=ux44ymcr",
+      "artifact": {
+        "path": "design/reference-packs/grug-principle.md",
+        "sha256": "d4ab830ee1887ed2837fa41a2cde2e11764209dff9dfef71afcb396e566fbb9a"
+      },
+      "kind": "documentation",
+      "observation": "The developer interview describes one authored stroke mechanism spanning layout, motion, and interaction states. TUCK must carry its own object language through the complete usable product."
+    },
+    {
+      "id": "reference.structured-hierarchy",
+      "url": "https://structured.app/",
+      "artifact": {
+        "path": "design/reference-packs/structured-principle.md",
+        "sha256": "6d631005b2751a7d625d18899a9ff3c68e1c1c13d33f612b5086dd703da610b4"
+      },
+      "kind": "documentation",
+      "observation": "The inspected phone image and official product site emphasize stable title, supporting information, and completion hierarchy. TUCK must make the next action and remaining items equally legible."
+    }
+  ],
+  "criteria": [
+    {
+      "id": "tuck.coherence",
+      "facet": "coherence",
+      "condition": "The trip, packing scene, editors, completion, recovery, and landing share a recognizable TUCK vocabulary. Palette, type hierarchy, outline weight, labels, and spacing stay consistent in every required state; no screen falls back to an unrelated template.",
+      "minimum": "exceeds",
+      "referenceIds": [
+        "reference.grug-mechanism",
+        "reference.seat-visual"
+      ]
+    },
+    {
+      "id": "tuck.originality",
+      "facet": "originality",
+      "condition": "Original shared object geometry and bag construction explain the actual packing action. The result has its own restrained character, with no copied reference drawings or cosmetic mascot pasted over generic controls. The landing and native app remain identifiable without the wordmark.",
+      "minimum": "exceeds",
+      "referenceIds": [
+        "reference.grug-mechanism",
+        "reference.seat-visual"
+      ]
+    },
+    {
+      "id": "tuck.craft",
+      "facet": "craft",
+      "condition": "At native resolution and both web widths, every required state has deliberate composition, clean vector edges, precise alignment, readable item labels, stable quantities, and no clipping, overflow, collisions, blank placeholders, accidental tiny targets, or generic filler sections.",
+      "minimum": "exceeds",
+      "referenceIds": [
+        "reference.seat-visual",
+        "reference.structured-hierarchy"
+      ]
+    },
+    {
+      "id": "tuck.functionality",
+      "facet": "functionality",
+      "condition": "Every interaction authored for this surface is actually executed on the current candidate and produces its specified result. Packing state, counts, undo, editing, persistence, export, import, and recovery remain consistent; no staged screenshot or successful build substitutes for behavior.",
+      "minimum": "meets",
+      "referenceIds": [
+        "reference.structured-hierarchy",
+        "reference.grug-mechanism"
+      ]
+    },
+    {
+      "id": "tuck.accessibility",
+      "facet": "accessibility",
+      "condition": "All essential information and actions remain available through labels, state text, non-drag controls, visible focus, and adequate contrast. The native surfaces work with large text and VoiceOver; web works with keyboard and no JavaScript. Reduced precision never prevents the complete packing journey.",
+      "minimum": "meets",
+      "referenceIds": [
+        "reference.structured-hierarchy",
+        "reference.grug-mechanism"
+      ]
+    },
+    {
+      "id": "tuck.motion",
+      "facet": "motion",
+      "condition": "Motion explains pickup, accepted placement, cancellation, and completion without delaying actions or changing data twice. Actual reduced-motion execution removes spatial travel and bounce while preserving every state and action; no unverified animation claim is accepted from a still image.",
+      "minimum": "meets",
+      "referenceIds": [
+        "reference.grug-mechanism",
+        "reference.seat-visual"
+      ]
+    },
+    {
+      "id": "tuck.cross_surface_identity",
+      "facet": "cross_surface_identity",
+      "condition": "Compare actual native and landing captures together: the same original object IDs, bag details, cream/navy/orange relationship, display voice, and packing meaning survive native and responsive layouts. Platform utility text adapts intentionally, and the landing depicts behavior the native app actually provides.",
+      "minimum": "exceeds",
+      "referenceIds": [
+        "reference.grug-mechanism",
+        "reference.seat-visual",
+        "reference.structured-hierarchy"
+      ]
+    }
+  ]
+}

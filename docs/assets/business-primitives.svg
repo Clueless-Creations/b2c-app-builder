@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="600" viewBox="0 0 1000 600" role="img" aria-labelledby="title desc">
+<title id="title">Sheet 1. The kitchen layout for a consumer-app business.</title>
+<desc id="desc">A drawing sheet. A kitchen drawn in plan with six numbered stations. The office and upkeep sit at the left. The kitchen and the hot line fill the middle. The pass stands between the hot line and front of house, with a mandate hanging on it and the chef beside it. Front of house opens through a door on the right to the business, drawn as a phone and a web page. Blue arrows carry tickets from the pass into the kitchen, down to the hot line, back to the pass, and out through front of house to the door. A dashed inspection line returns evidence from the business to the pass. Below, section A-A shows the shared foundation in hatched section: capabilities, providers, recipes, knowledge, evidence. A title block records the project, sheet number, license, and that the drawing is made by the agent and checked by evidence.</desc>
+<style>
+/* font-rationale: docs/assets/README.md, Identity derivation. Engineering lettering for annotation, a title-block serif for the sheet title. */
+.mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace}
+.serif{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif}
+.ink{fill:#1a1d21}.muted{fill:#5b5f66}.blue{fill:#2b55a3}.red{fill:#b83a2a}
+.frame{fill:none;stroke:#c3bcae}
+.wall{fill:none;stroke:#2b55a3;stroke-width:1.5}
+.part{fill:none;stroke:#2b55a3;stroke-width:0.9}
+.open{fill:none;stroke:#2b55a3;stroke-width:0.9;stroke-dasharray:4 3}
+.obj{fill:#f3efe6;stroke:#2b55a3;stroke-width:0.9}
+.flow{fill:none;stroke:#2b55a3;stroke-width:1.25}
+.ret{fill:none;stroke:#b83a2a;stroke-width:1.25;stroke-dasharray:5 3}
+.callout{fill:#f3efe6;stroke:#2b55a3;stroke-width:1.25}
+.plate{fill:#f3efe6}
+</style>
+<defs>
+<pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2b55a3" stroke-opacity="0.35" stroke-width="1"/></pattern>
+<pattern id="hatch2" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" stroke="#2b55a3" stroke-opacity="0.16" stroke-width="1"/></pattern>
+<marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#2b55a3"/></marker>
+<marker id="fr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#b83a2a"/></marker>
+</defs>
+<rect width="1000" height="600" fill="#f3efe6"/>
+<rect x="20" y="20" width="960" height="560" class="frame" stroke-width="1"/>
+<rect x="28" y="28" width="944" height="544" class="frame" stroke-width="0.6"/>
+
+<text x="48" y="56" class="mono ink" font-size="10" letter-spacing="0.8">B2C APP BUILDER · SHEET 1 OF 3 · THE KITCHEN LAYOUT</text>
+<text x="48" y="90" class="serif ink" font-size="27">Build the business around the app.</text>
+<text x="48" y="112" class="mono muted" font-size="11.5">Six stations and a pass. You run service. Your agents cook.</text>
+
+<!-- upkeep is hatched: the contributors' room -->
+<rect x="60" y="246" width="130" height="150" fill="url(#hatch2)"/>
+
+<!-- walls, with the door gap on the right -->
+<path d="M60 136H900V246M900 286V396H60V136" class="wall"/>
+<path d="M190 136V396" class="part"/>
+<path d="M60 246H190" class="part"/>
+<path d="M596 136V396" class="part"/>
+<path d="M680 136V396" class="part"/>
+<path d="M190 296H596" class="open"/>
+
+<!-- 5 the office -->
+<circle cx="78" cy="154" r="11" class="callout"/><text x="78" y="158" class="mono blue" font-size="10.5" font-weight="600" text-anchor="middle">5</text>
+<text x="94" y="158" class="mono ink" font-size="11.5">THE OFFICE</text>
+<text x="72" y="176" class="mono muted" font-size="9">Accounts, privacy,</text>
+<text x="72" y="188" class="mono muted" font-size="9">legal, licenses</text>
+<rect x="76" y="202" width="70" height="26" class="obj"/>
+<text x="111" y="219" class="mono muted" font-size="7.5" text-anchor="middle">DESK</text>
+
+<!-- 6 upkeep -->
+<circle cx="78" cy="264" r="11" class="callout"/><text x="78" y="268" class="mono blue" font-size="10.5" font-weight="600" text-anchor="middle">6</text>
+<text x="94" y="268" class="mono ink" font-size="11.5">UPKEEP</text>
+<text x="72" y="286" class="mono muted" font-size="9">Contributors keep</text>
+<text x="72" y="298" class="mono muted" font-size="9">the stations sharp</text>
+
+<!-- 2 the kitchen -->
+<circle cx="208" cy="154" r="11" class="callout"/><text x="208" y="158" class="mono blue" font-size="10.5" font-weight="600" text-anchor="middle">2</text>
+<text x="224" y="158" class="mono ink" font-size="11.5">THE KITCHEN</text>
+<text x="202" y="176" class="mono muted" font-size="9">Menu planning, product, experience, design, words</text>
+<rect x="230" y="206" width="200" height="30" class="obj"/>
+<text x="330" y="224" class="mono muted" font-size="7.5" text-anchor="middle">PREP TABLE</text>
+<rect x="520" y="232" width="60" height="52" class="obj"/>
+<text x="550" y="261" class="mono muted" font-size="7.5" text-anchor="middle">WALK-IN</text>
+
+<!-- 3 the hot line -->
+<circle cx="208" cy="314" r="11" class="callout"/><text x="208" y="318" class="mono blue" font-size="10.5" font-weight="600" text-anchor="middle">3</text>
+<text x="224" y="318" class="mono ink" font-size="11.5">THE HOT LINE</text>
+<text x="202" y="336" class="mono muted" font-size="9">Build, prove, sign, package, submit</text>
+<rect x="230" y="346" width="330" height="30" class="obj"/>
+<rect x="250" y="352" width="26" height="18" class="obj"/>
+<rect x="316" y="352" width="26" height="18" class="obj"/>
+<rect x="382" y="352" width="26" height="18" class="obj"/>
+<rect x="448" y="352" width="26" height="18" class="obj"/>
+<rect x="514" y="352" width="26" height="18" class="obj"/>
+
+<!-- 1 the pass -->
+<circle cx="614" cy="154" r="11" class="callout"/><text x="614" y="158" class="mono blue" font-size="10.5" font-weight="600" text-anchor="middle">1</text>
+<text x="604" y="180" class="mono ink" font-size="11.5">THE PASS</text>
+<text x="604" y="194" class="mono muted" font-size="9">Tickets in,</text>
+<text x="604" y="206" class="mono muted" font-size="9">plates out</text>
+<rect x="622" y="222" width="32" height="40" class="flow"/>
+<path d="M629 234H647M629 242H647M629 250H641" stroke="#5b5f66" stroke-width="1" fill="none"/>
+<text x="638" y="278" class="mono muted" font-size="9" text-anchor="middle">MANDATE</text>
+<circle cx="638" cy="330" r="7" class="obj"/>
+<text x="638" y="350" class="mono muted" font-size="7.5" text-anchor="middle">CHEF</text>
+
+<!-- 4 front of house -->
+<circle cx="698" cy="154" r="11" class="callout"/><text x="698" y="158" class="mono blue" font-size="10.5" font-weight="600" text-anchor="middle">4</text>
+<text x="714" y="158" class="mono ink" font-size="11.5">FRONT OF HOUSE</text>
+<text x="692" y="176" class="mono muted" font-size="9">Pricing, growth, analytics</text>
+<rect x="692" y="192" width="54" height="22" class="obj"/>
+<text x="719" y="207" class="mono muted" font-size="7.5" text-anchor="middle">REGISTER</text>
+<circle cx="770" cy="228" r="13" class="obj"/>
+<circle cx="840" cy="228" r="13" class="obj"/>
+<circle cx="770" cy="330" r="13" class="obj"/>
+<circle cx="840" cy="330" r="13" class="obj"/>
+
+<!-- the business, outside the door -->
+<rect x="918" y="240" width="20" height="52" rx="2" class="flow"/>
+<rect x="924" y="248" width="8" height="1.5" fill="#2b55a3"/>
+<rect x="944" y="250" width="22" height="40" class="flow"/>
+<path d="M948 258H962M948 264H962M948 270H958" stroke="#5b5f66" stroke-width="1" fill="none"/>
+<text x="943" y="308" class="mono muted" font-size="9.5" text-anchor="middle">BUSINESS</text>
+
+<!-- service flow: one path per arrow -->
+<path d="M596 190H300" class="flow" marker-end="url(#fa)"/>
+<text x="540" y="184" class="mono blue" font-size="8.5" text-anchor="middle">TICKETS</text>
+<path d="M330 240V342" class="flow" marker-end="url(#fa)"/>
+<path d="M560 361H592" class="flow" marker-end="url(#fa)"/>
+<path d="M680 266H896" class="flow" marker-end="url(#fa)"/>
+<text x="805" y="260" class="mono blue" font-size="8.5" text-anchor="middle">PLATES OUT</text>
+
+<!-- evidence return -->
+<path d="M943 300V414H638V400" class="ret" marker-end="url(#fr)"/>
+<text x="790" y="428" class="mono red" font-size="9.5" text-anchor="middle">EVIDENCE FROM THIS SERVICE FEEDS THE NEXT</text>
+
+<!-- section A-A: the shared foundation -->
+<text x="60" y="452" class="mono muted" font-size="9.5">SECTION A-A · SHARED FOUNDATION</text>
+<rect x="60" y="458" width="908" height="34" fill="url(#hatch)" stroke="#2b55a3" stroke-width="1"/>
+<path d="M60 458H968" stroke="#2b55a3" stroke-width="1.75"/>
+<rect x="106" y="466" width="90" height="18" class="plate"/><text x="151" y="479" class="mono ink" font-size="10.5" text-anchor="middle">CAPABILITIES</text>
+<rect x="297" y="466" width="71" height="18" class="plate"/><text x="332" y="479" class="mono ink" font-size="10.5" text-anchor="middle">PROVIDERS</text>
+<rect x="485" y="466" width="58" height="18" class="plate"/><text x="514" y="479" class="mono ink" font-size="10.5" text-anchor="middle">RECIPES</text>
+<rect x="660" y="466" width="71" height="18" class="plate"/><text x="696" y="479" class="mono ink" font-size="10.5" text-anchor="middle">KNOWLEDGE</text>
+<rect x="845" y="466" width="64" height="18" class="plate"/><text x="877" y="479" class="mono ink" font-size="10.5" text-anchor="middle">EVIDENCE</text>
+
+<!-- notes -->
+<text x="48" y="536" class="mono muted" font-size="9.5">First, one excellent business. Then a distinct sibling. Then a market of independent experiments.</text>
+<text x="48" y="554" class="mono muted" font-size="9.5">Sheet 2 draws the internal architecture. Sheet 3 draws one station in detail.</text>
+
+<!-- title block -->
+<rect x="652" y="508" width="320" height="64" class="frame" stroke-width="1" fill="#f3efe6"/>
+<path d="M812 508V572M892 508V572M652 540H972" class="frame" stroke-width="0.8"/>
+<text x="658" y="520" class="mono muted" font-size="7.5" letter-spacing="0.8">PROJECT</text>
+<text x="658" y="534" class="mono ink" font-size="10">One consumer-app business</text>
+<text x="818" y="520" class="mono muted" font-size="7.5" letter-spacing="0.8">SHEET</text>
+<text x="818" y="534" class="mono ink" font-size="10">1 of 3</text>
+<text x="898" y="520" class="mono muted" font-size="7.5" letter-spacing="0.8">LICENSE</text>
+<text x="898" y="534" class="mono ink" font-size="10">MIT</text>
+<text x="658" y="552" class="mono muted" font-size="7.5" letter-spacing="0.8">DRAWN BY</text>
+<text x="658" y="566" class="mono ink" font-size="10">Your AI agent</text>
+<text x="818" y="552" class="mono muted" font-size="7.5" letter-spacing="0.8">CHECKED BY</text>
+<text x="818" y="566" class="mono ink" font-size="10">Evidence</text>
+<text x="898" y="552" class="mono muted" font-size="7.5" letter-spacing="0.8">SOURCE</text>
+<text x="898" y="566" class="mono ink" font-size="10">README.md</text>
+</svg>

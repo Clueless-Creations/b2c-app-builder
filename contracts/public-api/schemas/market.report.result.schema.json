@@ -1,0 +1,377 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "const": "b2c/v1"
+        },
+        "requestId": {
+          "type": "string"
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ok": {
+          "type": "boolean",
+          "const": true
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "type": "string",
+              "const": "b2c.market-report/v1"
+            },
+            "experimentId": {
+              "type": "string"
+            },
+            "experimentRevision": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "reportDigest": {
+              "type": "string"
+            },
+            "generatedAt": {
+              "type": "string"
+            },
+            "comparisonKind": {
+              "type": "string",
+              "const": "exploratory_business_comparison"
+            },
+            "completion": {
+              "type": "object",
+              "properties": {
+                "expected": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "ready": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "degraded": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "complete",
+                    "partial"
+                  ]
+                }
+              },
+              "required": [
+                "expected",
+                "ready",
+                "degraded",
+                "status"
+              ],
+              "additionalProperties": true
+            },
+            "rows": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "workspaceId": {
+                    "type": "string"
+                  },
+                  "hypothesis": {
+                    "type": "string"
+                  },
+                  "treatment": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "type": "string",
+                    "enum": [
+                      "ready",
+                      "degraded"
+                    ]
+                  },
+                  "origin": {
+                    "type": "string",
+                    "enum": [
+                      "synthetic",
+                      "observed",
+                      "unknown"
+                    ]
+                  },
+                  "reasons": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "sources": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "revision": {
+                          "type": "number"
+                        },
+                        "uri": {
+                          "type": "string"
+                        },
+                        "sourceRevision": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "revision",
+                        "uri",
+                        "sourceRevision"
+                      ],
+                      "additionalProperties": true
+                    }
+                  },
+                  "basisDigest": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "number"
+                  },
+                  "cost": {
+                    "type": "number"
+                  },
+                  "exposed": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "missingJoinRate": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "workspaceId",
+                  "hypothesis",
+                  "treatment",
+                  "state",
+                  "origin",
+                  "reasons",
+                  "sources"
+                ],
+                "additionalProperties": true
+              }
+            },
+            "groups": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "origin": {
+                    "type": "string",
+                    "enum": [
+                      "synthetic",
+                      "observed"
+                    ]
+                  },
+                  "workspaceIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "comparable": {
+                    "type": "boolean"
+                  },
+                  "reasons": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "aggregate": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "primaryTotal": {
+                            "type": "number"
+                          },
+                          "actualCostTotal": {
+                            "type": "number"
+                          },
+                          "currency": {
+                            "type": "string"
+                          },
+                          "exposed": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          }
+                        },
+                        "required": [
+                          "primaryTotal",
+                          "actualCostTotal",
+                          "currency",
+                          "exposed"
+                        ],
+                        "additionalProperties": true
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "ranking": {
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "origin",
+                  "workspaceIds",
+                  "comparable",
+                  "reasons",
+                  "aggregate",
+                  "ranking"
+                ],
+                "additionalProperties": true
+              }
+            },
+            "authorityGranted": {
+              "type": "boolean",
+              "const": false
+            },
+            "liveLaunchProven": {
+              "type": "boolean",
+              "const": false
+            },
+            "limitations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "experimentId",
+            "experimentRevision",
+            "reportDigest",
+            "generatedAt",
+            "comparisonKind",
+            "completion",
+            "rows",
+            "groups",
+            "authorityGranted",
+            "liveLaunchProven",
+            "limitations"
+          ],
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "apiVersion",
+        "requestId",
+        "warnings",
+        "ok",
+        "data"
+      ],
+      "additionalProperties": true
+    },
+    {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "const": "b2c/v1"
+        },
+        "requestId": {
+          "type": "string"
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ok": {
+          "type": "boolean",
+          "const": false
+        },
+        "error": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string",
+              "enum": [
+                "INVALID_INPUT",
+                "UNSUPPORTED_VERSION",
+                "UNKNOWN_ENTITY",
+                "UNKNOWN_WORKSPACE",
+                "UNSUPPORTED_ENTITY_VERSION",
+                "UNKNOWN_OPERATION",
+                "INCOMPATIBLE_BINDING",
+                "COMPOSITION_APPLY_UNAVAILABLE",
+                "INTERNAL_ERROR",
+                "LOCAL_OPERATION_REFUSED",
+                "RECOVERY_REQUIRED",
+                "STALE_PREVIEW"
+              ]
+            },
+            "message": {
+              "type": "string"
+            },
+            "fields": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "retryable": {
+              "type": "boolean"
+            },
+            "recovery": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "code",
+            "message",
+            "fields",
+            "retryable",
+            "recovery"
+          ],
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "apiVersion",
+        "requestId",
+        "warnings",
+        "ok",
+        "error"
+      ],
+      "additionalProperties": true
+    }
+  ]
+}

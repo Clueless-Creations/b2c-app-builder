@@ -1,0 +1,11 @@
+id: artifact-template-coverage-gap
+title: Catalog workflow evidence lacks starter artifacts
+prompt: "Create a new business repo from templates and follow every lane evidence path."
+expected_guardrail: "Every catalog workflow evidence path must have a starter artifact or same-basename starter in templates."
+validators:
+  - check-artifact-templates
+must_catch:
+  - "missing starter template"
+  - "catalog workflow evidence path"
+should_say:
+  - "add a template artifact before shipping the lane"

@@ -1,0 +1,20 @@
+schema_version: 1.0.0
+id: reference.experience.ethics-guardrail
+title: Ethics Guardrail
+domain_id: domain.experience
+document_path: knowledge/experience/ethics-guardrail.md
+load_when: a HIGH-risk Experience Card (variable reward, streak, scarcity, urgency, social proof) is in play, or before
+  any regulatory/platform-compliance claim about an engagement mechanic — Bright-Line/Dark-Line test, FTC/EU
+  DSA/Apple/Google Play/COPPA landscape, the guardrail attestation-block contract consumed by check:emotional-design
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.experience.emotional-experience-design-producer
+    - workflow.experience.emotional-design-audit-auditor
+    - workflow.growth.viral-growth-loop
+    - workflow.growth.launch-narrative-and-cadence
+    - workflow.words.copy-review-audit
+  context_pack_ids:
+    - context.experience
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

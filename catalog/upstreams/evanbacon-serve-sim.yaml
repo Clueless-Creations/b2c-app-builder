@@ -1,0 +1,102 @@
+schema_version: 1
+id: evanbacon-serve-sim
+project: serve-sim
+canonical_url: https://github.com/EvanBacon/serve-sim
+aliases:
+  - EvanBacon/serve-sim
+authors:
+  - name: Evan Bacon
+    role: project author identified by reviewed package metadata; no project-specific copyright line in root LICENSE
+maintainers:
+  - name: Evan Bacon
+    role: current upstream maintainer
+copyright: "Project-specific copyright line not stated in LICENSE; attribution: Evan Bacon (package author)."
+license:
+  spdx: Apache-2.0
+  status: verified
+  evidence_url: https://github.com/EvanBacon/serve-sim/blob/0ee6fbde40a6b5840d0c6e0379f544feb9fa246b/LICENSE
+  evidence_sha256: 9024cdf56dfe7e66523698a9f63d3a0061eb15f43bd5ea8e3833a56017ae37fd
+  reviewed_revision: 0ee6fbde40a6b5840d0c6e0379f544feb9fa246b
+  notice_file: catalog/upstreams/notices/evanbacon-serve-sim.txt
+  scope: Selected simulator viewing and control guidance only. No Swift helper, injected library, source package,
+    camera integration or external dependency is incorporated. Root LICENSE has no project-specific copyright
+    line; package metadata names Evan Bacon.
+source_ids:
+  - github-com-evanbacon-serve-sim
+relationships:
+  - kind: adapted-method
+    consumption: Selected published methods and tool procedures are adapted into existing builder guidance. No whole
+      skill, executable, native dependency or asset was installed by this contribution.
+    local_owners: &a1
+      - knowledge/engineering/xcodebuildmcp-testing.md
+      - knowledge/process/tool-recipes/device-capture-and-proof.md
+    tests:
+      - checks/verification/fixtures/screenshot-upstreams.fixtures.ts
+    upstream_paths:
+      - packages/serve-sim/README.md
+      - packages/serve-sim/package.json
+    pin_authority: Reviewed immutable source commit and the existing builder package digest pin this guidance. A
+      host executable, editor project or native dependency is selected and verified separately.
+baselines:
+  reviewed_source:
+    revision: 0ee6fbde40a6b5840d0c6e0379f544feb9fa246b
+    observed_at: "2026-09-06"
+    by: b2c-contributor source review
+    note: Read-only metadata, license and selected documentation inspection; no tool or live provider execution.
+  reviewed_guidance:
+    revision: 0ee6fbde40a6b5840d0c6e0379f544feb9fa246b
+    observed_at: "2026-09-06"
+    by: b2c-contributor source review
+    note: Selected simulator viewing and control guidance only. No Swift helper, injected library, source package,
+      camera integration or external dependency is incorporated. Root LICENSE has no project-specific copyright
+      line; package metadata names Evan Bacon.
+support:
+  policy: Source-reviewed guidance only. Listed operations are mapped procedures, not newly executable provider
+    bindings or certification of installed versions.
+  versions:
+    - range: 0ee6fbde40a6b5840d0c6e0379f544feb9fa246b
+      status: untested
+      evidence:
+        - Source inspection and builder contract fixtures only; no live app or upstream binary execution.
+  operations:
+    - id: evanbacon-serve-sim-guidance
+      title: Selected serve-sim procedures
+      keywords:
+        - simulator
+        - stream
+        - camera
+        - keyboard
+        - macos
+        - arm64
+        - port
+      owners: *a1
+  unsupported_operations:
+    - id: automatic-install-or-upgrade
+      reason: Requires explicit target, selected compatible revision, scoped authority and independent verification.
+        No host installation, business repin or publication is automatic.
+    - id: unreviewed-upstream-features
+      reason: A new release or source commit creates a review candidate, never additional execution authority or
+        acceptance.
+  platforms: []
+adaptations:
+  - id: local-selected-simulator
+    description: Use an explicitly selected simulator and local scoped endpoint; do not attach to every booted
+      device or expose a LAN/tunnel by default. Inspect actual host and Xcode requirements.
+    owner: knowledge/engineering/xcodebuildmcp-testing.md
+    intentional: true
+  - id: no-camera-or-destructive-side-effects
+    description: Camera injection, webcam capture, host accessibility changes, remote exposure and stopping other
+      sessions require their own authority. Streaming does not certify provider state or signing readiness.
+    owner: knowledge/engineering/xcodebuildmcp-testing.md
+    intentional: true
+review:
+  owner: b2c-maintainers
+  cadence_days: 7
+  last_review: "2026-09-06"
+  status: current
+credits:
+  acknowledge: true
+  use: adapted
+  summary: Selected serve-sim methods inform knowledge/engineering/xcodebuildmcp-testing.md,
+    knowledge/process/tool-recipes/device-capture-and-proof.md. Original authors and license notices are
+    retained; no live integration is claimed.

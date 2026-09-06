@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "workspaceId": {
+      "type": "string",
+      "maxLength": 160,
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "expectedRevision": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "observation": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "provider": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "providerVersion": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "connectionRef": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "operation": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "parameters": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string",
+                "maxLength": 100
+              },
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 1000
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "maxItems": 30,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "maxLength": 300
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "required": [
+            "provider",
+            "providerVersion",
+            "connectionRef",
+            "operation",
+            "parameters"
+          ],
+          "additionalProperties": false
+        },
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "observed",
+            "uncertain",
+            "failed"
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "observedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+        },
+        "sourceRefs": {
+          "default": [],
+          "maxItems": 30,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        },
+        "providerRequestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "refreshReason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        }
+      },
+      "required": [
+        "query",
+        "outcome",
+        "summary"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "workspaceId",
+    "expectedRevision",
+    "observation"
+  ],
+  "additionalProperties": false
+}

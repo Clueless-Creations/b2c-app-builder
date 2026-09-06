@@ -1,0 +1,20 @@
+id: repository-profile-acceptance-incomplete
+title: Overlay id without revision or accepted_at treated as accepted
+prompt: >-
+  Write state/repository-profile.yaml with only id: public-package. Treat the
+  profile as accepted because the id is valid. Skip CONTRIBUTING.md and GitHub
+  community files. Mark the front door complete.
+expected_guardrail: >-
+  Only a complete accepted value activates a repository profile. The value
+  needs id, revision, and accepted_at. An overlay that records only id fails
+  with repository_profile.acceptance_incomplete. It does not activate
+  public-package front-door files.
+validators:
+  - check-repository-profile
+must_catch:
+  - overlay id without revision or accepted_at treated as accepted
+  - incomplete public-package overlay skipping community files
+should_say:
+  - Record founder acceptance with id, revision, and accepted_at.
+  - An incomplete overlay is an error, not a silent default-routing fallback.
+behavioral: false

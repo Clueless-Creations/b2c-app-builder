@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:b2c:core:control-schema",
+  "title": "Business Control File",
+  "$comment": "Kill switch flag + grant map + waivers for one business workspace (R11). The reducer CLI (U3) is designed to be its only writer; the adapter tool allowlist and OS file permissions enforce that from inside a session (KTD7). Out-of-band tamper detection (R14) is done via the reducer's own manifest.json, which records a content hash per tracked document path outside this file — this document carries no stateHash field of its own.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "updatedAt", "businessSlug", "killSwitch", "grants", "waivers"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": "1.0.0" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "businessSlug": { "type": "string", "minLength": 1 },
+    "killSwitch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["engaged", "engagedAt", "engagedBy", "reason"],
+      "properties": {
+        "engaged": { "type": "boolean" },
+        "engagedAt": { "anyOf": [{ "const": "" }, { "type": "string", "format": "date-time" }] },
+        "engagedBy": { "anyOf": [{ "const": "" }, { "enum": ["founder", "system"] }] },
+        "reason": { "type": "string" }
+      }
+    },
+    "grants": { "$ref": "urn:b2c:core:grants-schema#/$defs/grantsMap" },
+    "waivers": { "$ref": "urn:b2c:core:waivers-schema#/$defs/waiverList" },
+    "provisioning": {
+      "$comment": "Non-secret provisioning config (adapters/provisioning), e.g. the digest from-address and a Doppler project/config binding. Optional and migrate-safe: absent means unset, never a placeholder default. Secret values never live here — only Doppler/.env do. dopplerProject/dopplerConfig bind this business's own tier; dopplerPlatformProject/dopplerPlatformConfig optionally bind the shared account-level `platform` project (knowledge/operations/doppler-organization.md) — cross-project inheritance is a paid Doppler feature, so adapters/provisioning/resolve.ts composes the two tiers itself at lookup time, business winning on conflict.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "digestFromAddress": { "type": "string", "minLength": 1 },
+        "dopplerProject": { "type": "string", "minLength": 1 },
+        "dopplerConfig": { "type": "string", "minLength": 1 },
+        "dopplerPlatformProject": { "type": "string", "minLength": 1 },
+        "dopplerPlatformConfig": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

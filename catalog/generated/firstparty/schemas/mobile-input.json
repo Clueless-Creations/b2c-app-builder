@@ -1,0 +1,191 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "providerId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "operation": {
+      "type": "string",
+      "enum": [
+        "b2c/mobile-app-operation.launch",
+        "b2c/mobile-app-operation.inspect",
+        "b2c/mobile-app-operation.interact",
+        "b2c/mobile-app-operation.capture-screenshot",
+        "b2c/mobile-app-operation.record-video"
+      ]
+    },
+    "target": {
+      "type": "object",
+      "properties": {
+        "platform": {
+          "type": "string",
+          "enum": [
+            "ios",
+            "android"
+          ]
+        },
+        "deviceKind": {
+          "type": "string",
+          "enum": [
+            "simulator",
+            "emulator",
+            "physical"
+          ]
+        },
+        "deviceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "osVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "locale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "appId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "buildId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifactSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "platform",
+        "deviceKind",
+        "deviceId",
+        "osVersion",
+        "locale",
+        "appId",
+        "buildId",
+        "artifactSha256"
+      ],
+      "additionalProperties": false
+    },
+    "requestedAt": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+    },
+    "purpose": {
+      "type": "string",
+      "enum": [
+        "exploration",
+        "product-verification",
+        "marketing-source"
+      ]
+    },
+    "stateId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "actions": {
+      "maxItems": 30,
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "tap"
+              },
+              "x": {
+                "type": "number",
+                "minimum": 0
+              },
+              "y": {
+                "type": "number",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "kind",
+              "x",
+              "y"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "type"
+              },
+              "text": {
+                "type": "string",
+                "maxLength": 2000
+              }
+            },
+            "required": [
+              "kind",
+              "text"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "swipe"
+              },
+              "direction": {
+                "type": "string",
+                "enum": [
+                  "up",
+                  "down",
+                  "left",
+                  "right"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "direction"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "back"
+              }
+            },
+            "required": [
+              "kind"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "durationSeconds": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 60
+    }
+  },
+  "required": [
+    "providerId",
+    "operation",
+    "target",
+    "requestedAt",
+    "purpose",
+    "stateId"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,191 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:b2c:catalog:world-ontology",
+  "title": "B2C App Builder world ontology",
+  "$comment": "Map of the consumer-app world. Not a second catalog. Not the agent graph. Runtime agents must not query this file; check:catalog is the only reader.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "uri",
+    "pref_label",
+    "definition",
+    "domain_sentence",
+    "in_scope",
+    "out_of_scope",
+    "later",
+    "planes",
+    "instance_document",
+    "reuse",
+    "competency_questions",
+    "classes",
+    "slots",
+    "instance_stores",
+    "homonyms_with_work"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "uri": { "type": "string", "minLength": 1 },
+    "pref_label": { "type": "string", "minLength": 1 },
+    "definition": { "type": "string", "minLength": 1 },
+    "domain_sentence": { "type": "string", "minLength": 1 },
+    "in_scope": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "out_of_scope": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "later": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "planes": {
+      "type": "array",
+      "minItems": 3,
+      "items": { "$ref": "#/$defs/plane" }
+    },
+    "instance_document": { "$ref": "#/$defs/instanceDocument" },
+    "reuse": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/reuse" }
+    },
+    "competency_questions": {
+      "type": "array",
+      "minItems": 5,
+      "items": { "$ref": "#/$defs/question" }
+    },
+    "classes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/class" }
+    },
+    "slots": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/slot" }
+    },
+    "instance_stores": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/store" }
+    },
+    "homonyms_with_work": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/homonym" }
+    }
+  },
+  "$defs": {
+    "classId": {
+      "type": "string",
+      "pattern": "^class\\.[a-z][a-z0-9-]*$"
+    },
+    "plane": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "pref_label", "definition", "store"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^plane\\.[a-z][a-z0-9-]*$" },
+        "pref_label": { "type": "string", "minLength": 1 },
+        "definition": { "type": "string", "minLength": 1 },
+        "store": { "type": "string", "minLength": 1 }
+      }
+    },
+    "instanceDocument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "status", "renders", "schema_path"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "status": { "type": "string", "enum": ["planned", "active"] },
+        "renders": { "type": "string", "minLength": 1 },
+        "schema_path": { "type": "string", "minLength": 1 }
+      }
+    },
+    "reuse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "maps_to", "note"],
+      "properties": {
+        "source": { "type": "string", "minLength": 1 },
+        "maps_to": { "$ref": "#/$defs/classId" },
+        "note": { "type": "string", "minLength": 1 }
+      }
+    },
+    "question": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "question", "class_ids"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^cq\\.[0-9]+$" },
+        "question": { "type": "string", "minLength": 1 },
+        "class_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/classId" }
+        }
+      }
+    },
+    "class": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "pref_label", "definition", "abstract", "parent_ids"],
+      "properties": {
+        "id": { "$ref": "#/$defs/classId" },
+        "pref_label": { "type": "string", "minLength": 1 },
+        "definition": { "type": "string", "minLength": 1 },
+        "abstract": { "type": "boolean" },
+        "parent_ids": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/classId" }
+        }
+      }
+    },
+    "slot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "pref_label", "domain", "cardinality"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^slot\\.[a-z][a-z0-9.-]*$" },
+        "pref_label": { "type": "string", "minLength": 1 },
+        "domain": { "$ref": "#/$defs/classId" },
+        "cardinality": { "type": "string", "enum": ["0..1", "1..1", "0..n", "1..n"] },
+        "range_class": { "$ref": "#/$defs/classId" },
+        "range_enum": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "store": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "class_ids"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "class_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/classId" }
+        }
+      }
+    },
+    "homonym": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "world_class_id", "work_concept_id", "gloss"],
+      "properties": {
+        "label": { "type": "string", "minLength": 1 },
+        "world_class_id": { "$ref": "#/$defs/classId" },
+        "work_concept_id": { "type": "string", "minLength": 1 },
+        "gloss": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

@@ -1,0 +1,54 @@
+id: capability.web-presence
+title: Web presence
+version: 1.0.0
+revision: rev-web-presence-2026-08-22
+depends_on: []
+capabilities:
+  - id: capability.web-presence
+    title: Web presence
+    applicability: A business that needs a current public site.
+    required_facts:
+      - fact.public-site-url
+    authority:
+      - Operating agreement must authorize public messaging.
+    readiness:
+      - The public site must have a named owner.
+    inputs:
+      - offer
+      - channel
+    outputs:
+      - A current public-site record
+    effects:
+      - Updates the public offer surface
+    evidence:
+      - Live public URL
+      - Named measurement source
+    expected_outcome: The business can present one current public offer.
+    context_selectors:
+      - knowledge.web-presence.shared
+    exclusions:
+      - sku-owned inventory
+      - retailer listing copy
+      - manufacturing lot records
+      - food-regulatory filings
+      - app-store-signing packets
+      - store-console packets
+      - subscription-policy documents
+    extension_slots:
+      - offer
+      - channel
+      - conversion
+      - legal
+      - measurement
+      - distribution
+references:
+  - id: reference.web-presence.shared
+    session_scoped: true
+    path: catalog/capabilities/web-presence/shared.md
+    section_id: knowledge.web-presence.shared
+    revision: rev-web-presence-2026-08-22
+    domain_id: domain.growth
+    title: Shared web-presence contract
+    load_when: When a business pack binds web presence
+    applicability_notes: Shared capability text. Business packs bind extension slots.
+    source_exemption: Authored capability pack.

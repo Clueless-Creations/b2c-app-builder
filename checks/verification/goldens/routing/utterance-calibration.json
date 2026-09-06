@@ -1,0 +1,622 @@
+{
+  "metadata": {
+    "corpus": "utterance-calibration",
+    "purpose": "U9 (issue #26 AC 'Top-1 accuracy measured before release'): grid-searched by tooling/calibrate-utterance-router.ts to choose ROUTE_CONFIDENCE_THRESHOLD/AMBIGUITY_BAND. Frozen disjoint from utterance-regression.json, which is the release gate corpus — never tune this file against the regression corpus's utterances.",
+    "calibratedOn": "2026-09-01",
+    "sampleSize": 76,
+    "primarySampleSize": 68,
+    "chosenThreshold": 1.7,
+    "chosenBand": 0.2,
+    "measuredPrimaryAccuracy": 1,
+    "falsePrimaryCount": 0,
+    "calibrationTool": "tooling/calibrate-utterance-router.ts (npm run routing:calibrate)",
+    "recalibratedFor": "issue #58 stage 1+2 (route-scoring.ts router scoring + instructions at INSTRUCTIONS_MATCH_WEIGHT): band moved 0.4 -> 0.2 to stay on the accuracy-maximizing front (100.0%, 68/68, 0 false-primaries) under the new formula; see AMBIGUITY_BAND's doc comment in kernel/session/route-utterance.ts. cal-008 and cal-014 were re-authored (see their own notes) because their old wording only resolved via a coincidental substring match the new stopword list correctly removes."
+  },
+  "entries": [
+    {
+      "id": "cal-001",
+      "utterance": "research consumer app opportunities in the fitness niche",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.research.research-backed-spec"
+      }
+    },
+    {
+      "id": "cal-002",
+      "utterance": "validate this app idea before I build anything",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.research.research-backed-spec"
+      }
+    },
+    {
+      "id": "cal-003",
+      "utterance": "pull category economics and competitor review evidence for a habit-tracking app idea",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.research.research-backed-spec"
+      }
+    },
+    {
+      "id": "cal-004",
+      "utterance": "choose the locales worth localizing before we translate any surface",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.research.localization-market-research"
+      }
+    },
+    {
+      "id": "cal-005",
+      "utterance": "what kind of app archetype is this, social or AI chat or something else",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.product.app-archetype-detection-and-starter"
+      }
+    },
+    {
+      "id": "cal-006",
+      "utterance": "make this feel like an 11-star experience before we harden the plans",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.experience.11-star-experience"
+      }
+    },
+    {
+      "id": "cal-007",
+      "utterance": "audit this app's emotional design",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.experience.emotional-design-audit-auditor"
+      }
+    },
+    {
+      "id": "cal-008",
+      "utterance": "build a feature that makes people emotionally hooked and forms a habit",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.experience.emotional-experience-design-producer"
+      },
+      "note": "issue #58: originally \"build a habit-forming feature that people get emotionally attached to\". Under the pre-#58 formula this only resolved confidently because the query term \"get\" happened to substring-match \"tarGET\" inside a competing workflow's trigger text — a coincidental collision, not real signal — while \"habit-forming\" (hyphenated, one token) never matched the trigger's unhyphenated \"habit\" at all. Re-authored to use \"habit\" as a standalone word and drop the accidental \"get\"/\"target\" collision, so this entry tests real signal under the new router scoring (route-scoring.ts)."
+    },
+    {
+      "id": "cal-009",
+      "utterance": "define our brand voice and visual identity before design starts",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.design.brand-definition"
+      }
+    },
+    {
+      "id": "cal-010",
+      "utterance": "open the design room and work on the onboarding screens and paywall",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.design.design-room"
+      }
+    },
+    {
+      "id": "cal-011",
+      "utterance": "map the user flows and state matrices before we build",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.design.ux-patterns-refero"
+      }
+    },
+    {
+      "id": "cal-012",
+      "utterance": "polish the in-app UI so it has that premium feel with haptics",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.design.premium-mobile-craft"
+      }
+    },
+    {
+      "id": "cal-013",
+      "utterance": "generate marketing videos and app preview stills",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.design.content-assets-remotion-generated-visuals"
+      }
+    },
+    {
+      "id": "cal-014",
+      "utterance": "translate the finished onboarding graph into a real engineering plan",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.experience.onboarding-system.onb-21-compound-engineering-plan"
+      },
+      "note": "issue #58: originally \"plan the app's onboarding flow\". That utterance's only edge over two sibling onboarding sub-workflows was the query term \"app\" coincidentally substring-matching \"App Builder\" inside this workflow's own trigger text (\"...the B2C App Builder-equivalent fallback\") — an unrelated substring hit, not real signal. route-scoring.ts now filters \"app\" as founder-phrasing noise (see ROUTER_STOP_WORDS), so this entry was re-authored around this workflow's real distinguishing vocabulary (graph, engineering, plan)."
+    },
+    {
+      "id": "cal-015",
+      "utterance": "trace how onboarding actually works today, the routes, state, and providers",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.experience.onboarding-system.onb-01-current-state-trace"
+      }
+    },
+    {
+      "id": "cal-016",
+      "utterance": "research current onboarding benchmarks and platform guidance",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.experience.onboarding-system.onb-03-current-guidance"
+      }
+    },
+    {
+      "id": "cal-017",
+      "utterance": "mine competitor reviews for onboarding complaints",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.experience.onboarding-system.onb-04-competitor-reviews"
+      }
+    },
+    {
+      "id": "cal-018",
+      "utterance": "define what counts as first value and activation in onboarding",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.experience.onboarding-system.onb-10-first-value-activation"
+      }
+    },
+    {
+      "id": "cal-019",
+      "utterance": "specify every onboarding screen, its paywall states, and copy keys",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.experience.onboarding-system.onb-17-screen-control-paywall-contract"
+      }
+    },
+    {
+      "id": "cal-020",
+      "utterance": "produce the high fidelity onboarding design and prototype",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.experience.onboarding-system.onb-18-visual-design-prototype"
+      }
+    },
+    {
+      "id": "cal-021",
+      "utterance": "run the pre-launch onboarding adversarial QA pass",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.experience.onboarding-system.onb-20-adversarial-qa"
+      }
+    },
+    {
+      "id": "cal-022",
+      "utterance": "set up the engineering plan and production readiness checks before building",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.engineering.engineering-orchestration-ce-production-readiness"
+      }
+    },
+    {
+      "id": "cal-023",
+      "utterance": "define the backend data contract and API schema",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.engineering.backend-data-contract"
+      }
+    },
+    {
+      "id": "cal-024",
+      "utterance": "run the app on a device to check this new screen actually works",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.engineering.native-ios-proof-route-ladder"
+      }
+    },
+    {
+      "id": "cal-025",
+      "utterance": "wire up MobAI to run our Android test suite",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.engineering.mobai-device-automation-and-demo-videos"
+      }
+    },
+    {
+      "id": "cal-026",
+      "utterance": "run the accessibility common-task proof before we submit this beta",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.engineering.accessibility-common-task-proof"
+      }
+    },
+    {
+      "id": "cal-027",
+      "utterance": "check the app's performance and quality vitals before submission",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.engineering.app-quality-and-vitals"
+      }
+    },
+    {
+      "id": "cal-028",
+      "utterance": "prep our App Store listing fields and IAP field maps",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.store.app-store-listing-prep-packet"
+      }
+    },
+    {
+      "id": "cal-029",
+      "utterance": "set up Apple Developer signing and get ready to submit to TestFlight",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.store.apple-signing-and-release-readiness"
+      }
+    },
+    {
+      "id": "cal-030",
+      "utterance": "fill out the App Privacy questionnaire and privacy manifest",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.store.apple-app-store-requirements-privacy-manifest"
+      }
+    },
+    {
+      "id": "cal-031",
+      "utterance": "tell me exactly where to click and what to paste in App Store Connect or Play Console",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.store.store-console-workflow"
+      }
+    },
+    {
+      "id": "cal-032",
+      "utterance": "observe the current App Review status before we touch anything",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.store.app-review-observe"
+      }
+    },
+    {
+      "id": "cal-033",
+      "utterance": "fix the App Review rejection before resubmitting",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.store.app-review-remediate"
+      }
+    },
+    {
+      "id": "cal-034",
+      "utterance": "the remediation is independently verified, resubmit the app to Apple now",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.store.app-review-resubmit"
+      }
+    },
+    {
+      "id": "cal-035",
+      "utterance": "capture and compose our App Store screenshots",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.store.store-screenshots-production"
+      }
+    },
+    {
+      "id": "cal-036",
+      "utterance": "release this app on Google Play",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.store.google-play-release"
+      }
+    },
+    {
+      "id": "cal-037",
+      "utterance": "check regional compliance before we launch in these countries",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.store.marketplace-regional-compliance"
+      }
+    },
+    {
+      "id": "cal-038",
+      "utterance": "set up the paywall and RevenueCat products",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.money.revenue-monetization"
+      }
+    },
+    {
+      "id": "cal-039",
+      "utterance": "run our next paywall pricing experiment",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.money.experimentation"
+      }
+    },
+    {
+      "id": "cal-040",
+      "utterance": "launch a paid user acquisition campaign on Meta and TikTok",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.growth.paid-user-acquisition-system"
+      }
+    },
+    {
+      "id": "cal-041",
+      "utterance": "design a referral and invite loop for viral growth",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.growth.viral-growth-loop"
+      }
+    },
+    {
+      "id": "cal-042",
+      "utterance": "plan the public launch announcement and release cadence",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.growth.launch-narrative-and-cadence"
+      }
+    },
+    {
+      "id": "cal-043",
+      "utterance": "update our sitemap, robots.txt, and schema markup for AI search visibility",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.growth.geo-seo-public-visibility"
+      }
+    },
+    {
+      "id": "cal-044",
+      "utterance": "build the waitlist landing site while the app gets built",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.growth.pre-launch-funnel-landing-waitlist"
+      }
+    },
+    {
+      "id": "cal-045",
+      "utterance": "publish the landing site live",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.growth.landing-funnel-publication-and-live-proof"
+      }
+    },
+    {
+      "id": "cal-046",
+      "utterance": "source founder-led creators and run organic UGC format-discovery tests",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.growth.ugc-creator-engine"
+      }
+    },
+    {
+      "id": "cal-047",
+      "utterance": "set up Fastlane growth ops and social scheduling",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.growth.fastlane-growth-ops"
+      }
+    },
+    {
+      "id": "cal-048",
+      "utterance": "write the privacy policy and terms of service",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.trust.privacy-and-terms"
+      }
+    },
+    {
+      "id": "cal-049",
+      "utterance": "run a security architecture review before we ship",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.trust.security-architecture-and-release-gate"
+      }
+    },
+    {
+      "id": "cal-050",
+      "utterance": "make sure user-generated chat content is moderated safely",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.trust.community-and-user-safety"
+      }
+    },
+    {
+      "id": "cal-051",
+      "utterance": "review our AI image generation feature for safety",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.trust.generative-ai-safety"
+      }
+    },
+    {
+      "id": "cal-052",
+      "utterance": "what should I do now that the app is live",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.operations.post-launch-operations"
+      }
+    },
+    {
+      "id": "cal-053",
+      "utterance": "work through the support inbox and refund requests",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.operations.support-queue-operations"
+      }
+    },
+    {
+      "id": "cal-054",
+      "utterance": "look into why retention dropped this cohort",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.operations.retention-intervention"
+      }
+    },
+    {
+      "id": "cal-055",
+      "utterance": "review our spend and runway this month",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.operations.financial-health-review"
+      }
+    },
+    {
+      "id": "cal-056",
+      "utterance": "make the operating rhythm run on its own so no one has to start sessions by hand",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.operations.scheduled-autonomy-installation"
+      }
+    },
+    {
+      "id": "cal-057",
+      "utterance": "get our operator bootstrap in place before authenticated providers",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.operations.founder-zero-operator-bootstrap"
+      }
+    },
+    {
+      "id": "cal-058",
+      "utterance": "log this authenticated action we just took on the App Store account",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.operations.agent-operations-ledger"
+      }
+    },
+    {
+      "id": "cal-059",
+      "utterance": "resume where we left off on this launch and tell me the status",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.orchestration.session-continuity-resume"
+      }
+    },
+    {
+      "id": "cal-060",
+      "utterance": "launch this whole app end to end and keep going until something blocks you",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.orchestration.orient-scaffold-and-state-cockpit-upkeep"
+      }
+    },
+    {
+      "id": "cal-061",
+      "utterance": "before we mark the analytics lane as succeeded, verify the provider proof",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.process.provider-proof-verification"
+      }
+    },
+    {
+      "id": "cal-062",
+      "utterance": "the design doc was just accepted, cascade that change through product and copy",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.process.change-cascade"
+      }
+    },
+    {
+      "id": "cal-063",
+      "utterance": "decide whether we need a full engineering tech spec before crossing into build",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.process.launch-trace-and-build-contracts"
+      }
+    },
+    {
+      "id": "cal-064",
+      "utterance": "audit our launchbench failure cards and validator coverage before claiming launch-ready",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.process.launchbench-failure-cards-coverage-audit"
+      }
+    },
+    {
+      "id": "cal-065",
+      "utterance": "before we start, which repository kind and validator contract applies here",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.process.repository-profile-contract"
+      }
+    },
+    {
+      "id": "cal-066",
+      "utterance": "check which paid tool to use here and what the free fallback is",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.operations.paid-tool-routing-and-fallback"
+      }
+    },
+    {
+      "id": "cal-067",
+      "utterance": "before we add this new secret key or env var, tell me the secrets baseline and routing rule",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.operations.secrets-baseline-and-routing"
+      }
+    },
+    {
+      "id": "cal-068",
+      "utterance": "set up Resend for our transactional and lifecycle emails",
+      "expected": {
+        "kind": "primary",
+        "workflowId": "workflow.operations.resend-email-ops"
+      }
+    },
+    {
+      "id": "cal-069",
+      "utterance": "just build whatever you think is best",
+      "expected": {
+        "kind": "candidates"
+      }
+    },
+    {
+      "id": "cal-070",
+      "utterance": "I do not know where to start",
+      "expected": {
+        "kind": "candidates"
+      }
+    },
+    {
+      "id": "cal-071",
+      "utterance": "can you help",
+      "expected": {
+        "kind": "candidates"
+      }
+    },
+    {
+      "id": "cal-072",
+      "utterance": "???",
+      "expected": {
+        "kind": "insufficient_signal"
+      }
+    },
+    {
+      "id": "cal-073",
+      "utterance": " ",
+      "expected": {
+        "kind": "insufficient_signal"
+      }
+    },
+    {
+      "id": "cal-074",
+      "utterance": "hilf mir etwas für die Nutzer zu entwickeln",
+      "expected": {
+        "kind": "candidates"
+      },
+      "note": "Non-English utterance: no query term overlaps enough English trigger/title vocabulary to clear the threshold; scores tie near zero, which is why this must resolve to candidates rather than insufficient_signal (terms() still extracts non-empty tokens) or a confident primary."
+    },
+    {
+      "id": "cal-075",
+      "utterance": "ajude-me a construir alguma coisa",
+      "expected": {
+        "kind": "candidates"
+      },
+      "note": "Non-English utterance: no query term overlaps enough English trigger/title vocabulary to clear the threshold; scores tie near zero, which is why this must resolve to candidates rather than insufficient_signal (terms() still extracts non-empty tokens) or a confident primary."
+    },
+    {
+      "id": "cal-076",
+      "utterance": "planifica el flujo de incorporación de la aplicación",
+      "expected": {
+        "kind": "candidates"
+      },
+      "note": "Non-English utterance: no query term overlaps enough English trigger/title vocabulary to clear the threshold; scores tie near zero, which is why this must resolve to candidates rather than insufficient_signal (terms() still extracts non-empty tokens) or a confident primary."
+    }
+  ]
+}

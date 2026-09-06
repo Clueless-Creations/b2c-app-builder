@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "workspaceId": {
+      "type": "string",
+      "maxLength": 160,
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "directory": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "hypothesis": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000
+    },
+    "mandate": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 8000
+    }
+  },
+  "required": [
+    "workspaceId",
+    "directory",
+    "name",
+    "hypothesis"
+  ],
+  "additionalProperties": false
+}

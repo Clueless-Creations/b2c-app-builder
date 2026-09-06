@@ -1,0 +1,2 @@
+https://github.com/google/fonts/blob/main/ofl/fraunces/Fraunces[SOFT,WONK,opsz,wght].ttf
+License: SIL Open Font License 1.1; see Fraunces-OFL.txt

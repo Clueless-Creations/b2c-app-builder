@@ -1,0 +1,172 @@
+# Agent graph. Who does what, in what order — a map of the work.
+# Order is catalog phase order. This overlay does not replace the catalog.
+# Runtime agents must not query this file. check:catalog is the only reader.
+schema_version: 1
+id: b2c:graph.agent
+uri: https://b2c-app-builder.dev/ns/agent
+pref_label: Launch work
+definition: Ordered phase nodes naming the roles that act, the world classes they
+  read and write, and the founder gate before the next step.
+nodes:
+  - id: work.phase.0-orient
+    order: 0
+    phase_id: phase.0-orient
+    actor_kind: agent
+    role_ids: [role.orchestrator, role.operator-readiness]
+    reads: []
+    writes: []
+  - id: work.phase.0b
+    order: 2
+    phase_id: phase.0b
+    actor_kind: agent
+    role_ids: [role.operator-readiness]
+    reads: []
+    writes: []
+  - id: work.phase.0c
+    order: 3
+    phase_id: phase.0c
+    actor_kind: agent
+    role_ids: [role.operator-readiness]
+    reads: []
+    writes: []
+  - id: work.phase.1
+    order: 4
+    phase_id: phase.1
+    actor_kind: agent
+    role_ids: [role.research-strategist, role.product-leader]
+    reads: []
+    writes:
+      - class.customer
+      - class.problem
+      - class.competitor
+      - class.status-quo
+      - class.evidence
+      - class.hypothesis
+      - class.app
+      - class.promise
+      - class.wedge
+      - class.feature
+      - class.requirement
+      - class.core-loop
+      - class.risk
+    human_gate:
+      authority: founder
+      writes: [class.decision]
+      outcome: go-pivot-kill
+  - id: work.phase.1b
+    order: 5
+    phase_id: phase.1b
+    actor_kind: agent
+    role_ids: [role.product-leader]
+    reads: [class.customer, class.core-loop]
+    writes: [class.metric]
+  - id: work.phase.1c
+    order: 6
+    phase_id: phase.1c
+    actor_kind: agent
+    role_ids: [role.product-leader]
+    reads: [class.customer, class.promise, class.core-loop, class.feature]
+    writes: [class.journey]
+  - id: work.phase.1d
+    order: 7
+    phase_id: phase.1d
+    actor_kind: agent
+    role_ids: [role.marketing-guru]
+    reads: [class.customer]
+    writes: [class.channel]
+  - id: work.phase.1e
+    order: 8
+    phase_id: phase.1e
+    actor_kind: agent
+    role_ids: [role.marketing-guru]
+    reads: [class.customer, class.channel]
+    writes: [class.channel]
+  - id: work.phase.1f
+    order: 9
+    phase_id: phase.1f
+    actor_kind: agent
+    role_ids: [role.engineering-leader]
+    reads: [class.feature, class.core-loop]
+    writes: []
+  - id: work.phase.1g
+    order: 10
+    phase_id: phase.1g
+    actor_kind: agent
+    role_ids: [role.security-architect]
+    reads: [class.app, class.feature]
+    writes: [class.risk]
+  - id: work.phase.2
+    order: 11
+    phase_id: phase.2
+    actor_kind: agent
+    role_ids: [role.design-guru, role.copy-specialist]
+    reads: [class.customer, class.promise, class.core-loop, class.feature, class.journey]
+    writes: [class.flow, class.screen]
+  - id: work.phase.3
+    order: 12
+    phase_id: phase.3
+    actor_kind: agent
+    role_ids: [role.launch-surface-producer]
+    reads: [class.promise, class.screen]
+    writes: []
+    human_gate:
+      authority: founder
+      writes: [class.decision]
+      outcome: submit
+  - id: work.phase.3b
+    order: 13
+    phase_id: phase.3b
+    actor_kind: agent
+    role_ids: [role.product-leader]
+    reads: [class.customer, class.feature]
+    writes: [class.offer, class.price, class.entitlement]
+    human_gate:
+      authority: founder
+      writes: [class.decision]
+      outcome: price
+  - id: work.phase.4
+    order: 14
+    phase_id: phase.4
+    actor_kind: agent
+    role_ids: [role.marketing-guru]
+    reads: [class.customer, class.promise, class.channel]
+    writes: [class.channel]
+  - id: work.phase.5
+    order: 15
+    phase_id: phase.5
+    actor_kind: agent
+    role_ids: [role.orchestrator]
+    reads: []
+    writes: []
+  - id: work.phase.5b
+    order: 16
+    phase_id: phase.5b
+    actor_kind: agent
+    role_ids: [role.engineering-leader, role.mobile-engineer, role.backend-infrastructure-engineer]
+    reads: [class.feature, class.core-loop, class.screen]
+    writes: []
+  - id: work.phase.5c
+    order: 17
+    phase_id: phase.5c
+    actor_kind: agent
+    role_ids: [role.security-architect, role.accessibility-device-qa]
+    reads: [class.risk]
+    writes: []
+    human_gate:
+      authority: founder
+      writes: [class.decision]
+      outcome: ship
+  - id: work.phase.6
+    order: 18
+    phase_id: phase.6
+    actor_kind: agent
+    role_ids: [role.marketing-guru]
+    reads: [class.customer, class.channel]
+    writes: [class.channel]
+  - id: work.phase.6b
+    order: 19
+    phase_id: phase.6b
+    actor_kind: agent
+    role_ids: [role.customer-success, role.orchestrator]
+    reads: [class.customer, class.metric]
+    writes: []

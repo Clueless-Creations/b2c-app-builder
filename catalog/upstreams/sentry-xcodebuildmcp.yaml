@@ -1,0 +1,101 @@
+schema_version: 1
+id: sentry-xcodebuildmcp
+project: XcodeBuildMCP
+canonical_url: https://github.com/getsentry/XcodeBuildMCP
+aliases:
+  - getsentry/XcodeBuildMCP
+authors:
+  - name: Cameron Cooke
+    role: original author or copyright holder identified in the reviewed source
+maintainers:
+  - name: Sentry (getsentry)
+    role: current upstream maintainer
+copyright: Copyright (c) 2025 Cameron Cooke
+license:
+  spdx: MIT
+  status: verified
+  evidence_url: https://github.com/getsentry/XcodeBuildMCP/blob/e6ef59b49b44012c824f0a0de261c96142e37390/LICENSE
+  evidence_sha256: fef28fc4165c72b1f0e4ce94654ba44ad7ff7d5d2538b3d01e66e9cc5be3c4f6
+  reviewed_revision: e6ef59b49b44012c824f0a0de261c96142e37390
+  notice_file: catalog/upstreams/notices/sentry-xcodebuildmcp.txt
+  scope: Selected help-first tool routing and capture guidance only. Upstream binaries, templates, third-party
+    packages and THIRD_PARTY_LICENSES components are not redistributed.
+source_ids:
+  - github-com-getsentry-xcodebuildmcp
+relationships:
+  - kind: adapted-method
+    consumption: Selected published methods and tool procedures are adapted into existing builder guidance. No whole
+      skill, executable, native dependency or asset was installed by this contribution.
+    local_owners: &a1
+      - knowledge/engineering/xcodebuildmcp-testing.md
+      - knowledge/process/tool-recipes/device-capture-and-proof.md
+    tests:
+      - checks/verification/fixtures/screenshot-upstreams.fixtures.ts
+    upstream_paths:
+      - README.md
+      - skills/xcodebuildmcp/SKILL.md
+      - skills/xcodebuildmcp-cli/SKILL.md
+    pin_authority: Reviewed immutable source commit and the existing builder package digest pin this guidance. A
+      host executable, editor project or native dependency is selected and verified separately.
+baselines:
+  reviewed_source:
+    revision: e6ef59b49b44012c824f0a0de261c96142e37390
+    observed_at: "2026-09-06"
+    by: b2c-contributor source review
+    note: Read-only metadata, license and selected documentation inspection; no tool or live provider execution.
+  reviewed_guidance:
+    revision: e6ef59b49b44012c824f0a0de261c96142e37390
+    observed_at: "2026-09-06"
+    by: b2c-contributor source review
+    note: Selected help-first tool routing and capture guidance only. Upstream binaries, templates, third-party
+      packages and THIRD_PARTY_LICENSES components are not redistributed.
+support:
+  policy: Source-reviewed guidance only. Listed operations are mapped procedures, not newly executable provider
+    bindings or certification of installed versions.
+  versions:
+    - range: e6ef59b49b44012c824f0a0de261c96142e37390
+      status: untested
+      evidence:
+        - Source inspection and builder contract fixtures only; no live app or upstream binary execution.
+  operations:
+    - id: sentry-xcodebuildmcp-guidance
+      title: Selected XcodeBuildMCP procedures
+      keywords:
+        - screenshot
+        - simulator
+        - record
+        - build
+        - device
+        - skills
+        - configuration
+      owners: *a1
+  unsupported_operations:
+    - id: automatic-install-or-upgrade
+      reason: Requires explicit target, selected compatible revision, scoped authority and independent verification.
+        No host installation, business repin or publication is automatic.
+    - id: unreviewed-upstream-features
+      reason: A new release or source commit creates a review candidate, never additional execution authority or
+        acceptance.
+  platforms: []
+adaptations:
+  - id: host-selection-wins
+    description: The upstream preference for XcodeBuildMCP over raw native tools does not override explicit business
+      bindings or adequate host-native tools. No global install or skill init runs during source adoption.
+    owner: knowledge/engineering/xcodebuildmcp-testing.md
+    intentional: true
+  - id: capture-is-not-acceptance
+    description: Tool discovery and screenshot capture are not proof of current app correctness, provider behavior,
+      store readiness or independent design acceptance.
+    owner: knowledge/engineering/xcodebuildmcp-testing.md
+    intentional: true
+review:
+  owner: b2c-maintainers
+  cadence_days: 7
+  last_review: "2026-09-06"
+  status: current
+credits:
+  acknowledge: true
+  use: adapted
+  summary: Selected XcodeBuildMCP methods inform knowledge/engineering/xcodebuildmcp-testing.md,
+    knowledge/process/tool-recipes/device-capture-and-proof.md. Original authors and license notices are
+    retained; no live integration is claimed.

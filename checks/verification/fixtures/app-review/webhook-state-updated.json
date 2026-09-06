@@ -1,0 +1,22 @@
+{
+  "data": {
+    "type": "webhookEvents",
+    "id": "evt-signed-1",
+    "attributes": {
+      "createdDate": "2026-08-25T12:00:00.000Z",
+      "eventType": "APP_STORE_VERSION_APP_VERSION_STATE_UPDATED",
+      "payload": {
+        "oldValue": "WAITING_FOR_REVIEW",
+        "newValue": "REJECTED"
+      }
+    },
+    "relationships": {
+      "instance": {
+        "data": {
+          "type": "appStoreVersions",
+          "id": "asv-1"
+        }
+      }
+    }
+  }
+}

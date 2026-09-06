@@ -1,0 +1,14 @@
+schema_version: 1.0.0
+id: reference.experience.push-notification-lifecycle
+title: Push Notification Lifecycle
+domain_id: domain.experience
+document_path: knowledge/experience/push-notification-lifecycle.md
+load_when: before push permission priming, opt-in timing, or notification lifecycle design; for transactional and
+  lifecycle email mechanics load operations/resend-email-ops.md instead
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.experience.onboarding-conversion
+  context_pack_ids: []
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

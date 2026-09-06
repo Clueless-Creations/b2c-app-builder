@@ -1,0 +1,431 @@
+schema_version: 1.0.0
+id: reference.store.store-console-workflow
+title: Store Console Workflow
+domain_id: domain.store
+document_path: knowledge/store/store-console-workflow.md
+load_when: before App Store Connect or Play Console setup, privacy labels/Data safety, screenshot
+  capture/upload, reviewer notes, account-deletion console work, or any "where do I click and what do I paste"
+  handoff
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.store.apple-app-store-requirements-privacy-manifest
+    - workflow.store.store-console-workflow
+    - workflow.store.asc-cli-automation
+    - workflow.store.google-play-release
+    - workflow.store.google-play-metadata-standing-envelope
+    - workflow.orchestration.full-launch-closeout
+  context_pack_ids:
+    - context.store
+    - context.launch-surfaces
+sources:
+  - id: developer-apple-com-app-store-app-privacy-details
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/app-store/app-privacy-details
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-bundleresources-adding-a-privacy-manifest-to
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/bundleresources/adding-a-privacy-manifest-to-your-app-or-third-party-sdk
+    review_cadence_days: 7
+    claim_scope: Official Apple documentation for adding privacy manifest files to apps and third-party SDKs.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-bundleresources-describing-data-use-in-privac
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/bundleresources/describing-data-use-in-privacy-manifests
+    review_cadence_days: 7
+    claim_scope: Official Apple documentation for privacy manifest data-use declarations.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-bundleresources-describing-use-of-required-rea
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/bundleresources/describing-use-of-required-reason-api
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-bundleresources-protected-resources
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/bundleresources/protected-resources
+    review_cadence_days: 7
+    claim_scope: Official Apple documentation for protected-resource purpose strings and related Info.plist keys.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-bundleresources-privacy-manifest-files
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/bundleresources/privacy-manifest-files
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-bundleresources-information-property-list-nsu
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/BundleResources/Information-Property-List/NSUserTrackingUsageDescription
+    review_cadence_days: 7
+    claim_scope: Official Apple Info.plist key documentation for ATT tracking usage description copy.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-support-third-party-sdk-requirements
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/support/third-party-SDK-requirements
+    review_cadence_days: 7
+    claim_scope: Official Apple list of third-party SDKs requiring privacy manifests and SDK signatures.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-xcode-distributing-your-app-for-beta-testing-a
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/xcode/distributing-your-app-for-beta-testing-and-releases
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-xcode-preparing-your-app-for-distribution
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/xcode/preparing-your-app-for-distribution
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-account-certificates-certificates-overview
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/account/certificates/certificates-overview
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-account-certificates-cloud-managed-certificates
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/account/certificates/cloud-managed-certificates
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-account-identifiers-register-an-app-id
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/account/identifiers/register-an-app-id
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-account-provisioning-profiles-create-an-app-store-provi
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/account/provisioning-profiles/create-an-app-store-provisioning-profile
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-configure-in-app-purchase-settings-ov
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/configure-in-app-purchase-settings/overview-for-configuring-in-app-purchases
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-create-an-app-record-add-a-new-app
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/create-an-app-record/add-a-new-app
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-create-custom-product-pages-configure
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/create-custom-product-pages/configure-multiple-product-page-versions
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-manage-app-accessibility-manage-acces
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/manage-app-accessibility/manage-accessibility-nutrition-labels
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-manage-app-accessibility-overview-of-
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/manage-app-accessibility/overview-of-accessibility-nutrition-labels
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-manage-app-information-localize-app-i
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/manage-app-information/localize-app-information
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-manage-app-information-manage-app-pri
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/manage-app-information/manage-app-privacy
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-manage-app-information-overview-of-ex
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/manage-app-information/overview-of-export-compliance
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-manage-app-information-set-an-app-age
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/manage-app-information/set-an-app-age-rating
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-manage-app-information-upload-app-pre
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/manage-app-information/upload-app-previews-and-screenshots
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-manage-builds-upload-builds
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/manage-builds/upload-builds
+    review_cadence_days: 7
+    claim_scope: Official App Store Connect documentation for uploading and processing builds.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-manage-in-app-purchases-set-a-price-f
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/manage-in-app-purchases/set-a-price-for-an-in-app-purchase
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-manage-submissions-to-app-review-subm
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/manage-submissions-to-app-review/submit-an-app
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-offer-in-app-events-offer-in-app-even
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/offer-in-app-events/offer-in-app-events
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-reference-app-information
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/reference/app-information
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-reference-app-information-app-store-l
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/reference/app-information/app-store-localizations
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-reference-app-information-platform-ve
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/reference/app-information/platform-version-information
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-reference-app-information-screenshot-
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-programs-enroll
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/programs/enroll
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: github-com-mobai-app-mobile-recorder-skill
+    name: github.com
+    source_type: github
+    url: https://github.com/MobAI-App/mobile-recorder-skill
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: github-com-parthjadhav-app-store-screenshots
+    name: App Store Screenshots
+    source_type: github
+    url: https://github.com/ParthJadhav/app-store-screenshots
+    review_cadence_days: 7
+    claim_scope: Selected README and skill overview/migration guidance (SKILL.md lines 1-105). No template code,
+      mockup, example captures, fonts or style packs are incorporated.
+    last_review_date: 2026-09-06
+    reviewer: b2c-contributor source review
+    publisher: Parth Jadhav
+    revision: 18951ddc4e06c53a3d34207732c16d9568f88d11
+    retrieved_at: 2026-09-06T15:57:52.804206Z
+    upstream_id: parth-app-store-screenshots
+    selectors: &a1
+      - README.md
+      - skills/app-store-screenshots/SKILL.md
+    rights:
+      status: verified
+      spdx: MIT
+      evidence: catalog/upstreams/notices/parth-app-store-screenshots.txt
+      evidence_sha256: a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a
+      notes: Selected guidance adapted; unimported assets and executable dependencies retain separate review
+        requirements.
+  - id: github-com-rorkai-app-store-connect-cli
+    name: github.com
+    source_type: github
+    url: https://github.com/rorkai/App-Store-Connect-CLI
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: github-com-rorkai-app-store-connect-cli-skills
+    name: github.com
+    source_type: github
+    url: https://github.com/rorkai/app-store-connect-cli-skills
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: support-google-com-googleplay-android-developer-answer-10144311
+    name: support.google.com
+    source_type: support_docs
+    url: https://support.google.com/googleplay/android-developer/answer/10144311?hl=en
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: support-google-com-googleplay-android-developer-answer-10787469
+    name: support.google.com
+    source_type: support_docs
+    url: https://support.google.com/googleplay/android-developer/answer/10787469?hl=en
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: support-google-com-googleplay-android-developer-answer-13327111
+    name: support.google.com
+    source_type: support_docs
+    url: https://support.google.com/googleplay/android-developer/answer/13327111?hl=en
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: support-google-com-googleplay-android-developer-answer-9842757
+    name: support.google.com
+    source_type: support_docs
+    url: https://support.google.com/googleplay/android-developer/answer/9842757?hl=en
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: support-google-com-googleplay-android-developer-answer-9859152
+    name: support.google.com
+    source_type: support_docs
+    url: https://support.google.com/googleplay/android-developer/answer/9859152?hl=en
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: support-google-com-googleplay-android-developer-answer-9859455
+    name: support.google.com
+    source_type: support_docs
+    url: https://support.google.com/googleplay/android-developer/answer/9859455?hl=en
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: support-google-com-googleplay-android-developer-answer-9866151
+    name: support.google.com
+    source_type: support_docs
+    url: https://support.google.com/googleplay/android-developer/answer/9866151?hl=en
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: support-google-com-googleplay-android-developer-answer-9867159
+    name: support.google.com
+    source_type: support_docs
+    url: https://support.google.com/googleplay/android-developer/answer/9867159?hl=en
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: support-google-com-googleplay-android-developer-answer-9898842
+    name: support.google.com
+    source_type: support_docs
+    url: https://support.google.com/googleplay/android-developer/answer/9898842?hl=en
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: support-google-com-googleplay-android-developer-answer-9898843
+    name: support.google.com
+    source_type: support_docs
+    url: https://support.google.com/googleplay/android-developer/answer/9898843?hl=en
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+derivations:
+  - source_ids:
+      - github-com-parthjadhav-app-store-screenshots
+    relationship: adapted
+    baseline: 18951ddc4e06c53a3d34207732c16d9568f88d11
+    selectors: *a1
+    rationale: Reconcile existing selected guidance with the reviewed source while preserving builder artifact
+      ownership, host selection, authority and evidence semantics.
+    omissions:
+      - Use accepted product copy, DESIGN.md and source captures. Editor deck state owns presentation only; it
+        cannot redefine the product or silently replace a missing theme.
+      - No copy-over of the app root, global skill install or automatic editor upgrade. Preserve assets and
+        isolated export behavior; verify every crop after an authorized migration.
+      - Treat device labels and export sizes as upstream presets, not current Apple or Google requirements.
+        Required text and critical UI must survive each standalone crop.
+    reviewer: b2c-contributor source review
+    reviewed_at: 2026-09-06
+    notice: catalog/upstreams/notices/parth-app-store-screenshots.txt
+    evaluation: npm run test:fixtures -- screenshot-upstreams

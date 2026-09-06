@@ -1,0 +1,652 @@
+import { workflow } from "./helpers.js";
+
+/**
+ * Ported from runtime/graph/workflows/build-release.ts. All thirteen are grantable-domain.
+ *
+ * One structural fix versus v1: v1's `asc-cli-automation` and `store-console-workflow` both
+ * declared `store/STORE_CONSOLE.md` as an output. v1's graph tolerated this silently
+ * (runtime/graph/graph.ts dedupes discovered artifacts into a path-keyed map with no
+ * collision check); compile.ts's compilePlan() does not — it fails closed on "Ambiguous
+ * shared write(s)" by design (KTD6, carrying the v0.65.1 Compiler steps 1/9 rule). Since
+ * `asc-cli-automation` already depends on `store-console-workflow` and only extends that
+ * document rather than authoring a distinct one, its outputPaths drops the duplicate here
+ * rather than the catalog silently tolerating an unresolvable two-writer artifact.
+ *
+ * Same fix, same reason, for `engineering/PRODUCTION_READINESS.md`: v1 had THREE workflows
+ * declare it as an output (engineering-orchestration-ce-production-readiness,
+ * mobai-device-automation-and-demo-videos, native-ios-proof-route-ladder). The latter two
+ * both already depend on the first, which is the artifact's actual author; they attach
+ * evidence to it (device proof, MobAI proof) rather than authoring it, so their
+ * outputPaths drop the duplicate here too.
+ *
+ * `engineering/TECH_SPEC.md` had the same problem one level up: both
+ * workflow.process.launch-trace-and-build-contracts (operating-system.ts) and this file's
+ * `backend-data-contract` declared it. `backend-data-contract` already depends on
+ * `launch-trace-and-build-contracts`, which authors the file; `backend-data-contract`
+ * hardens its data/API sections rather than authoring it fresh, so it drops the duplicate.
+ */
+export const workflows = [
+  workflow({
+    id: "workflow.store.aso-and-store-ops",
+    founderPhrasings: [
+      "improve our App Store keyword rankings",
+      "research the right keywords for our store listing",
+      "run the ongoing App Store optimization loop",
+    ],
+    title: "ASO & store ops",
+    domainId: "domain.store",
+    areaIds: ["area.build-release"],
+    trigger: "Before App Store/Play metadata, keyword research, ASA, or post-launch ASO loops",
+    instructions:
+      "Build app-marketing-context (app name, category, target country, top competitors, primary/secondary/long-tail keyword candidates, current listing state, and public support/privacy URLs) before locking a single metadata field, then run keyword and name-collision checks in the target country and separate brand language from search language. Route any localization call through the demand-first priority tiers in LOCALIZATION_MARKET_RESEARCH.md rather than translating on inference, and route Apple Search Ads storefront targeting from the same tiers. Draft final metadata fields plus rejected alternatives with rationale into STORE_OPS.md, and run every metadata/keyword string through the no-slop-writing.md self-check before calling it locked. For the recurring post-launch loop, track keyword rank deltas, ASA search-term mining, and localization opportunities weekly rather than treating ASO as a one-time pass. Prefer `asc optimize keywords rank` first without Apple Ads credentials; record storefront, platform, locale, query set, CLI version, source availability, raw inputs, rank-window limitation, and collection time in STORE_OPS.md; keep `unavailable` as `unavailable`; do not auto-apply metadata.",
+    reads: ["DESIGN.md", "state/business-state.json"],
+    roleId: "role.marketing-guru",
+    laneIds: ["store_console"],
+    phaseIds: ["phase.3"],
+    dependencies: ["workflow.design.design-room"],
+    outputPaths: ["STORE_OPS.md"],
+    gates: ["check:aso-evidence"],
+    actionClass: "draft",
+    idempotent: true,
+  }),
+  workflow({
+    id: "workflow.store.app-store-listing-prep-packet",
+    founderPhrasings: [
+      "figure out everything needed to fill in the app store page",
+      "prep the listing fields before we submit",
+      "get the privacy questionnaire and purchase mapping ready",
+    ],
+    title: "App Store listing prep packet",
+    domainId: "domain.store",
+    areaIds: ["area.build-release"],
+    trigger: "Before listing fields, privacy questionnaire, IAP/subscription field maps, CPPs, in-app events",
+    instructions:
+      "Build APP_STORE_LISTING.md as the bridge document: default listing fields, App Privacy answers derived from the actual data inventory and SDK/vendor behavior (never from policy prose alone), and pricing/subscription mapping reconciled against revenue/REVENUE_OPS.md's RevenueCat/Stripe/web-funnel state. Anchor screenshot, App Preview, custom-product-page, and In-App Event concepts to the real complete product experience in 11_STAR_EXPERIENCE.md so the listing never invents a promise the app cannot keep. Run the finished description/keyword/promotional-text copy through the no-slop-writing.md self-check, then confirm `npm run check:store-console -- --root .` passes before calling the packet ready. Founder approval gates any live product creation, price change, or submission — draft the packet, do not publish it.",
+    reads: ["DESIGN.md", "STORE_OPS.md", "revenue/REVENUE_OPS.md", "product/experience/11-star-experience/11_STAR_EXPERIENCE.md", "state/business-state.json"],
+    roleId: "role.marketing-guru",
+    laneIds: ["store_console"],
+    phaseIds: ["phase.3"],
+    // Listing IAP/subscription field maps must name the same products RevenueCat already owns
+    // (see check:store-console's cross-check against revenue/REVENUE_OPS.md) — without this
+    // edge, store console work and RevenueCat product setup could each create the "same" live
+    // App Store/Play product with no ordering guarantee or drift detection.
+    // Listing fields come from the frozen copy deck: the isolated copy review precedes them.
+    dependencies: ["workflow.store.aso-and-store-ops", "workflow.money.revenue-monetization", "workflow.words.copy-review-audit"],
+    outputPaths: ["store/app-store-listing/APP_STORE_LISTING.md"],
+    gates: ["check:store-console"],
+    actionClass: "draft",
+    idempotent: true,
+  }),
+  workflow({
+    id: "workflow.store.apple-signing-and-release-readiness",
+    founderPhrasings: [
+      "get the ios build signed and to testers",
+      "prep everything Apple needs before TestFlight",
+      "check our Apple Developer account is actually ready",
+    ],
+    title: "Apple signing & release readiness",
+    domainId: "domain.store",
+    areaIds: ["area.build-release"],
+    trigger:
+      "Before Apple Developer enrollment, Team ID, signing, profiles, archive/upload, TestFlight. Founder phrasing: get on the App Store, ship to TestFlight, get the ios build signed and into testers hands.",
+    instructions:
+      "Classify the Apple account state (membership, Team ID, role, agreements signed) before any TestFlight/App Store distribution claim, and treat a simulator build as engineering proof only, never distribution readiness. Before each release archive, read Apple's live Upcoming Requirements, submission baseline, Xcode compatibility, and upload pages; compare them with the local Xcode/SDK; reconcile the intended Release bundle ID, version, and build with App Store Connect; lint PrivacyInfo.xcprivacy; audit required-reason API coverage; prepare API-key export authentication; and check native screenshot dimensions. Record items 1 through 6 in store/APPLE_SIGNING.md before archiving. After the new archive exists, read its compiled Info.plist and confirm its bundle ID, CFBundleShortVersionString, CFBundleVersion, and injected SDK keys. Record item 7 before export or upload. Do not use an older archive as evidence for a new build. A current exact TestFlight upload standing envelope authorizes archive/upload without another prompt; read back the build state and record proof. Enrollment, certificate creation/rotation, agreements, pricing, final review submission, and production release remain founder decisions unless the opening envelope names that exact action.",
+    reads: ["store/app-store-listing/APP_STORE_LISTING.md", "store/APPLE_APP_STORE_REQUIREMENTS.md", "state/business-state.json"],
+    roleId: "role.engineering-leader",
+    laneIds: ["apple_signing"],
+    phaseIds: ["phase.3"],
+    dependencies: ["workflow.store.app-store-listing-prep-packet", "workflow.store.apple-app-store-requirements-privacy-manifest"],
+    outputPaths: ["store/APPLE_SIGNING.md"],
+    gates: ["check:apple-release-readiness"],
+    providers: ["provider.app-store-connect"],
+    founderOnlyActions: ["approve signing, upload, or submission actions not covered by an exact current standing envelope"],
+    actionClass: "release",
+    protectedCategory: "release",
+    idempotent: false,
+  }),
+  workflow({
+    id: "workflow.store.apple-app-store-requirements-privacy-manifest",
+    founderPhrasings: [
+      "fill out the app privacy answers correctly",
+      "make sure the privacy manifest matches what the app actually does",
+      "reconcile our data collection with Apple's privacy questionnaire",
+    ],
+    title: "Apple App Store requirements (privacy manifest)",
+    domainId: "domain.store",
+    areaIds: ["area.build-release"],
+    trigger: "Before ASC upload — PrivacyInfo.xcprivacy, required-reason APIs, App Privacy answers",
+    instructions:
+      "Reconcile the App Privacy answers against the real data inventory: code/SDK list, analytics/ANALYTICS.md, revenue/REVENUE_OPS.md, backend schema, and the public privacy/terms pages — never answer from policy prose alone. Prove the bundled PrivacyInfo.xcprivacy lints clean, NSPrivacyAccessedAPITypes covers every required-reason API the code actually uses (UserDefaults, file-timestamp APIs, etc.), and third-party SDK manifests/signatures plus the Xcode privacy report are reconciled before any ASC upload-readiness claim. Write the result to store/APPLE_APP_STORE_REQUIREMENTS.md and pass `npm run check:apple-requirements -- --root .`; a passed App Store Connect upload with an invalid or incomplete privacy manifest is a release blocker, not post-submit cleanup. Founder approval is required on the final App Privacy answers before they are published in App Store Connect.",
+    reads: [
+      "store/app-store-listing/APP_STORE_LISTING.md",
+      "trust/PRIVACY.md",
+      "trust/TERMS.md",
+      "analytics/ANALYTICS.md",
+      "revenue/REVENUE_OPS.md",
+      "state/business-state.json",
+    ],
+    roleId: "role.security-architect",
+    laneIds: ["store_console", "privacy_legal"],
+    phaseIds: ["phase.3"],
+    dependencies: ["workflow.store.app-store-listing-prep-packet", "workflow.trust.privacy-and-terms"],
+    outputPaths: ["store/APPLE_APP_STORE_REQUIREMENTS.md"],
+    gates: ["check:apple-requirements"],
+    providers: ["provider.app-store-connect"],
+    founderOnlyActions: ["approve privacy answers"],
+    actionClass: "mutate",
+    protectedCategory: "legal_pricing",
+    idempotent: true,
+  }),
+  workflow({
+    id: "workflow.store.store-console-workflow",
+    founderPhrasings: [
+      "tell me exactly where to click in App Store Connect",
+      "walk me through the console step by step",
+      "what do I paste into Play Console right now",
+    ],
+    title: "Store console workflow",
+    domainId: "domain.store",
+    areaIds: ["area.build-release"],
+    trigger: 'Before "where do I click / what do I paste" in ASC or Play Console',
+    instructions:
+      "Produce the console-ready packet that tells the founder exactly where to click, what to paste, and what still needs their approval: fill store/STORE_CONSOLE.md field-by-field (click path, character limit, paste-ready value, evidence source, status) for every App Store Connect and Google Play Console page in scope, then render store/store-console.html as the copy-paste surface grouped by console page. Distinguish the Apple readiness states explicitly — simulator-build-ok, apple-account-ready, bundle-id-ready, app-record-ready, signing-ready, archive-ready, upload-ready — and never call the launch 'TestFlight-ready' from a simulator build alone. Reconcile Apple App Privacy answers against Google Play Data safety answers so the two stores never contradict each other for the same codebase. Record the Age Rating Questionnaire fields socialMedia, messagingAndChat, socialMediaAgeRestricted, ageAssurance, and userGeneratedContent from product evidence, run `asc age-rating audit` before review submission, and never infer false from a blank field. Then confirm `npm run check:store-console -- --root .` passes. Founder approval is required before any external console mutation — app creation, metadata apply, screenshot upload, submission, or age-rating edit.",
+    reads: ["store/app-store-listing/APP_STORE_LISTING.md", "store/APPLE_SIGNING.md", "state/business-state.json"],
+    roleId: "role.marketing-guru",
+    laneIds: ["store_console"],
+    phaseIds: ["phase.3"],
+    dependencies: ["workflow.store.app-store-listing-prep-packet", "workflow.store.apple-signing-and-release-readiness"],
+    outputPaths: ["store/STORE_CONSOLE.md", "store/store-console.html"],
+    gates: ["check:store-console"],
+    providers: ["provider.app-store-connect", "provider.google-play"],
+    founderOnlyActions: ["approve external console mutations"],
+    actionClass: "mutate",
+    protectedCategory: "credentials_access",
+    idempotent: false,
+  }),
+  workflow({
+    id: "workflow.store.asc-cli-automation",
+    founderPhrasings: [
+      "automate app store connect work from the command line",
+      "use the CLI instead of clicking through the console",
+      "script the App Store Connect metadata updates",
+    ],
+    title: "ASC CLI automation",
+    domainId: "domain.store",
+    areaIds: ["area.build-release"],
+    trigger: "Before Rork asc CLI app creation, metadata, screenshots, TestFlight, RevenueCat sync",
+    instructions:
+      "Default to the `asc` CLI/skill-pack route for App Store Connect work — reads, ID resolution, metadata/screenshot dry-runs, and TestFlight/review-status checks are safe without new approval. Work the auth ladder before reporting ASC as blocked: check an existing keychain profile first (`asc --profile <Name>`), never `source` a credential `.env` file, and treat 'app record not found' as a setup step. Confirm `--help` before any unverified subcommand. Apply approved metadata, screenshots, previews, product pages, and TestFlight uploads automatically when an exact current standing envelope covers the workflow, target, resource, and action class; use the required confirmation flag, capture before-state, and read back the provider result. Ask only when that scope is absent or expired. Pricing, agreements, final review submission, and public release remain exceptional unless explicitly named in the envelope. Pass `npm run check:asc-command-contract -- --root .` and return the state/STORE_CONSOLE reconciliation patch after every external change.",
+    reads: ["store/STORE_CONSOLE.md", "store/store-console.html", "state/business-state.json"],
+    roleId: "role.engineering-leader",
+    laneIds: ["store_console"],
+    phaseIds: ["phase.3"],
+    dependencies: ["workflow.store.store-console-workflow"],
+    // outputPaths intentionally empty: extends store/STORE_CONSOLE.md, which
+    // workflow.store.store-console-workflow already owns as its output (see file header).
+    gates: ["check:asc-command-contract"],
+    providers: ["provider.app-store-connect"],
+    founderOnlyActions: ["approve App Store Connect mutations"],
+    actionClass: "mutate",
+    protectedCategory: "credentials_access",
+    idempotent: false,
+  }),
+  workflow({
+    id: "workflow.store.app-review-observe",
+    founderPhrasings: ["check the status of our app store review", "watch for a decision on our submitted build", "is our app still in review"],
+    title: "App Review observe",
+    domainId: "domain.store",
+    areaIds: ["area.build-release"],
+    trigger: "When an App Store version is in review, or after a status change, before any remediation or resubmission",
+    instructions:
+      "Run an observe-only App Review watch for one exact app version. Probe public API commands and a separate web-session receipt (`asc web auth status`, `asc web review list`, `asc web review show`). Poll the three Apple layers, persist every raw value, and store unknown states as unknown_provider_state. A signed Apple webhook is a wake-up only: verify `x-apple-signature` HMAC-SHA256 on the raw body, persist a host-neutral envelope, then drain that queue with `b2c app-review-ingress consume` so poll writes `run/app-review.json`. Consume polls App Store Connect through the live `asc` provider. Archive each accepted envelope after the watch write. Keep `--provider-fixture` test-only. Deduplicate by Apple event ID, including archived IDs, during persist. Do not copy webhook oldValue or newValue into layer truth. When the listing has no match, clear stored registration. Ignore Apple deliveries that predate the mandate start. Fail closed when `asc review status` JSON has no valid app-version layer. Order live snapshots by poll time, not createdDate or submittedDate. If `asc web agreements status` fails, keep the public review snapshot and treat a missing web session as a founder handoff. When review issues appear, probe web-session readiness, retrieve `asc web review show` for the exact submission ID, quarantine reviewer content as fingerprints, and classify without implementing a fix. Write durable state to run/app-review.json. Project the current blocker and case surface into store/APP_REVIEW.md in founder language. Classify a pending Apple agreement as founder action required. Never call `asc web agreements accept`. Never run `asc webhooks serve` as production ingress. Never submit, upload, or mutate store material. Pass `npm run check:app-review-contract -- --root .`.",
+    reads: ["store/STORE_CONSOLE.md", "state/business-state.json"],
+    roleId: "role.engineering-leader",
+    laneIds: ["store_console"],
+    phaseIds: ["phase.3"],
+    dependencies: ["workflow.store.asc-cli-automation"],
+    outputPaths: ["store/APP_REVIEW.md", "run/app-review.json"],
+    gates: ["check:app-review-contract"],
+    providers: ["provider.app-store-connect"],
+    founderOnlyActions: ["accept Apple agreements"],
+    actionClass: "observe",
+    idempotent: true,
+  }),
+  workflow({
+    id: "workflow.store.app-review-remediate",
+    founderPhrasings: [
+      "apple rejected the build, plan what to fix before resubmitting",
+      "figure out why the app store rejected our build",
+      "build a plan to fix a rejected submission",
+    ],
+    title: "App Review remediate",
+    domainId: "domain.store",
+    areaIds: ["area.build-release"],
+    trigger: "After App Review observe classifies a rejection, before any store submission",
+    instructions:
+      "Build a bounded remediation plan from the classified App Review case. Route metadata_rejected to same-build metadata repair, invalid_binary to a new inspected archive, and missing_review_information to review notes. Park legal, privacy-promise, payments, product-scope, and unclear cases. Apply consumer-repo patches only. Run `asc metadata validate` and `asc metadata push --dry-run` before treating metadata as applied. Independent verification must use a different session than the producer. A verifier rejection opens a new attempt on the same occurrence. Never call `asc review submit`. Never call `asc publish appstore --submit`. Never call `asc web agreements accept`. Never upload. Pass `npm run check:app-review-contract -- --root .`.",
+    reads: ["store/APP_REVIEW.md", "run/app-review.json", "state/business-state.json"],
+    roleId: "role.engineering-leader",
+    laneIds: ["store_console"],
+    phaseIds: ["phase.3"],
+    dependencies: ["workflow.store.app-review-observe"],
+    // outputPaths intentionally empty: extends run/app-review.json and store/APP_REVIEW.md,
+    // which workflow.store.app-review-observe already owns as outputs.
+    gates: ["check:app-review-contract"],
+    providers: ["provider.app-store-connect"],
+    founderOnlyActions: ["accept protected-policy review changes"],
+    actionClass: "mutate",
+    protectedCategory: "credentials_access",
+    idempotent: false,
+    maxAttempts: 3,
+  }),
+  workflow({
+    id: "workflow.store.app-review-resubmit",
+    founderPhrasings: [
+      "resubmit the app after fixing the rejection",
+      "send the corrected build back for review",
+      "reattempt the store submission now that it's fixed",
+    ],
+    title: "App Review resubmit",
+    domainId: "domain.store",
+    areaIds: ["area.build-release"],
+    trigger: "After bounded App Review remediation is independently verified, before any further Apple mutation",
+    instructions:
+      "Run a capped App Review resubmission for one exact app version. Require a standing envelope that names the app ID, App Store version ID, marketing version, cycle cap, and already-uploaded proof. Never infer approval from a multiplier or from the verified fix. Same-build metadata and review-notes routes call `asc review submit --confirm` without a new upload. A new-binary route still needs the inspected archive identity and already-uploaded proof; this node does not upload. Probe `asc review submit --help` before the first live call. Record the exact command on run/app-review.json. Do not write that command into store/APP_REVIEW.md. After submit, poll App Store Connect. A timed-out mutation performs provider readback and does not submit again. A second rejection opens a linked cycle. Cycle exhaustion parks with founder action and emits no more submits. Pending developer release still needs a separate founder yes. Never call `asc publish appstore --submit`. Never call `asc web agreements accept`. Never run `asc webhooks serve` as production ingress. Pass `npm run check:app-review-contract -- --root .`.",
+    reads: ["store/APP_REVIEW.md", "run/app-review.json", "state/business-state.json"],
+    roleId: "role.engineering-leader",
+    laneIds: ["store_console"],
+    phaseIds: ["phase.3"],
+    dependencies: ["workflow.store.app-review-remediate"],
+    gates: ["check:app-review-contract"],
+    providers: ["provider.app-store-connect"],
+    founderOnlyActions: ["authorize App Review resubmission", "release a pending developer version"],
+    actionClass: "mutate",
+    protectedCategory: "credentials_access",
+    idempotent: false,
+    maxAttempts: 3,
+  }),
+  workflow({
+    id: "workflow.store.store-screenshots-production",
+    founderPhrasings: [
+      "get real screenshots for the store listing, not mockups",
+      "produce store screenshots from actual app captures",
+      "capture and compose the store images we need",
+    ],
+    title: "Store screenshots production",
+    domainId: "domain.store",
+    areaIds: ["area.build-release"],
+    trigger: "Store screenshots needed (raw capture → composed iPhone/iPad/Play assets)",
+    instructions:
+      "Capture raw app UI first through a provider that covers the selected platform and required capture operations. Prefer native tools already exposed by the agent host; use MobAI or another provider for explicit bindings or uncovered requirements — and treat those raw captures as proof inputs, never final store creative. Before this node enters the dispatch frontier, the orchestration manager must invalidate workflow.design.design-room in run state (mark it stale, clear its blocker and accepted output fingerprint, and mark its output bindings unaccepted), recompute the frontier, redispatch that Design Room node with a store-first-frame change classification and affected scope, accept its refreshed DESIGN.md, screen map, and Design Room outputs, and only then recompute and dispatch this screenshot node. The screenshot worker never writes Design Room outputs. Read root DESIGN.md and run check:design-md plus check:design-room before composing or materially changing a store frame; an accepted Design Room dependency from an earlier or unrelated scope is not evidence for new store creative. Compose final assets from the Asset Knowledge Brief (strategy/RESEARCH.md's user/problem, 11_STAR_EXPERIENCE.md's magical moment, the emotion/card from EMOTIONAL_DESIGN.md, DESIGN.md's tokens) with headline, copy overlay, device frame, and export every required iPhone/iPad/Play well — never a generic, knowledge-free hook. Run every composed frame through quality-lens.md's Anti-Generic Checks before calling the deck done, and write the raw-path/composition-path/upload-status table to SCREENSHOTS.md. Pass `npm run check:store-screenshots -- --root .`; a technically correct, on-brand screenshot that still reads as generic fails the done bar.",
+    reads: [
+      "DESIGN.md",
+      "store/app-store-listing/APP_STORE_LISTING.md",
+      "product/experience/11-star-experience/11_STAR_EXPERIENCE.md",
+      "strategy/RESEARCH.md",
+      "product/experience/emotional-design/EMOTIONAL_DESIGN.md",
+      "state/business-state.json",
+    ],
+    roleId: "role.design-guru",
+    laneIds: ["store_console", "content_assets"],
+    phaseIds: ["phase.3"],
+    // String freeze before screenshots (the copy review dates it); the design direction passed
+    // its isolated audit before any store frame is composed from it.
+    dependencies: [
+      "workflow.design.design-room",
+      "workflow.design.design-system-audit",
+      "workflow.store.app-store-listing-prep-packet",
+      "workflow.words.copy-review-audit",
+    ],
+    refreshDependencies: [
+      {
+        workflowId: "workflow.design.design-room",
+        instructions:
+          "Record a store-first-frame change classification and affected scope, then complete the Design Evidence pass for every composed or materially changed store frame.",
+      },
+    ],
+    outputPaths: ["store/app-store-listing/SCREENSHOTS.md"],
+    gates: ["check:design-md", "check:design-room", "check:store-screenshots"],
+    providers: ["provider.app-store-screenshots"],
+    actionClass: "mutate",
+    idempotent: false,
+  }),
+  workflow({
+    id: "workflow.store.google-play-release",
+    founderPhrasings: [
+      "how long until the android version can go live",
+      "get this app ready for the play store",
+      "check what's needed for a play store release",
+    ],
+    title: "Google Play release",
+    domainId: "domain.store",
+    areaIds: ["area.build-release"],
+    trigger: "Android in scope (platforms include android or an android bundle id exists)",
+    instructions:
+      "Classify the Play developer account (organization vs personal, verification status, payments profile) before any Android readiness claim, and if personal, plan the 12-tester/14-continuous-day closed-testing production gate into the launch timeline now — it is a calendar gate, not a paperwork gate. Complete every Policy > App content task (Data safety, content rating, App access demo credentials, account deletion) and reconcile the Data safety answers against the same data inventory used for Apple App Privacy; a divergence between the two stores for one codebase is a reconciliation failure unless explicitly documented. Enroll in Play App Signing, upload an AAB (never an APK) as the readiness artifact, and stage production rollout in percentages with a named halt owner rather than 0% straight to 100%. Write the eight required sections (Developer Account, Data Safety, Content Rating, Play App Signing, Target API Level, Release Tracks, Closed Testing, Pre-Launch Report) to store/GOOGLE_PLAY_RELEASE.md before calling the Play side of lanes.store_console done.",
+    reads: ["store/app-store-listing/APP_STORE_LISTING.md", "state/business-state.json"],
+    roleId: "role.engineering-leader",
+    laneIds: ["store_console"],
+    phaseIds: ["phase.3"],
+    dependencies: ["workflow.store.app-store-listing-prep-packet"],
+    outputPaths: ["store/GOOGLE_PLAY_RELEASE.md"],
+    providers: ["provider.google-play"],
+    founderOnlyActions: ["approve Play Console release"],
+    actionClass: "release",
+    protectedCategory: "release",
+    idempotent: false,
+  }),
+  workflow({
+    id: "workflow.store.google-play-metadata-standing-envelope",
+    founderPhrasings: [
+      "publish the approved play store listing text",
+      "apply the localized play store metadata we already signed off on",
+      "push the play listing copy live",
+    ],
+    title: "Google Play metadata standing envelope",
+    domainId: "domain.store",
+    areaIds: ["area.build-release"],
+    trigger: "Google Play listing metadata is ready and a matching metadata standing envelope is current",
+    instructions:
+      "Apply only the approved Google Play listing text, localized metadata, custom store listings, and promotional content covered by the exact current standing envelope. Verify account, package, track-neutral resource IDs, locales, payload digest, and capability immediately before mutation. Capture before-state and read back every locale. Write store/proof/google-play-metadata-apply.json with approval ID, request digest, before state, provider operation IDs, readback state, and timestamps. Do not upload media, change products, submit a release, or widen the envelope.",
+    reads: ["store/STORE_CONSOLE.md", "store/app-store-listing/APP_STORE_LISTING.md", "state/business-state.json"],
+    roleId: "role.marketing-guru",
+    laneIds: ["store_console"],
+    phaseIds: ["phase.3"],
+    dependencies: ["workflow.store.store-console-workflow"],
+    gates: ["check:store-console", "check:provider-proof"],
+    outputPaths: ["store/proof/google-play-metadata-apply.json"],
+    providers: ["provider.google-play"],
+    founderOnlyActions: ["approve Google Play metadata when no exact standing envelope exists"],
+    actionClass: "mutate",
+    protectedCategory: "credentials_access",
+    idempotent: false,
+  }),
+  workflow({
+    id: "workflow.store.google-play-media-standing-envelope",
+    founderPhrasings: [
+      "upload the approved play store screenshots and graphics",
+      "push the play store promo video and feature graphic live",
+      "publish the media assets we already approved for play",
+    ],
+    title: "Google Play media standing envelope",
+    domainId: "domain.store",
+    areaIds: ["area.build-release"],
+    trigger: "Google Play screenshots, feature graphics, or promo video are ready and a matching media standing envelope is current",
+    instructions:
+      "Upload only the locale, device-family, custom-store-listing, screenshot, feature-graphic, and promo-video assets covered by the exact current standing envelope. Verify every file digest and Play resource ID immediately before upload. Capture before-state and read back the resulting media set. Write store/proof/google-play-media-apply.json with approval ID, per-file digest, locale, device family, product-page/listing ID, provider operation IDs, readback state, and timestamps. Do not apply text metadata, products, testing tracks, or release state.",
+    reads: ["store/STORE_CONSOLE.md", "store/app-store-listing/SCREENSHOTS.md", "state/business-state.json"],
+    roleId: "role.marketing-guru",
+    laneIds: ["store_console", "content_assets"],
+    phaseIds: ["phase.3"],
+    dependencies: ["workflow.store.store-screenshots-production", "workflow.store.store-console-workflow"],
+    gates: ["check:store-screenshots"],
+    outputPaths: ["store/proof/google-play-media-apply.json"],
+    providers: ["provider.google-play"],
+    founderOnlyActions: ["approve Google Play media upload when no exact standing envelope exists"],
+    actionClass: "mutate",
+    protectedCategory: "credentials_access",
+    idempotent: false,
+  }),
+  workflow({
+    id: "workflow.store.google-play-testing-track-standing-envelope",
+    founderPhrasings: [
+      "roll the build out to our play store testing track",
+      "assign the AAB to internal testers on play",
+      "push this build to the approved play testing track",
+    ],
+    title: "Google Play testing-track standing envelope",
+    domainId: "domain.store",
+    areaIds: ["area.build-release"],
+    trigger: "An AAB is proven and an exact internal or closed-testing track standing envelope is current",
+    instructions:
+      "Upload the exact AAB digest and assign it only to the named internal or closed-testing track covered by the current standing envelope. Verify package, signing, version code, tester cohort, country scope, rollout state, and release notes immediately before upload. Read back processing and tester availability. Write store/proof/google-play-testing-track-apply.json with approval ID, AAB digest, version code, track, provider operation ID, processing/readback state, tester cohort, and timestamps. Production submission and public rollout remain separate founder decisions.",
+    reads: ["store/GOOGLE_PLAY_RELEASE.md", "engineering/PRODUCTION_READINESS.md", "state/business-state.json"],
+    roleId: "role.engineering-leader",
+    laneIds: ["store_console", "engineering"],
+    phaseIds: ["phase.5b"],
+    dependencies: ["workflow.store.google-play-release", "workflow.engineering.engineering-orchestration-ce-production-readiness"],
+    gates: ["check:provider-proof"],
+    outputPaths: ["store/proof/google-play-testing-track-apply.json"],
+    providers: ["provider.google-play"],
+    founderOnlyActions: ["approve testing-track upload when no exact standing envelope exists"],
+    actionClass: "release",
+    protectedCategory: "release",
+    idempotent: false,
+  }),
+  workflow({
+    id: "workflow.engineering.source-change-manifest",
+    founderPhrasings: [
+      "log what actually changed in the app's source",
+      "fingerprint the build after this change",
+      "record what shifted since the last accepted checkpoint",
+    ],
+    title: "App source change ingestion",
+    domainId: "domain.engineering",
+    areaIds: ["area.build-release"],
+    trigger: "When design is accepted and after every accepted app-source, build-config, localization, onboarding, feature, paywall, SDK, or visual change",
+    instructions:
+      "Fingerprint the mobile source roots, dependency locks, build configuration, localization resources, analytics schema, onboarding, paywall, and privacy manifests. Compare them with the last accepted checkpoint. Write engineering/SOURCE_CHANGE_MANIFEST.json with changed paths, before/after digests, and every applicable Change Cascade Map type. A change can carry multiple types. Open the matching change-cascade work before the app slice merges. An empty change list is valid only when the current aggregate digest matches the accepted checkpoint.",
+    reads: ["run/app-source-fingerprint.sha256", "DESIGN.md", "engineering/TECH_SPEC.md", "state/business-state.json"],
+    roleId: "role.mobile-engineer",
+    laneIds: ["engineering", "orchestration"],
+    phaseIds: ["phase.3"],
+    dependencies: ["workflow.design.design-room"],
+    outputPaths: ["engineering/SOURCE_CHANGE_MANIFEST.json"],
+    // This node records the change set. The downstream cascade owns surface accounting;
+    // requiring a completed cascade here would make the producer wait on its consumer.
+    actionClass: "draft",
+    idempotent: true,
+  }),
+  workflow({
+    id: "workflow.engineering.engineering-orchestration-ce-production-readiness",
+    founderPhrasings: [
+      "route this build through the proper engineering process",
+      "make sure implementation actually follows the engineering loop",
+      "check we're production-ready before claiming done",
+    ],
+    title: "Engineering orchestration (CE + production readiness)",
+    domainId: "domain.engineering",
+    areaIds: ["area.build-release"],
+    trigger: "Before actual app implementation, builder prompts, or production-readiness claims",
+    instructions:
+      "Route non-trivial implementation through the Compound Engineering loop. Use the five-stage Standalone Engineering Loop when CE is unavailable. Record the route in engineering/ENGINEERING_PLAN.md. When DESIGN.md is accepted, start app implementation and the local landing build in the same ready batch. Also dispatch the prepared launch-surface prompt for store copy, product-page plans, screenshot plans, marketing assets, and price-copy checks. Give each agent a disjoint write scope. Before each app slice merges, start a read-only launch-surface impact audit. Apply affected public-surface updates in parallel with the next app slice. Record file ownership and serialized resources in operations/ORCHESTRATION.md. Require build, typecheck, lint, integration tests, mobile end-to-end proof, provider proof, and an on-device taste pass. Write the results to engineering/PRODUCTION_READINESS.md. Run check:compound-engineering and check:orchestration before the engineering lane is done.",
+    reads: ["engineering/TECH_SPEC.md", "state/LAUNCH_TRACE.md", "DESIGN.md", "state/business-state.json"],
+    roleId: "role.engineering-leader",
+    laneIds: ["engineering", "orchestration"],
+    phaseIds: ["phase.5b"],
+    // Engineering is not the critical path until the design direction passed its isolated audit.
+    dependencies: [
+      "workflow.process.launch-trace-and-build-contracts",
+      "workflow.design.design-room",
+      "workflow.design.design-system-audit",
+      "workflow.engineering.source-change-manifest",
+    ],
+    outputPaths: ["engineering/ENGINEERING_PLAN.md", "operations/ORCHESTRATION.md", "engineering/PRODUCTION_READINESS.md"],
+    gates: ["check:compound-engineering", "check:orchestration"],
+    actionClass: "mutate",
+    idempotent: true,
+    // Local implementation repair may continue under the downstream craft audit while evidence
+    // changes. External and protected actions remain outside this idempotent producer node.
+    maxAttempts: 8,
+  }),
+  workflow({
+    id: "workflow.engineering.backend-data-contract",
+    founderPhrasings: [
+      "pick our backend before we build against it",
+      "decide between Supabase, Firebase, or a custom backend",
+      "lock the data and API contract before building",
+    ],
+    title: "Backend data contract",
+    domainId: "domain.engineering",
+    areaIds: ["area.build-release"],
+    trigger: "Before schema/auth prompts or engineering/TECH_SPEC.md data/API sections harden",
+    instructions:
+      "Pick one backend route (Supabase, Firebase, or custom), record the reason in engineering/TECH_SPEC.md's Backend Selection sub-section, and never silently substitute another route mid-build — a switch is a change-cascade event and a founder-only gate. Write the Data Model as one row per entity (owner, key fields, relationships, retention/deletion path, PII class) and the Authorization Model as a create/read/update/delete matrix expressed in the route's actual enforcement mechanism — RLS policies, Firestore security rules, or middleware authz — deny by default. Treat untested authorization as absent: exercise owner/anonymous/other-user access for every matrix row and record the exact test command and evidence path, not just 'RLS' in prose. Pass `npm run check:backend-contract -- --root . --state state/business-state.json`; the account-deletion promise in this contract's retention rules must match trust/PRIVACY.md's deletion promise exactly, not just approximately.",
+    reads: ["engineering/TECH_SPEC.md", "state/business-state.json"],
+    // DESIGN.md and PRIVACY.md land after this node's phase-1f architecture firing — consults,
+    // so the early data contract is not held on later lanes; the deletion-promise exact-match is
+    // re-enforced by change-cascade once trust/PRIVACY.md exists.
+    consults: ["DESIGN.md", "trust/PRIVACY.md"],
+    roleId: "role.backend-infrastructure-engineer",
+    laneIds: ["engineering"],
+    phaseIds: ["phase.1f", "phase.5b"],
+    // lane.engineering's dependencyIds (catalog/lanes.ts) name both lane.design and
+    // lane.traceability; this workflow previously enforced only traceability, so it could
+    // dispatch before Design Room output existed (routing-depth audit, 2026-08-07).
+    dependencies: ["workflow.process.launch-trace-and-build-contracts", "workflow.design.design-room"],
+    // outputPaths intentionally empty: hardens engineering/TECH_SPEC.md's data/API
+    // sections; workflow.process.launch-trace-and-build-contracts already owns the file
+    // (see this file's header).
+    gates: ["check:backend-contract"],
+    actionClass: "draft",
+    idempotent: true,
+  }),
+  workflow({
+    id: "workflow.engineering.app-agent-roster-and-repo-entrypoints",
+    founderPhrasings: [
+      "set up the agent instructions files for this repo",
+      "write the AGENTS.md so future agents know what to do",
+      "build the roster of agents and entrypoints for this app",
+    ],
+    title: "App agent roster & repo entrypoints",
+    domainId: "domain.engineering",
+    areaIds: ["area.build-release"],
+    trigger: "Before builder handoff bundles, AGENTS.md/CLAUDE.md, APP_AGENTS.md, agents/",
+    instructions:
+      "Fill AGENTS.md, CLAUDE.md, APP_AGENTS.md, and the complete agents/ roster from the current business documents. Include agents/launch-surface-producer.md. AGENTS.md must tell future agents to keep using the B2C App Builder skill's workflow. It must require state updates, validators, and the design-lock fan-out. Assign each role its audit surface. Specialists can edit only an assigned disjoint scope. They never stage, commit, release, spend, submit, or publish. A fresh agent must be able to resume from AGENTS.md and the roster without chat history.",
+    reads: ["engineering/ENGINEERING_PLAN.md", "operations/ORCHESTRATION.md", "engineering/PRODUCTION_READINESS.md", "state/business-state.json"],
+    roleId: "role.orchestrator",
+    laneIds: ["engineering"],
+    phaseIds: ["phase.5"],
+    dependencies: ["workflow.engineering.engineering-orchestration-ce-production-readiness"],
+    outputPaths: ["AGENTS.md", "CLAUDE.md", "APP_AGENTS.md"],
+    actionClass: "mutate",
+    idempotent: true,
+  }),
+  workflow({
+    id: "workflow.engineering.mobai-device-automation-and-demo-videos",
+    founderPhrasings: [
+      "get repeatable android device testing running",
+      "record a polished demo video across real devices",
+      "run this across multiple physical devices, not just the simulator",
+    ],
+    title: "MobAI device automation & demo videos",
+    domainId: "domain.engineering",
+    areaIds: ["area.build-release"],
+    trigger:
+      "Before MobAI-delta device work — Android coverage, repeatable .mob suites, multi-device or physical-hardware runs, performance gates, MobAI CI, or recorder-skill demo videos/app previews — after the Route Ladder (native-ios-proof-route-ladder) routes past the in-app simulator",
+    instructions:
+      "First confirm MobAI is explicitly selected or supplies required coverage unavailable from the host-native route: Android, a repeatable .mob suite, multi-device or physical hardware, performance gates, MobAI CI, or recorder-polished demo output. A run-the-app, screen-check, flow-walk, or one-off bug-repro request on a local Mac belongs at rung 0 of the Route Ladder (workflow.engineering.native-ios-proof-route-ladder) — starting MobAI there wastes founder time exactly the way silently downgrading coverage loses proof, so record the rung decision in strategy/TOOL_DECISIONS.md. Run the MobAI session-startup checklist (refresh the live MCP surface, verify device discovery, start the bridge, pin the device ID) before any automation command — most 'device not found' failures come from skipping it. Use MobAI's free tier without a spend gate for one device/current quota; load paid-tool-routing.md and ask the founder before any Plus/Pro spend or before narrowing an intended cross-platform route to Apple-only. For demo videos, follow the recorder's explore -> script -> dry-run -> record -> edit/export sequence exactly — never improvise during final recording — and write the choreography path, raw capture, final export, and privacy/sensitive-screen review to growth/DEMO_VIDEO.md. Pass `npm run check:mobai-proof -- --root .`; pair every action sequence with backend/provider verification (the onboarding answer actually lands in profile state) because a clean UI pass is not proof the mutation landed.",
+    reads: ["engineering/ENGINEERING_PLAN.md", "engineering/PRODUCTION_READINESS.md", "state/business-state.json"],
+    roleId: "role.accessibility-device-qa",
+    laneIds: ["engineering", "content_assets"],
+    phaseIds: ["phase.5b"],
+    dependencies: ["workflow.engineering.engineering-orchestration-ce-production-readiness"],
+    outputPaths: ["growth/DEMO_VIDEO.md"],
+    gates: ["check:mobai-proof"],
+    providers: ["provider.mobai"],
+    actionClass: "mutate",
+    idempotent: false,
+  }),
+  workflow({
+    id: "workflow.engineering.native-ios-proof-route-ladder",
+    founderPhrasings: [
+      "walk this flow on a real device before anything fancier",
+      "check this screen on the simulator first",
+      "pick the right tool before automating a device test",
+    ],
+    title: "Mobile app operation and native proof (Route Ladder)",
+    domainId: "domain.engineering",
+    areaIds: ["area.build-release"],
+    trigger:
+      "First for any iOS or Android device automation, run-the-app, screen-check, flow-walk, bug-repro, screenshot, or screen-recording request — read the selected platforms, then pick the lightest proof rung that covers them",
+    instructions:
+      "Read project.platforms in state/business-state.json and identify whether the task is exploration, functionality, design/accessibility review, raw screenshot capture, or video capture. Honor explicit provider bindings. Otherwise prefer native tools already exposed by the current host when they cover the target, operations, and required evidence; choose MobAI or another provider for uncovered requirements. A provider name is not proof of availability. Raw captures are inputs to acceptance or marketing composition, not automatic proof or finished creative. The commands below describe the current compatibility proof adapters; the mobile app operation contract owns provider-neutral execution. Prove one exact platform and target per invocation. For a local iOS screen or flow check, start interactively at rung 0 with the in-app iOS Simulator. The headless proof command never selects rung 0 or 1. When the proof needs a machine receipt, escalate to `b2c proof --workspace . --platform ios` for rung 2, or use XcodeBuildMCP physical-device/install readback, SnapshotPreviews, or serve-sim as required. The rung-2 producer retains separate copies of the built and installed `.app` bundles plus raw build, install, installed-app readback, and launch transcripts under proof/ios-simulator/. Physical-iPhone install and readback receipts live under proof/ios-device/ and also bind deviceModelIdentifier, osVersion, and osBuild. `check:native-ios` reads Info.plist, rehashes both executables and complete bundle contents, and binds the transcripts to one project, scheme, simulator, bundle ID, and build number. An adapter-only receipt or a hand-written hash is incomplete. For machine-receipted Android scope through the current compatibility adapter, run `b2c proof --workspace . --platform android` against a pinned MobAI emulator or physical device; keep its bounded worksheet/action evidence under proof/android-emulator/ or proof/android-device/, and use proof/android-incomplete/ while target identity is unresolved. `check:mobai-proof-workflow` validates the MobAI worksheet/action contract for this proof attempt even while the engineering lane is pending. It never establishes source-to-package identity or strict design acceptance. Consume a named machine-produced strict adapter receipt that binds the current design candidate and complete accepted Android implementation roots to packageName, versionCode, APK-or-AAB, any derived installation APK, device, OS, install/readback, launch identity, timestamps, and separate hashed evidence. Never reconstruct or hand-author that receipt from MobAI output. Pass `npm run check:native-android -- --root .`; if no strict receipt adapter is connected, record `android.strict_receipt_adapter_required` and keep the node incomplete. For mixed scope, invoke both explicit platform branches and pass all three checks; evidence from one invocation never satisfies the other. Keep every selected route inside the single declared proof/ output, record the rung and reason in strategy/TOOL_DECISIONS.md, and attach exact device, OS, tool route, screenshot, interaction, and log paths in engineering/PRODUCTION_READINESS.md. Use fixture or sandbox accounts on agent-driven devices. Record inaccessible local hardware as a named blocker instead of narrating a run that did not happen.",
+    reads: ["engineering/PRODUCTION_READINESS.md", "engineering/ENGINEERING_PLAN.md", "state/business-state.json"],
+    roleId: "role.accessibility-device-qa",
+    laneIds: ["engineering"],
+    phaseIds: ["phase.5b"],
+    dependencies: ["workflow.engineering.engineering-orchestration-ce-production-readiness"],
+    // The stable workflow id predates Android support. Its one neutral write root lets the
+    // selected-platform branch create only relevant receipts while the craft audit consumes one
+    // complete proof artifact. Device proof is safe to repeat for bounded audit repair; it cannot
+    // release, publish, spend, or change production traffic.
+    outputPaths: ["proof/"],
+    gates: ["check:native-ios", "check:mobai-proof-workflow", "check:native-android"],
+    providers: ["provider.in-app-ios-simulator", "provider.codex-native-ios", "provider.snapshot-previews", "provider.serve-sim", "provider.mobai"],
+    actionClass: "mutate",
+    idempotent: true,
+    maxAttempts: 8,
+  }),
+  workflow({
+    id: "workflow.engineering.accessibility-common-task-proof",
+    founderPhrasings: [
+      "test the app with a screen reader before we ship",
+      "check accessibility for the core tasks users need to do",
+      "make sure large text and reduced motion actually work",
+    ],
+    title: "Accessibility common-task proof",
+    domainId: "domain.engineering",
+    areaIds: ["area.build-release"],
+    trigger: "Before beta or store submission on every mobile launch",
+    instructions:
+      "Define the common tasks that a customer must complete. Test each task with platform assistive technology, large text, reduced motion, sufficient contrast, and keyboard or switch access where the platform supports it. Record the device, operating system, build, result, defect, owner, and evidence. Reconcile the proof with the App Store accessibility declarations. Write engineering/ACCESSIBILITY_READINESS.md. Do not claim readiness from static lint results alone.",
+    reads: ["engineering/PRODUCTION_READINESS.md", "DESIGN.md"],
+    roleId: "role.accessibility-device-qa",
+    laneIds: ["engineering"],
+    phaseIds: ["phase.5b"],
+    dependencies: ["workflow.engineering.engineering-orchestration-ce-production-readiness"],
+    outputPaths: ["engineering/ACCESSIBILITY_READINESS.md"],
+    providers: ["provider.in-app-ios-simulator", "provider.mobai"],
+    actionClass: "mutate",
+    idempotent: true,
+  }),
+  workflow({
+    id: "workflow.engineering.app-quality-and-vitals",
+    founderPhrasings: [
+      "check crash rate and startup time before submission",
+      "measure app performance and battery use",
+      "make sure the app isn't slow or crashy before launch",
+    ],
+    title: "App quality and vitals",
+    domainId: "domain.engineering",
+    areaIds: ["area.build-release"],
+    trigger: "Before beta or store submission on every mobile launch",
+    instructions:
+      "Measure crash-free operation, application-not-responding events, startup time, battery use, app size, offline behavior, and adaptive-layout behavior on supported devices. Define release thresholds and owners. Record observed values and evidence in engineering/APP_QUALITY.md. Mark missing device or production evidence as a blocker. When beta testing is in scope, the persona-balanced worksheet is optional planning guidance for recruiting complementary perspectives; it is not required proof, does not satisfy app-quality completion, and does not change this workflow's whole-artifact fresh-context acceptance. Do not treat empty or completed tester rows as measured quality evidence. Do not replace measured results with general guidance.",
+    reads: ["engineering/PRODUCTION_READINESS.md", "engineering/TECH_SPEC.md"],
+    roleId: "role.engineering-leader",
+    laneIds: ["engineering"],
+    phaseIds: ["phase.5b"],
+    dependencies: ["workflow.engineering.engineering-orchestration-ce-production-readiness"],
+    outputPaths: ["engineering/APP_QUALITY.md"],
+    providers: ["provider.sentry"],
+    actionClass: "mutate",
+    idempotent: true,
+  }),
+  workflow({
+    id: "workflow.store.marketplace-regional-compliance",
+    founderPhrasings: [
+      "check what each region requires before we distribute there",
+      "confirm tax and age-rating requirements per country",
+      "make sure we're compliant everywhere we plan to launch",
+    ],
+    title: "Marketplace and regional compliance",
+    domainId: "domain.store",
+    areaIds: ["area.build-release"],
+    trigger: "Before store distribution in every selected region",
+    instructions:
+      "List each store and distribution region. Confirm seller or trader status, identity verification, banking, tax, payout, age rating, content declarations, and local contact requirements. Record the responsible owner and evidence in store/MARKETPLACE_COMPLIANCE.md. Separate global requirements from region-specific requirements. Treat an incomplete declaration or verification as a release blocker.",
+    reads: ["store/app-store-listing/APP_STORE_LISTING.md", "operations/business-access.json"],
+    roleId: "role.engineering-leader",
+    laneIds: ["store_console", "privacy_legal"],
+    phaseIds: ["phase.3", "phase.5c"],
+    dependencies: ["workflow.store.app-store-listing-prep-packet", "workflow.operations.agent-operations-ledger"],
+    outputPaths: ["store/MARKETPLACE_COMPLIANCE.md"],
+    providers: ["provider.app-store-connect", "provider.google-play"],
+    founderOnlyActions: ["confirm seller identity, trader status, banking, tax, and payout details"],
+    actionClass: "mutate",
+    protectedCategory: "legal_pricing",
+    idempotent: true,
+  }),
+] as const;

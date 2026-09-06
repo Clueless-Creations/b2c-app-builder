@@ -1,0 +1,27 @@
+id: capability.paid-generative-ai
+title: Paid generative-AI controls
+applicability: An app capability that can create model-provider spend.
+required_facts:
+  - fact.paid-generation-entry
+authority:
+  - Operating agreement must authorize paid model-provider spend.
+readiness:
+  - The control record must name server-side auth, reservation, kill switch, and cap status.
+inputs:
+  - product
+  - spend-boundary
+outputs:
+  - A machine-readable paid-AI control record
+  - An incident runbook in the same file
+effects:
+  - Blocks paid generation until the control record exists
+evidence:
+  - trust/AI_PROVIDER_CONTROLS.md
+expected_outcome: Paid generation cannot create provider spend without the compiled control pack.
+context_selectors:
+  - knowledge.paid-generative-ai.controls
+exclusions:
+  - physical product inventory
+  - farm lot records
+extension_slots:
+  - cost-boundary

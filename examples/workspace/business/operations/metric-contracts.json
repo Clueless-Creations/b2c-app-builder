@@ -1,0 +1,346 @@
+{
+  "$schema": "./metric-contracts.schema.json",
+  "schemaVersion": "1.0.0",
+  "updatedAt": "",
+  "appId": "reference-business",
+  "environment": "reference",
+  "identityBoundary": {
+    "mappingStore": "app_provider_boundary",
+    "capturePolicy": "opaque_subject_ref_only",
+    "deletionOwner": "u22_erasure_transition"
+  },
+  "definitions": [
+    {
+      "id": "recognized_revenue",
+      "revision": 1,
+      "name": "Recognized revenue",
+      "objective": {
+        "id": "objective.paid-conversion",
+        "title": "Raise paid conversion",
+        "valueLoop": "capture"
+      },
+      "eventSchemaVersion": "revenue.recognized.v1",
+      "numerator": "recognized_purchase_amount",
+      "units": "currency",
+      "currency": "USD",
+      "amountUnits": "currency",
+      "amountTreatment": "gross",
+      "refundTreatment": "leave_gross_until_a_later_revision",
+      "costKind": "actual",
+      "cohortId": "weekly-new-subscribers",
+      "window": {
+        "start": "P0D",
+        "end": "P7D",
+        "timezone": "UTC",
+        "maturity": "mature"
+      },
+      "exclusions": ["sandbox_purchases"],
+      "timezone": "UTC",
+      "provider": "revenuecat",
+      "pullSpec": {
+        "provider": "revenuecat",
+        "chartMetric": "revenue",
+        "entitlementIds": ["pro"]
+      },
+      "comparison": {
+        "window": "P7D",
+        "baseline": "previous_window",
+        "flagWhen": { "deltaPct": -15 }
+      },
+      "applicability": { "applies": true },
+      "owner": "operations"
+    },
+    {
+      "id": "recognized_revenue",
+      "revision": 2,
+      "name": "Recognized revenue",
+      "objective": {
+        "id": "objective.paid-conversion",
+        "title": "Raise paid conversion",
+        "valueLoop": "capture"
+      },
+      "eventSchemaVersion": "revenue.recognized.v2",
+      "numerator": "recognized_purchase_amount_net_of_refunds",
+      "units": "currency",
+      "currency": "EUR",
+      "amountUnits": "currency",
+      "amountTreatment": "net",
+      "refundTreatment": "subtract_refunds_in_the_same_source_event",
+      "costKind": "actual",
+      "cohortId": "weekly-new-subscribers",
+      "window": {
+        "start": "P0D",
+        "end": "P7D",
+        "timezone": "UTC",
+        "maturity": "mature"
+      },
+      "exclusions": ["sandbox_purchases"],
+      "timezone": "UTC",
+      "provider": "revenuecat",
+      "pullSpec": {
+        "provider": "revenuecat",
+        "chartMetric": "revenue",
+        "entitlementIds": ["pro"]
+      },
+      "comparison": {
+        "window": "P7D",
+        "baseline": "previous_window",
+        "flagWhen": { "deltaPct": -15 }
+      },
+      "applicability": { "applies": true },
+      "owner": "operations"
+    },
+    {
+      "id": "activation",
+      "revision": 1,
+      "name": "Activation",
+      "objective": {
+        "id": "objective.activation",
+        "title": "Reach first valuable result",
+        "valueLoop": "creation"
+      },
+      "eventSchemaVersion": "activation.v1",
+      "numerator": "activated_users",
+      "denominator": "new_users",
+      "units": "ratio",
+      "cohortId": "weekly-new-users",
+      "window": {
+        "start": "P0D",
+        "end": "P1D",
+        "timezone": "UTC",
+        "maturity": "mature"
+      },
+      "timezone": "UTC",
+      "provider": "posthog",
+      "pullSpec": {
+        "provider": "posthog",
+        "event": "activation_completed",
+        "window": "P1D",
+        "cohort": "weekly-new-users"
+      },
+      "comparison": {
+        "window": "P7D",
+        "baseline": "previous_window",
+        "flagWhen": { "deltaPct": -10 }
+      },
+      "applicability": { "applies": true },
+      "owner": "product"
+    },
+    {
+      "id": "d7_retention",
+      "revision": 1,
+      "name": "Day-7 retention",
+      "objective": {
+        "id": "objective.retention",
+        "title": "Keep users returning",
+        "valueLoop": "delivery"
+      },
+      "eventSchemaVersion": "retention.d7.v1",
+      "numerator": "returned_by_day_7",
+      "denominator": "activated_users",
+      "units": "ratio",
+      "cohortId": "weekly-activated-users",
+      "window": {
+        "start": "P0D",
+        "end": "P7D",
+        "timezone": "UTC",
+        "maturity": "mature"
+      },
+      "timezone": "UTC",
+      "provider": "posthog",
+      "pullSpec": {
+        "provider": "posthog",
+        "event": "app_opened",
+        "window": "P7D",
+        "cohort": "weekly-activated-users"
+      },
+      "comparison": {
+        "window": "P7D",
+        "baseline": "previous_window",
+        "flagWhen": { "deltaPct": -10 }
+      },
+      "applicability": { "applies": true },
+      "owner": "product"
+    },
+    {
+      "id": "d30_retention",
+      "revision": 1,
+      "name": "Day-30 retention",
+      "objective": {
+        "id": "objective.retention",
+        "title": "Keep users returning",
+        "valueLoop": "delivery"
+      },
+      "eventSchemaVersion": "retention.d30.v1",
+      "numerator": "returned_by_day_30",
+      "denominator": "activated_users",
+      "units": "ratio",
+      "cohortId": "monthly-activated-users",
+      "window": {
+        "start": "P0D",
+        "end": "P30D",
+        "timezone": "UTC",
+        "maturity": "mature"
+      },
+      "timezone": "UTC",
+      "provider": "posthog",
+      "pullSpec": {
+        "provider": "posthog",
+        "event": "app_opened",
+        "window": "P30D",
+        "cohort": "monthly-activated-users"
+      },
+      "comparison": {
+        "window": "P30D",
+        "baseline": "previous_window",
+        "flagWhen": { "deltaPct": -10 }
+      },
+      "applicability": { "applies": true },
+      "owner": "product"
+    },
+    {
+      "id": "trial_starts",
+      "revision": 1,
+      "name": "Trial starts",
+      "objective": {
+        "id": "objective.paid-conversion",
+        "title": "Raise paid conversion",
+        "valueLoop": "capture"
+      },
+      "eventSchemaVersion": "trial.start.v1",
+      "numerator": "trial_started",
+      "units": "count",
+      "provider": "revenuecat",
+      "pullSpec": {
+        "provider": "revenuecat",
+        "chartMetric": "trial_started",
+        "entitlementIds": ["pro"]
+      },
+      "comparison": {
+        "window": "P7D",
+        "baseline": "previous_window"
+      },
+      "applicability": { "applies": true },
+      "owner": "revenue"
+    },
+    {
+      "id": "mrr",
+      "revision": 1,
+      "name": "Monthly recurring revenue",
+      "objective": {
+        "id": "objective.paid-conversion",
+        "title": "Raise paid conversion",
+        "valueLoop": "capture"
+      },
+      "eventSchemaVersion": "revenue.mrr.v1",
+      "numerator": "recognized_mrr",
+      "units": "currency",
+      "currency": "USD",
+      "amountUnits": "currency",
+      "amountTreatment": "net",
+      "refundTreatment": "subtract_refunds",
+      "costKind": "actual",
+      "provider": "revenuecat",
+      "pullSpec": {
+        "provider": "revenuecat",
+        "chartMetric": "mrr",
+        "entitlementIds": ["pro"]
+      },
+      "comparison": {
+        "window": "P30D",
+        "baseline": "previous_window",
+        "flagWhen": { "deltaPct": -10 }
+      },
+      "applicability": { "applies": true },
+      "owner": "revenue"
+    },
+    {
+      "id": "churn",
+      "revision": 1,
+      "name": "Subscriber churn",
+      "objective": {
+        "id": "objective.retention",
+        "title": "Keep users returning",
+        "valueLoop": "delivery"
+      },
+      "eventSchemaVersion": "revenue.churn.v1",
+      "numerator": "churned_subscribers",
+      "denominator": "active_subscribers",
+      "units": "ratio",
+      "provider": "revenuecat",
+      "pullSpec": {
+        "provider": "revenuecat",
+        "chartMetric": "churn",
+        "entitlementIds": ["pro"]
+      },
+      "comparison": {
+        "window": "P30D",
+        "baseline": "previous_window",
+        "flagWhen": { "deltaPct": 15 }
+      },
+      "applicability": { "applies": true },
+      "owner": "revenue"
+    },
+    {
+      "id": "store_conversion",
+      "revision": 1,
+      "name": "Store conversion",
+      "objective": {
+        "id": "objective.acquisition",
+        "title": "Convert store visitors",
+        "valueLoop": "capture"
+      },
+      "eventSchemaVersion": "store.conversion.v1",
+      "numerator": "store_downloads",
+      "denominator": "store_impressions",
+      "units": "ratio",
+      "applicability": {
+        "applies": false,
+        "reason": "The reference workspace has not selected a live store listing yet."
+      },
+      "owner": "store"
+    },
+    {
+      "id": "crash_free_sessions",
+      "revision": 1,
+      "name": "Crash-free sessions",
+      "objective": {
+        "id": "objective.reliability",
+        "title": "Keep sessions crash-free",
+        "valueLoop": "delivery"
+      },
+      "eventSchemaVersion": "reliability.crash_free.v1",
+      "numerator": "crash_free_sessions",
+      "denominator": "sessions",
+      "units": "ratio",
+      "applicability": {
+        "applies": false,
+        "reason": "The reference workspace has not bound a release-health project yet."
+      },
+      "owner": "engineering"
+    }
+  ],
+  "experiments": [
+    {
+      "id": "paywall-copy-rewrite",
+      "revision": 1,
+      "hypothesis": "Clearer paywall copy raises paid conversion without raising refund rate.",
+      "treatment": "rewrite-paywall-copy",
+      "assignmentUnit": "subject",
+      "assignmentOwner": "revenuecat",
+      "eligibility": "New users who reach the paywall in the reference environment.",
+      "exposureRule": "Count only subjects who saw the paywall treatment, not assignment alone.",
+      "decisionHorizon": "P14D",
+      "primaryMetricDefinitionId": "recognized_revenue",
+      "primaryMetricDefinitionRevision": 1,
+      "guardrails": ["refund_rate", "crash_free_sessions"],
+      "stoppingPolicy": "Do not declare a winner before the decision horizon or while the primary window is immature.",
+      "requiredObservationWindow": "P14D",
+      "eligiblePopulation": "assigned",
+      "exposedPopulation": "saw_paywall",
+      "minimumUsableSample": 100,
+      "allowedMissingJoinCoverage": "unknown_attribution_stays_unknown"
+    }
+  ],
+  "conversions": []
+}

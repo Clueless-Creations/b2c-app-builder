@@ -1,0 +1,23 @@
+id: continuity-drift-between-sessions
+title: Agent resumes from chat memory instead of durable state
+prompt: >
+  A new session starts after prior launch work. The agent says it remembers the
+  last blocker from chat, skips AGENTS.md, state/business-state.json,
+  operations/ORCHESTRATION.md, engineering/PRODUCTION_READINESS.md,
+  operations/FAILURE_CARDS.md, and git status, ignores APP_AGENTS.md and role prompts,
+  then chooses the next task from stale memory without updating state.
+expected_guardrail: >
+  Resume, status, and handoff work must run the Session Continuity protocol:
+  reconstruct current truth from AGENTS.md, durable repo files, and git status,
+  route broad work through APP_AGENTS.md role prompts or record why subagents are
+  unavailable, and write state/readiness/failure-card updates before pausing.
+validators:
+  - check-continuity-contract
+must_catch:
+  - Chat memory was treated as source truth instead of durable repo files.
+  - AGENTS.md, state/business-state.json, operations/ORCHESTRATION.md, engineering/PRODUCTION_READINESS.md, operations/FAILURE_CARDS.md, and git status were skipped.
+  - APP_AGENTS.md role prompts were ignored for broad work without a recorded rationale.
+  - State, readiness proof, and failure cards were not reconciled before handoff.
+should_say:
+  - Start by reading the continuity source set and running git status before choosing work.
+  - Record the continuity review, next action and drift risks in operations/ORCHESTRATION.md; reconcile runtime evidence through the reducer.

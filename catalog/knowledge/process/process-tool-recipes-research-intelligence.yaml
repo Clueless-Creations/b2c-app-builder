@@ -1,0 +1,30 @@
+schema_version: 1.0.0
+id: reference.process.tool-recipes.research-intelligence
+title: Research Intelligence
+domain_id: domain.process
+document_path: knowledge/process/tool-recipes/research-intelligence.md
+load_when: delegating AppKittie store intelligence, XPOZ social-language, Firecrawl web intelligence, Refero UX pattern
+  research, or name/keyword collision checks — routed from tool-recipes.md; complements the Market research rows
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.research.research-backed-spec
+  context_pack_ids:
+    - context.research
+sources:
+  - id: api-refero-design-mcp
+    name: api.refero.design
+    source_type: website
+    url: https://api.refero.design/mcp
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: doc-refero-design-llms-txt
+    name: doc.refero.design
+    source_type: website
+    url: https://doc.refero.design/llms.txt
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

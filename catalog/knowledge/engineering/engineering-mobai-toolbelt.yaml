@@ -1,0 +1,134 @@
+schema_version: 1.0.0
+id: reference.engineering.mobai-toolbelt
+title: MobAI Toolbelt
+domain_id: domain.engineering
+document_path: knowledge/engineering/mobai-toolbelt.md
+load_when: after the Route Ladder in xcodebuildmcp-testing.md routes device work to MobAI — before MobAI device
+  automation, .mob generation/healing, repeat or host-script actions, Sync Mode/multi-device work, Android coverage,
+  performance gates, MobAI screenshots/recordings, recorder-skill demo videos and app previews, MobAI CI, or
+  recorder-skill setup
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.store.store-screenshots-production
+    - workflow.engineering.mobai-device-automation-and-demo-videos
+  context_pack_ids:
+    - context.device
+applicability_notes: MobAI is rung 4 of the Route Ladder — a plain run-the-app, screen-check, screenshot, or one-off
+  bug-repro request loads xcodebuildmcp-testing.md first.
+sources:
+  - id: api-github-com-orgs-mobai-app-repos
+    name: api.github.com
+    source_type: website
+    url: https://api.github.com/orgs/MobAI-App/repos?per_page=100&type=public&sort=updated
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: github-com-mobai-app
+    name: github.com
+    source_type: github
+    url: https://github.com/MobAI-App
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: github-com-mobai-app-desktop-recorder-skill
+    name: github.com
+    source_type: github
+    url: https://github.com/MobAI-App/desktop-recorder-skill
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: github-com-mobai-app-ios-builder
+    name: github.com
+    source_type: github
+    url: https://github.com/MobAI-App/ios-builder
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: github-com-mobai-app-mobai-mcp
+    name: github.com
+    source_type: github
+    url: https://github.com/MobAI-App/mobai-mcp
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: github-com-mobai-app-mobai-mcp-2-5-0-capability-commit
+    name: MobAI MCP 2.5.0 capability commit
+    source_type: github
+    url: https://github.com/MobAI-App/mobai-mcp/commit/414f858ae60babeab16a45cb9364addb87498abe
+    review_cadence_days: 30
+    claim_scope: Reviewed 2026-07-13; authoritative public diff for repeat, run_script, eval_script, loop caps,
+      repeat_index, and the restricted host-side JavaScript VM.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: github-com-mobai-app-mobai-ci
+    name: github.com
+    source_type: github
+    url: https://github.com/MobAI-App/mobai-ci
+    review_cadence_days: 7
+    claim_scope: Reviewed 2026-07-13; official MobAI CI runner distribution and workflow documentation.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: mobai-run-docs
+    name: MobAI docs
+    source_type: docs
+    url: https://mobai.run/docs/
+    review_cadence_days: 7
+    claim_scope: Reviewed 2026-07-13; current documentation index for installation, testing, debugging, and automation discovery.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: npmjs-com-mobai-app-cli
+    name: MobAI CLI npm package
+    source_type: docs
+    url: https://www.npmjs.com/package/@mobai-app/cli
+    review_cadence_days: 7
+    claim_scope: Reviewed 2026-07-13; package registry source for the standalone CLI version track.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: github-com-mobai-app-mobile-harness
+    name: github.com
+    source_type: github
+    url: https://github.com/MobAI-App/mobile-harness
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: github-com-mobai-app-mobile-recorder-skill
+    name: github.com
+    source_type: github
+    url: https://github.com/MobAI-App/mobile-recorder-skill
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: github-com-mobai-app-releases-v2-5-1
+    name: MobAI desktop v2.5.1 release
+    source_type: github
+    url: https://github.com/MobAI-App/releases/releases/tag/v2.5.1
+    review_cadence_days: 30
+    claim_scope: Reviewed 2026-07-13; official desktop tag published 2026-07-12 with platform assets and a tag-only release
+      body, so no undocumented desktop feature claims are inferred.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: github-com-mobai-app-releases-v2-5-0
+    name: MobAI desktop v2.5.0 comparison baseline
+    source_type: github
+    url: https://github.com/MobAI-App/releases/releases/tag/v2.5.0
+    review_cadence_days: 30
+    claim_scope: Reviewed 2026-07-13; official baseline artifact source for the documented v2.5.0-to-v2.5.1 Apple-silicon
+      tarball symbol/string comparison. Checksums and artifact names are recorded in mobai-toolbelt.md.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: mobai-run
+    name: mobai.run
+    source_type: website
+    url: https://mobai.run/
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

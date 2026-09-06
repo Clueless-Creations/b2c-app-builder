@@ -1,0 +1,79 @@
+name: Behavioral Evals (manual)
+
+# The live execution layer for the flagship LaunchBench subset
+# (behavioral: true). Deliberately manual-only: live agent runs cost money and
+# carry model variance, so they never gate PRs — `npm run audit:ci` remains the
+# deterministic gate. See checks/validation/repository/launchbench-evals.md
+# "Behavioral Eval Harness".
+
+on:
+  workflow_dispatch:
+    inputs:
+      resume_run_id:
+        description: "Prior workflow run whose saved batches should resume (use identical model, subset and repeat)"
+        required: false
+        default: ""
+      model:
+        description: "Agent model id (from the claude-api skill; never date-suffixed)"
+        required: false
+        default: "claude-opus-5"
+      grader_model:
+        description: "Grader model id"
+        required: false
+        default: "claude-opus-5"
+      repeat:
+        description: "Reruns per scenario (pass^k); 1 unless set higher"
+        required: false
+        default: "1"
+      only:
+        description: "Comma-separated scenario ids (default: full behavioral subset)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  behavioral-evals:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - name: List behavioral subset
+        run: npm run evals:behavioral -- --list
+      - name: Restore submitted batches
+        if: inputs.resume_run_id != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RESUME_RUN_ID: ${{ inputs.resume_run_id }}
+        run: gh run download "$RESUME_RUN_ID" --name behavioral-eval-results --dir behavioral-results
+      - name: Run behavioral evals against a live agent
+        timeout-minutes: 300
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          EVAL_MODEL: ${{ inputs.model }}
+          EVAL_GRADER_MODEL: ${{ inputs.grader_model }}
+          EVAL_REPEAT: ${{ inputs.repeat }}
+          EVAL_ONLY: ${{ inputs.only }}
+          RESUME_RUN_ID: ${{ inputs.resume_run_id }}
+        run: |
+          ARGS=(--model "$EVAL_MODEL" --grader-model "$EVAL_GRADER_MODEL" --repeat "$EVAL_REPEAT" --out behavioral-results/results.json)
+          if [ -n "$EVAL_ONLY" ]; then
+            ARGS+=(--only "$EVAL_ONLY")
+          fi
+          if [ -n "$RESUME_RUN_ID" ]; then
+            ARGS+=(--resume)
+          fi
+          npm run evals:behavioral -- "${ARGS[@]}"
+      - name: Upload results artifact
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: behavioral-eval-results
+          path: behavioral-results/
+          if-no-files-found: warn

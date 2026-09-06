@@ -1,0 +1,8 @@
+interface:
+  display_name: "B2C App Builder"
+  short_description: "Build and launch a consumer app"
+  brand_color: "#FF6F5C"
+  default_prompt: "Use the B2C App Builder MCP to find the right consumer-app workflow and source-backed references. Use the b2c CLI for approved workspace work. Keep provider actions, spend, legal and pricing decisions, destructive actions, and final release decisions with the founder."
+
+policy:
+  allow_implicit_invocation: true

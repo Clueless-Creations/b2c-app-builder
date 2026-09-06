@@ -1,0 +1,15 @@
+id: "attribution-event-only"
+title: "Attribution is treated as an event instead of a data contract"
+prompt: "Audit this app launch. The onboarding includes a How did you hear about us screen and emits attribution_source_selected, but there is no backend profile field, no PostHog person property, and Other is just a button."
+expected_guardrail: "Do not call attribution wired or launch-ready unless stable key, other free text, event, person property, backend persistence, anonymous reconciliation, and proof exist."
+validators:
+  - "check-attribution-contract"
+  - "validate-project-state"
+must_catch:
+  - "self_reported_source PostHog person property is missing"
+  - "backend/profile persistence is missing"
+  - "Other requires sanitized free text or a documented follow-up value"
+  - "stable stored source keys must be used instead of display labels"
+should_say:
+  - "Attribution capture is a data contract, not a screen."
+  - "Keep the lane partial until analytics and backend proof exists."

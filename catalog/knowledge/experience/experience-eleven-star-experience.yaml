@@ -1,0 +1,26 @@
+schema_version: 1.0.0
+id: reference.experience.eleven-star-experience
+title: Eleven-Star Experience
+domain_id: domain.experience
+document_path: knowledge/experience/eleven-star-experience.md
+load_when: before PRODUCT.md, DESIGN.md, onboarding, ads, store screenshots, content assets, or engineering
+  plans are treated as ready; on "11-star run"/"11-star pass" — follow the reference's 11-Star Run Protocol before any
+  other output
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.experience.11-star-experience
+    - workflow.experience.onboarding-conversion
+    - workflow.store.app-store-listing-prep-packet
+    - workflow.engineering.engineering-orchestration-ce-production-readiness
+  context_pack_ids:
+    - context.experience
+sources:
+  - id: reid-medium-com-how-to-scale-a-magical-experience
+    name: Reid Hoffman on Brian Chesky's 11-star framework
+    source_type: website
+    url: https://reid.medium.com/how-to-scale-a-magical-experience-4-lessons-from-airbnbs-brian-chesky-eca0a182f3e3
+    review_cadence_days: 30
+    claim_scope: Source basis for the 11-star experience ladder and backsolving guidance.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

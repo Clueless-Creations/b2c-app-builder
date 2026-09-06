@@ -1,0 +1,20 @@
+schema_version: 1.0.0
+id: reference.research.distribution-first-niche
+title: Distribution-First Niche
+domain_id: domain.research
+document_path: knowledge/research/distribution-first-niche.md
+load_when: before Phase 2 build; when research must name a paying audience, one reachable channel,
+  and purchases as validation
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.research.research-backed-spec
+    - workflow.growth.ugc-creator-engine
+    - workflow.growth.launch-narrative-and-cadence
+    - workflow.research.spec-red-team-audit
+  context_pack_ids:
+    - context.research
+applicability_notes: Gate build on paying audience plus named channel. Point press and influencer
+  checklists at existing launch-narrative and influencer engines. Do not duplicate paid UA or MMP.
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

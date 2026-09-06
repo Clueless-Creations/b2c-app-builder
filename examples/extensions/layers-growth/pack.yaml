@@ -1,0 +1,58 @@
+id: business-pack.layers-growth
+title: Layers Growth draft creative loop
+version: 1.0.0
+revision: layers-growth-1
+creates_provider_spend: true
+roles:
+  - id: role.layers-growth
+    name: Draft creative operator
+    prompt_path: integration.md
+    scope: Request draft creatives from the selected Layers connection and read their jobs and results. Never deliver or publish.
+    capability_ids:
+      - manual
+    output_path_prefixes:
+      - growth/layers/
+workflows:
+  - id: workflow.layers-growth-draft-creative
+    title: Render a draft creative
+    domain_id: domain.growth
+    area_ids:
+      - area.growth-revenue
+    trigger: An accepted product brief needs a draft creative in a selected format
+    instructions: Read growth/layers/draft-request.json. Confirm the quote matches the brief and fits the approved credits. Run the selected host route. Record the job reference. Do not deliver, publish, or schedule anything.
+    role_id: role.layers-growth
+    output_paths:
+      - growth/layers/draft-creative.json
+      - growth/layers/draft-creative-receipt.json
+    action_class: spend
+    protected_category: spend
+    cost_estimate:
+      amount: 400
+      currency: credits
+    idempotent: false
+  - id: workflow.layers-growth-get-job
+    title: Read a render job
+    domain_id: domain.growth
+    area_ids:
+      - area.growth-revenue
+    trigger: A recorded render job needs a status read
+    instructions: Read growth/layers/job-request.json and run the selected host route. A read changes nothing and costs nothing.
+    role_id: role.layers-growth
+    output_paths:
+      - growth/layers/job-status.json
+      - growth/layers/job-status-receipt.json
+    action_class: observe
+    idempotent: true
+  - id: workflow.layers-growth-get-result
+    title: Read a completed render result
+    domain_id: domain.growth
+    area_ids:
+      - area.growth-revenue
+    trigger: A render job is expected to have completed
+    instructions: Read growth/layers/job-request.json and run the selected host route. A result is an artifact only when the job completed with a content hash. Review is a separate step.
+    role_id: role.layers-growth
+    output_paths:
+      - growth/layers/job-result.json
+      - growth/layers/job-result-receipt.json
+    action_class: observe
+    idempotent: true

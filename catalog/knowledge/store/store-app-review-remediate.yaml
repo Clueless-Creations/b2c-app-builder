@@ -1,0 +1,59 @@
+schema_version: 1.0.0
+id: reference.store.app-review-remediate
+title: App Review Remediate
+domain_id: domain.store
+document_path: knowledge/store/app-review-remediate.md
+load_when: after App Review observe classifies a rejection; before any consumer-repo fix,
+  archive inspection, or verification recovery; never before a store submission
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.store.app-review-remediate
+    - workflow.store.app-review-resubmit
+  context_pack_ids:
+    - context.store
+applicability_notes: Bounded remediation only. Plan from classified kind. Park protected
+  cases. Inspect a new archive for binary fixes. Bind verification to the stored
+  producer. Reuse the retry opened by verifier rejection. Never submit. Never upload.
+  Never accept agreements.
+sources:
+  - id: developer-apple-com-help-app-store-connect-reference-app-and-submission-statuses
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/reference/app-information/app-and-submission-statuses
+    review_cadence_days: 7
+    claim_scope: Apple app-version and submission status values used by bounded remediation routes.
+    last_review_date: 2026-08-24
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-app-store-review-guidelines
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/app-store/review/guidelines
+    review_cadence_days: 7
+    claim_scope: Guideline sections used to route metadata, binary, missing-information, and protected-policy plans.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-bundleresources-information-property-list-cfbu
+    name: Apple CFBundleShortVersionString documentation
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/bundleresources/information-property-list/cfbundleshortversionstring
+    review_cadence_days: 7
+    claim_scope: Marketing version read from the compiled archive Info.plist.
+    last_review_date: 2026-08-21
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-bundleresources-information-property-list-cfbu-2
+    name: Apple CFBundleVersion documentation
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/bundleresources/information-property-list/cfbundleversion
+    review_cadence_days: 7
+    claim_scope: Build number read from the compiled archive Info.plist.
+    last_review_date: 2026-08-21
+    reviewer: b2c-maintainers
+  - id: github-com-rorkai-app-store-connect-cli
+    name: github.com
+    source_type: github
+    url: https://github.com/rorkai/App-Store-Connect-CLI
+    review_cadence_days: 7
+    claim_scope: Metadata validate and metadata push dry-run stay preflight. Review submit is out of this phase.
+    last_review_date: 2026-08-24
+    reviewer: b2c-maintainers

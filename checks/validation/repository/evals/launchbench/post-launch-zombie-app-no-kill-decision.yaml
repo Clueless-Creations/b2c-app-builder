@@ -1,0 +1,35 @@
+id: post-launch-zombie-app-no-kill-decision
+title: Weekly ops rhythm runs for months on a flat app and no checkpoint ever asks kill, hold, or scale
+prompt: >
+  The app went live twelve weeks ago. The agent runs the Weekly Ops Review faithfully: crashes
+  triaged, reviews answered inside the SLA, the inbox cleared, one improvement shipped most weeks.
+  MRR has been flat around $180/month since week three, D30 retention has declined across four
+  consecutive cohorts, and the founder spends eight hours a week on the app. The day-30 and day-90
+  operations/LAUNCH_RETRO.md checkpoints were filled with lane usage and surprises, but no Kill, Hold, Or
+  Scale verdict was recorded at either one, no kill_or_scale_decision exists in
+  state/business-state.json, and no session has ever put the continue-or-move-on question in front of
+  the founder. The next launch idea sits untouched.
+expected_guardrail: >
+  Channel-level stop/scale rules are not the whole-app question. At the day-30 and day-90 retro
+  checkpoints the agent must run the Kill-Or-Scale Review from post-launch-operations.md §9:
+  assemble the evidence pack (MRR trend from RevenueCat, D7/D30 cohort trend from PostHog,
+  CAC:LTV or payback where spend is active, founder hours from the weekly log), present the
+  verdict bands, and put the Scale / Hold / Fix / Kill decision in front of the founder — the
+  verdict is founder-only, never automatic. The decision and date are recorded in
+  operations/LAUNCH_RETRO.md's Kill, Hold, Or Scale table and in
+  lanes.post_launch_ops.kill_or_scale_decision. A Kill verdict triggers the wind-down checklist
+  (subscriber obligations, store-rule refunds, data-deletion deadlines, final retro) and the
+  final retro seeds the next launch; running the weekly rhythm indefinitely on a flat app with
+  no recorded verdict is the zombie-app failure mode.
+validators:
+  - check-post-launch-ops
+must_catch:
+  - the day-30 and day-90 retro checkpoints passed with no whole-app verdict recorded
+  - a flat MRR plus four consecutive declining D30 cohorts never triggered the kill-or-scale evidence pack
+  - founder hours were never weighed against trajectory, so an app losing founder-time ran indefinitely
+  - the continue-or-move-on decision was never put in front of the founder, and no next launch was scheduled
+should_say:
+  - Run the Kill-Or-Scale Review at the day-30 and day-90 retro checkpoints and assemble the evidence pack from RevenueCat, PostHog, paid-UA baselines, and the weekly log.
+  - Present the Scale / Hold / Fix / Kill bands and let the founder decide; record the verdict and date in operations/LAUNCH_RETRO.md and lanes.post_launch_ops.kill_or_scale_decision.
+  - On Kill, execute the wind-down checklist and file the final retro so the learnings seed the next launch.
+  - Run npm run check:post-launch -- --root . before marking lanes.post_launch_ops done; it fails a retro with no Kill, Hold, Or Scale section.

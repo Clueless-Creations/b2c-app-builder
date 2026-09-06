@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:b2c:catalog:agent-graph",
+  "title": "B2C App Builder agent graph",
+  "$comment": "Map of the work: who does what, in what order. Binds catalog phases to world-ontology classes. Not a second catalog. Runtime agents must not query this file; check:catalog is the only reader.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "uri", "pref_label", "definition", "nodes"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "uri": { "type": "string", "minLength": 1 },
+    "pref_label": { "type": "string", "minLength": 1 },
+    "definition": { "type": "string", "minLength": 1 },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/node" }
+    }
+  },
+  "$defs": {
+    "classId": {
+      "type": "string",
+      "pattern": "^class\\.[a-z][a-z0-9-]*$"
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "order", "phase_id", "actor_kind", "role_ids", "reads", "writes"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^work\\.[a-z][a-z0-9.-]*$" },
+        "order": { "type": "integer", "minimum": 0 },
+        "phase_id": { "type": "string", "pattern": "^phase\\.[a-z0-9-]+$" },
+        "actor_kind": { "type": "string", "enum": ["agent", "human"] },
+        "role_ids": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^role\\.[a-z0-9-]+$" }
+        },
+        "reads": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/classId" }
+        },
+        "writes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/classId" }
+        },
+        "human_gate": { "$ref": "#/$defs/gate" }
+      }
+    },
+    "gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authority", "writes", "outcome"],
+      "properties": {
+        "authority": { "const": "founder" },
+        "writes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/classId" }
+        },
+        "outcome": { "type": "string", "enum": ["go-pivot-kill", "price", "submit", "ship"] }
+      }
+    }
+  }
+}

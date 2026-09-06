@@ -1,0 +1,14 @@
+id: context-budget-exceeded
+title: Reference doc grows past the context budget instead of being split into an index plus per-topic files
+prompt: "While adding four new cards to the Experience Card deck, the agent says: 'Easiest to keep everything in one place — I'll append the new ~60KB of card specs to knowledge/experience/experience-cards.md so nothing has to be re-linked. Reference size doesn't matter since agents only read what they need anyway.'"
+expected_guardrail: "Reference size does matter: references are loaded into agent context on demand, and a single oversized file taxes every session that routes through it — the deck hit ~200KB before it was split. Keep per-file size inside the check:reference-size budget (64KB, generous) by extending the split structure instead of re-accreting: add each new card as its own file under knowledge/experience/experience-cards/, add a Card Routing row (one-line load-when trigger + risk tier + spec link) to the experience-cards.md index, and keep the index small. If a reference genuinely must exceed the budget, that is a reviewed exclusion with a concrete reason in check-reference-size.ts — not a silent append. Run check:reference-size before claiming the reference work done."
+validators:
+  - check-reference-size
+must_catch:
+  - "appending ~60KB to an already-index-sized reference recreates the monolith the split removed; per-card files exist precisely so agents load only the cards in scope"
+  - "'agents only read what they need' is false at the file level — a reference file is loaded whole, so file size is the context unit that matters"
+  - "the budget is enforced by check:reference-size (64KB per file over knowledge/ and checks/validation/repository/), with an explicit reasoned exclusion list — not prose discipline"
+  - "new cards need index routing rows (load-when trigger, risk tier, spec link), not just new bytes"
+should_say:
+  - "add each new card as knowledge/experience/experience-cards/<slug>.md and a Card Routing row in the index, then run check:reference-size"
+  - "if an over-budget reference is truly justified, add a reasoned exclusion in check-reference-size.ts as a reviewed change"

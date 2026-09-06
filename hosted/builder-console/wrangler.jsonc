@@ -1,0 +1,40 @@
+{
+  // App Worker — Google sign-in, console, API key management, Stripe webhooks, and the
+  // first-party PostHog relay. Separate from b2c-app-builder-mcp on purpose: that Worker is an
+  // OAuth authorization server whose trust model is an enumerated route allowlist, and signup
+  // and billing have no business sharing its blast radius.
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "clueless-creations-app",
+  "main": "worker.ts",
+  "compatibility_date": "2026-08-27",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "routes": [{ "pattern": "app.clueless-creations.com", "custom_domain": true }],
+  "preview_urls": false,
+  "vars": {
+    // Region hosts. The organisation's projects are on US Cloud, so these are the US endpoints.
+    // POSTHOG_PROJECT_TOKEN is set with `wrangler secret put` rather than committed here.
+    "POSTHOG_HOST": "https://us.i.posthog.com",
+    // Opens self-serve Checkout in the console. Exactly "on"; anything else falls back to the
+    // PostHog flag cache, which needs the feature-flags secure key to be filled at all.
+    "CHECKOUT_ENABLED": "on",
+    // The Stripe account an organization-level restricted key acts on (Stripe-Context header).
+    "STRIPE_ACCOUNT_ID": "acct_0000000000000000",
+  },
+  "kv_namespaces": [
+    // Flag definitions written by the scheduled refresher, read by every request.
+    { "binding": "FLAGS_KV", "id": "00000000000000000000000000000000" },
+  ],
+  "d1_databases": [{ "binding": "DB", "database_name": "clueless-creations", "database_id": "00000000-0000-0000-0000-000000000000" }],
+  // Google OIDC (M3) and Stripe (M6). Doppler project/config names are in README.md's
+  // Credentials section; wrangler.jsonc only lists which secrets a deployment must supply.
+  "secrets": {
+    "required": ["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "B2C_APP_CONSOLE_AUTH_SECRET", "STRIPE_RESTRICTED_KEY", "STRIPE_WEBHOOK_SECRET"],
+  },
+  "triggers": {
+    // Flag definitions refresh. MAX_DEFINITION_AGE_MS in analytics/flags.ts is the tolerance
+    // for this job failing; keep the two in step.
+    "crons": ["*/5 * * * *"],
+  },
+  "observability": { "enabled": true },
+}

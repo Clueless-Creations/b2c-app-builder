@@ -1,0 +1,26 @@
+{
+  "$schema": "./schemas/component-index.schema.json",
+  "schemaVersion": "1.0.0",
+  "components": [
+    {
+      "id": "feedback.empty-state",
+      "path": "components/feedback.empty-state.md"
+    },
+    {
+      "id": "feedback.haptics",
+      "path": "components/feedback.haptics.md"
+    },
+    {
+      "id": "feedback.skeleton",
+      "path": "components/feedback.skeleton.md"
+    },
+    {
+      "id": "input.keyboard-behavior",
+      "path": "components/input.keyboard-behavior.md"
+    },
+    {
+      "id": "interaction.press-feedback",
+      "path": "components/interaction.press-feedback.md"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+schema_version: 1.0.0
+id: reference.growth.non-competitor-angle-discovery
+title: Non-Competitor Angle Discovery
+domain_id: domain.growth
+document_path: knowledge/growth/non-competitor-angle-discovery.md
+load_when: before the first paid creative batch; when PAID_UA.md needs a four-source angle hunt and
+  a competitor-wrong originality gate
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.growth.paid-user-acquisition-system
+  context_pack_ids:
+    - context.growth
+applicability_notes: Require all four hunt sources. Adopt at least one non-competitor original
+  angle. Do not clone competitor assets. Foreplay is optional, not a default.
+sources: []
+source_exemption: This package contains internal operating guidance. The four-source hunt is an
+  operator method, not an official vendor claim.

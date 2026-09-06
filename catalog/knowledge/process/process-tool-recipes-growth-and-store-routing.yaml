@@ -1,0 +1,57 @@
+schema_version: 1.0.0
+id: reference.process.tool-recipes.growth-and-store-routing
+title: Growth And Store Routing
+domain_id: domain.process
+document_path: knowledge/process/tool-recipes/growth-and-store-routing.md
+load_when: delegating ASO/paid-UA/viral-loop/UGC/Fastlane/GEO work to a specialist skill — routed from
+  tool-recipes.md; complements the Marketing and growth rows, never replaces them
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.store.aso-and-store-ops
+  context_pack_ids: []
+sources:
+  - id: github-com-eronred-aso-skills
+    name: ASO and App Marketing Skills
+    source_type: github
+    url: https://github.com/Eronred/aso-skills
+    review_cadence_days: 7
+    claim_scope: Selected screenshot strategy, preview and app-context guidance only; no tools, API integrations,
+      samples or marketing assets are imported.
+    last_review_date: 2026-09-06
+    reviewer: b2c-contributor source review
+    publisher: Erencan
+    revision: 4df730f456c21e42b9a2ea2be89fb32caf787728
+    retrieved_at: 2026-09-06T15:57:54.602674Z
+    upstream_id: eronred-aso-skills
+    selectors: &a1
+      - README.md
+      - skills/screenshot-optimization/SKILL.md
+      - skills/app-preview-video/SKILL.md
+      - skills/app-marketing-context/SKILL.md
+    rights:
+      status: verified
+      spdx: MIT
+      evidence: catalog/upstreams/notices/eronred-aso-skills.txt
+      evidence_sha256: 7fdc99dd7d8c1242068d470c2a3f91d531a622dbcad57da91971389dbe5155ec
+      notes: Selected guidance adapted; unimported assets and executable dependencies retain separate review
+        requirements.
+derivations:
+  - source_ids:
+      - github-com-eronred-aso-skills
+    relationship: adapted
+    baseline: 4df730f456c21e42b9a2ea2be89fb32caf787728
+    selectors: *a1
+    rationale: Reconcile existing selected guidance with the reviewed source while preserving builder artifact
+      ownership, host selection, authority and evidence semantics.
+    omissions:
+      - Omit unsupported numerical conversion claims and fixed ten-slot prescriptions. Use supported
+        device/locale requirements, real evidence and founder-approved product claims.
+      - Using an ASO method does not select Appeeky, grant access, create app-marketing-context.md as a
+        competing authority, or authorize paid research.
+      - The inspected tree has screenshot-optimization, app-preview-video and app-marketing-context. It has no
+        skills/ios-screenshots/SKILL.md; do not attribute that skill to this revision.
+    reviewer: b2c-contributor source review
+    reviewed_at: 2026-09-06
+    notice: catalog/upstreams/notices/eronred-aso-skills.txt
+    evaluation: npm run test:fixtures -- screenshot-upstreams

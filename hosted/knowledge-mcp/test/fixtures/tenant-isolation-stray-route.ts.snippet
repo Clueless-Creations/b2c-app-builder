@@ -1,0 +1,11 @@
+interface FixtureEnv {
+  readonly DB: D1Database;
+}
+
+export async function handle(env: FixtureEnv, id: string): Promise<unknown> {
+  return env.DB.prepare("SELECT * FROM fixture WHERE id = ?1").bind(id).run();
+}
+
+export function raw(db: D1Database): D1Database {
+  return db;
+}

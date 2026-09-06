@@ -1,0 +1,19 @@
+schema_version: 1.0.0
+id: reference.engineering.recommended-agent-skills
+title: Recommended Agent Skills
+domain_id: domain.engineering
+document_path: knowledge/engineering/recommended-agent-skills.md
+load_when: before Expo or SwiftUI implementation when choosing recommended external agent skill packs
+  for craft, motion, or store work, without vendor MCP lock-in
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.engineering.engineering-orchestration-ce-production-readiness
+    - workflow.store.aso-and-store-ops
+  context_pack_ids:
+    - context.engineering
+applicability_notes: Pin expo/skills and emilkowalski animate-expo/review-animations as recommended
+  installs. Keep Appllama MCP, Appeeky MCP, and bulk Vercel packs off the default surface.
+sources: []
+source_exemption: Named GitHub skill slugs appear as install identifiers only. This package contains
+  internal routing guidance and has no live command-syntax claims against a third-party CLI.

@@ -1,0 +1,27 @@
+schema_version: 1.0.0
+id: reference.experience.emotional-design-system
+title: Emotional Design System
+domain_id: domain.experience
+document_path: knowledge/experience/emotional-design-system.md
+load_when: any product, onboarding, core-loop, paywall, or return-session work targeting 6-star ("better than
+  expected") or higher; "charge this feature with emotion", "apply the <name> card", "emotional UX audit" —
+  the methodology hub
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.experience.emotional-experience-design-producer
+    - workflow.experience.emotional-design-audit-auditor
+  context_pack_ids: []
+applicability_notes: See experience-cards.md for the card deck, emotional-experience-design.md for full producer detail, emotional-experience-measurement.md for instrumentation, and ethics-guardrail.md for the regulatory/legal contract.
+sources:
+  - id: retention-mechanics-mcp
+    name: Retention Mechanics MCP server
+    source_type: api
+    url: https://github.com/Emuthmartinez/retention-mechanics-mcp
+    review_cadence_days: 30
+    claim_scope: First-party MCP over the Experience Card deck (mechanic search with risk ceilings, versioned card content,
+      ethics attestation scaffolds). Optional tooling - the bundled deck under knowledge/experience/experience-cards/ is
+      the frozen offline contract and every validator reads it; the server is preferred only when connected. Private
+      repo; local stdio during development.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

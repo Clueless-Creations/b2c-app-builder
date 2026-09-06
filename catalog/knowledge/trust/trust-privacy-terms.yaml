@@ -1,0 +1,26 @@
+schema_version: 1.0.0
+id: reference.trust.privacy-terms
+title: Privacy Terms
+domain_id: domain.trust
+document_path: knowledge/trust/privacy-terms.md
+load_when: before drafting or publishing privacy policy, terms, EULA, subscription terms, account/data deletion flows,
+  or app-store privacy/Data safety disclosures
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.trust.security-architecture-and-release-gate
+    - workflow.trust.privacy-and-terms
+    - workflow.store.apple-app-store-requirements-privacy-manifest
+    - workflow.store.google-play-release
+    - workflow.engineering.backend-data-contract
+  context_pack_ids:
+    - context.trust
+sources:
+  - id: general-legal-template-collection
+    name: General Legal template collection
+    source_type: attorney_template_repository
+    url: https://github.com/General-Legal/legal-templates
+    review_cadence_days: 30
+    claim_scope: Optional CC0 drafting benchmark for privacy policies, terms, cookie notices, and data-processing addenda. It is not legal authority.
+    last_review_date: 2026-08-20
+    reviewer: b2c-maintainers

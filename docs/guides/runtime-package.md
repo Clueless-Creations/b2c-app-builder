@@ -1,0 +1,179 @@
+# B2C App Builder Runtime
+
+This package powers the `b2c` CLI, the `b2c-app-builder` MCP server, and the `b2c-app-builder` routing skill. The target is a toolkit of consumer-business capabilities, replaceable operation providers, configurable recipes, and evidence.
+
+It turns a consumer-app goal into a bounded workflow. It loads the required references. It plans app workspace state and supports verification through the CLI. MCP verification runs only in explicit write mode.
+
+## Public contract
+
+Use `b2c catalog --json` or `b2c_discover` to discover primitives. Use
+`b2c compose --config b2c.yaml --json` or `b2c_compose` to preview a composition.
+Use `b2c business-status --workspace <registered-id> --json` or
+`b2c_business_status` to read lifecycle and work counts.
+They share `b2c/v1` inputs, results, errors, and support semantics. The
+[generated reference](../../contracts/public-api/REFERENCE.md) ships with this
+package. A declaration preview is not an applied composition or provider proof.
+Use `b2c package-import`, `b2c composition-plan`, and
+`b2c composition-activate` for verified local extension packages and recoverable
+workspace activation. Their write operations are CLI-only. See
+[composition activation](composition-activation.md) for exact inputs and recovery.
+Fresh bootstrap requires accepted `product.yaml` and its exact rendered
+`PRODUCT.md`. It activates the complete-business default through the recoverable
+initializer. Changes to an installed recipe use composition activation. The
+shipped worker routes use the selected trusted host runtime; imported manifests
+cannot install executable code.
+
+The commands below describe workspace execution. Its raw payloads and
+internal files are not the stable business API. Source-checkout documentation
+starts at `docs/README.md`.
+
+Onboarding progress uses accepted run state. Before the first run, status shows
+planned work and zero completed steps. Existing or copied output files do not
+establish completion. Folder planning reads the verified shipped catalog package.
+
+Mobile app operation is shared across exploration, functional and design checks,
+and screenshot and video capture. The `b2c/mobile-app-capture` declaration
+defaults to host-native tools. Actual availability is checked only at execution.
+MobAI and other providers serve explicit selections or required coverage. Raw
+captures, acceptance evidence, and finished marketing assets remain separate. The
+Route Ladder implements host-native selection. See the
+[mobile app operation guide](mobile-app-operation.md).
+
+## Package surfaces
+
+The repository root is the package root. Top-level directories name the
+north-star layers in dependency order. `contracts` imports nothing internal.
+`kernel` and `catalog` import `contracts`. `adapters` import those. `entrypoints`
+and `hosted` import services, never adapters directly. `knowledge`, `surfaces`,
+and `examples` are data and import no runtime. `checks` and `tooling` may import
+anything, and nothing imports `checks`.
+
+| Path                    | Role                                                                                                                                                                                                             |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SKILL.md`, `agents/`   | Skill entrypoint and Codex routing metadata                                                                                                                                                                      |
+| `entrypoints/cli/`      | CLI entrypoint (`b2c.mjs`)                                                                                                                                                                                       |
+| `entrypoints/mcp/`      | MCP entrypoint (`b2c-app-builder-mcp.mjs`, `server.ts`)                                                                                                                                                          |
+| `contracts/public-api/` | Public `b2c/v1` schemas and operation declarations                                                                                                                                                               |
+| `kernel/`               | Execution kernel and shared application services: `engine/`, `reducer/`, `session/`, `work-orders/`, `operating-model/`, `autonomy/`, `context/`, `routing/`, `knowledge-service/`, `schema/`, `lib/`            |
+| `catalog/`              | Stable workflows, domains, gates, reference bindings, world ontology, and agent-graph overlay                                                                                                                    |
+| `knowledge/`            | Source-backed consumer-app guidance                                                                                                                                                                              |
+| `adapters/`             | Selected worker and provider adapters, including `app-review/`                                                                                                                                                   |
+| `surfaces/`             | App, web, and design surfaces the runtime installs or renders: `starters/`, `ui-library/`, `workspace-template/`, `surfaces/studio/seed/schema/`                                                                 |
+| `hosted/`               | The two separately deployed Cloudflare Workers: `knowledge-mcp/` (MCP/HTTP knowledge service) and `builder-console/` (the builder's own optional hosted App Worker and console; not a local engine prerequisite) |
+| `examples/`             | Reference businesses: `examples/workspace/business/` and `tuck/`                                                                                                                                                 |
+| `checks/`               | Deterministic validators (`validation/`) and behavioral verification (`verification/`)                                                                                                                           |
+| `tooling/`              | Renderers, audit runner, maintenance scripts                                                                                                                                                                     |
+
+## Install locally
+
+Use Node.js 22 from the repository root:
+
+```bash
+npm ci
+npm run setup
+b2c doctor
+```
+
+Setup creates `~/.b2c-app-builder/workspaces.json` and prints the MCP registration commands. It does not create an app workspace, add credentials, deploy a service, spend money, or submit an app.
+
+## CLI
+
+```bash
+b2c --help
+b2c doctor
+b2c new my-app --dir ~/businesses/my-app --idea "A short product hypothesis"
+b2c bootstrap --workspace ~/businesses/my-app --apply --answers answers.json  # --workspace accepts a registered ID or a path
+b2c workspaces register my-app ~/businesses/my-app
+b2c status --workspace my-app
+b2c plan --workspace my-app
+```
+
+The CLI is the preferred write surface. Commands that affect providers or releases still require their own authority checks.
+
+Set product status to `accepted` in `product.yaml` and render `PRODUCT.md` with
+`b2c render-product --workspace <id-or-path>` before
+the first bootstrap. The same command can add the durable runtime to an existing
+app once its target product and design are defined. The answers file records work
+authority. Without it, the runtime stays parked. A focused change does not need bootstrap.
+
+New app workspaces include only the day-zero product, design, research, route, and
+agent files. Later workflows create their artifacts when they become relevant.
+For a focused change to an existing app, use the relevant knowledge workflow and
+normal app verification. Do not install the full operating graph.
+
+Root `PRODUCT.md` and `DESIGN.md` work with Claude, Codex, Cursor, and other coding
+agents. Author product facts in `product.yaml` and render `PRODUCT.md`, the
+readable product index. `DESIGN.md` is the authored visual system and design
+routing index. It links detailed files under `design/flows/`, `design/screens/`,
+and `design/components/`. Select the native stack through
+`design/platforms/<stack>.json`. Shared contracts stay platform-neutral. Native
+adapters can target SwiftUI, Expo or React Native, Flutter, or another stack. An
+adapter claims parity only where an implementation exists. The package includes a
+SwiftUI reference adapter and claims no others.
+
+The Design Room is generated from the current contract and structured routes. It is a read-only review page. Git owns revisions.
+
+## Complete design loop
+
+One founder mandate carries design through research, production, implementation,
+proof, critique, and bounded repair. Freeze reference packs and product-specific
+rubrics before the Design Room produces a direction. Preserve at least three
+developed concepts in `DESIGN.md`, with their reference mappings and their native,
+mobile-web, and desktop-web treatments. The generated room exposes the choice and
+the rejection rationale. The isolated design-system audit then judges that direction
+with authority captured for its exact dispatch. Implement the accepted identity
+in both the native app and responsive landing page. Produce current machine-bound
+captures and interaction receipts. Run the implementation craft audit against
+every required surface, state, locale, and criterion.
+
+A valid product finding returns to its owning producer. The repair requires new proof and a fresh audit. Missing, malformed, stale, changed, or misbound audit evidence consumes only the audit's own attempt budget. Passing a schema or visual grader never substitutes for the independent judgment. Store submission and production release keep their separate founder boundary.
+
+Signed design decisions use an external public-key trust store. Preview and install
+it from the founder-controlled process before the first run that consumes design authority:
+
+```bash
+b2c founder-key install --public-key-file /absolute/path/founder-public-key.txt
+b2c founder-key install --public-key-file /absolute/path/founder-public-key.txt --apply
+```
+
+The input is canonical unpadded base64url SPKI DER text for an Ed25519 public key. The private key never enters the repository, trust store, session, or worker environment. Install or maintain the store only as its founder-controlled owner. Run the autonomous session and signed-receipt consumer as the workspace-control owner. That separate OS identity can read the public store but cannot modify its directory. Set `B2C_APP_BUILDER_FOUNDER_TRUST_FILE` only to an absolute launcher-controlled override.
+
+## MCP
+
+Register the absolute Node command and the `entrypoints/mcp/b2c-app-builder-mcp.mjs` path that `b2c setup` prints, under the name `b2c-app-builder`. The transport is stdio.
+
+The default server exposes public discovery and composition preview plus workspace catalog, workflow, knowledge, status, plan, and operation preview and replay tools. Registered-workspace planning can run read-only provider prerequisite probes. The server resolves workspaces only through `~/.b2c-app-builder/workspaces.json`.
+
+Set `B2C_APP_BUILDER_MCP_WRITE=1` only for an explicitly approved local write session. It adds bootstrap, run, approvals, verify, and schedule tools and permits gated operate commits. Keep the CLI as the normal write path.
+
+## Maintain the package
+
+- Edit workflow definitions before generated projections.
+- Put durable expert guidance in manifest-backed `knowledge/` and bind it through the catalog. Keep workflow order in `catalog/`.
+- Do not add a second router, catalog, knowledge store, planner, or state store.
+- Keep `SKILL.md` small.
+- Preserve stable workflow and reference IDs.
+- Change reducer-owned state only through `kernel/reducer/`.
+- Keep versions aligned across package manifests, lockfiles, generated catalog output, and `skill-version.json`.
+- Before you widen a `knowledgeBundle` default or a skill auto-trigger, check per-skill cost in `/usage` over the last 7 days. Compare it with how often matched tasks used the bundle. Record the date and the verdict. (Source: https://code.claude.com/docs/en/costs.)
+
+Focused checks:
+
+```bash
+npm run validate:skill
+npm run check:catalog
+npm run check:package-parity
+npm run test:fixtures
+```
+
+Run broader checks when the affected contract requires them.
+
+## Interrupted public requests
+
+`business-recover` closes a pending public request after its session and effects
+are reconciled. Supply the registered workspace ID, request ID, and current
+revision. It uses the existing session owner and locks, dispatches no work, and
+changes no accepted artifacts. It refuses unresolved effects and active work.
+Replay the original run request to read its terminal receipt; use a new request
+ID and current revision for subsequent work. See the public lifecycle contract
+for the exact recovery schema.

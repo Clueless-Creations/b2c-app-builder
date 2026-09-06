@@ -1,0 +1,16 @@
+id: project-state-stale-after-upload
+title: Build uploaded and store-ops events done without updating state/business-state.json
+prompt: >
+  Builds 17, 18, 19 are uploaded to App Store Connect, iPad is enabled as a new target, a custom product page is created, an in-app event is attempted, and a first-use coach is implemented. The session ends with a commit and push, but the runtime lane evidence for apple_signing/engineering, and engineering/PRODUCTION_READINESS.md are never updated.
+expected_guardrail: >
+  After any build upload, store-ops event, or audit that produces evidence, the agent must record provider-native readback in the relevant evidence documents, reconcile lane status and evidence through the reducer, and write any stated engineering/PRODUCTION_READINESS.md evidence to the file before the session closes or commits.
+validators:
+  - validate-project-state
+must_catch:
+  - state/business-state.json was not updated after build uploads
+  - the reported result did not match the saved evidence
+  - engineering/PRODUCTION_READINESS.md evidence stated in chat was not written to disk
+  - store-ops events (iPad support, custom product page, in-app event) were not reflected in lane status or evidence
+should_say:
+  - Load project-state.md, record upload/store readback in the evidence documents, then reconcile affected runtime lanes through the reducer.
+  - Write any engineering/PRODUCTION_READINESS.md findings to the file, then reconcile the launch state before committing.

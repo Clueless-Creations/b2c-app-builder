@@ -1,0 +1,15 @@
+schema_version: 1.0.0
+id: reference.operations.provider-state-recipes
+title: Provider State Recipes
+domain_id: domain.operations
+document_path: knowledge/operations/provider-state-recipes.md
+load_when: setting up or auditing any provider account (Doppler, Supabase/Firebase, PostHog, RevenueCat, Stripe, Resend,
+  Sentry, App Store Connect, Google Play, Cloudflare) — what to record before and while configuring each, distinct from
+  the deep secrets-management.md reference (Doppler is one of ten entries here, not the focus)
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.operations.secrets-baseline-and-routing
+  context_pack_ids: []
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

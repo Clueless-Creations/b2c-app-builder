@@ -1,0 +1,45 @@
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
+!**/.env.example
+.playwright-mcp/
+node_modules
+.venv/
+dist/
+build/
+behavioral-results/
+evals/behavioral-results/
+evals/behavioral-results/
+
+# Superdesign local design-context artifacts
+.superdesign/
+
+# Hosted and app credentials and local workerd output are never source artifacts.
+hosted/knowledge-mcp/.wrangler/
+hosted/knowledge-mcp/.dev.vars*
+hosted/knowledge-mcp/.env*
+hosted/builder-console/.wrangler/
+hosted/builder-console/.dev.vars*
+hosted/builder-console/.env*
+
+# Local agent state and machine-bound observations are not distributable source.
+.cursor/hooks/state/
+examples/tuck/tests/proof/tuck-local-test-proof.json
+
+# Starter checkout build output; distributed ignore rules are activated on copy.
+surfaces/starters/*/starter/.next/
+surfaces/starters/*/starter/out/
+surfaces/starters/*/starter/.vercel/
+surfaces/starters/*/starter/*.tsbuildinfo
+surfaces/starters/*/starter/next-env.d.ts
+
+# Swift indexers create .build/ next to fixture Package.swift files; never source.
+checks/verification/test/data/**/.build/
+examples/contributions/**/.build/
+
+# Operator deploy overlay: production Cloudflare resource ids live here, never in the public tree.
+# Deploy with: wrangler deploy --config wrangler.production.jsonc
+hosted/knowledge-mcp/wrangler.production.jsonc
+hosted/builder-console/wrangler.production.jsonc

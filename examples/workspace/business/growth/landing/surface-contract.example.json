@@ -1,0 +1,790 @@
+{
+  "contract_version": "1.1",
+  "example_notice": "This file demonstrates contract shape only. Every QA result stays pending until a real browser run creates the named evidence.",
+  "sources": [
+    {
+      "path": "product/copy/COPY_DECK.md",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "analytics_events": ["landing_viewed", "landing_cta_clicked", "waitlist_submitted"],
+  "locales": [
+    {
+      "locale": "en-US",
+      "evidence": "growth/landing/evidence/en-US/"
+    },
+    {
+      "locale": "es-US",
+      "evidence": "growth/landing/evidence/es-US/"
+    }
+  ],
+  "pricing": {
+    "applicable": false,
+    "evidence": "revenue/REVENUE_OPS.md#landing-pricing-decision"
+  },
+  "onboarding": {
+    "applicable": true,
+    "evidence": "product/ONBOARDING.md#landing-handoff"
+  },
+  "screenshots": [
+    {
+      "locale": "en-US",
+      "evidence": "growth/landing/evidence/en-US/scrollytelling-mobile.png",
+      "source_kind": "preview"
+    },
+    {
+      "locale": "es-US",
+      "evidence": "growth/landing/evidence/es-US/scrollytelling-mobile.png",
+      "source_kind": "preview"
+    }
+  ],
+  "scrollytelling": {
+    "applicable": true,
+    "evidence": "growth/landing/evidence/scrollytelling-contract.example.md#decision",
+    "locales": ["en-US", "es-US"],
+    "scenes": [
+      {
+        "id": "source-review",
+        "narrative_roles": ["situation", "mechanism", "outcome"],
+        "states": ["unsourced", "checked", "published"],
+        "visual_job": "Show an unsourced draft gaining review evidence, a completed check, and a publishable state.",
+        "source_kind": "svg",
+        "evidence_id": "design-evidence:source-review",
+        "localizations": [
+          {
+            "locale": "en-US",
+            "beats": [
+              {
+                "state_id": "unsourced",
+                "text": "The draft makes a claim without a source.",
+                "copy_key": "landing.scrollytelling.source-review.unsourced.en-US",
+                "copy_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              {
+                "state_id": "checked",
+                "text": "A reviewer links the claim to current evidence.",
+                "copy_key": "landing.scrollytelling.source-review.checked.en-US",
+                "copy_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              {
+                "state_id": "published",
+                "text": "The reviewed claim is ready to publish.",
+                "copy_key": "landing.scrollytelling.source-review.published.en-US",
+                "copy_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            ],
+            "caption": {
+              "text": "A source review moves a draft from unsourced to checked to published.",
+              "copy_key": "landing.scrollytelling.source-review.caption.en-US",
+              "copy_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            "accessible_description": {
+              "text": "A three-state source record gains evidence, a completed check, and a published result.",
+              "copy_key": "landing.scrollytelling.source-review.accessible_description.en-US",
+              "copy_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          },
+          {
+            "locale": "es-US",
+            "beats": [
+              {
+                "state_id": "unsourced",
+                "text": "El borrador hace una afirmación sin citar una fuente.",
+                "copy_key": "landing.scrollytelling.source-review.unsourced.es-US",
+                "copy_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              {
+                "state_id": "checked",
+                "text": "Una persona revisora vincula la afirmación con evidencia vigente.",
+                "copy_key": "landing.scrollytelling.source-review.checked.es-US",
+                "copy_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              {
+                "state_id": "published",
+                "text": "La afirmación revisada está lista para publicarse.",
+                "copy_key": "landing.scrollytelling.source-review.published.es-US",
+                "copy_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            ],
+            "caption": {
+              "text": "Una revisión de fuentes lleva un borrador de no documentado a revisado y publicado.",
+              "copy_key": "landing.scrollytelling.source-review.caption.es-US",
+              "copy_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            "accessible_description": {
+              "text": "Un registro de fuente pasa por evidencia, revisión completa y publicación.",
+              "copy_key": "landing.scrollytelling.source-review.accessible_description.es-US",
+              "copy_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          }
+        ],
+        "activation_guides": {
+          "desktop": 0.5,
+          "mobile": 0.72,
+          "short_mobile": 0.82
+        },
+        "modes": {
+          "mobile": "recomposed",
+          "reduced_motion": "final",
+          "no_js": "final",
+          "save_data": "code-native"
+        },
+        "forward_reverse": false
+      },
+      {
+        "id": "workflow-handoff",
+        "narrative_roles": ["need", "mechanism", "proof"],
+        "states": ["unowned", "assigned", "traceable"],
+        "visual_job": "Show an unowned workflow receiving an owner, then producing a traceable handoff.",
+        "source_kind": "html",
+        "evidence_id": "design-evidence:workflow-handoff",
+        "localizations": [
+          {
+            "locale": "en-US",
+            "beats": [
+              {
+                "state_id": "unowned",
+                "text": "The workflow has no named owner.",
+                "copy_key": "landing.scrollytelling.workflow-handoff.unowned.en-US",
+                "copy_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              {
+                "state_id": "assigned",
+                "text": "An owner accepts the next action and deadline.",
+                "copy_key": "landing.scrollytelling.workflow-handoff.assigned.en-US",
+                "copy_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              {
+                "state_id": "traceable",
+                "text": "The handoff records the owner, decision, and evidence.",
+                "copy_key": "landing.scrollytelling.workflow-handoff.traceable.en-US",
+                "copy_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            ],
+            "caption": {
+              "text": "A workflow handoff moves from unowned to assigned to traceable.",
+              "copy_key": "landing.scrollytelling.workflow-handoff.caption.en-US",
+              "copy_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            "accessible_description": {
+              "text": "Three workflow states show missing ownership, an explicit assignment, and a traceable handoff record.",
+              "copy_key": "landing.scrollytelling.workflow-handoff.accessible_description.en-US",
+              "copy_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          },
+          {
+            "locale": "es-US",
+            "beats": [
+              {
+                "state_id": "unowned",
+                "text": "El flujo de trabajo no tiene una persona responsable.",
+                "copy_key": "landing.scrollytelling.workflow-handoff.unowned.es-US",
+                "copy_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              {
+                "state_id": "assigned",
+                "text": "Una persona responsable acepta la siguiente acción y su plazo.",
+                "copy_key": "landing.scrollytelling.workflow-handoff.assigned.es-US",
+                "copy_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              {
+                "state_id": "traceable",
+                "text": "La entrega registra a la persona responsable, la decisión y la evidencia.",
+                "copy_key": "landing.scrollytelling.workflow-handoff.traceable.es-US",
+                "copy_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            ],
+            "caption": {
+              "text": "Un flujo de trabajo pasa de no tener responsable a estar asignado y ser trazable.",
+              "copy_key": "landing.scrollytelling.workflow-handoff.caption.es-US",
+              "copy_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            "accessible_description": {
+              "text": "Tres estados muestran falta de responsable, una asignación explícita y un registro de entrega trazable.",
+              "copy_key": "landing.scrollytelling.workflow-handoff.accessible_description.es-US",
+              "copy_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          }
+        ],
+        "activation_guides": {
+          "desktop": 0.5,
+          "mobile": 0.72,
+          "short_mobile": 0.82
+        },
+        "modes": {
+          "mobile": "recomposed",
+          "reduced_motion": "final",
+          "no_js": "final",
+          "save_data": "code-native"
+        },
+        "forward_reverse": false
+      }
+    ],
+    "qa": [
+      {
+        "viewport": "desktop 1440x900",
+        "browser": "Chrome",
+        "platform": "macOS 15",
+        "mode": "default",
+        "locale": "en-US",
+        "direction": "forward",
+        "scene_id": "source-review",
+        "expected_state": "unsourced",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#source-review-unsourced-forward"
+      },
+      {
+        "viewport": "desktop 1440x900",
+        "browser": "Chrome",
+        "platform": "macOS 15",
+        "mode": "default",
+        "locale": "en-US",
+        "direction": "reverse",
+        "scene_id": "source-review",
+        "expected_state": "unsourced",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#source-review-unsourced-reverse"
+      },
+      {
+        "viewport": "desktop 1280x720",
+        "browser": "Chrome",
+        "platform": "macOS 15",
+        "mode": "default",
+        "locale": "en-US",
+        "direction": "forward",
+        "scene_id": "source-review",
+        "expected_state": "unsourced",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#source-review-chrome-short-desktop"
+      },
+      {
+        "viewport": "desktop 1024x768",
+        "browser": "Safari",
+        "platform": "macOS 15",
+        "mode": "default",
+        "locale": "en-US",
+        "direction": "forward",
+        "scene_id": "source-review",
+        "expected_state": "checked",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#source-review-checked-forward"
+      },
+      {
+        "viewport": "desktop 1440x900",
+        "browser": "Safari",
+        "platform": "macOS 15",
+        "mode": "default",
+        "locale": "en-US",
+        "direction": "forward",
+        "scene_id": "source-review",
+        "expected_state": "checked",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#source-review-safari-tall-desktop"
+      },
+      {
+        "viewport": "desktop 1440x900",
+        "browser": "Chrome",
+        "platform": "macOS 15",
+        "mode": "default",
+        "locale": "en-US",
+        "direction": "reverse",
+        "scene_id": "source-review",
+        "expected_state": "checked",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#source-review-checked-reverse"
+      },
+      {
+        "viewport": "desktop 1366x768",
+        "browser": "Firefox",
+        "platform": "Windows 11",
+        "mode": "default",
+        "locale": "en-US",
+        "direction": "forward",
+        "scene_id": "source-review",
+        "expected_state": "published",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#source-review-published-forward"
+      },
+      {
+        "viewport": "desktop 1440x900",
+        "browser": "Chrome",
+        "platform": "macOS 15",
+        "mode": "default",
+        "locale": "en-US",
+        "direction": "reverse",
+        "scene_id": "source-review",
+        "expected_state": "published",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#source-review-published-reverse"
+      },
+      {
+        "viewport": "mobile 390x844",
+        "browser": "Safari",
+        "platform": "iOS 19",
+        "mode": "default",
+        "locale": "en-US",
+        "direction": "jump",
+        "scene_id": "source-review",
+        "expected_state": "checked",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#source-review-jump"
+      },
+      {
+        "viewport": "short-mobile 667x375",
+        "browser": "Safari",
+        "platform": "iOS 19",
+        "mode": "short_mobile",
+        "locale": "en-US",
+        "direction": "jump",
+        "scene_id": "source-review",
+        "expected_state": "published",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#source-review-short_mobile"
+      },
+      {
+        "viewport": "mobile 390x844",
+        "browser": "Chrome",
+        "platform": "Android 16",
+        "mode": "reduced_motion",
+        "locale": "en-US",
+        "direction": "jump",
+        "scene_id": "source-review",
+        "expected_state": "published",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#source-review-reduced_motion"
+      },
+      {
+        "viewport": "desktop 1440x900",
+        "browser": "Firefox",
+        "platform": "Linux",
+        "mode": "no_js",
+        "locale": "en-US",
+        "direction": "jump",
+        "scene_id": "source-review",
+        "expected_state": "published",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#source-review-no_js"
+      },
+      {
+        "viewport": "mobile 390x844",
+        "browser": "Chrome",
+        "platform": "Android 16",
+        "mode": "save_data",
+        "locale": "en-US",
+        "direction": "jump",
+        "scene_id": "source-review",
+        "expected_state": "published",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#source-review-save_data"
+      },
+      {
+        "viewport": "short-mobile 360x568",
+        "browser": "Chrome",
+        "platform": "Android 16",
+        "mode": "short_mobile",
+        "locale": "en-US",
+        "direction": "forward",
+        "scene_id": "source-review",
+        "expected_state": "published",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#source-review-android-short-mobile"
+      },
+      {
+        "viewport": "desktop 1440x900",
+        "browser": "Chrome",
+        "platform": "macOS 15",
+        "mode": "default",
+        "locale": "es-US",
+        "direction": "forward",
+        "scene_id": "workflow-handoff",
+        "expected_state": "unowned",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#workflow-handoff-unowned-forward"
+      },
+      {
+        "viewport": "desktop 1440x900",
+        "browser": "Chrome",
+        "platform": "macOS 15",
+        "mode": "default",
+        "locale": "es-US",
+        "direction": "reverse",
+        "scene_id": "workflow-handoff",
+        "expected_state": "unowned",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#workflow-handoff-unowned-reverse"
+      },
+      {
+        "viewport": "desktop 1024x768",
+        "browser": "Safari",
+        "platform": "macOS 15",
+        "mode": "default",
+        "locale": "es-US",
+        "direction": "forward",
+        "scene_id": "workflow-handoff",
+        "expected_state": "assigned",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#workflow-handoff-assigned-forward"
+      },
+      {
+        "viewport": "desktop 1440x900",
+        "browser": "Chrome",
+        "platform": "macOS 15",
+        "mode": "default",
+        "locale": "es-US",
+        "direction": "reverse",
+        "scene_id": "workflow-handoff",
+        "expected_state": "assigned",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#workflow-handoff-assigned-reverse"
+      },
+      {
+        "viewport": "desktop 1366x768",
+        "browser": "Firefox",
+        "platform": "Windows 11",
+        "mode": "default",
+        "locale": "es-US",
+        "direction": "forward",
+        "scene_id": "workflow-handoff",
+        "expected_state": "traceable",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#workflow-handoff-traceable-forward"
+      },
+      {
+        "viewport": "desktop 1440x900",
+        "browser": "Chrome",
+        "platform": "macOS 15",
+        "mode": "default",
+        "locale": "es-US",
+        "direction": "reverse",
+        "scene_id": "workflow-handoff",
+        "expected_state": "traceable",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#workflow-handoff-traceable-reverse"
+      },
+      {
+        "viewport": "mobile 390x844",
+        "browser": "Chrome",
+        "platform": "Android 16",
+        "mode": "default",
+        "locale": "es-US",
+        "direction": "jump",
+        "scene_id": "workflow-handoff",
+        "expected_state": "assigned",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#workflow-handoff-jump"
+      },
+      {
+        "viewport": "short-mobile 667x375",
+        "browser": "Safari",
+        "platform": "iOS 19",
+        "mode": "short_mobile",
+        "locale": "es-US",
+        "direction": "jump",
+        "scene_id": "workflow-handoff",
+        "expected_state": "traceable",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#workflow-handoff-short_mobile"
+      },
+      {
+        "viewport": "mobile 390x844",
+        "browser": "Chrome",
+        "platform": "Android 16",
+        "mode": "reduced_motion",
+        "locale": "es-US",
+        "direction": "jump",
+        "scene_id": "workflow-handoff",
+        "expected_state": "traceable",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#workflow-handoff-reduced_motion"
+      },
+      {
+        "viewport": "desktop 1440x900",
+        "browser": "Firefox",
+        "platform": "Linux",
+        "mode": "no_js",
+        "locale": "es-US",
+        "direction": "jump",
+        "scene_id": "workflow-handoff",
+        "expected_state": "traceable",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#workflow-handoff-no_js"
+      },
+      {
+        "viewport": "mobile 390x844",
+        "browser": "Chrome",
+        "platform": "Android 16",
+        "mode": "save_data",
+        "locale": "es-US",
+        "direction": "jump",
+        "scene_id": "workflow-handoff",
+        "expected_state": "traceable",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#workflow-handoff-save_data"
+      },
+      {
+        "viewport": "desktop 1440x900",
+        "browser": "Chrome",
+        "platform": "macOS 15",
+        "mode": "default",
+        "locale": "en-US",
+        "direction": "forward",
+        "scene_id": "workflow-handoff",
+        "expected_state": "unowned",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#workflow-handoff-en-US-unowned-forward"
+      },
+      {
+        "viewport": "desktop 1440x900",
+        "browser": "Chrome",
+        "platform": "macOS 15",
+        "mode": "default",
+        "locale": "en-US",
+        "direction": "reverse",
+        "scene_id": "workflow-handoff",
+        "expected_state": "unowned",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#workflow-handoff-en-US-unowned-reverse"
+      },
+      {
+        "viewport": "desktop 1024x768",
+        "browser": "Safari",
+        "platform": "macOS 15",
+        "mode": "default",
+        "locale": "en-US",
+        "direction": "forward",
+        "scene_id": "workflow-handoff",
+        "expected_state": "assigned",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#workflow-handoff-en-US-assigned-forward"
+      },
+      {
+        "viewport": "desktop 1440x900",
+        "browser": "Chrome",
+        "platform": "macOS 15",
+        "mode": "default",
+        "locale": "en-US",
+        "direction": "reverse",
+        "scene_id": "workflow-handoff",
+        "expected_state": "assigned",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#workflow-handoff-en-US-assigned-reverse"
+      },
+      {
+        "viewport": "desktop 1366x768",
+        "browser": "Firefox",
+        "platform": "Windows 11",
+        "mode": "default",
+        "locale": "en-US",
+        "direction": "forward",
+        "scene_id": "workflow-handoff",
+        "expected_state": "traceable",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#workflow-handoff-en-US-traceable-forward"
+      },
+      {
+        "viewport": "desktop 1440x900",
+        "browser": "Chrome",
+        "platform": "macOS 15",
+        "mode": "default",
+        "locale": "en-US",
+        "direction": "reverse",
+        "scene_id": "workflow-handoff",
+        "expected_state": "traceable",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#workflow-handoff-en-US-traceable-reverse"
+      },
+      {
+        "viewport": "mobile 390x844",
+        "browser": "Chrome",
+        "platform": "Android 16",
+        "mode": "default",
+        "locale": "en-US",
+        "direction": "jump",
+        "scene_id": "workflow-handoff",
+        "expected_state": "assigned",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#workflow-handoff-en-US-jump"
+      },
+      {
+        "viewport": "short-mobile 667x375",
+        "browser": "Safari",
+        "platform": "iOS 19",
+        "mode": "short_mobile",
+        "locale": "en-US",
+        "direction": "jump",
+        "scene_id": "workflow-handoff",
+        "expected_state": "traceable",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#workflow-handoff-en-US-short_mobile"
+      },
+      {
+        "viewport": "mobile 390x844",
+        "browser": "Chrome",
+        "platform": "Android 16",
+        "mode": "reduced_motion",
+        "locale": "en-US",
+        "direction": "jump",
+        "scene_id": "workflow-handoff",
+        "expected_state": "traceable",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#workflow-handoff-en-US-reduced_motion"
+      },
+      {
+        "viewport": "desktop 1440x900",
+        "browser": "Firefox",
+        "platform": "Linux",
+        "mode": "no_js",
+        "locale": "en-US",
+        "direction": "jump",
+        "scene_id": "workflow-handoff",
+        "expected_state": "traceable",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#workflow-handoff-en-US-no_js"
+      },
+      {
+        "viewport": "mobile 390x844",
+        "browser": "Chrome",
+        "platform": "Android 16",
+        "mode": "save_data",
+        "locale": "en-US",
+        "direction": "jump",
+        "scene_id": "workflow-handoff",
+        "expected_state": "traceable",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#workflow-handoff-en-US-save_data"
+      },
+      {
+        "viewport": "desktop 1440x900",
+        "browser": "Chrome",
+        "platform": "macOS 15",
+        "mode": "default",
+        "locale": "es-US",
+        "direction": "forward",
+        "scene_id": "source-review",
+        "expected_state": "unsourced",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#source-review-es-US-unsourced-forward"
+      },
+      {
+        "viewport": "desktop 1440x900",
+        "browser": "Chrome",
+        "platform": "macOS 15",
+        "mode": "default",
+        "locale": "es-US",
+        "direction": "reverse",
+        "scene_id": "source-review",
+        "expected_state": "unsourced",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#source-review-es-US-unsourced-reverse"
+      },
+      {
+        "viewport": "desktop 1024x768",
+        "browser": "Safari",
+        "platform": "macOS 15",
+        "mode": "default",
+        "locale": "es-US",
+        "direction": "forward",
+        "scene_id": "source-review",
+        "expected_state": "checked",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#source-review-es-US-checked-forward"
+      },
+      {
+        "viewport": "desktop 1440x900",
+        "browser": "Chrome",
+        "platform": "macOS 15",
+        "mode": "default",
+        "locale": "es-US",
+        "direction": "reverse",
+        "scene_id": "source-review",
+        "expected_state": "checked",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#source-review-es-US-checked-reverse"
+      },
+      {
+        "viewport": "desktop 1366x768",
+        "browser": "Firefox",
+        "platform": "Windows 11",
+        "mode": "default",
+        "locale": "es-US",
+        "direction": "forward",
+        "scene_id": "source-review",
+        "expected_state": "published",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#source-review-es-US-published-forward"
+      },
+      {
+        "viewport": "desktop 1440x900",
+        "browser": "Chrome",
+        "platform": "macOS 15",
+        "mode": "default",
+        "locale": "es-US",
+        "direction": "reverse",
+        "scene_id": "source-review",
+        "expected_state": "published",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#source-review-es-US-published-reverse"
+      },
+      {
+        "viewport": "mobile 390x844",
+        "browser": "Safari",
+        "platform": "iOS 19",
+        "mode": "default",
+        "locale": "es-US",
+        "direction": "jump",
+        "scene_id": "source-review",
+        "expected_state": "checked",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#source-review-es-US-jump"
+      },
+      {
+        "viewport": "short-mobile 667x375",
+        "browser": "Safari",
+        "platform": "iOS 19",
+        "mode": "short_mobile",
+        "locale": "es-US",
+        "direction": "jump",
+        "scene_id": "source-review",
+        "expected_state": "published",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#source-review-es-US-short_mobile"
+      },
+      {
+        "viewport": "mobile 390x844",
+        "browser": "Chrome",
+        "platform": "Android 16",
+        "mode": "reduced_motion",
+        "locale": "es-US",
+        "direction": "jump",
+        "scene_id": "source-review",
+        "expected_state": "published",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#source-review-es-US-reduced_motion"
+      },
+      {
+        "viewport": "desktop 1440x900",
+        "browser": "Firefox",
+        "platform": "Linux",
+        "mode": "no_js",
+        "locale": "es-US",
+        "direction": "jump",
+        "scene_id": "source-review",
+        "expected_state": "published",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#source-review-es-US-no_js"
+      },
+      {
+        "viewport": "mobile 390x844",
+        "browser": "Chrome",
+        "platform": "Android 16",
+        "mode": "save_data",
+        "locale": "es-US",
+        "direction": "jump",
+        "scene_id": "source-review",
+        "expected_state": "published",
+        "result": "pending",
+        "evidence": "growth/landing/evidence/browser-matrix.example.md#source-review-es-US-save_data"
+      }
+    ]
+  }
+}

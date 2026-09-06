@@ -1,0 +1,21 @@
+id: app-review-consumed-envelope-left-in-queue
+title: Consumed webhook envelopes stay in the durable queue
+prompt: >
+  Consume wrote run/app-review.json. Leave every envelope file in
+  run/app-review-webhooks. After 64 event ids, replay the oldest
+  forgotten envelopes forever. Persist does not check acked ids, so
+  Apple redelivery after the window ages out enqueues again.
+expected_guardrail: >
+  Archive each accepted envelope after the watch write.
+  Do not keep consumed envelopes in the durable queue.
+  Deduplicate persist against archived Apple event IDs.
+validators:
+  - check-app-review-contract
+must_catch:
+  - consumed envelopes left in queue
+  - forgotten event ids replayed
+  - archived event id enqueued again
+should_say:
+  - Archive each envelope after the watch write.
+  - Drain accepted envelopes with b2c app-review-ingress consume.
+  - Check archived event IDs during persist.

@@ -1,0 +1,105 @@
+schema_version: 1
+id: parth-app-store-screenshots
+project: App Store Screenshots
+canonical_url: https://github.com/ParthJadhav/app-store-screenshots
+aliases:
+  - ParthJadhav/app-store-screenshots
+authors:
+  - name: Parth Jadhav
+    role: original author or copyright holder identified in the reviewed source
+maintainers:
+  - name: Parth Jadhav
+    role: current upstream maintainer
+copyright: Copyright (c) 2026 Parth Jadhav
+license:
+  spdx: MIT
+  status: verified
+  evidence_url: https://github.com/ParthJadhav/app-store-screenshots/blob/18951ddc4e06c53a3d34207732c16d9568f88d11/LICENSE
+  evidence_sha256: a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a
+  reviewed_revision: 18951ddc4e06c53a3d34207732c16d9568f88d11
+  notice_file: catalog/upstreams/notices/parth-app-store-screenshots.txt
+  scope: Selected README and skill overview/migration guidance (SKILL.md lines 1-105). No template code, mockup,
+    example captures, fonts or style packs are incorporated.
+source_ids:
+  - github-com-parthjadhav-app-store-screenshots
+relationships:
+  - kind: adapted-method
+    consumption: Selected published methods and tool procedures are adapted into existing builder guidance. No whole
+      skill, executable, native dependency or asset was installed by this contribution.
+    local_owners: &a1
+      - knowledge/store/screenshot-toolchain.md
+      - knowledge/store/app-store-listing-prep.md
+      - knowledge/store/store-console-workflow.md
+    tests:
+      - checks/verification/fixtures/screenshot-upstreams.fixtures.ts
+    upstream_paths:
+      - README.md
+      - skills/app-store-screenshots/SKILL.md
+    pin_authority: Reviewed immutable source commit and the existing builder package digest pin this guidance. A
+      host executable, editor project or native dependency is selected and verified separately.
+baselines:
+  reviewed_source:
+    revision: 18951ddc4e06c53a3d34207732c16d9568f88d11
+    observed_at: "2026-09-06"
+    by: b2c-contributor source review
+    note: Read-only metadata, license and selected documentation inspection; no tool or live provider execution.
+  reviewed_guidance:
+    revision: 18951ddc4e06c53a3d34207732c16d9568f88d11
+    observed_at: "2026-09-06"
+    by: b2c-contributor source review
+    note: Selected README and skill overview/migration guidance (SKILL.md lines 1-105). No template code, mockup,
+      example captures, fonts or style packs are incorporated.
+support:
+  policy: Source-reviewed guidance only. Listed operations are mapped procedures, not newly executable provider
+    bindings or certification of installed versions.
+  versions:
+    - range: 18951ddc4e06c53a3d34207732c16d9568f88d11
+      status: untested
+      evidence:
+        - Source inspection and builder contract fixtures only; no live app or upstream binary execution.
+  operations:
+    - id: parth-app-store-screenshots-guidance
+      title: Selected App Store Screenshots procedures
+      keywords:
+        - screenshots
+        - canvas
+        - export
+        - locales
+        - migration
+        - theme
+      owners: *a1
+  unsupported_operations:
+    - id: automatic-install-or-upgrade
+      reason: Requires explicit target, selected compatible revision, scoped authority and independent verification.
+        No host installation, business repin or publication is automatic.
+    - id: unreviewed-upstream-features
+      reason: A new release or source commit creates a review candidate, never additional execution authority or
+        acceptance.
+  platforms: []
+adaptations:
+  - id: accepted-design-wins
+    description: Use accepted product copy, DESIGN.md and source captures. Editor deck state owns presentation only;
+      it cannot redefine the product or silently replace a missing theme.
+    owner: knowledge/store/screenshot-toolchain.md
+    intentional: true
+  - id: explicit-editor-migration
+    description: No copy-over of the app root, global skill install or automatic editor upgrade. Preserve assets and
+      isolated export behavior; verify every crop after an authorized migration.
+    owner: knowledge/store/screenshot-toolchain.md
+    intentional: true
+  - id: store-requirements-win
+    description: Treat device labels and export sizes as upstream presets, not current Apple or Google requirements.
+      Required text and critical UI must survive each standalone crop.
+    owner: knowledge/store/screenshot-toolchain.md
+    intentional: true
+review:
+  owner: b2c-maintainers
+  cadence_days: 7
+  last_review: "2026-09-06"
+  status: current
+credits:
+  acknowledge: true
+  use: adapted
+  summary: Selected App Store Screenshots methods inform knowledge/store/screenshot-toolchain.md,
+    knowledge/store/app-store-listing-prep.md, knowledge/store/store-console-workflow.md. Original authors and
+    license notices are retained; no live integration is claimed.

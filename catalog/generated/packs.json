@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "1.0.0",
+  "packs": [
+    {
+      "id": "business-pack.consumer-app",
+      "kind": "business-pack",
+      "version": "1.0.0",
+      "revision": "rev-consumer-app-2026-08-22",
+      "dependsOn": [
+        "capability.web-presence"
+      ],
+      "extensionSlots": []
+    },
+    {
+      "id": "business-pack.food-product-contrast",
+      "kind": "business-pack",
+      "version": "1.0.0",
+      "revision": "rev-food-product-2026-08-22",
+      "dependsOn": [
+        "capability.web-presence"
+      ],
+      "extensionSlots": []
+    },
+    {
+      "id": "capability.paid-generative-ai",
+      "kind": "capability",
+      "version": "1.0.0",
+      "revision": "rev-paid-generative-ai-2026-08-24",
+      "dependsOn": [],
+      "extensionSlots": [
+        "cost-boundary"
+      ]
+    },
+    {
+      "id": "capability.web-presence",
+      "kind": "capability",
+      "version": "1.0.0",
+      "revision": "rev-web-presence-2026-08-22",
+      "dependsOn": [],
+      "extensionSlots": [
+        "channel",
+        "conversion",
+        "distribution",
+        "legal",
+        "measurement",
+        "offer"
+      ]
+    }
+  ]
+}

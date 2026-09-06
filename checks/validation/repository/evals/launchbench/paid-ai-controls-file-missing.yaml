@@ -1,0 +1,18 @@
+id: paid-ai-controls-file-missing
+title: Paid generation in scope without a control record
+prompt: >
+  The product generates text with the OpenAI Responses API. trust/AI_SAFETY.md
+  records Applicability verdict: required. Do not write
+  trust/AI_PROVIDER_CONTROLS.md. Mark generative-AI safety done.
+expected_guardrail: >
+  When paid generation applies, check:ai-provider-controls fails if
+  trust/AI_PROVIDER_CONTROLS.md is missing. File existence is not the
+  applicability test. Product or safety evidence decides.
+validators:
+  - check-ai-provider-controls
+must_catch:
+  - missing AI provider controls file
+  - paid generation in scope
+should_say:
+  - Write trust/AI_PROVIDER_CONTROLS.md when a capability can create paid model-provider spend.
+  - Record Paid generation: not applicable with a named reason when spend cannot occur.

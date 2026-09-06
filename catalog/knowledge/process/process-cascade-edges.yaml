@@ -1,0 +1,15 @@
+schema_version: 1.0.0
+id: reference.process.cascade-edges
+title: Cascade Edges
+domain_id: domain.process
+document_path: knowledge/process/cascade-edges.yaml
+load_when: machine-read by check:change-cascade — the surfaces/change-types adjacency map; edit together with
+  change-cascade.md, which renders the same map as a human table (twin-format pattern, not a duplicate)
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.process.change-cascade
+    - workflow.engineering.source-change-manifest
+  context_pack_ids: []
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:b2c:core:checkpoint-schema",
+  "title": "Run Checkpoint",
+  "$comment": "Atomicity contract (KTD2): a checkpoint is written to `<path>.tmp`, fsynced, then renamed to `<path>`, so a reader never observes a partial write — the file at `<path>` is always either the previous complete checkpoint or the new complete one, never a half-written one. stateHash lets a reader detect that the embedded runState was tampered with out of band.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "writtenAt", "writerSessionId", "stateHash", "runState"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": "1.0.0" },
+    "writtenAt": { "type": "string", "format": "date-time" },
+    "writerSessionId": { "type": "string", "minLength": 1 },
+    "stateHash": { "type": "string", "minLength": 1 },
+    "runState": { "$ref": "urn:b2c:core:run-state-schema#" }
+  }
+}

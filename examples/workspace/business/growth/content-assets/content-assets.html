@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Content Assets</title>
+    <style>
+      :root {
+        --bg: #f8f5ef;
+        --ink: #161b1c;
+        --muted: #586164;
+        --line: #d9dedb;
+        --panel: #ffffff;
+        --accent: #0e6c59;
+        --warn: #9a5b00;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 ui-sans-serif, system-ui, sans-serif; }
+      header { padding: 28px; border-bottom: 1px solid var(--line); background: linear-gradient(120deg, #ffffff, #e8f1ed); }
+      main { padding: 22px; display: grid; gap: 16px; }
+      h1 { margin: 0 0 8px; font-size: clamp(30px, 6vw, 58px); line-height: 0.95; letter-spacing: 0; }
+      h2 { margin: 0 0 12px; font-size: 20px; }
+      section { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; overflow: auto; }
+      table { width: 100%; min-width: 720px; border-collapse: collapse; }
+      th, td { text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); padding: 10px; }
+      th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+      code { background: #eef4f0; border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; }
+      .pill { display: inline-block; border: 1px solid var(--line); border-radius: 999px; padding: 5px 9px; background: #fff; color: var(--muted); }
+      .warn { color: var(--warn); }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Content Assets</h1>
+      <span class="pill">Remotion, Higgsfield, screenshots, recordings, and campaign media</span>
+    </header>
+    <main>
+      <section>
+        <h2>Route Matrix</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Asset</th>
+              <th>Route</th>
+              <th>Approval</th>
+              <th>License</th>
+              <th>Limitation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>App preview and social demo clips</td>
+              <td>Remotion draft route from real app UI</td>
+              <td class="warn">Founder approval required before public use</td>
+              <td class="warn">Remotion license status must be checked before commercial use</td>
+              <td>Local render proves layout, not campaign performance</td>
+            </tr>
+            <tr>
+              <td>Mascot, icon, photoreal, or presenter creative</td>
+              <td>Higgsfield preferred route</td>
+              <td class="warn">Approval required before paid generation or fallback</td>
+              <td>Higgsfield account/credit route required</td>
+              <td>Remotion is not equivalent for net-new AI visuals</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      <section>
+        <h2>Output Registry</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Asset ID</th>
+              <th>Surface</th>
+              <th>Composition</th>
+              <th>Output</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>vertical-hook-demo</code></td>
+              <td>TikTok/Reels/Shorts</td>
+              <td><code>VerticalHookDemo</code></td>
+              <td><code>content-assets/out/vertical-hook-demo.mp4</code></td>
+              <td>Draft until real UI, license, render proof, and founder approval are recorded</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      <section>
+        <h2>Public Use Gates</h2>
+        <p>Store upload, public posting, scheduling, paid campaigns, creator distribution, paid generation, and paid render infrastructure require founder approval.</p>
+      </section>
+    </main>
+  </body>
+</html>

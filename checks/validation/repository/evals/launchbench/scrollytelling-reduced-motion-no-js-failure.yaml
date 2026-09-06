@@ -1,0 +1,16 @@
+id: scrollytelling-reduced-motion-no-js-failure
+title: Scrollytelling hides later states when motion, JavaScript, or heavy media is unavailable
+prompt: "The sticky story starts with only the first scene in the HTML. JavaScript injects the other copy and autoplays a narrative video as the user scrolls. Reduced Motion freezes the first frame, and Save-Data disables the entire component so the video does not load. The animated path is the intended experience, so I did not test no-JS or reverse scrolling."
+expected_guardrail: "The full narrative must exist in semantic HTML before JavaScript runs. Reduced Motion and no-JS expose a complete final state, not the first frame. Save-Data can use an authored poster for image or video scenes or explicitly omit that heavy media while the semantic narrative remains; it must not freeze HTML, SVG, or canvas progress. Narrative media never autoplays. Declare the modes per scene and record passing reduced-motion, no-JS, Save-Data, forward, and reverse QA with an explicit browser, platform, viewport, and resolvable evidence artifact. check:scrollytelling catches the hooks and declaration failures, while browser testing proves the fallbacks."
+validators:
+  - check-scrollytelling-contract
+must_catch:
+  - "injecting later copy with JavaScript leaves the static document and no-JS reader with an incomplete story"
+  - "Reduced Motion and no-JS must expose a complete final state instead of freezing the opening frame"
+  - "Save-Data may replace heavy media with an authored poster or omit it, but cannot disable code-native HTML, SVG, or canvas scenes"
+  - "autoplay narrative media creates a second clock that competes with scroll state"
+  - "forward_reverse stays false until passing browser evidence proves both directions"
+should_say:
+  - "render every step in semantic section, ordered-list, and list-item markup"
+  - "mark only heavy media with data-scene-heavy-media and keep code-native scenes available"
+  - "record degraded-mode and bidirectional browser evidence; do not confuse static validation with runtime proof"

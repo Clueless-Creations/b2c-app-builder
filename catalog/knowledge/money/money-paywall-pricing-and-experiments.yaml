@@ -1,0 +1,27 @@
+schema_version: 1.0.0
+id: reference.money.paywall-pricing-and-experiments
+title: Paywall, Pricing, And Experiments
+domain_id: domain.money
+document_path: knowledge/money/paywall-pricing-and-experiments.md
+load_when: paywall timing/placement/trials/offers, pricing disclosure, price-point procedure, standing
+  experiment cadence, or RevenueCat Experiments vs bandit vs PostHog engine choice — routed from
+  revenue-monetization.md
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.money.revenue-monetization
+    - workflow.money.experimentation
+  context_pack_ids:
+    - context.launch-surfaces
+    - context.money
+applicability_notes: RevenueCat Experiments is the default monetization engine. Bandit is allocation only.
+sources:
+  - id: www-revenuecat-com-docs-tools-experiments-v1
+    name: www.revenuecat.com
+    source_type: official_docs
+    url: https://www.revenuecat.com/docs/tools/experiments-v1
+    review_cadence_days: 30
+    claim_scope: RevenueCat Experiments v1 is the default engine for offering, price, trial, and
+      paywall tests. The app fetches the current Offering.
+    last_review_date: 2026-08-24
+    reviewer: b2c-maintainers

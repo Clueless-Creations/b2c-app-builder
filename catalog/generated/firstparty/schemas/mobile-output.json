@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "observation": {
+      "type": "object",
+      "properties": {
+        "providerId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operation": {
+          "type": "string",
+          "enum": [
+            "b2c/mobile-app-operation.launch",
+            "b2c/mobile-app-operation.inspect",
+            "b2c/mobile-app-operation.interact",
+            "b2c/mobile-app-operation.capture-screenshot",
+            "b2c/mobile-app-operation.record-video"
+          ]
+        },
+        "target": {
+          "type": "object",
+          "properties": {
+            "platform": {
+              "type": "string",
+              "enum": [
+                "ios",
+                "android"
+              ]
+            },
+            "deviceKind": {
+              "type": "string",
+              "enum": [
+                "simulator",
+                "emulator",
+                "physical"
+              ]
+            },
+            "deviceId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "osVersion": {
+              "type": "string",
+              "minLength": 1
+            },
+            "locale": {
+              "type": "string",
+              "minLength": 1
+            },
+            "appId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "buildId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "artifactSha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "required": [
+            "platform",
+            "deviceKind",
+            "deviceId",
+            "osVersion",
+            "locale",
+            "appId",
+            "buildId",
+            "artifactSha256"
+          ],
+          "additionalProperties": false
+        },
+        "executionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "host-observation",
+            "fixture"
+          ]
+        },
+        "completion": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "interrupted",
+            "failed"
+          ]
+        },
+        "observations": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "actionsCompleted": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "capture": {
+          "type": "object",
+          "properties": {
+            "artifactId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "mimeType": {
+              "type": "string",
+              "enum": [
+                "image/png",
+                "image/jpeg",
+                "video/mp4"
+              ]
+            },
+            "width": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "height": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "durationSeconds": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "stateId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source": {
+              "type": "string",
+              "const": "app-pixels"
+            }
+          },
+          "required": [
+            "artifactId",
+            "sha256",
+            "mimeType",
+            "width",
+            "height",
+            "stateId",
+            "source"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "providerId",
+        "operation",
+        "target",
+        "executionId",
+        "observedAt",
+        "source",
+        "completion",
+        "observations",
+        "actionsCompleted"
+      ],
+      "additionalProperties": false
+    },
+    "acceptance": {
+      "type": "object",
+      "properties": {
+        "functional": {
+          "type": "boolean",
+          "const": false
+        },
+        "accessibility": {
+          "type": "boolean",
+          "const": false
+        },
+        "design": {
+          "type": "boolean",
+          "const": false
+        },
+        "backend": {
+          "type": "boolean",
+          "const": false
+        },
+        "release": {
+          "type": "boolean",
+          "const": false
+        }
+      },
+      "required": [
+        "functional",
+        "accessibility",
+        "design",
+        "backend",
+        "release"
+      ],
+      "additionalProperties": false
+    },
+    "marketingStatus": {
+      "type": "string",
+      "enum": [
+        "raw-source",
+        "not-captured"
+      ]
+    }
+  },
+  "required": [
+    "observation",
+    "acceptance",
+    "marketingStatus"
+  ],
+  "additionalProperties": false
+}

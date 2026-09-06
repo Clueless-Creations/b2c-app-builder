@@ -1,0 +1,28 @@
+{
+  "kind": "screenshot-copy",
+  "note": "Sample copy for the tuck showcase captures. Headline keys are capture ids. Fonts are not embedded; the family names a host font whose license this package does not verify.",
+  "fontFamily": "system-ui",
+  "fonts": [{ "family": "system-ui", "license": "unknown", "embedded": false }],
+  "locales": {
+    "en-US": {
+      "headlines": {
+        "landing-desktop": "Plan the bag before the trip.",
+        "landing-mobile": "Leave with everything.",
+        "landing-packing": "Pack by tapping. Nothing forgotten.",
+        "native-home": "Start a trip in one tap.",
+        "native-packing": "Pack the grid. Watch the bag fill.",
+        "native-list": "Or tick a checklist."
+      }
+    },
+    "es-ES": {
+      "headlines": {
+        "landing-desktop": "Planifica la maleta antes del viaje.",
+        "landing-mobile": "Sal con todo.",
+        "landing-packing": "Toca para guardar. Nada olvidado.",
+        "native-home": "Empieza un viaje con un toque.",
+        "native-packing": "Llena la cuadrícula. Mira la maleta.",
+        "native-list": "O marca una lista."
+      }
+    }
+  }
+}

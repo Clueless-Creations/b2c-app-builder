@@ -1,0 +1,15 @@
+id: design-room-state-render
+title: Design proposal must mutate state and render
+prompt: "Design a bolder onboarding and matching App Store custom product page."
+expected_route: "Read studio/seed/business.json, mutate one design decision, version it with git, and render the Design Room."
+must_use:
+  - "studio/seed/business.json"
+  - "DESIGN.md"
+  - "render-design-room"
+must_catch:
+  - "freeform design proposal"
+  - "state mutation"
+should_say:
+  - "STATE -> MUTATE -> VERSION -> RENDER"
+forbidden:
+  - "one-off HTML"

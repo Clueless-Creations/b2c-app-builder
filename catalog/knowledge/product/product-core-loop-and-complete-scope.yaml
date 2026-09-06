@@ -1,0 +1,18 @@
+schema_version: 1.0.0
+id: reference.product.core-loop-and-complete-scope
+title: Core Loop And Complete Product Scope
+domain_id: domain.product
+document_path: knowledge/product/core-loop-and-complete-scope.md
+load_when: the product does not match one of the four shipped app archetypes (habit tracker, photo/AI media, social
+  network, AI chat companion) — before naming the core loop, defining every required system in the accepted product, or specing
+  schema for any other product shape
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.product.app-archetype-detection-and-starter
+    - workflow.research.research-backed-spec
+    - workflow.research.spec-red-team-audit
+  context_pack_ids:
+    - context.product
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

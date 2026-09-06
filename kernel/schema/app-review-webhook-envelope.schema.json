@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:b2c:core:app-review-webhook-envelope-schema",
+  "title": "App Review signed webhook envelope",
+  "description": "Host-neutral immutable envelope for a verified App Store Connect webhook. The envelope is a wake-up signal. It is not provider truth. The receiver stores this envelope before the adapter polls App Store Connect.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "provider",
+    "providerEventId",
+    "eventType",
+    "providerTimestamp",
+    "receivedAt",
+    "rawBodySha256",
+    "rawBodyByteLength",
+    "signatureAlgorithm",
+    "secretId",
+    "unknownPayload"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "provider": { "const": "app-store-connect" },
+    "providerEventId": { "type": "string", "minLength": 1 },
+    "eventType": { "type": "string", "minLength": 1 },
+    "payloadVersion": { "type": "string", "minLength": 1 },
+    "providerTimestamp": { "type": "string", "format": "date-time" },
+    "receivedAt": { "type": "string", "format": "date-time" },
+    "rawBodySha256": { "type": "string", "minLength": 64, "maxLength": 64 },
+    "rawBodyByteLength": { "type": "integer", "minimum": 1 },
+    "signatureAlgorithm": { "const": "hmacsha256" },
+    "secretId": { "type": "string", "minLength": 1 },
+    "appStoreVersionId": { "type": "string", "minLength": 1 },
+    "relatedResourceType": { "type": "string", "minLength": 1 },
+    "reportedOldValue": { "type": "string", "minLength": 1 },
+    "reportedNewValue": { "type": "string", "minLength": 1 },
+    "unknownPayload": { "type": "boolean" }
+  }
+}

@@ -1,0 +1,60 @@
+id: business-pack.store-screenshot-compose
+title: Store screenshot composition
+version: 1.0.0
+revision: store-screenshot-compose-1
+domains:
+  - id: domain.store-screenshot-compose
+    name: Store screenshot composition
+    area_ids: [area.store-screenshot-compose]
+    grantable: true
+    operator_group: Store
+areas:
+  - id: area.store-screenshot-compose
+    name: Marketing screenshot composition
+    description: Compose, localize, and validate store screenshot deliverables from existing approved captures.
+    domain_ids: [domain.store-screenshot-compose]
+roles:
+  - id: role.store-screenshot-compose
+    name: Screenshot compositor
+    prompt_path: compositor.md
+    scope: Compose and validate marketing screenshots from approved captures
+    capability_ids: []
+    output_path_prefixes:
+      - store/screenshots/
+workflows:
+  - id: workflow.store-screenshot-compose-layout
+    title: Compose marketing screenshot layouts
+    domain_id: domain.store-screenshot-compose
+    area_ids:
+      - area.store-screenshot-compose
+    trigger: Approved raw captures need store screenshot layouts
+    instructions: Run compose.mjs compose with the approved capture manifest, the wells table, the SVG template, the copy file, a fixed --now value, and an output directory. Read provenance.json before reporting. The outputs are drafts, not capture evidence. Never pass --upload or --capture.
+    role_id: role.store-screenshot-compose
+    output_paths:
+      - store/screenshots/composed/provenance.json
+    action_class: draft
+    idempotent: true
+  - id: workflow.store-screenshot-export-localized
+    title: Export composed layouts per locale
+    domain_id: domain.store-screenshot-compose
+    area_ids:
+      - area.store-screenshot-compose
+    trigger: A composed directory needs one export per store locale
+    instructions: Run compose.mjs export against the composed directory with the requested locales and the copy file. A locale without a headline for every capture fails before any file is written. Report each locale directory and its provenance.json.
+    role_id: role.store-screenshot-compose
+    output_paths:
+      - store/screenshots/composed/locales/
+    action_class: draft
+    idempotent: true
+  - id: workflow.store-screenshot-validate-deliverables
+    title: Validate composed deliverables
+    domain_id: domain.store-screenshot-compose
+    area_ids:
+      - area.store-screenshot-compose
+    trigger: Composed deliverables need a check before founder review and upload
+    instructions: Run compose.mjs validate against the composed directory and the wells table. Exit 0 means every output matches a well, every source capture exists with its recorded sha256, and provenance has no missing field. Exit 1 lists the failures. Save the JSON report. Upload stays with the asc route after founder approval.
+    role_id: role.store-screenshot-compose
+    output_paths:
+      - store/screenshots/validation.json
+    action_class: observe
+    idempotent: true

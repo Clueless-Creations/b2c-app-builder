@@ -1,0 +1,95 @@
+schema_version: 1.0.0
+id: reference.words.conversion-copy
+title: Conversion Copy
+domain_id: domain.words
+document_path: knowledge/words/conversion-copy.md
+load_when: "before writing any words a user reads: conversion copy (hero/CTA, store, paywall) and every in-app string
+  (buttons, empty states, errors, settings); and l10n readiness"
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.words.writing-quality-no-slop
+    - workflow.growth.pre-launch-funnel-landing-waitlist
+    - workflow.growth.landing-funnel-publication-and-live-proof
+    - workflow.growth.viral-growth-loop
+    - workflow.store.aso-and-store-ops
+    - workflow.store.app-store-listing-prep-packet
+    - workflow.store.store-screenshots-production
+    - workflow.store.google-play-metadata-standing-envelope
+    - workflow.store.asc-cli-automation
+    - workflow.money.revenue-monetization
+    - workflow.operations.resend-email-ops
+    - workflow.experience.onboarding-conversion
+    - workflow.words.copy-review-audit
+  context_pack_ids:
+    - context.words
+    - context.launch-surfaces
+sources:
+  - id: github-com-coreyhaines31-marketingskills
+    name: github.com
+    source_type: skill_pack
+    url: https://github.com/coreyhaines31/marketingskills
+    review_cadence_days: 90
+    claim_scope: MIT-licensed marketing skill pack (© Corey Haines 2025). Conversion-copywriting/copy-editing craft and
+      landing-page CRO discipline adapted with attribution and reframed for B2C mobile surfaces. Reference-and-adapt
+      only; do not vendor its skill files into templates or business repos. Most other skills in the pack (paid ads,
+      referrals, onboarding, ASO, email, social, SEO/GEO, pricing) are already covered by deeper B2C-mobile references
+      here and were intentionally not duplicated; its B2B skills (cold-email, prospecting, revops, sales-enablement) are
+      out of scope.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: support-google-com-play-developer-listing-policy
+    name: support.google.com
+    source_type: support_docs
+    url: https://support.google.com/googleplay/android-developer/answer/9859455
+    review_cadence_days: 7
+    claim_scope: Google Play store listing metadata policy (title/description constraints, prohibited promotional and
+      keyword-stuffing patterns). Refresh before locking Play listing copy rules.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-hig-writing
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/design/human-interface-guidelines/writing
+    review_cadence_days: 7
+    claim_scope: Apple HIG writing guidance for in-app voice, dialogs, and errors; Apple's capitalization stance is
+      pick-one-and-hold-it, which is why check:app-copy warns on mixed case instead of mandating one style. JS-rendered
+      page — verify via a browser-capable fetch when quoting exact phrasing.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: m3-material-io-content-design-style-guide
+    name: m3.material.io
+    source_type: official_docs
+    url: https://m3.material.io/foundations/content-design/style-guide
+    review_cadence_days: 7
+    claim_scope: Material 3 writing style guide; mandates sentence case on Android, the other half of the case-consistency
+      contract. JS-rendered page — verify via a browser-capable fetch when quoting exact phrasing.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-xcode-string-catalog
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/xcode/localizing-and-varying-text-with-a-string-catalog
+    review_cadence_days: 7
+    claim_scope: Xcode String Catalogs (.xcstrings), the current iOS string-externalization mechanism the
+      localization-readiness contract names. Refresh before changing iOS externalization guidance.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: docs-expo-dev-guides-localization
+    name: docs.expo.dev
+    source_type: official_docs
+    url: https://docs.expo.dev/guides/localization/
+    review_cadence_days: 7
+    claim_scope: Expo localization guide (expo-localization + i18next), the React Native externalization route the
+      localization-readiness contract names. Refresh before changing RN externalization guidance.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: docs-flutter-dev-ui-internationalization
+    name: docs.flutter.dev
+    source_type: official_docs
+    url: https://docs.flutter.dev/ui/internationalization
+    review_cadence_days: 7
+    claim_scope: Flutter internationalization (ARB + gen-l10n), the Flutter externalization route the localization-readiness
+      contract names. Refresh before changing Flutter externalization guidance.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

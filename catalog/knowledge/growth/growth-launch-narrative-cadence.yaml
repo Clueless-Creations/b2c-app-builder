@@ -1,0 +1,77 @@
+schema_version: 1.0.0
+id: reference.growth.launch-narrative-cadence
+title: Launch Narrative Cadence
+domain_id: domain.growth
+document_path: knowledge/growth/launch-narrative-cadence.md
+load_when: before drafting the announcement, the launch-day sequence, the tentpole-vs-weekly-cadence plan, or launch post copy
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.growth.launch-narrative-and-cadence
+  context_pack_ids:
+    - context.growth
+sources:
+  - id: shownmedia-com
+    name: Shown Media
+    source_type: website
+    url: https://shownmedia.com
+    review_cadence_days: 30
+    claim_scope: NYC viral go-to-market launch agency whose stated method (internet moments, algorithm/reply-chain craft,
+      4-6 week launch process) informs the launch-narrative-cadence lane. Self-reported aggregate view/revenue numbers
+      are unverified marketing claims and are not repeated as fact.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: shownmedia-com-tech
+    name: Shown Media tech launches
+    source_type: website
+    url: https://shownmedia.com/tech
+    review_cadence_days: 30
+    claim_scope: Shown Media tech/AI launch page; source for the 4-6 week process, the ~2-10M-view/~48-hour-peak outcome
+      band, and the disclosed client list used in the launch-narrative-cadence evidence base.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: the-ai-corner-com-shown-media-script-factory
+    name: The AI Corner profile of Shown Media
+    source_type: website
+    url: https://www.the-ai-corner.com/p/20-agent-ai-script-factory-10m-revenue
+    review_cadence_days: 30
+    claim_scope: Profile describing Shown Media's founders and Claude Code multi-agent script-factory method ("the system
+      doesn't invent taste, it encodes it"). Used for the launch-process description; credential claims beyond the
+      verified facts are flagged unverified in the reference.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: x-com-suekhim-koji-launch
+    name: Koji by Brilliant launch post (Sue Khim)
+    source_type: website
+    url: https://x.com/suekhim/status/2060378988606878147
+    review_cadence_days: 90
+    claim_scope: Verified tentpole launch artifact (~4.71M impressions) used as a feeling-first copy exemplar in
+      launch-narrative-cadence.md.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: blog-brilliant-org-world-class-tutor
+    name: Brilliant Koji launch post
+    source_type: website
+    url: https://blog.brilliant.org/a-world-class-tutor-in-every-home
+    review_cadence_days: 90
+    claim_scope: Brilliant's own post announcing Koji; supporting evidence for the Koji tentpole launch example.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: x-com-anvisha-moda-launch
+    name: Moda funding launch post (Anvisha Pai)
+    source_type: website
+    url: https://x.com/anvisha/status/2036474296353411290
+    review_cadence_days: 90
+    claim_scope: Verified tentpole launch artifact (~4.50M impressions) used to illustrate category-reframe copy and the
+      optional RT+comment engagement mechanic.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: x-com-chatgptapp-paperwork-feature
+    name: ChatGPT feature launch post
+    source_type: website
+    url: https://x.com/ChatGPTapp/status/2057908052968521902
+    review_cadence_days: 90
+    claim_scope: Verified weekly-heartbeat artifact (~2.66M impressions); model for framing a single small feature as an
+      event with feeling-first copy.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

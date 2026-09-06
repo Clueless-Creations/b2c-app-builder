@@ -1,0 +1,29 @@
+schema_version: 1.0.0
+id: reference.operations.paid-tool-routing
+title: Paid Tool Routing
+domain_id: domain.operations
+document_path: knowledge/operations/paid-tool-routing.md
+load_when: before using or replacing any paid/account-gated tool, before running a free fallback, or when a service is
+  missing from the runtime
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.operations.paid-tool-routing-and-fallback
+    - workflow.engineering.mobai-device-automation-and-demo-videos
+    - workflow.growth.paid-user-acquisition-system
+    - workflow.growth.fastlane-growth-ops
+    - workflow.orchestration.full-launch-program
+  context_pack_ids:
+    - context.operations
+sources:
+  - id: retention-mechanics-mcp
+    name: Retention Mechanics MCP server
+    source_type: api
+    url: https://github.com/Emuthmartinez/retention-mechanics-mcp
+    review_cadence_days: 30
+    claim_scope: First-party MCP over the Experience Card deck (mechanic search with risk ceilings, versioned card content,
+      ethics attestation scaffolds). Optional tooling - the bundled deck under knowledge/experience/experience-cards/ is
+      the frozen offline contract and every validator reads it; the server is preferred only when connected. Private
+      repo; local stdio during development.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

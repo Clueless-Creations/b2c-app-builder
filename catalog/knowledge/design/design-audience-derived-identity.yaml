@@ -1,0 +1,62 @@
+schema_version: 1.0.0
+id: reference.design.audience-derived-identity
+title: Audience-Derived Identity
+domain_id: domain.design
+document_path: knowledge/design/audience-derived-identity.md
+load_when: "when DESIGN.md is created or revised, when a visual direction is drafted or reviewed, and when the
+  Design Room needs the anti-generic review — derives palette/type/motion/imagery from strategy/RESEARCH.md audience
+  facts and names the generic-template tells"
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.design.brand-definition
+    - workflow.design.design-room
+    - workflow.design.design-system-audit
+  context_pack_ids:
+    - context.design
+sources:
+  - id: design-duolingo-com-identity-color
+    name: design.duolingo.com
+    source_type: official_docs
+    url: https://design.duolingo.com/identity/color
+    review_cadence_days: 90
+    claim_scope: Duolingo's published brand color system, grounding the character-led case study (palette values and the
+      against-category-default rationale).
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-whoop-com-design-guidelines
+    name: developer.whoop.com
+    source_type: official_docs
+    url: https://developer.whoop.com/docs/developing/design-guidelines/
+    review_cadence_days: 90
+    claim_scope: WHOOP's published design guidelines, grounding the performance/dark/data-dense case study (locked semantic
+      color system, numeral typeface split, dark-canvas usage rationale).
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: styles-refero-design-flighty
+    name: styles.refero.design
+    source_type: website
+    url: https://styles.refero.design/
+    review_cadence_days: 90
+    claim_scope: Refero's captured design-system records, grounding the Flighty case study (achromatic ramp, single action
+      color, platform-native type rule, pill radius system).
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-behind-the-design-flighty
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/news/?id=970ncww4
+    review_cadence_days: 90
+    claim_scope: Apple's Behind the Design interview on Flighty, grounding the aviation-insider audience framing of that
+      case study.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: dev-to-tailwind-indigo-default-analysis
+    name: dev.to
+    source_type: website
+    url: https://dev.to/alanwest/why-every-ai-built-website-looks-the-same-blame-tailwinds-indigo-500-3h2p
+    review_cadence_days: 90
+    claim_scope: The documented mechanism behind the indigo/purple-gradient generic-AI tell (Tailwind UI default propagating
+      through training corpora), grounding the Generic-Design Tells table.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

@@ -1,0 +1,29 @@
+id: asc-cli-app-create-screenshot-orchestration-missed
+title: Agent underclaims ASC CLI app creation and screenshot upload capability
+prompt: >
+  The founder asks the agent to create the App Store Connect app, produce iPhone and
+  iPad screenshots with app-store-screenshots plus Higgsfield/design files, and upload
+  them through ASC CLI. The agent replies that it cannot create the app and gives only
+  manual App Store Connect click instructions. It also mentions screenshots but never
+  resolves ASC IDs, app creation route, screenshot device wells, version-localization
+  IDs, or upload validation.
+expected_guardrail: >
+  The agent must route ASC work through app-store-connect-cli.md and current ASC CLI
+  skills before a manual-only handoff. App creation, metadata, screenshots, TestFlight,
+  review status, products/subscriptions, and RevenueCat catalog sync are supported routes
+  when auth/account/founder gates are satisfied. Screenshot production must use real UI,
+  ParthJadhav/app-store-screenshots or equivalent composition/export proof, current Apple
+  iPhone/iPad wells, asc-screenshot-resize validation, and asc-shots-pipeline upload proof.
+validators:
+  - check-store-console-packet
+  - check-store-screenshots
+  - check-source-freshness
+must_catch:
+  - Manual-only App Store Connect app creation is not the default when ASC CLI/skills are available.
+  - Founder approval, auth, roles, agreements, app name, bundle ID, and SKU are gates, not proof the agent cannot create the app.
+  - Screenshot upload needs version-localization IDs, ASC device types, current iPhone/iPad wells, and validation before upload.
+  - ParthJadhav/app-store-screenshots must be an operational export route with saved state, not a style suggestion.
+should_say:
+  - Load app-store-connect-cli.md, apple-signing-release.md, app-store-listing-prep.md, and store-console-workflow.md.
+  - Record ASC auth/status, app creation route, sticky-field founder gate, and dry-run/apply distinction.
+  - Create or update SCREENSHOTS.md with the composition/export board, required/scaled device wells, final paths, validation, and upload status.

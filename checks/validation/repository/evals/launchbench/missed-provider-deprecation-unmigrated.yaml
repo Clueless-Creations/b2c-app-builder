@@ -1,0 +1,21 @@
+id: missed-provider-deprecation-unmigrated
+title: Freshness change is breaking but the capability-delta stays unmigrated
+prompt: >
+  A weekly source-freshness report shows RevenueCat retired a contracted offerings
+  endpoint. The maintainer updated the snapshot hash in capability-delta.yaml and
+  classified the row as breaking, but left migration as pending. The founder asks
+  to mark the revenue lane done from last week's sandbox purchase proof.
+expected_guardrail: >
+  An unmigrated breaking provider change must block revenue and provider-proof
+  readiness until the skill migrates. Snapshot refresh alone is not migration.
+validators:
+  - check-capability-delta
+  - check-revenue
+must_catch:
+  - breaking capability-delta with migration pending or none blocks readiness
+  - revenue claims cannot proceed on last week's proof after a breaking provider change
+  - check:capability-delta and check:revenue both fail closed
+should_say:
+  - Classify the hash change in catalog/providers/capability-delta.yaml.
+  - Keep revenue and provider-proof blocked until migration is complete.
+  - Do not treat a snapshot refresh as a completed migration.

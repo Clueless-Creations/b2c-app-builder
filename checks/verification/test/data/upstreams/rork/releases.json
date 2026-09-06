@@ -1,0 +1,506 @@
+[
+  {
+    "tag_name": "4.11.0",
+    "name": "4.11.0",
+    "prerelease": false,
+    "draft": false,
+    "published_at": "2026-08-29T10:09:07Z",
+    "target_commitish": "main",
+    "html_url": "https://github.com/rorkai/App-Store-Connect-CLI/releases/tag/4.11.0",
+    "body": "## What's Changed\n* apps wall: add TapTape by @superkam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2216\n* fix(docs): preserve help output with cold Go cache by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2223\n* build(deps): bump github.com/aws/aws-sdk-go-v2 from 1.43.6 to 1.43.7 by @dependabot[bot] in https://github.com/rorkai/App-Store-Connect-CLI/pull/2222\n* build(deps): bump github.com/aws/smithy-go from 1.27.8 to 1.27.10 by @dependabot[bot] in https://github.com/rorkai/App-Store-Connect-CLI/pull/2221\n* build(deps): bump github.com/aws/aws-sdk-go-v2/credentials from 1.19.36 to 1.19.37 by @dependabot[bot] in https://github.com/rorkai/App-Store-Connect-CLI/pull/2218\n* build(deps): bump github.com/aws/aws-sdk-go-v2/service/s3 from 1.107.1 to 1.107.3 by @dependabot[bot] in https://github.com/rorkai/App-Store-Connect-CLI/pull/2220\n* build(deps): bump github.com/bitrise-io/go-utils/v2 from 2.0.0-alpha.37 to 2.0.0-alpha.38 by @dependabot[bot] in https://github.com/rorkai/App-Store-Connect-CLI/pull/2219\n* fix(notify): keep Slack validation diagnostics concise by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2224\n* fix(telemetry): classify snitch descriptions as leaf calls by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2225\n* Add deep submission validation by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2226\n* apps wall: add Somilo by @nogu66 in https://github.com/rorkai/App-Store-Connect-CLI/pull/2217\n\n## New Contributors\n* @superkam made their first contribution in https://github.com/rorkai/App-Store-Connect-CLI/pull/2216\n* @nogu66 made their first contribution in https://github.com/rorkai/App-Store-Connect-CLI/pull/2217\n\n**Full Changelog**: https://github.com/rorkai/App-Store-Connect-CLI/compare/4.10.0...4.11.0",
+    "assets": [
+      {
+        "name": "asc_4.11.0_checksums.txt",
+        "size": 451,
+        "digest": "sha256:3fd036048559a07684cea47c1f447b010978365e9c9970e89d1803ec52d82f7e"
+      },
+      {
+        "name": "asc_4.11.0_linux_amd64",
+        "size": 53563554,
+        "digest": "sha256:5b963646eb39d51f8b1ac44466bf5e23fc2e41ae25debaa1b221c883a17a8591"
+      },
+      {
+        "name": "asc_4.11.0_linux_arm64",
+        "size": 48693410,
+        "digest": "sha256:aa81ffabd8c755ad2aae6ff9b79267d4523bcecc5c1f9c7f4abe33b8b52ad774"
+      },
+      {
+        "name": "asc_4.11.0_macOS_amd64",
+        "size": 54628208,
+        "digest": "sha256:276b0ca833041294983fa2506e428b2a5ad29915a141b709251ea90e4a4ef3b4"
+      },
+      {
+        "name": "asc_4.11.0_macOS_arm64",
+        "size": 49344576,
+        "digest": "sha256:b928a12dec6be975271a2d374ba811717447a211089c6c89d3318d32c61c8202"
+      },
+      {
+        "name": "asc_4.11.0_windows_amd64.exe",
+        "size": 54329344,
+        "digest": "sha256:bff86fc63a40924b71800e78486512ca3a7e55c7a60be17031d70a1019398403"
+      }
+    ]
+  },
+  {
+    "tag_name": "4.10.0",
+    "name": "4.10.0",
+    "prerelease": false,
+    "draft": false,
+    "published_at": "2026-08-27T10:01:52Z",
+    "target_commitish": "main",
+    "html_url": "https://github.com/rorkai/App-Store-Connect-CLI/releases/tag/4.10.0",
+    "body": "## What's Changed\n* apps wall: add Ordsnok - Snoop for words by @Strangees in https://github.com/rorkai/App-Store-Connect-CLI/pull/2200\n* apps wall: add takt - car glance by @juergen-kc in https://github.com/rorkai/App-Store-Connect-CLI/pull/2201\n* fix(json): preserve sparse resource attribute presence by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2203\n* feat(product-pages): expose custom page query controls by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2183\n* feat(app-events): expose list query controls by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2182\n* fix(cli): sanitize usage diagnostics for terminal output by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2204\n* fix(signing): guard pagination cycles during fetch by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2206\n* fix(upload): reject zero-length asset operations by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2202\n* fix(analytics): paginate reports from continuation URLs by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2205\n* feat(iap): add v2 list query filters by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2209\n* fix(cli): classify list validation as usage errors by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2208\n* feat(bundle-ids): expose list query controls by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2184\n* test(metadata): stabilize pagination deadline check by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2212\n* feat(certificates): expose list query controls by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2185\n* fix(json): preserve null sparse resource attributes by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2213\n* fix(screenshots): paginate complete screenshot collections by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2207\n* feat(xcode-cloud): expose CI product list query controls by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2211\n* feat(versions): add --latest to reduce to the newest version per platform by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2131\n* Add TestFlight group creation controls by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2088\n* feat(profiles): expose list query controls by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2186\n* feat(subscriptions): expose price list query controls by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2210\n* test(telemetry): remove Windows timing flake by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2214\n* feat(testflight): expose beta group list query controls by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2188\n* feat(users): expose list query controls by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2187\n* feat(metadata): check URL destinations during validation by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2215\n* feat(completion): support nested commands and flags by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2115\n* feat(validate): report screenshot sets over the 10-screenshot cap by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2125\n* feat(testflight): expose sort, include, and invite-type on testers list by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2114\n* feat(analytics): allow missing sales reports by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2103\n* feat(validation): flag placeholder copy in App Store metadata by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2110\n\n## New Contributors\n* @Strangees made their first contribution in https://github.com/rorkai/App-Store-Connect-CLI/pull/2200\n\n**Full Changelog**: https://github.com/rorkai/App-Store-Connect-CLI/compare/4.9.4...4.10.0",
+    "assets": [
+      {
+        "name": "asc_4.10.0_checksums.txt",
+        "size": 451,
+        "digest": "sha256:e52aa7d81b8cdffd36b24d5101229154d4901fe55c0d8d8165d423245251c211"
+      },
+      {
+        "name": "asc_4.10.0_linux_amd64",
+        "size": 53461154,
+        "digest": "sha256:c0881f21d0bd7ab53465cd08e92b091a0fd44bd1a2d9cc07a13bd5ee06a5f744"
+      },
+      {
+        "name": "asc_4.10.0_linux_arm64",
+        "size": 48627874,
+        "digest": "sha256:9c908776f44febe08a8e84f9c7fa72bbdcc184ca99889c100f5cb36776949598"
+      },
+      {
+        "name": "asc_4.10.0_macOS_amd64",
+        "size": 54529040,
+        "digest": "sha256:b1b90d3479652179489dfab65583e5470433ce62bf8d1b4ad31d259161bc5c59"
+      },
+      {
+        "name": "asc_4.10.0_macOS_arm64",
+        "size": 49278832,
+        "digest": "sha256:a1d47bf80756558caef984f62ece891809f06d8f6e36f00ebd9d1acae81e2320"
+      },
+      {
+        "name": "asc_4.10.0_windows_amd64.exe",
+        "size": 54225920,
+        "digest": "sha256:3c831dee4a2f11081dbf0d56e7e2db4615ae969240e10c42794113e72a62718e"
+      }
+    ]
+  },
+  {
+    "tag_name": "4.9.4",
+    "name": "4.9.4",
+    "prerelease": false,
+    "draft": false,
+    "published_at": "2026-08-26T17:23:46Z",
+    "target_commitish": "main",
+    "html_url": "https://github.com/rorkai/App-Store-Connect-CLI/releases/tag/4.9.4",
+    "body": "## What's Changed\n* fix(xcode): accept project paths with trailing separators by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2169\n* fix(app-clips): reject repeated CSV mutation flags by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2174\n* fix(apps): preserve partial published audits by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2176\n* fix(users): confirm visible app replacement by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2175\n* fix(auth): normalize stored profile names by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2167\n\n\n**Full Changelog**: https://github.com/rorkai/App-Store-Connect-CLI/compare/4.9.3...4.9.4",
+    "assets": [
+      {
+        "name": "asc_4.9.4_checksums.txt",
+        "size": 446,
+        "digest": "sha256:03a079d40a68a7172170a42e893f14d3a33bb3417effbe31958e2cfd24663abc"
+      },
+      {
+        "name": "asc_4.9.4_linux_amd64",
+        "size": 52400290,
+        "digest": "sha256:f0893706d3edf24df45da72c0f29ce6768ea216e5b386061eca9b3e260342472"
+      },
+      {
+        "name": "asc_4.9.4_linux_arm64",
+        "size": 47710370,
+        "digest": "sha256:495754f089003588190a42c8dfc0f15063e3336a05fca2daf6923d4463a13e13"
+      },
+      {
+        "name": "asc_4.9.4_macOS_amd64",
+        "size": 53457760,
+        "digest": "sha256:f1556df28fcd249d385c15aa521c4e4fb972e46d13b9815bc98b1062a19f1ab8"
+      },
+      {
+        "name": "asc_4.9.4_macOS_arm64",
+        "size": 48308368,
+        "digest": "sha256:c0fed0518f8e42e5f8ee469882c153ecaa82d7a29743102dac278572c23f2693"
+      },
+      {
+        "name": "asc_4.9.4_windows_amd64.exe",
+        "size": 53136896,
+        "digest": "sha256:8bc78e50a0b0c505b0ba226879abbd12c530d0b16fca46f41d777040a0ac0fd7"
+      }
+    ]
+  },
+  {
+    "tag_name": "4.9.3",
+    "name": "4.9.3",
+    "prerelease": false,
+    "draft": false,
+    "published_at": "2026-08-26T08:17:52Z",
+    "target_commitish": "main",
+    "html_url": "https://github.com/rorkai/App-Store-Connect-CLI/releases/tag/4.9.3",
+    "body": "## What's Changed\n* apps wall: add Otis — A friend to your stocks by @iamngoni in https://github.com/rorkai/App-Store-Connect-CLI/pull/2199\n* fix(subscriptions): validate price-point stream output flags by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2166\n* fix(itunes): honor ratings histogram cancellation by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2168\n* fix(reports): reject symlinked file parents by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2171\n* fix(game-center): confirm relationship replacements by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2172\n* fix(testflight): preserve tester metric payloads by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2177\n* fix(encryption): reject repeated build IDs by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2180\n\n## New Contributors\n* @iamngoni made their first contribution in https://github.com/rorkai/App-Store-Connect-CLI/pull/2199\n\n**Full Changelog**: https://github.com/rorkai/App-Store-Connect-CLI/compare/4.9.2...4.9.3",
+    "assets": [
+      {
+        "name": "asc_4.9.3_checksums.txt",
+        "size": 446,
+        "digest": "sha256:7788bad3a5aa7c7dd5611192522210a9b38dadd371d4b2ad5140e4690045b57a"
+      },
+      {
+        "name": "asc_4.9.3_linux_amd64",
+        "size": 52363426,
+        "digest": "sha256:05c90865a9bde6cb931b7010512e071709b7aaa7d780378bbafe808b1af4dcdc"
+      },
+      {
+        "name": "asc_4.9.3_linux_arm64",
+        "size": 47710370,
+        "digest": "sha256:f88c7f0aeef4b7277b9bdf568ddcf25ca1ccad0bb809b4c5ca8c205ab07ebc34"
+      },
+      {
+        "name": "asc_4.9.3_macOS_amd64",
+        "size": 53420560,
+        "digest": "sha256:67ba4772f8bad683136193af7f1e14716508d21ed95e65eaaf7884038a876b50"
+      },
+      {
+        "name": "asc_4.9.3_macOS_arm64",
+        "size": 48275504,
+        "digest": "sha256:d933a71cfe73bfb233bc68c17da8e372fcef2a42f0a8c32355051eb09cac4383"
+      },
+      {
+        "name": "asc_4.9.3_windows_amd64.exe",
+        "size": 53098496,
+        "digest": "sha256:7185fe6ca94b1f710b4b3e9c40b96dd42d3b96aa590822ccdf35fd8a5e47a094"
+      }
+    ]
+  },
+  {
+    "tag_name": "4.9.2",
+    "name": "4.9.2",
+    "prerelease": false,
+    "draft": false,
+    "published_at": "2026-08-25T11:05:11Z",
+    "target_commitish": "main",
+    "html_url": "https://github.com/rorkai/App-Store-Connect-CLI/releases/tag/4.9.2",
+    "body": "## What's Changed\n* apps wall: add Quit Caffeine: Stop Coffee by @kempsu in https://github.com/rorkai/App-Store-Connect-CLI/pull/2191\n* apps wall: add Focus & Streak: That One Thing by @kempsu in https://github.com/rorkai/App-Store-Connect-CLI/pull/2192\n* apps wall: add Baby Sleep Sounds - Dozy by @kempsu in https://github.com/rorkai/App-Store-Connect-CLI/pull/2193\n* apps wall: add MultiPods Audio by @kempsu in https://github.com/rorkai/App-Store-Connect-CLI/pull/2194\n* apps wall: add QELM by @dcodeu in https://github.com/rorkai/App-Store-Connect-CLI/pull/2195\n* apps wall: add Convusic by @vsanthanam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2197\n* fix(itunes): cap oversized Retry-After delays by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2165\n* fix(sandbox): preserve list filters across pagination by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2173\n* fix(web): explain missing company name on app create by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2178\n* fix(subscriptions): reconcile setup price mutations by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2181\n* docs: the app-scoped builds endpoint hides the latest build by @dcodeu in https://github.com/rorkai/App-Store-Connect-CLI/pull/2196\n* fix(cli): keep known flag parse errors concise by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2170\n* fix(builds): reject filters combined with next cursor by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2179\n* docs(skills): personalize wall approvals and codify protected-merge cycle by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2198\n\n## New Contributors\n* @kempsu made their first contribution in https://github.com/rorkai/App-Store-Connect-CLI/pull/2191\n* @dcodeu made their first contribution in https://github.com/rorkai/App-Store-Connect-CLI/pull/2195\n* @vsanthanam made their first contribution in https://github.com/rorkai/App-Store-Connect-CLI/pull/2197\n\n**Full Changelog**: https://github.com/rorkai/App-Store-Connect-CLI/compare/4.9.1...4.9.2",
+    "assets": [
+      {
+        "name": "asc_4.9.2_checksums.txt",
+        "size": 446,
+        "digest": "sha256:a1f3e985475423b84a2ccc3cae4269da58670ac401b8a76e2292b61cf0a97b92"
+      },
+      {
+        "name": "asc_4.9.2_linux_amd64",
+        "size": 52334754,
+        "digest": "sha256:123cef4fce6c331e04e57959c37b24fff98d5dd599c944180c81b3011b4c0a2f"
+      },
+      {
+        "name": "asc_4.9.2_linux_arm64",
+        "size": 47644834,
+        "digest": "sha256:51717824d8e71d21da13efe0a7305d7b8de24b970b2290e6332585635b4e8065"
+      },
+      {
+        "name": "asc_4.9.2_macOS_amd64",
+        "size": 53395760,
+        "digest": "sha256:b8f480df032af393beee211791b9d1a622838c3957363844b8c6eefdba759a89"
+      },
+      {
+        "name": "asc_4.9.2_macOS_arm64",
+        "size": 48259056,
+        "digest": "sha256:b5389ac19f33f2be6fbf3e312cbdb7f26d08d16ab2023a778a1cd37d6e8d6ac5"
+      },
+      {
+        "name": "asc_4.9.2_windows_amd64.exe",
+        "size": 53072896,
+        "digest": "sha256:9acf0c755148c3043d4488ffcd2e72dbaeea049bf71a4c15f32d3fc5a827cdf8"
+      }
+    ]
+  },
+  {
+    "tag_name": "4.9.1",
+    "name": "4.9.1",
+    "prerelease": false,
+    "draft": false,
+    "published_at": "2026-08-24T14:49:02Z",
+    "target_commitish": "main",
+    "html_url": "https://github.com/rorkai/App-Store-Connect-CLI/releases/tag/4.9.1",
+    "body": "## What's Changed\n* fix(cli): classify usage errors in top failure-parameter blind spots by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2119\n* Make build upload failures actionable by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2087\n* fix(testflight): make post-upload test-notes failures recoverable by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2108\n* fix(builds): match equivalent X.Y and X.Y.0 pre-release versions by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2085\n* fix: ergonomics for the two most-failed required flags by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2117\n* fix(asc): explain agreement-blocked 403 responses by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2124\n* docs(cli): teach the discovery loop on the root help screen by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2128\n* test: add shared off-test-goroutine assertion helper and convert the concurrency-sensitive suites by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2133\n* fix(previews): pin preview upload order and report partial results by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2081\n* fix(itunes): retry rate-limited public App Store reads by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2122\n* test(pricing): adapt merged availability fixtures by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2164\n\n\n**Full Changelog**: https://github.com/rorkai/App-Store-Connect-CLI/compare/4.9.0...4.9.1",
+    "assets": [
+      {
+        "name": "asc_4.9.1_checksums.txt",
+        "size": 446,
+        "digest": "sha256:80ff37da4dc43ec67cf39fb6b5e913ec413ef63e707af0b49bbbc2fe41f5e92e"
+      },
+      {
+        "name": "asc_4.9.1_linux_amd64",
+        "size": 52310178,
+        "digest": "sha256:7cc0bb402d2de0e6c48e3db7689dbb04fd1a0f7287a0381b964068c4522aecc2"
+      },
+      {
+        "name": "asc_4.9.1_linux_arm64",
+        "size": 47644834,
+        "digest": "sha256:a5b32cdd73e92552d6bd72c7158dd359bc9aeae283e8107453ce82b0409b0097"
+      },
+      {
+        "name": "asc_4.9.1_macOS_amd64",
+        "size": 53366800,
+        "digest": "sha256:4c44fd603854e7e1d62b7f531f3cca1827e310d346239bf272253c50b7f49641"
+      },
+      {
+        "name": "asc_4.9.1_macOS_arm64",
+        "size": 48226160,
+        "digest": "sha256:b05825228d780afbf227beeea30686013b59516990968288e60d8ce9358f79ef"
+      },
+      {
+        "name": "asc_4.9.1_windows_amd64.exe",
+        "size": 53047296,
+        "digest": "sha256:eb97e58bdeb74428657127de0a471275d13a44cda2a0e131bffa313f343874e3"
+      }
+    ]
+  },
+  {
+    "tag_name": "4.9.0",
+    "name": "4.9.0",
+    "prerelease": false,
+    "draft": false,
+    "published_at": "2026-08-23T10:33:37Z",
+    "target_commitish": "main",
+    "html_url": "https://github.com/rorkai/App-Store-Connect-CLI/releases/tag/4.9.0",
+    "body": "## What's Changed\n* feat(metadata): catch push-time metadata rejections offline by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2086\n* feat(pricing): availability platforms command + app-wide removal guard by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2121\n* feat(versions): resolve view by app and version by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2100\n* feat(testflight): tester removal --wait, export name filters; require --confirm on game-center relationship removal by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2132\n* feat(optimize): add keyword rank evaluation by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2120\n* feat(age-rating): audit subcommand for September 2026 social-media responses by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2127\n* feat(web): add agreements status and accept commands by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2134\n* feat(optimize): score keyword candidates against official Apple sources by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2123\n* feat(optimize): discover keyword candidates from official Apple Ads suggestions by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2126\n* feat(subscriptions): derive localized prices from another subscription by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2163\n\n\n**Full Changelog**: https://github.com/rorkai/App-Store-Connect-CLI/compare/4.8.0...4.9.0",
+    "assets": [
+      {
+        "name": "asc_4.9.0_checksums.txt",
+        "size": 446,
+        "digest": "sha256:dcb4c8e6207e873ff63128c333e5595db1e8e18c8cca431e454ae751b2a9c54a"
+      },
+      {
+        "name": "asc_4.9.0_linux_amd64",
+        "size": 52269218,
+        "digest": "sha256:45311a9b3d76b1f7d9103e5f9f1a8410176707e7ea61b527fb4a49e723223287"
+      },
+      {
+        "name": "asc_4.9.0_linux_arm64",
+        "size": 47579298,
+        "digest": "sha256:c2e1591a77ec66d63ebad748604cc088bb948e6a894edcaa0ea892150471fe0a"
+      },
+      {
+        "name": "asc_4.9.0_macOS_amd64",
+        "size": 53329568,
+        "digest": "sha256:d14bb7adc5f04ed1c5263be0152648f168e0711da135f269b580a50e3a34a6be"
+      },
+      {
+        "name": "asc_4.9.0_macOS_arm64",
+        "size": 48193264,
+        "digest": "sha256:df3efaec856f16a0c6d6093c3266e44ba664fcfdcfe2dae4791a9cd3c03657e3"
+      },
+      {
+        "name": "asc_4.9.0_windows_amd64.exe",
+        "size": 53006848,
+        "digest": "sha256:456d3d222bceb05551f3890d85079b8c780353dfaf8989a4dc752ff21661d515"
+      }
+    ]
+  },
+  {
+    "tag_name": "4.8.0",
+    "name": "4.8.0",
+    "prerelease": false,
+    "draft": false,
+    "published_at": "2026-08-22T18:29:32Z",
+    "target_commitish": "main",
+    "html_url": "https://github.com/rorkai/App-Store-Connect-CLI/releases/tag/4.8.0",
+    "body": "## What's Changed\n* build(deps): bump github.com/aws/aws-sdk-go-v2/config from 1.32.36 to 1.32.37 by @dependabot[bot] in https://github.com/rorkai/App-Store-Connect-CLI/pull/2140\n* build(deps): bump golang.org/x/crypto from 0.54.0 to 0.55.0 by @dependabot[bot] in https://github.com/rorkai/App-Store-Connect-CLI/pull/2143\n* build(deps): bump github.com/bitrise-io/go-utils/v2 from 2.0.0-alpha.36 to 2.0.0-alpha.37 by @dependabot[bot] in https://github.com/rorkai/App-Store-Connect-CLI/pull/2144\n* Register devices from validated TSV files by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2065\n* feat(builds): expose the full /v1/builds query surface on builds list by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2073\n* feat(localizations): update directly by resource ID by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2096\n* feat(categories): paginate categories list with --next and --paginate by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2106\n* feat(apps): sort apps list by SKU and filter by version/review-submission state by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2111\n* fix(snitch): redact credentials before reporting by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2095\n* fix(system-status): accept completed incidents by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2146\n* fix(xcode-cloud): include artifacts from every run action by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2147\n* feat(xcode-cloud): add build run doctor by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2148\n* feat(xcode-cloud): diagnose waited runs by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2149\n* apps wall: add Sunrise Sunset Time SolarWatch by @ekurutepe in https://github.com/rorkai/App-Store-Connect-CLI/pull/2150\n* apps wall: add Elite Soccer Tactic Board by @ekurutepe in https://github.com/rorkai/App-Store-Connect-CLI/pull/2151\n* apps wall: add DuoCam Multicam Video Camera by @ekurutepe in https://github.com/rorkai/App-Store-Connect-CLI/pull/2152\n* docs: make PR validation and base refresh proportional by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2153\n* docs(skills): speed up maintainer workflows by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2154\n* fix(auth): validate environment private keys in doctor by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2155\n* fix(analytics): warn when report output is truncated by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2156\n* fix(auth): report environment precedence in status by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2157\n* feat(cli): suggest common tasks on unknown subcommands by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2112\n* fix(xcode-cloud): accept deprecated --id on status by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2159\n* fix(metadata): add targeted flag recovery guidance by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2160\n* fix(metadata): keep required-input errors concise by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2158\n* docs(auth): clarify credential precedence by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2161\n* feat(auth): stage logout confirmation by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2162\n\n## New Contributors\n* @ekurutepe made their first contribution in https://github.com/rorkai/App-Store-Connect-CLI/pull/2150\n\n**Full Changelog**: https://github.com/rorkai/App-Store-Connect-CLI/compare/4.7.1...4.8.0",
+    "assets": [
+      {
+        "name": "asc_4.8.0_checksums.txt",
+        "size": 446,
+        "digest": "sha256:c71b8e53ff397a22879ae42e6555023951cf1b8f125d1d36e8dfb127813bd386"
+      },
+      {
+        "name": "asc_4.8.0_linux_amd64",
+        "size": 51867810,
+        "digest": "sha256:2d9b167373ad2f937b0bee6a295466e4717e8c3bfc49439193dc448bf11a7f0c"
+      },
+      {
+        "name": "asc_4.8.0_linux_arm64",
+        "size": 47251618,
+        "digest": "sha256:ca493a89734ffa054ea08d5c9091898ec65d28ea269393b60f290c6c4ffc3aa5"
+      },
+      {
+        "name": "asc_4.8.0_macOS_amd64",
+        "size": 52924528,
+        "digest": "sha256:218bddde7b3d6bec8720a62f970e25f74a4a835e342058c494d59eb4e518cce7"
+      },
+      {
+        "name": "asc_4.8.0_macOS_arm64",
+        "size": 47831632,
+        "digest": "sha256:1bda05cd83973fa44eff505d0b44b99dc9543ee6e268181cb78d874e4747653a"
+      },
+      {
+        "name": "asc_4.8.0_windows_amd64.exe",
+        "size": 52598784,
+        "digest": "sha256:7a997cceb827e3a699c56201c036852b4e577f1ba30a32f1b612aeb3dfa21aaf"
+      }
+    ]
+  },
+  {
+    "tag_name": "4.7.1",
+    "name": "4.7.1",
+    "prerelease": false,
+    "draft": false,
+    "published_at": "2026-08-21T16:37:58Z",
+    "target_commitish": "main",
+    "html_url": "https://github.com/rorkai/App-Store-Connect-CLI/releases/tag/4.7.1",
+    "body": "## What's Changed\n* fix(video-previews): preflight set capacity by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2098\n* docs(help): keep command examples first-party by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2092\n* Reject query flags that continuation URLs would discard by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2113\n* fix(cli): report unsupported output formats in enum style by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2084\n* test(itunes): forbid score-ordered tvOS ranking by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2104\n* fix(web): sanitize Bundle ID patch attributes by @Skywt2003 in https://github.com/rorkai/App-Store-Connect-CLI/pull/2137\n* fix(subscriptions): honor --dry-run for single-territory intro offers by @aliosmanozturk1 in https://github.com/rorkai/App-Store-Connect-CLI/pull/2139\n* fix(search): prioritize precise command paths by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2107\n* fix(cli): identify misplaced global flags by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2091\n* docs(versions): add worked examples to versions group help by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2077\n* fix(subscriptions): correct localization selector flag ergonomics by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2118\n\n## New Contributors\n* @Skywt2003 made their first contribution in https://github.com/rorkai/App-Store-Connect-CLI/pull/2137\n* @aliosmanozturk1 made their first contribution in https://github.com/rorkai/App-Store-Connect-CLI/pull/2139\n\n**Full Changelog**: https://github.com/rorkai/App-Store-Connect-CLI/compare/4.7.0...4.7.1",
+    "assets": [
+      {
+        "name": "asc_4.7.1_checksums.txt",
+        "size": 446,
+        "digest": "sha256:37dab545db8f68b448936cfd7478e86a5d5ab2c8a232ca77583f028287ca9f16"
+      },
+      {
+        "name": "asc_4.7.1_linux_amd64",
+        "size": 51277986,
+        "digest": "sha256:83847887f5546184e72c4358aef7ecb06f7c67b05f7e81a9c9fea0a22f03b527"
+      },
+      {
+        "name": "asc_4.7.1_linux_arm64",
+        "size": 46661794,
+        "digest": "sha256:e29d2c6968ae952a98c87ffcfcc609e26f6cddc762f02081d2a960215cdf0c59"
+      },
+      {
+        "name": "asc_4.7.1_macOS_amd64",
+        "size": 52321136,
+        "digest": "sha256:ed3a3f65c53d72583e2c53577e2f63d4c1c891d5efcd313c0fef433ec8db93eb"
+      },
+      {
+        "name": "asc_4.7.1_macOS_arm64",
+        "size": 47289232,
+        "digest": "sha256:b0facdac1704c33c9ff5afa96220f2d4c77dc0c1d177084fa13deacd2d34fc4b"
+      },
+      {
+        "name": "asc_4.7.1_windows_amd64.exe",
+        "size": 51997184,
+        "digest": "sha256:a4dfded31606d5d5284351f24960dbc844fbd68cb334e2a04abca194f1225dbf"
+      }
+    ]
+  },
+  {
+    "tag_name": "4.7.0",
+    "name": "4.7.0",
+    "prerelease": false,
+    "draft": false,
+    "published_at": "2026-08-21T08:02:54Z",
+    "target_commitish": "main",
+    "html_url": "https://github.com/rorkai/App-Store-Connect-CLI/releases/tag/4.7.0",
+    "body": "## What's Changed\n* Retry asset upload parts on transient failures by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2069\n* fix(builds): survive transient errors during long build waits by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2075\n* Reject images whose format contradicts their extension by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2078\n* fix(screenshots): wait for checksum settlement by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2097\n* fix(screenshots): make capacity recovery actionable by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2102\n* Preserve unchanged screenshot downloads by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2067\n* feat(screenshots): list by version and locale by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2094\n* feat(localizations): add --include to localizations list by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2109\n* feat(versions): add --include to versions list by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2068\n* feat(reviews): multi-rating --stars and version-scoped review filters by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2080\n* feat(status): surface latest build internal state and expiry by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2105\n* fix(cli): print explicitly requested help to stdout by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2070\n* fix(testflight): route app-scoped beta group filters through /v1/betaGroups by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2074\n* fix(asc): retry rate-limited mutating requests by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2076\n* fix(asc): bound honored Retry-After by the retry cap by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2129\n* fix(cli): make --build-id the canonical build selector by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2079\n* feat(auth): detect swapped key and issuer IDs before the 401 by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2116\n\n\n**Full Changelog**: https://github.com/rorkai/App-Store-Connect-CLI/compare/4.6.1...4.7.0",
+    "assets": [
+      {
+        "name": "asc_4.7.0_checksums.txt",
+        "size": 446,
+        "digest": "sha256:d79b4b95f55276e13e243bbcb4caf269d1e053448d756cc25d9b510f850d1ba2"
+      },
+      {
+        "name": "asc_4.7.0_linux_amd64",
+        "size": 51241122,
+        "digest": "sha256:d465e413178830dae2ef43a2f1b6e7d5c374f60b73a22ca56bc2f3e892d7609e"
+      },
+      {
+        "name": "asc_4.7.0_linux_arm64",
+        "size": 46661794,
+        "digest": "sha256:2da1a98a38731bf0581ddc06a1c097c3eebb4fb7c4e59000be6224785f6eaab1"
+      },
+      {
+        "name": "asc_4.7.0_macOS_amd64",
+        "size": 52283920,
+        "digest": "sha256:59376378d05ed7d1b315a687eb5331ed88b4cb60b55594c615703e23675ac7db"
+      },
+      {
+        "name": "asc_4.7.0_macOS_arm64",
+        "size": 47272752,
+        "digest": "sha256:a4b5ab178c9acb366f45e44d3eac2f97ddd4141a3ddac610f0e5e4d46d48aab9"
+      },
+      {
+        "name": "asc_4.7.0_windows_amd64.exe",
+        "size": 51960832,
+        "digest": "sha256:333303421a3af0ea686f81c2668a2e42736e2dd7e017edb8e4d09c41d8826b89"
+      }
+    ]
+  },
+  {
+    "tag_name": "4.6.1",
+    "name": "4.6.1",
+    "prerelease": false,
+    "draft": false,
+    "published_at": "2026-08-20T13:29:48Z",
+    "target_commitish": "main",
+    "html_url": "https://github.com/rorkai/App-Store-Connect-CLI/releases/tag/4.6.1",
+    "body": "## What's Changed\n* apps wall: add Secure Storage: Private Vault by @sbis04 in https://github.com/rorkai/App-Store-Connect-CLI/pull/2089\n* fix(versions): reject repeated copy field flags on versions create by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2072\n* fix(ads): bound optimization body pagination by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2071\n* fix(ads): backdate client secret issued-at to absorb clock skew by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2093\n* fix(auth): backdate JWT issued-at to absorb client clock skew by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2083\n* fix(build-localizations): validate release notes before the API call by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2090\n* fix(bundle-ids): reject positional mutation arguments by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2101\n* fix(cli): reject repeated comma-separated flags on nominations, profiles, and win-back offers by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2082\n* apps wall: add Ring Widget by @drankou in https://github.com/rorkai/App-Store-Connect-CLI/pull/2135\n* docs: retire the Migrate to 1.0 guide by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2130\n* fix(schema): honor documented query contract by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2099\n\n## New Contributors\n* @sbis04 made their first contribution in https://github.com/rorkai/App-Store-Connect-CLI/pull/2089\n* @drankou made their first contribution in https://github.com/rorkai/App-Store-Connect-CLI/pull/2135\n\n**Full Changelog**: https://github.com/rorkai/App-Store-Connect-CLI/compare/4.6.0...4.6.1",
+    "assets": [
+      {
+        "name": "asc_4.6.1_checksums.txt",
+        "size": 446,
+        "digest": "sha256:f34d5855d08b3a46296941d6a0a784bacc788999625afa8205846045122f9a10"
+      },
+      {
+        "name": "asc_4.6.1_linux_amd64",
+        "size": 51085474,
+        "digest": "sha256:aee8dd269d0465f6f6a80e610b376f35a21b8a2b2391625bfd3fd59f1039058e"
+      },
+      {
+        "name": "asc_4.6.1_linux_arm64",
+        "size": 46530722,
+        "digest": "sha256:215bfe62452eb7da62556b33433c773187c4981678e408531200022d2e81ac65"
+      },
+      {
+        "name": "asc_4.6.1_macOS_amd64",
+        "size": 52131008,
+        "digest": "sha256:fb4bc08d193989774a198d31c71cc1ed0c23e9e820b9782bd49d2ef12246c941"
+      },
+      {
+        "name": "asc_4.6.1_macOS_arm64",
+        "size": 47124832,
+        "digest": "sha256:e48595ccdc20120783e1ad8852b3e57200544b2b754cc1a279c3bb617ab66121"
+      },
+      {
+        "name": "asc_4.6.1_windows_amd64.exe",
+        "size": 51805696,
+        "digest": "sha256:aa83c3fdbf87b97ccc7b4ec556d15f05ab548eb819abc9003f5bfda852944016"
+      }
+    ]
+  },
+  {
+    "tag_name": "4.6.0",
+    "name": "4.6.0",
+    "prerelease": false,
+    "draft": false,
+    "published_at": "2026-08-19T16:45:24Z",
+    "target_commitish": "main",
+    "html_url": "https://github.com/rorkai/App-Store-Connect-CLI/releases/tag/4.6.0",
+    "body": "## What's Changed\n* Set TestFlight notes as soon as builds appear by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2063\n* Detect the platform declared by IPA uploads by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2064\n* Reject unsafe build artifacts before upload reservation by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2066\n* Add Apple Developer system status command by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2062\n\n\n**Full Changelog**: https://github.com/rorkai/App-Store-Connect-CLI/compare/4.5.0...4.6.0",
+    "assets": [
+      {
+        "name": "asc_4.6.0_checksums.txt",
+        "size": 446,
+        "digest": "sha256:ebb0e6f71f227ad3668011a68e4dd9aeba1ef60b65d3fa7143e47046aa6f76ce"
+      },
+      {
+        "name": "asc_4.6.0_linux_amd64",
+        "size": 51056802,
+        "digest": "sha256:45c472fed4c5c9bc283f5e3da522c1e486e30343096c788bbc51609af161e626"
+      },
+      {
+        "name": "asc_4.6.0_linux_arm64",
+        "size": 46530722,
+        "digest": "sha256:537e1a6008622e1f6e3d3deceecad80189f7c7c813b8d249632df6283b1ff157"
+      },
+      {
+        "name": "asc_4.6.0_macOS_amd64",
+        "size": 52097952,
+        "digest": "sha256:0eb9544221fa8615232415a89e3084483c12556bb86066cba304af80343cc905"
+      },
+      {
+        "name": "asc_4.6.0_macOS_arm64",
+        "size": 47091968,
+        "digest": "sha256:91c57dd01c5c7c10d3fcf894268ae8202ebf1b005aca3bde29637ec9eb7bd656"
+      },
+      {
+        "name": "asc_4.6.0_windows_amd64.exe",
+        "size": 51773440,
+        "digest": "sha256:f6160a46c28980d02fa35324f0105d22e6a33b01696dbf83a86856e87a7ae248"
+      }
+    ]
+  }
+]

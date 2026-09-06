@@ -1,0 +1,11 @@
+{
+  "probe": "posthog@1",
+  "event_name": "attribution_source_selected",
+  "event_count": 87,
+  "window_days": 30,
+  "window_start": "2026-05-06T00:00:00.000Z",
+  "window_end": "2026-06-05T00:00:00.000Z",
+  "api_host": "https://app.posthog.com",
+  "http_status": 200,
+  "recorded_at": "2026-06-05T14:23:00.000Z"
+}

@@ -1,0 +1,80 @@
+schema_version: 1.0.0
+id: reference.experience.onboarding-conversion
+title: Onboarding Conversion
+domain_id: domain.experience
+document_path: knowledge/experience/onboarding-conversion.md
+load_when: before onboarding quizzes, welcome/splash screens, personalization, attribution questions, demo videos, App
+  Review popups, paywall timing, closing offers, trials, or first-session activation
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.experience.onboarding-conversion
+    - workflow.experience.onboarding-system.onb-00-resume-scope
+    - workflow.experience.onboarding-system.onb-01-current-state-trace
+    - workflow.experience.onboarding-system.onb-02-evidence-plan
+    - workflow.experience.onboarding-system.onb-03-current-guidance
+    - workflow.experience.onboarding-system.onb-04-competitor-reviews
+    - workflow.experience.onboarding-system.onb-05-onbo-hub-atlas
+    - workflow.experience.onboarding-system.onb-06-internal-guidance-audit
+    - workflow.experience.onboarding-system.onb-07-provider-policy-landscape
+    - workflow.experience.onboarding-system.onb-08-motion-research
+    - workflow.experience.onboarding-system.onb-09-evidence-join
+    - workflow.experience.onboarding-system.onb-10-first-value-activation
+    - workflow.experience.onboarding-system.onb-11-effort-question-audit
+    - workflow.experience.onboarding-system.onb-12-state-identity-contract
+    - workflow.experience.onboarding-system.onb-13-analytics-experiments
+    - workflow.experience.onboarding-system.onb-14-trust-lifecycle-policy
+    - workflow.experience.onboarding-system.onb-15-architecture-decision
+    - workflow.experience.onboarding-system.onb-16-journey-graph
+    - workflow.experience.onboarding-system.onb-17-screen-control-paywall-contract
+    - workflow.experience.onboarding-system.onb-18-visual-design-prototype
+    - workflow.experience.onboarding-system.onb-19-implementation-cutover-contract
+    - workflow.experience.onboarding-system.onb-20-adversarial-qa
+    - workflow.experience.onboarding-system.onb-21-compound-engineering-plan
+    - workflow.growth.viral-growth-loop
+  context_pack_ids:
+    - context.experience
+sources:
+  - id: developer-android-com-guide-playcore-in-app-review
+    name: developer.android.com
+    source_type: official_docs
+    url: https://developer.android.com/guide/playcore/in-app-review
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-app-store-ratings-and-reviews
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/app-store/ratings-and-reviews
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-app-store-review-guidelines
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/app-store/review/guidelines
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: doc-refero-design-llms-txt
+    name: doc.refero.design
+    source_type: website
+    url: https://doc.refero.design/llms.txt
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: revenuecat-com-state-of-subscription-apps
+    name: www.revenuecat.com
+    source_type: website
+    url: https://www.revenuecat.com/state-of-subscription-apps
+    review_cadence_days: 7
+    claim_scope: State of Subscription Apps benchmark. Cited figures verified against the SOSA 2026 PDF on 2026-06-05; added
+      involuntary-churn (Google Play ~31% vs App Store ~14%), AI-retention (~41% higher RPP / ~30% faster churn),
+      paid-intro-offer, first-renewal-inflection / Y1-retention-softening, reactivation-by-plan-duration (monthly ~20% /
+      weekly ~9% / annual ~5%), and web-revenue-adoption (~41% top-tier vs ~1.3% hobby) findings.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

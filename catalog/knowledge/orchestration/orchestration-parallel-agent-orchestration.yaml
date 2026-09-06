@@ -1,0 +1,145 @@
+schema_version: 1.0.0
+id: reference.orchestration.parallel-agent-orchestration
+title: Parallel Agent Orchestration
+domain_id: domain.orchestration
+document_path: knowledge/orchestration/parallel-agent-orchestration.md
+load_when: dispatching or coordinating subagents — lane ownership, worktree isolation, budgets, quarantine, reconciliation,
+  and reconciling durable state; before provider/store mutations or handoff in multi-lane work
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.orchestration.session-continuity-resume
+    - workflow.engineering.engineering-orchestration-ce-production-readiness
+    - workflow.engineering.app-agent-roster-and-repo-entrypoints
+    - workflow.orchestration.full-launch-program
+    - workflow.design.reference-pack-librarian
+  context_pack_ids:
+    - context.orchestration
+applicability_notes: Apply this before any subagent dispatch that shares state, credentials, or budget across lanes.
+sources:
+  - id: code-claude-com-docs-en-workflows
+    name: Claude Code dynamic workflows
+    source_type: official_docs
+    url: https://code.claude.com/docs/en/workflows
+    review_cadence_days: 7
+    claim_scope: Official Claude Code documentation for Dynamic Workflows (ultracode, the agent/parallel/pipeline API,
+      limits, and save/ship-as-skill) used for the Claude-side pre-build stages.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: anthropic-com-engineering-how-we-contain-claude
+    name: Anthropic Claude containment
+    source_type: official_docs
+    url: https://www.anthropic.com/engineering/how-we-contain-claude
+    review_cadence_days: 7
+    claim_scope: Official Anthropic containment guidance for limiting agent blast radius.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: anthropic-com-engineering-multi-agent-research-system
+    name: Anthropic multi-agent research system
+    source_type: official_docs
+    url: https://www.anthropic.com/engineering/multi-agent-research-system
+    review_cadence_days: 7
+    claim_scope: Official Anthropic engineering writeup on when multi-agent systems help and where they are costly.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: anthropic-com-webinars-claude-code-advanced-patterns
+    name: Anthropic Claude Code advanced patterns
+    source_type: official_docs
+    url: https://www.anthropic.com/webinars/claude-code-advanced-patterns
+    review_cadence_days: 7
+    claim_scope: Official Anthropic webinar page for Claude Code subagents, MCP, and scaling patterns.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: code-claude-com-docs-en-sub-agents
+    name: Claude Code subagents
+    source_type: official_docs
+    url: https://code.claude.com/docs/en/sub-agents
+    review_cadence_days: 7
+    claim_scope: Official Claude Code subagent documentation for context preservation, tool limitation, and reusable specialists.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: openai-com-business-guides-building-ai-agents
+    name: OpenAI practical guide to building agents
+    source_type: official_docs
+    url: https://openai.com/business/guides-and-resources/a-practical-guide-to-building-ai-agents/
+    review_cadence_days: 7
+    claim_scope: Official OpenAI guide covering single-agent, manager, and decentralized orchestration patterns.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: openai-com-index-introducing-codex-app
+    name: OpenAI Codex app
+    source_type: official_docs
+    url: https://openai.com/index/introducing-the-codex-app/
+    review_cadence_days: 7
+    claim_scope: Official OpenAI Codex app page covering delegated coding work and parallel software tasks.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: openai-com-index-harness-engineering
+    name: OpenAI harness engineering
+    source_type: official_docs
+    url: https://openai.com/index/harness-engineering/
+    review_cadence_days: 7
+    claim_scope: Official OpenAI writeup informing short AGENTS.md maps, repo-local instructions, and mechanical harness checks.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: openai-com-index-agents-sdk-evolution
+    name: OpenAI Agents SDK evolution
+    source_type: official_docs
+    url: https://openai.com/index/the-next-evolution-of-the-agents-sdk/
+    review_cadence_days: 7
+    claim_scope: Official OpenAI Agents SDK update for current orchestration primitives and managed runtime direction.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: florian-bruniaux-com-guides-plan-execute-migrations
+    name: Plan-execute migrations guide
+    source_type: website
+    url: https://florian.bruniaux.com/guides/plan-execute-migrations/
+    review_cadence_days: 30
+    claim_scope: Basis for the dispatch-quality metrics note (convergence, unique-insight, and false-positive counts).
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers
+  - id: code-claude-com-docs-en-mcp
+    name: Claude Code MCP and Tool Search
+    source_type: official_docs
+    url: https://code.claude.com/docs/en/mcp
+    review_cadence_days: 30
+    claim_scope: Official confirmation that MCP tool definitions are deferred by default; does not state the 10%/v2.1.7/85%
+      figures below (see the ultimate-guide entry for those).
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers
+  - id: github-com-florianbruniaux-claude-code-ultimate-guide-mcp-vs-cli
+    name: Claude Code ultimate guide, MCP vs CLI
+    source_type: github
+    url: https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/guide/ecosystem/mcp-vs-cli.md
+    review_cadence_days: 30
+    claim_scope: Basis for the Tool Search lazy-loading mechanism (auto:10 default, since Claude Code v2.1.7) and the
+      measured roughly-85%-reduction figure replacing the ENABLE_TOOL_SEARCH note.
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers
+  - id: github-com-packmindhub-context-evaluator
+    name: Context evaluator, token-count strategy thresholds
+    source_type: github
+    url: https://github.com/PackmindHub/context-evaluator
+    review_cadence_days: 30
+    claim_scope: Basis for the token-count threshold and script-over-subagent decision rules in Strategy Choices.
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers
+  - id: github-com-florianbruniaux-claude-code-ultimate-guide-agent-teams
+    name: Claude Code ultimate guide, agent teams
+    source_type: github
+    url: https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/guide/workflows/agent-teams.md
+    review_cadence_days: 30
+    claim_scope: Basis for the five-agent coordination-overhead caution on the B2C Launch Dispatch Map, and for the
+      Mid-Run Supervision drift signals (script edited but never run past roughly 12 minutes, a self-restarting loop,
+      repeated directory rediscovery, a literal unsubstituted shell variable).
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers
+  - id: github-com-florianbruniaux-claude-code-ultimate-guide-plan-pipeline
+    name: Claude Code ultimate guide, plan pipeline
+    source_type: github
+    url: https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/guide/workflows/plan-pipeline.md
+    review_cadence_days: 30
+    claim_scope: Basis for giving each of the nine Predetermined Specialist Prompts a dispatch trigger instead of a blanket
+      run.
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers

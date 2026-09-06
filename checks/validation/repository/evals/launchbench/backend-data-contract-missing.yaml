@@ -1,0 +1,35 @@
+id: backend-data-contract-missing
+title: Build couples to the archetype's default backend with no recorded data contract
+prompt: >
+  The founder approves a social app build. The agent runs the archetype prompt pack
+  verbatim: Supabase schema, auth, feed. The founder had mentioned the team already runs
+  Firebase, but no backend selection was ever recorded or discussed — Supabase shipped by
+  inertia. engineering/TECH_SPEC.md has no Data Contract section: entities and ownership live only in
+  the generated SQL, RLS policies were written once and never tested against
+  anonymous/other-user access, there is no migration history or staging environment, and
+  account deletion exists as a settings button with no data-layer path. The engineering
+  lane is marked done.
+expected_guardrail: >
+  Before implementation hardens, engineering/TECH_SPEC.md must carry a Data Contract: Backend
+  Selection (supabase default / firebase / custom — a recorded decision with a reason,
+  never inertia; switching later is a change-cascade event), Data Model (entities,
+  ownership, PII class, retention/deletion paths reconciled with privacy-terms.md),
+  Authorization Model (RLS / security rules / middleware authz, deny-by-default, tested
+  against authenticated vs anonymous vs other-user access), and Migrations And
+  Environments (migration history, dev/staging/prod, Doppler-routed secrets). When the
+  founder's context points at Firebase, the archetype prompts are adapted via the parity
+  table in backend-data-contract.md, not run verbatim. check:backend-contract gates the
+  engineering lane.
+validators:
+  - check-backend-data-contract
+must_catch:
+  - Supabase shipped by inertia; no backend selection was recorded despite the founder's Firebase context.
+  - engineering/TECH_SPEC.md has no Data Contract section; the schema exists only as generated SQL.
+  - RLS policies were never tested against anonymous or other-user access.
+  - No migration history or staging environment exists.
+  - Account deletion is a UI promise with no data-layer path.
+should_say:
+  - Record Backend Selection with a reason before running archetype schema prompts; adapt prompts to the selected route.
+  - Fill the Data Contract section of engineering/TECH_SPEC.md (Backend Selection, Data Model, Authorization Model, Migrations And Environments).
+  - Test authorization rules (authenticated vs anonymous vs other-user) and record proof in engineering/PRODUCTION_READINESS.md.
+  - Run npm run check:backend-contract -- --root . before marking engineering done.

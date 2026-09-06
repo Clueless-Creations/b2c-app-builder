@@ -1,0 +1,66 @@
+name: Proposal
+description: Propose a new lane, archetype, validator, or playbook change
+labels: ["proposal"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        B2C App Builder is opinionated and scoped to founders launching subscription and freemium consumer mobile apps. Proposals that widen that scope are welcome as discussion, but read the scope section in [CONTRIBUTING.md](https://github.com/Clueless-Creations/b2c-app-builder/blob/main/CONTRIBUTING.md) first so we start from the same place.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What goes wrong today
+      description: The launch failure, gap, or friction this would fix. Concrete beats abstract.
+      placeholder: |
+        Nothing checks that a paywall's trial length matches what the store product actually sells, so the two drift silently.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you propose
+      description: The change itself. Name the reference, template, validator, or eval it would touch.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of change is this
+      options:
+        - New or tightened validator
+        - New or changed playbook reference
+        - New or changed template artifact
+        - New app archetype pack
+        - New LaunchBench eval
+        - Something else
+    validations:
+      required: true
+
+  - type: input
+    id: lane
+    attributes:
+      label: Which existing lane does it extend
+      description: For example research, design, onboarding, revenue, store ops, growth, verification.
+      placeholder: "revenue"
+
+  - type: textarea
+    id: enforcement
+    attributes:
+      label: How would it be enforced
+      description: |
+        The house rule is enforcement over reminders. If this can only be a longer instruction and never a check, say so and explain why.
+      placeholder: |
+        A new check in check-revenue.ts comparing revenue/REVENUE_OPS.md trial length against the product mapping in store/STORE_CONSOLE.md, with positive and negative fixtures.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: This fits subscription or freemium consumer mobile apps, or I explained below why the scope should change.
+          required: true

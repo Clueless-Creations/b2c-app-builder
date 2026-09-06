@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true
+  },
+  "exclude": ["catalog/generated/firstparty/**", "hosted/knowledge-mcp/**", "hosted/builder-console/**", "surfaces/**", "examples/**", "node_modules/**"],
+  "include": [
+    "checks/**/*.ts",
+    "tooling/**/*.ts",
+    "kernel/**/*.ts",
+    "contracts/**/*.ts",
+    "adapters/**/*.ts",
+    "entrypoints/**/*.ts",
+    "catalog/**/*.ts",
+    "hosted/shared/**/*.ts"
+  ]
+}

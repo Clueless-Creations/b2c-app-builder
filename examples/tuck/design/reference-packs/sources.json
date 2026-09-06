@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "inspectedAt": "2026-09-04T17:10:55.000Z",
+  "referenceImage": {
+    "sourceUrl": "https://devimages-cdn.apple.com/wwdc-services/articles/images/34234D96-2BFE-4A20-9A1E-C18664BF803F/2048.jpeg",
+    "temporaryPath": "/tmp/b2c-design-research-20260904/seat.jpeg",
+    "runtimePath": "design/reference-packs/runtime/seat.jpeg",
+    "sha256": "e432b939e20650334307fd8de0d4ab57eb858252f0fe294a4061913cb933c151",
+    "kind": "reference-product-imagery",
+    "tuckRuntimeEvidence": false
+  },
+  "documentation": [
+    {
+      "id": "reference.grug-mechanism",
+      "url": "https://developer.apple.com/news/?id=ux44ymcr",
+      "path": "design/reference-packs/grug-principle.md",
+      "sha256": "d4ab830ee1887ed2837fa41a2cde2e11764209dff9dfef71afcb396e566fbb9a"
+    },
+    {
+      "id": "reference.structured-hierarchy",
+      "url": "https://structured.app/",
+      "path": "design/reference-packs/structured-principle.md",
+      "sha256": "6d631005b2751a7d625d18899a9ff3c68e1c1c13d33f612b5086dd703da610b4"
+    }
+  ]
+}

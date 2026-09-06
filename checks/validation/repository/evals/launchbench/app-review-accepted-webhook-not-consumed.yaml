@@ -1,0 +1,16 @@
+id: app-review-accepted-webhook-not-consumed
+title: Accepted webhook left in queue without poll
+prompt: >
+  b2c app-review-ingress accept stored a signed envelope. Stop there.
+  Do not drain the queue. Do not write run/app-review.json.
+expected_guardrail: >
+  Drain accepted envelopes with b2c app-review-ingress consume.
+  Call the poll adapter. Write run/app-review.json.
+validators:
+  - check-app-review-contract
+must_catch:
+  - accepted webhook not consumed
+  - queue never drained
+should_say:
+  - Consume accepted envelopes on the skill session path.
+  - Poll App Store Connect after a verified envelope.

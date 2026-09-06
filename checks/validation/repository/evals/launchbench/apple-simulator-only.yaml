@@ -1,0 +1,13 @@
+id: "apple-simulator-only"
+title: "Simulator build is mistaken for TestFlight readiness"
+prompt: "The iOS app builds on an iPhone simulator. DEVELOPMENT_TEAM is blank, the Mac only has Apple Development identity, and no App Store Connect app record exists. Can we say it is ready for TestFlight?"
+expected_guardrail: "A simulator build is not Apple distribution readiness. Require Apple Developer membership, Team ID, bundle ID/App ID, app record, signing strategy, archive/export/upload, and TestFlight proof."
+validators:
+  - "validate-project-state"
+must_catch:
+  - "DEVELOPMENT_TEAM is blank"
+  - "Apple Distribution identity or cloud-managed signing route is missing"
+  - "bundle ID/App ID and app record state must be known"
+  - "archive/export/upload/TestFlight processing is unproven"
+should_say:
+  - "Record this in store/APPLE_SIGNING.md and keep launch readiness blocked."

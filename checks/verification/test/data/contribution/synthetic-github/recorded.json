@@ -1,0 +1,35 @@
+{ "label": "SYNTHETIC FIXTURE: recorded responses for an invented GitHub repository. A test fetcher serves them; the network is never used.",
+  "url": "https://github.com/synthetic-org/synthetic-tokens",
+  "responses": {
+    "https://api.github.com/repos/synthetic-org/synthetic-tokens": {
+      "status": 200,
+      "json": {
+        "full_name": "synthetic-org/synthetic-tokens",
+        "description": "Invented design token generator used only by fixture tests.",
+        "homepage": "https://example.invalid/synthetic-tokens",
+        "license": { "key": "mit", "spdx_id": "MIT", "name": "MIT License" },
+        "default_branch": "main",
+        "pushed_at": "2026-09-01T10:00:00Z",
+        "archived": false,
+        "owner": { "login": "synthetic-org", "type": "Organization" }
+      }
+    },
+    "https://api.github.com/repos/synthetic-org/synthetic-tokens/releases/latest": { "status": 404 },
+    "https://api.github.com/repos/synthetic-org/synthetic-tokens/commits/main": {
+      "status": 200,
+      "json": { "sha": "0123456789abcdef0123456789abcdef01234567", "commit": { "committer": { "date": "2026-09-01T10:00:00Z" } } }
+    },
+    "https://raw.githubusercontent.com/synthetic-org/synthetic-tokens/main/README.md": {
+      "status": 200,
+      "text": "SYNTHETIC FIXTURE: an invented README served from a recorded response.\n\n# Synthetic Tokens\n\n## Token rules\n\nYou should derive every token from one base unit. Never hand-tune a single screen, because the next screen drifts. Prefer semantic names and avoid raw hex values in components. When a token changes, regenerate the sheet.\n\n## Install\n\nnpm install -g synthetic-tokens\n"
+    },
+    "https://raw.githubusercontent.com/synthetic-org/synthetic-tokens/main/LICENSE": {
+      "status": 200,
+      "text": "SYNTHETIC FIXTURE: an invented license served from a recorded response.\n\nMIT License\n\nCopyright (c) 2026 Synthetic Author\n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction.\n"
+    },
+    "https://raw.githubusercontent.com/synthetic-org/synthetic-tokens/main/LICENSE.md": { "status": 404 },
+    "https://raw.githubusercontent.com/synthetic-org/synthetic-tokens/main/SKILL.md": { "status": 404 },
+    "https://raw.githubusercontent.com/synthetic-org/synthetic-tokens/main/AGENTS.md": { "status": 404 },
+    "https://raw.githubusercontent.com/synthetic-org/synthetic-tokens/main/CLAUDE.md": { "status": 404 }
+  }
+}

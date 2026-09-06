@@ -1,0 +1,105 @@
+schema_version: 1.0.0
+id: reference.money.revenuecat-agent-tooling
+title: RevenueCat Agent Tooling
+domain_id: domain.money
+document_path: knowledge/money/revenuecat-agent-tooling.md
+load_when: when the selected RevenueCat operation needs official agent setup, identity, instrumentation, or verification
+  procedures
+lifecycle: active
+applicability_notes: Default worker provider guidance only. No neutral capability, unselected provider, global skill
+  installation, or remote action is implied.
+bindings:
+  workflow_ids:
+    - workflow.money.revenue-monetization
+    - workflow.money.experimentation
+    - workflow.experience.onboarding-system.onb-07-provider-policy-landscape
+    - workflow.experience.onboarding-system.onb-12-state-identity-contract
+  context_pack_ids: []
+sources:
+  - id: github-com-revenuecat-ai-toolkit
+    name: RevenueCat AI Toolkit
+    source_type: github
+    url: https://github.com/RevenueCat/ai-toolkit
+    review_cadence_days: 7
+    claim_scope: Selected procedures and limitations; no installed or live-provider support claim.
+    last_review_date: 2026-09-06
+    reviewer: b2c-contributor source review
+    publisher: RevenueCat
+    revision: b9b77b12da33213c9c2e750b06cd6270c1d8ed65
+    retrieved_at: 2026-09-06T13:59:33.574497Z
+    rights:
+      status: verified
+      spdx: MIT
+      evidence: catalog/upstreams/notices/revenuecat-ai-toolkit.txt
+      evidence_sha256: 2e92c72a8e13012a7f53d2bebbee52ab1a1c06cf652092faecf4523a5bc23e3f
+    selectors:
+      - README.md
+      - revenuecat/skills/create-revenuecat-project/SKILL.md
+      - revenuecat/skills/integrate-revenuecat/SKILL.md
+      - revenuecat/skills/revenuecat-identify-user/SKILL.md
+      - revenuecat/skills/revenuecat-purchase-flow/SKILL.md
+      - revenuecat/skills/revenuecat-entitlements-gate/SKILL.md
+      - revenuecat/skills/revenuecat-cli/SKILL.md
+    upstream_id: revenuecat-ai-toolkit
+  - id: github-com-revenuecat-cli
+    name: RevenueCat CLI
+    source_type: github
+    url: https://github.com/RevenueCat/cli
+    review_cadence_days: 7
+    claim_scope: Selected procedures and limitations; no installed or live-provider support claim.
+    last_review_date: 2026-09-06
+    reviewer: b2c-contributor source review
+    publisher: RevenueCat
+    revision: 1a3d2820b3166dd6d4cc4775902e43eeeab5f004
+    retrieved_at: 2026-09-06T13:59:35.856259Z
+    rights:
+      status: verified
+      spdx: MIT
+      evidence: catalog/upstreams/notices/revenuecat-cli.txt
+      evidence_sha256: 2a966901053e26d85533a8fb524aacf4894911220a41f326c9637ab821029523
+    selectors:
+      - README.md
+    upstream_id: revenuecat-cli
+  - id: revenuecat-customer-identity-onboarding
+    name: Official provider documentation
+    source_type: documentation
+    url: https://www.revenuecat.com/docs/customers/identifying-customers
+    review_cadence_days: 7
+    claim_scope: Official identity and privacy behavior used to resolve upstream assumptions.
+    last_review_date: 2026-09-06
+    reviewer: b2c-contributor source review
+derivations:
+  - relationship: adapted
+    source_ids:
+      - github-com-revenuecat-ai-toolkit
+    baseline: b9b77b12da33213c9c2e750b06cd6270c1d8ed65
+    selectors:
+      - README.md
+      - revenuecat/skills/create-revenuecat-project/SKILL.md
+      - revenuecat/skills/integrate-revenuecat/SKILL.md
+      - revenuecat/skills/revenuecat-identify-user/SKILL.md
+      - revenuecat/skills/revenuecat-purchase-flow/SKILL.md
+      - revenuecat/skills/revenuecat-entitlements-gate/SKILL.md
+      - revenuecat/skills/revenuecat-cli/SKILL.md
+    rationale: Retain relevant official procedures while preserving existing artifact ownership, scoped authority and
+      independently verified acceptance.
+    omissions:
+      - Automatic installation, broad agent workflows, unreviewed remotely fetched skills and implicit acceptance.
+    reviewer: b2c-contributor source review
+    reviewed_at: 2026-09-06
+    notice: catalog/upstreams/notices/revenuecat-ai-toolkit.txt
+    evaluation: npm run test:fixtures -- official-upstreams
+  - relationship: adapted
+    source_ids:
+      - github-com-revenuecat-cli
+    baseline: 1a3d2820b3166dd6d4cc4775902e43eeeab5f004
+    selectors:
+      - README.md
+    rationale: Retain relevant official procedures while preserving existing artifact ownership, scoped authority and
+      independently verified acceptance.
+    omissions:
+      - Automatic installation, broad agent workflows, unreviewed remotely fetched skills and implicit acceptance.
+    reviewer: b2c-contributor source review
+    reviewed_at: 2026-09-06
+    notice: catalog/upstreams/notices/revenuecat-cli.txt
+    evaluation: npm run test:fixtures -- official-upstreams

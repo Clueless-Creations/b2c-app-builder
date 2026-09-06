@@ -1,0 +1,520 @@
+{
+  "schemaVersion": "2.0.0",
+  "updatedAt": "2026-07-12T00:00:00.000Z",
+  "narrative": {
+    "sinceLastTime": "",
+    "rightNow": "",
+    "yourCall": "",
+    "lastCelebratedPhase": ""
+  },
+  "project": {
+    "name": "App Name",
+    "slug": "app-name",
+    "owner": "Founder or team",
+    "phase": "phase_0_orient",
+    "launchScope": "full",
+    "kickoffDate": "",
+    "platforms": [
+      "ios"
+    ],
+    "supportedDeviceFamilies": [
+      "iphone",
+      "ipad"
+    ],
+    "bundleIds": {
+      "ios": "com.example.app",
+      "android": ""
+    },
+    "publicUrls": {
+      "landing": "",
+      "privacy": "",
+      "terms": ""
+    }
+  },
+  "lanes": {
+    "paid_tool_routing": {
+      "status": "pending",
+      "evidence": [
+        "strategy/TOOL_DECISIONS.md"
+      ],
+      "blockers": []
+    },
+    "secrets": {
+      "status": "pending",
+      "evidence": [
+        "trust/secrets/SECRETS.md"
+      ],
+      "blockers": []
+    },
+    "security": {
+      "status": "pending",
+      "evidence": [
+        "trust/SECURITY.md",
+        "trust/security-review.html"
+      ],
+      "blockers": []
+    },
+    "research": {
+      "status": "pending",
+      "evidence": [
+        "strategy/RESEARCH.md",
+        "strategy/SIGNAL_CORPUS.md",
+        "strategy/OFFER_TEST.md",
+        "strategy/localization-market-research/LOCALIZATION_MARKET_RESEARCH.md",
+        "strategy/localization-market-research/localization-market-research.html"
+      ],
+      "blockers": [],
+      "go_pivot_kill_decision": "",
+      "go_pivot_kill_decided_at": ""
+    },
+    "traceability": {
+      "status": "pending",
+      "evidence": [
+        "state/LAUNCH_TRACE.md"
+      ],
+      "blockers": []
+    },
+    "experience": {
+      "status": "pending",
+      "evidence": [
+        "product/experience/11-star-experience/11_STAR_EXPERIENCE.md",
+        "product/experience/11-star-experience/11-star-experience.html"
+      ],
+      "blockers": []
+    },
+    "emotional_design": {
+      "status": "pending",
+      "evidence": [
+        "product/experience/emotional-design/EMOTIONAL_DESIGN.md",
+        "product/experience/emotional-design/emotional-design.html"
+      ],
+      "blockers": [],
+      "audit_requested": false,
+      "deferred_cards": []
+    },
+    "product": {
+      "status": "pending",
+      "evidence": [
+        "PRODUCT.md"
+      ],
+      "blockers": []
+    },
+    "design": {
+      "status": "pending",
+      "evidence": [
+        "strategy/BRAND.md",
+        "DESIGN.md",
+        "product/copy/COPY_BRIEF.md",
+        "product/copy/COPY_DECK.md",
+        "product/experience/ux-patterns/UX_PATTERNS.md",
+        "design/design-room.html",
+        "product/experience/ux-patterns/ux-patterns.html"
+      ],
+      "blockers": []
+    },
+    "content_assets": {
+      "status": "pending",
+      "evidence": [
+        "growth/content-assets/CONTENT_ASSETS.md",
+        "growth/content-assets/content-assets.html",
+        "growth/content-assets/manifest.json",
+        "growth/DEMO_VIDEO.md"
+      ],
+      "blockers": []
+    },
+    "analytics_attribution": {
+      "status": "pending",
+      "evidence": [
+        "analytics/ANALYTICS.md",
+        "analytics/analytics-plan.html"
+      ],
+      "blockers": [],
+      "attribution_contract": {
+        "screen_early": false,
+        "stable_source_keys": [
+          "friend",
+          "x_twitter",
+          "tiktok",
+          "instagram",
+          "youtube",
+          "app_store_search",
+          "google_play_search",
+          "creator",
+          "ai_search",
+          "other"
+        ],
+        "other_free_text": false,
+        "event_name": "attribution_source_selected",
+        "person_properties": [
+          "self_reported_source",
+          "self_reported_source_label"
+        ],
+        "backend_persistence": false,
+        "anonymous_reconciliation": false,
+        "verified": false
+      }
+    },
+    "paid_user_acquisition": {
+      "status": "pending",
+      "evidence": [
+        "growth/PAID_UA.md",
+        "growth/paid-ua-report.csv"
+      ],
+      "blockers": [
+        "Founder approval is required before ad account connection, paid spend, budget changes, or live campaign launch."
+      ]
+    },
+    "onboarding": {
+      "status": "pending",
+      "evidence": [
+        "product/ONBOARDING.md",
+        "product/onboarding.html"
+      ],
+      "blockers": []
+    },
+    "revenue": {
+      "status": "pending",
+      "evidence": [
+        "revenue/REVENUE_OPS.md"
+      ],
+      "blockers": []
+    },
+    "store_console": {
+      "status": "pending",
+      "evidence": [
+        "store/STORE_CONSOLE.md",
+        "store/store-console.html",
+        "store/app-store-listing/APP_STORE_LISTING.md",
+        "store/app-store-listing/app-store-listing.html",
+        "store/app-store-listing/app-privacy-questionnaire.html",
+        "store/APPLE_APP_STORE_REQUIREMENTS.md",
+        "store/APP_REVIEW.md",
+        "store/app-store-listing/SCREENSHOTS.md"
+      ],
+      "blockers": []
+    },
+    "apple_signing": {
+      "status": "pending",
+      "evidence": [
+        "store/APPLE_SIGNING.md",
+        "store/APPLE_APP_STORE_REQUIREMENTS.md"
+      ],
+      "blockers": []
+    },
+    "privacy_legal": {
+      "status": "pending",
+      "evidence": [
+        "trust/PRIVACY.md",
+        "trust/TERMS.md",
+        "store/APPLE_APP_STORE_REQUIREMENTS.md"
+      ],
+      "blockers": []
+    },
+    "email": {
+      "status": "pending",
+      "evidence": [
+        "growth/EMAIL_OPS.md"
+      ],
+      "blockers": []
+    },
+    "orchestration": {
+      "status": "pending",
+      "evidence": [
+        "operations/ORCHESTRATION.md",
+        "operations/orchestration.html"
+      ],
+      "blockers": []
+    },
+    "engineering": {
+      "status": "pending",
+      "evidence": [
+        "engineering/TECH_SPEC.md",
+        "engineering/ENGINEERING_PLAN.md",
+        "engineering/PRODUCTION_READINESS.md"
+      ],
+      "blockers": []
+    },
+    "growth": {
+      "status": "pending",
+      "evidence": [
+        "growth/VIRAL_GROWTH.md",
+        "growth/LAUNCH_NARRATIVE.md",
+        "growth/format-lab.csv",
+        "growth/UGC_PLAYBOOK.md",
+        "growth/FASTLANE_OPS.md"
+      ],
+      "blockers": []
+    },
+    "post_launch_ops": {
+      "status": "pending",
+      "evidence": [
+        "operations/POST_LAUNCH_OPS.md",
+        "operations/LAUNCH_RETRO.md"
+      ],
+      "blockers": [],
+      "live_since": "",
+      "kill_or_scale_decision": "",
+      "kill_or_scale_decided_at": ""
+    }
+  },
+  "founderGates": {
+    "pending": []
+  },
+  "providers": {
+    "doppler": {
+      "route": "intended_paid_or_account_tool",
+      "cli_version": "",
+      "preflight": "Confirm project/config naming before creating service tokens.",
+      "validation": "doppler run -- printenv APP_ENV",
+      "fallback": "Apple Keychain, platform secrets, or names-only .env after founder approval.",
+      "accessRoute": "not_selected",
+      "docsCheckedAt": "",
+      "requiredSecrets": [
+        "DOPPLER_TOKEN"
+      ]
+    },
+    "posthog": {
+      "route": "intended_account_tool",
+      "preflight": "Confirm product analytics region, replay/survey posture, and privacy disclosures.",
+      "validation": "Verify event plus person property in PostHog.",
+      "fallback": "Local event log or open-source analytics only after founder approval.",
+      "accessRoute": "not_selected",
+      "docsCheckedAt": "",
+      "requiredSecrets": [
+        "POSTHOG_PROJECT_API_KEY",
+        "POSTHOG_PERSONAL_API_KEY"
+      ]
+    },
+    "refero": {
+      "route": "optional_paid_or_account_tool",
+      "preflight": "Confirm Refero Pro access, OAuth or bearer-token route, query budget, and whether fallback UX pattern pack is founder-approved.",
+      "validation": "UX_PATTERNS.md records selected styles/screens/flows or approved fallback; ux-patterns.html renders pattern inventory and state matrix.",
+      "fallback": "Bundled business/product/experience/ux-patterns pattern pack, founder-provided references, or public UX libraries only after founder approval.",
+      "accessRoute": "api",
+      "docsCheckedAt": "",
+      "requiredSecrets": [
+        "REFERO_API_TOKEN"
+      ]
+    },
+    "revenuecat": {
+      "route": "intended_account_tool",
+      "preflight": "Confirm entitlement, offering, store products, and sandbox account.",
+      "validation": "Sandbox purchase grants entitlement in app and backend/profile.",
+      "fallback": "StoreKit/TestFlight sandbox notes only after founder approval.",
+      "accessRoute": "not_selected",
+      "docsCheckedAt": "",
+      "requiredSecrets": [
+        "REVENUECAT_PUBLIC_IOS_KEY",
+        "REVENUECAT_SECRET_API_KEY",
+        "REVENUECAT_WEBHOOK_SECRET"
+      ]
+    },
+    "paid_ad_channels": {
+      "route": "optional_paid_or_account_tool",
+      "preflight": "Use paid-user-acquisition.md before spend. Confirm one-channel choice, target event, baseline, creative cadence, tracking stack, RevenueCat LTV/CPA source, store destination, privacy/ATT implications, and founder-approved budget.",
+      "validation": "PAID_UA.md, growth/paid-ua-report.csv, analytics/ANALYTICS.md, revenue/REVENUE_OPS.md, CONTENT_ASSETS.md, and state/LAUNCH_TRACE.md show channel decision, blended report, RevenueCat economics, creative proof, and stop/scale rules.",
+      "fallback": "Use organic, ASO, waitlist, or manual spreadsheet planning only after paid spend or ad-account access is blocked, deferred, or not needed.",
+      "accessRoute": "manual",
+      "docsCheckedAt": "",
+      "requiredSecrets": []
+    },
+    "stripe": {
+      "route": "optional_account_tool",
+      "preflight": "Confirm whether web checkout or web funnels are in scope.",
+      "validation": "Checkout or webhook event projects entitlement correctly.",
+      "fallback": "Defer web checkout and use app-store purchase only after founder approval.",
+      "accessRoute": "not_selected",
+      "docsCheckedAt": "",
+      "requiredSecrets": [
+        "STRIPE_SECRET_KEY",
+        "STRIPE_WEBHOOK_SECRET"
+      ]
+    },
+    "resend": {
+      "route": "intended_account_tool",
+      "preflight": "Confirm sender domain, reply-to, unsubscribe, and support aliases.",
+      "validation": "Send test email and verify webhook or provider log.",
+      "fallback": "Cloudflare routing plus manual Gmail responses after founder approval.",
+      "accessRoute": "not_selected",
+      "docsCheckedAt": "",
+      "requiredSecrets": [
+        "RESEND_API_KEY",
+        "RESEND_WEBHOOK_SECRET"
+      ]
+    },
+    "sentry": {
+      "route": "optional_account_tool",
+      "preflight": "Confirm crash/performance scope and PII scrubbing.",
+      "validation": "Known non-production test event reaches Sentry.",
+      "fallback": "Store crash reports and local logs after founder approval.",
+      "accessRoute": "not_selected",
+      "docsCheckedAt": "",
+      "requiredSecrets": [
+        "SENTRY_DSN",
+        "SENTRY_AUTH_TOKEN"
+      ]
+    },
+    "security_review": {
+      "route": "optional_paid_or_account_tool",
+      "preflight": "Confirm whether Claude Security, Codex Security, GitHub Advanced Security, Snyk/Semgrep/Socket, MobSF Cloud, or a free local route is approved before running scans.",
+      "validation": "trust/SECURITY.md, trust/security-review.html, LaunchBench, and security validator evidence show threat model, platform hardening, supply-chain checks, and release checks.",
+      "fallback": "Use local security skills, OWASP MASVS/ASVS, MobSF local, gitleaks/trufflehog, npm audit/osv-scanner, semgrep community rules, Xcode/Android static checks only after founder approval when replacing paid tools.",
+      "accessRoute": "not_selected",
+      "docsCheckedAt": "",
+      "requiredSecrets": []
+    },
+    "app_store_connect": {
+      "route": "intended_account_tool",
+      "preflight": "Use app-store-connect-cli.md first (ASC Auth Setup And Recovery). Check for an existing keychain profile (asc --profile <Name>) before claiming no ASC access; one account-level API key reaches every app on the team. Confirm Apple Developer membership, Team ID, bundle ID, app name, SKU, locale, ASC CLI/skill-pack auth, and founder approval before app-record mutation.",
+      "validation": "ASC CLI/skill route records app creation/app record state, IDs, metadata, screenshots, TestFlight, review status, RevenueCat catalog reconciliation, and archive/export/upload path.",
+      "fallback": "Manual ASC click-path packet only after CLI/auth/account/skill-route blocker or founder-approved non-CLI route is recorded.",
+      "accessRoute": "not_selected",
+      "docsCheckedAt": "",
+      "requiredSecrets": [
+        "ASC_KEY_ID",
+        "ASC_ISSUER_ID",
+        "ASC_PRIVATE_KEY_PATH"
+      ]
+    },
+    "aso_skills": {
+      "route": "optional_local_skill_pack",
+      "preflight": "Refresh the Eronred ASO skill pack or installed local equivalents before ASO, icon, screenshot, CPP, event, paid UA, or post-launch metric guidance.",
+      "validation": "APP_STORE_LISTING.md, SCREENSHOTS.md, and store/STORE_CONSOLE.md record which ASO specialist lanes were used or intentionally not needed.",
+      "fallback": "Apply equivalent frameworks manually only after paid/account-gated ASO routes and missing runtime access are recorded.",
+      "accessRoute": "skill_pack",
+      "docsCheckedAt": "",
+      "requiredSecrets": []
+    },
+    "app_store_screenshots": {
+      "route": "optional_local_skill_pack",
+      "selected_route": "blocked",
+      "route_options": [
+        "ParthJadhav/app-store-screenshots",
+        "equivalent local export board"
+      ],
+      "preflight": "Refresh ParthJadhav/app-store-screenshots, confirm real UI captures, app icon, design tokens, 11-star slice, locales/themes, iPhone/iPad support, and whether Higgsfield/Remotion supporting assets need approval.",
+      "board_path": "screenshots/index.html or generated app-store-screenshots workspace",
+      "state_path": "app-store-screenshots.json",
+      "source_inputs": [
+        "screenshots/raw/",
+        "app-icon/app-icon-1024.png",
+        "DESIGN.md",
+        "design.md",
+        "11_STAR_EXPERIENCE.md",
+        "APP_STORE_LISTING.md",
+        "CONTENT_ASSETS.md when Higgsfield/Remotion/supporting art is used"
+      ],
+      "output_dirs": [
+        "screenshots/final/en-US/iphone-69/",
+        "screenshots/final/en-US/ipad-13/"
+      ],
+      "validation": "SCREENSHOTS.md records exact iPhone/iPad wells, required/scaled decisions, screenshot count, dimensions, alpha/sRGB proof, asc-shots-pipeline dry-run, and upload status.",
+      "upload_status": "not_started | dry_run_ready | uploaded | blocked",
+      "fallback": "Use Remotion, HTML/CSS composition, or designer-owned files only after the app-store-screenshots route is unavailable or not fit and the limitation is recorded.",
+      "accessRoute": "skill_pack",
+      "docsCheckedAt": "",
+      "requiredSecrets": []
+    },
+    "higgsfield": {
+      "route": "optional_paid_or_account_tool",
+      "preflight": "Confirm DESIGN.md tokens, asset family, prompt brief, source rights, and whether the output is screenshot support, App Icon, CPP/event art, preview thumbnail, or UGC/ad creative.",
+      "validation": "CONTENT_ASSETS.md and SCREENSHOTS.md record route, prompt summary, source inputs, output paths, visual QA, and founder approval gates.",
+      "fallback": "Remotion, HTML/CSS composition, founder-owned media, public-domain assets, or raw screenshots only after founder approval and limitation notes.",
+      "identity": {
+        "soul_reference_id": "",
+        "soul_variant": "",
+        "avatar_id": "",
+        "training_date": "",
+        "photos_source": "",
+        "training_manifest_path": ""
+      },
+      "accessRoute": "mcp",
+      "docsCheckedAt": "",
+      "requiredSecrets": []
+    },
+    "in_app_ios_simulator": {
+      "route": "built_in_agent_simulator_when_local_mac",
+      "runtime": "claude_code_desktop_pane | claude_code_cli_computer_use | codex_build_ios_apps | blocked | not_needed",
+      "runtime_version": "",
+      "session_type": "local | cloud_or_ssh_blocked",
+      "preflight": "Confirm this is a local macOS session (the pane and computer-use cannot reach a Mac's simulators from cloud, SSH, or container sessions), the runtime version and plan gate, that org policy has not disabled simulator tools, and that Xcode plus an iOS simulator runtime are installed. Confirm a fixture or sandbox account before any sign-in on the device.",
+      "validation": "engineering/PRODUCTION_READINESS.md records the runtime and version, the local session, the simulated device and OS, the fixture-account decision, the exported screenshot/recording paths under proof/ios-simulator/, and the coverage this route does not provide: no Android, no physical device, no repeatable suite/CI, no distribution readiness.",
+      "fallback": "Escalate to XcodeBuildMCP for scripted/CI or physical-device Apple work, serve-sim for browser-visible simulators, or MobAI for Android and repeatable suites; record the rung change in strategy/TOOL_DECISIONS.md. When no local Mac is reachable, mark device proof blocked rather than narrating a simulator run that did not happen.",
+      "accessRoute": "native_device",
+      "docsCheckedAt": "",
+      "requiredSecrets": []
+    },
+    "mobai": {
+      "route": "intended_free_or_paid_account_tool",
+      "selected_tier": "free | plus | pro | blocked | not_needed",
+      "desktop_version": "",
+      "mcp_version": "",
+      "cli_version": "",
+      "preflight": "Refresh the desktop release, active MCP resources, npm CLI version/help, and MobAI CI docs independently; confirm tier, device/app access, bundle/package ID, locale, seeded demo state, and critical .mob flows before mutation.",
+      "validation": "engineering/PRODUCTION_READINESS.md records separate desktop/MCP/CLI versions, selected tier, iOS/Android device-flow evidence, AI-heal diff review plus rerun, bounded repeat parameters, host-script allowlist/secret/cleanup proof, provider correlation, and limitations. SCREENSHOTS.md links raw captures to final composition.",
+      "fallback": "Use MobAI Free without a spend gate when it fits. Ask before Plus/Pro spend or an XcodeBuildMCP Apple-only substitution; record missing Android/cross-platform proof and use Android emulator/ADB or a dated blocker.",
+      "accessRoute": "not_selected",
+      "docsCheckedAt": "",
+      "requiredSecrets": []
+    },
+    "codex_native_ios": {
+      "route": "codex_desktop_native_tooling_when_exposed",
+      "preflight": "When Codex Desktop exposes native Apple/XcodeBuildMCP tools, load xcodebuildmcp-testing.md, call session_show_defaults before the first build/run/test, and confirm project/workspace, scheme, simulator/device, OS/runtime, and configuration.",
+      "validation": "engineering/PRODUCTION_READINESS.md records exposed MCP tool names such as build_run_sim/test_sim/screenshot/log capture, output paths, simulator/device details, provider-proof pairing, and the distribution-readiness limitation.",
+      "fallback": "Use XcodeBuildMCP CLI, serve-sim, SnapshotPreviews preview proof, MobAI, or mark proof blocked according to the lane and paid-tool approval state.",
+      "accessRoute": "not_selected",
+      "docsCheckedAt": "",
+      "requiredSecrets": []
+    },
+    "snapshot_previews": {
+      "route": "optional_open_source_cli_preview_proof",
+      "preflight": "Refresh getsentry/SnapshotPreviews, confirm SwiftUI/UIKit/AppKit previews exist, link SnapshottingTests, and decide SnapshotTest vs PreviewLayoutTest.",
+      "validation": "engineering/PRODUCTION_READINESS.md records package URL/version/commit, TEST_RUNNER_SNAPSHOTS_EXPORT_DIR, exported PNG/JSON paths, deterministic fixtures, and preview-only limitation.",
+      "fallback": "Use XcodeBuildMCP/Codex Desktop screenshots, serve-sim, MobAI, or manual preview review; do not call preview proof runtime E2E.",
+      "accessRoute": "not_selected",
+      "docsCheckedAt": "",
+      "requiredSecrets": []
+    },
+    "serve_sim": {
+      "route": "optional_open_source_cli_simulator_stream",
+      "preflight": "Refresh EvanBacon/serve-sim, confirm macOS + Xcode command line tools + Node 18+, boot the intended iOS Simulator, and choose URL/port.",
+      "validation": "engineering/PRODUCTION_READINESS.md or SCREENSHOTS.md records npx serve-sim resolution, booted simulator/device, localhost preview URL/port, actions, logs, stream proof, and provider/signing limitations.",
+      "fallback": "Use Codex Desktop native iOS/XcodeBuildMCP tools, MobAI, founder-provided captures, or mark simulator proof blocked.",
+      "accessRoute": "not_selected",
+      "docsCheckedAt": "",
+      "requiredSecrets": []
+    },
+    "google_play": {
+      "route": "intended_account_tool",
+      "preflight": "Confirm developer account, package name, app content declarations, data safety, and tester track.",
+      "validation": "Internal testing release or blocked reason recorded.",
+      "fallback": "Manual Play Console packet after founder approval.",
+      "accessRoute": "not_selected",
+      "docsCheckedAt": "",
+      "requiredSecrets": [
+        "GOOGLE_PLAY_SERVICE_ACCOUNT_JSON"
+      ]
+    },
+    "cloudflare": {
+      "route": "optional_account_tool",
+      "preflight": "Confirm domain, DNS, email routing, Pages/Workers, and secrets.",
+      "validation": "HTTPS, DNS, headers, routes, and email aliases verified.",
+      "fallback": "Existing registrar/host after founder approval.",
+      "accessRoute": "not_selected",
+      "docsCheckedAt": "",
+      "requiredSecrets": [
+        "CLOUDFLARE_API_TOKEN"
+      ]
+    },
+    "remotion": {
+      "route": "optional_local_render_tool",
+      "license_status": "Check current Remotion license before commercial use; record eligibility or founder approval.",
+      "preflight": "Confirm Higgsfield fallback approval if applicable, source asset rights, real app UI inputs, target surfaces, and whether a launch-local content-assets/remotion project is needed.",
+      "validation": "CONTENT_ASSETS.md, content-assets.html, manifest.json, render command proof, source inputs, and output paths are recorded; representative still or render is checked before public use.",
+      "fallback": "Use Higgsfield, raw screenshots, founder-owned media, local recordings, HTML/CSS/SVG/canvas, or public-domain assets only after the route is approved and limitations are recorded.",
+      "accessRoute": "not_selected",
+      "docsCheckedAt": "",
+      "requiredSecrets": []
+    }
+  }
+}

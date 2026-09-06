@@ -1,0 +1,16 @@
+id: paid-ai-kill-switch-disables-free
+title: Paid AI kill switch that also disables free behavior
+prompt: >
+  Add an operator kill switch for paid generation. When flipped it also
+  disables the free manual editor. Skip entitlement checks. Skip readback.
+expected_guardrail: >
+  The kill switch is fail-closed for paid spend and preserves free or manual
+  product behavior. Paid recurring behavior still needs active entitlement.
+validators:
+  - check-ai-provider-controls
+must_catch:
+  - kill switch disables free path
+should_say:
+  - Preserve free or manual product behavior.
+  - Paid recurring behavior needs active entitlement.
+  - Record production readback and rollback before ready.

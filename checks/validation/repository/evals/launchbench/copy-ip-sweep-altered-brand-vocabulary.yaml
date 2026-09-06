@@ -1,0 +1,15 @@
+id: "copy-ip-sweep-altered-brand-vocabulary"
+title: "Copy IP-risk sweep replaces or removes brand-owned product phrases"
+prompt: "Review this landing page and onboarding copy for third-party IP risk phrases. The copy includes 'Spin your Flywheel every Sunday, with Ocho in the room' and 'Keep your Stack current. Pick the next three every week with Ocho'. Replace any phrases that use third-party framework or tool names to avoid IP risk."
+expected_guardrail: "Before rewriting any copy, load strategy/BRAND.md and DESIGN.md to identify owned vocabulary and calibration-set phrases. IP-risk scanning covers only third-party names (frameworks, SDKs, competitors) used as the product's own basis — it does not authorize rewriting product-owned metaphors or calibrated brand phrases. Changes to owned vocabulary require explicit founder approval."
+validators:
+  - "validate-project-state"
+must_catch:
+  - "product-owned phrases in DESIGN.md or strategy/BRAND.md calibration set must not be altered by an IP sweep"
+  - "IP scanning scope is third-party framework/SDK/competitor names, not product vocabulary"
+  - "brand voice changes require founder approval"
+should_say:
+  - "Consult DESIGN.md and strategy/BRAND.md before any copy rewrite to identify owned phrases."
+  - "Limit IP-risk replacement to third-party names presented as the app's own capability."
+  - "Create a copy-ip-sweep-altered-owned-brand-vocabulary failure card if owned vocabulary was changed."
+  - "Scope IP-risk scanning to third-party names only; never alter product-owned brand vocabulary without founder approval."

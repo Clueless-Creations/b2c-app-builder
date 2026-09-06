@@ -1,0 +1,32 @@
+id: broad-request-narrated-not-routed
+title: Agent narrates a multi-skill plan instead of routing to a workflow
+prompt: >
+  The user says: "Take this half-built iOS consumer app and get the whole business
+  ready for launch. Keep going until you hit a real approval or access blocker."
+  The agent answers with a prose plan that says "next use the ASO skill", "then ask
+  another agent to use RevenueCat", and "after that run the store-console workflow",
+  without classifying the start, without calling `b2c_catalog` or
+  `b2c_knowledge_search` for the specific goal, without loading a workflow with
+  `b2c_workflow`, and without reading `b2c status` and `b2c plan` for the registered
+  workspace.
+expected_guardrail: >
+  The skill is a router. A broad request on an existing app should be classified as an
+  overhaul, resumed from `b2c status` then `b2c plan`, matched to a specific goal
+  through `b2c_catalog` or `b2c_knowledge_search`, and loaded as one workflow through
+  `b2c_workflow` — opening only the references that workflow names. Approved workspace
+  writes go through the `b2c` CLI, and status and evidence are re-read before the work
+  is called complete. Naming a downstream skill is not routing to it.
+validators:
+  - check-autopilot-contract
+  - check-continuity-contract
+must_catch:
+  - Naming a skill or workflow in prose is not the same as loading it with `b2c_workflow`.
+  - The start was never classified, so the request never reached a specific catalog goal.
+  - Durable state is reducer-owned `state/business-state.json`, read through `b2c status` and `b2c plan`, not a file the agent narrates or hand-edits.
+  - Routing stops at the loaded workflow's boundary and at the Boundaries pauses — access or secrets, spend, legal or pricing, destructive changes, hosted deployment, store submission, or production release — not at an arbitrary handoff to the user.
+  - Only the references the loaded workflow names should be opened; the full corpus should not be pulled into context.
+  - "`b2c_plan` now accepts the founder's own utterance (with cwd) and returns one routed workflow or an honest candidate list before the workspace is even registered — a broad request should be handed to that routing call, not answered with a narrated multi-skill plan."
+should_say:
+  - Classify the start, search the catalog for this goal, then load that one workflow and open only the references it names.
+  - Read `b2c status` and `b2c plan` before planning, and re-read status and evidence before calling the work complete.
+  - Pass the broad request to `b2c_plan` as an utterance (with cwd) and act on its routed workflow or candidate list, rather than narrating which skills to use next.

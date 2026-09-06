@@ -1,0 +1,13 @@
+schema_version: 1.0.0
+id: reference.experience.experience-cards.perceived-effort-delay-card
+title: Perceived Effort Delay Card
+domain_id: domain.experience
+document_path: knowledge/experience/experience-cards/perceived-effort-delay-card.md
+load_when: showing real work happening during a wait to convert delay into perceived craft — routed from experience-cards.md
+lifecycle: active
+bindings:
+  workflow_ids: []
+  context_pack_ids:
+    - context.experience-cards
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

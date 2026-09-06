@@ -1,0 +1,44 @@
+schema_version: 1.0.0
+id: reference.store.age-rating-questionnaire
+title: Age Rating Questionnaire
+domain_id: domain.store
+document_path: knowledge/store/age-rating-questionnaire.md
+load_when: before Apple review submission; when STORE_CONSOLE.md needs social, chat, age-assurance,
+  and UGC age-rating answers with product evidence
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.store.store-console-workflow
+    - workflow.store.asc-cli-automation
+    - workflow.store.apple-signing-and-release-readiness
+  context_pack_ids:
+    - context.store
+applicability_notes: Hard-block Apple submission when a September 2026 age-rating field is blank.
+  Do not infer false. Restricted social requires age assurance and UGC answers.
+sources:
+  - id: developer-apple-com-help-app-store-connect-manage-app-information-set-an-app-age-rating
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/manage-app-information/set-an-app-age-rating
+    review_cadence_days: 7
+    claim_scope: Official Apple help for setting an app age rating, including required questionnaire
+      fields.
+    last_review_date: 2026-08-24
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-reference-app-information-required-localizable
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/reference/app-information/required-localizable-and-editable-properties
+    review_cadence_days: 7
+    claim_scope: Age rating is required App Store information. Incomplete answers block submission.
+    last_review_date: 2026-08-24
+    reviewer: b2c-maintainers
+  - id: github-com-rorkai-app-store-connect-cli-releases-4-9-0
+    name: github.com
+    source_type: official_docs
+    url: https://github.com/rorkai/App-Store-Connect-CLI/releases/tag/4.9.0
+    review_cadence_days: 7
+    claim_scope: Rork asc 4.9.0 adds experimental asc age-rating audit for the September 2026
+      social and messaging questionnaire fields.
+    last_review_date: 2026-08-24
+    reviewer: b2c-maintainers

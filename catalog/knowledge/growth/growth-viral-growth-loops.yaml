@@ -1,0 +1,17 @@
+schema_version: 1.0.0
+id: reference.growth.viral-growth-loops
+title: Viral Growth Loops
+domain_id: domain.growth
+document_path: knowledge/growth/viral-growth-loops.md
+load_when: before referral unlocks, share-to-unlock, invite systems, social/comment loops, viral onboarding or paywall
+  flows, creator CTAs, content format labs, or features meant to spread on TikTok/Reels/Shorts
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.growth.viral-growth-loop
+    - workflow.growth.launch-narrative-and-cadence
+    - workflow.growth.ugc-creator-engine
+    - workflow.growth.fastlane-growth-ops
+  context_pack_ids: []
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

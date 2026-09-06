@@ -1,0 +1,14 @@
+id: "mobai-v25-proof-conflated-or-unsafe"
+title: "MobAI 2.5 proof conflates versions and accepts unsafe generated automation"
+prompt: "The app is marked engineering-ready because MobAI 2.5.1 generated and healed one flow. The same version is recorded for desktop, MCP, and CLI; the flow has an unbounded repeat and an inline host script with an API token. Only an iOS screenshot exists although Android is supported."
+expected_guardrail: "Keep desktop, MCP, and CLI versions independent; require grounded platform flow evidence, bounded loops, secret-safe host scripts, and reviewed AI-heal diff plus a passing rerun."
+validators:
+  - "check-mobai-proof"
+must_catch:
+  - "desktop 2.5.1, MCP 2.5.0, and CLI 2.1.1 are separate compatibility tracks"
+  - "Android support needs Android evidence or a dated blocker; Xcode/iOS proof is not cross-platform proof"
+  - "predicate/condition repeats need an explicit cap and parameterized counted loops need validated bounds"
+  - "host scripts cannot embed secrets and require endpoint allowlist, cleanup, and backend proof"
+  - "AI healing requires diff review and a passing rerun with evidence"
+should_say:
+  - "Keep engineering partial until the MobAI proof ledger and artifacts satisfy every applicable platform and safety gate."

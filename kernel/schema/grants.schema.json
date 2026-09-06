@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:b2c:core:grants-schema",
+  "title": "Autonomy Grants",
+  "$comment": "Grants bind to stable domain IDs (KTD3). Business units are a copy-layer grouping over these domains and are not a grant key themselves. System domains (domain.process, domain.orchestration) never appear here.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "updatedAt", "grants"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": "1.0.0" },
+    "updatedAt": { "$ref": "#/$defs/dateTime" },
+    "grants": { "$ref": "#/$defs/grantsMap" }
+  },
+  "$defs": {
+    "dateTime": { "type": "string", "format": "date-time" },
+    "optionalDateTime": { "anyOf": [{ "const": "" }, { "$ref": "#/$defs/dateTime" }] },
+    "probe": {
+      "type": "object",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "kind", "ttlSeconds", "status"],
+          "properties": {
+            "id": { "type": "string", "minLength": 1 },
+            "kind": { "const": "doppler_auth" },
+            "ttlSeconds": { "type": "integer", "minimum": 0 },
+            "status": { "enum": ["unverified", "verified", "lapsed"] },
+            "verifiedAt": { "$ref": "#/$defs/optionalDateTime" },
+            "evidencePath": { "type": "string" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "kind", "ttlSeconds", "status", "budgetRef"],
+          "properties": {
+            "id": { "type": "string", "minLength": 1 },
+            "kind": { "const": "budget_funded" },
+            "ttlSeconds": { "type": "integer", "minimum": 0 },
+            "status": { "enum": ["unverified", "verified", "lapsed"] },
+            "verifiedAt": { "$ref": "#/$defs/optionalDateTime" },
+            "budgetRef": { "type": "string", "minLength": 1 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "kind", "ttlSeconds", "status", "description"],
+          "properties": {
+            "id": { "type": "string", "minLength": 1 },
+            "kind": { "const": "custom" },
+            "ttlSeconds": { "type": "integer", "minimum": 0 },
+            "status": { "enum": ["unverified", "verified", "lapsed"] },
+            "verifiedAt": { "$ref": "#/$defs/optionalDateTime" },
+            "evidencePath": { "type": "string" },
+            "description": { "type": "string", "minLength": 1 }
+          }
+        }
+      ]
+    },
+    "baseGrantableDomainId": {
+      "enum": [
+        "domain.research",
+        "domain.product",
+        "domain.experience",
+        "domain.words",
+        "domain.design",
+        "domain.engineering",
+        "domain.growth",
+        "domain.data",
+        "domain.money",
+        "domain.store",
+        "domain.trust",
+        "domain.operations"
+      ]
+    },
+    "grant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["domainId", "level", "prerequisites", "grantedAt", "grantedBy", "updatedAt"],
+      "properties": {
+        "domainId": { "type": "string", "pattern": "^domain\\.(?!process$|orchestration$|machine$)[a-z][a-z0-9-]*$" },
+        "level": { "enum": ["review-first", "run-with-guardrails", "full"] },
+        "prerequisites": { "type": "array", "items": { "$ref": "#/$defs/probe" } },
+        "grantedAt": { "$ref": "#/$defs/dateTime" },
+        "grantedBy": { "const": "founder" },
+        "grantedViaUnit": { "enum": ["Product", "Design", "Engineering", "Growth", "Analytics", "Revenue", "Store", "Trust", "Operations"] },
+        "updatedAt": { "$ref": "#/$defs/dateTime" },
+        "notes": { "type": "string" }
+      }
+    },
+    "grantsMap": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^domain\\.(?!process$|orchestration$|machine$)[a-z][a-z0-9-]*$": { "$ref": "#/$defs/grant" }
+      }
+    }
+  }
+}

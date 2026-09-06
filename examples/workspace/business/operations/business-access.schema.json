@@ -1,0 +1,268 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:b2c:business-access-schema",
+  "title": "B2C Mobile Business Founder-Zero Operator Bootstrap",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "updatedAt", "status", "founderModel", "security", "doppler", "accounts"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": "2.0.0" },
+    "updatedAt": { "$ref": "#/$defs/optionalDateTime" },
+    "status": { "enum": ["not_started", "active", "blocked", "ready"] },
+    "founderModel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assumedExperience", "agentRole", "interactionMode", "questionMode", "founderOwnsBusiness", "agentDrivesExecution", "neverDumpChecklist", "currentPhase", "activeFounderGate", "gateHistory", "nextFounderAction", "nextAgentAction", "nextBusinessOperation"],
+      "properties": {
+        "assumedExperience": { "const": "beginner" },
+        "agentRole": { "const": "business_operator" },
+        "interactionMode": { "const": "plain_language_one_step_at_a_time" },
+        "questionMode": { "const": "ask_user_question_when_available" },
+        "founderOwnsBusiness": { "const": true },
+        "agentDrivesExecution": { "const": true },
+        "neverDumpChecklist": { "const": true },
+        "currentPhase": { "$ref": "#/$defs/founderPhase" },
+        "activeFounderGate": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["id", "actionType", "target", "gateClass", "origin", "phase", "whatThisIs", "whyNow", "definitions", "founderAction", "question", "bypassPolicy", "safeWorkWhileWaiting", "agentActionNext", "successProof", "lifecycle"],
+              "properties": {
+            "id": { "type": "string", "minLength": 1 },
+            "actionType": { "enum": ["decision", "login", "confirmation", "secure_value_entry", "approval", "purchase"] },
+            "target": { "type": "string", "minLength": 3 },
+            "gateClass": { "enum": ["access", "spend", "legal", "pricing", "public_action", "release", "destructive", "research", "scope", "provider_route", "other"] },
+            "origin": { "enum": ["user_request", "platform_requirement", "legal_requirement", "skill_requirement", "agent_proposal"] },
+            "phase": { "$ref": "#/$defs/founderPhase" },
+            "whatThisIs": { "type": "string", "minLength": 20 },
+            "whyNow": { "type": "string", "minLength": 20 },
+            "definitions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["term", "meaning"],
+                "properties": {
+                  "term": { "type": "string", "minLength": 2 },
+                  "meaning": { "type": "string", "minLength": 12 }
+                }
+              }
+            },
+            "founderAction": { "type": "string", "minLength": 20, "maxLength": 240 },
+            "question": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["header", "prompt", "options"],
+              "properties": {
+                "header": { "type": "string", "minLength": 1, "maxLength": 12 },
+                "prompt": { "type": "string", "minLength": 20, "maxLength": 240 },
+                "options": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 3,
+                  "items": { "$ref": "#/$defs/questionOption" }
+                }
+              }
+            },
+            "bypassPolicy": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["mode", "optionId", "reason", "fallbackAction", "revisitTrigger"],
+              "properties": {
+                "mode": { "enum": ["fallback_allowed", "defer_only"] },
+                "optionId": { "type": "string", "minLength": 1 },
+                "reason": { "type": "string", "minLength": 20 },
+                "fallbackAction": { "type": "string", "minLength": 20 },
+                "revisitTrigger": { "type": "string", "minLength": 20 }
+              }
+            },
+            "safeWorkWhileWaiting": { "type": "string", "minLength": 20 },
+            "agentActionNext": { "type": "string", "minLength": 20, "maxLength": 320 },
+            "successProof": { "type": "string", "minLength": 20 },
+            "lifecycle": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["status", "presentedAt", "supersedesGateId"],
+              "properties": {
+                "status": { "const": "pending" },
+                "presentedAt": { "$ref": "#/$defs/optionalDateTime" },
+                "supersedesGateId": { "type": "string" }
+              }
+            }
+              }
+            }
+          ]
+        },
+        "gateHistory": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/gateHistoryEntry" }
+        },
+        "nextFounderAction": {
+          "anyOf": [
+            { "const": "" },
+            { "type": "string", "minLength": 20, "maxLength": 240 }
+          ]
+        },
+        "nextAgentAction": { "type": "string", "minLength": 20, "maxLength": 320 },
+        "nextBusinessOperation": { "type": "string", "minLength": 20 }
+      }
+    },
+    "security": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["delegatedAccessFirst", "oauthBeforeSharedCredentials", "noPasswordsInChatOrRepo", "dopplerForAutomationSecretsNotBrowserPasswords", "founderControlsRecovery", "founderControlsMfa", "separateOperatorIdentityWhenPossible", "accessIsRevocable"],
+      "properties": {
+        "delegatedAccessFirst": { "const": true },
+        "oauthBeforeSharedCredentials": { "const": true },
+        "noPasswordsInChatOrRepo": { "const": true },
+        "dopplerForAutomationSecretsNotBrowserPasswords": { "const": true },
+        "founderControlsRecovery": { "const": true },
+        "founderControlsMfa": { "const": true },
+        "separateOperatorIdentityWhenPossible": { "const": true },
+        "accessIsRevocable": { "const": true }
+      }
+    },
+    "doppler": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "statusReason", "cliVersion", "docsCheckedAt", "authenticatedAccountLabel", "workspaceOwner", "operatorIdentityLabel", "operatorRole", "authenticationMethod", "recoveryOwner", "mfaOwner", "revocationPath", "project", "configs", "secretNames", "proofPath", "nextFounderAction", "nextAgentAction"],
+      "properties": {
+        "status": { "enum": ["not_started", "founder_action_needed", "active", "blocked", "ready", "not_needed"] },
+        "statusReason": { "type": "string" },
+        "cliVersion": { "type": "string" },
+        "docsCheckedAt": { "$ref": "#/$defs/optionalDateTime" },
+        "authenticatedAccountLabel": { "type": "string" },
+        "workspaceOwner": { "const": "founder" },
+        "operatorIdentityLabel": { "type": "string" },
+        "operatorRole": { "type": "string" },
+        "authenticationMethod": { "enum": ["not_selected", "founder_authenticated_cli", "delegated_role", "service_token", "oidc", "integration"] },
+        "recoveryOwner": { "const": "founder" },
+        "mfaOwner": { "const": "founder" },
+        "revocationPath": { "type": "string" },
+        "project": { "type": "string" },
+        "configs": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "secretNames": { "type": "array", "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" }, "uniqueItems": true },
+        "proofPath": { "type": "string" },
+        "nextFounderAction": { "type": "string", "minLength": 20 },
+        "nextAgentAction": { "type": "string", "minLength": 20 }
+      }
+    },
+    "accounts": {
+      "type": "array",
+      "minItems": 8,
+      "items": { "$ref": "#/$defs/account" }
+    }
+  },
+  "$defs": {
+    "optionalDateTime": {
+      "anyOf": [
+        { "const": "" },
+        { "type": "string", "format": "date-time" }
+      ]
+    },
+    "founderPhase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "outcome"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "minLength": 3, "maxLength": 80 },
+        "outcome": { "type": "string", "minLength": 20, "maxLength": 240 }
+      }
+    },
+    "questionOption": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "route", "description", "consequence", "agentActionNext", "evidenceEffect", "recommended"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "minLength": 1, "maxLength": 40 },
+        "route": { "enum": ["proceed", "fallback", "defer", "stop"] },
+        "description": { "type": "string", "minLength": 20 },
+        "consequence": { "type": "string", "minLength": 20 },
+        "agentActionNext": { "type": "string", "minLength": 20 },
+        "evidenceEffect": { "type": "string", "minLength": 20 },
+        "recommended": { "type": "boolean" }
+      }
+    },
+    "gateHistoryEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "status", "selectedOptionId", "decidedAt", "authority", "consequence", "evidencePath", "reason"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["resolved", "consumed", "stale", "superseded", "cancelled"] },
+        "selectedOptionId": { "type": "string" },
+        "decidedAt": { "$ref": "#/$defs/optionalDateTime" },
+        "authority": { "enum": ["founder", "platform", "legal"] },
+        "consequence": { "type": "string", "minLength": 1 },
+        "evidencePath": { "type": "string" },
+        "reason": { "type": "string", "minLength": 1 },
+        "context": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["actionType", "target", "whatThisIs", "whyNow", "founderAction", "agentActionNext", "successProof"],
+          "properties": {
+            "actionType": { "type": "string" },
+            "target": { "type": "string" },
+            "whatThisIs": { "type": "string" },
+            "whyNow": { "type": "string" },
+            "founderAction": { "type": "string" },
+            "agentActionNext": { "type": "string" },
+            "successProof": { "type": "string" }
+          }
+        }
+      }
+    },
+    "account": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "platform", "purpose", "status", "statusReason", "exactAccount", "businessAsset", "owner", "accessMethod", "operatorIdentityLabel", "operatorRole", "delegatedBy", "revocationPath", "delegationGapReason", "tokenScopeSource", "rotationOrExpiry", "grantedScopes", "canObserve", "canDraft", "canPublish", "canReply", "canModerate", "canViewAnalytics", "canSpend", "canChangeIdentity", "canDelete", "approvalRequired", "recoveryOwner", "mfaOwner", "secretNames", "checkedAt", "proofPath", "nextFounderAction", "nextAgentAction", "limitations"],
+      "properties": {
+        "id": { "enum": ["business_email", "domain", "apple", "google", "x", "meta", "tiktok", "youtube"] },
+        "kind": { "enum": ["support", "infrastructure", "store", "social"] },
+        "platform": { "type": "string", "minLength": 1 },
+        "purpose": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["not_evaluated", "missing_account", "founder_action_needed", "access_pending", "access_ready", "blocked", "not_needed"] },
+        "statusReason": { "type": "string" },
+        "exactAccount": { "type": "string" },
+        "businessAsset": { "type": "string" },
+        "owner": { "enum": ["founder", "founder_controlled_business"] },
+        "accessMethod": { "enum": ["not_selected", "delegated_role", "oauth", "dedicated_operator_account", "authenticated_browser_session", "api_token", "service_account", "manual_founder_only"] },
+        "operatorIdentityLabel": { "type": "string" },
+        "operatorRole": { "type": "string" },
+        "delegatedBy": { "type": "string" },
+        "revocationPath": { "type": "string" },
+        "delegationGapReason": { "type": "string" },
+        "tokenScopeSource": { "type": "string" },
+        "rotationOrExpiry": { "type": "string" },
+        "grantedScopes": {
+          "type": "array",
+          "items": { "enum": ["observe", "draft", "publish", "reply", "moderate", "analytics", "spend", "identity_change", "delete", "store_submit", "release", "infrastructure_change"] },
+          "uniqueItems": true
+        },
+        "canObserve": { "type": "boolean" },
+        "canDraft": { "type": "boolean" },
+        "canPublish": { "type": "boolean" },
+        "canReply": { "type": "boolean" },
+        "canModerate": { "type": "boolean" },
+        "canViewAnalytics": { "type": "boolean" },
+        "canSpend": { "type": "boolean" },
+        "canChangeIdentity": { "type": "boolean" },
+        "canDelete": { "type": "boolean" },
+        "approvalRequired": { "const": true },
+        "recoveryOwner": { "type": "string", "minLength": 1 },
+        "mfaOwner": { "type": "string", "minLength": 1 },
+        "secretNames": { "type": "array", "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" }, "uniqueItems": true },
+        "checkedAt": { "$ref": "#/$defs/optionalDateTime" },
+        "proofPath": { "type": "string" },
+        "nextFounderAction": { "type": "string", "minLength": 10 },
+        "nextAgentAction": { "type": "string", "minLength": 10 },
+        "limitations": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

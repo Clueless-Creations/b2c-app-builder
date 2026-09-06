@@ -1,0 +1,22 @@
+schema_version: 1.0.0
+id: reference.product.ai-chat-companion
+title: AI Chat Companion
+domain_id: domain.product
+document_path: knowledge/product/ai-chat-companion.md
+load_when: '"an AI assistant", "a chatbot for <domain>", "an AI companion/character", a coach/tutor chat app; before
+  specing conversation schema, model integration, memory, usage metering, or the safety layer'
+lifecycle: active
+bindings:
+  workflow_ids: []
+  context_pack_ids:
+    - context.archetypes
+sources:
+  - id: github-com-florianbruniaux-claude-code-ultimate-guide-production-reliability
+    name: github.com
+    source_type: github
+    url: https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/workflows/production-reliability.md
+    review_cadence_days: 30
+    claim_scope: Circuit-breaker (closed/open/half-open) and structured is_retryable-error pattern
+      for wrapping the chat companion's external inference call.
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers

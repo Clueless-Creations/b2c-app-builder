@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:b2c:core:budget-ledger-schema",
+  "title": "Budget Ledger",
+  "$comment": "Running balances per business unit and period (R10). Every entry declares a cost estimate before dispatch; actuals are recorded after. A spend-class node without a declared estimate does not compile (enforced by the engine, U2); this schema makes the estimate axis structurally required.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "updatedAt", "balances", "entries"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": "1.0.0" },
+    "updatedAt": { "$ref": "#/$defs/dateTime" },
+    "balances": { "type": "array", "items": { "$ref": "#/$defs/balance" } },
+    "entries": { "type": "array", "items": { "$ref": "#/$defs/entry" } }
+  },
+  "$defs": {
+    "dateTime": { "type": "string", "format": "date-time" },
+    "businessUnit": { "enum": ["Product", "Design", "Engineering", "Growth", "Analytics", "Revenue", "Store", "Trust", "Operations"] },
+    "domainId": {
+      "type": "string",
+      "pattern": "^domain\\.(?!process$|orchestration$|machine$)[a-z][a-z0-9-]*$"
+    },
+    "amountRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["amount", "currency"],
+      "properties": {
+        "amount": { "type": "number", "minimum": 0 },
+        "currency": { "type": "string", "minLength": 1 }
+      }
+    },
+    "balance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unit", "period", "currency", "allocated", "committed", "spent", "remaining", "updatedAt"],
+      "properties": {
+        "unit": { "$ref": "#/$defs/businessUnit" },
+        "period": { "type": "string", "minLength": 1 },
+        "currency": { "type": "string", "minLength": 1 },
+        "allocated": { "type": "number", "minimum": 0 },
+        "committed": { "type": "number", "minimum": 0 },
+        "spent": { "type": "number", "minimum": 0 },
+        "remaining": { "type": "number" },
+        "updatedAt": { "$ref": "#/$defs/dateTime" }
+      }
+    },
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "unit", "domainId", "period", "estimate", "status", "auditRef"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "unit": { "$ref": "#/$defs/businessUnit" },
+        "domainId": { "$ref": "#/$defs/domainId" },
+        "nodeRef": { "type": "string" },
+        "period": { "type": "string", "minLength": 1 },
+        "estimate": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["amount", "currency", "declaredAt"],
+          "properties": {
+            "amount": { "type": "number", "minimum": 0 },
+            "currency": { "type": "string", "minLength": 1 },
+            "declaredAt": { "$ref": "#/$defs/dateTime" }
+          }
+        },
+        "actual": { "anyOf": [{ "type": "null" }, { "$ref": "#/$defs/actualRecord" }] },
+        "status": { "enum": ["estimated", "actualized", "rejected"] },
+        "waiverRef": { "type": "string" },
+        "auditRef": { "type": "string", "minLength": 1 }
+      }
+    },
+    "actualRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["amount", "currency", "recordedAt"],
+      "properties": {
+        "amount": { "type": "number", "minimum": 0 },
+        "currency": { "type": "string", "minLength": 1 },
+        "recordedAt": { "$ref": "#/$defs/dateTime" }
+      }
+    }
+  }
+}

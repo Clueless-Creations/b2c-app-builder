@@ -1,0 +1,79 @@
+schema_version: 1.0.0
+id: reference.engineering.engineering-orchestration
+title: Engineering Orchestration
+domain_id: domain.engineering
+document_path: knowledge/engineering/engineering-orchestration.md
+load_when: before app implementation, backend/frontend work, or production-readiness claims — mobile quality bars,
+  engineering/ENGINEERING_PLAN.md, engineering/PRODUCTION_READINESS.md, and device-proof expectations
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.engineering.engineering-orchestration-ce-production-readiness
+  context_pack_ids:
+    - context.engineering
+sources:
+  - id: arxiv-org-abs-2602-11988
+    name: arxiv.org
+    source_type: paper
+    url: https://arxiv.org/abs/2602.11988
+    review_cadence_days: 30
+    claim_scope: The measured effect of developer-written versus LLM-generated context files on agent task success
+      and inference cost, grounding the AGENTS.md-authoring caution in §4.
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers
+  - id: every-to-guides-compound-engineering
+    name: every.to
+    source_type: website
+    url: https://every.to/guides/compound-engineering
+    review_cadence_days: 30
+    claim_scope: The compound-engineering practice of writing a post-fix solutions note, grounding §6b's
+      docs/solutions/<slug>.md contract.
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers
+  - id: anthropic-com-engineering-claude-code-best-practices
+    name: anthropic.com
+    source_type: official_docs
+    url: https://www.anthropic.com/engineering/claude-code-best-practices
+    review_cadence_days: 30
+    claim_scope: Anthropic's published guidance to write a failing test before implementation, grounding the
+      test-first requirement added to §1b Bounded Slices.
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers
+  - id: github-com-florianbruniaux-claude-code-ultimate-guide-ai-unit-economics
+    name: github.com
+    source_type: github
+    url: https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/guide/ops/ai-unit-economics.md
+    review_cadence_days: 30
+    claim_scope: The recommendation to cap retries on a stuck implementation slice before escalating, grounding
+      the numeric retry cap added to §1b Bounded Slices.
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers
+  - id: github-com-florianbruniaux-claude-code-ultimate-guide-claude-code-releases
+    name: github.com
+    source_type: github
+    url: https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/guide/core/claude-code-releases.md
+    review_cadence_days: 30
+    claim_scope: Claude Code's built-in /ultrareview cloud adversarial-review command, its v2.1.114 introduction, and
+      its Pro/Max account requirement, grounding the fallback named in §1b Adversarial Review. (The prior
+      code.claude.com/docs/en/claude-code URL returns 404; re-attributed here.)
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers
+  - id: marmelab-com-blog-2026-agent-experience
+    name: marmelab.com
+    source_type: website
+    url: https://marmelab.com/blog/2026/01/21/agent-experience.html
+    review_cadence_days: 30
+    claim_scope: Basis for writing test assertions on entitlement/attribution/payment logic before the
+      implementing agent starts (§7) and for recording a short decision entry for a non-obvious architecture
+      or data-model choice (§6).
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers
+  - id: academy-claude-com-tutorials-the-ai-fluency-index
+    name: academy.claude.com
+    source_type: official_docs
+    url: https://academy.claude.com/tutorials/the-ai-fluency-index
+    review_cadence_days: 30
+    claim_scope: Basis for the "reviewers grow less critical once an artifact looks finished" note in §7,
+      grounding the edge-case-listing self-check before accepting a slice as done.
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers

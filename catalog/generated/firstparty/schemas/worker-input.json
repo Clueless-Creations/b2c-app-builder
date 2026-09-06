@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "workflowId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "attemptId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "inputFingerprint": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "workflowId",
+    "runId",
+    "attemptId",
+    "inputFingerprint"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,102 @@
+schema_version: 1.0.0
+id: reference.engineering.external-skill-packs
+title: External Skill Packs
+domain_id: domain.engineering
+document_path: knowledge/engineering/external-skill-packs.md
+load_when: a launch routes work to an installed third-party skill pack (marketing, writing, GEO/SEO, product management,
+  legal templates, design tooling, design taste, layered product method) and the dispatcher must know which role may
+  load it, in which mode, and with which boundary
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.orchestration.full-launch-program
+    - workflow.engineering.app-agent-roster-and-repo-entrypoints
+    - workflow.research.spec-red-team-audit
+    - workflow.design.reference-pack-librarian
+    - workflow.design.design-system-audit
+    - workflow.growth.landing-funnel-audit
+    - workflow.words.copy-review-audit
+  context_pack_ids:
+    - context.orchestration
+applicability_notes: A skill pack never marks a lane done. The B2C reference that already adapts a pack wins on conflict.
+  Skill names are installed directory names; verify the installed set with the runtime's skill listing before dispatch.
+  Packs that write PRODUCT.md, DESIGN.md, or reducer state are restricted to the commands that do not.
+sources:
+  - id: github-com-coreyhaines31-marketingskills
+    name: github.com
+    source_type: skill_pack
+    url: https://github.com/coreyhaines31/marketingskills
+    review_cadence_days: 90
+    claim_scope: MIT-licensed marketing skill pack. Basis for the installed skill list and the producer/auditor split
+      between the writing skills and copy-editing, cro, aso, and marketing-council.
+    last_review_date: 2026-09-03
+    reviewer: b2c-maintainers
+  - id: github-com-petergyang-no-ai-slop
+    name: github.com
+    source_type: github
+    url: https://github.com/petergyang/no-ai-slop
+    review_cadence_days: 30
+    claim_scope: MIT-licensed slop-detection skill. Basis for the detect-mode auditor role and the voice-preservation
+      boundary.
+    last_review_date: 2026-09-03
+    reviewer: b2c-maintainers
+  - id: github-com-zubair-trabzada-geo-seo-claude
+    name: github.com
+    source_type: github
+    url: https://github.com/zubair-trabzada/geo-seo-claude
+    review_cadence_days: 30
+    claim_scope: GEO/SEO skill pack. Basis for the installed sub-skill list and the audit-before-first-edit rule.
+    last_review_date: 2026-09-03
+    reviewer: b2c-maintainers
+  - id: general-legal-template-collection
+    name: General Legal template collection
+    source_type: attorney_template_repository
+    url: https://github.com/General-Legal/legal-templates
+    review_cadence_days: 30
+    claim_scope: CC0 drafting benchmark for privacy, terms, cookie notice, and data-processing templates. Benchmark only;
+      not legal authority and never source text.
+    last_review_date: 2026-09-03
+    reviewer: b2c-maintainers
+  - id: github-appllama-top-welcome-screens
+    name: Appllama top-welcome-screens
+    source_type: inspiration_benchmark
+    url: https://github.com/Appllama/top-welcome-screens
+    review_cadence_days: 90
+    claim_scope: Welcome-screen reference gallery. Basis for the reference-only mode and the no-branded-asset boundary.
+    last_review_date: 2026-09-03
+    reviewer: b2c-maintainers
+  - id: github-com-google-labs-code-design-md
+    name: github.com
+    source_type: github
+    url: https://github.com/google-labs-code/design.md
+    review_cadence_days: 30
+    claim_scope: design.md CLI. Basis for the lint, diff, and DTCG export commands used as producer and auditor tools.
+    last_review_date: 2026-09-03
+    reviewer: b2c-maintainers
+  - id: github-com-leonxlnx-taste-skill
+    name: github.com
+    source_type: github
+    url: https://github.com/Leonxlnx/taste-skill
+    review_cadence_days: 30
+    claim_scope: Design taste skill pack. Basis for the installed skill list and the rule that its scroll-animation
+      skeletons stay out of the measured landing controller.
+    last_review_date: 2026-09-03
+    reviewer: b2c-maintainers
+  - id: github-com-pbakaus-impeccable
+    name: github.com
+    source_type: github
+    url: https://github.com/pbakaus/impeccable
+    review_cadence_days: 30
+    claim_scope: Impeccable design skill and CLI detector. Basis for the evaluate-only command list and the rule that
+      init and document never run because they write PRODUCT.md and DESIGN.md.
+    last_review_date: 2026-09-03
+    reviewer: b2c-maintainers
+  - id: github-com-jamiemill-layers-skills
+    name: github.com
+    source_type: github
+    url: https://github.com/jamiemill/layers-skills
+    review_cadence_days: 30
+    claim_scope: Layers product-method skill pack. Basis for the layer-by-layer producer method and the layers-surface
+      auditor checklist.
+    last_review_date: 2026-09-03
+    reviewer: b2c-maintainers

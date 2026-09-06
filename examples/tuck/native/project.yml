@@ -1,0 +1,76 @@
+name: Tuck
+options:
+  bundleIdPrefix: com.b2cappbuilder
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    CODE_SIGNING_ALLOWED: NO
+    CODE_SIGNING_REQUIRED: NO
+    TARGETED_DEVICE_FAMILY: "1"
+    IPHONEOS_DEPLOYMENT_TARGET: "17.0"
+    GENERATE_INFOPLIST_FILE: YES
+targets:
+  Tuck:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+      - path: Assets.xcassets
+      - path: ../shared/object-geometry.json
+        buildPhase: resources
+      - path: ../shared/fonts/Fraunces.ttf
+        buildPhase: resources
+      - path: ../shared/fonts/DMSans.ttf
+        buildPhase: resources
+    info:
+      path: Info.plist
+      properties:
+        UIAppFonts: [Fraunces.ttf, DMSans.ttf]
+    settings:
+      base:
+        TARGETED_DEVICE_FAMILY: "1"
+        PRODUCT_BUNDLE_IDENTIFIER: com.b2cappbuilder.tuck
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        INFOPLIST_KEY_CFBundleDisplayName: Tuck
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait
+        INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace: YES
+        INFOPLIST_KEY_UIFileSharingEnabled: NO
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: "1"
+  TuckTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [Tests]
+    dependencies:
+      - target: Tuck
+    settings:
+      base:
+        TARGETED_DEVICE_FAMILY: "1"
+        PRODUCT_BUNDLE_IDENTIFIER: com.b2cappbuilder.tuck.tests
+  TuckUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [UITests]
+    dependencies:
+      - target: Tuck
+    settings:
+      base:
+        TARGETED_DEVICE_FAMILY: "1"
+        PRODUCT_BUNDLE_IDENTIFIER: com.b2cappbuilder.tuck.uitests
+schemes:
+  Tuck:
+    build:
+      targets:
+        Tuck: all
+        TuckTests: [test]
+        TuckUITests: [test]
+    test:
+      gatherCoverageData: true
+      targets:
+        - TuckTests
+        - TuckUITests

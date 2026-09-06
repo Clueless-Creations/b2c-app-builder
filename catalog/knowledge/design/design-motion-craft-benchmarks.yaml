@@ -1,0 +1,84 @@
+schema_version: 1.0.0
+id: reference.design.motion-craft-benchmarks
+title: Motion Craft Benchmarks
+domain_id: domain.design
+document_path: knowledge/design/motion-craft-benchmarks.md
+load_when: implementing or auditing a specific motion recipe against check:motion-contract's numeric spring/duration
+  tokens, tying a micro-interaction to the Experience Card it serves, or designing a cold-launch
+  splash/loading/welcome-screen entrance (R11-R14), live-state effect, liquid morph, perimeter beam, liquid-metal ring,
+  or semantic thinking orb (R15-R18)
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.design.premium-mobile-craft
+    - workflow.design.reference-pack-librarian
+  context_pack_ids: []
+sources:
+  - id: x-com-60fpsdesign-catalog
+    name: 60fps.design best-in-class app details catalog
+    source_type: inspiration_benchmark
+    url: https://60fps.design/
+    review_cadence_days: 30
+    claim_scope: Curated catalog (X @60fpsdesign, 1800+ entries) of motion/interaction details from best-in-class consumer
+      apps. Inspiration benchmark for the in-app motion lane — the mobile counterpart to motionsites-ai for landing.
+      Engagement figures cited from it are point-in-time and unverified.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: github-appllama-top-welcome-screens
+    name: Appllama top-welcome-screens (React Native Expo welcome-screen reference gallery)
+    source_type: inspiration_benchmark
+    url: https://github.com/Appllama/top-welcome-screens
+    review_cadence_days: 90
+    claim_scope: Ten shipped-app cold-launch (splash/loading/welcome) sequences with timings recovered from 30fps reference
+      clips, distilled into motion-craft-benchmarks.md's R11-R14. Inspiration benchmark only, same as
+      x-com-60fpsdesign-catalog — mechanics transfer, branded assets (mascot, wordmark, illustration, copy) do not. The
+      source repo's own NOTICE.md independently requires the same before any of its reference implementations ships, so
+      no separate legal reconciliation is needed.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: sixty-fps-design-mcp
+    name: 60fps.design MCP server
+    source_type: api
+    url: https://60fps.design/mcp
+    review_cadence_days: 30
+    claim_scope: Live MCP endpoint over the 60fps.design catalog (shot search, motion breakdowns, SwiftUI starter code).
+      Optional tooling — the distilled recipes in motion-craft-benchmarks.md remain the contract when the server is not
+      connected. Generated code must be rewritten onto the token scale before shipping.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: jakubantalik-liquid-gooey
+    name: Liquid Gooey
+    source_type: component_reference
+    url: https://gooey.jakubantalik.com/
+    review_cadence_days: 30
+    claim_scope: MIT-licensed React reference for liquid morph, move, and dissolve effects. B2C App Builder transfers its
+      two-layer interaction model, reduced-motion behavior, and idle-cost controls through recipe R15.
+    last_review_date: 2026-08-20
+    reviewer: b2c-maintainers
+  - id: jakubantalik-border-beam
+    name: Border Beam
+    source_type: component_reference
+    url: https://beam.jakubantalik.com/
+    review_cadence_days: 30
+    claim_scope: MIT-licensed React reference for traveling and breathing perimeter effects. B2C App Builder transfers its
+      state binding, decorative-layer isolation, visibility pausing, and reduced-motion behavior through recipe R16.
+    last_review_date: 2026-08-20
+    reviewer: b2c-maintainers
+  - id: jakubantalik-metal-fx
+    name: Metal FX
+    source_type: component_reference
+    url: https://metal.jakubantalik.com/
+    review_cadence_days: 30
+    claim_scope: MIT-licensed React and WebGL reference for animated liquid-metal rings. B2C App Builder transfers its shared
+      render-loop, context reuse, offscreen pause, context-failure fallback, and hierarchy limits through recipe R17.
+    last_review_date: 2026-08-20
+    reviewer: b2c-maintainers
+  - id: jakubantalik-thinking-orbs
+    name: Thinking Orbs
+    source_type: component_reference
+    url: https://orbs.jakubantalik.com/
+    review_cadence_days: 30
+    claim_scope: MIT-licensed React and Canvas reference for semantic AI activity states. B2C App Builder transfers its state
+      mapping, tuned sizes, accessible status, visibility pause, and static reduced-motion frame through recipe R18.
+    last_review_date: 2026-08-20
+    reviewer: b2c-maintainers

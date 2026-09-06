@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "kind": "example-screenshot-provenance",
+  "description": "Original exploratory runtime screenshots, retained without pixel edits. Native captures precede later accessibility repairs. Source fingerprints were not retained for these captures.",
+  "screenshots": [
+    {
+      "file": "landing-desktop.jpg",
+      "sourceFilename": "landing-desktop-repaired.png",
+      "sha256": "97d3cf8de48606d187d91ddaf64662cd09e27ac3325df6530aeeb25cc663c6a7",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 75034,
+      "surface": "browser",
+      "captureDate": "2026-09-04",
+      "sourceFingerprint": null,
+      "acceptanceEvidence": false,
+      "mediaType": "image/jpeg"
+    },
+    {
+      "file": "landing-mobile.jpg",
+      "sourceFilename": "landing-mobile-hero-final.png",
+      "sha256": "2616383db8223715c83c61703d6745b04eca6510ed3207a5a6acfcc4f0ec7004",
+      "width": 390,
+      "height": 844,
+      "bytes": 37575,
+      "surface": "browser",
+      "captureDate": "2026-09-04",
+      "sourceFingerprint": null,
+      "acceptanceEvidence": false,
+      "mediaType": "image/jpeg"
+    },
+    {
+      "file": "landing-packing.jpg",
+      "sourceFilename": "landing-mobile-packing-repaired.png",
+      "sha256": "9792cf4ca8f54cff4011a3bec89970b1e5541b785c824e38e57dccb3df86cc50",
+      "width": 390,
+      "height": 844,
+      "bytes": 33621,
+      "surface": "browser",
+      "captureDate": "2026-09-04",
+      "sourceFingerprint": null,
+      "acceptanceEvidence": false,
+      "mediaType": "image/jpeg"
+    },
+    {
+      "file": "native-home.png",
+      "sourceFilename": "native-empty-current.png",
+      "sha256": "3111c52c7e523ff7f1c6bf8d4707b1501094227f3028e6c249240932c3245a0d",
+      "width": 1206,
+      "height": 2622,
+      "bytes": 277527,
+      "surface": "ios-simulator",
+      "captureDate": "2026-09-04",
+      "sourceFingerprint": null,
+      "acceptanceEvidence": false,
+      "mediaType": "image/png"
+    },
+    {
+      "file": "native-packing.png",
+      "sourceFilename": "native-packing-current.png",
+      "sha256": "4f2a05c523fb49b04cc4c084c1e654d313dce51b7d42898bcd479d352516bd9e",
+      "width": 1206,
+      "height": 2622,
+      "bytes": 345427,
+      "surface": "ios-simulator",
+      "captureDate": "2026-09-04",
+      "sourceFingerprint": null,
+      "acceptanceEvidence": false,
+      "mediaType": "image/png"
+    },
+    {
+      "file": "native-list.png",
+      "sourceFilename": "native-list-current.png",
+      "sha256": "35611a019c0f2f164ba8daf2be5bda854ef0ddec05d77af17a92970e4b48c33b",
+      "width": 1206,
+      "height": 2622,
+      "bytes": 302049,
+      "surface": "ios-simulator",
+      "captureDate": "2026-09-04",
+      "sourceFingerprint": null,
+      "acceptanceEvidence": false,
+      "mediaType": "image/png"
+    }
+  ]
+}

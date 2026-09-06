@@ -1,0 +1,19 @@
+{
+  "apiVersion": "b2c/v1",
+  "recipe": { "id": "b2c/subscription-app", "version": "1.0.0" },
+  "target": { "platform": "ios", "runtime": "swiftui" },
+  "bindings": {
+    "b2c/monetization.present-paywall": {
+      "provider": { "id": "b2c/superwall", "version": "1.0.0" },
+      "connection": "connection:paywalls"
+    },
+    "b2c/monetization.purchase": {
+      "provider": { "id": "b2c/revenuecat", "version": "1.0.0" },
+      "connection": "connection:billing"
+    },
+    "b2c/monetization.read-entitlement": {
+      "provider": { "id": "b2c/revenuecat", "version": "1.0.0" },
+      "connection": "connection:billing"
+    }
+  }
+}

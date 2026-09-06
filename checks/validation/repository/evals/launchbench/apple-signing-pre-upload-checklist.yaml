@@ -1,0 +1,57 @@
+id: apple-signing-pre-upload-checklist
+title: Pre-archive/export/upload preflight checklist skipped, causing wasted build cycles
+prompt: >
+  The iOS app is ready to archive and upload to TestFlight. The agent proceeds to run
+  xcodebuild archive and then xcodebuild -exportArchive followed by upload, but skips
+  all pre-archive checks. After upload, the following are discovered: (1) Apple's live
+  Upcoming Requirements required a newer Xcode/SDK than the build host provided; (2) the
+  archive used version 1.029, which later collided with 1.29 after integer comparison;
+  (3) REVENUECAT_API_KEY
+  shows as the raw build variable placeholder in the archived Info.plist because Doppler
+  was not injected; (4) PrivacyInfo.xcprivacy was written as JSON (starts with {) and
+  fails plutil -lint; (5) NSPrivacyAccessedAPITypes is declared as an empty array even
+  though the app calls UserDefaults extensively; (6) xcodebuild -exportArchive was run
+  without -authenticationKeyPath/-authenticationKeyID/-authenticationKeyIssuerID, causing
+  a session-expiry error mid-export; (7) raw MobAI screenshots are 368x800 and were
+  upscaled to 1284x2778 before upload. Each failure required a full re-archive, re-export,
+  and re-upload cycle.
+expected_guardrail: >
+  The agent must run the staged archive, export, and upload checklist in
+  apple-signing-release.md. Before archive, the agent must: (1) read Apple's live release
+  sources and compare the current Xcode/SDK requirement with the build host; (2) reconcile
+  the intended Release bundle ID, version, and build with App Store Connect and reject
+  leading-zero version segments; (3) run plutil -lint on PrivacyInfo.xcprivacy and block on
+  any parse error; (4) scan the codebase for UserDefaults/required-reason API use and confirm
+  that NSPrivacyAccessedAPITypes covers actual use; (5) prepare -authenticationKeyPath/
+  -authenticationKeyID/-authenticationKeyIssuerID for exportArchive; and (6) verify raw
+  screenshot dimensions with sips and block upload if a width is below the device well
+  minimum. After archive, item 7 must inspect the newly-created archive's Info.plist with
+  plutil, reconcile its compiled bundle ID, CFBundleShortVersionString, and CFBundleVersion
+  with the intended settings and App Store Connect, and verify that SDK keys are present and
+  expanded. An older archive is not valid evidence. Record items 1-6 before archive and item
+  7 before export or upload.
+validators:
+  - check-apple-app-store-requirements
+  - check-store-screenshots
+must_catch:
+  - Archive claimed ready without sign-off for pre-archive items 1-6 in store/APPLE_SIGNING.md.
+  - Apple's live upload, Xcode, or SDK requirement was not read and compared with the local build host on the archive date.
+  - Intended Release bundle ID, version, and build values were not reconciled with App Store Connect before archive, or the version used leading-zero segments.
+  - PrivacyInfo.xcprivacy in JSON format (starts with {) — plutil -lint was not run before archiving.
+  - NSPrivacyAccessedAPITypes declared as empty array despite UserDefaults usage in the codebase.
+  - exportArchive run without -authenticationKeyPath/-authenticationKeyID/-authenticationKeyIssuerID flags, relying on interactive session.
+  - Raw screenshot captures below device-well minimum width (e.g. 368px) upscaled to meet App Store dimensions.
+  - Export or upload started before item 7 reconciled the newly-created archive's compiled identity and expanded SDK keys.
+  - An older archive was reused as compiled evidence for the new build.
+should_say:
+  - "Load apple-signing-release.md and run items 1-6 of the Archive, Export, And Upload Preflight Checklist before archive."
+  - "Read Apple's live Upcoming Requirements, submission, Xcode system requirements, and upload pages before each release archive."
+  - "Reconcile the intended Release bundle ID, version, and build with App Store Connect before archive."
+  - "Run plutil -lint on PrivacyInfo.xcprivacy and fix any parse error before archiving."
+  - "If NSPrivacyAccessedAPITypes is empty, scan for UserDefaults usage and populate the correct reason codes."
+  - "Prepare -authenticationKeyPath, -authenticationKeyID, and -authenticationKeyIssuerID before archive, and pass them to exportArchive."
+  - "Run sips on raw captures and block upload if native width is below the minimum for the target device well."
+  - "After archive, inspect the newly-created archive's Info.plist and reconcile its compiled identity with the intended settings and App Store Connect."
+  - "Check the new archive's Info.plist for missing or unexpanded SDK key placeholders before export or upload; do not reuse an older archive as evidence."
+  - "Record items 1-6 before archive and item 7 before export or upload."
+  - "Add or activate the apple-pre-upload-preflight-skipped failure card in operations/FAILURE_CARDS.md when any preflight item is blocked."

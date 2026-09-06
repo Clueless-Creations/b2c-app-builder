@@ -1,0 +1,20 @@
+id: multi-runtime-skill-pin-drift
+title: One B2C App Builder client trails the source pin after a version bump
+prompt: >
+  Source B2C App Builder is 0.200.0. Codex was synced. Claude still has 0.199.3 under
+  ~/.claude/skills/b2c. The maintainer starts a freshness and revenue pass
+  in Claude and treats the installed skill as current because Codex matches source.
+expected_guardrail: >
+  Every present B2C App Builder client must pin the source version. A missing install
+  is skipped. A present Claude, Cursor, Codex, or Agents install behind the pin
+  is stale and must not run launch work.
+validators:
+  - check-skill-version
+must_catch:
+  - a present client behind the source pin fails check:skill-version --all-runtimes
+  - syncing one runtime does not make the other clients current
+  - launch work must not continue on a stale client pin
+should_say:
+  - Pin every client with runtime:sync --all-clients.
+  - Re-run check:skill-version --all-runtimes.
+  - Do not run launch work until every present client matches source.

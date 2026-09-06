@@ -1,0 +1,100 @@
+schema_version: 1.0.0
+id: reference.store.screenshot-toolchain
+title: Screenshot Toolchain and Source Adoption
+domain_id: domain.store
+document_path: knowledge/store/screenshot-toolchain.md
+load_when: when selecting or upgrading the Parth screenshot editor or Eronred screenshot strategy for a store
+  creative task
+lifecycle: active
+applicability_notes: Selected composition and ASO guidance only. Raw capture, preview testing, export, upload
+  and acceptance remain separate responsibilities.
+bindings:
+  workflow_ids:
+    - workflow.store.store-screenshots-production
+  context_pack_ids: []
+sources:
+  - id: github-com-parthjadhav-app-store-screenshots
+    name: App Store Screenshots
+    source_type: github
+    url: https://github.com/ParthJadhav/app-store-screenshots
+    review_cadence_days: 7
+    claim_scope: Selected README and skill overview/migration guidance (SKILL.md lines 1-105). No template code,
+      mockup, example captures, fonts or style packs are incorporated.
+    last_review_date: 2026-09-06
+    reviewer: b2c-contributor source review
+    publisher: Parth Jadhav
+    revision: 18951ddc4e06c53a3d34207732c16d9568f88d11
+    retrieved_at: 2026-09-06T15:57:52.804206Z
+    upstream_id: parth-app-store-screenshots
+    selectors: &a1
+      - README.md
+      - skills/app-store-screenshots/SKILL.md
+    rights:
+      status: verified
+      spdx: MIT
+      evidence: catalog/upstreams/notices/parth-app-store-screenshots.txt
+      evidence_sha256: a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a
+      notes: Selected guidance adapted; unimported assets and executable dependencies retain separate review
+        requirements.
+  - id: github-com-eronred-aso-skills
+    name: ASO and App Marketing Skills
+    source_type: github
+    url: https://github.com/Eronred/aso-skills
+    review_cadence_days: 7
+    claim_scope: Selected screenshot strategy, preview and app-context guidance only; no tools, API integrations,
+      samples or marketing assets are imported.
+    last_review_date: 2026-09-06
+    reviewer: b2c-contributor source review
+    publisher: Erencan
+    revision: 4df730f456c21e42b9a2ea2be89fb32caf787728
+    retrieved_at: 2026-09-06T15:57:54.602674Z
+    upstream_id: eronred-aso-skills
+    selectors: &a2
+      - README.md
+      - skills/screenshot-optimization/SKILL.md
+      - skills/app-preview-video/SKILL.md
+      - skills/app-marketing-context/SKILL.md
+    rights:
+      status: verified
+      spdx: MIT
+      evidence: catalog/upstreams/notices/eronred-aso-skills.txt
+      evidence_sha256: 7fdc99dd7d8c1242068d470c2a3f91d531a622dbcad57da91971389dbe5155ec
+      notes: Selected guidance adapted; unimported assets and executable dependencies retain separate review
+        requirements.
+derivations:
+  - source_ids:
+      - github-com-parthjadhav-app-store-screenshots
+    relationship: adapted
+    baseline: 18951ddc4e06c53a3d34207732c16d9568f88d11
+    selectors: *a1
+    rationale: Reconcile existing selected guidance with the reviewed source while preserving builder artifact
+      ownership, host selection, authority and evidence semantics.
+    omissions:
+      - Use accepted product copy, DESIGN.md and source captures. Editor deck state owns presentation only; it
+        cannot redefine the product or silently replace a missing theme.
+      - No copy-over of the app root, global skill install or automatic editor upgrade. Preserve assets and
+        isolated export behavior; verify every crop after an authorized migration.
+      - Treat device labels and export sizes as upstream presets, not current Apple or Google requirements.
+        Required text and critical UI must survive each standalone crop.
+    reviewer: b2c-contributor source review
+    reviewed_at: 2026-09-06
+    notice: catalog/upstreams/notices/parth-app-store-screenshots.txt
+    evaluation: npm run test:fixtures -- screenshot-upstreams
+  - source_ids:
+      - github-com-eronred-aso-skills
+    relationship: adapted
+    baseline: 4df730f456c21e42b9a2ea2be89fb32caf787728
+    selectors: *a2
+    rationale: Reconcile existing selected guidance with the reviewed source while preserving builder artifact
+      ownership, host selection, authority and evidence semantics.
+    omissions:
+      - Omit unsupported numerical conversion claims and fixed ten-slot prescriptions. Use supported
+        device/locale requirements, real evidence and founder-approved product claims.
+      - Using an ASO method does not select Appeeky, grant access, create app-marketing-context.md as a
+        competing authority, or authorize paid research.
+      - The inspected tree has screenshot-optimization, app-preview-video and app-marketing-context. It has no
+        skills/ios-screenshots/SKILL.md; do not attribute that skill to this revision.
+    reviewer: b2c-contributor source review
+    reviewed_at: 2026-09-06
+    notice: catalog/upstreams/notices/eronred-aso-skills.txt
+    evaluation: npm run test:fixtures -- screenshot-upstreams

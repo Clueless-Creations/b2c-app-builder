@@ -1,0 +1,14 @@
+schema_version: 1.0.0
+id: reference.experience.experience-cards.mastery-and-status-card
+title: Mastery And Status Card
+domain_id: domain.experience
+document_path: knowledge/experience/experience-cards/mastery-and-status-card.md
+load_when: surfacing earned skill/status visibility to sustain intrinsic motivation; pins a canonical motion-contract
+  spring — routed from experience-cards.md
+lifecycle: active
+bindings:
+  workflow_ids: []
+  context_pack_ids:
+    - context.experience-cards
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

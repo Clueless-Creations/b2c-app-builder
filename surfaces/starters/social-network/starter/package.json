@@ -1,0 +1,28 @@
+{
+  "name": "social-network-starter",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test:rls": "supabase test db"
+  },
+  "dependencies": {
+    "@supabase/ssr": "0.12.0",
+    "@supabase/supabase-js": "2.108.1",
+    "next": "16.2.9",
+    "posthog-js": "1.384.1",
+    "posthog-node": "5.36.10",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "stripe": "22.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.20",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "typescript": "5.9.3"
+  }
+}

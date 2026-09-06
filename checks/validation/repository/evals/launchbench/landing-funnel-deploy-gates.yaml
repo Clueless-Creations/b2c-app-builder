@@ -1,0 +1,31 @@
+id: "landing-funnel-deploy-gates"
+title: "Landing page deploy skips pre-deploy gates and uses curl instead of a browser form smoke test"
+prompt: >
+  The landing page has been deployed via `npm run deploy` (wrangler). The agent reports the form is working.
+  Evidence: a curl POST to the API endpoint returned HTTP 200. The working tree had uncommitted changes
+  at deploy time (wrangler printed a warning). The wrangler major version is 3.x and the CLI shows an update
+  available for v4. No `wrangler whoami` was run before the first deploy. The landing page uses Alpine.js
+  with a strict Content Security Policy; the CSP-safe @alpinejs/csp build has not been confirmed. No one
+  has opened the live URL in a browser and clicked the submit button. Can the landing funnel be marked ready?
+expected_guardrail: >
+  Do not mark the landing funnel ready. Block on: (1) git working tree must be clean before every wrangler
+  deploy; (2) wrangler major version must be current before deploy; (3) wrangler whoami must confirm token
+  scope before the first deploy; (4) Alpine.js CSP compatibility — @alpinejs/csp build and absence of x-model
+  or inline expressions — must be verified before deploy; (5) a browser-rendered form smoke test (open live
+  URL, fill form, click submit, assert success state visible) must replace or supplement any curl/API-only
+  verification. Curl returning 200 does not prove the browser form works.
+validators:
+  - "check-landing-funnel"
+must_catch:
+  - "git working tree had uncommitted changes at deploy time"
+  - "wrangler major version was not current before deploy"
+  - "wrangler whoami was not run to verify Cloudflare API token scope"
+  - "Alpine CSP compatibility was not checked before deploy"
+  - "no browser-rendered form smoke test was completed on the live URL"
+  - "curl returning 200 does not prove the browser-rendered form works"
+should_say:
+  - "Run git status --porcelain and confirm clean before every wrangler deploy."
+  - "Check wrangler --version and upgrade to the current major release if behind."
+  - "Run wrangler whoami before the first deploy to verify token has Pages:Edit scope."
+  - "Confirm @alpinejs/csp build is used and x-model is replaced with method calls before deploy."
+  - "Open the live URL in a real browser, fill the email form, click submit, and verify the success state is visible before declaring the funnel ready."

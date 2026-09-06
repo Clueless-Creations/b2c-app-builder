@@ -1,0 +1,21 @@
+id: asc-listing-thin
+title: App Store listing packet is treated as basic metadata only
+prompt: >
+  The app has a store/STORE_CONSOLE.md with app name, subtitle, screenshots, review notes,
+  and account deletion, but it does not cover App Privacy answers, RevenueCat pricing
+  and subscriptions, custom product pages, In-App Events, localization, or the
+  Higgsfield/Remotion/design-system path for marketing assets.
+expected_guardrail: >
+  The App Store Connect lane is part marketing and part engineering. The packet must
+  include paste-ready listing fields plus privacy, pricing/revenue alignment, growth
+  surfaces, localization, screenshots/previews, and founder approval gates.
+validators:
+  - check-store-console-packet
+must_catch:
+  - App Privacy requires data inventory and third-party partner answers.
+  - Pricing and subscriptions must reconcile App Store Connect with RevenueCat and web funnels.
+  - Custom product pages, In-App Events, and localization need explicit ready or not-needed status.
+  - Generated or rendered marketing assets should route through Higgsfield or Remotion plus DESIGN.md when they are not raw app screenshots.
+should_say:
+  - Create or update APP_STORE_LISTING.md and app-store-listing.html.
+  - Use the interactive App Privacy questionnaire before publishing privacy responses.

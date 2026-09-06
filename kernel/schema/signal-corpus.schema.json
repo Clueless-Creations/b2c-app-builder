@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:b2c:core:signal-corpus-schema",
+  "title": "Signal Corpus (strategy/SIGNAL_CORPUS.md)",
+  "$comment": "Structural floor only — see research-evidence.schema.json's $comment. checks/validation/business/research/check-research-evidence.ts's validateSignalCorpus() stays the sole content-quality authority (placeholder scanning, the not-applicable-reason check, the acyclic supersession-graph walk). This schema encodes the INPUT-*/SIG-* ID grammar, the lifecycle enum, and the two document shapes (an active corpus, or a documented not-applicable corpus) and nothing else.",
+  "oneOf": [{ "$ref": "#/$defs/activeCorpus" }, { "$ref": "#/$defs/notApplicableCorpus" }],
+  "$defs": {
+    "isoDate": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "inputId": { "type": "string", "pattern": "^INPUT-[A-Z0-9][A-Z0-9-]*$" },
+    "signalId": { "type": "string", "pattern": "^SIG-[A-Z0-9][A-Z0-9-]*$" },
+    "activeCorpus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "applicable", "corpusInputs", "signalRecords", "conflicts", "derivedOutputs"],
+      "properties": {
+        "$schema": { "type": "string" },
+        "schemaVersion": { "const": "1.0.0" },
+        "applicable": { "const": true },
+        "corpusInputs": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/corpusInputRow" } },
+        "signalRecords": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/signalRecordRow" } },
+        "conflicts": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/conflictRow" } },
+        "derivedOutputs": { "type": "array", "items": { "$ref": "#/$defs/derivedOutputRow" } }
+      }
+    },
+    "notApplicableCorpus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "applicable", "reason"],
+      "properties": {
+        "$schema": { "type": "string" },
+        "schemaVersion": { "const": "1.0.0" },
+        "applicable": { "const": false },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "corpusInputRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "sourceType", "ownerOrCreator", "scope", "startDate", "collectionRoute", "permissionOrPublicBasis", "limits"],
+      "properties": {
+        "id": { "$ref": "#/$defs/inputId" },
+        "sourceType": { "$ref": "#/$defs/nonEmptyString" },
+        "ownerOrCreator": { "$ref": "#/$defs/nonEmptyString" },
+        "scope": { "$ref": "#/$defs/nonEmptyString" },
+        "startDate": { "$ref": "#/$defs/isoDate" },
+        "endDate": { "$ref": "#/$defs/isoDate" },
+        "collectionRoute": { "$ref": "#/$defs/nonEmptyString" },
+        "permissionOrPublicBasis": { "$ref": "#/$defs/nonEmptyString" },
+        "limits": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "signalRecordRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "claim", "sourceIds", "observedAt", "appliesTo", "confidence", "lifecycle", "supersedes", "artifactOrTrace"],
+      "properties": {
+        "id": { "$ref": "#/$defs/signalId" },
+        "type": { "$ref": "#/$defs/nonEmptyString" },
+        "claim": { "$ref": "#/$defs/nonEmptyString" },
+        "sourceIds": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/inputId" } },
+        "observedAt": { "$ref": "#/$defs/isoDate" },
+        "appliesTo": { "$ref": "#/$defs/nonEmptyString" },
+        "confidence": { "enum": ["low", "medium", "high"] },
+        "lifecycle": { "enum": ["current", "dated", "superseded", "rejected", "unverified"] },
+        "supersedes": { "type": "string" },
+        "artifactOrTrace": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "conflictRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["earlierSignal", "laterSignal", "conflict", "currentPosition", "reason"],
+      "properties": {
+        "earlierSignal": { "$ref": "#/$defs/nonEmptyString" },
+        "laterSignal": { "$ref": "#/$defs/nonEmptyString" },
+        "conflict": { "$ref": "#/$defs/nonEmptyString" },
+        "currentPosition": { "$ref": "#/$defs/nonEmptyString" },
+        "reason": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "derivedOutputRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["signalIds", "output", "decisionChanged", "traceId"],
+      "properties": {
+        "signalIds": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/signalId" } },
+        "output": { "$ref": "#/$defs/nonEmptyString" },
+        "decisionChanged": { "$ref": "#/$defs/nonEmptyString" },
+        "traceId": { "type": "string", "pattern": "TRACE-[A-Z0-9][A-Z0-9-]*" }
+      }
+    }
+  }
+}

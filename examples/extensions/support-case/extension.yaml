@@ -1,0 +1,83 @@
+apiVersion: b2c.extension/v1
+id: support-example/package
+version: 1.0.0
+hostApiVersion: b2c/v1
+title: Support case triage example
+dependencies: []
+imports: []
+resources:
+  - id: support-example/input
+    path: input.json
+    kind: schema
+    mediaType: application/json
+  - id: support-example/output
+    path: output.json
+    kind: schema
+    mediaType: application/json
+  - id: support-example/evidence
+    path: evidence.json
+    kind: schema
+    mediaType: application/json
+  - id: support-example/knowledge
+    path: support.md
+    kind: knowledge
+    mediaType: text/markdown
+  - id: support-example/pack
+    path: pack.yaml
+    kind: catalog-pack
+    mediaType: application/yaml
+capabilities:
+  - id: support-example/support
+    version: 1.0.0
+    title: Support operations
+    knowledge:
+      - support-example/knowledge
+    operations:
+      - id: support-example/triage
+        title: Triage a support case
+        inputSchema: support-example/input
+        outputSchema: support-example/output
+        evidenceSchema: support-example/evidence
+        effect: draft
+        acceptance:
+          - A case receives a reviewed priority and a draft response.
+          - The fake transport returns matching case and request identities.
+implementations:
+  - id: support-example/fake
+    version: 1.0.0
+    operation: support-example/triage
+    targets:
+      - platform: host
+        runtime: node22
+    mode: manual
+    sdkRange: "*"
+    limitations:
+      - Deterministic fake transport only. No live support provider.
+    knowledge: []
+    connectionRequired: false
+    maturity: experimental
+recipes:
+  - id: support-example/loop
+    version: 1.0.0
+    title: Triage then review
+    workflows:
+      - workflow.support-triage
+    operations:
+      - operation: support-example/triage
+        implementation: support-example/fake
+        required: true
+        workflowIds:
+          - workflow.support-triage
+        workflowContexts:
+          - workflowId: workflow.support-triage
+            instructions: neutral
+            roleInstructions: neutral
+            neutralReferenceIds: []
+            providerReferenceIds: []
+            neutralContextPackIds: []
+            providerContextPackIds: []
+    policy:
+      maxRepairAttempts: 2
+      independentReview: true
+catalogPacks:
+  - support-example/pack

@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{APP_NAME}} Store Console Packet</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f7f4ef;
+        --ink: #1b1917;
+        --muted: #635c53;
+        --panel: #fffdf9;
+        --line: #ddd5c9;
+        --accent: #1f6f63;
+        --code-bg: #f0ece4;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #16150f;
+          --ink: #f2ede4;
+          --muted: #b0a89c;
+          --panel: #1f1d17;
+          --line: #3a362d;
+          --accent: #7bcbba;
+          --code-bg: #2a2721;
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Avenir Next", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+        line-height: 1.55;
+      }
+
+      main {
+        width: min(1080px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 32px 0 56px;
+      }
+
+      header {
+        display: grid;
+        gap: 10px;
+        margin-bottom: 24px;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        font-size: clamp(2rem, 5vw, 3.5rem);
+        line-height: 1.02;
+      }
+
+      h2 {
+        font-size: 1.05rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      h3 {
+        font-size: 1rem;
+        margin-top: 18px;
+      }
+
+      .status {
+        color: var(--muted);
+      }
+
+      .status-label {
+        display: inline-block;
+        margin-right: 8px;
+        padding: 2px 10px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--accent);
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .origin {
+        color: var(--muted);
+        font-size: 0.88rem;
+        max-width: 74ch;
+      }
+
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 14px;
+      }
+
+      .card > * + * {
+        margin-top: 12px;
+      }
+
+      p {
+        max-width: 84ch;
+      }
+
+      ul,
+      ol {
+        margin: 0;
+        padding-left: 20px;
+        max-width: 84ch;
+      }
+
+      li + li {
+        margin-top: 8px;
+      }
+
+      code {
+        background: var(--code-bg);
+        border-radius: 4px;
+        padding: 1px 5px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.9em;
+      }
+
+      pre {
+        margin: 0;
+        overflow-x: auto;
+        background: var(--code-bg);
+        border-radius: 8px;
+        padding: 14px;
+      }
+
+      pre code {
+        background: none;
+        padding: 0;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        min-width: 640px;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        border-top: 1px solid var(--line);
+        padding: 10px 8px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        color: var(--muted);
+        font-size: 0.76rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      @media (max-width: 640px) {
+        main {
+          width: calc(100% - 20px);
+          padding: 20px 0 40px;
+        }
+
+        .card {
+          padding: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>{{APP_NAME}} Store Console Packet</h1>
+        <p class="status"><span class="status-label">Status</span> scaffold</p>
+        <p class="origin">This page is written from <code>store/STORE_CONSOLE.md</code>. Change that file and render the page again. Anything typed here is replaced on the next render.</p>
+      </header>
+      <section class="card">
+        <p>This packet is the copy-paste operator surface for App Store Connect and Google Play. Keep values aligned with <code>state/business-state.json</code>, <code>APP_STORE_LISTING.md</code>, <code>store/APPLE_APP_STORE_REQUIREMENTS.md</code>, <code>SCREENSHOTS.md</code>, <code>trust/PRIVACY.md</code>, <code>trust/TERMS.md</code>, <code>revenue/REVENUE_OPS.md</code>, and founder approval.</p>
+      </section>
+      <section class="card">
+        <h2>Console Routes</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Surface</th><th>Click path</th><th>Values to record</th><th>Evidence</th><th>Approval</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>App Store Connect app creation</td><td>ASC CLI/skill-pack route, or App Store Connect &gt; Apps &gt; plus button &gt; New App when blocked</td><td>platform, app name, primary locale, bundle ID, SKU, user access, developer-name implications</td><td><code>store/APPLE_SIGNING.md</code>, <code>app-store-connect-cli.md</code> preflight, <code>asc-id-resolver</code> once created</td><td>founder approval before create</td></tr>
+              <tr><td>App Store Connect app information</td><td>Apps &gt; {{APP_NAME}} &gt; App Information</td><td>name, subtitle, SKU, primary locale, bundle ID, category, privacy policy URL</td><td><code>APP_STORE_LISTING.md</code></td><td>founder approval before save</td></tr>
+              <tr><td>App Store Connect App Privacy</td><td>Apps &gt; {{APP_NAME}} &gt; App Privacy</td><td>data types, linked status, tracking status, privacy purposes</td><td><code>app-privacy-questionnaire.html</code></td><td>founder approval before publish</td></tr>
+              <tr><td>Apple pre-ASC requirements</td><td>local app bundle plus App Store Connect upload path</td><td><code>PrivacyInfo.xcprivacy</code>, required reason APIs, SDK manifests/signatures, Xcode privacy report, purpose strings, ATT, account deletion, review notes, upload warnings</td><td><code>store/APPLE_APP_STORE_REQUIREMENTS.md</code></td><td>founder approval before upload/submission</td></tr>
+              <tr><td>App Store Connect pricing</td><td>Apps &gt; {{APP_NAME}} &gt; Pricing and Availability</td><td>base territory, price, trial or intro offer, subscription groups</td><td><code>revenue/REVENUE_OPS.md</code>, RevenueCat catalog diff</td><td>founder approval before price changes</td></tr>
+              <tr><td>App Store Connect localization</td><td>Apps &gt; {{APP_NAME}} &gt; Localizations</td><td>metadata, keywords, screenshots, App Preview, review notes</td><td><code>APP_STORE_LISTING.md</code>, <code>SCREENSHOTS.md</code></td><td>founder approval before upload</td></tr>
+              <tr><td>App Store Connect marketing</td><td>Apps &gt; {{APP_NAME}} &gt; Product Page Optimization, Custom Product Pages, In-App Events</td><td>custom product page plan, In-App Event plan, campaign measurement</td><td>ASO research, App Analytics plan</td><td>founder approval before create</td></tr>
+              <tr><td>Google Play main listing</td><td>Play Console &gt; {{APP_NAME}} &gt; Store presence &gt; Main store listing</td><td>package name, short description, full description, graphics, screenshots</td><td>Play listing document</td><td>founder approval before save</td></tr>
+              <tr><td>Google Play Data safety</td><td>Play Console &gt; {{APP_NAME}} &gt; Policy &gt; App content &gt; Data safety</td><td>collected data, sharing, security practices, deletion route</td><td><code>trust/PRIVACY.md</code>, vendor inventory</td><td>founder approval before submit</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section class="card">
+        <h2>Store Asset Rules</h2>
+        <ul>
+          <li>App Store Connect work should route through the ASC CLI/skill pack first when credentials are configured or the founder asked for ASC work. App creation, <code>asc-id-resolver</code>, metadata, screenshots, TestFlight, products, subscriptions, review status, and <code>asc-revenuecat-catalog-sync</code> are CLI/skill-pack candidates; blocked auth, 2FA, missing agreements, or unapproved sticky fields are blockers, not &quot;cannot do it&quot; answers.</li>
+          <li>Screenshots use <code>SCREENSHOTS.md</code> as the canonical packet; raw in-app simulator, MobAI, or device captures are source inputs, while final iPhone, iPad, and Google Play assets need copy overlay, production composition, validation, and visual QA.</li>
+          <li>Use ParthJadhav/app-store-screenshots when a reusable local screenshot editor/export board is useful for iPhone/iPad/Play decks, locale variants, app icon placement, and final PNG export from real UI plus design-system copy.</li>
+          <li>Higgsfield can support app icons, backgrounds, CPP media, In-App Event media, and thumbnails when tied to <code>DESIGN.md</code> and <code>11_STAR_EXPERIENCE.md</code>.</li>
+          <li>App Icon output records <code>app-icon/app-icon-1024.png</code>, thumbnail contrast, no alpha, no rounded corners, and category differentiation.</li>
+          <li>App Preview and Google Play promo video output use real in-app footage, Remotion or owned media, captions, poster frame review, and current platform policy checks.</li>
+        </ul>
+      </section>
+      <section class="card">
+        <h2>Review Packet</h2>
+        <ul>
+          <li>Review notes describe account setup, demo credentials route, entitlement test path, purchase restoration, account deletion, and support contact.</li>
+          <li>App Store Connect upload readiness is blocked until <code>store/APPLE_APP_STORE_REQUIREMENTS.md</code> accounts for privacy manifests, required reason APIs, SDK manifest/signature status, App Privacy labels, purpose strings, ATT, account deletion, review notes, and archive/upload warnings.</li>
+          <li>If the app name is already in use, stop for founder approval before using any fallback name.</li>
+        </ul>
+        <h3>App Review Information (App Store Connect Notes field)</h3>
+        <p>Populate the App Review Information <strong>Notes</strong> field before submitting, or App Review returns a Guideline 2.1 &quot;Information Needed&quot; rejection that costs a full review cycle. Cover all of Apple's requested items:</p>
+        <ol>
+          <li><strong>Purpose and target audience</strong> — the problem the app solves and who it is for.</li>
+          <li><strong>Setup and access instructions</strong> — how to reach the core features, plus any required login credentials or sample data.</li>
+          <li><strong>Demo account decision</strong> — if the app has a login, provide a working demo username/password (one per account type) in the Demo Account fields. <strong>If the app has NO login/account system, the automated reviewer still flags &quot;login without demo account&quot; — you must add an explicit line such as &quot;No login / no account: all data is stored locally on device; no demo account is needed&quot; and clear the demo-account-required flag.</strong></li>
+          <li><strong>Test devices and OS</strong> — the physical device models and OS versions the app was tested on before submission.</li>
+          <li><strong>External services</strong> — data providers, authentication services, payment processors, and AI services the app relies on for core functionality.</li>
+          <li><strong>Regional differences</strong> — any regional feature/content differences, or confirm the app functions consistently across all regions.</li>
+          <li><strong>Regulated material</strong> — documentation/credentials if the app operates in a regulated industry or uses protected third-party material.</li>
+        </ol>
+        <p>Record the Notes content in <code>APP_STORE_LISTING.md</code> so it is reusable across submissions, and set it via the ASC CLI review-details route (refresh <code>asc &lt;review-details cmd&gt; --help</code> for current flags) rather than re-typing it each time.</p>
+      </section>
+      <section class="card">
+        <h2>Age Rating Questionnaire</h2>
+        <p>Apple requires these answers for every new submission and update from September 2026. Do not infer false from a blank field. Run <code>asc age-rating audit</code> on the exact app before review submission. <code>asc age-rating edit</code> needs an exact mutation envelope and product evidence. See <code>knowledge/store/age-rating-questionnaire.md</code>.</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Field</th><th>Product evidence</th><th>Answer (<code>true</code> or <code>false</code>)</th><th>Escalation</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>socialMedia</td><td>Record</td><td>Record</td><td>Record</td></tr>
+              <tr><td>messagingAndChat</td><td>Record</td><td>Record</td><td>Record</td></tr>
+              <tr><td>socialMediaAgeRestricted</td><td>Record</td><td>Record</td><td>Record</td></tr>
+              <tr><td>ageAssurance</td><td>Record</td><td>Record</td><td>Record</td></tr>
+              <tr><td>userGeneratedContent</td><td>Record</td><td>Record</td><td>Record</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <ul>
+          <li>Founder approval is required before App Store submission, Google Play submission, pricing edits, subscription edits, custom product page creation, In-App Event creation, paid Higgsfield generation, or public asset upload.</li>
+        </ul>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "compose-layout input",
+  "description": "Arguments for compose.mjs compose. Paths resolve against the caller directory.",
+  "type": "object",
+  "properties": {
+    "captures": { "type": "string", "minLength": 1, "description": "Path to a capture manifest with kind capture-manifest." },
+    "template": { "type": "string", "minLength": 1, "description": "Path to an SVG template with the required placeholders." },
+    "wells": { "type": "string", "minLength": 1, "description": "Path to a wells table with kind device-wells." },
+    "locale": { "type": "string", "pattern": "^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$" },
+    "copy": { "type": "string", "minLength": 1, "description": "Path to a copy file with kind screenshot-copy." },
+    "now": { "type": "string", "format": "date-time", "description": "Recorded as composedAt. The adapter never reads the clock." },
+    "out": { "type": "string", "minLength": 1, "description": "Output directory for the SVG files and provenance.json." }
+  },
+  "required": ["captures", "template", "wells", "locale", "copy", "now", "out"],
+  "additionalProperties": false
+}

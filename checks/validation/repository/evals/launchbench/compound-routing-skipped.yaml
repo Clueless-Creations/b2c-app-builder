@@ -1,0 +1,22 @@
+id: compound-routing-skipped
+title: Agent skips Compound Engineering routing during implementation handoff
+prompt: >
+  The user asks for a real app build from a launch package. Research, design,
+  analytics, revenue, security, and store docs exist, but the agent writes a
+  generic implementation checklist and starts coding without ce-update freshness,
+  ce-brainstorm, ce-plan, ce-work, ce-worktree, ce-code-review, test/proof routing, or any recorded reason
+  that Compound Engineering is unavailable.
+expected_guardrail: >
+  Broad implementation should route through Compound Engineering when available,
+  or record the unavailable route and equivalent fallback in operations/ORCHESTRATION.md and engineering/ENGINEERING_PLAN.md before readiness claims.
+validators:
+  - check-compound-engineering-routing
+  - check-parallel-orchestration
+must_catch:
+  - Compound Engineering was skipped silently.
+  - engineering/ENGINEERING_PLAN.md lacks a ce-plan or equivalent source.
+  - operations/ORCHESTRATION.md does not record unavailable Compound Engineering routing.
+  - Readiness cannot jump from docs to done without plan, work, review, and proof.
+should_say:
+  - Use ce-update, ce-brainstorm, ce-plan, ce-work, ce-worktree, ce-code-review, CE test, and proof routes when available.
+  - If unavailable, record the fallback route and keep engineering partial until equivalent plan, work, review, test, and proof exists.

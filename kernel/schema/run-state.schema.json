@@ -1,0 +1,430 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:b2c:core:run-state-schema",
+  "title": "Run State",
+  "$comment": "Ports GraphRunState/RunNodeState/AttemptRecord from runtime/graph/execution.ts and adds R12's per-attempt owner session id, heartbeat, and TTL, plus the orphaned/needs_readback statuses a dead heartbeat can land on. Also carries the session-level wall-clock cap (KTD6) enforced independently of any single heartbeat.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "runId",
+    "planId",
+    "planRevision",
+    "createdAt",
+    "updatedAt",
+    "ownerSessionId",
+    "heartbeatAt",
+    "ttlSeconds",
+    "wallClockCapSeconds",
+    "approvals",
+    "artifactBindings",
+    "nodes"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": "1.0.0" },
+    "runId": { "type": "string", "minLength": 1 },
+    "planId": { "type": "string", "minLength": 1 },
+    "planRevision": { "type": "integer", "minimum": 1 },
+    "createdAt": { "$ref": "#/$defs/dateTime" },
+    "updatedAt": { "$ref": "#/$defs/dateTime" },
+    "ownerSessionId": { "type": "string", "minLength": 1 },
+    "heartbeatAt": { "$ref": "#/$defs/dateTime" },
+    "ttlSeconds": { "type": "integer", "minimum": 1 },
+    "wallClockCapSeconds": { "type": "integer", "minimum": 1 },
+    "founderDecisionKeyId": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "founderDecisionTrust": { "$ref": "#/$defs/founderDecisionTrust" },
+    "approvals": { "type": "object", "additionalProperties": { "enum": ["pending", "approved", "rejected"] } },
+    "approvalProvenance": {
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["source", "envelopeId", "actionId", "validatedAt"],
+            "properties": {
+              "source": { "const": "standing_envelope" },
+              "envelopeId": { "type": "string", "minLength": 1 },
+              "actionId": { "type": "string", "minLength": 1 },
+              "validatedAt": { "$ref": "#/$defs/dateTime" }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["source", "receiptId", "keyId", "auditEntryHash", "issuedAt", "validatedAt"],
+            "properties": {
+              "source": { "const": "founder_receipt" },
+              "receiptId": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$" },
+              "keyId": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+              "auditEntryHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+              "issuedAt": { "$ref": "#/$defs/dateTime" },
+              "validatedAt": { "$ref": "#/$defs/dateTime" }
+            }
+          }
+        ]
+      }
+    },
+    "artifactBindings": { "type": "array", "items": { "$ref": "#/$defs/artifactBinding" } },
+    "nodes": { "type": "object", "additionalProperties": { "$ref": "#/$defs/runNode" } },
+    "publicRequests": { "type": "object", "additionalProperties": {
+      "type": "object", "additionalProperties": false, "required": ["requestDigest", "sessionId", "status"],
+      "properties": {"requestDigest": {"type":"string","pattern":"^sha256:[a-f0-9]{64}$"},"sessionId":{"type":"string"},"status":{"enum":["running","completed"]},
+      "result":{"type":"object","additionalProperties":false,"required":["runId","planId","outcome","completed","held"],"properties":{"runId":{"type":["string","null"]},"planId":{"type":["string","null"]},"outcome":{"type":"string"},"completed":{"type":"integer","minimum":0},"held":{"type":"integer","minimum":0}}}}
+    }},
+    "archivedPlans": { "type": "array", "items": { "$ref": "#/$defs/archivedPlan" } },
+    "workOrders": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/workOrderOccurrence" }
+    }
+  },
+  "$defs": {
+    "archivedPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["planId", "planRevision", "archivedAt", "nodes", "artifactBindings", "approvals"],
+      "properties": {
+        "planId": { "$ref": "#/properties/planId" },
+        "planRevision": { "$ref": "#/properties/planRevision" },
+        "archivedAt": { "$ref": "#/$defs/dateTime" },
+        "nodes": { "$ref": "#/properties/nodes" },
+        "artifactBindings": { "$ref": "#/properties/artifactBindings" },
+        "approvals": { "$ref": "#/properties/approvals" },
+        "approvalProvenance": { "$ref": "#/properties/approvalProvenance" },
+        "workOrders": { "$ref": "#/properties/workOrders" }
+      }
+    },
+    "dateTime": { "type": "string", "format": "date-time" },
+    "optionalDateTime": { "anyOf": [{ "const": "" }, { "$ref": "#/$defs/dateTime" }] },
+    "status": { "$ref": "urn:b2c:core:status-schema#/$defs/status" },
+    "founderDecisionTrust": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["keyId", "trustFileSha256", "canonicalTrustPath", "workspaceBinding", "runId", "boundAt", "auditEntryHash"],
+      "properties": {
+        "keyId": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "trustFileSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "canonicalTrustPath": { "type": "string", "minLength": 1 },
+        "workspaceBinding": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "runId": { "type": "string", "minLength": 1 },
+        "boundAt": { "$ref": "#/$defs/dateTime" },
+        "auditEntryHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "founderDecisionReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "algorithm", "keyId", "payload", "signature"],
+      "properties": {
+        "schemaVersion": { "const": "1.0.0" },
+        "algorithm": { "const": "Ed25519" },
+        "keyId": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["audience", "receiptId", "previousReceiptId", "sequence", "workspaceBinding", "runId", "issuedAt", "expiresAt", "decision"],
+          "properties": {
+            "audience": { "const": "b2c-app-builder/founder-decision/v1" },
+            "receiptId": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$" },
+            "previousReceiptId": {
+              "anyOf": [{ "type": "null" }, { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$" }]
+            },
+            "sequence": { "type": "integer", "minimum": 1 },
+            "workspaceBinding": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+            "runId": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,255}$" },
+            "issuedAt": { "$ref": "#/$defs/dateTime" },
+            "expiresAt": { "$ref": "#/$defs/dateTime" },
+            "decision": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["kind", "verdict", "designSha256"],
+                  "properties": {
+                    "kind": { "const": "design_taste_direct" },
+                    "verdict": { "enum": ["pass", "fail"] },
+                    "designSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+                  }
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["kind", "status"],
+                  "properties": {
+                    "kind": { "const": "design_taste_delegation" },
+                    "status": { "enum": ["approved", "rejected"] }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "signature": { "type": "string", "pattern": "^[A-Za-z0-9_-]{86}$" }
+      }
+    },
+    "artifactBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifactId", "path", "accepted"],
+      "properties": {
+        "artifactId": { "type": "string", "minLength": 1 },
+        "path": { "type": "string" },
+        "fingerprint": { "type": "string" },
+        "accepted": { "type": "boolean" },
+        "producedBy": { "type": "string" },
+        "attemptId": { "type": "string" },
+        "refreshBaselineFingerprint": { "type": "string" }
+      }
+    },
+    "attempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "nodeId", "number", "status", "ownerSessionId", "heartbeatAt", "ttlSeconds", "inputFingerprint", "evidence", "readbackRequired"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "nodeId": { "type": "string", "minLength": 1 },
+        "number": { "type": "integer", "minimum": 1 },
+        "status": { "$ref": "#/$defs/status" },
+        "ownerSessionId": { "type": "string", "minLength": 1 },
+        "heartbeatAt": { "$ref": "#/$defs/optionalDateTime" },
+        "ttlSeconds": { "type": "integer", "minimum": 1 },
+        "inputFingerprint": { "type": "string" },
+        "startedAt": { "$ref": "#/$defs/optionalDateTime" },
+        "finishedAt": { "$ref": "#/$defs/optionalDateTime" },
+        "evidence": { "type": "array", "items": { "type": "string" } },
+        "error": { "type": "string" },
+        "readbackRequired": { "type": "boolean" },
+        "readbackEvidence": { "type": "string" },
+        "proofSource": { "enum": ["workspace", "synthetic"] },
+        "independentVerification": { "$ref": "#/$defs/independentVerification" },
+        "workOrderOccurrenceId": { "type": "string", "minLength": 1 },
+        "designAuthorityEvaluation": { "$ref": "#/$defs/designAuthorityEvaluation" },
+        "deterministicVerification": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["attemptId", "inputFingerprint", "outputFingerprint", "gateIds", "passed", "evidence", "checkedAt"],
+          "properties": {
+            "attemptId": { "type": "string", "minLength": 1 },
+            "inputFingerprint": { "type": "string" },
+            "outputFingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+            "gateIds": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+            "passed": { "type": "boolean" },
+            "evidence": { "type": "array", "items": { "type": "string" } },
+            "checkedAt": { "$ref": "#/$defs/dateTime" },
+            "authorityContextFingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+          }
+        }
+      }
+    },
+    "designTasteDelegationSnapshot": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["approvalId", "status", "runId", "receiptId", "keyId", "auditEntryHash"],
+          "properties": {
+            "approvalId": { "const": "decision.design.taste.delegation" },
+            "status": { "enum": ["approved", "rejected"] },
+            "runId": { "type": "string", "minLength": 1 },
+            "receiptId": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$" },
+            "keyId": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+            "auditEntryHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["approvalId", "status", "runId"],
+          "properties": {
+            "approvalId": { "const": "decision.design.taste.delegation" },
+            "status": { "enum": ["absent", "stale"] },
+            "runId": { "type": "string", "minLength": 1 }
+          }
+        }
+      ]
+    },
+    "directDesignTasteSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["verdict", "runId", "designSha256", "receiptId", "keyId", "auditEntryHash"],
+      "properties": {
+        "verdict": { "enum": ["pass", "fail"] },
+        "runId": { "type": "string", "minLength": 1 },
+        "designSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "receiptId": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$" },
+        "keyId": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "auditEntryHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "designAuthorityEvaluation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "evaluatedAt", "delegation", "authorityContextFingerprint"],
+      "properties": {
+        "source": { "enum": ["dispatch", "founder_revalidation"] },
+        "evaluatedAt": { "$ref": "#/$defs/dateTime" },
+        "delegation": { "$ref": "#/$defs/designTasteDelegationSnapshot" },
+        "direct": { "$ref": "#/$defs/directDesignTasteSnapshot" },
+        "authorityContextFingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "independentVerification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "workflowId",
+        "attemptId",
+        "producerSessionId",
+        "verifierSessionId",
+        "verdict",
+        "checkedAt",
+        "policyFingerprint",
+        "outputFingerprint",
+        "subjects",
+        "criteria",
+        "evidence"
+      ],
+      "properties": {
+        "mode": { "enum": ["workspace", "synthetic", "graph"] },
+        "workflowId": { "type": "string", "minLength": 1 },
+        "attemptId": { "type": "string", "minLength": 1 },
+        "producerSessionId": { "type": "string", "minLength": 1 },
+        "verifierSessionId": { "type": "string", "minLength": 1 },
+        "verdict": { "enum": ["accepted", "rejected"] },
+        "checkedAt": { "$ref": "#/$defs/dateTime" },
+        "policyFingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "outputFingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "subjects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["artifactId", "path", "fingerprint"],
+            "properties": {
+              "artifactId": { "type": "string", "minLength": 1 },
+              "path": { "type": "string", "minLength": 1 },
+              "fingerprint": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "criteria": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "fingerprint"],
+            "properties": {
+              "path": { "type": "string", "minLength": 1 },
+              "fingerprint": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "evidence": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "runNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nodeId", "status", "attempts"],
+      "properties": {
+        "nodeId": { "type": "string", "minLength": 1 },
+        "status": { "$ref": "#/$defs/status" },
+        "acceptedOutputFingerprint": { "type": "string" },
+        "attempts": { "type": "array", "items": { "$ref": "#/$defs/attempt" } },
+        "blocker": { "type": "string" },
+        "verifiedBySessionId": { "type": "string", "minLength": 1 },
+        "applicabilityFingerprint": { "type": "string", "minLength": 1 },
+        "attemptCycleStart": { "type": "integer", "minimum": 0 },
+        "dependencyRefreshCycles": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "refreshInstructions": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "repairInstructions": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "contractFingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "workOrderOccurrence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "revision",
+        "workflowId",
+        "decisionId",
+        "objectiveId",
+        "metricId",
+        "mandateId",
+        "contextSourceIds",
+        "readinessSnapshot",
+        "expectationId",
+        "horizonAt",
+        "proofPolicy",
+        "status",
+        "idempotencyKey",
+        "recordedAt",
+        "attemptIds",
+        "transitions",
+        "snapshots"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "revision": { "type": "integer", "minimum": 1 },
+        "workflowId": { "type": "string", "minLength": 1 },
+        "decisionId": { "type": "string", "minLength": 1 },
+        "objectiveId": { "type": "string", "minLength": 1 },
+        "metricId": { "type": "string", "minLength": 1 },
+        "mandateId": { "type": "string", "minLength": 1 },
+        "contextSourceIds": { "type": "array", "items": { "type": "string" } },
+        "readinessSnapshot": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["capabilityReady", "recordedAt"],
+          "properties": {
+            "capabilityReady": { "type": "boolean" },
+            "recordedAt": { "$ref": "#/$defs/dateTime" }
+          }
+        },
+        "expectationId": { "type": "string", "minLength": 1 },
+        "horizonAt": { "$ref": "#/$defs/dateTime" },
+        "proofPolicy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "required"],
+          "properties": {
+            "kind": { "type": "string", "minLength": 1 },
+            "required": { "type": "boolean" }
+          }
+        },
+        "status": { "enum": ["authorized", "running", "proved", "observing", "completed", "exhausted", "refused"] },
+        "idempotencyKey": { "type": "string", "minLength": 1 },
+        "recordedAt": { "$ref": "#/$defs/dateTime" },
+        "attemptIds": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "transitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["at", "from", "to", "ok", "reasonCode"],
+            "properties": {
+              "at": { "$ref": "#/$defs/dateTime" },
+              "from": { "enum": ["authorized", "running", "proved", "observing", "completed", "exhausted", "refused"] },
+              "to": { "enum": ["authorized", "running", "proved", "observing", "completed", "exhausted", "refused"] },
+              "ok": { "type": "boolean" },
+              "reasonCode": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "snapshots": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["decisionStatus", "mandateStatus", "contextSourceIds"],
+          "properties": {
+            "decisionStatus": { "type": "string" },
+            "mandateStatus": { "enum": ["active", "revoked"] },
+            "contextSourceIds": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    }
+  }
+}

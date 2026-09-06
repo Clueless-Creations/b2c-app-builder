@@ -1,0 +1,6242 @@
+{
+  "version": 1,
+  "objects": [
+    {
+      "id": "tshirt",
+      "label": "T-shirt",
+      "width": 120,
+      "height": 120,
+      "layers": [
+        {
+          "fill": "#87A99A",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                42,
+                20
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                60,
+                31,
+                78,
+                20
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                105,
+                40
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                89,
+                59
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                79,
+                51
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                84,
+                103
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                60,
+                110,
+                36,
+                103
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                41,
+                51
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                30,
+                59
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                15,
+                40
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "#B7CFC0",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                42,
+                21
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                60,
+                41,
+                78,
+                21
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                75,
+                18
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                60,
+                28,
+                45,
+                18
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                39,
+                96
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                60,
+                99
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                81,
+                96
+              ]
+            }
+          ],
+          "stroke": "#668878",
+          "strokeWidth": 1.5
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                38,
+                41
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                41,
+                51
+              ]
+            }
+          ],
+          "stroke": "#668878",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                82,
+                41
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                79,
+                51
+              ]
+            }
+          ],
+          "stroke": "#668878",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "#93B5A5",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                54,
+                42
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                70,
+                42
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                72,
+                42,
+                72,
+                44
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                72,
+                58
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                72,
+                60,
+                70,
+                60
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                54,
+                60
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                52,
+                60,
+                52,
+                58
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                52,
+                44
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                52,
+                42,
+                54,
+                42
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ]
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                52,
+                43
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                72,
+                43
+              ]
+            }
+          ],
+          "stroke": "#668878",
+          "strokeWidth": 1
+        }
+      ]
+    },
+    {
+      "id": "pants",
+      "label": "Trousers",
+      "width": 120,
+      "height": 120,
+      "layers": [
+        {
+          "fill": "#57778B",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                31,
+                15
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                88,
+                15
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                98,
+                104
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                68,
+                108
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                59,
+                55
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                51,
+                108
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                22,
+                104
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "#6E8D9E",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                33,
+                15
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                86,
+                15
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                88,
+                15,
+                88,
+                17
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                88,
+                23
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                88,
+                25,
+                86,
+                25
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                33,
+                25
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                31,
+                25,
+                31,
+                23
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                31,
+                17
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                31,
+                15,
+                33,
+                15
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                59,
+                28
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                60,
+                49
+              ]
+            }
+          ],
+          "stroke": "#395A6C",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                39,
+                27
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                36,
+                41
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                29,
+                43
+              ]
+            }
+          ],
+          "stroke": "#94ACB9",
+          "strokeWidth": 1.6
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                80,
+                27
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                83,
+                41
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                90,
+                43
+              ]
+            }
+          ],
+          "stroke": "#94ACB9",
+          "strokeWidth": 1.6
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                25,
+                97
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                49,
+                101
+              ]
+            }
+          ],
+          "stroke": "#A7B9C1",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                70,
+                101
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                95,
+                97
+              ]
+            }
+          ],
+          "stroke": "#A7B9C1",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "#E7CAA0",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                60,
+                20
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                60,
+                18.8954305,
+                60.8954305,
+                18,
+                62,
+                18
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                63.1045695,
+                18,
+                64,
+                18.8954305,
+                64,
+                20
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                64,
+                21.1045695,
+                63.1045695,
+                22,
+                62,
+                22
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                60.8954305,
+                22,
+                60,
+                21.1045695,
+                60,
+                20
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sweater",
+      "label": "Sweater",
+      "width": 120,
+      "height": 120,
+      "layers": [
+        {
+          "fill": "#B7A4C5",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                41,
+                18
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                79,
+                18
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                108,
+                43
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                99,
+                86
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                83,
+                84
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                83,
+                106
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                37,
+                106
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                37,
+                84
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                21,
+                86
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                12,
+                43
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "#9D88AD",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                47,
+                14
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                73,
+                14
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                77,
+                14,
+                77,
+                18
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                77,
+                24
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                77,
+                28,
+                73,
+                28
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                47,
+                28
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                43,
+                28,
+                43,
+                24
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                43,
+                18
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                43,
+                14,
+                47,
+                14
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "#9D88AD",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                38,
+                97
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                82,
+                97
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                83,
+                97,
+                83,
+                98
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                83,
+                105
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                83,
+                106,
+                82,
+                106
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                38,
+                106
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                37,
+                106,
+                37,
+                105
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                37,
+                98
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                37,
+                97,
+                38,
+                97
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ]
+        },
+        {
+          "fill": "#9D88AD",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                20,
+                78
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                35,
+                78
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                36,
+                78,
+                36,
+                79
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                36,
+                86
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                36,
+                87,
+                35,
+                87
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                20,
+                87
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                19,
+                87,
+                19,
+                86
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                19,
+                79
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                19,
+                78,
+                20,
+                78
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ]
+        },
+        {
+          "fill": "#9D88AD",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                85,
+                78
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                100,
+                78
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                101,
+                78,
+                101,
+                79
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                101,
+                86
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                101,
+                87,
+                100,
+                87
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                85,
+                87
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                84,
+                87,
+                84,
+                86
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                84,
+                79
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                84,
+                78,
+                85,
+                78
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ]
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                39,
+                40
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                37,
+                82
+              ]
+            }
+          ],
+          "stroke": "#8E789F",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                81,
+                40
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                83,
+                82
+              ]
+            }
+          ],
+          "stroke": "#8E789F",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                47,
+                38
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                47,
+                90
+              ]
+            }
+          ],
+          "stroke": "#C9BBD2",
+          "strokeWidth": 1.4
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                59,
+                38
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                59,
+                90
+              ]
+            }
+          ],
+          "stroke": "#C9BBD2",
+          "strokeWidth": 1.4
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                71,
+                38
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                71,
+                90
+              ]
+            }
+          ],
+          "stroke": "#C9BBD2",
+          "strokeWidth": 1.4
+        }
+      ]
+    },
+    {
+      "id": "socks",
+      "label": "Socks",
+      "width": 120,
+      "height": 120,
+      "layers": [
+        {
+          "fill": "#EED6AB",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                27,
+                13
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                52,
+                13
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                52,
+                67
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                78,
+                82
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                90,
+                90,
+                78,
+                103
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                73,
+                110,
+                63,
+                105
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                30,
+                85
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                22,
+                80,
+                22,
+                69
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "#D85A36",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                28,
+                13
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                51,
+                13
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                52,
+                13,
+                52,
+                14
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                52,
+                22
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                52,
+                23,
+                51,
+                23
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                28,
+                23
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                27,
+                23,
+                27,
+                22
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                27,
+                14
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                27,
+                13,
+                28,
+                13
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ]
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                26,
+                32
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                51,
+                32
+              ]
+            }
+          ],
+          "stroke": "#D85A36",
+          "strokeWidth": 4
+        },
+        {
+          "fill": "#F4E5C9",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                62,
+                13
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                87,
+                13
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                87,
+                65
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                105,
+                78
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                116,
+                88,
+                104,
+                98
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                99,
+                103,
+                88,
+                98
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                63,
+                80
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                57,
+                75,
+                58,
+                63
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "#87A99A",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                63,
+                13
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                86,
+                13
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                87,
+                13,
+                87,
+                14
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                87,
+                22
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                87,
+                23,
+                86,
+                23
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                63,
+                23
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                62,
+                23,
+                62,
+                22
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                62,
+                14
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                62,
+                13,
+                63,
+                13
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ]
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                61,
+                32
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                87,
+                32
+              ]
+            }
+          ],
+          "stroke": "#87A99A",
+          "strokeWidth": 4
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                86,
+                66
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                95,
+                72
+              ]
+            }
+          ],
+          "stroke": "#CFBC97",
+          "strokeWidth": 2
+        }
+      ]
+    },
+    {
+      "id": "shoes",
+      "label": "Shoes",
+      "width": 120,
+      "height": 120,
+      "layers": [
+        {
+          "fill": "#DC6D4F",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                14,
+                46
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                29,
+                45,
+                40,
+                32
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                70,
+                57
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                101,
+                67
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                115,
+                73,
+                107,
+                87
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                19,
+                87
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                10,
+                82,
+                14,
+                46
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "#F7E9CA",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                14,
+                77
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                47,
+                84,
+                108,
+                77
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                107,
+                91
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                54,
+                99,
+                17,
+                91
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "#C15337",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                17,
+                44
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                25,
+                54,
+                36,
+                47
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                42,
+                34
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                27,
+                32,
+                17,
+                44
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                39,
+                50
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                54,
+                43
+              ]
+            }
+          ],
+          "stroke": "#F7F1E6",
+          "strokeWidth": 3
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                49,
+                58
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                63,
+                51
+              ]
+            }
+          ],
+          "stroke": "#F7F1E6",
+          "strokeWidth": 3
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                59,
+                65
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                72,
+                58
+              ]
+            }
+          ],
+          "stroke": "#F7F1E6",
+          "strokeWidth": 3
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                76,
+                73
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                98,
+                75
+              ]
+            }
+          ],
+          "stroke": "#B5452C",
+          "strokeWidth": 2
+        }
+      ]
+    },
+    {
+      "id": "washbag",
+      "label": "Wash bag",
+      "width": 120,
+      "height": 120,
+      "layers": [
+        {
+          "fill": "#B7A4C5",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                29,
+                36
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                91,
+                36
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                107,
+                36,
+                107,
+                52
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                107,
+                85
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                107,
+                101,
+                91,
+                101
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                29,
+                101
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                13,
+                101,
+                13,
+                85
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                13,
+                52
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                13,
+                36,
+                29,
+                36
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "#9C84AE",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                26,
+                34
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                94,
+                34
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                98,
+                34,
+                98,
+                38
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                98,
+                42
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                98,
+                46,
+                94,
+                46
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                26,
+                46
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                22,
+                46,
+                22,
+                42
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                22,
+                38
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                22,
+                34,
+                26,
+                34
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                20,
+                54
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                100,
+                54
+              ]
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 3
+        },
+        {
+          "fill": "#E8C887",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                88,
+                51
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                92,
+                51
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                94,
+                51,
+                94,
+                53
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                94,
+                66
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                94,
+                68,
+                92,
+                68
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                88,
+                68
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                86,
+                68,
+                86,
+                66
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                86,
+                53
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                86,
+                51,
+                88,
+                51
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "#F7F1E6",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                37,
+                69
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                83,
+                69
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                85,
+                69,
+                85,
+                71
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                85,
+                86
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                85,
+                88,
+                83,
+                88
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                37,
+                88
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                35,
+                88,
+                35,
+                86
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                35,
+                71
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                35,
+                69,
+                37,
+                69
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                44,
+                79
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                76,
+                79
+              ]
+            }
+          ],
+          "stroke": "#ADAA9A",
+          "strokeWidth": 1
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                19,
+                48
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                4,
+                47,
+                8,
+                32
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                11,
+                25,
+                25,
+                29
+              ]
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 3
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                20,
+                89
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                28,
+                96
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                91,
+                96
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                100,
+                89
+              ]
+            }
+          ],
+          "stroke": "#C8B6D3",
+          "strokeWidth": 1.4
+        }
+      ]
+    },
+    {
+      "id": "toothbrush",
+      "label": "Toothbrush",
+      "width": 120,
+      "height": 120,
+      "layers": [
+        {
+          "fill": "#EACAA0",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                54,
+                34
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                69,
+                34
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                73,
+                103
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                62,
+                112,
+                51,
+                103
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "#DBB47F",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                59,
+                8
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                65,
+                8
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                74,
+                8,
+                74,
+                17
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                74,
+                32
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                74,
+                41,
+                65,
+                41
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                59,
+                41
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                50,
+                41,
+                50,
+                32
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                50,
+                17
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                50,
+                8,
+                59,
+                8
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "#FAF8ED",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                52,
+                10
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                61,
+                10
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                66,
+                10,
+                66,
+                15
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                66,
+                35
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                66,
+                40,
+                61,
+                40
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                52,
+                40
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                47,
+                40,
+                47,
+                35
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                47,
+                15
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                47,
+                10,
+                52,
+                10
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                51,
+                13
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                51,
+                35
+              ]
+            }
+          ],
+          "stroke": "#C7D5CE",
+          "strokeWidth": 1.3
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                56,
+                13
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                56,
+                35
+              ]
+            }
+          ],
+          "stroke": "#C7D5CE",
+          "strokeWidth": 1.3
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                61,
+                13
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                61,
+                35
+              ]
+            }
+          ],
+          "stroke": "#C7D5CE",
+          "strokeWidth": 1.3
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                60,
+                49
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                63,
+                92
+              ]
+            }
+          ],
+          "stroke": "#FAE8C7",
+          "strokeWidth": 2
+        }
+      ]
+    },
+    {
+      "id": "bottle",
+      "label": "Water bottle",
+      "width": 120,
+      "height": 120,
+      "layers": [
+        {
+          "fill": "#87A99A",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                56,
+                20
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                65,
+                20
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                83,
+                20,
+                83,
+                38
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                83,
+                88
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                83,
+                106,
+                65,
+                106
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                56,
+                106
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                38,
+                106,
+                38,
+                88
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                38,
+                38
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                38,
+                20,
+                56,
+                20
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "#A8C8B4",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                49,
+                31
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                71,
+                31
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                81,
+                31,
+                81,
+                41
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                81,
+                86
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                81,
+                96,
+                71,
+                96
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                49,
+                96
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                39,
+                96,
+                39,
+                86
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                39,
+                41
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                39,
+                31,
+                49,
+                31
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ]
+        },
+        {
+          "fill": "#203A45",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                49,
+                10
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                71,
+                10
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                75,
+                10,
+                75,
+                14
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                75,
+                24
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                75,
+                28,
+                71,
+                28
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                49,
+                28
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                45,
+                28,
+                45,
+                24
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                45,
+                14
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                45,
+                10,
+                49,
+                10
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                49,
+                14
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                70,
+                14
+              ]
+            }
+          ],
+          "stroke": "#6A8384",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                75,
+                12
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                101,
+                11,
+                96,
+                33
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                94,
+                45,
+                80,
+                39
+              ]
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 4
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                47,
+                46
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                47,
+                81
+              ]
+            }
+          ],
+          "stroke": "#D5E4D5",
+          "strokeWidth": 4
+        },
+        {
+          "fill": "#F7F1E6",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                50,
+                61
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                69,
+                61
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                71,
+                61,
+                71,
+                63
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                71,
+                72
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                71,
+                74,
+                69,
+                74
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                50,
+                74
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                48,
+                74,
+                48,
+                72
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                48,
+                63
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                48,
+                61,
+                50,
+                61
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ]
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                53,
+                67
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                66,
+                67
+              ]
+            }
+          ],
+          "stroke": "#77968A",
+          "strokeWidth": 1
+        }
+      ]
+    },
+    {
+      "id": "passport",
+      "label": "Passport",
+      "width": 120,
+      "height": 120,
+      "layers": [
+        {
+          "fill": "#325A55",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                30,
+                10
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                91,
+                10
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                96,
+                10,
+                96,
+                15
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                96,
+                103
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                96,
+                108,
+                91,
+                108
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                30,
+                108
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                25,
+                108,
+                25,
+                103
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                25,
+                15
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                25,
+                10,
+                30,
+                10
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "#274D49",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                29,
+                12
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                34,
+                12
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                35,
+                12,
+                35,
+                13
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                35,
+                105
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                35,
+                106,
+                34,
+                106
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                29,
+                106
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                28,
+                106,
+                28,
+                105
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                28,
+                13
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                28,
+                12,
+                29,
+                12
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ]
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                44,
+                30
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                82,
+                30
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                84,
+                30,
+                84,
+                32
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                84,
+                75
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                84,
+                77,
+                82,
+                77
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                44,
+                77
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                42,
+                77,
+                42,
+                75
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                42,
+                32
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                42,
+                30,
+                44,
+                30
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#D9BE83",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                49,
+                53
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                49,
+                45.2680135,
+                55.2680135,
+                39,
+                63,
+                39
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                70.7319865,
+                39,
+                77,
+                45.2680135,
+                77,
+                53
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                77,
+                60.7319865,
+                70.7319865,
+                67,
+                63,
+                67
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                55.2680135,
+                67,
+                49,
+                60.7319865,
+                49,
+                53
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#D9BE83",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                56,
+                53
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                56,
+                45.2680135,
+                59.13400675,
+                39,
+                63,
+                39
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                66.86599325,
+                39,
+                70,
+                45.2680135,
+                70,
+                53
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                70,
+                60.7319865,
+                66.86599325,
+                67,
+                63,
+                67
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                59.13400675,
+                67,
+                56,
+                60.7319865,
+                56,
+                53
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#D9BE83",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                50,
+                53
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                76,
+                53
+              ]
+            }
+          ],
+          "stroke": "#D9BE83",
+          "strokeWidth": 1
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                46,
+                86
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                81,
+                86
+              ]
+            }
+          ],
+          "stroke": "#D9BE83",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                49,
+                92
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                78,
+                92
+              ]
+            }
+          ],
+          "stroke": "#D9BE83",
+          "strokeWidth": 1
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                92,
+                15
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                92,
+                101
+              ]
+            }
+          ],
+          "stroke": "#658476",
+          "strokeWidth": 1
+        }
+      ]
+    },
+    {
+      "id": "charger",
+      "label": "Charger",
+      "width": 120,
+      "height": 120,
+      "layers": [
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                70,
+                76
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                116,
+                79,
+                104,
+                21,
+                70,
+                21
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                36,
+                21,
+                44,
+                65,
+                67,
+                57
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                86,
+                52,
+                91,
+                80,
+                76,
+                100
+              ]
+            }
+          ],
+          "stroke": "#A69F91",
+          "strokeWidth": 6
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                70,
+                76
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                116,
+                79,
+                104,
+                21,
+                70,
+                21
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                36,
+                21,
+                44,
+                65,
+                67,
+                57
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                86,
+                52,
+                91,
+                80,
+                76,
+                100
+              ]
+            }
+          ],
+          "stroke": "#F7F1E6",
+          "strokeWidth": 4
+        },
+        {
+          "fill": "#E8E2D6",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                26,
+                42
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                56,
+                42
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                66,
+                42,
+                66,
+                52
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                66,
+                89
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                66,
+                99,
+                56,
+                99
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                26,
+                99
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                16,
+                99,
+                16,
+                89
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                16,
+                52
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                16,
+                42,
+                26,
+                42
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "#FCF8ED",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                27,
+                45
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                53,
+                45
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                60,
+                45,
+                60,
+                52
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                60,
+                83
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                60,
+                90,
+                53,
+                90
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                27,
+                90
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                20,
+                90,
+                20,
+                83
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                20,
+                52
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                20,
+                45,
+                27,
+                45
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ]
+        },
+        {
+          "fill": "#203A45",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                29,
+                29
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                33,
+                29
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                34,
+                29,
+                34,
+                30
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                34,
+                43
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                34,
+                44,
+                33,
+                44
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                29,
+                44
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                28,
+                44,
+                28,
+                43
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                28,
+                30
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                28,
+                29,
+                29,
+                29
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ]
+        },
+        {
+          "fill": "#203A45",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                49,
+                29
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                53,
+                29
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                54,
+                29,
+                54,
+                30
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                54,
+                43
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                54,
+                44,
+                53,
+                44
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                49,
+                44
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                48,
+                44,
+                48,
+                43
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                48,
+                30
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                48,
+                29,
+                49,
+                29
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ]
+        },
+        {
+          "fill": "#203A45",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                75,
+                91
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                82,
+                91
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                84,
+                91,
+                84,
+                93
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                84,
+                108
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                84,
+                110,
+                82,
+                110
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                75,
+                110
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                73,
+                110,
+                73,
+                108
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                73,
+                93
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                73,
+                91,
+                75,
+                91
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ]
+        },
+        {
+          "fill": "#A6AEA5",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                77,
+                88
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                80,
+                88
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                81,
+                88,
+                81,
+                89
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                81,
+                93
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                81,
+                94,
+                80,
+                94
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                77,
+                94
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                76,
+                94,
+                76,
+                93
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                76,
+                89
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                76,
+                88,
+                77,
+                88
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ]
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                34,
+                66
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                45,
+                66
+              ]
+            }
+          ],
+          "stroke": "#BBB4A5",
+          "strokeWidth": 2
+        }
+      ]
+    },
+    {
+      "id": "headphones",
+      "label": "Headphones",
+      "width": 120,
+      "height": 120,
+      "layers": [
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                28,
+                69
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                8,
+                8,
+                112,
+                8,
+                92,
+                69
+              ]
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 13
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                28,
+                52
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                28,
+                12,
+                92,
+                12,
+                92,
+                52
+              ]
+            }
+          ],
+          "stroke": "#B7A4C5",
+          "strokeWidth": 10
+        },
+        {
+          "fill": "#203A45",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                28,
+                49
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                31,
+                49
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                43,
+                49,
+                43,
+                61
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                43,
+                89
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                43,
+                101,
+                31,
+                101
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                28,
+                101
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                16,
+                101,
+                16,
+                89
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                16,
+                61
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                16,
+                49,
+                28,
+                49
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ]
+        },
+        {
+          "fill": "#8C779E",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                33,
+                55
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                36,
+                55
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                46,
+                55,
+                46,
+                65
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                46,
+                88
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                46,
+                98,
+                36,
+                98
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                33,
+                98
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                23,
+                98,
+                23,
+                88
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                23,
+                65
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                23,
+                55,
+                33,
+                55
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ]
+        },
+        {
+          "fill": "#203A45",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                90,
+                49
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                93,
+                49
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                105,
+                49,
+                105,
+                61
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                105,
+                89
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                105,
+                101,
+                93,
+                101
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                90,
+                101
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                78,
+                101,
+                78,
+                89
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                78,
+                61
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                78,
+                49,
+                90,
+                49
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ]
+        },
+        {
+          "fill": "#8C779E",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                85,
+                55
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                88,
+                55
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                98,
+                55,
+                98,
+                65
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                98,
+                88
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                98,
+                98,
+                88,
+                98
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                85,
+                98
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                75,
+                98,
+                75,
+                88
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                75,
+                65
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                75,
+                55,
+                85,
+                55
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ]
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                31,
+                61
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                31,
+                91
+              ]
+            }
+          ],
+          "stroke": "#B6A3C6",
+          "strokeWidth": 3
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                87,
+                61
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                87,
+                91
+              ]
+            }
+          ],
+          "stroke": "#B6A3C6",
+          "strokeWidth": 3
+        }
+      ]
+    },
+    {
+      "id": "sunscreen",
+      "label": "Sunscreen",
+      "width": 120,
+      "height": 120,
+      "layers": [
+        {
+          "fill": "#E8B85F",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                33,
+                13
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                87,
+                13
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                81,
+                93
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                39,
+                93
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "#E4DAC4",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                42,
+                91
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                78,
+                91
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                81,
+                91,
+                81,
+                94
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                81,
+                105
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                81,
+                108,
+                78,
+                108
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                42,
+                108
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                39,
+                108,
+                39,
+                105
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                39,
+                94
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                39,
+                91,
+                42,
+                91
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "#F7F1E6",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                40,
+                29
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                80,
+                29
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                82,
+                29,
+                82,
+                31
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                82,
+                75
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                82,
+                77,
+                80,
+                77
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                40,
+                77
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                38,
+                77,
+                38,
+                75
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                38,
+                31
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                38,
+                29,
+                40,
+                29
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ]
+        },
+        {
+          "fill": "#D85A36",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                49,
+                48
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                49,
+                41.92486775,
+                53.92486775,
+                37,
+                60,
+                37
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                66.07513225,
+                37,
+                71,
+                41.92486775,
+                71,
+                48
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                71,
+                54.07513225,
+                66.07513225,
+                59,
+                60,
+                59
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                53.92486775,
+                59,
+                49,
+                54.07513225,
+                49,
+                48
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ]
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                46,
+                66
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                74,
+                66
+              ]
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                49,
+                71
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                71,
+                71
+              ]
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 1
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                38,
+                19
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                82,
+                19
+              ]
+            }
+          ],
+          "stroke": "#C68C3D",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                36,
+                23
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                84,
+                23
+              ]
+            }
+          ],
+          "stroke": "#F3D492",
+          "strokeWidth": 1
+        }
+      ]
+    },
+    {
+      "id": "glasses",
+      "label": "Sunglasses",
+      "width": 120,
+      "height": 120,
+      "layers": [
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                17,
+                64
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                14,
+                31
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                34,
+                18
+              ]
+            }
+          ],
+          "stroke": "#854B37",
+          "strokeWidth": 5
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                101,
+                64
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                105,
+                31
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                88,
+                18
+              ]
+            }
+          ],
+          "stroke": "#854B37",
+          "strokeWidth": 5
+        },
+        {
+          "fill": "#729897",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                12,
+                46
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                49,
+                46
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                46,
+                77
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                25,
+                90,
+                15,
+                72
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#854B37",
+          "strokeWidth": 5
+        },
+        {
+          "fill": "#729897",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                70,
+                46
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                108,
+                46
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                103,
+                74
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                85,
+                91,
+                73,
+                77
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#854B37",
+          "strokeWidth": 5
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                50,
+                53
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                60,
+                45,
+                70,
+                53
+              ]
+            }
+          ],
+          "stroke": "#854B37",
+          "strokeWidth": 5
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                20,
+                54
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                38,
+                54
+              ]
+            }
+          ],
+          "stroke": "#B8D0C4",
+          "strokeWidth": 3
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                78,
+                54
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                95,
+                54
+              ]
+            }
+          ],
+          "stroke": "#B8D0C4",
+          "strokeWidth": 3
+        }
+      ]
+    },
+    {
+      "id": "hat",
+      "label": "Sun hat",
+      "width": 120,
+      "height": 120,
+      "layers": [
+        {
+          "fill": "#E2C48F",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                9,
+                78
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                9,
+                63.08831175,
+                31.83347775,
+                51,
+                60,
+                51
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                88.16652225,
+                51,
+                111,
+                63.08831175,
+                111,
+                78
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                111,
+                92.91168825,
+                88.16652225,
+                105,
+                60,
+                105
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                31.83347775,
+                105,
+                9,
+                92.91168825,
+                9,
+                78
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "#E9D5AC",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                29,
+                72
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                37,
+                27
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                60,
+                9,
+                83,
+                27
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                91,
+                72
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                61,
+                94,
+                29,
+                72
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "#CF7656",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                31,
+                59
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                60,
+                76,
+                89,
+                59
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                91,
+                72
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                60,
+                90,
+                29,
+                72
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                40,
+                32
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                34,
+                54
+              ]
+            }
+          ],
+          "stroke": "#FBEDCD",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                20,
+                79
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                59,
+                111,
+                101,
+                79
+              ]
+            }
+          ],
+          "stroke": "#C5A777",
+          "strokeWidth": 1.4
+        }
+      ]
+    },
+    {
+      "id": "book",
+      "label": "Something to read",
+      "width": 120,
+      "height": 120,
+      "layers": [
+        {
+          "fill": "#F0E5CC",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                29,
+                16
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                91,
+                16
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                101,
+                101
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                33,
+                107
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "#D97050",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                23,
+                11
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                90,
+                11
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                94,
+                99
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                26,
+                105
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "#B74B32",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                26,
+                12
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                33,
+                12
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                34,
+                12,
+                34,
+                13
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                34,
+                99
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                34,
+                100,
+                33,
+                100
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                26,
+                100
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                25,
+                100,
+                25,
+                99
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                25,
+                13
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                25,
+                12,
+                26,
+                12
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ]
+        },
+        {
+          "fill": "#F7F1E6",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                42,
+                29
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                78,
+                29
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                79,
+                29,
+                79,
+                30
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                79,
+                65
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                79,
+                66,
+                78,
+                66
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                42,
+                66
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                41,
+                66,
+                41,
+                65
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                41,
+                30
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                41,
+                29,
+                42,
+                29
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ]
+        },
+        {
+          "fill": "#87A99A",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                50,
+                46
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                50,
+                40.4771525,
+                54.4771525,
+                36,
+                60,
+                36
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                65.5228475,
+                36,
+                70,
+                40.4771525,
+                70,
+                46
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                70,
+                51.5228475,
+                65.5228475,
+                56,
+                60,
+                56
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                54.4771525,
+                56,
+                50,
+                51.5228475,
+                50,
+                46
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ]
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                43,
+                77
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                80,
+                74
+              ]
+            }
+          ],
+          "stroke": "#F4C6A6",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                47,
+                84
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                77,
+                81
+              ]
+            }
+          ],
+          "stroke": "#F4C6A6",
+          "strokeWidth": 1.5
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                95,
+                103
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                35,
+                108
+              ]
+            }
+          ],
+          "stroke": "#BEAD8C",
+          "strokeWidth": 1
+        }
+      ]
+    },
+    {
+      "id": "bag",
+      "label": "Your weekend bag",
+      "width": 120,
+      "height": 120,
+      "layers": [
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                39,
+                39
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                40,
+                21
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                60,
+                5,
+                80,
+                21
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                81,
+                39
+              ]
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 8
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                39,
+                39
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                40,
+                21
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                60,
+                5,
+                80,
+                21
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                81,
+                39
+              ]
+            }
+          ],
+          "stroke": "#8A9A91",
+          "strokeWidth": 3
+        },
+        {
+          "fill": "#203A45",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                27,
+                36
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                93,
+                36
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                110,
+                36,
+                110,
+                53
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                110,
+                88
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                110,
+                105,
+                93,
+                105
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                27,
+                105
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                10,
+                105,
+                10,
+                88
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                10,
+                53
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                10,
+                36,
+                27,
+                36
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "#39565C",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                28,
+                40
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                92,
+                40
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                105,
+                40,
+                105,
+                53
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                105,
+                84
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                105,
+                97,
+                92,
+                97
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                28,
+                97
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                15,
+                97,
+                15,
+                84
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                15,
+                53
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                15,
+                40,
+                28,
+                40
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ]
+        },
+        {
+          "fill": "#152D35",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                18,
+                42
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                18,
+                35.372583,
+                36.8040405,
+                30,
+                60,
+                30
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                83.1959595,
+                30,
+                102,
+                35.372583,
+                102,
+                42
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                102,
+                48.627417,
+                83.1959595,
+                54,
+                60,
+                54
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                36.8040405,
+                54,
+                18,
+                48.627417,
+                18,
+                42
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                22,
+                41
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                33,
+                35
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                86,
+                35
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                99,
+                41
+              ]
+            }
+          ],
+          "stroke": "#D85A36",
+          "strokeWidth": 4
+        },
+        {
+          "fill": "#2C474D",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                39,
+                69
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                81,
+                69
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                85,
+                69,
+                85,
+                73
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                85,
+                92
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                85,
+                96,
+                81,
+                96
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                39,
+                96
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                35,
+                96,
+                35,
+                92
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                35,
+                73
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                35,
+                69,
+                39,
+                69
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#6F8989",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                39,
+                73
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                80,
+                73
+              ]
+            }
+          ],
+          "stroke": "#8DA099",
+          "strokeWidth": 1
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                27,
+                48
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                27,
+                97
+              ]
+            }
+          ],
+          "stroke": "#8A9A91",
+          "strokeWidth": 3
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                94,
+                48
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                94,
+                97
+              ]
+            }
+          ],
+          "stroke": "#8A9A91",
+          "strokeWidth": 3
+        },
+        {
+          "fill": "#F7F1E6",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                84,
+                43
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                95,
+                43
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                97,
+                43,
+                97,
+                45
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                97,
+                67
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                97,
+                69,
+                95,
+                69
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                84,
+                69
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                82,
+                69,
+                82,
+                67
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                82,
+                45
+              ]
+            },
+            {
+              "type": "Q",
+              "values": [
+                82,
+                43,
+                84,
+                43
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ],
+          "stroke": "#203A45",
+          "strokeWidth": 2
+        },
+        {
+          "fill": "#203A45",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                87,
+                47
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                87,
+                45.8954305,
+                87.8954305,
+                45,
+                89,
+                45
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                90.1045695,
+                45,
+                91,
+                45.8954305,
+                91,
+                47
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                91,
+                48.1045695,
+                90.1045695,
+                49,
+                89,
+                49
+              ]
+            },
+            {
+              "type": "C",
+              "values": [
+                87.8954305,
+                49,
+                87,
+                48.1045695,
+                87,
+                47
+              ]
+            },
+            {
+              "type": "Z",
+              "values": []
+            }
+          ]
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                86,
+                54
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                93,
+                54
+              ]
+            }
+          ],
+          "stroke": "#A8987F",
+          "strokeWidth": 1
+        },
+        {
+          "fill": "none",
+          "commands": [
+            {
+              "type": "M",
+              "values": [
+                86,
+                59
+              ]
+            },
+            {
+              "type": "L",
+              "values": [
+                93,
+                59
+              ]
+            }
+          ],
+          "stroke": "#A8987F",
+          "strokeWidth": 1
+        }
+      ]
+    }
+  ]
+}

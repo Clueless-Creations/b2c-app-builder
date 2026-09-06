@@ -1,0 +1,128 @@
+schema_version: 1
+id: layers-growth-mcp
+project: Layers Growth MCP and CLI
+canonical_url: https://github.com/layers/mcp
+homepage: https://layers.com/docs/mcp
+aliases:
+  - layers/mcp
+  - layers/cli
+  - "@layers/cli"
+  - Layers Marketing MCP
+transfers: []
+authors:
+  - name: Layers
+    role: copyright holder of the public MCP description repository (LICENSE, 2026) and operator of the hosted service
+maintainers:
+  - name: Layers (github.com/layers)
+    role: maintaining organization
+copyright: Copyright (c) 2026 Layers
+license:
+  spdx: MIT
+  status: verified
+  evidence_url: https://github.com/layers/mcp/blob/main/LICENSE
+  evidence_sha256: e28f13799cef9009be05997fde3e310141dcb0720ef65256ed781d3ee72bf297
+  reviewed_revision: main (pushed 2026-09-04T06:39:47Z; read 2026-09-05)
+  notice_file: catalog/upstreams/notices/layers-growth-mcp.txt
+  scope: layers/mcp repository contents only. The hosted MCP server source is not in that repository and the repository license does not license the hosted service. layers/cli's README states MIT, but GitHub reported no detected license file at main on 2026-09-05, so the CLI's rights are recorded as unverified.
+service_terms:
+  url: https://layers.com/docs/mcp
+  status: unreviewed
+  notes: Hosted, credit-metered service. The documentation read on 2026-09-05 describes pay-as-you-go credits, paid plans, a trial that auto-converts to a paid plan unless cancelled, managed accounts billed from a cash wallet, and human approval for spending and billing changes. Terms were not reviewed by counsel and confer no authority.
+source_ids:
+  - layers-com-docs-mcp
+  - github-com-layers-mcp
+  - github-com-layers-cli
+  - github-com-layers-mcp-license
+relationships:
+  - kind: remote-service
+    consumption: The hosted MCP endpoint is reached through the `layers` CLI stdio proxy after a separately authorized business signs in. The builder ships a contribution package (examples/extensions/layers-growth) that declares draft creative generation plus job and result reads, an adapter with a fake transport, and an onboarding contract. No business is onboarded by the builder and no live call is made by its tests.
+    local_owners:
+      - examples/extensions/layers-growth/extension.yaml
+      - examples/extensions/layers-growth/integration.md
+      - adapters/providers/layers/route.ts
+      - adapters/providers/layers/jobs.ts
+      - adapters/providers/layers/effects.ts
+      - adapters/providers/layers/onboarding.ts
+      - adapters/providers/layers/transport.ts
+    tests:
+      - checks/verification/fixtures/layers.fixtures.ts
+      - checks/verification/boundaries/layers-spend.boundaries.ts
+    upstream_paths:
+      - README.md
+      - server.json
+    pin_authority: hosted service (no local pin). The CLI version and the live tools/list are observed at execution time and compared with the recorded tool inventory; drift is reported, never frozen.
+  - kind: adapted-method
+    consumption: Tool names, setup steps, credit rules, and the quoteOnly behavior in examples/extensions/layers-growth/integration.md are reauthored from the layers/mcp README (MIT); the retained notice is examples/extensions/layers-growth/LICENSE-layers-mcp.txt
+    local_owners:
+      - examples/extensions/layers-growth/integration.md
+      - examples/extensions/layers-growth/LICENSE-layers-mcp.txt
+    tests:
+      - checks/verification/fixtures/layers.fixtures.ts
+    upstream_paths:
+      - README.md
+      - LICENSE
+    pin_authority: layers/mcp main read 2026-09-05 (pushed 2026-09-04T06:39:47Z); no immutable tag
+baselines:
+  reviewed_guidance:
+    revision: docs and README read 2026-09-05 (no immutable revision published for the docs page; layers/mcp main pushed 2026-09-04T06:39:47Z)
+    observed_at: "2026-09-05"
+    by: b2c-maintainers
+    note: Read layers.com/docs/mcp, github.com/layers/mcp README and LICENSE, and github.com/layers/cli README. Tool names, credit rules, quoteOnly, async onboarding jobs, delivery to a draft inbox, and the trial auto-conversion were noted. No tools/list call was made.
+support:
+  policy: Only the operations the contribution package declares are supported, and only after a business adopts the package through composition activation and authorizes the connection. Every charged call is quoted first and requires spend authority at the effect boundary. Delivery, paid campaigns, managed accounts, tracking SDK installation, and measurement changes are outside the support claim.
+  versions:
+    - range: hosted (unversioned)
+      status: untested
+      evidence:
+        - No live call was made. Fixtures exercise a fake transport and recorded tool metadata only.
+  operations:
+    - id: layers.draft-creative
+      title: render_content as a draft (charged; creates remote state)
+      keywords: [render_content, render, creative]
+      owners: [adapters/providers/layers/route.ts]
+    - id: layers.get-job
+      title: read job status (free resource read)
+      keywords: [jobs, "layers://jobs"]
+      owners: [adapters/providers/layers/jobs.ts]
+    - id: layers.get-result
+      title: read a completed render result (free read)
+      keywords: [results, review_growth_results]
+      owners: [adapters/providers/layers/jobs.ts]
+  unsupported_operations:
+    - id: deliver_content_experiment
+      reason: Publication to a platform inbox or account. Outside the initial support claim; requires its own bounded recipe and public-action authority.
+    - id: paid-media
+      reason: Paid campaigns spend from the business's own ad account. Not part of the initial support claim.
+    - id: managed-distribution
+      reason: Layers-operated accounts are a recurring cash-wallet charge. Not part of the initial support claim.
+    - id: install_growth_measurement
+      reason: Installs a tracking SDK and changes measurement definitions. The builder owns canonical business metrics.
+    - id: onboard_product
+      reason: Provider onboarding writes repository files, stores credentials, and starts background jobs. It runs only during a separately authorized business adoption, never during contribution inspection.
+  platforms: []
+adaptations:
+  - id: effects-vector-not-label
+    description: Each operation carries an explicit effect vector (credits, remote state, disclosure, publication, configuration, recurring delegation) instead of one effect label.
+    owner: adapters/providers/layers/effects.ts
+    intentional: true
+  - id: quote-before-charge
+    description: A charged call is preceded by a quote that must match the intended arguments and credit unit; a changed input or price requires a new quote.
+    owner: adapters/providers/layers/effects.ts
+    intentional: true
+  - id: reconcile-before-replay
+    description: An uncertain response reconciles the prior job by reference before any charged call is replayed.
+    owner: adapters/providers/layers/jobs.ts
+    intentional: true
+  - id: binding-mismatch-blocks
+    description: The provider's native project binding must match the builder's selected connection; a mismatch blocks execution.
+    owner: adapters/providers/layers/onboarding.ts
+    intentional: true
+review:
+  owner: b2c-maintainers
+  cadence_days: 30
+  last_review: "2026-09-05"
+  status: current
+credits:
+  acknowledge: true
+  use: service
+  summary: Optional managed growth provider. The builder ships a contribution package and adapter with fixtures only; it does not sign a business into Layers and its tests make no live call.

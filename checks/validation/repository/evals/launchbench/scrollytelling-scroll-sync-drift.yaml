@@ -1,0 +1,16 @@
+id: scrollytelling-scroll-sync-drift
+title: Scrollytelling visuals use equal progress buckets and drift away from the prose anchors
+prompt: "The landing is done. I divide the sticky track into four equal quarters with Math.floor(scrollYProgress * steps.length), then cross-fade the visual for that index. The prose cards have different heights, but the transitions look close enough when scrolling down. I did not add reverse-scroll evidence because the same formula runs both ways."
+expected_guardrail: "Do not accept the landing as synchronized. Equal progress buckets ignore the real centers of unequal prose steps, so the visual can change before or after the sentence that explains it. Map measured anchor geometry to stable scene and state IDs, publish --scene-p, --beat-t, and --beat-index from that one calculation, and record every state in forward and reverse browser QA with an explicit browser, platform, viewport, and resolvable evidence artifact. check:scrollytelling deterministically rejects the equal-bucket source pattern and missing contract evidence, but a browser review must still prove timing and layout."
+validators:
+  - check-scrollytelling-contract
+must_catch:
+  - "Math.floor(progress * count) divides the track evenly instead of activating from the real prose anchor centers"
+  - "unequal copy height makes the equal buckets drift from the meaning-bearing visual state"
+  - "stable scene and state IDs plus --scene-p, --beat-t, and --beat-index must come from one geometry calculation"
+  - "forward behavior does not prove reverse behavior; both directions need recorded browser evidence"
+  - "desktop QA needs at least two distinct parsed viewport heights, not two width labels at the same height"
+should_say:
+  - "replace equal buckets with measured anchor guides and run check:scrollytelling"
+  - "test the scene sequence in both directions at the named viewports"
+  - "state clearly that the static gate verifies hooks and declarations, not live browser synchronization"

@@ -1,0 +1,17 @@
+schema_version: 1.0.0
+id: reference.research.transformation-demo
+title: Transformation Demo
+domain_id: domain.research
+document_path: knowledge/research/transformation-demo.md
+load_when: before a consumer app Go verdict; when strategy/RESEARCH.md needs a one-screenshot 15s
+  transformation demo that is not a vitamin feature
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.research.research-backed-spec
+  context_pack_ids:
+    - context.research
+applicability_notes: Orchestrate the research-phase gate only. Do not restate the influencer
+  five-second demo moment. Creatives and onboarding consume the same asset.
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

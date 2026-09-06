@@ -1,0 +1,18 @@
+schema_version: 1.0.0
+id: reference.growth.hdyhau-blended-roas
+title: HDYHAU Survey And Blended ROAS
+domain_id: domain.growth
+document_path: knowledge/growth/hdyhau-blended-roas.md
+load_when: before spend-ready attribution; when a solo needs HDYHAU survey rules and a blended ROAS
+  sheet ahead of AppsFlyer
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.data.analytics-and-attribution-blueprint
+    - workflow.growth.paid-user-acquisition-system
+  context_pack_ids:
+    - context.growth
+applicability_notes: Sequence this lighter path before the AppsFlyer MMP issue. Do not add tv as a
+  required stable source key. Do not replace paid-UA spend gates.
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

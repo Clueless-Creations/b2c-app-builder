@@ -1,0 +1,26 @@
+id: photo-ai-media-archetype-prompt-pack
+title: Photo/AI-media request detects the archetype and routes the prompt pack
+prompt: "I want to build an app where people upload selfies and get professional AI headshots."
+expected_route: "Detect the photo/AI-media archetype, load photo-ai-media.md, confirm media shape / primary surface / optional systems / niche via one batched AskUserQuestion, record the archetype as a product decision in product.yaml, copy the runnable starter as the floor, then route the bundled prompt pack in order (schema, auth, capture/library, generation pipeline) with content safety & rights (prompt 08) before any public launch and the generation provider founder-gated via paid-tool routing — instead of improvising the schema and hardcoding an image provider."
+must_use:
+  - "photo-ai-media.md"
+  - "surfaces/starters/photo-ai-media"
+  - "AskUserQuestion"
+  - "product.yaml"
+must_catch:
+  - "the request is a photo/AI-media archetype (identity-conditioned headshots) with a known build sequence"
+  - "the generation provider is a founder-gated paid-tool decision routed through paid-tool-routing.md and recorded in strategy/TOOL_DECISIONS.md, with the key server-side — never hardcoded"
+  - "content safety and rights (NSFW/CSAM screening, likeness consent, rights posture, takedown, age gating) is a launch gate, not a V2 item"
+  - "the before/after reveal is a HIGH-risk Variable Reward card requiring the ethics-guardrail contract (attestation, escape hatch, counter-metric, reward_variation_proof)"
+  - "per-generation COGS means credits/metering must exist before monetization"
+  - "the pack feeds the launch lanes (research, 11-star, revenue, analytics, security) rather than bypassing them, and the starter is the pre-wired floor"
+should_say:
+  - "confirm the media shape and primary surface with the founder before building"
+  - "build one core system at a time, test it, then move on"
+  - "faces are biometric-adjacent data — owner-scoped storage, signed URLs, tested RLS, and real deletion paths"
+  - "surface the revenue lane's SOSA benchmarks as defaults to test, with pricing founder-gated"
+forbidden:
+  - "hardcode a generation provider or its API key without founder approval via paid-tool routing"
+  - "skip or defer the content-safety-and-rights prompt before a public launch"
+  - "improvise the schema and pipeline from scratch while ignoring the pack and starter"
+  - "skip the AskUserQuestion archetype confirmation"

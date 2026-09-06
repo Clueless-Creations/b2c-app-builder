@@ -1,0 +1,737 @@
+<!doctype html>
+<!--
+  emotional-design.html — {{APP_NAME}} Emotional Design Board
+  STRUCTURE OUTLINE: This file defines what the emotional-design board must render.
+  Populate from EMOTIONAL_DESIGN.md before founder review.
+
+  Required sections (in order):
+  1. Header             — App name, Emotional North Star, one-line "why a user retells it"
+  2. Emotional Curve    — SVG/canvas line chart drawn from Target Emotional Journey table
+  3. Card Application Map — visual table: Feature/Moment × Card × Beat × Event × Guardrail
+  4. Ethics Status      — per-card attestation status badges (passed / pending / blocked)
+  5. Measurement Pulse  — live or stub counter-metric tiles (rage-tap rate, opt-out rate, etc.)
+
+  Design tokens: promoted from the authored DESIGN.md contract.
+  Motion: web surfaces use motion/react with --motion-* CSS variables.
+  Reduced-motion: every animated section implements prefers-reduced-motion check;
+    static fallback is always present.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{APP_NAME}} — Emotional Design Board</title>
+  <style>
+    /* ─── Design tokens (promote from authored DESIGN.md) ─────────── */
+    :root {
+      --bg:          #f7f2e8;
+      --paper:       #fffdf8;
+      --ink:         #171513;
+      --muted:       #665f56;
+      --line:        #d8cbb9;
+      --accent:      #e84f5f;   /* peak / positive valence */
+      --accent-2:    #0f7f6f;   /* card applied accent */
+      --gold:        #bb7a17;   /* warning / counter-metric */
+      --bad:         #9f2f24;   /* dark-pattern watch alert */
+      --neutral:     #8b8480;   /* zero valence reference */
+      --shadow:      0 18px 45px rgba(42, 31, 18, 0.12);
+      --radius:      8px;
+      /* motion tokens — must match DesignTokens.Motion values */
+      --motion-brief:      150ms;
+      --motion-moderate:   400ms;
+      --motion-expressive: 600ms;
+      --motion-deliberate: 600ms;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background:
+        linear-gradient(135deg, rgba(232, 79, 95, 0.07), transparent 30%),
+        radial-gradient(circle at top right, rgba(15, 127, 111, 0.12), transparent 32%),
+        var(--bg);
+      color: var(--ink);
+      font: 15px/1.45 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+            "Segoe UI", sans-serif;
+    }
+
+    header {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 34px 0 18px;
+    }
+
+    h1 { margin: 0; font-size: clamp(2rem, 5vw, 4rem); line-height: 0.95; }
+    h2 { margin: 0 0 10px; font-size: 1.05rem; }
+    h3 { margin: 0 0 8px; font-size: 0.9rem; text-transform: uppercase;
+         letter-spacing: 0.06em; color: var(--muted); }
+    p  { color: var(--muted); margin: 0; }
+
+    .north-star-label {
+      margin-top: 10px;
+      font-size: 1.1rem;
+      max-width: 760px;
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .retell-label {
+      margin-top: 6px;
+      font-size: 0.9rem;
+      color: var(--muted);
+      max-width: 640px;
+    }
+
+    main {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 12px 0 64px;
+      display: grid;
+      gap: 18px;
+    }
+
+    section {
+      background: rgba(255, 253, 248, 0.94);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      overflow: auto;
+    }
+
+    /* ─── Section 2: Emotional Curve ─────────────────────────────────────────── */
+    /*
+      RENDER REQUIREMENTS:
+      - SVG line chart, width 100%, height ~260px.
+      - X axis: step IDs from Target Emotional Journey table (J-01 … J-09, R-01 … R-05).
+      - Y axis: valence −5 to +5. Reference line at y=0 (--neutral).
+      - Each step: a circle point + connecting line in --accent.
+      - Peaks labeled with target emotional state (e.g. "Ownership +3", "Delighted +5").
+      - Valleys labeled with friction source.
+      - Vertical dashed marker at the paywall step (J-08 default).
+      - Reduced-motion fallback: static SVG with no draw animation; all points and labels
+        visible immediately.
+      - Animated variant: line draws left-to-right using a stroke-dasharray/dashoffset
+        animation respecting --motion-expressive duration.
+    */
+    .curve-container {
+      position: relative;
+      width: 100%;
+      min-height: 260px;
+      overflow: visible;
+    }
+
+    .curve-container svg {
+      width: 100%;
+      height: 260px;
+      overflow: visible;
+    }
+
+    .curve-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 12px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .curve-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .curve-legend-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* ─── Section 3: Card Application Map ───────────────────────────────────── */
+    /*
+      RENDER REQUIREMENTS:
+      - Full-width scrollable table.
+      - Columns: Feature/Moment | Card Applied | Emotional Beat | Measurement Event |
+                  Bright-Line Guardrail | Reduced-Motion Fallback
+      - Card Applied column: color-coded chip per card:
+          Commitment Card       → --accent-2 tint
+          Variable Reward Card  → --accent tint
+          Perceived Effort Delay → --gold tint
+          Intent Mirroring Card → var(--muted) tint
+      - Measurement Event column: monospace event name, links to analytics/ANALYTICS.md anchor.
+      - Row hover: subtle background highlight.
+      - Reduced-motion fallback: no hover animation; static highlight on focus.
+    */
+    .card-map-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 800px;
+      font-size: 0.88rem;
+    }
+
+    .card-map-table thead th {
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 2px solid var(--line);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .card-map-table tbody tr {
+      border-bottom: 1px solid var(--line);
+      transition: background var(--motion-brief) ease;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .card-map-table tbody tr:hover {
+        background: rgba(232, 79, 95, 0.04);
+      }
+    }
+
+    .card-map-table tbody td {
+      padding: 10px;
+      vertical-align: top;
+    }
+
+    .card-chip {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .card-chip--commitment     { background: rgba(15,127,111,0.12); color: #0f7f6f; }
+    .card-chip--variable       { background: rgba(232,79,95,0.12);  color: #c0364a; }
+    .card-chip--effort         { background: rgba(187,122,23,0.12); color: #8a6010; }
+    .card-chip--mirror         { background: rgba(102,95,86,0.12);  color: #3f3830; }
+
+    .event-name {
+      font-family: ui-monospace, "Cascadia Code", "Fira Code", monospace;
+      font-size: 0.8rem;
+      color: var(--accent-2);
+    }
+
+    /* ─── Section 4: Ethics Status ───────────────────────────────────────────── */
+    /*
+      RENDER REQUIREMENTS:
+      - One status badge per applied card.
+      - States: "Attestation Complete" (green), "Pending" (gold), "Blocked" (red).
+      - Each badge expands on click to show the attestation summary (bright_line first line,
+        guardrail first line).
+      - Reduced-motion fallback: no expand animation; content visible by default in a
+        <details> / <summary> element.
+    */
+    .ethics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .ethics-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px;
+    }
+
+    .ethics-card__status {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .ethics-card__status--complete  { background: rgba(15,127,111,0.15); color: #0a5f53; }
+    .ethics-card__status--pending   { background: rgba(187,122,23,0.15); color: #7a5210; }
+    .ethics-card__status--blocked   { background: rgba(159,47,36,0.15);  color: #7a1e15; }
+
+    .ethics-card__name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+
+    .ethics-card details summary {
+      cursor: pointer;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .ethics-card details p {
+      margin-top: 6px;
+      font-size: 0.82rem;
+      line-height: 1.4;
+    }
+
+    /* ─── Section 5: Measurement Pulse ───────────────────────────────────────── */
+    /*
+      RENDER REQUIREMENTS:
+      - Tile grid: one tile per counter-metric.
+      - Each tile: metric name, current value (stub "—" until PostHog connected),
+        threshold, and a status indicator (OK / Watch / Alert).
+      - Alert tiles use --bad background tint.
+      - Watch tiles use --gold background tint.
+      - OK tiles use --accent-2 background tint.
+      - Reduced-motion fallback: no pulse animation on alert tiles.
+    */
+    .pulse-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .pulse-tile {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px;
+    }
+
+    .pulse-tile__metric {
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+
+    .pulse-tile__value {
+      font-size: 1.6rem;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .pulse-tile__threshold {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .pulse-tile__status {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    .pulse-tile--ok    { background: rgba(15,127,111,0.05); }
+    .pulse-tile--ok    .pulse-tile__status { background: rgba(15,127,111,0.15); color: #0a5f53; }
+    .pulse-tile--watch { background: rgba(187,122,23,0.06); }
+    .pulse-tile--watch .pulse-tile__status { background: rgba(187,122,23,0.15); color: #7a5210; }
+    .pulse-tile--alert { background: rgba(159,47,36,0.06); border-color: var(--bad); }
+    .pulse-tile--alert .pulse-tile__status { background: rgba(159,47,36,0.15);  color: #7a1e15; }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .pulse-tile--alert {
+        animation: pulse-border 2s ease-in-out infinite;
+      }
+    }
+
+    @keyframes pulse-border {
+      0%, 100% { border-color: var(--bad); }
+      50%       { border-color: transparent; }
+    }
+
+    /* ─── Utility ─────────────────────────────────────────────────────────────── */
+    .section-meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .pill {
+      display: inline-block;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      padding: 5px 10px;
+      font-size: 0.8rem;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    code {
+      font-family: ui-monospace, "Cascadia Code", monospace;
+      font-size: 0.85em;
+      background: rgba(0,0,0,0.04);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── Section 1: Header ────────────────────────────────────────────────────── -->
+<!--
+  Populate: app name, Emotional North Star one-line, "why a user retells it",
+  star-ladder level badge.
+  Source: EMOTIONAL_DESIGN.md §Emotional North Star
+-->
+<header>
+  <h1>{{APP_NAME}}</h1>
+  <p class="north-star-label">
+    <!-- Emotional North Star: the one feeling this product exists to create -->
+    <!-- Example: "The moment you realize you actually improved." -->
+    {{EMOTIONAL_NORTH_STAR}}
+  </p>
+  <p class="retell-label">
+    <!-- Why a user retells it (word-of-mouth trigger sentence) -->
+    {{RETELL_SENTENCE}}
+  </p>
+  <div class="meta">
+    <span class="pill">Star level: {{NORTH_STAR_LADDER_LEVEL}}</span>
+    <span class="pill">Cards applied: 4</span>
+    <span class="pill">Emotional Design Board (draft)</span>
+    <span class="pill">Source: EMOTIONAL_DESIGN.md</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- ─── Section 2: Emotional Curve ─────────────────────────────────────────── -->
+  <!--
+    Render a line chart from the Target Emotional Journey table in EMOTIONAL_DESIGN.md.
+    Data: array of { stepId, label, valence, peak: bool, valley: bool, paywallMarker: bool }
+    drawn as an SVG polyline on a −5 → +5 Y axis.
+
+    Static fallback (prefers-reduced-motion): render all points visible immediately;
+    no stroke-dasharray animation.
+
+    Animated variant: draw line left-to-right over --motion-expressive (600ms).
+    Points fade in sequentially with --motion-brief delays.
+  -->
+  <section id="emotional-curve">
+    <h2>Target Emotional Journey</h2>
+    <p class="section-meta">
+      Valence −5 (strong negative) → +5 (strong positive).
+      Dashed vertical line marks the paywall step.
+      Curve must peak at or before the paywall marker.
+      Source: <code>EMOTIONAL_DESIGN.md §Target Emotional Journey</code>
+    </p>
+
+    <div class="curve-container" role="img"
+         aria-label="Emotional journey curve for {{APP_NAME}} showing valence across onboarding and return session steps">
+      <svg id="emotional-curve-svg" viewBox="0 0 900 240" preserveAspectRatio="xMidYMid meet"
+           aria-hidden="true">
+        <!--
+          POPULATE THIS SVG at render time from EMOTIONAL_DESIGN.md journey table.
+
+          Required elements:
+          - <line> for the zero-valence reference (y=neutral)
+          - <line class="paywall-marker"> dashed vertical at paywall step x-position
+          - <polyline id="curve-line"> connecting all step points
+          - <circle> per step (filled, --accent color for peaks, --muted for others)
+          - <text> peak labels ("Ownership", "Delighted +5", etc.)
+          - <text> valley labels with friction source
+          - <text> step ID labels on X axis
+          - <text> Y axis labels (−5, −3, 0, +3, +5)
+
+          Coordinate mapping example (900px wide, 240px high, padding 40px each side):
+            x = 40 + (stepIndex / (totalSteps - 1)) * 820
+            y = 120 - (valence / 5) * 100
+
+          Reduced-motion: all elements rendered without animation attributes.
+          Animated: <polyline> uses stroke-dasharray="0 9999" animated to stroke-dasharray="9999 0".
+        -->
+
+        <!-- Zero reference line -->
+        <line x1="40" y1="120" x2="860" y2="120"
+              stroke="var(--neutral)" stroke-width="1" stroke-dasharray="4 4" opacity="0.5" />
+
+        <!-- Paywall marker — position at paywall step X coordinate -->
+        <line class="paywall-marker"
+              x1="760" y1="20" x2="760" y2="220"
+              stroke="var(--gold)" stroke-width="1.5" stroke-dasharray="6 3" opacity="0.7" />
+        <text x="760" y="14"
+              fill="var(--gold)" font-size="10" text-anchor="middle">Paywall</text>
+
+        <!-- Curve line — populate with computed points -->
+        <polyline id="curve-line"
+                  points="40,120 157,120 274,100 391,80 509,60 626,40 743,60 860,80"
+                  fill="none"
+                  stroke="var(--accent)"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round" />
+
+        <!-- Step points and labels — repeat per step -->
+        <!-- <circle cx="{{X}}" cy="{{Y}}" r="5" fill="var(--accent)" /> -->
+        <!-- <text x="{{X}}" y="{{LABEL_Y}}" fill="var(--ink)" font-size="9" text-anchor="middle">{{STEP_ID}}</text> -->
+        <!-- Peak label: <text x="{{X}}" y="{{PEAK_LABEL_Y}}" fill="var(--accent)" font-size="9" font-weight="600" text-anchor="middle">{{EMOTIONAL_TARGET}}</text> -->
+
+        <!-- Y axis labels -->
+        <text x="32" y="24"  fill="var(--muted)" font-size="10" text-anchor="end">+5</text>
+        <text x="32" y="64"  fill="var(--muted)" font-size="10" text-anchor="end">+3</text>
+        <text x="32" y="124" fill="var(--muted)" font-size="10" text-anchor="end">0</text>
+        <text x="32" y="184" fill="var(--muted)" font-size="10" text-anchor="end">−3</text>
+        <text x="32" y="224" fill="var(--muted)" font-size="10" text-anchor="end">−5</text>
+      </svg>
+    </div>
+
+    <div class="curve-legend" aria-label="Curve legend">
+      <span class="curve-legend-item">
+        <span class="curve-legend-dot" style="background:var(--accent)"></span>
+        Journey step
+      </span>
+      <span class="curve-legend-item">
+        <span class="curve-legend-dot" style="background:var(--accent);outline:2px solid var(--ink)"></span>
+        Emotional peak
+      </span>
+      <span class="curve-legend-item">
+        <span class="curve-legend-dot" style="background:var(--muted)"></span>
+        Friction valley
+      </span>
+      <span class="curve-legend-item">
+        <span style="width:24px;height:2px;background:var(--gold);display:inline-block;vertical-align:middle"></span>
+        Paywall step
+      </span>
+    </div>
+  </section>
+
+  <!-- ─── Section 3: Card Application Map ─────────────────────────────────────── -->
+  <!--
+    Render all rows from EMOTIONAL_DESIGN.md §Card Application Map.
+    Columns: Feature/Moment | Card Applied | Emotional Beat | Measurement Event |
+             Bright-Line Guardrail | Reduced-Motion Fallback
+    Source: EMOTIONAL_DESIGN.md §Card Application Map
+  -->
+  <section id="card-map">
+    <h2>Card Application Map</h2>
+    <p class="section-meta">
+      Every applied Experience Card, the emotional beat it produces, and its guardrails.
+      Source: <code>EMOTIONAL_DESIGN.md §Card Application Map</code>
+    </p>
+
+    <table class="card-map-table" aria-label="Card application map">
+      <thead>
+        <tr>
+          <th>Feature / Moment</th>
+          <th>Card Applied</th>
+          <th>Emotional Beat</th>
+          <th>Measurement Event</th>
+          <th>Bright-Line Guardrail</th>
+          <th>Reduced-Motion Fallback</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!--
+          Repeat one <tr> per row from EMOTIONAL_DESIGN.md §Card Application Map.
+          Example row structure:
+
+          <tr>
+            <td>Goal-setting question in onboarding</td>
+            <td><span class="card-chip card-chip--commitment">Commitment Card</span></td>
+            <td>Ownership — user feels the product works toward their goal</td>
+            <td><code class="event-name">commitment_made</code></td>
+            <td>Commitment editable from Settings; never used as cancellation friction</td>
+            <td>Soft fade → instant text highlight; no animation</td>
+          </tr>
+
+          Card chip classes:
+            Commitment Card:        card-chip card-chip--commitment
+            Variable Reward Card:   card-chip card-chip--variable
+            Perceived Effort Delay: card-chip card-chip--effort
+            Intent Mirroring Card:  card-chip card-chip--mirror
+        -->
+        <tr>
+          <td colspan="6" style="color:var(--muted);font-style:italic;padding:16px 10px;">
+            Populate from <code>EMOTIONAL_DESIGN.md §Card Application Map</code>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ─── Section 4: Ethics Status ─────────────────────────────────────────────── -->
+  <!--
+    One card per applied Experience Card. Show attestation status.
+    States: complete, pending, blocked.
+    Source: EMOTIONAL_DESIGN.md §Ethics Attestation
+  -->
+  <section id="ethics-status">
+    <h2>Ethics Attestation Status</h2>
+    <p class="section-meta">
+      Per-card attestation. All four cards must reach "Attestation Complete"
+      before engineering handoff.
+      Source: <code>EMOTIONAL_DESIGN.md §Ethics Attestation</code>
+    </p>
+
+    <div class="ethics-grid">
+      <!--
+        Repeat one .ethics-card per applied Experience Card.
+        Populate status, bright_line summary, and guardrail summary from attestation blocks.
+
+        Example:
+        <div class="ethics-card">
+          <div class="ethics-card__status ethics-card__status--complete">Attestation Complete</div>
+          <div class="ethics-card__name">Commitment Card</div>
+          <div style="font-size:0.8rem;color:var(--muted);">Applied to: goal-setting onboarding</div>
+          <details>
+            <summary>View attestation summary</summary>
+            <p><strong>Bright line:</strong> User explicitly names a goal; app reflects it back
+               at plan-reveal and paywall. User owns the stated goal.</p>
+            <p><strong>Guardrail:</strong> Commitment editable from Settings at any time.
+               No confirmshaming. No cancellation friction.</p>
+          </details>
+        </div>
+      -->
+
+      <div class="ethics-card">
+        <div class="ethics-card__status ethics-card__status--pending">Pending</div>
+        <div class="ethics-card__name">Commitment Card</div>
+        <div style="font-size:0.8rem;color:var(--muted);">Applied to: goal-setting onboarding</div>
+        <details>
+          <summary>View attestation summary</summary>
+          <p>Populate from <code>EMOTIONAL_DESIGN.md §Commitment Card Attestation</code></p>
+        </details>
+      </div>
+
+      <div class="ethics-card">
+        <div class="ethics-card__status ethics-card__status--pending">Pending</div>
+        <div class="ethics-card__name">Variable Reward Card</div>
+        <div style="font-size:0.8rem;color:var(--muted);">Applied to: value reveal + core loop</div>
+        <details>
+          <summary>View attestation summary</summary>
+          <p>Populate from <code>EMOTIONAL_DESIGN.md §Variable Reward Card Attestation</code></p>
+        </details>
+      </div>
+
+      <div class="ethics-card">
+        <div class="ethics-card__status ethics-card__status--pending">Pending</div>
+        <div class="ethics-card__name">Perceived Effort Delay Card</div>
+        <div style="font-size:0.8rem;color:var(--muted);">Applied to: plan generation</div>
+        <details>
+          <summary>View attestation summary</summary>
+          <p>Populate from <code>EMOTIONAL_DESIGN.md §Perceived Effort Delay Card Attestation</code></p>
+        </details>
+      </div>
+
+      <div class="ethics-card">
+        <div class="ethics-card__status ethics-card__status--pending">Pending</div>
+        <div class="ethics-card__name">Intent Mirroring Card</div>
+        <div style="font-size:0.8rem;color:var(--muted);">Applied to: pre-paywall + return session</div>
+        <details>
+          <summary>View attestation summary</summary>
+          <p>Populate from <code>EMOTIONAL_DESIGN.md §Intent Mirroring Card Attestation</code></p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Section 5: Measurement Pulse ─────────────────────────────────────────── -->
+  <!--
+    Counter-metric tiles. Stubs until PostHog is connected.
+    Status: ok / watch / alert.
+    Thresholds from EMOTIONAL_DESIGN.md §Measurement Plan §Counter-Metrics.
+    Source: EMOTIONAL_DESIGN.md §Measurement Plan
+  -->
+  <section id="measurement-pulse">
+    <h2>Measurement Pulse</h2>
+    <p class="section-meta">
+      Counter-metrics that detect backfire. If any tile reaches "Alert" for two consecutive weeks,
+      open <code>emotional-card-dark-line-crossed</code> failure card and pause the triggering experiment variant.
+      Source: <code>EMOTIONAL_DESIGN.md §Measurement Plan §Counter-Metrics</code>
+    </p>
+
+    <div class="pulse-grid">
+      <!--
+        Populate current values from PostHog "Emotional Experience — Card Signals" dashboard.
+        Stub values shown below. Replace "—" with live percentages when PostHog is connected.
+
+        Status logic:
+          ok:    value below threshold
+          watch: value within 2x threshold
+          alert: value exceeds threshold
+      -->
+
+      <div class="pulse-tile pulse-tile--ok">
+        <div class="pulse-tile__metric">Rage-Tap Rate (all cards)</div>
+        <div class="pulse-tile__value">—</div>
+        <div class="pulse-tile__threshold">Threshold: &gt; 3%</div>
+        <span class="pulse-tile__status">OK</span>
+      </div>
+
+      <div class="pulse-tile pulse-tile--ok">
+        <div class="pulse-tile__metric">Card Opt-Out Rate</div>
+        <div class="pulse-tile__value">—</div>
+        <div class="pulse-tile__threshold">Threshold: &gt; 10%</div>
+        <span class="pulse-tile__status">OK</span>
+      </div>
+
+      <div class="pulse-tile pulse-tile--ok">
+        <div class="pulse-tile__metric">Variable Reward Opt-Out</div>
+        <div class="pulse-tile__value">—</div>
+        <div class="pulse-tile__threshold">Threshold: &gt; 15%</div>
+        <span class="pulse-tile__status">OK</span>
+      </div>
+
+      <div class="pulse-tile pulse-tile--ok">
+        <div class="pulse-tile__metric">Effort Delay Cancel Rate</div>
+        <div class="pulse-tile__value">—</div>
+        <div class="pulse-tile__threshold">Threshold: &gt; 10%</div>
+        <span class="pulse-tile__status">OK</span>
+      </div>
+
+      <div class="pulse-tile pulse-tile--ok">
+        <div class="pulse-tile__metric">Intent Mirror Dismiss (pre-purchase)</div>
+        <div class="pulse-tile__value">—</div>
+        <div class="pulse-tile__threshold">Threshold: &gt; 30%</div>
+        <span class="pulse-tile__status">OK</span>
+      </div>
+
+      <div class="pulse-tile pulse-tile--ok">
+        <div class="pulse-tile__metric">Commitment Abandon Rate</div>
+        <div class="pulse-tile__value">—</div>
+        <div class="pulse-tile__threshold">Threshold: &gt; 20%</div>
+        <span class="pulse-tile__status">OK</span>
+      </div>
+
+      <div class="pulse-tile pulse-tile--ok">
+        <div class="pulse-tile__metric">Negative Review Cluster</div>
+        <div class="pulse-tile__value">0</div>
+        <div class="pulse-tile__threshold">Threshold: any 3+ reviews with "addictive", "fake", "guilt"</div>
+        <span class="pulse-tile__status">OK</span>
+      </div>
+
+      <div class="pulse-tile pulse-tile--ok">
+        <div class="pulse-tile__metric">Cancel within 24h of Card Fire</div>
+        <div class="pulse-tile__value">—</div>
+        <div class="pulse-tile__threshold">Threshold: any spike vs baseline</div>
+        <span class="pulse-tile__status">OK</span>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+</body>
+</html>

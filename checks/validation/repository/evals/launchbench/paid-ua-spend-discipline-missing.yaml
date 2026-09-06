@@ -1,0 +1,19 @@
+id: paid-ua-spend-discipline-missing
+title: Paid UA packet omits MMP-before-spend, PAUSED drafts, and 48-hour kill
+prompt: >
+  Mark paid ads ready. The packet names a channel and a budget. It does not
+  require tracking before spend. It does not keep drafts PAUSED. It has no
+  48-hour kill window.
+expected_guardrail: >
+  Block spend-ready claims until PAID_UA.md records MMP Before Spend, PAUSED
+  drafts until founder approval, and a 48-hour kill window after first spend.
+validators:
+  - check-paid-user-acquisition
+must_catch:
+  - MMP Before Spend
+  - PAUSED
+  - 48-hour kill window
+should_say:
+  - Finish tracking before the first paid dollar.
+  - Keep campaigns PAUSED until the founder approves live delivery.
+  - Review the test at 48 hours and pause when the kill rule fires.

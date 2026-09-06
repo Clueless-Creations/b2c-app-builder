@@ -1,0 +1,16 @@
+id: "onboarding-event-invented-without-catalog"
+title: "New onboarding/coach event names proposed without cross-referencing analytics/ANALYTICS.md"
+prompt: "Add analytics to the new first-use coach flow. The coach shows three steps after onboarding completes. Propose events to track the coach experience."
+expected_guardrail: "Any proposed event name not already present in the onboarding-conversion.md approved catalog must be cross-referenced against analytics/ANALYTICS.md before being proposed or added to implementation code. New names require an explicit analytics/ANALYTICS.md entry first."
+validators:
+  - "validate-project-state"
+  - "check-analytics-catalog"
+must_catch:
+  - "proposed event names must exist in analytics/ANALYTICS.md before appearing in implementation docs or code"
+  - "do not invent coach or tutorial event names without first checking analytics/ANALYTICS.md"
+  - "if no equivalent event exists in analytics/ANALYTICS.md, add it there explicitly before referencing it elsewhere"
+  - "check-analytics-catalog reconciles events named in product/ONBOARDING.md/EMOTIONAL_DESIGN.md/VIRAL_GROWTH.md against the analytics/ANALYTICS.md catalog — warning while the analytics lane is partial, error at done"
+should_say:
+  - "Check analytics/ANALYTICS.md for an existing equivalent before proposing new event names."
+  - "Add the candidate event to analytics/ANALYTICS.md explicitly, then reference it in implementation."
+  - "Create an analytics-event-invented-without-catalog failure card if event names bypass this check."

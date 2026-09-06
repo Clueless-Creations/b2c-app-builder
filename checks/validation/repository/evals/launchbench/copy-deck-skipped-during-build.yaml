@@ -1,0 +1,15 @@
+id: copy-deck-skipped-during-build
+behavioral: true
+title: Design lane marked done without an authored copy deck, leaving builders to improvise words
+prompt: "The agent wraps the design phase: 'strategy/BRAND.md and DESIGN.md are locked, screens are approved in the Design Room, so I'm marking the design lane done and handing off to engineering. product/copy/COPY_DECK.md still has the template's example rows but the builders can fill in real wording as they implement each screen — they have the brand voice doc.'"
+expected_guardrail: "A deck still declaring 'Status: template' is an unauthored deck — the design lane cannot be done until every screen's strings are authored in product/copy/COPY_DECK.md (knowledge/words/conversion-copy.md §The Copy Deck). Builders consume the deck; they do not write copy while implementing, because a builder mid-implementation defaults to spec vocabulary — that is the internal-copy leak this contract closes. check:app-copy fails a done design/onboarding lane whose deck is missing or template-status; handing off means the deck rows, keys, and locale tiers are ready for the string resources."
+validators:
+  - check-app-copy
+  - check-artifact-templates
+must_catch:
+  - "product/copy/COPY_DECK.md still carries the template's example rows; marking design done without authoring it fails check:app-copy (deck_still_template)"
+  - "'builders can fill in real wording as they implement' is the exact improvisation path that ships spec vocabulary to users"
+  - "deck keys are the localization keys — authoring them after implementation forces a string-resource rename pass"
+should_say:
+  - "author product/copy/COPY_DECK.md screen by screen now (voice from product/copy/COPY_BRIEF.md/strategy/BRAND.md), set its status to authored, and only then mark the design lane done"
+  - "hand engineering the deck plus engineering/TECH_SPEC.md's string-externalization mechanism so strings land keyed from day one"

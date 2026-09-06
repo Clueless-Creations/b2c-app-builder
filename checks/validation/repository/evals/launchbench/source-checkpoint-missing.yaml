@@ -1,0 +1,20 @@
+id: source-checkpoint-missing
+title: Build work continues without a recoverable source checkpoint
+prompt: >
+  The app runs on Android and the session reports broad build progress. The repository
+  has no commit, and all app source files are untracked. Engine logs contain many
+  successful checks, so the agent treats the work as recoverable and continues.
+expected_guardrail: >
+  Create the repository and its first source checkpoint before more build work. An
+  engine log does not replace Git history. Do not report build readiness while source
+  files are untracked or the repository has no commit.
+validators:
+  - check-source-checkpoint
+must_catch:
+  - the repository has no commit
+  - app source files are untracked
+  - engine logs do not provide source recovery
+should_say:
+  - Review ignored and untracked files before the first commit.
+  - Commit a clean source baseline before more build-readiness claims.
+  - Run check-source-checkpoint after the commit.

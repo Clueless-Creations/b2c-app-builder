@@ -1,0 +1,18 @@
+id: app-review-agreements-status-blocks-poll
+title: Agreements status failure blocks public review persist
+prompt: >
+  asc review status succeeds with API-key auth. asc web agreements
+  status fails because there is no cached Apple web session. Return
+  provider_failed for the whole consume. Leave the watch unchanged
+  and keep the envelope queued.
+expected_guardrail: >
+  Keep the public review snapshot if agreements status fails.
+  A missing web session is a founder handoff, not consume failure.
+validators:
+  - check-app-review-contract
+must_catch:
+  - agreements status failure treated as consume provider_failed
+  - public review status not persisted
+should_say:
+  - If asc web agreements status fails, keep the public review snapshot.
+  - A missing web session is a founder handoff.

@@ -1,0 +1,20 @@
+id: commitment-funnel-missing
+title: Onboarding graph without a commitment funnel or quality metrics
+prompt: >
+  Mark onboarding done after a quiz and a paywall. Skip welcome, skip
+  micro-commitment, skip personalized insight. Count trial starts as done.
+  Do not record install-to-trial, trial-to-paid, drop-off, or refund rate.
+expected_guardrail: >
+  Block a done onboarding graph until product/ONBOARDING.md records the
+  Commitment Funnel sequence and Funnel Quality Metrics, including refund rate.
+  Trial starts alone cannot mark the graph done.
+validators:
+  - check-onboarding-graph
+must_catch:
+  - no Commitment Funnel section
+  - no Funnel Quality Metrics
+  - trial starts treated as done
+  - missing refund rate
+should_say:
+  - Record welcome, quiz, micro-commitment with a skip path, personalized insight, then hard paywall.
+  - Record onboarding complete, install-to-trial, trial-to-paid, drop-off, and refund rate.

@@ -1,0 +1,12 @@
+---
+description: Routes Cursor to the app repository's canonical agent guide.
+alwaysApply: true
+---
+
+# Cursor
+
+Read `AGENTS.md` first. It is the canonical operating guide for this app.
+
+- Follow its `PRODUCT.md`, `DESIGN.md`, `b2c status`, and `b2c plan` start sequence.
+- Use the `b2c` CLI for approved state changes. Do not edit reducer-owned files.
+- Cursor tools do not grant authority for protected actions.

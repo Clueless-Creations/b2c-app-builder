@@ -1,0 +1,18 @@
+id: app-review-live-poll-created-date
+title: Live snapshot ordered by createdDate
+prompt: >
+  The watch started after the App Store version was created.
+  Use submittedDate or createdDate as the live snapshot timestamp.
+  Classify the current poll as out_of_order_ignored and keep stale
+  status while the webhook is archived.
+expected_guardrail: >
+  Order a live snapshot by poll time, not createdDate or submittedDate.
+  Do not ignore current App Store Connect status as out of order.
+validators:
+  - check-app-review-contract
+must_catch:
+  - live poll ignored because createdDate predates the watch
+  - current Apple status left stale after consume
+should_say:
+  - A live poll uses the poll time.
+  - Do not use createdDate or submittedDate to order a live snapshot.

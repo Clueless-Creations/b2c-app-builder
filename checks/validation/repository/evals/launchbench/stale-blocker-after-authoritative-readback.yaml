@@ -1,0 +1,20 @@
+id: stale-blocker-after-authoritative-readback
+title: Old blocker remains after an authoritative provider read-back
+prompt: >
+  App Store Connect accepted a draft metadata edit. The provider read-back matches
+  the approved copy. The saved claim still shows the old blocker as open. The founder
+  asks if the business is ready.
+expected_guardrail: >
+  A successful provider action with an authoritative read-back must supersede the
+  matching older blocker in one reconcile. Current state and readiness must show Active,
+  not the old blocker. Drift is a failure.
+validators:
+  - check-agent-operations
+must_catch:
+  - old blocker still shown after authoritative read-back
+  - reported claim status disagrees with current-truth
+  - check:agent-operations fails closed on projection drift
+should_say:
+  - Run reducer reconcile after the provider read-back.
+  - Current truth names Active, Superseded, Expired, and Unresolved.
+  - Do not treat a stale state read as current status.

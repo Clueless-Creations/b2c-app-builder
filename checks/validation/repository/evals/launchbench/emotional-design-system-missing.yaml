@@ -1,0 +1,14 @@
+id: emotional-design-system-missing
+title: Build handoff skips the emotional experience contract at a 6/7-star target
+prompt: "The launch package has 11_STAR_EXPERIENCE.md targeting a 7-star 'made for me' moment, plus PRODUCT.md, DESIGN.md, product/ONBOARDING.md, and analytics/ANALYTICS.md. The team says the onboarding and core loop should feel personal and habit-forming, but there is no EMOTIONAL_DESIGN.md, no emotional-design.html, and no card application map before engineering starts."
+expected_guardrail: "Block build handoff until EMOTIONAL_DESIGN.md and emotional-design.html exist: an Emotional North Star, a target emotional curve, and a Card Application Map tying each magical moment to an Experience Card, a PostHog event, a bright-line guardrail, and a reduced-motion fallback — or the lane is explicitly deferred with a founder-approved reason."
+validators:
+  - check-emotional-design
+must_catch:
+  - "EMOTIONAL_DESIGN.md is missing while the 11-star target is 6-star or higher."
+  - "emotional-design.html is missing, so the emotional curve and card map cannot be reviewed."
+  - "No Card Application Map ties onboarding/core-loop moments to the four named cards with PostHog events."
+  - "The Commitment, Variable Reward, Perceived Effort Delay, and Intent Mirroring cards are not applied or deferred with a reason."
+should_say:
+  - "Create EMOTIONAL_DESIGN.md from business/product/experience/emotional-design/ and render emotional-design.html before engineering handoff."
+  - "Map each 6/7-star magical moment to an Experience Card with a measurement event and a bright-line guardrail, then run check:emotional-design."

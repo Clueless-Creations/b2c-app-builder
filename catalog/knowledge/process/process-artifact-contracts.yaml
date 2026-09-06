@@ -1,0 +1,31 @@
+schema_version: 1.0.0
+id: reference.process.artifact-contracts
+title: Artifact Contracts
+domain_id: domain.process
+document_path: knowledge/process/artifact-contracts.md
+load_when: writing docs, handoff bundles, or acceptance criteria
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.orchestration.orient-scaffold-and-state-cockpit-upkeep
+    - workflow.process.launch-trace-and-build-contracts
+    - workflow.process.launchbench-failure-cards-coverage-audit
+    - workflow.engineering.app-agent-roster-and-repo-entrypoints
+    - workflow.data.analytics-and-attribution-blueprint
+  context_pack_ids:
+    - context.process
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.
+specifies:
+  - artifact: strategy/RESEARCH.md
+    heading: strategy/RESEARCH.md
+  - artifact: strategy/SIGNAL_CORPUS.md
+    heading: strategy/RESEARCH.md
+  - artifact: strategy/OFFER_TEST.md
+    heading: strategy/RESEARCH.md
+  - artifact: product.yaml
+    heading: PRODUCT.md
+  - artifact: PRODUCT.md
+    heading: PRODUCT.md
+  - artifact: DESIGN.md
+    heading: DESIGN.md

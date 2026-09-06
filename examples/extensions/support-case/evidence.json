@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "caseId": {
+      "type": "string"
+    },
+    "requestKey": {
+      "type": "string",
+      "minLength": 1
+    },
+    "observedState": {
+      "const": "triaged"
+    },
+    "transport": {
+      "const": "fake"
+    }
+  },
+  "required": ["caseId", "requestKey", "observedState", "transport"],
+  "additionalProperties": false
+}

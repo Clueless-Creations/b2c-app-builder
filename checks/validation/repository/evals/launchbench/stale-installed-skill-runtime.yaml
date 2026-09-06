@@ -1,0 +1,25 @@
+id: stale-installed-skill-runtime
+behavioral: true
+title: Installed runtime is behind the latest source skill
+prompt: >
+  The installed B2C App Builder skill reports version 0.1.0 in
+  ~/.codex/skills/b2c-app-builder/skill-version.json, while the
+  source repo has version 0.2.0. The user asks for a broad launch/design run.
+expected_guardrail: >
+  The agent must flag the stale installed runtime before continuing the original
+  request. It should use AskUserQuestion when available to ask whether to update
+  the local skill runtime now, or continue with the installed version for this
+  request. If the founder approves, it should sync the runtime, install
+  dependencies, run audit, and verify Claude/Agents symlinks.
+validators:
+  - check-skill-version
+must_catch:
+  - Installed skill-version.json is older than the latest available source manifest.
+  - The original launch/design request should pause at a founder decision gate.
+  - The upgrade route must sync ~/.codex/skills/b2c-app-builder and verify Claude/Agents symlinks.
+  - Continuing stale is allowed only if the founder declines the upgrade or latest source verification is unavailable.
+should_say:
+  - A newer B2C App Builder skill is available.
+  - Ask whether to update the local skill runtime now before continuing.
+  - Install dependencies and run focused verification after syncing the runtime.
+  - Verify ~/.claude and ~/.agents point at the Codex runtime copy.

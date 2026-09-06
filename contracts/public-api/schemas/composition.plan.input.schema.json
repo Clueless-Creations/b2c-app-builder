@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "workspaceId": {
+      "type": "string",
+      "maxLength": 160,
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "packageDigests": {
+      "minItems": 1,
+      "maxItems": 100,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^sha256:[a-f0-9]{64}$"
+      }
+    }
+  },
+  "required": [
+    "workspaceId",
+    "packageDigests"
+  ],
+  "additionalProperties": false
+}

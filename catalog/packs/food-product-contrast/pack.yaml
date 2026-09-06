@@ -1,0 +1,108 @@
+id: business-pack.food-product-contrast
+title: Food-product contrast pack
+version: 1.0.0
+revision: rev-food-product-2026-08-22
+depends_on:
+  - capability.web-presence
+domains:
+  - id: domain.food
+    slug: food
+    name: Food Product
+    area_ids:
+      - area.product-experience
+    route_label: Food product
+    route_when: sku contrast
+    order: 160
+    grantable: true
+    operator_group: Operations
+areas:
+  - id: area.product-experience
+    name: Product And Experience
+    description: Existing product area. The food pack adds domain.food.
+    domain_ids:
+      - domain.food
+references:
+  - id: reference.food-product.promise
+    session_scoped: true
+    source_exemption: Authored business composition instructions; factual provider claims require current provider evidence.
+    path: catalog/packs/food-product-contrast/promise.md
+    section_id: knowledge.food-product.promise
+    revision: rev-food-product-2026-08-22
+    domain_id: domain.food
+    title: Food product promise
+  - id: reference.food-product.sku
+    session_scoped: true
+    source_exemption: Authored business composition instructions; factual provider claims require current provider evidence.
+    path: catalog/packs/food-product-contrast/sku.md
+    section_id: knowledge.food-product.sku
+    revision: rev-food-product-2026-08-22
+    domain_id: domain.food
+    title: Food SKU contrast
+  - id: reference.food-product.retailer
+    session_scoped: true
+    source_exemption: Authored business composition instructions; factual provider claims require current provider evidence.
+    path: catalog/packs/food-product-contrast/retailer.md
+    section_id: knowledge.food-product.retailer
+    revision: rev-food-product-2026-08-22
+    domain_id: domain.food
+    title: Food retailer or direct channel
+  - id: reference.food-product.regulatory
+    session_scoped: true
+    source_exemption: Authored business composition instructions; factual provider claims require current provider evidence.
+    path: catalog/packs/food-product-contrast/regulatory.md
+    section_id: knowledge.food-product.regulatory
+    revision: rev-food-product-2026-08-22
+    domain_id: domain.food
+    title: Current food-regulatory facts
+  - id: reference.food-product.manufacturing
+    session_scoped: true
+    source_exemption: Authored business composition instructions; factual provider claims require current provider evidence.
+    path: catalog/packs/food-product-contrast/manufacturing.md
+    section_id: knowledge.food-product.manufacturing
+    revision: rev-food-product-2026-08-22
+    domain_id: domain.food
+    title: Food manufacturing lot record
+  - id: reference.food-product.conversion
+    session_scoped: true
+    source_exemption: Authored business composition instructions; factual provider claims require current provider evidence.
+    path: catalog/packs/food-product-contrast/conversion.md
+    section_id: knowledge.food-product.conversion
+    revision: rev-food-product-2026-08-22
+    domain_id: domain.food
+    title: Food conversion measurement
+workflows:
+  - id: workflow.food.sku-contrast
+    title: Food SKU contrast
+    domain_id: domain.food
+    area_ids:
+      - area.product-experience
+    trigger: When a food-product SKU needs a contrast record
+    instructions: Produce the food SKU contrast artifact and stop.
+    reference_ids:
+      - reference.food-product.sku
+      - reference.food-product.promise
+    role_id: role.orchestrator
+    output_paths:
+      - food/sku-contrast.md
+    action_class: draft
+    extension_slots:
+      - proof
+extensions:
+  - target_id: capability.web-presence
+    slot: offer
+    kind: bind
+  - target_id: capability.web-presence
+    slot: channel
+    kind: bind
+  - target_id: capability.web-presence
+    slot: conversion
+    kind: bind
+  - target_id: capability.web-presence
+    slot: legal
+    kind: bind
+  - target_id: capability.web-presence
+    slot: measurement
+    kind: bind
+  - target_id: capability.web-presence
+    slot: distribution
+    kind: bind

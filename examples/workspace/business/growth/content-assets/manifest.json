@@ -1,0 +1,73 @@
+{
+  "schema_version": "1",
+  "assets": [
+    {
+      "asset_id": "vertical-hook-demo",
+      "surface": "tiktok_reels_shorts",
+      "route": "remotion",
+      "status": "draft",
+      "composition_id": "VerticalHookDemo",
+      "dimensions": "1080x1920",
+      "duration_seconds": 12,
+      "inputs": [
+        "screenshots/raw/onboarding.png",
+        "11_STAR_EXPERIENCE.md",
+        "DESIGN.md",
+        "growth/content-assets/copy/hooks.json"
+      ],
+      "outputs": [
+        "growth/content-assets/out/vertical-hook-demo.mp4"
+      ],
+      "truth_constraints": [
+        "real app UI remains visible",
+        "V1 scalable slice from 11_STAR_EXPERIENCE.md remains truthful",
+        "no unsupported claims",
+        "mock UI is not presented as production UI"
+      ],
+      "approvals": [
+        "fallback approval required before replacing Higgsfield",
+        "founder approval required before public posting or store upload"
+      ],
+      "render_proof": "cd content-assets/remotion && npx remotion render VerticalHookDemo --output ../out/vertical-hook-demo.mp4",
+      "license_status": "Remotion license status must be checked before commercial use"
+    },
+    {
+      "asset_id": "founder-ugc-ad",
+      "surface": "meta_tiktok_paid",
+      "route": "higgsfield_marketing_studio",
+      "status": "draft",
+      "dimensions": "1080x1920",
+      "duration_seconds": 15,
+      "prompt_brief": "DESIGN.md palette, typography mood, and banned aesthetics injected into the marketing_studio_video --prompt",
+      "asset_kind": "ugc",
+      "script_id": "ugc/script-bank.md#FMT-001",
+      "judge_verdict": "pending — the judge panel must clear the script before generation spend (ugc-creator-engine.md, Script Bank And Judge Panel)",
+      "believability": "pending — one real human who did not make the clip watches it before any done-tier status",
+      "soul_reference_id": "",
+      "avatar_id": "",
+      "webproduct_id": "",
+      "source_job_id": "",
+      "virality_score": "brain_activity: overall pending, peak hook second pending, sustain % pending, Default Mode risk pending",
+      "inputs": [
+        "DESIGN.md",
+        "state/business-state.json tools.higgsfield.identity",
+        "growth/content-assets/copy/hooks.json"
+      ],
+      "outputs": [
+        "growth/content-assets/out/founder-ugc-ad.mp4"
+      ],
+      "truth_constraints": [
+        "real app UI shown in product cutaways remains truthful",
+        "no unsupported claims",
+        "founder likeness used with consent"
+      ],
+      "approvals": [
+        "spend confirmation before generation",
+        "virality score recorded before paid distribution",
+        "founder approval required before public posting or paid campaign"
+      ],
+      "render_proof": "higgsfield generate create marketing_studio_video --avatars @avatars.json --product_ids @products.json --mode ugc --aspect_ratio 9:16 --wait; reframe to 1:1 and 16:9 from the master",
+      "license_status": "Higgsfield account/credit route; founder owns generated output rights"
+    }
+  ]
+}

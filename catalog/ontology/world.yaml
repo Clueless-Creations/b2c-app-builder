@@ -1,0 +1,422 @@
+# World ontology (Ontology 101). Map of the consumer-app business.
+# Not a second catalog. Not the agent graph. Instances live in workspace files.
+# Runtime agents must not query this file. check:catalog is the only reader.
+schema_version: 1
+id: b2c:ontology.world
+uri: https://b2c-app-builder.dev/ns/world
+pref_label: Consumer-app world
+definition: Classes and relations for what a consumer-app business knows about
+  customers, product, market, money, and the evidence behind decisions.
+domain_sentence: A consumer-app company's customers, product, market, and money.
+  Not the founder's accounts, tools, or secrets. Not agent execution.
+in_scope:
+  - Primary customer and the problem they have
+  - Promise, wedge, competitors, and status quo
+  - App, core loop, features, and V1 requirements
+  - Offer, price, and entitlements once accepted
+  - Journey, flow, and screen that realize the core loop
+  - Evidence, decisions, hypotheses, metrics, and risks
+  - How the customer hears about the app
+out_of_scope:
+  - Catalog workflow, role, phase, lane, and domain IDs (agent graph and work thesaurus)
+  - Reducer work orders, grants, mandates, and operating parties
+  - Founder accounts, Doppler, paid tools, delegated access, and 2FA (operator plane)
+  - PostHog event taxonomy
+  - Implementation types for a specific UI stack
+  - Expert method text in knowledge/
+later:
+  - Store listing as its own class
+  - Copy string as a first-class class
+  - Experiment as a subclass of hypothesis
+planes:
+  - id: plane.world
+    pref_label: world
+    definition: What the consumer-app company knows about customers, product, market, and money. Price lives here. The Apple Developer login does not.
+    store: product.yaml
+  - id: plane.operator
+    pref_label: operator
+    definition: How the founder runs accounts, tools, secrets, and access. Outside the app. Already typed.
+    store: operations/business-access.json
+  - id: plane.operating
+    pref_label: operating
+    definition: How the agent system executes work. Work orders, grants, and reducer records.
+    store: kernel/operating-model
+instance_document:
+  path: product.yaml
+  status: active
+  renders: PRODUCT.md
+  schema_path: catalog/ontology/instance.schema.json
+reuse:
+  - source: schema.org Audience
+    maps_to: class.customer
+    note: The primary user is an audience, not schema.org Person and not operating-model Party.
+  - source: schema.org SoftwareApplication
+    maps_to: class.app
+    note: The consumer product itself.
+  - source: schema.org Offer
+    maps_to: class.offer
+    note: Commercial package. Do not mint a price until the founder accepts it.
+  - source: schema.org PriceSpecification
+    maps_to: class.price
+    note: Amount and period live on Price, not on Feature.
+  - source: kernel/operating-model record kinds
+    maps_to: class.decision
+    note: Operating records are a runtime instance plane. product.yaml is the authored instance plane. One class, two stores.
+competency_questions:
+  - id: cq.1
+    question: Who is the primary customer and what problem do they have?
+    class_ids: [class.customer, class.problem]
+  - id: cq.2
+    question: What promise and wedge does the app make against competitors and the status quo?
+    class_ids: [class.app, class.promise, class.wedge, class.competitor, class.status-quo]
+  - id: cq.3
+    question: What is the core loop, and which features are in V1, deferred, or non-goals?
+    class_ids: [class.core-loop, class.feature]
+  - id: cq.4
+    question: Which requirements must V1 satisfy?
+    class_ids: [class.requirement]
+  - id: cq.5
+    question: What price and entitlements does the accepted offer include?
+    class_ids: [class.offer, class.price, class.entitlement]
+  - id: cq.6
+    question: Which decisions are accepted, and on what evidence?
+    class_ids: [class.decision, class.evidence]
+  - id: cq.7
+    question: What metric measures whether the product works for that customer?
+    class_ids: [class.metric, class.customer]
+  - id: cq.8
+    question: Which journey, flows, and screens realize the core loop?
+    class_ids: [class.journey, class.flow, class.screen]
+  - id: cq.9
+    question: How does the customer hear about the app?
+    class_ids: [class.channel, class.customer]
+  - id: cq.10
+    question: What risks and hypotheses remain open?
+    class_ids: [class.risk, class.hypothesis]
+classes:
+  - id: class.world-thing
+    pref_label: world thing
+    definition: Abstract root of the consumer-app world. Never instantiated.
+    abstract: true
+    parent_ids: []
+  - id: class.actor
+    pref_label: actor
+    definition: A being in the market. Not an operating-model Party (founder or operator).
+    abstract: true
+    parent_ids: [class.world-thing]
+  - id: class.customer
+    pref_label: customer
+    definition: Primary user or ICP the app is for.
+    abstract: false
+    parent_ids: [class.actor]
+  - id: class.competitor
+    pref_label: competitor
+    definition: Another product a customer could choose instead of this app.
+    abstract: false
+    parent_ids: [class.actor]
+  - id: class.offering
+    pref_label: offering
+    definition: Something the business puts in the market.
+    abstract: true
+    parent_ids: [class.world-thing]
+  - id: class.app
+    pref_label: app
+    definition: The consumer product being built.
+    abstract: false
+    parent_ids: [class.offering]
+  - id: class.offer
+    pref_label: offer
+    definition: Commercial package a customer can buy. Exists only after a price decision.
+    abstract: false
+    parent_ids: [class.offering]
+  - id: class.product-spec
+    pref_label: product spec
+    definition: Specified shape of the product. Not the commercial package.
+    abstract: true
+    parent_ids: [class.world-thing]
+  - id: class.feature
+    pref_label: feature
+    definition: A named capability of the app, with a V1, deferred, or non-goal scope.
+    abstract: false
+    parent_ids: [class.product-spec]
+  - id: class.requirement
+    pref_label: requirement
+    definition: A user outcome with an observable acceptance condition.
+    abstract: false
+    parent_ids: [class.product-spec]
+  - id: class.core-loop
+    pref_label: core loop
+    definition: The one repeatable action that produces first value.
+    abstract: false
+    parent_ids: [class.product-spec]
+  - id: class.market-fact
+    pref_label: market fact
+    definition: A fact about demand, positioning, or reach. Not an actor.
+    abstract: true
+    parent_ids: [class.world-thing]
+  - id: class.problem
+    pref_label: problem
+    definition: The pain the customer already has.
+    abstract: false
+    parent_ids: [class.market-fact]
+  - id: class.promise
+    pref_label: promise
+    definition: What the app says it will do for that customer.
+    abstract: false
+    parent_ids: [class.market-fact]
+  - id: class.wedge
+    pref_label: wedge
+    definition: Why this app survives a one-week copy by the incumbent.
+    abstract: false
+    parent_ids: [class.market-fact]
+  - id: class.channel
+    pref_label: channel
+    definition: How the customer hears about the app.
+    abstract: false
+    parent_ids: [class.market-fact]
+  - id: class.status-quo
+    pref_label: status quo
+    definition: What the customer does today if they do not switch.
+    abstract: false
+    parent_ids: [class.market-fact]
+  - id: class.experience
+    pref_label: experience
+    definition: How a person moves through the app.
+    abstract: true
+    parent_ids: [class.world-thing]
+  - id: class.journey
+    pref_label: journey
+    definition: End-to-end path that serves the core loop.
+    abstract: false
+    parent_ids: [class.experience]
+  - id: class.flow
+    pref_label: flow
+    definition: A bounded interaction sequence inside a journey.
+    abstract: false
+    parent_ids: [class.experience]
+  - id: class.screen
+    pref_label: screen
+    definition: One presented state a person can see or hear.
+    abstract: false
+    parent_ids: [class.experience]
+  - id: class.commercial-term
+    pref_label: commercial term
+    definition: Money and access terms. Not a feature.
+    abstract: true
+    parent_ids: [class.world-thing]
+  - id: class.price
+    pref_label: price
+    definition: Amount and billing period of an offer. Founder-owned.
+    abstract: false
+    parent_ids: [class.commercial-term]
+  - id: class.entitlement
+    pref_label: entitlement
+    definition: Access a purchase unlocks.
+    abstract: false
+    parent_ids: [class.commercial-term]
+  - id: class.epistemic-record
+    pref_label: epistemic record
+    definition: Knowledge about the world, not a thing in the world.
+    abstract: true
+    parent_ids: [class.world-thing]
+  - id: class.evidence
+    pref_label: evidence
+    definition: Dated source that supports or weakens a claim.
+    abstract: false
+    parent_ids: [class.epistemic-record]
+  - id: class.decision
+    pref_label: decision
+    definition: An accepted product or commercial choice, with evidence. Distinct from a reducer decision record.
+    abstract: false
+    parent_ids: [class.epistemic-record]
+  - id: class.hypothesis
+    pref_label: hypothesis
+    definition: A testable claim that is not yet accepted.
+    abstract: false
+    parent_ids: [class.epistemic-record]
+  - id: class.metric
+    pref_label: metric
+    definition: A named measure of whether the product works.
+    abstract: false
+    parent_ids: [class.epistemic-record]
+  - id: class.risk
+    pref_label: risk
+    definition: A named threat to the product, business, or user.
+    abstract: false
+    parent_ids: [class.epistemic-record]
+slots:
+  - id: slot.customer.problem
+    pref_label: has problem
+    domain: class.customer
+    range_class: class.problem
+    cardinality: "1..1"
+  - id: slot.channel.customer
+    pref_label: reaches
+    domain: class.channel
+    range_class: class.customer
+    cardinality: "1..1"
+  - id: slot.competitor.app
+    pref_label: alternative to
+    domain: class.competitor
+    range_class: class.app
+    cardinality: "1..1"
+  - id: slot.app.promise
+    pref_label: promises
+    domain: class.app
+    range_class: class.promise
+    cardinality: "1..1"
+  - id: slot.app.core-loop
+    pref_label: has core loop
+    domain: class.app
+    range_class: class.core-loop
+    cardinality: "1..1"
+  - id: slot.app.features
+    pref_label: has features
+    domain: class.app
+    range_class: class.feature
+    cardinality: "1..n"
+  - id: slot.app.requirements
+    pref_label: has requirements
+    domain: class.app
+    range_class: class.requirement
+    cardinality: "0..n"
+  - id: slot.promise.wedge
+    pref_label: differentiates via
+    domain: class.promise
+    range_class: class.wedge
+    cardinality: "0..1"
+  - id: slot.feature.problem
+    pref_label: solves
+    domain: class.feature
+    range_class: class.problem
+    cardinality: "0..1"
+  - id: slot.feature.scope
+    pref_label: scope
+    domain: class.feature
+    range_enum: [required, excluded, non-goal]
+    cardinality: "1..1"
+  - id: slot.offer.price
+    pref_label: has price
+    domain: class.offer
+    range_class: class.price
+    cardinality: "1..1"
+  - id: slot.offer.entitlements
+    pref_label: grants
+    domain: class.offer
+    range_class: class.entitlement
+    cardinality: "1..n"
+  - id: slot.offer.features
+    pref_label: packages
+    domain: class.offer
+    range_class: class.feature
+    cardinality: "1..n"
+  - id: slot.entitlement.features
+    pref_label: unlocks
+    domain: class.entitlement
+    range_class: class.feature
+    cardinality: "1..n"
+  - id: slot.journey.core-loop
+    pref_label: serves
+    domain: class.journey
+    range_class: class.core-loop
+    cardinality: "1..1"
+  - id: slot.flow.journey
+    pref_label: belongs to
+    domain: class.flow
+    range_class: class.journey
+    cardinality: "1..1"
+  - id: slot.screen.journey
+    pref_label: belongs to
+    domain: class.screen
+    range_class: class.journey
+    cardinality: "1..1"
+  - id: slot.screen.flow
+    pref_label: appears in
+    domain: class.screen
+    range_class: class.flow
+    cardinality: "0..1"
+  - id: slot.decision.about
+    pref_label: about
+    domain: class.decision
+    range_class: class.world-thing
+    cardinality: "1..1"
+  - id: slot.decision.evidence
+    pref_label: based on
+    domain: class.decision
+    range_class: class.evidence
+    cardinality: "1..n"
+  - id: slot.evidence.about
+    pref_label: supports
+    domain: class.evidence
+    range_class: class.world-thing
+    cardinality: "1..1"
+  - id: slot.hypothesis.about
+    pref_label: about
+    domain: class.hypothesis
+    range_class: class.world-thing
+    cardinality: "1..1"
+  - id: slot.metric.measures
+    pref_label: measures
+    domain: class.metric
+    range_class: class.world-thing
+    cardinality: "1..1"
+  - id: slot.risk.threatens
+    pref_label: threatens
+    domain: class.risk
+    range_class: class.world-thing
+    cardinality: "1..1"
+instance_stores:
+  - path: product.yaml
+    class_ids:
+      - class.app
+      - class.customer
+      - class.problem
+      - class.promise
+      - class.wedge
+      - class.feature
+      - class.requirement
+      - class.core-loop
+      - class.offer
+      - class.price
+      - class.metric
+      - class.risk
+      - class.decision
+      - class.hypothesis
+  - path: strategy/RESEARCH.md
+    class_ids:
+      - class.evidence
+      - class.competitor
+      - class.status-quo
+      - class.channel
+      - class.hypothesis
+  - path: DESIGN.md
+    class_ids:
+      - class.journey
+      - class.flow
+      - class.screen
+  - path: revenue/REVENUE_OPS.md
+    class_ids:
+      - class.offer
+      - class.price
+      - class.entitlement
+homonyms_with_work:
+  - label: decision
+    world_class_id: class.decision
+    work_concept_id: record.decision
+    gloss: World decision is an accepted product or price choice. Work decision is a reducer operating record.
+  - label: evidence
+    world_class_id: class.evidence
+    work_concept_id: record.evidence
+    gloss: World evidence lives in RESEARCH.md. Work evidence is a reducer record that an attempt existed.
+  - label: metric
+    world_class_id: class.metric
+    work_concept_id: record.metric
+    gloss: World metric is the named measure in product.yaml. Work metric is an operating-model record keyed off an objective.
+  - label: hypothesis
+    world_class_id: class.hypothesis
+    work_concept_id: record.hypothesis
+    gloss: World hypothesis is a product claim under test. Work hypothesis is a reducer record.
+  - label: party
+    world_class_id: class.customer
+    work_concept_id: term.party
+    gloss: Customer is who the app is for. Party is founder, operator, or collaborator in the operating graph.

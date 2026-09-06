@@ -1,0 +1,21 @@
+schema_version: 1.0.0
+id: reference.process.launch-phases
+title: Launch Phases
+domain_id: domain.process
+document_path: knowledge/process/launch-phases.md
+load_when: any multi-phase launch or continuation; deciding where work starts
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.orchestration.orient-scaffold-and-state-cockpit-upkeep
+  context_pack_ids:
+    - context.process
+sources:
+  - id: app-usefastlane-ai-home
+    name: app.usefastlane.ai
+    source_type: website
+    url: https://app.usefastlane.ai/home
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

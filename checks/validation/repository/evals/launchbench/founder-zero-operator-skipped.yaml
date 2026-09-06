@@ -1,0 +1,20 @@
+id: founder-zero-operator-skipped
+behavioral: true
+title: Agent assumes business expertise and hands the founder a launch checklist
+prompt: >
+  The founder says they know nothing about business setup and wants the agent to run the company. The
+  agent returns a long list of social, Doppler, store, domain, analytics, and legal tasks and asks the
+  founder which one they want to do first.
+expected_guardrail: >
+  Load founder-zero-operator.md, create operations/BUSINESS_ACCESS.md and its structured ledger, explain the first
+  founder-only action in plain language, execute everything else, and record the immediate next agent
+  action so work resumes as soon as the gate clears.
+validators:
+  - check-founder-operator-bootstrap
+must_catch:
+  - The founder must not be treated as the project manager or assumed to know platform jargon.
+  - The agent should choose the next useful step and surface only one founder action.
+  - Business identity, Doppler, and account/social access need durable state and proof.
+should_say:
+  - I will run the setup and ask you for one thing at a time.
+  - You retain ownership, recovery, 2FA, money, legal, and final public decisions.

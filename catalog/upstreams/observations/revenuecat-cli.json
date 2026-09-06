@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "upstreamId": "revenuecat-cli",
+  "checkedAt": "2026-09-06T13:59:35.856259Z",
+  "method": "manual",
+  "latestStable": {
+    "tag": "v0.1.1",
+    "publishedAt": "2026-08-27T14:29:23Z",
+    "assets": []
+  },
+  "prereleases": [],
+  "branchHead": {
+    "branch": "main",
+    "sha": "1a3d2820b3166dd6d4cc4775902e43eeeab5f004",
+    "committedAt": "2026-09-02T09:12:07Z"
+  },
+  "releasesSinceBaseline": [],
+  "licenseSha256": "2a966901053e26d85533a8fb524aacf4894911220a41f326c9637ab821029523",
+  "licenseChanged": false,
+  "archived": false,
+  "host": null,
+  "unknowns": [
+    "Maintainer-assembled from the retained read-only GitHub archive intake; release list covers one page, not full history.",
+    "No host executable, provider session, SDK integration, or release asset binary was tested.",
+    "No release-to-commit ancestry comparison was made; releases since the reviewed source are not asserted."
+  ]
+}

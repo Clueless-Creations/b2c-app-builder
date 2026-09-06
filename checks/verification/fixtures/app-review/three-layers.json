@@ -1,0 +1,48 @@
+{
+  "capabilities": {
+    "observedCliVersion": "4.9.0",
+    "capabilitiesText": "version capabilities review metadata web webhooks",
+    "helpByCommand": {
+      "review": "status history doctor submit",
+      "metadata": "pull plan apply validate push --dry-run",
+      "web": "agreements status review auth",
+      "web-auth": "login status capabilities logout",
+      "web-review": "list show subscriptions iaps",
+      "webhooks": "list view ping deliveries serve"
+    },
+    "schemaIds": [
+      "APP_STORE_VERSION_APP_VERSION_STATE_UPDATED",
+      "AppStoreVersion",
+      "ReviewSubmission",
+      "ReviewSubmissionItem"
+    ]
+  },
+  "snapshot": {
+    "providerTimestamp": "2026-08-24T12:00:00.000Z",
+    "providerEventId": "apple-event-1",
+    "layers": [
+      {
+        "layer": "app_version",
+        "rawValue": "WAITING_FOR_REVIEW",
+        "providerObjectId": "asv-1",
+        "schemaId": "AppStoreVersion"
+      },
+      {
+        "layer": "review_submission",
+        "rawValue": "WAITING_FOR_REVIEW",
+        "providerObjectId": "rs-1",
+        "schemaId": "ReviewSubmission"
+      },
+      {
+        "layer": "submission_item",
+        "rawValue": "WAITING_FOR_REVIEW",
+        "providerObjectId": "rsi-1",
+        "schemaId": "ReviewSubmissionItem"
+      }
+    ],
+    "agreement": {
+      "rawStatus": "NONE",
+      "pending": false
+    }
+  }
+}

@@ -1,0 +1,23 @@
+schema_version: 1.0.0
+id: reference.design.design-worthiness
+title: Design Worthiness
+domain_id: domain.design
+document_path: knowledge/design/design-worthiness.md
+load_when: when a Design Room mutation needs the mechanical worthiness floor or its independent audit
+  must record the delegated taste decision before engineering harden, with no beauty score
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.research.research-backed-spec
+    - workflow.design.design-room
+    - workflow.growth.pre-launch-funnel-landing-waitlist
+    - workflow.design.design-system-audit
+  context_pack_ids:
+    - context.design
+applicability_notes: Orchestrate holes only. Do not rewrite eleven-star, emotional design, quality-lens,
+  vibecoded-tells, or motion craft. DESIGN.md stays producer-owned. Mechanical, attested, and independently
+  bound taste tiers decide what an agent may assert.
+sources: []
+source_exemption: Named standards (WCAG 2.2, Dieter Rams, Apple Human Interface Guidelines, Nielsen Norman
+  Group progressive disclosure) appear as names only. This package contains internal operating guidance
+  and has no external command-syntax claims.

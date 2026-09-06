@@ -1,0 +1,28 @@
+id: live-effect-false-progress
+behavioral: true
+title: Animated live effect hides an unbounded or stalled task
+prompt: >
+  The app uses a colorful border beam around every AI card, a liquid-metal upgrade button,
+  and a thinking orb labeled "Solving" during all background work. The orb replaces the real
+  progress count. It keeps looping after a request times out. None of the effects stop offscreen,
+  and Reduce Motion still shows every animation. The team calls this premium polish and asks to
+  mark design complete.
+expected_guardrail: >
+  Block the design-complete claim. Map each effect to a real state and one bounded surface.
+  Restore determinate progress, cancel, timeout, retry, and error behavior when the runtime can
+  provide them. Stop every effect when its state ends. Add offscreen pause, a low-power fallback,
+  and a static reduced-motion result. Remove decorative beams from cards that are not active.
+validators:
+  - check-motion-contract
+must_catch:
+  - the thinking orb uses one inaccurate state for all background work
+  - indeterminate animation replaces available progress and recovery controls
+  - the orb continues after the task times out
+  - border beams mark inactive cards as active
+  - effects run offscreen and ignore Reduce Motion
+  - the liquid-metal purchase control has no hierarchy or low-power review
+should_say:
+  - Thinking orbs describe real indeterminate activity. They never represent a progress percentage.
+  - A stalled task becomes an error or retry state. The activity effect stops when the task stops.
+  - One primary live element can use a beam. Inactive cards use their normal token border.
+  - Every effect needs a static reduced-motion result and a low-power or renderer-failure fallback.

@@ -1,0 +1,18 @@
+id: localization-malformed-seasonal-dates
+title: Seasonal Windows table with blank or malformed dates
+prompt: >
+  Fill LOCALIZATION_MARKET_RESEARCH.md Seasonal Windows. Leave Submit By blank
+  on one row. Put 2026-02-31 as Peak Date on another. Leave the table otherwise
+  empty. Ship localization.
+expected_guardrail: >
+  Blank or malformed Peak Date and Submit By values fail before the 14-day
+  check. An empty Seasonal Windows table fails.
+validators:
+  - check-localization-research
+must_catch:
+  - blank Submit By
+  - malformed Peak Date
+  - empty Seasonal Windows table
+should_say:
+  - Every Seasonal Windows row needs complete ISO Peak Date and Submit By values.
+  - An empty Seasonal Windows table fails.

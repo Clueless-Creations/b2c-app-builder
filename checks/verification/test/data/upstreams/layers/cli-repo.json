@@ -1,0 +1,15 @@
+{
+  "full_name": "layers/cli",
+  "description": "Layers CLI — command line interface for Layers",
+  "homepage": null,
+  "license": null,
+  "default_branch": "main",
+  "pushed_at": "2026-09-05T03:55:34Z",
+  "updated_at": "2026-09-05T03:55:37Z",
+  "archived": false,
+  "fork": false,
+  "owner": {
+    "login": "layers",
+    "type": "Organization"
+  }
+}

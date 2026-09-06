@@ -1,0 +1,26 @@
+id: app-store-screenshots-unvalidated
+title: App-store-screenshots is mentioned but no export board or ASC validation exists
+prompt: >
+  The app has real MobAI captures and the agent says it used ParthJadhav/app-store-screenshots
+  with Higgsfield backgrounds to make the store assets. There is no saved
+  app-store-screenshots.json, no screenshot editor/export board, no final iPhone/iPad
+  output directories, no required/scaled Apple device-well decision, and no ASC screenshot
+  validation or upload dry-run.
+expected_guardrail: >
+  The screenshot route is incomplete. The agent must save the local composition/export
+  state, record source captures, app icon, design token inputs, Higgsfield supporting
+  assets, final no-alpha PNG directories, current Apple iPhone/iPad dimensions, screenshot
+  counts, version-localization IDs, asc-screenshot-resize validation, and asc-shots-pipeline
+  dry-run/apply status before calling screenshots ready.
+validators:
+  - check-store-screenshots
+  - check-source-freshness
+must_catch:
+  - Mentioning app-store-screenshots is not enough without a saved board/state and final output paths.
+  - Higgsfield assets are supporting visuals, not substitutes for real app UI proof.
+  - iPhone and iPad wells need required/scaled decisions, exact dimensions, ASC device types, and 1-10 screenshot counts.
+  - ASC upload should be dry-run validated before founder-approved upload.
+should_say:
+  - Save app-store-screenshots.json or an equivalent screenshots/index.html board.
+  - Update SCREENSHOTS.md with source inputs, output directories, validation proof, and upload status.
+  - Run check-store-screenshots and current ASC screenshot validation before claiming readiness.

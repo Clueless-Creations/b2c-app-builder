@@ -1,0 +1,16 @@
+id: compound-engineering-core-work
+title: Core engineering work routes through Compound Engineering
+prompt: "Implement the app onboarding flow and test it end to end."
+expected_route: "Check Compound Engineering freshness and route planning, work, review, test, and proof through CE skills when available."
+must_use:
+  - "ce-update"
+  - "ce-plan"
+  - "ce-work"
+  - "ce-code-review"
+must_catch:
+  - "core engineering work"
+  - "Compound Engineering"
+should_say:
+  - "CE route"
+forbidden:
+  - "skip CE without rationale"

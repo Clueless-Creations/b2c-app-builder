@@ -1,0 +1,78 @@
+schema_version: 1.0.0
+id: reference.design.design-evidence-stack
+title: Design Evidence Stack
+domain_id: domain.design
+document_path: knowledge/design/design-evidence-stack.md
+load_when: before planning, creating, revising, auditing, or implementing any user-facing surface, component,
+  interaction, onboarding flow, paywall, store frame, or marketing design; use it to classify the decision, select
+  evidence sources, and record the evidence pass before mutation
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.design.brand-definition
+    - workflow.design.design-room
+    - workflow.design.ux-patterns-refero
+    - workflow.design.premium-mobile-craft
+    - workflow.design.content-assets-remotion-generated-visuals
+    - workflow.experience.emotional-experience-design-producer
+    - workflow.experience.emotional-design-audit-auditor
+    - workflow.experience.onboarding-system.onb-16-journey-graph
+    - workflow.experience.onboarding-system.onb-17-screen-control-paywall-contract
+    - workflow.experience.onboarding-system.onb-18-visual-design-prototype
+    - workflow.growth.pre-launch-funnel-landing-waitlist
+    - workflow.store.store-screenshots-production
+    - workflow.design.design-system-audit
+    - workflow.design.reference-pack-librarian
+    - workflow.orchestration.full-launch-program
+  context_pack_ids:
+    - context.design
+applicability_notes: This is the mandatory design-source router. Open only relevant sources. High-impact and high-risk surfaces require two complementary source lanes.
+sources:
+  - id: design-evidence-60fps
+    name: 60fps.design
+    source_type: inspiration_benchmark
+    url: https://60fps.design/
+    review_cadence_days: 30
+    claim_scope: Curated examples of motion and interaction details from shipped apps. Use examples to study mechanics. Do not copy source branding, assets, copy, exact layouts, or unadapted code.
+    last_review_date: 2026-08-20
+    reviewer: b2c-maintainers
+  - id: projectsbyif-patterns-catalogue
+    name: IF Design Patterns Catalogue
+    source_type: pattern_catalog
+    url: https://catalogue.projectsbyif.com/
+    review_cadence_days: 90
+    claim_scope: Trustworthy-service patterns for AI decisions, consent, authentication, data access, security, user control, and recovery. Pattern pages describe advantages and limitations. The catalog states a CC BY 4.0 license.
+    last_review_date: 2026-08-20
+    reviewer: b2c-maintainers
+  - id: abtest-design-library
+    name: abtest.design
+    source_type: experiment_library
+    url: https://abtest.design/
+    review_cadence_days: 30
+    claim_scope: Curated experiment examples for conversion, onboarding, checkout, engagement, retention, monetization, and referral. Treat results as hypothesis seeds. Verify each cited source before using a result or number.
+    last_review_date: 2026-08-20
+    reviewer: b2c-maintainers
+  - id: design-spells-gallery
+    name: Design Spells
+    source_type: inspiration_benchmark
+    url: https://www.designspells.com/
+    review_cadence_days: 30
+    claim_scope: Gallery of small design details, interactions, motion, and moments of delight. Use emotional principles and mechanics as inspiration. Do not copy branded assets or exact compositions.
+    last_review_date: 2026-08-20
+    reviewer: b2c-maintainers
+  - id: uxsnaps-breakdowns
+    name: UXSnaps
+    source_type: design_breakdown
+    url: https://www.uxsnaps.com/
+    review_cadence_days: 30
+    claim_scope: Product and flow breakdowns from real apps. Use them as critique and hypothesis input. Do not treat a breakdown as authority or causal proof.
+    last_review_date: 2026-08-20
+    reviewer: b2c-maintainers
+  - id: ui-playbook-components
+    name: UI Playbook
+    source_type: component_reference
+    url: https://uiplaybook.dev/
+    review_cadence_days: 30
+    claim_scope: Documented UI component guidance for function, states, implementation, and accessibility. Use it as a component specification seed. Confirm platform and accessibility details in current official documentation.
+    last_review_date: 2026-08-20
+    reviewer: b2c-maintainers

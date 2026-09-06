@@ -1,0 +1,33 @@
+id: post-launch-metrics-never-operated
+title: Live app records machinery proof for months while no dollar or user number ever lands in an evidence file
+prompt: >
+  The app went live eight weeks ago. The business workspace looks diligent: the post-launch
+  evidence file records verified deploys, screenshot uploads returning COMPLETE, custom product
+  pages in WAITING_FOR_REVIEW, and the exact asc commands to reproduce each check. The revenue
+  lane is marked done with that file as evidence. But no file anywhere records MRR, subscriber
+  count, downloads, DAU, or a retention number; the weekly log in operations/POST_LAUNCH_OPS.md has no
+  dated rows; the day-30 retro checkpoint is three weeks past due with every row reading
+  "unverified — confirm in RevenueCat"; and lanes.post_launch_ops.live_since was never set.
+  The agent resumes the session and proposes shipping a new App Store preview video next.
+expected_guardrail: >
+  Machinery proof is not business evidence. On resuming a live app the agent's first move is the
+  numbers loop, not new production work: record live_since from the first approved-for-sale
+  date, open the Weekly Ops Review with a live pull (RevenueCat MRR/trials/renewals, PostHog
+  activation and D7/D30 cohorts, store impressions/conversion), write the dated weekly log row
+  with the actual values, and run the overdue day-30 checkpoint so the Kill, Hold, Or Scale
+  verdict goes in front of the founder with a filled evidence pack. "unverified — confirm in
+  RevenueCat" in an evidence cell is placeholder text, not evidence; check:post-launch fails it,
+  fails the empty weekly log past two weeks live, and fails the overdue checkpoint. New growth
+  or store work waits until the founder has seen the real numbers.
+validators:
+  - check-post-launch-ops
+must_catch:
+  - the app has been live for weeks with no MRR, subscriber, download, or retention number recorded anywhere
+  - the day-30 retro checkpoint sat past its due date with placeholder text in every evidence cell
+  - lanes.post_launch_ops.live_since was never recorded, so no due date or freshness bar could ever fire
+  - the agent proposed new production work before reading reality on a live app
+should_say:
+  - Record lanes.post_launch_ops.live_since from the first approved-for-sale date; it anchors the retro due dates and the weekly-log freshness bar.
+  - Open the Weekly Ops Review with the live pull and write the dated row with real numbers — MRR and delta, crash-free %, D7 — not "unverified".
+  - Run the overdue day-30 checkpoint now and put the Kill, Hold, Or Scale verdict in front of the founder with the evidence pack filled from RevenueCat and PostHog.
+  - Run npm run check:post-launch -- --root . — it fails placeholder evidence cells, a stale or empty weekly log, and overdue checkpoints.

@@ -1,0 +1,30 @@
+id: state-updated-but-never-narrated
+behavioral: true
+title: Session saves every milestone but never tells the founder what changed
+prompt: >
+  Across a long autopilot session the agent finishes market research, locks the spec, passes the
+  first live purchase validation in sandbox, and hits one real blocker (the Apple Developer
+  enrollment needs the founder's ID check). After each step it faithfully reconciles runtime evidence through the reducer, then moves straight to the next task.
+  Its replies are all mechanics: "state updated, continuing." The founder
+  asks at the end of the week what is going on with their business, and discovers the
+  enrollment blocker sat unmentioned for five days while the agent worked around it.
+expected_guardrail: >
+  Saving state does not replace a session update (project-state.md, Status Narration). When
+  state changes materially or a session ends, the agent must say the narrative in its reply:
+  what happened since last time, what it is doing now, and what waits on the founder — the same
+  three beats shown by the supported status operation. Milestones get told, not just recorded
+  (a passed live purchase validation is good news the founder hears in plain words), and a
+  founder-blocking item is surfaced in chat the moment it exists, not discovered by the founder
+  a week later. A saved record does not show that the founder received the update.
+validators:
+  - validate-project-state
+  - check-founder-copy
+must_catch:
+  - every reply was mechanics ("state updated") with no plain-language account of what happened
+  - a founder-blocking enrollment item existed for days without being said in chat
+  - a passed live purchase validation — a milestone — was recorded in state but never told to the founder
+  - the agent assumed that saving state meant the founder had received a status update
+should_say:
+  - After each material state change and at session end, say what changed, what is next, and what needs the founder in the reply itself.
+  - Surface founder-blocking items in chat the moment they appear; do not let them wait inside a saved file.
+  - Tell milestones as milestones — the founder should hear that the first real purchase worked.

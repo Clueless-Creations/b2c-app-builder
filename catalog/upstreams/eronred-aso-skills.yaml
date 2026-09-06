@@ -1,0 +1,107 @@
+schema_version: 1
+id: eronred-aso-skills
+project: ASO and App Marketing Skills
+canonical_url: https://github.com/Eronred/aso-skills
+aliases:
+  - Eronred/aso-skills
+authors:
+  - name: Erencan
+    role: original author or copyright holder identified in the reviewed source
+maintainers:
+  - name: Erencan
+    role: current upstream maintainer
+copyright: Copyright (c) 2026 Erencan
+license:
+  spdx: MIT
+  status: verified
+  evidence_url: https://github.com/Eronred/aso-skills/blob/4df730f456c21e42b9a2ea2be89fb32caf787728/LICENSE
+  evidence_sha256: 7fdc99dd7d8c1242068d470c2a3f91d531a622dbcad57da91971389dbe5155ec
+  reviewed_revision: 4df730f456c21e42b9a2ea2be89fb32caf787728
+  notice_file: catalog/upstreams/notices/eronred-aso-skills.txt
+  scope: Selected screenshot strategy, preview and app-context guidance only; no tools, API integrations, samples
+    or marketing assets are imported.
+source_ids:
+  - github-com-eronred-aso-skills
+  - github-com-eronred-aso-skills-tree-main-skills
+relationships:
+  - kind: adapted-method
+    consumption: Selected published methods and tool procedures are adapted into existing builder guidance. No whole
+      skill, executable, native dependency or asset was installed by this contribution.
+    local_owners: &a1
+      - knowledge/store/screenshot-toolchain.md
+      - knowledge/store/app-store-listing-prep.md
+      - knowledge/process/tool-recipes/growth-and-store-routing.md
+    tests:
+      - checks/verification/fixtures/screenshot-upstreams.fixtures.ts
+    upstream_paths:
+      - README.md
+      - skills/screenshot-optimization/SKILL.md
+      - skills/app-preview-video/SKILL.md
+      - skills/app-marketing-context/SKILL.md
+    pin_authority: Reviewed immutable source commit and the existing builder package digest pin this guidance. A
+      host executable, editor project or native dependency is selected and verified separately.
+baselines:
+  reviewed_source:
+    revision: 4df730f456c21e42b9a2ea2be89fb32caf787728
+    observed_at: "2026-09-06"
+    by: b2c-contributor source review
+    note: Read-only metadata, license and selected documentation inspection; no tool or live provider execution.
+  reviewed_guidance:
+    revision: 4df730f456c21e42b9a2ea2be89fb32caf787728
+    observed_at: "2026-09-06"
+    by: b2c-contributor source review
+    note: Selected screenshot strategy, preview and app-context guidance only; no tools, API integrations, samples
+      or marketing assets are imported.
+support:
+  policy: Source-reviewed guidance only. Listed operations are mapped procedures, not newly executable provider
+    bindings or certification of installed versions.
+  versions:
+    - range: 4df730f456c21e42b9a2ea2be89fb32caf787728
+      status: untested
+      evidence:
+        - Source inspection and builder contract fixtures only; no live app or upstream binary execution.
+  operations:
+    - id: eronred-aso-skills-guidance
+      title: Selected ASO and App Marketing Skills procedures
+      keywords:
+        - screenshot
+        - copy
+        - preview
+        - localization
+        - appeeky
+      owners: *a1
+  unsupported_operations:
+    - id: automatic-install-or-upgrade
+      reason: Requires explicit target, selected compatible revision, scoped authority and independent verification.
+        No host installation, business repin or publication is automatic.
+    - id: unreviewed-upstream-features
+      reason: A new release or source commit creates a review candidate, never additional execution authority or
+        acceptance.
+  platforms: []
+adaptations:
+  - id: no-unmeasured-conversion-claims
+    description: Omit unsupported numerical conversion claims and fixed ten-slot prescriptions. Use supported
+      device/locale requirements, real evidence and founder-approved product claims.
+    owner: knowledge/store/screenshot-toolchain.md
+    intentional: true
+  - id: not-an-appeeky-connection
+    description: Using an ASO method does not select Appeeky, grant access, create app-marketing-context.md as a
+      competing authority, or authorize paid research.
+    owner: knowledge/store/screenshot-toolchain.md
+    intentional: true
+  - id: resolve-real-skill-paths
+    description: The inspected tree has screenshot-optimization, app-preview-video and app-marketing-context. It has
+      no skills/ios-screenshots/SKILL.md; do not attribute that skill to this revision.
+    owner: knowledge/store/screenshot-toolchain.md
+    intentional: true
+review:
+  owner: b2c-maintainers
+  cadence_days: 7
+  last_review: "2026-09-06"
+  status: current
+credits:
+  acknowledge: true
+  use: adapted
+  summary: Selected ASO and App Marketing Skills methods inform knowledge/store/screenshot-toolchain.md,
+    knowledge/store/app-store-listing-prep.md, knowledge/process/tool-recipes/growth-and-store-routing.md.
+    Original authors and license notices are retained; no live integration is claimed.

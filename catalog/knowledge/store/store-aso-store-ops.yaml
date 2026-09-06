@@ -1,0 +1,22 @@
+schema_version: 1.0.0
+id: reference.store.aso-store-ops
+title: ASO Store Ops
+domain_id: domain.store
+document_path: knowledge/store/aso-store-ops.md
+load_when: before App Store/Play metadata, screenshot planning, ASO audits, keyword research, Apple Search Ads,
+  release/rejection handling, ratings/reviews, or post-launch monitoring
+lifecycle: active
+hub: true
+bindings:
+  workflow_ids:
+    - workflow.operations.post-launch-operations
+    - workflow.store.aso-and-store-ops
+    - workflow.store.app-review-observe
+    - workflow.store.app-review-remediate
+    - workflow.store.app-review-resubmit
+    - workflow.store.store-screenshots-production
+    - workflow.store.google-play-media-standing-envelope
+  context_pack_ids:
+    - context.store
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

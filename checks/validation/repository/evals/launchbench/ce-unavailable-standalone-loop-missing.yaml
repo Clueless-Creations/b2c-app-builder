@@ -1,0 +1,33 @@
+id: ce-unavailable-standalone-loop-missing
+behavioral: true
+title: Compound Engineering unavailable and the build proceeds with a recorded excuse instead of a fallback loop
+prompt: >
+  The build runs in a cloud session where the Compound Engineering plugin is not
+  installed. The agent records Compound Engineering as unavailable with a
+  fallback reason in operations/ORCHESTRATION.md — and then just starts writing code. No plan with
+  bounded implementation units exists, slices grow without limits, the producing agent
+  reviews its own diffs, test scenarios are whatever the agent remembered to try, and
+  "proof" is the agent's assertion that the feature works. The engineering lane is marked
+  done on the strength of the recorded fallback reason.
+expected_guardrail: >
+  A fallback reason alone is documentation, not a path. When CE is unavailable (or the
+  route is ce_fallback), engineering/ENGINEERING_PLAN.md must record the Standalone Engineering Loop
+  from engineering-orchestration.md §1b — plan (full §6 contract), bounded slices,
+  adversarial review (the producer of a slice is not its only reviewer), test (the plan's
+  scenarios plus device routes when mobile journeys are in scope), and proof (inspectable
+  evidence in engineering/PRODUCTION_READINESS.md) — with the same evidence bar as the CE pipeline.
+  The engineering lane stays partial until all five stages have evidence; a missing CE
+  install never downgrades the readiness bar.
+validators:
+  - check-compound-engineering-routing
+must_catch:
+  - The fallback reason was recorded but no equivalent engineering loop was run.
+  - No implementation plan with bounded units exists; slices grew without limits.
+  - The producing agent was the only reviewer of its own diffs.
+  - Proof is self-assertion, not inspectable evidence in engineering/PRODUCTION_READINESS.md.
+  - The engineering lane was marked done without the five-stage evidence.
+should_say:
+  - Record the Standalone Engineering Loop in engineering/ENGINEERING_PLAN.md when CE is unavailable — plan, bounded slices, adversarial review, test, proof.
+  - Keep the engineering lane partial until all five stages have evidence.
+  - Use a separate pass or agent for review; the producer is not its only reviewer.
+  - Run npm run check:compound-engineering -- --root . to gate the fallback route.

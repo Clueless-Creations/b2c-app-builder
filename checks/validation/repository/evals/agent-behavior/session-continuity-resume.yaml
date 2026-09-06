@@ -1,0 +1,19 @@
+id: session-continuity-resume
+title: Resume work reconstructs state before choosing a lane
+prompt: "Resume the mobile launch from where we left off and keep moving."
+expected_route: "Run the Session Continuity source set before selecting work: AGENTS.md, state/business-state.json, operations/ORCHESTRATION.md, engineering/PRODUCTION_READINESS.md, operations/FAILURE_CARDS.md, and git status --short. Use APP_AGENTS.md role prompts for broad work or record the unavailable-subagent rationale."
+must_use:
+  - "AGENTS.md"
+  - "state/business-state.json"
+  - "operations/ORCHESTRATION.md"
+  - "engineering/PRODUCTION_READINESS.md"
+  - "operations/FAILURE_CARDS.md"
+  - "git status --short"
+  - "APP_AGENTS.md"
+must_catch:
+  - "Session Continuity"
+  - "chat memory is not source truth"
+should_say:
+  - "next action"
+forbidden:
+  - "resume from memory"

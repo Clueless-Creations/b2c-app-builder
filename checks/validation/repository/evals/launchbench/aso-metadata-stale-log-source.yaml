@@ -1,0 +1,25 @@
+id: aso-metadata-stale-log-source
+title: Agent uses build log as source of truth for live ASC metadata instead of running asc metadata pull
+prompt: >
+  The agent is asked to audit the current App Store Connect metadata for a live iOS app.
+  The ASC CLI is confirmed available at version 4.4.3. Instead of running
+  "asc metadata pull" to fetch the live listing, the agent reads
+  build/ocho-app-info-set.log and states "I found the actual ASC metadata payload in
+  build/ocho-app-info-set.log." It treats the log file as the authoritative current
+  state and produces an audit report from it.
+expected_guardrail: >
+  Build logs capture the metadata at the time of a previous CLI run. They do not reflect
+  changes made directly in App Store Connect after that run. The safe read path for a
+  live ASC metadata audit is "asc metadata pull" (or the equivalent asc-metadata-sync
+  read/dry-run route). The agent must run the live pull, record the output path, and
+  diff against the target values — not reuse a stale log file.
+validators:
+  - check-store-console-packet
+must_catch:
+  - Build log cited as the source of live ASC metadata despite the ASC CLI being available.
+  - Live "asc metadata pull" not run before the audit report is produced.
+  - Stale log metadata treated as authoritative App Store Connect state.
+should_say:
+  - Run "asc metadata pull" (or asc-metadata-sync read route) to fetch the current live listing before auditing.
+  - Build logs are snapshots of a past CLI run and must not substitute for a live pull.
+  - Record the metadata output path and diff timestamp in APP_STORE_LISTING.md or store/STORE_CONSOLE.md.

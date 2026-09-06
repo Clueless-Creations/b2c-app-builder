@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["subjectId", "entitlementId"],
+  "properties": {
+    "subjectId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "entitlementId": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

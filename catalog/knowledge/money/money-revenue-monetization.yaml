@@ -1,0 +1,148 @@
+schema_version: 1.0.0
+id: reference.money.revenue-monetization
+title: Revenue Monetization
+domain_id: domain.money
+document_path: knowledge/money/revenue-monetization.md
+load_when: before RevenueCat, Stripe, app-store products, web billing, web purchase links, funnels, paywalls,
+  subscriptions, webhooks, taxes, pricing, restore purchases, or entitlements — the Decision Matrix, Founder-Only Gates,
+  and anti-pattern digest hub; see revenuecat-and-store-products.md, stripe-and-web-billing.md,
+  paywall-pricing-and-experiments.md, and billing-health-and-reactivation.md for setup and procedure detail
+lifecycle: active
+hub: true
+bindings:
+  workflow_ids:
+    - workflow.store.app-store-listing-prep-packet
+    - workflow.store.google-play-release
+    - workflow.growth.paid-user-acquisition-system
+    - workflow.growth.viral-growth-loop
+    - workflow.money.revenue-monetization
+    - workflow.money.experimentation
+  context_pack_ids:
+    - context.money
+sources:
+  - id: developer-android-com-google-play-billing-lifecycle-subscriptions
+    name: developer.android.com
+    source_type: official_docs
+    url: https://developer.android.com/google/play/billing/lifecycle/subscriptions
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-app-store-review-guidelines
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/app-store/review/guidelines
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: docs-stripe-com-billing-subscriptions-webhooks
+    name: docs.stripe.com
+    source_type: docs
+    url: https://docs.stripe.com/billing/subscriptions/webhooks
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: docs-stripe-com-customer-management
+    name: docs.stripe.com
+    source_type: docs
+    url: https://docs.stripe.com/customer-management
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: docs-stripe-com-get-started-checklist-go-live
+    name: docs.stripe.com
+    source_type: docs
+    url: https://docs.stripe.com/get-started/checklist/go-live
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: docs-stripe-com-payments-advanced-tax
+    name: docs.stripe.com
+    source_type: docs
+    url: https://docs.stripe.com/payments/advanced/tax
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: revenuecat-com-blog-growth-how-to-build-a-ua-system-when-youre-a-one-person-team
+    name: www.revenuecat.com
+    source_type: website
+    url: https://www.revenuecat.com/blog/growth/how-to-build-a-ua-system-when-youre-a-one-person-team
+    review_cadence_days: 7
+    claim_scope: "RevenueCat growth article used for the solo-founder paid UA system: one channel, creative production,
+      tracking baseline, blended report, RevenueCat LTV/CPA review, and cadence."
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: revenuecat-com-docs-projects-configuring-products
+    name: www.revenuecat.com
+    source_type: docs
+    url: https://www.revenuecat.com/docs/projects/configuring-products
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: revenuecat-com-docs-projects-connect-a-store
+    name: www.revenuecat.com
+    source_type: docs
+    url: https://www.revenuecat.com/docs/projects/connect-a-store
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: revenuecat-com-docs-web-web-billing-overview
+    name: www.revenuecat.com
+    source_type: docs
+    url: https://www.revenuecat.com/docs/web/web-billing/overview
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: revenuecat-com-docs-web-web-billing-redemption-links
+    name: www.revenuecat.com
+    source_type: docs
+    url: https://www.revenuecat.com/docs/web/web-billing/redemption-links
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: revenuecat-com-docs-web-web-billing-web-purchase-links
+    name: www.revenuecat.com
+    source_type: docs
+    url: https://www.revenuecat.com/docs/web/web-billing/web-purchase-links
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: revenuecat-com-state-of-subscription-apps
+    name: www.revenuecat.com
+    source_type: website
+    url: https://www.revenuecat.com/state-of-subscription-apps
+    review_cadence_days: 7
+    claim_scope: State of Subscription Apps benchmark. Cited figures verified against the SOSA 2026 PDF on 2026-06-05; added
+      involuntary-churn (Google Play ~31% vs App Store ~14%), AI-retention (~41% higher RPP / ~30% faster churn),
+      paid-intro-offer, first-renewal-inflection / Y1-retention-softening, reactivation-by-plan-duration (monthly ~20% /
+      weekly ~9% / annual ~5%), and web-revenue-adoption (~41% top-tier vs ~1.3% hobby) findings.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: support-google-com-googleplay-android-developer-answer-9858738
+    name: support.google.com
+    source_type: support_docs
+    url: https://support.google.com/googleplay/android-developer/answer/9858738?hl=en
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: platform-claude-com-docs-en-about-claude-pricing
+    name: platform.claude.com
+    source_type: official_docs
+    url: https://platform.claude.com/docs/en/about-claude/pricing
+    review_cadence_days: 30
+    claim_scope: Per-Request Cost Model §4 — the four token-cost components (input, output, cache write, cache read)
+      each carry their own rate, and the rule that a request or output limit must count the real token payload or
+      call the provider's token-counting endpoint, never a character estimate.
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers

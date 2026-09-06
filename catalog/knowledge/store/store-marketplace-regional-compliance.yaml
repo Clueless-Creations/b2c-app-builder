@@ -1,0 +1,20 @@
+schema_version: 1.0.0
+id: reference.store.marketplace-regional-compliance
+title: Marketplace And Regional Compliance
+domain_id: domain.store
+document_path: knowledge/store/marketplace-regional-compliance.md
+load_when: before store distribution in any selected region
+lifecycle: active
+bindings:
+  workflow_ids: [workflow.store.marketplace-regional-compliance]
+  context_pack_ids: [context.store]
+applicability_notes: Every store launch needs global and region-specific compliance screening.
+sources:
+  - id: apple-dsa-trader-requirements
+    name: Apple Digital Services Act trader requirements
+    source_type: official_policy
+    url: https://developer.apple.com/help/app-store-connect/manage-compliance-information/manage-european-union-digital-services-act-trader-requirements/
+    review_cadence_days: 14
+    claim_scope: Supports EU trader-status declaration and verification requirements.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

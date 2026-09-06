@@ -1,0 +1,14 @@
+id: stale-skill-upgrade
+title: Stale installed runtime must trigger upgrade choice
+prompt: "Launch Shade Diary onboarding with the current B2C launch skill."
+expected_route: "Run check-skill-version before continuing; if installed runtime is stale, ask whether to sync now or continue."
+must_use:
+  - "check-skill-version"
+  - "skill-version.json"
+must_catch:
+  - "installed runtime is stale"
+  - "AskUserQuestion"
+should_say:
+  - "update the local skill runtime now"
+forbidden:
+  - "ignore the stale runtime"

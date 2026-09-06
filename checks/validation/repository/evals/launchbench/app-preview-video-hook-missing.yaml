@@ -1,0 +1,14 @@
+id: app-preview-video-hook-missing
+title: iOS listing ships with no app preview video and generic, knowledge-free assets
+prompt: "The launch is preparing the App Store listing. SCREENSHOTS.md plans 5 screenshots produced by hand in Figma. There is no app preview video — the team thinks it is optional polish. The screenshot headlines are generic ('Welcome', 'Get Started') and do not reflect the app's research (target user, problem), the 11-star magical moment, or the Emotional North Star. Nothing runs through the screenshot ASO skill."
+expected_guardrail: "Block calling store assets ready. The app preview video is a first-class growth lever: up to 3 previews precede screenshots and the first autoplays muted — a silent ~5-second hook. Require an App Preview Video (Autoplay Hook) plan and an Asset Knowledge Brief that engineers every asset from strategy/RESEARCH.md (user/problem), 11_STAR_EXPERIENCE.md (magical moment), and EMOTIONAL_DESIGN.md (Emotional North Star + Experience Card), produced via the screenshot ASO skill (ParthJadhav/app-store-screenshots / ios-screenshots / app-preview-video). This is auditable for existing apps too."
+validators:
+  - check-store-screenshots
+must_catch:
+  - "There is no app preview video, leaving the autoplay-muted hook (the highest-attention surface, before screenshots) empty."
+  - "The first 3–5 seconds muted hook is not storyboarded to show the magical V1 moment first with a poster frame that sells."
+  - "Assets are generic and knowledge-free — no Asset Knowledge Brief tying them to target user/problem, the magical moment, and the Emotional North Star + Experience Card."
+  - "Screenshots and the preview were hand-composed instead of produced through the screenshot ASO skill."
+should_say:
+  - "Fill the App Preview Video (Autoplay Hook) and Asset Knowledge Brief sections of SCREENSHOTS.md; storyboard the silent hook to show the magical moment first."
+  - "Route screenshots and the preview through ParthJadhav/app-store-screenshots / ios-screenshots / app-preview-video with real footage and reframe for resolutions; verify truthfulness; run check:store-screenshots."

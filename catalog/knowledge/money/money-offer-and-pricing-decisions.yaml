@@ -1,0 +1,15 @@
+schema_version: 1.0.0
+id: reference.money.offer-and-pricing-decisions
+title: Offer And Pricing Decisions
+domain_id: domain.money
+document_path: knowledge/money/offer-and-pricing-decisions.md
+load_when: research proposes an offer or monetization locks a production price; separate hypotheses, offer evidence, and exact founder authority
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.research.research-backed-spec
+    - workflow.research.spec-red-team-audit
+    - workflow.money.revenue-monetization
+  context_pack_ids: []
+sources: []
+source_exemption: Internal product-evidence and authority contract; no external price or market claim.

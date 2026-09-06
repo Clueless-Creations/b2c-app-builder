@@ -1,0 +1,34 @@
+schema_version: 1.0.0
+id: reference.design.landing-motion-craft
+title: Landing Motion Craft
+domain_id: domain.design
+document_path: knowledge/design/landing-motion-craft.md
+load_when: before building or animating any landing page, funnel page, or web marketing surface
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.design.design-room
+    - workflow.growth.pre-launch-funnel-landing-waitlist
+    - workflow.design.reference-pack-librarian
+    - workflow.growth.landing-funnel-audit
+  context_pack_ids: []
+sources:
+  - id: motionsites-ai
+    name: motionsites.ai
+    source_type: inspiration_benchmark
+    url: https://motionsites.ai/
+    review_cadence_days: 90
+    claim_scope: Visual quality benchmark for the landing motion craft lane (animated landing-page section gallery).
+      Inspiration reference only, never a command-syntax source.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: motion-dev-docs-react
+    name: motion.dev
+    source_type: docs
+    url: https://motion.dev/docs/react
+    review_cadence_days: 7
+    claim_scope: Motion (framer-motion's successor, import from motion/react) React animation docs. Web-surface library used
+      by the Design Room render app and launch web surfaces (landing, funnel); never used in the shipped mobile binary.
+      Refresh before changing motion API/setup guidance.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

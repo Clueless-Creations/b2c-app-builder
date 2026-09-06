@@ -1,0 +1,270 @@
+{
+  "$comment": "Declarative PostHog resources for the platform project (one dedicated PostHog project, US Cloud). Applied by tooling/provision-posthog-platform.ts, which is idempotent — re-running matches on flag key and insight name rather than creating duplicates. These resources exist live; this file is the reproducible definition, so edit here and re-run rather than editing in the PostHog UI.",
+  "featureFlags": [
+    {
+      "key": "self-serve-checkout",
+      "name": "Reveals Stripe Checkout. Off means the interest collector renders instead. M9 is deferred, so this stays off until that release ships.",
+      "active": true,
+      "tags": [
+        "platform",
+        "billing"
+      ],
+      "evaluation_runtime": "all",
+      "$comment": "active:true with a 0% rollout, not active:false. An inactive flag and a 0% flag both evaluate false, but 0% keeps the release condition visible and lets the rollout be raised without reactivating. The app Worker fails closed regardless — see resolveCheckoutGate.",
+      "filters": {
+        "groups": [
+          {
+            "properties": [],
+            "rollout_percentage": 0
+          }
+        ]
+      }
+    }
+  ],
+  "dashboard": {
+    "name": "Signup and activation funnel",
+    "description": "Landing through first successful MCP call, plus the interest collector standing in for deferred Checkout.",
+    "pinned": true,
+    "tags": [
+      "platform"
+    ]
+  },
+  "insights": [
+    {
+      "name": "Signup funnel — landing to first API key",
+      "description": "The funnel that is fully measurable today. First-key conversion uses first_time_for_user, so a user with several keys counts once.",
+      "query": {
+        "kind": "InsightVizNode",
+        "source": {
+          "kind": "FunnelsQuery",
+          "dateRange": {
+            "date_from": "-30d"
+          },
+          "series": [
+            {
+              "kind": "EventsNode",
+              "event": "landing_viewed",
+              "custom_name": "Landed"
+            },
+            {
+              "kind": "EventsNode",
+              "event": "signin_started",
+              "custom_name": "Started sign-in"
+            },
+            {
+              "kind": "EventsNode",
+              "event": "signin_completed",
+              "custom_name": "Signed in"
+            },
+            {
+              "kind": "EventsNode",
+              "event": "account_created",
+              "custom_name": "Account created"
+            },
+            {
+              "kind": "EventsNode",
+              "event": "api_key_created",
+              "math": "first_time_for_user",
+              "custom_name": "First API key"
+            }
+          ],
+          "funnelsFilter": {
+            "funnelOrderType": "ordered",
+            "funnelWindowInterval": 14,
+            "funnelWindowIntervalUnit": "day",
+            "layout": "vertical",
+            "funnelVizType": "steps",
+            "funnelStepReference": "total"
+          }
+        }
+      }
+    },
+    {
+      "name": "Activation funnel — account to first MCP call",
+      "description": "KNOWN GAP until M4: MCP events are keyed on the access-policy subject, not account_id, so the last step cannot convert yet. A zero here is a stitching gap, not a product problem.",
+      "query": {
+        "kind": "InsightVizNode",
+        "source": {
+          "kind": "FunnelsQuery",
+          "dateRange": {
+            "date_from": "-90d"
+          },
+          "series": [
+            {
+              "kind": "EventsNode",
+              "event": "account_created",
+              "custom_name": "Account created"
+            },
+            {
+              "kind": "EventsNode",
+              "event": "api_key_created",
+              "math": "first_time_for_user",
+              "custom_name": "First API key"
+            },
+            {
+              "kind": "EventsNode",
+              "event": "mcp_call_succeeded",
+              "math": "first_time_for_user",
+              "custom_name": "First MCP call"
+            }
+          ],
+          "funnelsFilter": {
+            "funnelOrderType": "ordered",
+            "funnelWindowInterval": 30,
+            "funnelWindowIntervalUnit": "day",
+            "layout": "vertical",
+            "funnelVizType": "steps",
+            "funnelStepReference": "total"
+          }
+        }
+      }
+    },
+    {
+      "name": "Upgrade intent to interest submitted",
+      "description": "Conversion of the surface standing in for Checkout while self-serve-checkout is off. This is the number that says whether the waitlist is worth converting at M9.",
+      "query": {
+        "kind": "InsightVizNode",
+        "source": {
+          "kind": "FunnelsQuery",
+          "dateRange": {
+            "date_from": "-30d"
+          },
+          "series": [
+            {
+              "kind": "EventsNode",
+              "event": "upgrade_intent_clicked",
+              "custom_name": "Clicked upgrade"
+            },
+            {
+              "kind": "EventsNode",
+              "event": "interest_submitted",
+              "custom_name": "Submitted interest"
+            }
+          ],
+          "funnelsFilter": {
+            "funnelOrderType": "ordered",
+            "funnelWindowInterval": 1,
+            "funnelWindowIntervalUnit": "day",
+            "layout": "vertical",
+            "funnelVizType": "steps",
+            "funnelStepReference": "total"
+          }
+        }
+      }
+    },
+    {
+      "name": "Interest submissions by acquisition source",
+      "description": "Self-reported source_key on interest_submitted. D1 is the system of record; this is the funnel view of the same answer.",
+      "query": {
+        "kind": "InsightVizNode",
+        "source": {
+          "kind": "TrendsQuery",
+          "dateRange": {
+            "date_from": "-90d"
+          },
+          "series": [
+            {
+              "kind": "EventsNode",
+              "event": "interest_submitted",
+              "math": "total"
+            }
+          ],
+          "breakdownFilter": {
+            "breakdowns": [
+              {
+                "property": "source_key",
+                "type": "event"
+              }
+            ]
+          },
+          "trendsFilter": {
+            "display": "ActionsBarValue"
+          }
+        }
+      }
+    },
+    {
+      "name": "Sign-in failures by reason",
+      "description": "Reason codes only — never messages. A spike in token_invalid or state_mismatch is an auth regression, not user error.",
+      "query": {
+        "kind": "InsightVizNode",
+        "source": {
+          "kind": "TrendsQuery",
+          "dateRange": {
+            "date_from": "-14d"
+          },
+          "series": [
+            {
+              "kind": "EventsNode",
+              "event": "signin_failed",
+              "math": "total"
+            }
+          ],
+          "breakdownFilter": {
+            "breakdowns": [
+              {
+                "property": "reason",
+                "type": "event"
+              }
+            ]
+          },
+          "trendsFilter": {
+            "display": "ActionsLineGraph"
+          }
+        }
+      }
+    },
+    {
+      "name": "Daily active MCP subjects",
+      "description": "mcp_call_succeeded is deduped to one event per subject per UTC day, so a unique-persons count is the daily active figure by construction.",
+      "query": {
+        "kind": "InsightVizNode",
+        "source": {
+          "kind": "TrendsQuery",
+          "dateRange": {
+            "date_from": "-30d"
+          },
+          "interval": "day",
+          "series": [
+            {
+              "kind": "EventsNode",
+              "event": "mcp_call_succeeded",
+              "math": "dau"
+            }
+          ],
+          "trendsFilter": {
+            "display": "ActionsLineGraph"
+          }
+        }
+      }
+    },
+    {
+      "name": "MCP retention after first call",
+      "description": "Do people who make a first MCP call keep using it? Target and return are both mcp_call_succeeded, so this stays inside the MCP identity space and is unaffected by the M4 stitching gap.",
+      "query": {
+        "kind": "InsightVizNode",
+        "source": {
+          "kind": "RetentionQuery",
+          "dateRange": {
+            "date_from": "-60d"
+          },
+          "retentionFilter": {
+            "period": "Week",
+            "retentionType": "retention_first_time",
+            "totalIntervals": 8,
+            "targetEntity": {
+              "id": "mcp_call_succeeded",
+              "type": "events",
+              "name": "mcp_call_succeeded"
+            },
+            "returningEntity": {
+              "id": "mcp_call_succeeded",
+              "type": "events",
+              "name": "mcp_call_succeeded"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

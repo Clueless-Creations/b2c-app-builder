@@ -1,0 +1,54 @@
+schema_version: 1.0.0
+id: reference.orchestration.isolated-review
+title: Isolated Review
+domain_id: domain.orchestration
+document_path: knowledge/orchestration/isolated-review.md
+load_when: before dispatching any producer whose surface a second agent must accept, before dispatching an auditor
+  node, when writing or checking the review ledger in operations/ORCHESTRATION.md, and when a review, rubric, or fix
+  loop is contested
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.orchestration.full-launch-program
+    - workflow.orchestration.full-launch-closeout
+    - workflow.research.spec-red-team-audit
+    - workflow.design.reference-pack-librarian
+    - workflow.design.design-system-audit
+    - workflow.growth.landing-funnel-audit
+    - workflow.words.copy-review-audit
+    - workflow.experience.emotional-design-audit-auditor
+    - workflow.experience.onboarding-system.onb-20-adversarial-qa
+    - workflow.engineering.engineering-orchestration-ce-production-readiness
+  context_pack_ids:
+    - context.orchestration
+applicability_notes: The producer never accepts its own surface. Auditor nodes write findings only. Every producer-to-auditor
+  pair is a review-ledger row that check:orchestration verifies. Runtime isolation (separate subagent or workflow step
+  with read-only tools) is the dispatcher's job; record used:false with a reason when the runtime cannot isolate.
+sources:
+  - id: code-claude-com-docs-en-sub-agents
+    name: Claude Code subagents
+    source_type: official_docs
+    url: https://code.claude.com/docs/en/sub-agents
+    review_cadence_days: 30
+    claim_scope: Official Claude Code subagent documentation for context preservation and tool limitation; the basis for
+      the fresh-context auditor shape and the read-only tool list on the auditor dispatch brief.
+    last_review_date: 2026-09-03
+    reviewer: b2c-maintainers
+  - id: code-claude-com-docs-en-workflows
+    name: Claude Code dynamic workflows
+    source_type: official_docs
+    url: https://code.claude.com/docs/en/workflows
+    review_cadence_days: 30
+    claim_scope: Official Claude Code Dynamic Workflows documentation; the basis for preferring adversarial-verification
+      and tournament shapes when the runtime supports scripted isolation.
+    last_review_date: 2026-09-03
+    reviewer: b2c-maintainers
+  - id: anthropic-com-engineering-how-we-contain-claude
+    name: Anthropic Claude containment
+    source_type: official_docs
+    url: https://www.anthropic.com/engineering/how-we-contain-claude
+    review_cadence_days: 30
+    claim_scope: Official Anthropic containment guidance; the basis for the quarantine rule that keeps raw untrusted pages
+      away from the acting agent.
+    last_review_date: 2026-09-03
+    reviewer: b2c-maintainers

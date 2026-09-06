@@ -1,0 +1,15 @@
+schema_version: 1.0.0
+id: reference.process.tool-recipes.visual-and-motion-production
+title: Visual And Motion Production
+domain_id: domain.process
+document_path: knowledge/process/tool-recipes/visual-and-motion-production.md
+load_when: Higgsfield or Remotion production routing, including the seven named chained recipes for
+  ads/UGC/virality/seasonal restyle and the UGC-realism prompt structure for believable-person clips — routed from
+  tool-recipes.md
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.design.content-assets-remotion-generated-visuals
+  context_pack_ids: []
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

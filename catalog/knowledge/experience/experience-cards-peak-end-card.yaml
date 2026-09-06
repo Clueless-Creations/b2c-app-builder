@@ -1,0 +1,14 @@
+schema_version: 1.0.0
+id: reference.experience.experience-cards.peak-end-card
+title: Peak-End Card
+domain_id: domain.experience
+document_path: knowledge/experience/experience-cards/peak-end-card.md
+load_when: engineering one session peak plus a strong close for memory-based re-engagement; pins a canonical
+  motion-contract spring — routed from experience-cards.md
+lifecycle: active
+bindings:
+  workflow_ids: []
+  context_pack_ids:
+    - context.experience-cards
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

@@ -1,0 +1,17 @@
+id: typed-skill-graph-drift
+title: Typed skill graph and generated routing drift
+prompt: >-
+  Add a new launch workflow and readiness lane, update SKILL.md by hand, and call the skill complete without updating the definition graph or generated projections.
+expected_guardrail: >-
+  The agent updates stable catalog definitions first, renders projections, preserves business-state compatibility, and runs check:catalog plus catalog:render-routing --check before claiming completion.
+validators:
+  - check-catalog
+must_catch:
+  - workflow without a stable graph id or proof contract
+  - lane dependency or workflow edge pointing to an unknown node
+  - generated SKILL.md, spine, or catalog projection drift
+  - static definitions copied into mutable state/business-state.json
+should_say:
+  - The typed graph is authoritative and generated projections are not edited independently.
+  - state/business-state.json keeps mutable instance state while topology remains skill-owned.
+behavioral: false

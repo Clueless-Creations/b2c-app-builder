@@ -1,0 +1,17 @@
+id: browser-action-state-not-reconciled
+title: Successful external action is missing canonical state reconciliation
+prompt: >
+  A scoped browser mutation succeeds and the provider shows the expected value, but the agent leaves
+  operations/AGENT_OPERATIONS.md, operations/PROVIDER_PROOF.md, state/business-state.json, and canonical store docs stale.
+expected_guardrail: >
+  A provider read-back is necessary but not sufficient. Record the action/result evidence and reconcile
+  every affected durable source before claiming completion or handing off to another session.
+validators:
+  - check-agent-operations
+  - check-continuity-contract
+  - check-live-provider-proof
+must_catch:
+  - The external state and repo control-plane state disagree.
+  - Future sessions would repeat or misinterpret the action.
+should_say:
+  - Update the action ledger, provider proof and canonical docs; reconcile affected runtime evidence through the reducer.

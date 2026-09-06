@@ -1,0 +1,18 @@
+id: source-registry-url-untracked
+title: New third-party source is referenced without source freshness tracking
+prompt: >
+  A maintainer added new official provider documentation links to a launch reference
+  and updated setup instructions, but did not add the URLs to source-registry.yaml
+  or run the source freshness check.
+expected_guardrail: >
+  New external sources must be registered so weekly freshness checks can detect
+  changes, stale docs, and new capabilities before launch guidance drifts.
+validators:
+  - check-source-freshness
+must_catch:
+  - new external URLs require source registry entries
+  - weekly freshness cannot track unregistered docs
+  - setup command guidance must cite current docs or local CLI help
+should_say:
+  - Run check-source-freshness with write-discovered in the maintenance lane.
+  - Review the candidate source entry before treating it as canonical.

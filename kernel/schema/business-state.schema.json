@@ -1,0 +1,909 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:b2c:core:business-state-schema",
+  "title": "Business State v2",
+  "$comment": "Reducer-owned business identity, narrative, lane progress, provider selections, and operating records. Control documents own work authority. Lane objects permit domain-specific fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "updatedAt",
+    "narrative",
+    "project",
+    "lanes",
+    "founderGates"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": "2.0.0"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "narrative": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sinceLastTime",
+        "rightNow",
+        "yourCall",
+        "lastCelebratedPhase"
+      ],
+      "properties": {
+        "sinceLastTime": {
+          "type": "string"
+        },
+        "rightNow": {
+          "type": "string"
+        },
+        "yourCall": {
+          "type": "string"
+        },
+        "lastCelebratedPhase": {
+          "type": "string"
+        }
+      }
+    },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "slug",
+        "owner",
+        "phase",
+        "launchScope",
+        "platforms",
+        "bundleIds",
+        "publicUrls"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "slug": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "type": "string"
+        },
+        "phase": {
+          "type": "string",
+          "pattern": "^phase_"
+        },
+        "launchScope": {
+          "enum": [
+            "essentials",
+            "full"
+          ]
+        },
+        "kickoffDate": {
+          "anyOf": [
+            {
+              "const": ""
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "platforms": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "ios",
+              "android"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "supportedDeviceFamilies": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "iphone",
+              "ipad"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "bundleIds": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "ios",
+            "android"
+          ],
+          "properties": {
+            "ios": {
+              "type": "string"
+            },
+            "android": {
+              "type": "string"
+            }
+          }
+        },
+        "publicUrls": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "landing",
+            "privacy",
+            "terms"
+          ],
+          "properties": {
+            "landing": {
+              "type": "string"
+            },
+            "privacy": {
+              "type": "string"
+            },
+            "terms": {
+              "type": "string"
+            }
+          }
+        },
+        "repositoryProfile": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "revision",
+            "acceptedAt"
+          ],
+          "properties": {
+            "id": {
+              "enum": [
+                "app-source",
+                "founder-operating",
+                "public-package",
+                "marketing-site"
+              ]
+            },
+            "revision": {
+              "type": "string",
+              "minLength": 1
+            },
+            "acceptedAt": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "lanes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "paid_tool_routing",
+        "secrets",
+        "security",
+        "research",
+        "traceability",
+        "experience",
+        "product",
+        "design",
+        "emotional_design",
+        "content_assets",
+        "analytics_attribution",
+        "paid_user_acquisition",
+        "onboarding",
+        "revenue",
+        "store_console",
+        "apple_signing",
+        "privacy_legal",
+        "email",
+        "orchestration",
+        "engineering",
+        "growth",
+        "post_launch_ops"
+      ],
+      "properties": {
+        "paid_tool_routing": {
+          "$ref": "#/$defs/lane"
+        },
+        "secrets": {
+          "$ref": "#/$defs/lane"
+        },
+        "security": {
+          "$ref": "#/$defs/lane"
+        },
+        "research": {
+          "$ref": "#/$defs/lane"
+        },
+        "traceability": {
+          "$ref": "#/$defs/lane"
+        },
+        "experience": {
+          "$ref": "#/$defs/lane"
+        },
+        "product": {
+          "$ref": "#/$defs/lane"
+        },
+        "design": {
+          "$ref": "#/$defs/lane"
+        },
+        "emotional_design": {
+          "$ref": "#/$defs/lane"
+        },
+        "content_assets": {
+          "$ref": "#/$defs/lane"
+        },
+        "analytics_attribution": {
+          "$ref": "#/$defs/lane"
+        },
+        "paid_user_acquisition": {
+          "$ref": "#/$defs/lane"
+        },
+        "onboarding": {
+          "$ref": "#/$defs/lane"
+        },
+        "revenue": {
+          "$ref": "#/$defs/lane"
+        },
+        "store_console": {
+          "$ref": "#/$defs/lane"
+        },
+        "apple_signing": {
+          "$ref": "#/$defs/lane"
+        },
+        "privacy_legal": {
+          "$ref": "#/$defs/lane"
+        },
+        "email": {
+          "$ref": "#/$defs/lane"
+        },
+        "orchestration": {
+          "$ref": "#/$defs/lane"
+        },
+        "engineering": {
+          "$ref": "#/$defs/lane"
+        },
+        "growth": {
+          "$ref": "#/$defs/lane"
+        },
+        "post_launch_ops": {
+          "$ref": "#/$defs/lane"
+        }
+      }
+    },
+    "founderGates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pending"
+      ],
+      "properties": {
+        "pending": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pendingFounderGate"
+          }
+        }
+      }
+    },
+    "providers": {
+      "$comment": "Optional provider selections. The schema validates access routes; the reducer checks each route against the selected provider.",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/providerStateEntry"
+      }
+    },
+    "continuity": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "lastStateReview": {
+          "type": "string"
+        },
+        "sourceFiles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gitStatusReviewed": {
+          "type": "boolean"
+        },
+        "nextAction": {
+          "type": "string"
+        }
+      }
+    },
+    "workflowApplicability": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "verdict",
+          "reason",
+          "evidence",
+          "updatedAt"
+        ],
+        "properties": {
+          "verdict": {
+            "enum": [
+              "required",
+              "not-needed"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "operatingModel": {
+      "$ref": "#/$defs/operatingModel"
+    }
+  },
+  "$defs": {
+    "lane": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "status",
+        "evidence",
+        "blockers"
+      ],
+      "properties": {
+        "status": {
+          "$ref": "urn:b2c:core:status-schema#/$defs/status"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "blockers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "providerStateEntry": {
+      "$comment": "Typed provider fields and provider-specific configuration.",
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "accessRoute"
+      ],
+      "properties": {
+        "accessRoute": {
+          "enum": [
+            "mcp",
+            "api",
+            "cli",
+            "browser",
+            "native_device",
+            "skill_pack",
+            "manual",
+            "not_selected"
+          ]
+        },
+        "route": {
+          "type": "string"
+        },
+        "docsCheckedAt": {
+          "type": "string"
+        },
+        "requiredSecrets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "preflight": {
+          "type": "string"
+        },
+        "validation": {
+          "type": "string"
+        },
+        "fallback": {
+          "type": "string"
+        }
+      }
+    },
+    "pendingFounderGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "category",
+        "reason",
+        "createdAt"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "category": {
+          "enum": [
+            "spend",
+            "credentials_access",
+            "legal_pricing",
+            "public_actions",
+            "release",
+            "destructive",
+            "other"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "sourceCoordinates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "uri",
+        "revision"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sectionId": {
+          "type": "string"
+        }
+      }
+    },
+    "confidenceLimits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lower",
+        "upper"
+      ],
+      "properties": {
+        "lower": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "upper": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "operatingRecord": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "id",
+        "kind",
+        "revision",
+        "recordedAt",
+        "producer",
+        "status",
+        "epistemic"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "objective",
+            "metric",
+            "observation",
+            "evidence",
+            "gap",
+            "diagnosis",
+            "option",
+            "decision",
+            "expectation",
+            "hypothesis",
+            "outcome",
+            "learning"
+          ]
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "recordedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "producer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "epistemic": {
+          "enum": [
+            "known",
+            "inferred",
+            "disputed",
+            "absent",
+            "stale"
+          ]
+        },
+        "supersedes": {
+          "type": "string"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "observation"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "metricId",
+              "observedAt",
+              "source",
+              "independenceGroup",
+              "confidence"
+            ],
+            "properties": {
+              "status": {
+                "const": "recorded"
+              },
+              "revision": {
+                "const": 1
+              },
+              "metricId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "observedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "source": {
+                "$ref": "#/$defs/sourceCoordinates"
+              },
+              "independenceGroup": {
+                "type": "string",
+                "minLength": 1
+              },
+              "confidence": {
+                "$ref": "#/$defs/confidenceLimits"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "diagnosis"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "gapId",
+              "evidenceIds"
+            ],
+            "properties": {
+              "gapId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "evidenceIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "option"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "diagnosisId",
+              "evidenceIds"
+            ],
+            "properties": {
+              "diagnosisId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "evidenceIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "decision"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "optionId",
+              "evidenceIds"
+            ],
+            "properties": {
+              "optionId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "evidenceIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "outcome"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "expectationId",
+              "observationIds"
+            ],
+            "properties": {
+              "expectationId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "observationIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "operatingEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type",
+        "recordedAt",
+        "producer",
+        "payload"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "enum": [
+            "record_appended",
+            "observation_accepted",
+            "observation_rejected",
+            "source_revised",
+            "evidence_requested"
+          ]
+        },
+        "recordedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "producer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "payload": {
+          "type": "object"
+        }
+      }
+    },
+    "evidenceRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "status",
+        "needed",
+        "recordedAt"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "open",
+            "gathering",
+            "fulfilled",
+            "cancelled"
+          ]
+        },
+        "needed": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recordedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "gapId": {
+          "type": "string"
+        }
+      }
+    },
+    "operatingModel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "records",
+        "events",
+        "evidenceRequests"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "1.0.0"
+        },
+        "records": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/operatingRecord"
+          }
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/operatingEvent"
+          }
+        },
+        "evidenceRequests": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidenceRequest"
+          }
+        },
+        "erasures": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "erasedAt",
+              "workspaceBinding",
+              "policyDigest",
+              "subjectDigests",
+              "recordDigests",
+              "fileDigests",
+              "providerDeletion"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$"
+              },
+              "erasedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "workspaceBinding": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "policyDigest": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "subjectDigests": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              },
+              "recordDigests": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              },
+              "fileDigests": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              },
+              "providerDeletion": {
+                "enum": [
+                  "pending",
+                  "not_required"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

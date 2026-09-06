@@ -1,0 +1,39 @@
+schema_version: 1.0.0
+id: reference.design.vibecoded-tells
+title: Vibecoded Tells
+domain_id: domain.design
+document_path: knowledge/design/vibecoded-tells.md
+load_when: "when a landing page, funnel page, web marketing surface, or app screen needs the vibecoded-tells smell
+  review — the trust-breaker/default-tell checklist, its scoring rule, and the vibecode audit pass dispatch prompt —
+  and before any such surface is marked review-ready"
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.design.design-room
+    - workflow.growth.pre-launch-funnel-landing-waitlist
+    - workflow.design.design-system-audit
+    - workflow.growth.landing-funnel-audit
+  context_pack_ids:
+    - context.design
+applicability_notes: The mechanical subset is enforced by check:vibecoded-tells; the judgment subset runs as the
+  bounded audit pass the reference defines.
+sources:
+  - id: instagram-aj-on-ai-vibecoded-checklist
+    name: instagram.com/aj.on.ai
+    source_type: inspiration_benchmark
+    url: https://www.instagram.com/aj.on.ai/
+    review_cadence_days: 180
+    claim_scope: Origin of the widely shared 30-item "reasons your site looks vibecoded" checklist this reference
+      adapts into tiers, earned-exception rules, and gate wiring. Inspiration reference only, never a command-syntax
+      source.
+    last_review_date: 2026-08-18
+    reviewer: b2c-maintainers
+  - id: dev-to-tailwind-indigo-default-analysis
+    name: dev.to
+    source_type: website
+    url: https://dev.to/alanwest/why-every-ai-built-website-looks-the-same-blame-tailwinds-indigo-500-3h2p
+    review_cadence_days: 90
+    claim_scope: The documented mechanism behind the indigo/purple-gradient default (Tailwind UI defaults propagating
+      through training corpora), grounding the harsh-gradient and purple-and-black rows.
+    last_review_date: 2026-08-18
+    reviewer: b2c-maintainers

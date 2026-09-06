@@ -1,0 +1,109 @@
+# SYNTHETIC FIXTURE: not a real creator's repository
+apiVersion: b2c.extension/v1
+id: swiftui-cardstack/package
+version: 1.0.0
+hostApiVersion: b2c/v1
+title: Synthetic CardStack SwiftUI reuse example
+dependencies: []
+imports: []
+resources:
+  - id: swiftui-cardstack/notice
+    path: NOTICE.txt
+    kind: notice
+    mediaType: text/plain
+  - id: swiftui-cardstack/cardstack-source
+    path: Sources/CardStack/CardStack.swift
+    kind: adapter
+    mediaType: text/plain
+  - id: swiftui-cardstack/package-swift
+    path: Package.swift
+    kind: adapter
+    mediaType: text/plain
+  - id: swiftui-cardstack/package-resolved
+    path: Package.resolved
+    kind: lockfile
+    mediaType: application/json
+  - id: swiftui-cardstack/input
+    path: input.json
+    kind: schema
+    mediaType: application/json
+  - id: swiftui-cardstack/output
+    path: output.json
+    kind: schema
+    mediaType: application/json
+  - id: swiftui-cardstack/evidence
+    path: evidence.json
+    kind: schema
+    mediaType: application/json
+  - id: swiftui-cardstack/role-prompt
+    path: role.md
+    kind: prompt
+    mediaType: text/markdown
+  - id: swiftui-cardstack/pack
+    path: pack.yaml
+    kind: catalog-pack
+    mediaType: application/yaml
+capabilities:
+  - id: swiftui-cardstack/ui
+    version: 1.0.0
+    title: Card stack presentation
+    knowledge: []
+    operations:
+      - id: swiftui-cardstack/ui.present-card-stack
+        title: Present a card stack
+        inputSchema: swiftui-cardstack/input
+        outputSchema: swiftui-cardstack/output
+        evidenceSchema: swiftui-cardstack/evidence
+        effect: draft
+        acceptance:
+          - The stack renders the requested count with the top card at zero offset.
+          - A person or a vision check records the rendered review. Nothing passes automatically.
+implementations:
+  - id: swiftui-cardstack/manual
+    version: 1.0.0
+    operation: swiftui-cardstack/ui.present-card-stack
+    targets:
+      - platform: ios
+        runtime: swiftui
+    mode: manual
+    sdkRange: "*"
+    limitations:
+      - Illustrative Swift sources. Repository checks do not compile or device-test them.
+    knowledge: []
+    connectionRequired: false
+    maturity: experimental
+recipes:
+  - id: swiftui-cardstack/composition
+    version: 1.0.0
+    title: Present then review
+    workflows:
+      - workflow.swiftui-cardstack-present
+    operations:
+      - operation: swiftui-cardstack/ui.present-card-stack
+        implementation: swiftui-cardstack/manual
+        required: true
+        workflowIds:
+          - workflow.swiftui-cardstack-present
+        workflowContexts:
+          - workflowId: workflow.swiftui-cardstack-present
+            instructions: neutral
+            roleInstructions: neutral
+            neutralReferenceIds: []
+            providerReferenceIds: []
+            neutralContextPackIds: []
+            providerContextPackIds: []
+    policy:
+      maxRepairAttempts: 2
+      independentReview: true
+catalogPacks:
+  - swiftui-cardstack/pack
+thirdParty:
+  - id: swiftui-cardstack/notice-cardstack
+    project: Synthetic Creator CardStack
+    upstream: https://example.invalid/synthetic-creator/repo-b-components
+    license: MIT
+    copyright: Copyright (c) 2026 Synthetic Creator
+    notice: swiftui-cardstack/notice
+    covers:
+      - swiftui-cardstack/cardstack-source
+      - swiftui-cardstack/package-swift

@@ -1,0 +1,15 @@
+schema_version: 1.0.0
+id: reference.process.current-truth
+title: Current Truth
+domain_id: domain.process
+document_path: knowledge/process/current-truth.md
+load_when: after a provider or store action changes evidence, or when reported status and readiness must match reducer state
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.operations.agent-operations-ledger
+    - workflow.orchestration.orient-scaffold-and-state-cockpit-upkeep
+  context_pack_ids:
+    - context.process
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

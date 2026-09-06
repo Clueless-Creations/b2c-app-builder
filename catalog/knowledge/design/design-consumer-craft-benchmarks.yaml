@@ -1,0 +1,105 @@
+schema_version: 1.0.0
+id: reference.design.consumer-craft-benchmarks
+title: Consumer Craft Benchmarks
+domain_id: domain.design
+document_path: knowledge/design/consumer-craft-benchmarks.md
+load_when: calibrating complete consumer-business mobile and landing craft against primary-source product examples before production and independent review
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.research.research-backed-spec
+    - workflow.design.reference-pack-librarian
+    - workflow.design.design-system-audit
+    - workflow.design.implementation-craft-audit
+    - workflow.orchestration.full-launch-program
+  context_pack_ids: []
+applicability_notes: Select relevant principles; the eight examples span mobile, desktop, games, and spatial products. Public image inspection is not installed-app interaction proof. This reference adds no default context bundle.
+sources:
+  - id: craft-apple-design-awards-2026
+    name: Apple Design Awards 2026
+    source_type: official_docs
+    url: https://developer.apple.com/design/awards/
+    review_cadence_days: 90
+    claim_scope: Official app identities, platform distinctions, and Apple's descriptions of the named 2026 examples. Award recognition does not prove business profitability.
+    last_review_date: 2026-09-04
+    reviewer: b2c-maintainers
+  - id: craft-airbnb-visual-language
+    name: Airbnb Design - Building a Visual Language
+    source_type: official_docs
+    url: https://medium.com/airbnb-design/building-a-visual-language-behind-the-scenes-of-our-airbnb-design-system-224748775e4e
+    review_cadence_days: 365
+    claim_scope: Historical first-party account of unified design foundations, component function and personality, native implementations, and system maintenance. Not a current implementation specification.
+    last_review_date: 2026-09-04
+    reviewer: b2c-maintainers
+  - id: craft-airbnb-release-imagery
+    name: Airbnb 2025 Summer Release
+    source_type: inspiration_benchmark
+    url: https://news.airbnb.com/product-releases/airbnb-2025-summer-release
+    review_cadence_days: 90
+    claim_scope: Official 2025 app imagery inspected for visual hierarchy, product photography, and dimensional category objects. No gesture or live runtime claims.
+    last_review_date: 2026-09-04
+    reviewer: b2c-maintainers
+  - id: craft-duolingo-shape-language
+    name: Duolingo - Shape Language and Art Style
+    source_type: official_docs
+    url: https://blog.duolingo.com/shape-language-duolingos-art-style/
+    review_cadence_days: 365
+    claim_scope: First-party shape and illustration design principles with inspected historical art-direction images. Not a current full-app screenshot inventory.
+    last_review_date: 2026-09-04
+    reviewer: b2c-maintainers
+  - id: craft-duolingo-product-principles
+    name: Duolingo Product Principles
+    source_type: official_docs
+    url: https://blog.duolingo.com/product-principles/
+    review_cadence_days: 365
+    claim_scope: First-party account of long-term user value, global comprehension, and repeated design cycles.
+    last_review_date: 2026-09-04
+    reviewer: b2c-maintainers
+  - id: craft-grug-developer-interview
+    name: Apple Developer - grug Team Interview
+    source_type: official_docs
+    url: https://developer.apple.com/news/?id=ux44ymcr
+    review_cadence_days: 365
+    claim_scope: Creator account of grug's stroke-based typography, rendering, and interaction design; public app images inspected. No installed-app performance or accessibility proof.
+    last_review_date: 2026-09-04
+    reviewer: b2c-maintainers
+  - id: craft-blippo-official
+    name: Blippo+ Official Product Site
+    source_type: inspiration_benchmark
+    url: https://blippo.plus/
+    review_cadence_days: 90
+    claim_scope: First-party product description and inspected program-guide image showing coherent television world design. No live playback validation.
+    last_review_date: 2026-09-04
+    reviewer: b2c-maintainers
+  - id: craft-metaballs-official
+    name: Apposite - Metaballs
+    source_type: inspiration_benchmark
+    url: https://www.apposite.ai/metaballs.html
+    review_cadence_days: 90
+    claim_scope: First-party sculpting, material, manipulation, and edition descriptions plus inspected spatial product image. A still does not prove responsive manipulation.
+    last_review_date: 2026-09-04
+    reviewer: b2c-maintainers
+  - id: craft-seat-taken-interview
+    name: Apple Developer - Is This Seat Taken? Interview
+    source_type: official_docs
+    url: https://developer.apple.com/news/?id=z12xq8fa
+    review_cadence_days: 365
+    claim_scope: Creator account of focused mechanics, playtest-driven subtraction, and visual refinements; inspected official game screenshot.
+    last_review_date: 2026-09-04
+    reviewer: b2c-maintainers
+  - id: craft-hearing-buddy-official
+    name: Hearing Buddy Official Product Site
+    source_type: inspiration_benchmark
+    url: https://hearingbuddyapp.com/
+    review_cadence_days: 90
+    claim_scope: Inspected caption-screen promotional image and first-party landing content. Does not independently substantiate medical, accuracy, privacy, or accessibility claims.
+    last_review_date: 2026-09-04
+    reviewer: b2c-maintainers
+  - id: craft-structured-official
+    name: Structured Official Product Site
+    source_type: inspiration_benchmark
+    url: https://structured.app/
+    review_cadence_days: 90
+    claim_scope: Inspected official phone imagery showing timeline, duration, labels, icons, and completion affordances. No installed-app performance or accessibility proof.
+    last_review_date: 2026-09-04
+    reviewer: b2c-maintainers

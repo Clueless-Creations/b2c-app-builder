@@ -1,0 +1,42 @@
+schema_version: 1.0.0
+id: reference.store.app-review-resubmit
+title: App Review Resubmit
+domain_id: domain.store
+document_path: knowledge/store/app-review-resubmit.md
+load_when: after bounded App Review remediation is independently verified; before any
+  Apple resubmission; never from an observe-only mandate
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.store.app-review-resubmit
+  context_pack_ids:
+    - context.store
+applicability_notes: Capped resubmission only. Exact standing envelope. Already-uploaded
+  builds use asc review submit with --confirm. Timeout performs provider readback.
+  A second rejection opens a linked cycle. Cycle exhaustion parks. Never publish.
+  Never accept agreements.
+sources:
+  - id: developer-apple-com-help-app-store-connect-reference-app-and-submission-statuses
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/reference/app-information/app-and-submission-statuses
+    review_cadence_days: 7
+    claim_scope: Apple app-version and submission status values used after a capped resubmission.
+    last_review_date: 2026-08-26
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-app-store-review-guidelines
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/app-store/review/guidelines
+    review_cadence_days: 7
+    claim_scope: Protected guideline classes still park. They do not enter the resubmit loop.
+    last_review_date: 2026-08-26
+    reviewer: b2c-maintainers
+  - id: github-com-rorkai-app-store-connect-cli
+    name: github.com
+    source_type: github
+    url: https://github.com/rorkai/App-Store-Connect-CLI
+    review_cadence_days: 7
+    claim_scope: asc review submit with --confirm is the capped resubmission mutation. Publish stays out of this phase.
+    last_review_date: 2026-08-26
+    reviewer: b2c-maintainers

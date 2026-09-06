@@ -1,0 +1,16 @@
+schema_version: 1.0.0
+id: reference.engineering.technical-documentation-ste100
+title: Technical Documentation In ASD-STE100
+domain_id: domain.engineering
+document_path: knowledge/engineering/technical-documentation-ste100.md
+load_when: writing or editing docs/architecture.md, docs/validators.md, this skill's own README.md/SKILL.md, any
+  knowledge/*.md reference file, an ADR, a runbook, an API/config reference, or an engineering/TECH_SPEC.md-style spec
+  authored for this repository itself; not root README.md/AGENTS.md/CLAUDE.md or founder/marketing copy, which stay with
+  no-slop-writing.md
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.machine.skill-triggering-contract-maintainer
+  context_pack_ids: []
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

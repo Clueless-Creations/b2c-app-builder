@@ -1,0 +1,32 @@
+{
+  "compiledAt": "2026-08-28T00:00:00.000Z",
+  "catalog": {
+    "version": "catalog.current-pin.1",
+    "artifacts": [
+      {
+        "id": "artifact.saved-method",
+        "path": "research/method.md"
+      }
+    ],
+    "workflows": [
+      {
+        "id": "workflow.saved-method",
+        "title": "Apply the saved method",
+        "domainId": "domain.research",
+        "actionClass": "observe",
+        "dependencies": [],
+        "outputPaths": [
+          "research/method.md"
+        ],
+        "providerIds": [],
+        "laneIds": [],
+        "founderOnlyActions": [
+          "Approve the method"
+        ],
+        "gateCommands": [],
+        "idempotent": true,
+        "groupId": "group.research"
+      }
+    ]
+  }
+}

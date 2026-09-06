@@ -1,0 +1,35 @@
+schema_version: 1.0.0
+id: reference.words.no-slop-writing
+title: No-Slop Writing
+domain_id: domain.words
+document_path: knowledge/words/no-slop-writing.md
+load_when: always for dispatched business workers — the voice and writing-quality bar applied to whatever other lanes
+  produce, covering onboarding, store listing, landing, paywall, email, ads, launch-post wording, UGC scripts, GEO/SEO
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.operations.resend-email-ops
+    - workflow.words.writing-quality-no-slop
+    - workflow.store.aso-and-store-ops
+    - workflow.store.app-store-listing-prep-packet
+    - workflow.growth.launch-narrative-and-cadence
+    - workflow.growth.geo-seo-public-visibility
+    - workflow.growth.ugc-creator-engine
+    - workflow.machine.founder-language-translation-maintainer
+    - workflow.words.copy-review-audit
+    - workflow.growth.landing-funnel-audit
+  context_pack_ids:
+    - context.founder-language
+    - context.words
+sources:
+  - id: github-com-petergyang-no-ai-slop
+    name: github.com
+    source_type: github
+    url: https://github.com/petergyang/no-ai-slop
+    review_cadence_days: 30
+    claim_scope: MIT-licensed AI-slop editing skill. Source basis for no-slop-writing.md's banned-word list,
+      empty-adverb/phrase lists, portability test, named patterns, and eval.md self-check, adapted for this skill's
+      founder-facing copy and generated marketing copy. Stable rules repo; recheck for drift on the normal cadence
+      rather than a fast-moving one. Reviewed at upstream commit d30eddb9e04562234f2070b5ee63ca4649d9a05e.
+    last_review_date: 2026-08-20
+    reviewer: b2c-maintainers

@@ -1,0 +1,37 @@
+id: capability.web-presence
+title: Web presence
+applicability: A business that needs a current public site.
+required_facts:
+  - fact.public-site-url
+authority:
+  - Operating agreement must authorize public messaging.
+readiness:
+  - The public site must have a named owner.
+inputs:
+  - offer
+  - channel
+outputs:
+  - A current public-site record
+effects:
+  - Updates the public offer surface
+evidence:
+  - Live public URL
+  - Named measurement source
+expected_outcome: The business can present one current public offer.
+context_selectors:
+  - knowledge.web-presence.shared
+exclusions:
+  - sku-owned inventory
+  - retailer listing copy
+  - manufacturing lot records
+  - food-regulatory filings
+  - app-store-signing packets
+  - store-console packets
+  - subscription-policy documents
+extension_slots:
+  - offer
+  - channel
+  - conversion
+  - legal
+  - measurement
+  - distribution

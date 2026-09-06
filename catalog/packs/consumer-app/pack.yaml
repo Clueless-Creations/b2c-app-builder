@@ -1,0 +1,66 @@
+id: business-pack.consumer-app
+title: Consumer-app compatibility pack
+version: 1.0.0
+revision: rev-consumer-app-2026-08-22
+depends_on:
+  - capability.web-presence
+references:
+  - id: reference.consumer-app.acquisition
+    session_scoped: true
+    source_exemption: Authored business composition instructions; factual provider claims require current provider evidence.
+    path: catalog/packs/consumer-app/acquisition.md
+    section_id: knowledge.consumer-app.acquisition
+    revision: rev-consumer-app-2026-08-22
+    domain_id: domain.growth
+    title: Consumer-app acquisition with app-store signing
+  - id: reference.consumer-app.activation
+    session_scoped: true
+    source_exemption: Authored business composition instructions; factual provider claims require current provider evidence.
+    path: catalog/packs/consumer-app/activation.md
+    section_id: knowledge.consumer-app.activation
+    revision: rev-consumer-app-2026-08-22
+    domain_id: domain.store
+    title: Consumer-app activation through store-console
+  - id: reference.consumer-app.retention
+    session_scoped: true
+    source_exemption: Authored business composition instructions; factual provider claims require current provider evidence.
+    path: catalog/packs/consumer-app/retention.md
+    section_id: knowledge.consumer-app.retention
+    revision: rev-consumer-app-2026-08-22
+    domain_id: domain.growth
+    title: Consumer-app retention evidence
+  - id: reference.consumer-app.revenue
+    session_scoped: true
+    source_exemption: Authored business composition instructions; factual provider claims require current provider evidence.
+    path: catalog/packs/consumer-app/revenue.md
+    section_id: knowledge.consumer-app.revenue
+    revision: rev-consumer-app-2026-08-22
+    domain_id: domain.money
+    title: Consumer-app revenue with subscription policy
+  - id: reference.consumer-app.referral
+    session_scoped: true
+    source_exemption: Authored business composition instructions; factual provider claims require current provider evidence.
+    path: catalog/packs/consumer-app/referral.md
+    section_id: knowledge.consumer-app.referral
+    revision: rev-consumer-app-2026-08-22
+    domain_id: domain.growth
+    title: Consumer-app referral evidence
+extensions:
+  - target_id: capability.web-presence
+    slot: offer
+    kind: bind
+  - target_id: capability.web-presence
+    slot: channel
+    kind: bind
+  - target_id: capability.web-presence
+    slot: conversion
+    kind: bind
+  - target_id: capability.web-presence
+    slot: legal
+    kind: bind
+  - target_id: capability.web-presence
+    slot: measurement
+    kind: bind
+  - target_id: capability.web-presence
+    slot: distribution
+    kind: bind

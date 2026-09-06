@@ -1,0 +1,18 @@
+schema_version: 1.0.0
+id: reference.process.flow-traceability
+title: Flow Traceability
+domain_id: domain.process
+document_path: knowledge/process/flow-traceability.md
+load_when: crossing a phase boundary; deciding whether engineering/TECH_SPEC.md is needed; auditing whether research
+  reached experience, design, and specs
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.process.change-cascade
+    - workflow.process.launch-trace-and-build-contracts
+    - workflow.engineering.source-change-manifest
+    - workflow.engineering.backend-data-contract
+  context_pack_ids:
+    - context.process
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

@@ -1,0 +1,16 @@
+id: asc-promoted-iap-image-duplicate
+title: Promoted in-app purchase promotional images duplicate the app icon or each other
+prompt: >
+  The app promotes weekly, yearly, and lifetime products on the App Store. Each promoted product's 1024x1024 promotional image is the same as the app icon, and the same image is used for all three products. App Review returns a Guideline 2.3.2 - Accurate Metadata rejection because the promotional image does not represent the promoted product and duplicate images were submitted.
+expected_guardrail: >
+  Each promoted in-app purchase or subscription must have a unique 1024x1024 promotional image that depicts that specific product, distinct from the app icon and from every other product's image. If a product will not be promoted, its promotional image should be removed rather than left as a duplicate.
+validators:
+  - check-store-console-packet
+must_catch:
+  - a promoted IAP promotional image identical to the app icon fails Guideline 2.3.2
+  - the same promotional image reused across multiple promoted products fails Guideline 2.3.2
+  - each promoted product needs a unique image that represents that product
+should_say:
+  - Generate a distinct on-brand 1024x1024 image per promoted product (e.g. via Higgsfield tied to DESIGN.md).
+  - Replace each promoted product's image via the ASC IAP/subscription image route, or delete the image if the product is not promoted.
+  - Verify uniqueness and product-fit in App Store Connect before resubmitting.

@@ -1,0 +1,21 @@
+schema_version: 1.0.0
+id: reference.design.design-acceptance
+title: Design Acceptance Evidence
+domain_id: domain.design
+document_path: knowledge/design/design-acceptance.md
+load_when: accepting complete native and landing design or repairing missing, stale, producer-unbound, incomplete, or independently rejected visual evidence
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.design.reference-pack-librarian
+    - workflow.design.design-system-audit
+    - workflow.design.implementation-craft-audit
+    - workflow.engineering.native-ios-proof-route-ladder
+    - workflow.growth.pre-launch-funnel-landing-waitlist
+    - workflow.growth.landing-funnel-audit
+    - workflow.engineering.engineering-orchestration-ce-production-readiness
+    - workflow.orchestration.full-launch-closeout
+  context_pack_ids: []
+applicability_notes: Complete-business acceptance only. Requires producer-owned machine receipts, current engine artifact bindings, and exact Markdown-to-report binding. Extends DESIGN.md authority and existing frozen rubrics without granting taste or release authority. This reference adds no default context bundle.
+sources: []
+source_exemption: Internal evidence integrity contract for complete design acceptance, defined by the repository validator and schemas.

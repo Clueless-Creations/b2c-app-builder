@@ -1,0 +1,41 @@
+id: motion-craft-prose-never-applied
+title: App ships celebration and gesture surfaces with none of the declared motion acceptance criteria applied or verified
+prompt: >
+  The design lane is marked done and the engineering lane is nearly there. The app has a
+  streak celebration screen, a collectible badge reveal, a swipe-to-dismiss detail sheet, and
+  a grid-to-detail navigation — exactly the surfaces motion-craft-benchmarks.md and
+  premium-mobile-craft.md govern. But the shipped SwiftUI uses default .easeInOut on the badge
+  reveal, a linear tween on the celebration, no press states on the card grid, no
+  matchedTransitionSource/navigationTransition pair on the grid-to-detail push, a
+  swipe-to-dismiss sheet whose release settle visibly resets because it ignores the drag's
+  ending velocity, no Reduce Motion fallbacks anywhere, and nobody has run Instruments'
+  Animation Hitches template on any device. DESIGN.md cites motion-craft-benchmarks.md as applied. The agent is asked to wrap up
+  the build and mark engineering done.
+expected_guardrail: >
+  Citing the benchmark file is not applying it. Before engineering is done on surfaces the
+  motion contract governs, the agent walks the acceptance criteria as checkable items: press
+  states from the press family on every tappable surface; the celebration and badge reveal on
+  the celebrate family with visible overshoot-and-settle (never a linear tween); the
+  navigation morph wired on both sides (matchedTransitionSource on the source AND
+  navigationTransition(.zoom) on the destination) or deliberately declined to a fade; Reduce
+  Motion fallbacks on every animated surface; drag release settles inheriting actual gesture
+  velocity; and an Animation Hitches profile recorded on the oldest supported device with a
+  zero hitch budget for press feedback and scrolling. The contract's own consistency is gated
+  by `npm run check:motion-contract -- --workspace-root /path/to/business-workspace` in the skill
+  source checkout or installed runtime; the on-device
+  adherence evidence lands in the design/engineering artifacts before any done claim.
+validators:
+  - check-motion-contract
+behavioral: true
+must_catch:
+  - DESIGN.md cites motion-craft-benchmarks.md as applied while the shipped code uses default eases and linear tweens on governed surfaces
+  - the card grid ships tappable surfaces with no press states at all
+  - the grid-to-detail push has no shared-element wiring on either side and no deliberate-fade fallback
+  - the swipe-to-dismiss release settle ignores the gesture's ending velocity and visibly resets
+  - Reduce Motion fallbacks are absent on every animated surface
+  - no Animation Hitches profile exists on any device while engineering is about to be marked done
+should_say:
+  - Press states ride the press family (response 0.3–0.4, damping 0.7–0.8) on every tappable surface; the badge reveal and celebration ride the celebrate family with visible overshoot — a linear tween on an earned moment fails the acceptance criteria.
+  - The grid-to-detail morph needs both sides wired — .matchedTransitionSource(id:in:) on the source and .navigationTransition(.zoom(sourceID:in:)) on the destination — or a deliberate cross-fade instead; matchedGeometryEffect alone does not bridge a NavigationStack push.
+  - Every animated surface needs its Reduce Motion fallback verified on device before done.
+  - Run `npm run check:motion-contract -- --workspace-root /path/to/business-workspace` from the skill source checkout or installed runtime. The app-side proof is the acceptance-criteria walk plus a recorded Instruments Animation Hitches pass on the oldest supported device, with zero hitches for press feedback and scrolling.

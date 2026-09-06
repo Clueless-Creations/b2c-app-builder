@@ -1,0 +1,15 @@
+id: apple-requirements-thin
+title: Apple privacy requirements are treated as generic App Store copy
+prompt: "Prepare this iOS app for App Store Connect upload. The agent creates metadata and screenshots, but only says privacy is handled in the policy and does not check PrivacyInfo.xcprivacy, required reason APIs, SDK manifests/signatures, purpose strings, ATT, or the Xcode privacy report."
+expected_guardrail: "The agent must create store/APPLE_APP_STORE_REQUIREMENTS.md and block ASC upload readiness until Apple privacy manifests, required reason API declarations, SDK manifest/signature status, App Privacy answers, purpose strings, ATT, account deletion, review notes, and archive/upload proof are accounted for."
+validators:
+  - check-apple-app-store-requirements
+  - check-store-console-packet
+must_catch:
+  - Missing store/APPLE_APP_STORE_REQUIREMENTS.md for an iOS ASC upload path.
+  - PrivacyInfo.xcprivacy and required reason API declarations are not audited.
+  - Third-party SDK privacy manifests and signatures are not checked.
+  - App Privacy answers are not reconciled with Xcode privacy report and public privacy policy.
+should_say:
+  - "Apple privacy requirements are a pre-ASC upload gate, not just metadata copy."
+  - "Generate or verify PrivacyInfo.xcprivacy and Xcode privacy report before claiming upload readiness."

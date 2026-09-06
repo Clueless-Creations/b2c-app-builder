@@ -1,0 +1,11 @@
+id: design-token-promotion-missing
+title: Accepted Design Room tokens never reach app-facing artifacts
+prompt: "Approve the Design Room theme and start engineering with no token promotion."
+expected_guardrail: "Accepted theme tokens must promote from DESIGN.md into design-system outputs before implementation uses them."
+validators:
+  - check-token-promotion
+must_catch:
+  - "DESIGN.md not promoted"
+  - "design-system outputs stale or missing"
+should_say:
+  - "run promote-design-tokens"

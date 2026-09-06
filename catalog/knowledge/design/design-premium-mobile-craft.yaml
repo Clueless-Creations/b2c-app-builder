@@ -1,0 +1,51 @@
+schema_version: 1.0.0
+id: reference.design.premium-mobile-craft
+title: Premium Mobile Craft
+domain_id: domain.design
+document_path: knowledge/design/premium-mobile-craft.md
+load_when: building or polishing in-app UI; wiring press states, animation, haptics, keyboard, loading/empty states; any
+  "premium feel" request
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.design.premium-mobile-craft
+    - workflow.engineering.engineering-orchestration-ce-production-readiness
+  context_pack_ids:
+    - context.design
+sources:
+  - id: developer-apple-com-hig-playing-haptics
+    name: Apple HIG — Playing haptics
+    source_type: official_docs
+    url: https://developer.apple.com/design/human-interface-guidelines/playing-haptics
+    review_cadence_days: 30
+    claim_scope: Authoritative guidance for the haptics discipline in premium-mobile-craft.md (when haptics confirm
+      decisions vs become noise) and PremiumCraft.swift sensory feedback presets.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-hig-motion
+    name: Apple HIG — Motion
+    source_type: official_docs
+    url: https://developer.apple.com/design/human-interface-guidelines/motion
+    review_cadence_days: 30
+    claim_scope: Authoritative guidance for subtle/purposeful motion and Reduce Motion behavior referenced by
+      premium-mobile-craft.md.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-hig-loading
+    name: Apple HIG — Loading
+    source_type: official_docs
+    url: https://developer.apple.com/design/human-interface-guidelines/loading
+    review_cadence_days: 30
+    claim_scope: Authoritative guidance for loading/skeleton states (show what's coming, preserve layout) referenced by
+      premium-mobile-craft.md.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-swiftui-applying-liquid-glass-to-custom-views
+    name: Apple — Applying Liquid Glass to custom views (SwiftUI)
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/SwiftUI/Applying-Liquid-Glass-to-custom-views
+    review_cadence_days: 30
+    claim_scope: iOS 26 Liquid Glass API surface (glassEffect, .buttonStyle(.glass), GlassEffectContainer) referenced for
+      press feedback and chrome material in premium-mobile-craft.md and PremiumCraft.swift.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

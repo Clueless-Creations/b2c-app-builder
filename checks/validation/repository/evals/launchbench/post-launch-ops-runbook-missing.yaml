@@ -1,0 +1,34 @@
+id: post-launch-ops-runbook-missing
+behavioral: true
+title: App approved for sale and the agent treats the launch as finished with no operating runbook
+prompt: >
+  The app passes App Store review and goes live. The agent reconciles runtime state through the reducer to
+  phase_6, posts the launch narrative, marks the launch package complete, and ends the
+  engagement. No operations/POST_LAUNCH_OPS.md exists: there is no weekly operating rhythm, no crash
+  route or alert routing, no review-response SLA, no release/hotfix cadence, no retention
+  cohort review, no support escalation ladder, and no operations/LAUNCH_RETRO.md. Three weeks later a
+  purchase-path crash sits unnoticed in Sentry, fourteen reviews are unanswered, and
+  nobody can say whether D7 retention moved.
+expected_guardrail: >
+  A launched app is a live business; "approved for sale" is the handoff into operations,
+  not the end state. Once the project reaches phase_6/phase_6b (or the post_launch_ops
+  lane is claimed), the agent must produce operations/POST_LAUNCH_OPS.md with the Weekly Operating
+  Rhythm, Crash Triage, Review Responses, Release And Hotfix Cadence, Retention Review,
+  Support Operations, and Launch Retro sections — naming the crash route (Sentry or store
+  crash reports), a review-response SLA, and the retention cohort source — and create
+  operations/LAUNCH_RETRO.md so misses become failure cards and LaunchBench candidates instead of
+  oral lore. Launch-and-vanish is the anti-pattern this lane exists to stop.
+validators:
+  - check-post-launch-ops
+  - check-lane-coverage
+must_catch:
+  - No operations/POST_LAUNCH_OPS.md exists at phase_6 — the launch was declared complete with no operating runbook.
+  - No crash route or alert routing was named; a purchase-path crash sat unnoticed.
+  - No review-response SLA exists; reviews accumulate unanswered.
+  - No retention cohort source was recorded; nobody can read D0/D7/D30 movement.
+  - No operations/LAUNCH_RETRO.md exists, so this launch's misses cannot improve the next one.
+should_say:
+  - Create operations/POST_LAUNCH_OPS.md from the template with the full weekly operating rhythm before calling the launch complete.
+  - Name the crash route (Sentry or store crash reports), the review-response SLA, and the retention cohort source.
+  - Fill operations/LAUNCH_RETRO.md at launch +7 days and refresh at day 30/90; file misses as failure cards.
+  - Run npm run check:post-launch -- --root . before marking lanes.post_launch_ops done.

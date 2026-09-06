@@ -1,0 +1,42 @@
+{
+  "tag_name": "4.11.0",
+  "name": "4.11.0",
+  "prerelease": false,
+  "draft": false,
+  "published_at": "2026-08-29T10:09:07Z",
+  "target_commitish": "main",
+  "html_url": "https://github.com/rorkai/App-Store-Connect-CLI/releases/tag/4.11.0",
+  "body": "## What's Changed\n* apps wall: add TapTape by @superkam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2216\n* fix(docs): preserve help output with cold Go cache by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2223\n* build(deps): bump github.com/aws/aws-sdk-go-v2 from 1.43.6 to 1.43.7 by @dependabot[bot] in https://github.com/rorkai/App-Store-Connect-CLI/pull/2222\n* build(deps): bump github.com/aws/smithy-go from 1.27.8 to 1.27.10 by @dependabot[bot] in https://github.com/rorkai/App-Store-Connect-CLI/pull/2221\n* build(deps): bump github.com/aws/aws-sdk-go-v2/credentials from 1.19.36 to 1.19.37 by @dependabot[bot] in https://github.com/rorkai/App-Store-Connect-CLI/pull/2218\n* build(deps): bump github.com/aws/aws-sdk-go-v2/service/s3 from 1.107.1 to 1.107.3 by @dependabot[bot] in https://github.com/rorkai/App-Store-Connect-CLI/pull/2220\n* build(deps): bump github.com/bitrise-io/go-utils/v2 from 2.0.0-alpha.37 to 2.0.0-alpha.38 by @dependabot[bot] in https://github.com/rorkai/App-Store-Connect-CLI/pull/2219\n* fix(notify): keep Slack validation diagnostics concise by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2224\n* fix(telemetry): classify snitch descriptions as leaf calls by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2225\n* Add deep submission validation by @rudrankriyam in https://github.com/rorkai/App-Store-Connect-CLI/pull/2226\n* apps wall: add Somilo by @nogu66 in https://github.com/rorkai/App-Store-Connect-CLI/pull/2217\n\n## New Contributors\n* @superkam made their first contribution in https://github.com/rorkai/App-Store-Connect-CLI/pull/2216\n* @nogu66 made their first contribution in https://github.com/rorkai/App-Store-Connect-CLI/pull/2217\n\n**Full Changelog**: https://github.com/rorkai/App-Store-Connect-CLI/compare/4.10.0...4.11.0",
+  "assets": [
+    {
+      "name": "asc_4.11.0_checksums.txt",
+      "size": 451,
+      "digest": "sha256:3fd036048559a07684cea47c1f447b010978365e9c9970e89d1803ec52d82f7e"
+    },
+    {
+      "name": "asc_4.11.0_linux_amd64",
+      "size": 53563554,
+      "digest": "sha256:5b963646eb39d51f8b1ac44466bf5e23fc2e41ae25debaa1b221c883a17a8591"
+    },
+    {
+      "name": "asc_4.11.0_linux_arm64",
+      "size": 48693410,
+      "digest": "sha256:aa81ffabd8c755ad2aae6ff9b79267d4523bcecc5c1f9c7f4abe33b8b52ad774"
+    },
+    {
+      "name": "asc_4.11.0_macOS_amd64",
+      "size": 54628208,
+      "digest": "sha256:276b0ca833041294983fa2506e428b2a5ad29915a141b709251ea90e4a4ef3b4"
+    },
+    {
+      "name": "asc_4.11.0_macOS_arm64",
+      "size": 49344576,
+      "digest": "sha256:b928a12dec6be975271a2d374ba811717447a211089c6c89d3318d32c61c8202"
+    },
+    {
+      "name": "asc_4.11.0_windows_amd64.exe",
+      "size": 54329344,
+      "digest": "sha256:bff86fc63a40924b71800e78486512ca3a7e55c7a60be17031d70a1019398403"
+    }
+  ]
+}

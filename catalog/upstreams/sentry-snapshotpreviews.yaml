@@ -1,0 +1,103 @@
+schema_version: 1
+id: sentry-snapshotpreviews
+project: SnapshotPreviews
+canonical_url: https://github.com/getsentry/SnapshotPreviews
+aliases:
+  - getsentry/SnapshotPreviews
+  - EmergeTools/SnapshotPreviews
+authors:
+  - name: Emerge Tools
+    role: original author or copyright holder identified in the reviewed source
+maintainers:
+  - name: Sentry (getsentry)
+    role: current upstream maintainer
+copyright: Copyright (c) 2023 Emerge Tools
+license:
+  spdx: MIT
+  status: verified
+  evidence_url: https://github.com/getsentry/SnapshotPreviews/blob/856a1c1585e31d4113c019050d6d0712cf6ddadc/LICENSE
+  evidence_sha256: d0404079f9a0cfade1fa38c8d4809834851886212359b7ac9d5a20470f719e07
+  reviewed_revision: 856a1c1585e31d4113c019050d6d0712cf6ddadc
+  notice_file: catalog/upstreams/notices/sentry-snapshotpreviews.txt
+  scope: Selected preview-export procedures and dependency awareness only. No package source, binary targets,
+    transitive dependencies or example app are incorporated.
+source_ids:
+  - github-com-emerge-tools-snapshotpreviews
+  - github-com-getsentry-snapshotpreviews
+relationships:
+  - kind: adapted-method
+    consumption: Selected published methods and tool procedures are adapted into existing builder guidance. No whole
+      skill, executable, native dependency or asset was installed by this contribution.
+    local_owners: &a1
+      - knowledge/engineering/xcodebuildmcp-testing.md
+      - knowledge/process/tool-recipes/device-capture-and-proof.md
+    tests:
+      - checks/verification/fixtures/screenshot-upstreams.fixtures.ts
+    upstream_paths:
+      - README.md
+      - Package.swift
+    pin_authority: Reviewed immutable source commit and the existing builder package digest pin this guidance. A
+      host executable, editor project or native dependency is selected and verified separately.
+baselines:
+  reviewed_source:
+    revision: 856a1c1585e31d4113c019050d6d0712cf6ddadc
+    observed_at: "2026-09-06"
+    by: b2c-contributor source review
+    note: Read-only metadata, license and selected documentation inspection; no tool or live provider execution.
+  reviewed_guidance:
+    revision: 856a1c1585e31d4113c019050d6d0712cf6ddadc
+    observed_at: "2026-09-06"
+    by: b2c-contributor source review
+    note: Selected preview-export procedures and dependency awareness only. No package source, binary targets,
+      transitive dependencies or example app are incorporated.
+support:
+  policy: Source-reviewed guidance only. Listed operations are mapped procedures, not newly executable provider
+    bindings or certification of installed versions.
+  versions:
+    - range: 856a1c1585e31d4113c019050d6d0712cf6ddadc
+      status: untested
+      evidence:
+        - Source inspection and builder contract fixtures only; no live app or upstream binary execution.
+  operations:
+    - id: sentry-snapshotpreviews-guidance
+      title: Selected SnapshotPreviews procedures
+      keywords:
+        - snapshot
+        - preview
+        - xctest
+        - export
+        - gallery
+        - accessibility
+      owners: *a1
+  unsupported_operations:
+    - id: automatic-install-or-upgrade
+      reason: Requires explicit target, selected compatible revision, scoped authority and independent verification.
+        No host installation, business repin or publication is automatic.
+    - id: unreviewed-upstream-features
+      reason: A new release or source commit creates a review candidate, never additional execution authority or
+        acceptance.
+  platforms: []
+adaptations:
+  - id: preview-not-runtime
+    description: PreviewLayoutTest exercises layout without producing PNGs; SnapshotTest can produce captures.
+      Neither establishes a real onboarding session, live data, purchases, or whole-business readiness.
+    owner: knowledge/engineering/xcodebuildmcp-testing.md
+    intentional: true
+  - id: no-production-preview-gallery
+    description: PreviewGallery is optional internal tooling, not a production app feature. Select dependency
+      revisions and inspect binary/transitive license and compatibility requirements separately.
+    owner: knowledge/engineering/xcodebuildmcp-testing.md
+    intentional: true
+review:
+  owner: b2c-maintainers
+  cadence_days: 7
+  last_review: "2026-09-06"
+  status: current
+credits:
+  acknowledge: true
+  use: adapted
+  summary: Selected SnapshotPreviews methods inform knowledge/engineering/xcodebuildmcp-testing.md,
+    knowledge/process/tool-recipes/device-capture-and-proof.md. Original authors and license notices are
+    retained; no live integration is claimed.
+transfers:
+  - README retains the EmergeTools package URL; the source was reviewed at getsentry/SnapshotPreviews.

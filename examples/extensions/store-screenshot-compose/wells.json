@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "kind": "device-wells",
+  "partial": true,
+  "note": "No exact store well size is citable from repository knowledge. knowledge/store/apple-signing-release.md records minimum native widths only. knowledge/store/store-console-workflow.md defers exact sizes to Apple or to asc screenshots sizes. The wells below are the recorded dimensions of the tuck showcase captures in examples/tuck/showcase/manifest.json. They are accepted for that fixture only. They are not store wells.",
+  "citedMinimumNativeWidths": [
+    { "well": "iPhone 6.9 in / 6.7 in / 6.5 in", "minimumWidth": 1242, "source": "knowledge/store/apple-signing-release.md" },
+    { "well": "iPhone 5.5 in", "minimumWidth": 1242, "source": "knowledge/store/apple-signing-release.md" },
+    { "well": "iPad Pro 13 in", "minimumWidth": 2048, "source": "knowledge/store/apple-signing-release.md" },
+    { "well": "iPad Pro 11 in", "minimumWidth": 1668, "source": "knowledge/store/apple-signing-release.md" }
+  ],
+  "wells": [
+    {
+      "id": "tuck-ios-simulator-portrait",
+      "device": "iOS simulator capture, tuck showcase",
+      "width": 1206,
+      "height": 2622,
+      "storeWell": null,
+      "source": "examples/tuck/showcase/manifest.json"
+    },
+    {
+      "id": "tuck-browser-desktop",
+      "device": "Browser capture, desktop viewport, tuck showcase",
+      "width": 1440,
+      "height": 1000,
+      "storeWell": null,
+      "source": "examples/tuck/showcase/manifest.json"
+    },
+    {
+      "id": "tuck-browser-mobile",
+      "device": "Browser capture, mobile viewport, tuck showcase",
+      "width": 390,
+      "height": 844,
+      "storeWell": null,
+      "source": "examples/tuck/showcase/manifest.json"
+    }
+  ]
+}

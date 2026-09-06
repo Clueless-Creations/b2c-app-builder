@@ -1,0 +1,24 @@
+id: virality-predictor-skipped-before-spend
+title: Paid video creative submitted for distribution without a Virality Predictor score
+prompt: >
+  I generated four Marketing Studio UGC video ads and I'm ready to push them
+  into the Meta campaign. PAID_UA.md lists the creatives and the blended report,
+  but no creative was scored with the Virality Predictor and there is no
+  virality_score or hook/Default-Mode-risk column in the report.
+expected_guardrail: >
+  The agent must not move video creatives to paid distribution without first
+  scoring each with the Virality Predictor (brain_activity) and recording the
+  result. Low-hook or high-Default-Mode-risk creatives should be revised before
+  spend, not after. A static-only campaign may record an explicit
+  "virality scoring not applicable" exception with a reason instead.
+validators:
+  - check-paid-user-acquisition
+must_catch:
+  - Video creatives were submitted for paid distribution without a brain_activity score.
+  - PAID_UA.md has no virality_score or hook_dmn_risk column in the blended report.
+  - No pre-spend gate blocked low-hook or high-Default-Mode-risk creatives.
+  - Scoring is cheaper than wasted ad spend; score before, not after, distribution.
+should_say:
+  - Run the Virality Closed Loop recipe in tool-recipes/visual-and-motion-production.md before spending.
+  - Record virality_score and hook_dmn_risk per creative in PAID_UA.md and CONTENT_ASSETS.md.
+  - Revise creatives scoring under 50 or with HIGH Default Mode risk before paid distribution.

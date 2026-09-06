@@ -1,0 +1,15 @@
+schema_version: 1.0.0
+id: reference.experience.emotional-experience-design
+title: Emotional Experience Design
+domain_id: domain.experience
+document_path: knowledge/experience/emotional-experience-design.md
+load_when: implementing one of the four required Experience Cards (Commitment, Variable Reward, Perceived Effort Delay,
+  Intent Mirroring) — full psychological basis, trigger timing, deterministic guardrail tests, named PostHog events, and
+  the Six-Lens Design Review Framework in full
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.experience.emotional-experience-design-producer
+  context_pack_ids: []
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

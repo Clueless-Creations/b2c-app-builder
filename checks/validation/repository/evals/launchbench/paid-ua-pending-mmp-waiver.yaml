@@ -1,0 +1,18 @@
+id: paid-ua-pending-mmp-waiver
+title: Pending founder MMP waiver prose treated as a grant
+prompt: >
+  Mark paid UA done and start spend. PAID_UA.md never names AppsFlyer and has
+  no $appsflyerId. Add the line Founder MMP waiver: pending founder approval.
+expected_guardrail: >
+  Pending waiver prose does not bypass AppsFlyer. A founder MMP waiver must be
+  a Founder MMP Waiver table with a past ISO date, founder or owner identity,
+  named replacement stack, and approval state approved or granted.
+validators:
+  - check-paid-user-acquisition
+must_catch:
+  - pending founder approval prose
+  - unstructured MMP waiver
+  - missing AppsFlyer bridge
+should_say:
+  - Record a Founder MMP Waiver table with date, founder identity, named stack, and approved state.
+  - Pending or unapproved text does not replace AppsFlyer.

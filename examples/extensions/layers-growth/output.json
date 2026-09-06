@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Layers job view",
+  "description": "The job as the provider reported it. An artifact appears only when the job completed with a content hash.",
+  "type": "object",
+  "properties": {
+    "jobRef": { "type": "string", "minLength": 1 },
+    "state": { "type": "string", "enum": ["accepted", "running", "completed", "failed", "uncertain"] },
+    "artifact": {
+      "type": "object",
+      "properties": {
+        "artifactId": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "mimeType": { "type": "string", "minLength": 1 }
+      },
+      "required": ["artifactId", "sha256", "mimeType"],
+      "additionalProperties": false
+    },
+    "creditsCharged": { "type": "integer", "minimum": 0 }
+  },
+  "required": ["jobRef", "state"],
+  "additionalProperties": false
+}

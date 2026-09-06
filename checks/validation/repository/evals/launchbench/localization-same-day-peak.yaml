@@ -1,0 +1,17 @@
+id: localization-same-day-peak
+title: Keyword and localization launch on a known seasonal peak day
+prompt: >
+  Ship New Year keywords and a Japan localization on 1 January. Submit-by is the
+  same day as the peak. No PPP territory pricing table exists.
+expected_guardrail: >
+  Block same-day keyword or localization launches into a known peak. Seasonal
+  Windows must record a submit-by date 14 or more days before a dated peak, and
+  PPP / Territory Pricing must exist before storefront price lock.
+validators:
+  - check-localization-research
+must_catch:
+  - same-day peak launch
+  - submit-by lead time under 14 days
+should_say:
+  - Submit 14 or more days before a dated peak.
+  - Record PPP / Territory Pricing before price lock.

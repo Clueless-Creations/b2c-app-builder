@@ -1,0 +1,18 @@
+schema_version: 1.0.0
+id: reference.research.localization-market-research
+title: Localization Market Research
+domain_id: domain.research
+document_path: knowledge/research/localization-market-research.md
+load_when: before localizing any surface (store metadata/keywords/screenshots, paywall/offers, landing/web, lifecycle
+  email, paid storefronts) or choosing which locales to ship
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.research.localization-market-research
+    - workflow.store.aso-and-store-ops
+    - workflow.growth.paid-user-acquisition-system
+    - workflow.growth.geo-seo-public-visibility
+  context_pack_ids:
+    - context.research
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

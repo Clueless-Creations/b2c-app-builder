@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:b2c:core:status-schema",
+  "$comment": "The single status vocabulary shared by business-state lanes and engine run nodes (KTD6). Other schemas $ref #/$defs/status rather than declaring their own enum. Keep this list in sync with kernel/schema/types.ts statusValues.",
+  "$defs": {
+    "status": {
+      "enum": [
+        "pending",
+        "ready",
+        "running",
+        "waiting_founder",
+        "blocked",
+        "orphaned",
+        "needs_readback",
+        "succeeded",
+        "failed",
+        "stale",
+        "skipped",
+        "not_needed",
+        "deferred",
+        "cancelled"
+      ]
+    }
+  }
+}

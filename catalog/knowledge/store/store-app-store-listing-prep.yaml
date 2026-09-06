@@ -1,0 +1,309 @@
+schema_version: 1.0.0
+id: reference.store.app-store-listing-prep
+title: App Store Listing Prep
+domain_id: domain.store
+document_path: knowledge/store/app-store-listing-prep.md
+load_when: before listing packets, privacy questionnaires, pricing/subscription field maps, custom product
+  pages, in-app events, promotion pages, localization matrices, App Icon/App Preview work, or App Store
+  marketing material
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.store.app-store-listing-prep-packet
+    - workflow.store.apple-app-store-requirements-privacy-manifest
+  context_pack_ids:
+    - context.store
+    - context.launch-surfaces
+sources:
+  - id: developer-apple-com-app-store-app-privacy-details
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/app-store/app-privacy-details
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-app-store-product-page
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/app-store/product-page
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-app-store-review-guidelines
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/app-store/review/guidelines
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-bundleresources-adding-a-privacy-manifest-to
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/bundleresources/adding-a-privacy-manifest-to-your-app-or-third-party-sdk
+    review_cadence_days: 7
+    claim_scope: Official Apple documentation for adding privacy manifest files to apps and third-party SDKs.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-bundleresources-describing-data-use-in-privac
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/bundleresources/describing-data-use-in-privacy-manifests
+    review_cadence_days: 7
+    claim_scope: Official Apple documentation for privacy manifest data-use declarations.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-bundleresources-describing-use-of-required-rea
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/bundleresources/describing-use-of-required-reason-api
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-bundleresources-protected-resources
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/bundleresources/protected-resources
+    review_cadence_days: 7
+    claim_scope: Official Apple documentation for protected-resource purpose strings and related Info.plist keys.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-bundleresources-privacy-manifest-files
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/bundleresources/privacy-manifest-files
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-documentation-bundleresources-information-property-list-nsu
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/documentation/BundleResources/Information-Property-List/NSUserTrackingUsageDescription
+    review_cadence_days: 7
+    claim_scope: Official Apple Info.plist key documentation for ATT tracking usage description copy.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-support-third-party-sdk-requirements
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/support/third-party-SDK-requirements
+    review_cadence_days: 7
+    claim_scope: Official Apple list of third-party SDKs requiring privacy manifests and SDK signatures.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-configure-in-app-purchase-settings-ov
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/configure-in-app-purchase-settings/overview-for-configuring-in-app-purchases
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-create-custom-product-pages-configure
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/create-custom-product-pages/configure-multiple-product-page-versions
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-manage-app-information-localize-app-i
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/manage-app-information/localize-app-information
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-manage-app-information-manage-app-pri
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/manage-app-information/manage-app-privacy
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-manage-app-information-upload-app-pre
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/manage-app-information/upload-app-previews-and-screenshots
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-manage-builds-upload-builds
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/manage-builds/upload-builds
+    review_cadence_days: 7
+    claim_scope: Official App Store Connect documentation for uploading and processing builds.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-manage-in-app-purchases-set-a-price-f
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/manage-in-app-purchases/set-a-price-for-an-in-app-purchase
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-offer-in-app-events-offer-in-app-even
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/offer-in-app-events/offer-in-app-events
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-reference-app-information
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/reference/app-information
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-reference-app-information-app-store-l
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/reference/app-information/app-store-localizations
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-reference-app-information-platform-ve
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/reference/app-information/platform-version-information
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: github-com-eronred-aso-skills
+    name: ASO and App Marketing Skills
+    source_type: github
+    url: https://github.com/Eronred/aso-skills
+    review_cadence_days: 7
+    claim_scope: Selected screenshot strategy, preview and app-context guidance only; no tools, API integrations,
+      samples or marketing assets are imported.
+    last_review_date: 2026-09-06
+    reviewer: b2c-contributor source review
+    publisher: Erencan
+    revision: 4df730f456c21e42b9a2ea2be89fb32caf787728
+    retrieved_at: 2026-09-06T15:57:54.602674Z
+    upstream_id: eronred-aso-skills
+    selectors: &a1
+      - README.md
+      - skills/screenshot-optimization/SKILL.md
+      - skills/app-preview-video/SKILL.md
+      - skills/app-marketing-context/SKILL.md
+    rights:
+      status: verified
+      spdx: MIT
+      evidence: catalog/upstreams/notices/eronred-aso-skills.txt
+      evidence_sha256: 7fdc99dd7d8c1242068d470c2a3f91d531a622dbcad57da91971389dbe5155ec
+      notes: Selected guidance adapted; unimported assets and executable dependencies retain separate review
+        requirements.
+  - id: github-com-eronred-aso-skills-tree-main-skills
+    name: ASO and App Marketing Skills
+    source_type: github
+    url: https://github.com/Eronred/aso-skills
+    review_cadence_days: 7
+    claim_scope: Selected screenshot strategy, preview and app-context guidance only; no tools, API integrations,
+      samples or marketing assets are imported.
+    last_review_date: 2026-09-06
+    reviewer: b2c-contributor source review
+    publisher: Erencan
+    revision: 4df730f456c21e42b9a2ea2be89fb32caf787728
+    retrieved_at: 2026-09-06T15:57:54.602674Z
+    upstream_id: eronred-aso-skills
+    selectors: *a1
+    rights:
+      status: verified
+      spdx: MIT
+      evidence: catalog/upstreams/notices/eronred-aso-skills.txt
+      evidence_sha256: 7fdc99dd7d8c1242068d470c2a3f91d531a622dbcad57da91971389dbe5155ec
+      notes: Selected guidance adapted; unimported assets and executable dependencies retain separate review
+        requirements.
+  - id: github-com-parthjadhav-app-store-screenshots
+    name: App Store Screenshots
+    source_type: github
+    url: https://github.com/ParthJadhav/app-store-screenshots
+    review_cadence_days: 7
+    claim_scope: Selected README and skill overview/migration guidance (SKILL.md lines 1-105). No template code,
+      mockup, example captures, fonts or style packs are incorporated.
+    last_review_date: 2026-09-06
+    reviewer: b2c-contributor source review
+    publisher: Parth Jadhav
+    revision: 18951ddc4e06c53a3d34207732c16d9568f88d11
+    retrieved_at: 2026-09-06T15:57:52.804206Z
+    upstream_id: parth-app-store-screenshots
+    selectors: &a2
+      - README.md
+      - skills/app-store-screenshots/SKILL.md
+    rights:
+      status: verified
+      spdx: MIT
+      evidence: catalog/upstreams/notices/parth-app-store-screenshots.txt
+      evidence_sha256: a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a
+      notes: Selected guidance adapted; unimported assets and executable dependencies retain separate review
+        requirements.
+derivations:
+  - source_ids:
+      - github-com-eronred-aso-skills
+    relationship: adapted
+    baseline: 4df730f456c21e42b9a2ea2be89fb32caf787728
+    selectors: *a1
+    rationale: Reconcile existing selected guidance with the reviewed source while preserving builder artifact
+      ownership, host selection, authority and evidence semantics.
+    omissions:
+      - Omit unsupported numerical conversion claims and fixed ten-slot prescriptions. Use supported
+        device/locale requirements, real evidence and founder-approved product claims.
+      - Using an ASO method does not select Appeeky, grant access, create app-marketing-context.md as a
+        competing authority, or authorize paid research.
+      - The inspected tree has screenshot-optimization, app-preview-video and app-marketing-context. It has no
+        skills/ios-screenshots/SKILL.md; do not attribute that skill to this revision.
+    reviewer: b2c-contributor source review
+    reviewed_at: 2026-09-06
+    notice: catalog/upstreams/notices/eronred-aso-skills.txt
+    evaluation: npm run test:fixtures -- screenshot-upstreams
+  - source_ids:
+      - github-com-eronred-aso-skills-tree-main-skills
+    relationship: adapted
+    baseline: 4df730f456c21e42b9a2ea2be89fb32caf787728
+    selectors: *a1
+    rationale: Reconcile existing selected guidance with the reviewed source while preserving builder artifact
+      ownership, host selection, authority and evidence semantics.
+    omissions:
+      - Omit unsupported numerical conversion claims and fixed ten-slot prescriptions. Use supported
+        device/locale requirements, real evidence and founder-approved product claims.
+      - Using an ASO method does not select Appeeky, grant access, create app-marketing-context.md as a
+        competing authority, or authorize paid research.
+      - The inspected tree has screenshot-optimization, app-preview-video and app-marketing-context. It has no
+        skills/ios-screenshots/SKILL.md; do not attribute that skill to this revision.
+    reviewer: b2c-contributor source review
+    reviewed_at: 2026-09-06
+    notice: catalog/upstreams/notices/eronred-aso-skills.txt
+    evaluation: npm run test:fixtures -- screenshot-upstreams
+  - source_ids:
+      - github-com-parthjadhav-app-store-screenshots
+    relationship: adapted
+    baseline: 18951ddc4e06c53a3d34207732c16d9568f88d11
+    selectors: *a2
+    rationale: Reconcile existing selected guidance with the reviewed source while preserving builder artifact
+      ownership, host selection, authority and evidence semantics.
+    omissions:
+      - Use accepted product copy, DESIGN.md and source captures. Editor deck state owns presentation only; it
+        cannot redefine the product or silently replace a missing theme.
+      - No copy-over of the app root, global skill install or automatic editor upgrade. Preserve assets and
+        isolated export behavior; verify every crop after an authorized migration.
+      - Treat device labels and export sizes as upstream presets, not current Apple or Google requirements.
+        Required text and critical UI must survive each standalone crop.
+    reviewer: b2c-contributor source review
+    reviewed_at: 2026-09-06
+    notice: catalog/upstreams/notices/parth-app-store-screenshots.txt
+    evaluation: npm run test:fixtures -- screenshot-upstreams

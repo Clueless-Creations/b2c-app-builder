@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="design-state-hash" content="7413ab3bb5a7bc66" />
+  <meta name="design-contract-path" content="DESIGN.md" />
+  <title>App Name Design Room</title>
+  <style>
+    :root {
+      --color-background: #f7f3ec;
+      --color-surface: #fffdfa;
+      --color-surface-elevated: #ffffff;
+      --color-primary: #0c7c59;
+      --color-accent: #ff6f5c;
+      --color-text: #161512;
+      --color-muted: #686159;
+      --color-border: #d8d0c3;
+      --font-display: Fraunces, Georgia, serif;
+      --font-body: Source Sans 3, Avenir Next, sans-serif;
+      --radius-md: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --motion-duration-base: 220ms;
+      --motion-easing: cubic-bezier(0.2, 0, 0, 1);
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .card { animation: design-room-rise var(--motion-duration-base, 220ms) var(--motion-easing, ease) both; }
+    }
+    @keyframes design-room-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 15% 10%, color-mix(in srgb, var(--color-accent) 18%, transparent), transparent 28%),
+        linear-gradient(135deg, var(--color-background), color-mix(in srgb, var(--color-primary) 9%, var(--color-background)));
+      color: var(--color-text);
+      font: 15px/1.5 var(--font-body);
+    }
+    header { padding: 36px clamp(18px, 5vw, 56px) 28px; border-bottom: 1px solid var(--color-border); }
+    h1 { margin: 0; font: 700 clamp(38px, 8vw, 84px)/0.92 var(--font-display); max-width: 900px; }
+    h2 { margin: 0 0 14px; font: 700 clamp(24px, 4vw, 38px)/1 var(--font-display); }
+    h3 { margin: 0; font: 700 20px/1.1 var(--font-display); }
+    p { margin: 0; }
+    main { display: grid; gap: 18px; padding: 24px clamp(18px, 5vw, 56px) 56px; }
+    section { background: color-mix(in srgb, var(--color-surface) 94%, white); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 20px; overflow: hidden; }
+    ul { margin: 14px 0 0; padding-left: 20px; }
+    li + li { margin-top: 6px; }
+    code { border: 1px solid var(--color-border); border-radius: 6px; background: var(--color-surface); padding: 4px 7px; color: var(--color-muted); font-size: 12px; }
+    .eyebrow { color: var(--color-muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+    .intro { max-width: 760px; margin-top: 14px; color: var(--color-muted); }
+    .meta, .pills, .references { display: flex; flex-wrap: wrap; gap: 8px; }
+    .meta { margin-top: 18px; }
+    .pill, .reference, .status { border: 1px solid var(--color-border); border-radius: 999px; padding: 6px 10px; }
+    .pill { background: var(--color-surface); }
+    .platform { font-weight: 700; }
+    .status { background: var(--color-surface); color: var(--color-muted); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+    .status-ready, .status-approved, .status-published { color: var(--color-primary); border-color: color-mix(in srgb, var(--color-primary) 42%, var(--color-border)); }
+    .status-blocked { color: #9b332b; border-color: color-mix(in srgb, #9b332b 42%, var(--color-border)); }
+    .grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+    .card { border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface-elevated); padding: 16px; min-width: 0; }
+    .cardHead { display: flex; justify-content: space-between; align-items: start; gap: 14px; }
+    .screenCard > p { margin-top: 12px; }
+    .flowSteps { display: flex; flex-wrap: wrap; align-items: stretch; gap: 22px; margin: 18px 0 0; padding: 0; list-style: none; counter-reset: flow-step; }
+    .flowSteps li { position: relative; min-width: 150px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); padding: 12px; counter-increment: flow-step; }
+    .flowSteps li::before { content: counter(flow-step); display: block; color: var(--color-primary); font-weight: 800; }
+    .flowSteps li:not(:last-child)::after { content: "→"; position: absolute; right: -17px; top: 50%; color: var(--color-muted); transform: translateY(-50%); }
+    .flowSteps span, .flowSteps small { display: block; }
+    .flowSteps span { margin-top: 5px; font-weight: 700; }
+    .flowSteps small { margin-top: 3px; color: var(--color-muted); }
+    .flowSteps .unlinked { border-style: dashed; }
+    .relationships { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin-top: 16px; border-top: 1px solid var(--color-border); padding-top: 12px; }
+    .relationships strong { margin-right: 2px; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+    .reference { background: color-mix(in srgb, var(--color-primary) 9%, var(--color-surface)); color: var(--color-primary); font-size: 12px; }
+    .references { margin-top: 14px; }
+    .conceptCard { display: grid; gap: 12px; }
+    .conceptPremise { color: var(--color-muted); }
+    .conceptLabel { margin-top: 4px; color: var(--color-muted); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; }
+    .treatmentGrid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+    .treatmentGrid > div { border-left: 2px solid var(--color-border); padding-left: 10px; }
+    .treatmentGrid strong { font-size: 12px; }
+    .treatmentGrid p { margin-top: 3px; color: var(--color-muted); }
+    .empty { border: 1px dashed var(--color-border); border-radius: var(--radius-md); padding: 18px; color: var(--color-muted); }
+    .muted { color: var(--color-muted); }
+    .direction { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .direction article { border-top: 1px solid var(--color-border); padding-top: 10px; }
+    .direction h3 { margin-bottom: 7px; font-size: 15px; }
+    .swatches { display: flex; flex-wrap: wrap; gap: 10px; }
+    .swatch { display: grid; gap: 7px; min-width: 118px; color: var(--color-muted); font-size: 12px; }
+    .swatch::before { content: ""; display: block; height: 42px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--swatch); }
+    details.techDetails { border: 1px dashed var(--color-border); background: transparent; }
+    details.techDetails summary { cursor: pointer; color: var(--color-muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+    details.techDetails p { margin-top: 8px; color: var(--color-muted); font-size: 13px; }
+    @media (max-width: 680px) {
+      .flowSteps { display: grid; gap: 24px; }
+      .flowSteps li:not(:last-child)::after { content: "↓"; right: auto; left: 50%; top: auto; bottom: -23px; transform: translateX(-50%); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <p class="eyebrow">Design Room · read-only review</p>
+    <h1>App Name</h1>
+    <p class="intro">Review the selected mobile targets, the paths people take, and the screens those paths use. Edit the design sources, then render this page again.</p>
+    <div class="meta">
+      <span class="status status-not-started">not started</span>
+      <span class="pill">Contract: DESIGN.md</span>
+      <span class="pill">Updated: 2026-08-31</span>
+    </div>
+  </header>
+  <main>
+    <section>
+      <p class="eyebrow">Direction exploration</p>
+      <h2>Distinct concepts and the recorded choice</h2>
+      <div class="grid"><p class="empty">Direction exploration has not been recorded in DESIGN.md.</p></div>
+    </section>
+    <section>
+      <p class="eyebrow">Mobile targets</p>
+      <h2>Chosen implementation surface</h2>
+      <div class="pills"><span class="pill platform">Stack: unselected</span><span class="pill platform">ios</span></div>
+    </section>
+    <section>
+      <p class="eyebrow">Experience map</p>
+      <h2>Flows</h2>
+      <div class="grid"><p class="empty">No flows are recorded in the design state.</p></div>
+    </section>
+    <section>
+      <p class="eyebrow">Screen inventory</p>
+      <h2>Screens</h2>
+      <div class="grid"><p class="empty">No screens are recorded in the design state.</p></div>
+    </section>
+    <section>
+      <p class="eyebrow">Reusable system</p>
+      <h2>Component contracts</h2>
+      <div class="grid"><article class="card">
+        <div class="cardHead">
+          <div><p class="eyebrow">feedback.empty-state</p><h3>Empty state</h3></div>
+          <span class="status status-specified">specified</span>
+        </div>
+      </article><article class="card">
+        <div class="cardHead">
+          <div><p class="eyebrow">feedback.haptics</p><h3>Semantic haptics</h3></div>
+          <span class="status status-specified">specified</span>
+        </div>
+      </article><article class="card">
+        <div class="cardHead">
+          <div><p class="eyebrow">feedback.skeleton</p><h3>Skeleton loading</h3></div>
+          <span class="status status-specified">specified</span>
+        </div>
+      </article><article class="card">
+        <div class="cardHead">
+          <div><p class="eyebrow">input.keyboard-behavior</p><h3>Keyboard behavior</h3></div>
+          <span class="status status-specified">specified</span>
+        </div>
+      </article><article class="card">
+        <div class="cardHead">
+          <div><p class="eyebrow">interaction.press-feedback</p><h3>Press feedback</h3></div>
+          <span class="status status-specified">specified</span>
+        </div>
+      </article></div>
+    </section>
+    <section>
+      <p class="eyebrow">Native implementation</p>
+      <h2>Adapter coverage</h2>
+      <div class="grid"><article class="card">
+        <div class="cardHead">
+          <div><p class="eyebrow">swiftui</p><h3>SwiftUI</h3></div>
+          <span class="status status-implemented">implemented</span>
+        </div>
+        <p class="muted">5 of 5 reusable contracts mapped to real source.</p>
+      </article></div>
+
+    </section>
+    <section>
+      <p class="eyebrow">Product intent</p>
+      <h2>What the experience must do</h2>
+      <div class="direction">
+        <article><h3>Positioning</h3><p>One-sentence promise still to be defined.</p></article>
+        <article><h3>Audience</h3><p>Primary consumer segment still to be defined.</p></article>
+      </div>
+    </section>
+    <section>
+      <p class="eyebrow">Design direction</p>
+      <h2>Visual and interaction intent</h2>
+      <div class="direction">
+        <article><h3>Style</h3><p><span class="muted">Not set.</span></p></article>
+        <article><h3>Palette</h3><p><span class="muted">Not set.</span></p></article>
+        <article><h3>Typography</h3><p><span class="muted">Not set.</span></p></article>
+      </div>
+    </section>
+    <section>
+      <p class="eyebrow">Shared tokens</p>
+      <h2>Color anchors</h2>
+      <div class="swatches">
+        <span class="swatch" style="--swatch: #f7f3ec">Background<code>color.background</code></span><span class="swatch" style="--swatch: #fffdfa">Surface<code>color.surface</code></span><span class="swatch" style="--swatch: #0c7c59">Primary<code>color.primary</code></span><span class="swatch" style="--swatch: #ff6f5c">Accent<code>color.accent</code></span><span class="swatch" style="--swatch: #161512">Text<code>color.text</code></span><span class="swatch" style="--swatch: #d8d0c3">Border<code>color.border</code></span>
+      </div>
+    </section>
+    <details class="techDetails">
+      <summary>Technical details</summary>
+      <p>State hash: 7413ab3bb5a7bc66</p>
+      <p>Design contract: DESIGN.md</p>
+      <p>Authored token source: DESIGN.md</p>
+      <p>Design brief source: ui-ux-pro-max</p>
+    </details>
+  </main>
+</body>
+</html>

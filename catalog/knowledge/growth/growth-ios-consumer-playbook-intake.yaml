@@ -1,0 +1,19 @@
+schema_version: 1.0.0
+id: reference.growth.ios-consumer-playbook-intake
+title: iOS Consumer Playbook Intake
+domain_id: domain.growth
+document_path: knowledge/growth/ios-consumer-playbook-intake.md
+load_when: before encoding an external iOS consumer-app playbook into paywall, onboarding, or paid-UA
+  gates, including ToS-risky spend and social-proof tactics
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.growth.paid-user-acquisition-system
+    - workflow.research.research-backed-spec
+  context_pack_ids:
+    - context.growth
+applicability_notes: ADAPT durable mechanics. Reject unverifiable revenue claims and Apple- or
+  platform-ToS-risky tactics. Do not treat a tutorial outcome as a B2C App Builder promise.
+sources: []
+source_exemption: This package records an internal go or no-go mapping. Named playbook claims appear
+  as labels only. No live third-party command syntax is asserted.

@@ -1,0 +1,15 @@
+schema_version: 1.0.0
+id: reference.experience.emotional-experience-measurement
+title: Emotional Experience Measurement
+domain_id: domain.experience
+document_path: knowledge/experience/emotional-experience-measurement.md
+load_when: instrumenting an emotional-design or Experience Card feature — system-level events/metrics, per-card PostHog
+  events, leading behavioral metrics, dark-pattern counter-metrics, and A/B experiment design (measurement only; see
+  emotional-design-system.md for the psychology)
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.experience.emotional-experience-design-producer
+  context_pack_ids: []
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

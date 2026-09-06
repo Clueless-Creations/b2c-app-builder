@@ -1,0 +1,19 @@
+{
+  "full_name": "rorkai/App-Store-Connect-CLI",
+  "description": "Fast, scriptable CLI for the App Store Connect API. Automate TestFlight, builds, submissions, signing, analytics, screenshots, subscriptions, and more",
+  "homepage": "https://asccli.sh",
+  "license": {
+    "key": "mit",
+    "spdx_id": "MIT",
+    "name": "MIT License"
+  },
+  "default_branch": "main",
+  "pushed_at": "2026-09-05T21:19:50Z",
+  "updated_at": "2026-09-05T21:19:53Z",
+  "archived": false,
+  "fork": false,
+  "owner": {
+    "login": "rorkai",
+    "type": "Organization"
+  }
+}

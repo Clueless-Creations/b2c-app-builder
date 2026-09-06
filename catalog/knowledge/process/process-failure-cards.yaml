@@ -1,0 +1,34 @@
+schema_version: 1.0.0
+id: reference.process.failure-cards
+title: Failure Cards
+domain_id: domain.process
+document_path: knowledge/process/failure-cards.md
+load_when: before readiness claims; after a repeated agent miss; when adding a validator or scenario
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.process.launchbench-failure-cards-coverage-audit
+    - workflow.machine.asc-command-contract-maintainer
+    - workflow.machine.eval-suite-execution-maintainer
+    - workflow.orchestration.full-launch-closeout
+  context_pack_ids:
+    - context.machine
+sources:
+  - id: code-claude-com-docs-en-sandboxing
+    name: code.claude.com
+    source_type: official_docs
+    url: https://code.claude.com/docs/en/sandboxing
+    review_cadence_days: 30
+    claim_scope: Claude Code's native sandbox and its sandbox.network.allowLocalBinding setting, grounding the
+      native-sandbox-devserver-unreachable failure card.
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers
+  - id: github-com-florianbruniaux-claude-code-ultimate-guide-context-engineering
+    name: github.com
+    source_type: github
+    url: https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/guide/core/context-engineering.md
+    review_cadence_days: 30
+    claim_scope: The staleness-discipline pattern (last-reviewed date, ejection candidate, retirement on automation)
+      grounding the Refresh section.
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers

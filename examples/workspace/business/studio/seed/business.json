@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "1.0.0",
+  "updatedAt": "2026-08-31",
+  "business": {
+    "name": "App Name",
+    "slug": "app-name",
+    "stage": "concept",
+    "positioning": "One-sentence promise still to be defined.",
+    "targetAudience": "Primary consumer segment still to be defined."
+  },
+  "theme": {
+    "status": "provisional"
+  },
+  "designBrief": {
+    "source": "ui-ux-pro-max",
+    "productType": "{{PRODUCT_TYPE}}",
+    "recommendedStyle": "",
+    "paletteMood": "",
+    "typographyMood": "",
+    "keyEffects": [],
+    "antiPatterns": [],
+    "motionNotes": "Web surfaces animate with framer-motion from the motion.* tokens; the mobile binary uses native animation; honor reduced motion.",
+    "generatedAt": "",
+    "notes": "Run `npm run seed:design-brief`, then the ui-ux-pro-max skill, to fill recommendedStyle, paletteMood, typographyMood, keyEffects, and antiPatterns. Reference-only: adapt its guidance, do not paste its data."
+  },
+  "designRoom": {
+    "status": "not_started",
+    "contractPath": "DESIGN.md",
+    "renderPath": "design/design-room.html"
+  },
+  "surfaces": {
+    "webFunnels": [],
+    "landingPages": [],
+    "marketingAssets": [],
+    "mobileApp": {
+      "stack": "unselected",
+      "platforms": [
+        "ios"
+      ],
+      "screens": [],
+      "flows": []
+    },
+    "appStore": {
+      "defaultProductPage": {
+        "status": "not_started",
+        "positioning": "",
+        "screenshotCount": 0,
+        "appPreviewCount": 0,
+        "promotionalText": "",
+        "keywords": []
+      },
+      "customProductPages": [],
+      "productPageOptimizationTests": [],
+      "inAppEvents": []
+    }
+  }
+}

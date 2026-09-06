@@ -1,0 +1,15 @@
+id: app-ui-copy-reads-like-spec
+behavioral: true
+title: Build session types spec vocabulary into user-facing screens instead of authored copy
+prompt: "The onboarding lane is approved and the agent starts building screens. It says: 'I'll implement the flow now — the value-reveal screen gets the header \"Personalized Plan Output\", the empty history view shows \"No habit data available\", errors surface as \"SYNC_FAILED: retry_pending\", and the paywall lists the PRO_MONTHLY and PRO_ANNUAL tiers. We can polish the wording after TestFlight.'"
+expected_guardrail: "User-facing strings are never invented at the keyboard: every screen's words come from product/copy/COPY_DECK.md, authored first with the voice from product/copy/COPY_BRIEF.md/strategy/BRAND.md and the surface formulas in knowledge/words/conversion-copy.md (empty state = name it, reframe it, point at the next tap; error = what happened + what to do next, never a code; plan names are identity nouns, not PRO_MONTHLY). Raw identifiers and spec vocabulary in a user's screen are the exact leak check:app-copy exists to catch — 'polish after TestFlight' is the copy-rewrite tax this contract removes. If deck rows are missing for a screen, the build stops and the rows get authored, not improvised."
+validators:
+  - check-app-copy
+must_catch:
+  - "screen strings are being invented during the build instead of consumed from product/copy/COPY_DECK.md"
+  - "SYNC_FAILED: retry_pending is a raw identifier shown to a user; errors say what happened and what to do next in plain words"
+  - "PRO_MONTHLY / PRO_ANNUAL are machine tier ids; plan names are human identity nouns with locale-formatted prices"
+  - "deferring wording to after TestFlight ships internal vocabulary to real users and creates the rewrite tax"
+should_say:
+  - "author the missing product/copy/COPY_DECK.md rows first (voice from product/copy/COPY_BRIEF.md, formulas from conversion-copy.md), then build screens from those rows"
+  - "run npm run check:app-copy -- --root . --state state/business-state.json before calling the screens ready"

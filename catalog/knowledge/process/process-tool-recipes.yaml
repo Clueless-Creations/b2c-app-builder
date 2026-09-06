@@ -1,0 +1,16 @@
+schema_version: 1.0.0
+id: reference.process.tool-recipes
+title: Tool Recipes
+domain_id: domain.process
+document_path: knowledge/process/tool-recipes.md
+load_when: running research, setting up the funnel, configuring domain/email routing, checking analytics, choosing
+  stack, or verifying deployment — the Recipe Routing hub into the 8 files in tool-recipes/, the Paid Tool Decision
+  Protocol, and the Founder-Only Gates list
+lifecycle: active
+hub: true
+bindings:
+  workflow_ids:
+    - workflow.orchestration.orient-scaffold-and-state-cockpit-upkeep
+  context_pack_ids: []
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

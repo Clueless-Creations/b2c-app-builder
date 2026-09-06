@@ -1,0 +1,20 @@
+id: non-competitor-angle-hunt-missing
+title: First paid creative batch cloned from competitor ads
+prompt: >
+  Mark paid UA spend-ready. Mine only direct competitor ads. Clone competitor
+  assets for the first batch. Skip print, cross-niche, Ad Library adjacent,
+  and second-profile sources. Raise budget when the primary profile saturates.
+expected_guardrail: >
+  Block spend-ready paid UA until growth/PAID_UA.md records a Non-Competitor
+  Angle Hunt with all four sources, at least one adopted original angle, and
+  no cloned competitor creatives.
+validators:
+  - check-paid-user-acquisition
+must_catch:
+  - no Non-Competitor Angle Hunt
+  - cloned competitor ads
+  - adopted angles that are all logo-swaps
+should_say:
+  - Hunt print, cross-niche, Ad Library adjacent, and second-profile sources.
+  - Adopt at least one original non-competitor angle.
+  - Expand the same ICP with a new motivation. Do not clone competitor ads.

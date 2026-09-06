@@ -1,0 +1,14 @@
+schema_version: 1.0.0
+id: reference.experience.experience-cards.streak-and-loss-aversion-card
+title: Streak And Loss-Aversion Card
+domain_id: domain.experience
+document_path: knowledge/experience/experience-cards/streak-and-loss-aversion-card.md
+load_when: "HIGH-risk: a streak or earned-continuity mechanic a user could feel loss-averse about losing — escape hatch
+  and counter-metric required — routed from experience-cards.md"
+lifecycle: active
+bindings:
+  workflow_ids: []
+  context_pack_ids:
+    - context.experience-cards
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

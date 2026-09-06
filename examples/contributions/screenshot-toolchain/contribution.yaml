@@ -1,0 +1,997 @@
+apiVersion: b2c.contribution/v1
+id: screenshot-toolchain
+goal: Track and adapt existing screenshot, ASO and native capture upstreams without installing a competing agent
+  or granting provider authority.
+scope: contribution
+routing:
+  intendedTarget: Existing screenshot/capture knowledge and upstream maintenance records
+  effect: Reviewed guidance, source provenance, contribution checks and generated reports only
+  verdict: contribution
+  reason: Uses ADR-0005 and existing knowledge, upstream and package notice owners.
+createdAt: 2026-09-06T16:00:00Z
+synthetic: false
+sources:
+  - id: parth-app-store-screenshots
+    kind: repository
+    title: App Store Screenshots
+    canonicalUrl: https://github.com/ParthJadhav/app-store-screenshots
+    publisher: Parth Jadhav
+    revision: 18951ddc4e06c53a3d34207732c16d9568f88d11
+    retrievedAt: 2026-09-06T15:57:52.804206Z
+    reviewedAt: 2026-09-06
+    retrieval:
+      status: complete
+      method: Full selected documentation sections and license read at exact commit; not a claim to have reviewed the
+        entire repository.
+      notes: Selected README and skill overview/migration guidance (SKILL.md lines 1-105). No template code, mockup,
+        example captures, fonts or style packs are incorporated.
+    rights:
+      status: verified
+      spdx: MIT
+      scope: Selected README and skill overview/migration guidance (SKILL.md lines 1-105). No template code, mockup,
+        example captures, fonts or style packs are incorporated.
+      evidence: notices/parth-app-store-screenshots.txt
+      evidenceSha256: a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a
+    selectors: &a1
+      - README.md
+      - skills/app-store-screenshots/SKILL.md
+    registrySourceId: github-com-parthjadhav-app-store-screenshots
+    upstreamId: parth-app-store-screenshots
+    directives: []
+  - id: eronred-aso-skills
+    kind: repository
+    title: ASO and App Marketing Skills
+    canonicalUrl: https://github.com/Eronred/aso-skills
+    publisher: Erencan
+    revision: 4df730f456c21e42b9a2ea2be89fb32caf787728
+    retrievedAt: 2026-09-06T15:57:54.602674Z
+    reviewedAt: 2026-09-06
+    retrieval:
+      status: complete
+      method: Full selected documentation sections and license read at exact commit; not a claim to have reviewed the
+        entire repository.
+      notes: Selected screenshot strategy, preview and app-context guidance only; no tools, API integrations, samples
+        or marketing assets are imported.
+    rights:
+      status: verified
+      spdx: MIT
+      scope: Selected screenshot strategy, preview and app-context guidance only; no tools, API integrations, samples
+        or marketing assets are imported.
+      evidence: notices/eronred-aso-skills.txt
+      evidenceSha256: 7fdc99dd7d8c1242068d470c2a3f91d531a622dbcad57da91971389dbe5155ec
+    selectors: &a2
+      - README.md
+      - skills/screenshot-optimization/SKILL.md
+      - skills/app-preview-video/SKILL.md
+      - skills/app-marketing-context/SKILL.md
+    registrySourceId: github-com-eronred-aso-skills
+    upstreamId: eronred-aso-skills
+    directives: []
+  - id: sentry-xcodebuildmcp
+    kind: repository
+    title: XcodeBuildMCP
+    canonicalUrl: https://github.com/getsentry/XcodeBuildMCP
+    publisher: Cameron Cooke
+    revision: e6ef59b49b44012c824f0a0de261c96142e37390
+    retrievedAt: 2026-09-06T15:57:57.050471Z
+    reviewedAt: 2026-09-06
+    retrieval:
+      status: complete
+      method: Full selected documentation sections and license read at exact commit; not a claim to have reviewed the
+        entire repository.
+      notes: Selected help-first tool routing and capture guidance only. Upstream binaries, templates, third-party
+        packages and THIRD_PARTY_LICENSES components are not redistributed.
+    rights:
+      status: verified
+      spdx: MIT
+      scope: Selected help-first tool routing and capture guidance only. Upstream binaries, templates, third-party
+        packages and THIRD_PARTY_LICENSES components are not redistributed.
+      evidence: notices/sentry-xcodebuildmcp.txt
+      evidenceSha256: fef28fc4165c72b1f0e4ce94654ba44ad7ff7d5d2538b3d01e66e9cc5be3c4f6
+    selectors: &a3
+      - README.md
+      - skills/xcodebuildmcp/SKILL.md
+      - skills/xcodebuildmcp-cli/SKILL.md
+    registrySourceId: github-com-getsentry-xcodebuildmcp
+    upstreamId: sentry-xcodebuildmcp
+    directives: []
+  - id: sentry-snapshotpreviews
+    kind: repository
+    title: SnapshotPreviews
+    canonicalUrl: https://github.com/getsentry/SnapshotPreviews
+    publisher: Emerge Tools
+    revision: 856a1c1585e31d4113c019050d6d0712cf6ddadc
+    retrievedAt: 2026-09-06T15:57:58.988151Z
+    reviewedAt: 2026-09-06
+    retrieval:
+      status: complete
+      method: Full selected documentation sections and license read at exact commit; not a claim to have reviewed the
+        entire repository.
+      notes: Selected preview-export procedures and dependency awareness only. No package source, binary targets,
+        transitive dependencies or example app are incorporated.
+    rights:
+      status: verified
+      spdx: MIT
+      scope: Selected preview-export procedures and dependency awareness only. No package source, binary targets,
+        transitive dependencies or example app are incorporated.
+      evidence: notices/sentry-snapshotpreviews.txt
+      evidenceSha256: d0404079f9a0cfade1fa38c8d4809834851886212359b7ac9d5a20470f719e07
+    selectors: &a4
+      - README.md
+      - Package.swift
+    registrySourceId: github-com-emerge-tools-snapshotpreviews
+    upstreamId: sentry-snapshotpreviews
+    directives: []
+  - id: evanbacon-serve-sim
+    kind: repository
+    title: serve-sim
+    canonicalUrl: https://github.com/EvanBacon/serve-sim
+    publisher: Evan Bacon
+    revision: 0ee6fbde40a6b5840d0c6e0379f544feb9fa246b
+    retrievedAt: 2026-09-06T15:58:00.701780Z
+    reviewedAt: 2026-09-06
+    retrieval:
+      status: complete
+      method: Full selected documentation sections and license read at exact commit; not a claim to have reviewed the
+        entire repository.
+      notes: Selected simulator viewing and control guidance only. No Swift helper, injected library, source package,
+        camera integration or external dependency is incorporated. Root LICENSE has no project-specific
+        copyright line; package metadata names Evan Bacon.
+    rights:
+      status: verified
+      spdx: Apache-2.0
+      scope: Selected simulator viewing and control guidance only. No Swift helper, injected library, source package,
+        camera integration or external dependency is incorporated. Root LICENSE has no project-specific
+        copyright line; package metadata names Evan Bacon.
+      evidence: notices/evanbacon-serve-sim.txt
+      evidenceSha256: 9024cdf56dfe7e66523698a9f63d3a0061eb15f43bd5ea8e3833a56017ae37fd
+    selectors: &a5
+      - packages/serve-sim/README.md
+      - packages/serve-sim/package.json
+    registrySourceId: github-com-evanbacon-serve-sim
+    upstreamId: evanbacon-serve-sim
+    directives: []
+existingOwners:
+  - id: knowledge/store/screenshot-toolchain.md
+    path: knowledge/store/screenshot-toolchain.md
+    match: Already selected screenshot, store or device guidance
+  - id: knowledge/store/app-store-listing-prep.md
+    path: knowledge/store/app-store-listing-prep.md
+    match: Already selected screenshot, store or device guidance
+  - id: knowledge/store/store-console-workflow.md
+    path: knowledge/store/store-console-workflow.md
+    match: Already selected screenshot, store or device guidance
+  - id: knowledge/store/screenshot-toolchain.md
+    path: knowledge/store/screenshot-toolchain.md
+    match: Already selected screenshot, store or device guidance
+  - id: knowledge/store/app-store-listing-prep.md
+    path: knowledge/store/app-store-listing-prep.md
+    match: Already selected screenshot, store or device guidance
+  - id: knowledge/process/tool-recipes/growth-and-store-routing.md
+    path: knowledge/process/tool-recipes/growth-and-store-routing.md
+    match: Already selected screenshot, store or device guidance
+  - id: knowledge/engineering/xcodebuildmcp-testing.md
+    path: knowledge/engineering/xcodebuildmcp-testing.md
+    match: Already selected screenshot, store or device guidance
+  - id: knowledge/process/tool-recipes/device-capture-and-proof.md
+    path: knowledge/process/tool-recipes/device-capture-and-proof.md
+    match: Already selected screenshot, store or device guidance
+  - id: knowledge/engineering/xcodebuildmcp-testing.md
+    path: knowledge/engineering/xcodebuildmcp-testing.md
+    match: Already selected screenshot, store or device guidance
+  - id: knowledge/process/tool-recipes/device-capture-and-proof.md
+    path: knowledge/process/tool-recipes/device-capture-and-proof.md
+    match: Already selected screenshot, store or device guidance
+  - id: knowledge/engineering/xcodebuildmcp-testing.md
+    path: knowledge/engineering/xcodebuildmcp-testing.md
+    match: Already selected screenshot, store or device guidance
+  - id: knowledge/process/tool-recipes/device-capture-and-proof.md
+    path: knowledge/process/tool-recipes/device-capture-and-proof.md
+    match: Already selected screenshot, store or device guidance
+units:
+  - id: parth-app-store-screenshots-guidance-1
+    kind: knowledge
+    title: App Store Screenshots selected guidance
+    upstream:
+      sourceId: parth-app-store-screenshots
+      selector: README.md
+    target:
+      kind: new-reference
+      path: knowledge/store/screenshot-toolchain.md
+      owner: knowledge/store/screenshot-toolchain.md
+      id: reference.store.screenshot-toolchain
+    disposition: adapt
+    status: accepted
+    rationale: Preserve the useful procedure and traceable upstream while keeping app truth, authority, proofs and
+      package selection with existing owners.
+    verification:
+      - npm run test:fixtures -- screenshot-upstreams
+    selection: selected-method
+    kept:
+      - Documented methods and relevant supported-tool semantics.
+    changed:
+      - Use accepted product copy, DESIGN.md and source captures. Editor deck state owns presentation only; it
+        cannot redefine the product or silently replace a missing theme.
+      - No copy-over of the app root, global skill install or automatic editor upgrade. Preserve assets and
+        isolated export behavior; verify every crop after an authorized migration.
+      - Treat device labels and export sizes as upstream presets, not current Apple or Google requirements.
+        Required text and critical UI must survive each standalone crop.
+    omitted:
+      - Global installs, full upstream agents, unreviewed assets and unverified live support.
+  - id: parth-app-store-screenshots-guidance-2
+    kind: knowledge
+    title: App Store Screenshots selected guidance
+    upstream:
+      sourceId: parth-app-store-screenshots
+      selector: README.md
+    target:
+      kind: existing-reference
+      path: knowledge/store/app-store-listing-prep.md
+      owner: knowledge/store/app-store-listing-prep.md
+      id: reference.store.app-store-listing-prep
+    disposition: adapt
+    status: accepted
+    rationale: Preserve the useful procedure and traceable upstream while keeping app truth, authority, proofs and
+      package selection with existing owners.
+    verification:
+      - npm run test:fixtures -- screenshot-upstreams
+    selection: selected-method
+    kept:
+      - Documented methods and relevant supported-tool semantics.
+    changed:
+      - Use accepted product copy, DESIGN.md and source captures. Editor deck state owns presentation only; it
+        cannot redefine the product or silently replace a missing theme.
+      - No copy-over of the app root, global skill install or automatic editor upgrade. Preserve assets and
+        isolated export behavior; verify every crop after an authorized migration.
+      - Treat device labels and export sizes as upstream presets, not current Apple or Google requirements.
+        Required text and critical UI must survive each standalone crop.
+    omitted:
+      - Global installs, full upstream agents, unreviewed assets and unverified live support.
+  - id: parth-app-store-screenshots-guidance-3
+    kind: knowledge
+    title: App Store Screenshots selected guidance
+    upstream:
+      sourceId: parth-app-store-screenshots
+      selector: README.md
+    target:
+      kind: existing-reference
+      path: knowledge/store/store-console-workflow.md
+      owner: knowledge/store/store-console-workflow.md
+      id: reference.store.store-console-workflow
+    disposition: adapt
+    status: accepted
+    rationale: Preserve the useful procedure and traceable upstream while keeping app truth, authority, proofs and
+      package selection with existing owners.
+    verification:
+      - npm run test:fixtures -- screenshot-upstreams
+    selection: selected-method
+    kept:
+      - Documented methods and relevant supported-tool semantics.
+    changed:
+      - Use accepted product copy, DESIGN.md and source captures. Editor deck state owns presentation only; it
+        cannot redefine the product or silently replace a missing theme.
+      - No copy-over of the app root, global skill install or automatic editor upgrade. Preserve assets and
+        isolated export behavior; verify every crop after an authorized migration.
+      - Treat device labels and export sizes as upstream presets, not current Apple or Google requirements.
+        Required text and critical UI must survive each standalone crop.
+    omitted:
+      - Global installs, full upstream agents, unreviewed assets and unverified live support.
+  - id: eronred-aso-skills-guidance-1
+    kind: knowledge
+    title: ASO and App Marketing Skills selected guidance
+    upstream:
+      sourceId: eronred-aso-skills
+      selector: README.md
+    target:
+      kind: new-reference
+      path: knowledge/store/screenshot-toolchain.md
+      owner: knowledge/store/screenshot-toolchain.md
+      id: reference.store.screenshot-toolchain
+    disposition: adapt
+    status: accepted
+    rationale: Preserve the useful procedure and traceable upstream while keeping app truth, authority, proofs and
+      package selection with existing owners.
+    verification:
+      - npm run test:fixtures -- screenshot-upstreams
+    selection: selected-method
+    kept:
+      - Documented methods and relevant supported-tool semantics.
+    changed:
+      - Omit unsupported numerical conversion claims and fixed ten-slot prescriptions. Use supported
+        device/locale requirements, real evidence and founder-approved product claims.
+      - Using an ASO method does not select Appeeky, grant access, create app-marketing-context.md as a
+        competing authority, or authorize paid research.
+      - The inspected tree has screenshot-optimization, app-preview-video and app-marketing-context. It has no
+        skills/ios-screenshots/SKILL.md; do not attribute that skill to this revision.
+    omitted:
+      - Global installs, full upstream agents, unreviewed assets and unverified live support.
+  - id: eronred-aso-skills-guidance-2
+    kind: knowledge
+    title: ASO and App Marketing Skills selected guidance
+    upstream:
+      sourceId: eronred-aso-skills
+      selector: README.md
+    target:
+      kind: existing-reference
+      path: knowledge/store/app-store-listing-prep.md
+      owner: knowledge/store/app-store-listing-prep.md
+      id: reference.store.app-store-listing-prep
+    disposition: adapt
+    status: accepted
+    rationale: Preserve the useful procedure and traceable upstream while keeping app truth, authority, proofs and
+      package selection with existing owners.
+    verification:
+      - npm run test:fixtures -- screenshot-upstreams
+    selection: selected-method
+    kept:
+      - Documented methods and relevant supported-tool semantics.
+    changed:
+      - Omit unsupported numerical conversion claims and fixed ten-slot prescriptions. Use supported
+        device/locale requirements, real evidence and founder-approved product claims.
+      - Using an ASO method does not select Appeeky, grant access, create app-marketing-context.md as a
+        competing authority, or authorize paid research.
+      - The inspected tree has screenshot-optimization, app-preview-video and app-marketing-context. It has no
+        skills/ios-screenshots/SKILL.md; do not attribute that skill to this revision.
+    omitted:
+      - Global installs, full upstream agents, unreviewed assets and unverified live support.
+  - id: eronred-aso-skills-guidance-3
+    kind: knowledge
+    title: ASO and App Marketing Skills selected guidance
+    upstream:
+      sourceId: eronred-aso-skills
+      selector: README.md
+    target:
+      kind: existing-reference
+      path: knowledge/process/tool-recipes/growth-and-store-routing.md
+      owner: knowledge/process/tool-recipes/growth-and-store-routing.md
+      id: reference.process.tool-recipes.growth-and-store-routing
+    disposition: adapt
+    status: accepted
+    rationale: Preserve the useful procedure and traceable upstream while keeping app truth, authority, proofs and
+      package selection with existing owners.
+    verification:
+      - npm run test:fixtures -- screenshot-upstreams
+    selection: selected-method
+    kept:
+      - Documented methods and relevant supported-tool semantics.
+    changed:
+      - Omit unsupported numerical conversion claims and fixed ten-slot prescriptions. Use supported
+        device/locale requirements, real evidence and founder-approved product claims.
+      - Using an ASO method does not select Appeeky, grant access, create app-marketing-context.md as a
+        competing authority, or authorize paid research.
+      - The inspected tree has screenshot-optimization, app-preview-video and app-marketing-context. It has no
+        skills/ios-screenshots/SKILL.md; do not attribute that skill to this revision.
+    omitted:
+      - Global installs, full upstream agents, unreviewed assets and unverified live support.
+  - id: sentry-xcodebuildmcp-guidance-1
+    kind: knowledge
+    title: XcodeBuildMCP selected guidance
+    upstream:
+      sourceId: sentry-xcodebuildmcp
+      selector: README.md
+    target:
+      kind: existing-reference
+      path: knowledge/engineering/xcodebuildmcp-testing.md
+      owner: knowledge/engineering/xcodebuildmcp-testing.md
+      id: reference.engineering.xcodebuildmcp-testing
+    disposition: adapt
+    status: accepted
+    rationale: Preserve the useful procedure and traceable upstream while keeping app truth, authority, proofs and
+      package selection with existing owners.
+    verification:
+      - npm run test:fixtures -- screenshot-upstreams
+    selection: selected-method
+    kept:
+      - Documented methods and relevant supported-tool semantics.
+    changed:
+      - The upstream preference for XcodeBuildMCP over raw native tools does not override explicit business
+        bindings or adequate host-native tools. No global install or skill init runs during source adoption.
+      - Tool discovery and screenshot capture are not proof of current app correctness, provider behavior, store
+        readiness or independent design acceptance.
+    omitted:
+      - Global installs, full upstream agents, unreviewed assets and unverified live support.
+  - id: sentry-xcodebuildmcp-guidance-2
+    kind: knowledge
+    title: XcodeBuildMCP selected guidance
+    upstream:
+      sourceId: sentry-xcodebuildmcp
+      selector: README.md
+    target:
+      kind: existing-reference
+      path: knowledge/process/tool-recipes/device-capture-and-proof.md
+      owner: knowledge/process/tool-recipes/device-capture-and-proof.md
+      id: reference.process.tool-recipes.device-capture-and-proof
+    disposition: adapt
+    status: accepted
+    rationale: Preserve the useful procedure and traceable upstream while keeping app truth, authority, proofs and
+      package selection with existing owners.
+    verification:
+      - npm run test:fixtures -- screenshot-upstreams
+    selection: selected-method
+    kept:
+      - Documented methods and relevant supported-tool semantics.
+    changed:
+      - The upstream preference for XcodeBuildMCP over raw native tools does not override explicit business
+        bindings or adequate host-native tools. No global install or skill init runs during source adoption.
+      - Tool discovery and screenshot capture are not proof of current app correctness, provider behavior, store
+        readiness or independent design acceptance.
+    omitted:
+      - Global installs, full upstream agents, unreviewed assets and unverified live support.
+  - id: sentry-snapshotpreviews-guidance-1
+    kind: knowledge
+    title: SnapshotPreviews selected guidance
+    upstream:
+      sourceId: sentry-snapshotpreviews
+      selector: README.md
+    target:
+      kind: existing-reference
+      path: knowledge/engineering/xcodebuildmcp-testing.md
+      owner: knowledge/engineering/xcodebuildmcp-testing.md
+      id: reference.engineering.xcodebuildmcp-testing
+    disposition: adapt
+    status: accepted
+    rationale: Preserve the useful procedure and traceable upstream while keeping app truth, authority, proofs and
+      package selection with existing owners.
+    verification:
+      - npm run test:fixtures -- screenshot-upstreams
+    selection: selected-method
+    kept:
+      - Documented methods and relevant supported-tool semantics.
+    changed:
+      - PreviewLayoutTest exercises layout without producing PNGs; SnapshotTest can produce captures. Neither
+        establishes a real onboarding session, live data, purchases, or whole-business readiness.
+      - PreviewGallery is optional internal tooling, not a production app feature. Select dependency revisions
+        and inspect binary/transitive license and compatibility requirements separately.
+    omitted:
+      - Global installs, full upstream agents, unreviewed assets and unverified live support.
+  - id: sentry-snapshotpreviews-guidance-2
+    kind: knowledge
+    title: SnapshotPreviews selected guidance
+    upstream:
+      sourceId: sentry-snapshotpreviews
+      selector: README.md
+    target:
+      kind: existing-reference
+      path: knowledge/process/tool-recipes/device-capture-and-proof.md
+      owner: knowledge/process/tool-recipes/device-capture-and-proof.md
+      id: reference.process.tool-recipes.device-capture-and-proof
+    disposition: adapt
+    status: accepted
+    rationale: Preserve the useful procedure and traceable upstream while keeping app truth, authority, proofs and
+      package selection with existing owners.
+    verification:
+      - npm run test:fixtures -- screenshot-upstreams
+    selection: selected-method
+    kept:
+      - Documented methods and relevant supported-tool semantics.
+    changed:
+      - PreviewLayoutTest exercises layout without producing PNGs; SnapshotTest can produce captures. Neither
+        establishes a real onboarding session, live data, purchases, or whole-business readiness.
+      - PreviewGallery is optional internal tooling, not a production app feature. Select dependency revisions
+        and inspect binary/transitive license and compatibility requirements separately.
+    omitted:
+      - Global installs, full upstream agents, unreviewed assets and unverified live support.
+  - id: evanbacon-serve-sim-guidance-1
+    kind: knowledge
+    title: serve-sim selected guidance
+    upstream:
+      sourceId: evanbacon-serve-sim
+      selector: packages/serve-sim/README.md
+    target:
+      kind: existing-reference
+      path: knowledge/engineering/xcodebuildmcp-testing.md
+      owner: knowledge/engineering/xcodebuildmcp-testing.md
+      id: reference.engineering.xcodebuildmcp-testing
+    disposition: adapt
+    status: accepted
+    rationale: Preserve the useful procedure and traceable upstream while keeping app truth, authority, proofs and
+      package selection with existing owners.
+    verification:
+      - npm run test:fixtures -- screenshot-upstreams
+    selection: selected-method
+    kept:
+      - Documented methods and relevant supported-tool semantics.
+    changed:
+      - Use an explicitly selected simulator and local scoped endpoint; do not attach to every booted device or
+        expose a LAN/tunnel by default. Inspect actual host and Xcode requirements.
+      - Camera injection, webcam capture, host accessibility changes, remote exposure and stopping other
+        sessions require their own authority. Streaming does not certify provider state or signing readiness.
+    omitted:
+      - Global installs, full upstream agents, unreviewed assets and unverified live support.
+  - id: evanbacon-serve-sim-guidance-2
+    kind: knowledge
+    title: serve-sim selected guidance
+    upstream:
+      sourceId: evanbacon-serve-sim
+      selector: packages/serve-sim/README.md
+    target:
+      kind: existing-reference
+      path: knowledge/process/tool-recipes/device-capture-and-proof.md
+      owner: knowledge/process/tool-recipes/device-capture-and-proof.md
+      id: reference.process.tool-recipes.device-capture-and-proof
+    disposition: adapt
+    status: accepted
+    rationale: Preserve the useful procedure and traceable upstream while keeping app truth, authority, proofs and
+      package selection with existing owners.
+    verification:
+      - npm run test:fixtures -- screenshot-upstreams
+    selection: selected-method
+    kept:
+      - Documented methods and relevant supported-tool semantics.
+    changed:
+      - Use an explicitly selected simulator and local scoped endpoint; do not attach to every booted device or
+        expose a LAN/tunnel by default. Inspect actual host and Xcode requirements.
+      - Camera injection, webcam capture, host accessibility changes, remote exposure and stopping other
+        sessions require their own authority. Streaming does not certify provider state or signing readiness.
+    omitted:
+      - Global installs, full upstream agents, unreviewed assets and unverified live support.
+derivations:
+  - target: knowledge/store/screenshot-toolchain.md
+    sourceIds:
+      - parth-app-store-screenshots
+    relationship: adapted
+    baseline: 18951ddc4e06c53a3d34207732c16d9568f88d11
+    selectors: *a1
+    rationale: Selected procedures adapted to existing builder contracts; differences are recorded in catalog/upstreams.
+    omissions:
+      - Use accepted product copy, DESIGN.md and source captures. Editor deck state owns presentation only; it
+        cannot redefine the product or silently replace a missing theme.
+      - No copy-over of the app root, global skill install or automatic editor upgrade. Preserve assets and
+        isolated export behavior; verify every crop after an authorized migration.
+      - Treat device labels and export sizes as upstream presets, not current Apple or Google requirements.
+        Required text and critical UI must survive each standalone crop.
+    reviewer: b2c-contributor source review
+    reviewedAt: 2026-09-06
+    evaluation: npm run test:fixtures -- screenshot-upstreams
+    notice: notices/parth-app-store-screenshots.txt
+  - target: knowledge/store/app-store-listing-prep.md
+    sourceIds:
+      - parth-app-store-screenshots
+    relationship: adapted
+    baseline: 18951ddc4e06c53a3d34207732c16d9568f88d11
+    selectors: *a1
+    rationale: Selected procedures adapted to existing builder contracts; differences are recorded in catalog/upstreams.
+    omissions:
+      - Use accepted product copy, DESIGN.md and source captures. Editor deck state owns presentation only; it
+        cannot redefine the product or silently replace a missing theme.
+      - No copy-over of the app root, global skill install or automatic editor upgrade. Preserve assets and
+        isolated export behavior; verify every crop after an authorized migration.
+      - Treat device labels and export sizes as upstream presets, not current Apple or Google requirements.
+        Required text and critical UI must survive each standalone crop.
+    reviewer: b2c-contributor source review
+    reviewedAt: 2026-09-06
+    evaluation: npm run test:fixtures -- screenshot-upstreams
+    notice: notices/parth-app-store-screenshots.txt
+  - target: knowledge/store/store-console-workflow.md
+    sourceIds:
+      - parth-app-store-screenshots
+    relationship: adapted
+    baseline: 18951ddc4e06c53a3d34207732c16d9568f88d11
+    selectors: *a1
+    rationale: Selected procedures adapted to existing builder contracts; differences are recorded in catalog/upstreams.
+    omissions:
+      - Use accepted product copy, DESIGN.md and source captures. Editor deck state owns presentation only; it
+        cannot redefine the product or silently replace a missing theme.
+      - No copy-over of the app root, global skill install or automatic editor upgrade. Preserve assets and
+        isolated export behavior; verify every crop after an authorized migration.
+      - Treat device labels and export sizes as upstream presets, not current Apple or Google requirements.
+        Required text and critical UI must survive each standalone crop.
+    reviewer: b2c-contributor source review
+    reviewedAt: 2026-09-06
+    evaluation: npm run test:fixtures -- screenshot-upstreams
+    notice: notices/parth-app-store-screenshots.txt
+  - target: knowledge/store/screenshot-toolchain.md
+    sourceIds:
+      - eronred-aso-skills
+    relationship: adapted
+    baseline: 4df730f456c21e42b9a2ea2be89fb32caf787728
+    selectors: *a2
+    rationale: Selected procedures adapted to existing builder contracts; differences are recorded in catalog/upstreams.
+    omissions:
+      - Omit unsupported numerical conversion claims and fixed ten-slot prescriptions. Use supported
+        device/locale requirements, real evidence and founder-approved product claims.
+      - Using an ASO method does not select Appeeky, grant access, create app-marketing-context.md as a
+        competing authority, or authorize paid research.
+      - The inspected tree has screenshot-optimization, app-preview-video and app-marketing-context. It has no
+        skills/ios-screenshots/SKILL.md; do not attribute that skill to this revision.
+    reviewer: b2c-contributor source review
+    reviewedAt: 2026-09-06
+    evaluation: npm run test:fixtures -- screenshot-upstreams
+    notice: notices/eronred-aso-skills.txt
+  - target: knowledge/store/app-store-listing-prep.md
+    sourceIds:
+      - eronred-aso-skills
+    relationship: adapted
+    baseline: 4df730f456c21e42b9a2ea2be89fb32caf787728
+    selectors: *a2
+    rationale: Selected procedures adapted to existing builder contracts; differences are recorded in catalog/upstreams.
+    omissions:
+      - Omit unsupported numerical conversion claims and fixed ten-slot prescriptions. Use supported
+        device/locale requirements, real evidence and founder-approved product claims.
+      - Using an ASO method does not select Appeeky, grant access, create app-marketing-context.md as a
+        competing authority, or authorize paid research.
+      - The inspected tree has screenshot-optimization, app-preview-video and app-marketing-context. It has no
+        skills/ios-screenshots/SKILL.md; do not attribute that skill to this revision.
+    reviewer: b2c-contributor source review
+    reviewedAt: 2026-09-06
+    evaluation: npm run test:fixtures -- screenshot-upstreams
+    notice: notices/eronred-aso-skills.txt
+  - target: knowledge/process/tool-recipes/growth-and-store-routing.md
+    sourceIds:
+      - eronred-aso-skills
+    relationship: adapted
+    baseline: 4df730f456c21e42b9a2ea2be89fb32caf787728
+    selectors: *a2
+    rationale: Selected procedures adapted to existing builder contracts; differences are recorded in catalog/upstreams.
+    omissions:
+      - Omit unsupported numerical conversion claims and fixed ten-slot prescriptions. Use supported
+        device/locale requirements, real evidence and founder-approved product claims.
+      - Using an ASO method does not select Appeeky, grant access, create app-marketing-context.md as a
+        competing authority, or authorize paid research.
+      - The inspected tree has screenshot-optimization, app-preview-video and app-marketing-context. It has no
+        skills/ios-screenshots/SKILL.md; do not attribute that skill to this revision.
+    reviewer: b2c-contributor source review
+    reviewedAt: 2026-09-06
+    evaluation: npm run test:fixtures -- screenshot-upstreams
+    notice: notices/eronred-aso-skills.txt
+  - target: knowledge/engineering/xcodebuildmcp-testing.md
+    sourceIds:
+      - sentry-xcodebuildmcp
+    relationship: adapted
+    baseline: e6ef59b49b44012c824f0a0de261c96142e37390
+    selectors: *a3
+    rationale: Selected procedures adapted to existing builder contracts; differences are recorded in catalog/upstreams.
+    omissions:
+      - The upstream preference for XcodeBuildMCP over raw native tools does not override explicit business
+        bindings or adequate host-native tools. No global install or skill init runs during source adoption.
+      - Tool discovery and screenshot capture are not proof of current app correctness, provider behavior, store
+        readiness or independent design acceptance.
+    reviewer: b2c-contributor source review
+    reviewedAt: 2026-09-06
+    evaluation: npm run test:fixtures -- screenshot-upstreams
+    notice: notices/sentry-xcodebuildmcp.txt
+  - target: knowledge/process/tool-recipes/device-capture-and-proof.md
+    sourceIds:
+      - sentry-xcodebuildmcp
+    relationship: adapted
+    baseline: e6ef59b49b44012c824f0a0de261c96142e37390
+    selectors: *a3
+    rationale: Selected procedures adapted to existing builder contracts; differences are recorded in catalog/upstreams.
+    omissions:
+      - The upstream preference for XcodeBuildMCP over raw native tools does not override explicit business
+        bindings or adequate host-native tools. No global install or skill init runs during source adoption.
+      - Tool discovery and screenshot capture are not proof of current app correctness, provider behavior, store
+        readiness or independent design acceptance.
+    reviewer: b2c-contributor source review
+    reviewedAt: 2026-09-06
+    evaluation: npm run test:fixtures -- screenshot-upstreams
+    notice: notices/sentry-xcodebuildmcp.txt
+  - target: knowledge/engineering/xcodebuildmcp-testing.md
+    sourceIds:
+      - sentry-snapshotpreviews
+    relationship: adapted
+    baseline: 856a1c1585e31d4113c019050d6d0712cf6ddadc
+    selectors: *a4
+    rationale: Selected procedures adapted to existing builder contracts; differences are recorded in catalog/upstreams.
+    omissions:
+      - PreviewLayoutTest exercises layout without producing PNGs; SnapshotTest can produce captures. Neither
+        establishes a real onboarding session, live data, purchases, or whole-business readiness.
+      - PreviewGallery is optional internal tooling, not a production app feature. Select dependency revisions
+        and inspect binary/transitive license and compatibility requirements separately.
+    reviewer: b2c-contributor source review
+    reviewedAt: 2026-09-06
+    evaluation: npm run test:fixtures -- screenshot-upstreams
+    notice: notices/sentry-snapshotpreviews.txt
+  - target: knowledge/process/tool-recipes/device-capture-and-proof.md
+    sourceIds:
+      - sentry-snapshotpreviews
+    relationship: adapted
+    baseline: 856a1c1585e31d4113c019050d6d0712cf6ddadc
+    selectors: *a4
+    rationale: Selected procedures adapted to existing builder contracts; differences are recorded in catalog/upstreams.
+    omissions:
+      - PreviewLayoutTest exercises layout without producing PNGs; SnapshotTest can produce captures. Neither
+        establishes a real onboarding session, live data, purchases, or whole-business readiness.
+      - PreviewGallery is optional internal tooling, not a production app feature. Select dependency revisions
+        and inspect binary/transitive license and compatibility requirements separately.
+    reviewer: b2c-contributor source review
+    reviewedAt: 2026-09-06
+    evaluation: npm run test:fixtures -- screenshot-upstreams
+    notice: notices/sentry-snapshotpreviews.txt
+  - target: knowledge/engineering/xcodebuildmcp-testing.md
+    sourceIds:
+      - evanbacon-serve-sim
+    relationship: adapted
+    baseline: 0ee6fbde40a6b5840d0c6e0379f544feb9fa246b
+    selectors: *a5
+    rationale: Selected procedures adapted to existing builder contracts; differences are recorded in catalog/upstreams.
+    omissions:
+      - Use an explicitly selected simulator and local scoped endpoint; do not attach to every booted device or
+        expose a LAN/tunnel by default. Inspect actual host and Xcode requirements.
+      - Camera injection, webcam capture, host accessibility changes, remote exposure and stopping other
+        sessions require their own authority. Streaming does not certify provider state or signing readiness.
+    reviewer: b2c-contributor source review
+    reviewedAt: 2026-09-06
+    evaluation: npm run test:fixtures -- screenshot-upstreams
+    notice: notices/evanbacon-serve-sim.txt
+  - target: knowledge/process/tool-recipes/device-capture-and-proof.md
+    sourceIds:
+      - evanbacon-serve-sim
+    relationship: adapted
+    baseline: 0ee6fbde40a6b5840d0c6e0379f544feb9fa246b
+    selectors: *a5
+    rationale: Selected procedures adapted to existing builder contracts; differences are recorded in catalog/upstreams.
+    omissions:
+      - Use an explicitly selected simulator and local scoped endpoint; do not attach to every booted device or
+        expose a LAN/tunnel by default. Inspect actual host and Xcode requirements.
+      - Camera injection, webcam capture, host accessibility changes, remote exposure and stopping other
+        sessions require their own authority. Streaming does not certify provider state or signing readiness.
+    reviewer: b2c-contributor source review
+    reviewedAt: 2026-09-06
+    evaluation: npm run test:fixtures -- screenshot-upstreams
+    notice: notices/evanbacon-serve-sim.txt
+evaluations:
+  - id: parth-app-store-screenshots-guidance-1-checks
+    unitId: parth-app-store-screenshots-guidance-1
+    kind: command
+    description: Check provenance, notice delivery, bounded routing and the no-live-support boundary.
+    command: npm run test:fixtures -- screenshot-upstreams
+  - id: parth-app-store-screenshots-guidance-2-checks
+    unitId: parth-app-store-screenshots-guidance-2
+    kind: command
+    description: Check provenance, notice delivery, bounded routing and the no-live-support boundary.
+    command: npm run test:fixtures -- screenshot-upstreams
+  - id: parth-app-store-screenshots-guidance-3-checks
+    unitId: parth-app-store-screenshots-guidance-3
+    kind: command
+    description: Check provenance, notice delivery, bounded routing and the no-live-support boundary.
+    command: npm run test:fixtures -- screenshot-upstreams
+  - id: eronred-aso-skills-guidance-1-checks
+    unitId: eronred-aso-skills-guidance-1
+    kind: command
+    description: Check provenance, notice delivery, bounded routing and the no-live-support boundary.
+    command: npm run test:fixtures -- screenshot-upstreams
+  - id: eronred-aso-skills-guidance-2-checks
+    unitId: eronred-aso-skills-guidance-2
+    kind: command
+    description: Check provenance, notice delivery, bounded routing and the no-live-support boundary.
+    command: npm run test:fixtures -- screenshot-upstreams
+  - id: eronred-aso-skills-guidance-3-checks
+    unitId: eronred-aso-skills-guidance-3
+    kind: command
+    description: Check provenance, notice delivery, bounded routing and the no-live-support boundary.
+    command: npm run test:fixtures -- screenshot-upstreams
+  - id: sentry-xcodebuildmcp-guidance-1-checks
+    unitId: sentry-xcodebuildmcp-guidance-1
+    kind: command
+    description: Check provenance, notice delivery, bounded routing and the no-live-support boundary.
+    command: npm run test:fixtures -- screenshot-upstreams
+  - id: sentry-xcodebuildmcp-guidance-2-checks
+    unitId: sentry-xcodebuildmcp-guidance-2
+    kind: command
+    description: Check provenance, notice delivery, bounded routing and the no-live-support boundary.
+    command: npm run test:fixtures -- screenshot-upstreams
+  - id: sentry-snapshotpreviews-guidance-1-checks
+    unitId: sentry-snapshotpreviews-guidance-1
+    kind: command
+    description: Check provenance, notice delivery, bounded routing and the no-live-support boundary.
+    command: npm run test:fixtures -- screenshot-upstreams
+  - id: sentry-snapshotpreviews-guidance-2-checks
+    unitId: sentry-snapshotpreviews-guidance-2
+    kind: command
+    description: Check provenance, notice delivery, bounded routing and the no-live-support boundary.
+    command: npm run test:fixtures -- screenshot-upstreams
+  - id: evanbacon-serve-sim-guidance-1-checks
+    unitId: evanbacon-serve-sim-guidance-1
+    kind: command
+    description: Check provenance, notice delivery, bounded routing and the no-live-support boundary.
+    command: npm run test:fixtures -- screenshot-upstreams
+  - id: evanbacon-serve-sim-guidance-2-checks
+    unitId: evanbacon-serve-sim-guidance-2
+    kind: command
+    description: Check provenance, notice delivery, bounded routing and the no-live-support boundary.
+    command: npm run test:fixtures -- screenshot-upstreams
+  - id: parth-app-store-screenshots-guidance-1-counterexample
+    unitId: parth-app-store-screenshots-guidance-1
+    kind: counterexample
+    description: Reject attribution-only adoption that has no source-specific provenance or treats guidance as
+      executable proof.
+    mustFail:
+      - An accepted adaptation names a branch instead of its reviewed immutable commit.
+      - A retained notice belongs to another project or carries changed bytes.
+      - A screenshot compositor output is presented as a native app-session observation.
+    mustPass:
+      - The correct source commit, target reference, notice bytes and bounded selected guidance are retained.
+    path: checks/verification/fixtures/screenshot-upstreams.fixtures.ts
+  - id: parth-app-store-screenshots-guidance-2-counterexample
+    unitId: parth-app-store-screenshots-guidance-2
+    kind: counterexample
+    description: Reject attribution-only adoption that has no source-specific provenance or treats guidance as
+      executable proof.
+    mustFail:
+      - An accepted adaptation names a branch instead of its reviewed immutable commit.
+      - A retained notice belongs to another project or carries changed bytes.
+      - A screenshot compositor output is presented as a native app-session observation.
+    mustPass:
+      - The correct source commit, target reference, notice bytes and bounded selected guidance are retained.
+    path: checks/verification/fixtures/screenshot-upstreams.fixtures.ts
+  - id: parth-app-store-screenshots-guidance-3-counterexample
+    unitId: parth-app-store-screenshots-guidance-3
+    kind: counterexample
+    description: Reject attribution-only adoption that has no source-specific provenance or treats guidance as
+      executable proof.
+    mustFail:
+      - An accepted adaptation names a branch instead of its reviewed immutable commit.
+      - A retained notice belongs to another project or carries changed bytes.
+      - A screenshot compositor output is presented as a native app-session observation.
+    mustPass:
+      - The correct source commit, target reference, notice bytes and bounded selected guidance are retained.
+    path: checks/verification/fixtures/screenshot-upstreams.fixtures.ts
+  - id: eronred-aso-skills-guidance-1-counterexample
+    unitId: eronred-aso-skills-guidance-1
+    kind: counterexample
+    description: Reject attribution-only adoption that has no source-specific provenance or treats guidance as
+      executable proof.
+    mustFail:
+      - An accepted adaptation names a branch instead of its reviewed immutable commit.
+      - A retained notice belongs to another project or carries changed bytes.
+      - A screenshot compositor output is presented as a native app-session observation.
+    mustPass:
+      - The correct source commit, target reference, notice bytes and bounded selected guidance are retained.
+    path: checks/verification/fixtures/screenshot-upstreams.fixtures.ts
+  - id: eronred-aso-skills-guidance-2-counterexample
+    unitId: eronred-aso-skills-guidance-2
+    kind: counterexample
+    description: Reject attribution-only adoption that has no source-specific provenance or treats guidance as
+      executable proof.
+    mustFail:
+      - An accepted adaptation names a branch instead of its reviewed immutable commit.
+      - A retained notice belongs to another project or carries changed bytes.
+      - A screenshot compositor output is presented as a native app-session observation.
+    mustPass:
+      - The correct source commit, target reference, notice bytes and bounded selected guidance are retained.
+    path: checks/verification/fixtures/screenshot-upstreams.fixtures.ts
+  - id: eronred-aso-skills-guidance-3-counterexample
+    unitId: eronred-aso-skills-guidance-3
+    kind: counterexample
+    description: Reject attribution-only adoption that has no source-specific provenance or treats guidance as
+      executable proof.
+    mustFail:
+      - An accepted adaptation names a branch instead of its reviewed immutable commit.
+      - A retained notice belongs to another project or carries changed bytes.
+      - A screenshot compositor output is presented as a native app-session observation.
+    mustPass:
+      - The correct source commit, target reference, notice bytes and bounded selected guidance are retained.
+    path: checks/verification/fixtures/screenshot-upstreams.fixtures.ts
+  - id: sentry-xcodebuildmcp-guidance-1-counterexample
+    unitId: sentry-xcodebuildmcp-guidance-1
+    kind: counterexample
+    description: Reject attribution-only adoption that has no source-specific provenance or treats guidance as
+      executable proof.
+    mustFail:
+      - An accepted adaptation names a branch instead of its reviewed immutable commit.
+      - A retained notice belongs to another project or carries changed bytes.
+      - A screenshot compositor output is presented as a native app-session observation.
+    mustPass:
+      - The correct source commit, target reference, notice bytes and bounded selected guidance are retained.
+    path: checks/verification/fixtures/screenshot-upstreams.fixtures.ts
+  - id: sentry-xcodebuildmcp-guidance-2-counterexample
+    unitId: sentry-xcodebuildmcp-guidance-2
+    kind: counterexample
+    description: Reject attribution-only adoption that has no source-specific provenance or treats guidance as
+      executable proof.
+    mustFail:
+      - An accepted adaptation names a branch instead of its reviewed immutable commit.
+      - A retained notice belongs to another project or carries changed bytes.
+      - A screenshot compositor output is presented as a native app-session observation.
+    mustPass:
+      - The correct source commit, target reference, notice bytes and bounded selected guidance are retained.
+    path: checks/verification/fixtures/screenshot-upstreams.fixtures.ts
+  - id: sentry-snapshotpreviews-guidance-1-counterexample
+    unitId: sentry-snapshotpreviews-guidance-1
+    kind: counterexample
+    description: Reject attribution-only adoption that has no source-specific provenance or treats guidance as
+      executable proof.
+    mustFail:
+      - An accepted adaptation names a branch instead of its reviewed immutable commit.
+      - A retained notice belongs to another project or carries changed bytes.
+      - A screenshot compositor output is presented as a native app-session observation.
+    mustPass:
+      - The correct source commit, target reference, notice bytes and bounded selected guidance are retained.
+    path: checks/verification/fixtures/screenshot-upstreams.fixtures.ts
+  - id: sentry-snapshotpreviews-guidance-2-counterexample
+    unitId: sentry-snapshotpreviews-guidance-2
+    kind: counterexample
+    description: Reject attribution-only adoption that has no source-specific provenance or treats guidance as
+      executable proof.
+    mustFail:
+      - An accepted adaptation names a branch instead of its reviewed immutable commit.
+      - A retained notice belongs to another project or carries changed bytes.
+      - A screenshot compositor output is presented as a native app-session observation.
+    mustPass:
+      - The correct source commit, target reference, notice bytes and bounded selected guidance are retained.
+    path: checks/verification/fixtures/screenshot-upstreams.fixtures.ts
+  - id: evanbacon-serve-sim-guidance-1-counterexample
+    unitId: evanbacon-serve-sim-guidance-1
+    kind: counterexample
+    description: Reject attribution-only adoption that has no source-specific provenance or treats guidance as
+      executable proof.
+    mustFail:
+      - An accepted adaptation names a branch instead of its reviewed immutable commit.
+      - A retained notice belongs to another project or carries changed bytes.
+      - A screenshot compositor output is presented as a native app-session observation.
+    mustPass:
+      - The correct source commit, target reference, notice bytes and bounded selected guidance are retained.
+    path: checks/verification/fixtures/screenshot-upstreams.fixtures.ts
+  - id: evanbacon-serve-sim-guidance-2-counterexample
+    unitId: evanbacon-serve-sim-guidance-2
+    kind: counterexample
+    description: Reject attribution-only adoption that has no source-specific provenance or treats guidance as
+      executable proof.
+    mustFail:
+      - An accepted adaptation names a branch instead of its reviewed immutable commit.
+      - A retained notice belongs to another project or carries changed bytes.
+      - A screenshot compositor output is presented as a native app-session observation.
+    mustPass:
+      - The correct source commit, target reference, notice bytes and bounded selected guidance are retained.
+    path: checks/verification/fixtures/screenshot-upstreams.fixtures.ts
+requiredChecks:
+  - npm run test:fixtures -- screenshot-upstreams
+  - npm run check:upstreams
+  - npm run check:credits
+affectedOutputs:
+  - knowledge/store/screenshot-toolchain.md
+  - knowledge/store/app-store-listing-prep.md
+  - knowledge/store/store-console-workflow.md
+  - knowledge/store/screenshot-toolchain.md
+  - knowledge/store/app-store-listing-prep.md
+  - knowledge/process/tool-recipes/growth-and-store-routing.md
+  - knowledge/engineering/xcodebuildmcp-testing.md
+  - knowledge/process/tool-recipes/device-capture-and-proof.md
+  - knowledge/engineering/xcodebuildmcp-testing.md
+  - knowledge/process/tool-recipes/device-capture-and-proof.md
+  - knowledge/engineering/xcodebuildmcp-testing.md
+  - knowledge/process/tool-recipes/device-capture-and-proof.md
+missingCoreMechanism:
+  present: false
+notices:
+  - sourceId: parth-app-store-screenshots
+    spdx: MIT
+    copyright: Copyright (c) 2026 Parth Jadhav
+    noticePath: notices/parth-app-store-screenshots.txt
+    covers:
+      - knowledge/store/screenshot-toolchain.md
+      - knowledge/store/app-store-listing-prep.md
+      - knowledge/store/store-console-workflow.md
+  - sourceId: eronred-aso-skills
+    spdx: MIT
+    copyright: Copyright (c) 2026 Erencan
+    noticePath: notices/eronred-aso-skills.txt
+    covers:
+      - knowledge/store/screenshot-toolchain.md
+      - knowledge/store/app-store-listing-prep.md
+      - knowledge/process/tool-recipes/growth-and-store-routing.md
+  - sourceId: sentry-xcodebuildmcp
+    spdx: MIT
+    copyright: Copyright (c) 2025 Cameron Cooke
+    noticePath: notices/sentry-xcodebuildmcp.txt
+    covers:
+      - knowledge/engineering/xcodebuildmcp-testing.md
+      - knowledge/process/tool-recipes/device-capture-and-proof.md
+  - sourceId: sentry-snapshotpreviews
+    spdx: MIT
+    copyright: Copyright (c) 2023 Emerge Tools
+    noticePath: notices/sentry-snapshotpreviews.txt
+    covers:
+      - knowledge/engineering/xcodebuildmcp-testing.md
+      - knowledge/process/tool-recipes/device-capture-and-proof.md
+  - sourceId: evanbacon-serve-sim
+    spdx: Apache-2.0
+    copyright: "Project-specific copyright line not stated in LICENSE; attribution: Evan Bacon (package author)."
+    noticePath: notices/evanbacon-serve-sim.txt
+    covers:
+      - knowledge/engineering/xcodebuildmcp-testing.md
+      - knowledge/process/tool-recipes/device-capture-and-proof.md
+uncertainties:
+  - Reviewed code/knowledge contributions are not proof of live screenshot export, simulator behavior, store
+    acceptance or higher conversion.

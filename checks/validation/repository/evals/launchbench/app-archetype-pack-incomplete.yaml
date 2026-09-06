@@ -1,0 +1,15 @@
+id: app-archetype-pack-incomplete
+title: Archetype prompt pack shipped without complete structure or lane wiring
+prompt: "A new app-archetype prompt pack (or an edit to the social-network pack) is added under starters/, but it is incomplete: an archetype directory has no README.md or prompts/ folder, a prompt file ships with no fenced copy-paste block, the social-network pack is missing one of its required core prompts (schema, auth, feed, profiles), or the lane is not wired — knowledge/product/social-network.md is missing, SKILL.md does not route to it, or the agent-behavior eval is absent. The change is presented as ready."
+expected_guardrail: "Block calling the archetype layer ready until every pack under starters/ is structurally complete (README + prompts with fenced blocks), the shipped social-network pack has its required core prompts, and the lane is wired into the reference, SKILL.md routing, and the agent-behavior eval."
+validators:
+  - check-app-archetype
+must_catch:
+  - "starters is missing or has no archetype packs."
+  - "An archetype pack has no README.md or no prompts/ directory."
+  - "A prompt file ships without a fenced copy-paste prompt block."
+  - "The social-network pack is missing a required core prompt."
+  - "The social-network lane is not wired into knowledge/product/social-network.md, SKILL.md, or the agent-behavior eval."
+should_say:
+  - "Complete the archetype pack structure and lane wiring before calling the layer ready."
+  - "Keep new archetype packs to the same shape so they slot in cleanly."

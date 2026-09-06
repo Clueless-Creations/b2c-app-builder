@@ -1,0 +1,70 @@
+schema_version: 1.0.0
+id: reference.data.posthog-agent-tooling
+title: PostHog Agent Tooling
+domain_id: domain.data
+document_path: knowledge/data/posthog-agent-tooling.md
+load_when: when the selected PostHog operation needs official agent setup, identity, instrumentation, or verification procedures
+lifecycle: active
+applicability_notes: Default worker provider guidance only. No neutral capability, unselected provider, global skill
+  installation, or remote action is implied.
+bindings:
+  workflow_ids:
+    - workflow.data.analytics-and-attribution-blueprint
+    - workflow.experience.onboarding-system.onb-13-analytics-experiments
+    - workflow.experience.onboarding-system.onb-07-provider-policy-landscape
+  context_pack_ids: []
+sources:
+  - id: github-com-posthog-wizard
+    name: PostHog wizard
+    source_type: github
+    url: https://github.com/PostHog/wizard
+    review_cadence_days: 7
+    claim_scope: Selected procedures and limitations; no installed or live-provider support claim.
+    last_review_date: 2026-09-06
+    reviewer: b2c-contributor source review
+    publisher: PostHog
+    revision: 41c12328636f46a517777b17359dd8f5b3d14d96
+    retrieved_at: 2026-09-06T13:59:44.598491Z
+    rights:
+      status: verified
+      spdx: MIT
+      evidence: catalog/upstreams/notices/posthog-wizard.txt
+      evidence_sha256: 6dd6cb84dae639a6d710f4217f507a1f590864cd2c4699557a8380b0a7254d27
+    selectors:
+      - README.md
+      - src/lib/programs
+      - src/lib/agent
+    upstream_id: posthog-wizard
+  - id: posthog-identify-onboarding
+    name: Official provider documentation
+    source_type: documentation
+    url: https://posthog.com/docs/product-analytics/identify
+    review_cadence_days: 7
+    claim_scope: Official identity and privacy behavior used to resolve upstream assumptions.
+    last_review_date: 2026-09-06
+    reviewer: b2c-contributor source review
+  - id: posthog-com-docs-privacy-data-collection
+    name: Official provider documentation
+    source_type: documentation
+    url: https://posthog.com/docs/privacy/data-collection
+    review_cadence_days: 7
+    claim_scope: Official identity and privacy behavior used to resolve upstream assumptions.
+    last_review_date: 2026-09-06
+    reviewer: b2c-contributor source review
+derivations:
+  - relationship: adapted
+    source_ids:
+      - github-com-posthog-wizard
+    baseline: 41c12328636f46a517777b17359dd8f5b3d14d96
+    selectors:
+      - README.md
+      - src/lib/programs
+      - src/lib/agent
+    rationale: Retain relevant official procedures while preserving existing artifact ownership, scoped authority and
+      independently verified acceptance.
+    omissions:
+      - Automatic installation, broad agent workflows, unreviewed remotely fetched skills and implicit acceptance.
+    reviewer: b2c-contributor source review
+    reviewed_at: 2026-09-06
+    notice: catalog/upstreams/notices/posthog-wizard.txt
+    evaluation: npm run test:fixtures -- official-upstreams

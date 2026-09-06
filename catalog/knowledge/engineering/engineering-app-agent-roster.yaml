@@ -1,0 +1,14 @@
+schema_version: 1.0.0
+id: reference.engineering.app-agent-roster
+title: App Agent Roster
+domain_id: domain.engineering
+document_path: knowledge/engineering/app-agent-roster.md
+load_when: before app handoffs, builder-ready bundles, business-repo AGENTS.md/CLAUDE.md, or post-launch operating docs
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.engineering.app-agent-roster-and-repo-entrypoints
+  context_pack_ids:
+    - context.engineering
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

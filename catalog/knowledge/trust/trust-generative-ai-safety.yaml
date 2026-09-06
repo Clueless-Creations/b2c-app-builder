@@ -1,0 +1,29 @@
+schema_version: 1.0.0
+id: reference.trust.generative-ai-safety
+title: Generative-AI Safety
+domain_id: domain.trust
+document_path: knowledge/trust/generative-ai-safety.md
+load_when: when the app generates text, images, audio, or video
+lifecycle: active
+bindings:
+  workflow_ids: [workflow.trust.generative-ai-safety]
+  context_pack_ids: [context.trust]
+applicability_notes: Required when the product generates text, images, audio, or video.
+sources:
+  - id: google-play-ai-generated-content-policy
+    name: Google Play AI-generated content policy
+    source_type: official_policy
+    url: https://support.google.com/googleplay/android-developer/answer/14094294?hl=en
+    review_cadence_days: 14
+    claim_scope: Supports controls against prohibited AI-generated content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: github-com-florianbruniaux-claude-code-ultimate-guide-production-reliability-escalation
+    name: github.com
+    source_type: github
+    url: https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/workflows/production-reliability.md
+    review_cadence_days: 30
+    claim_scope: Escalation-trigger taxonomy — an explicit human request, a policy or scope gap, and
+      an exhausted retry budget — kept distinct from a frustration signal.
+    last_review_date: 2026-09-02
+    reviewer: b2c-maintainers

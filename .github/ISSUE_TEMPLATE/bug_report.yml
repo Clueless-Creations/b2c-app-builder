@@ -1,0 +1,85 @@
+name: Bug report
+description: A validator, template, or playbook behaved incorrectly
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before filing: run `npm run audit` and paste the failing step's output below. Most reports are much faster to act on with it.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What the skill or a validator did, and what you expected instead.
+      placeholder: |
+        `check:revenue` failed on a repo where revenue/REVENUE_OPS.md has every required section.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: The exact commands or the prompt you gave your agent.
+      placeholder: |
+        1. npm run check:revenue -- --root ~/code/my-app
+        2. See error: revenue.entitlement_proof.missing
+      render: shell
+    validations:
+      required: true
+
+  - type: input
+    id: skill-version
+    attributes:
+      label: Skill version
+      description: The `version` field in `skill-version.json`, or the installed runtime copy's.
+      placeholder: "0.26.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: runtime
+    attributes:
+      label: Agent runtime
+      options:
+        - Claude Code
+        - Codex
+        - Both
+        - Not applicable (running validators directly)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: source
+    attributes:
+      label: Where are you running from
+      options:
+        - This repo (cloned)
+        - An installed runtime copy (~/.codex/skills or ~/.claude/skills)
+    validations:
+      required: true
+
+  - type: textarea
+    id: output
+    attributes:
+      label: Validator output
+      description: Output from the failing `npm run` command. Redact secrets and account identifiers.
+      render: shell
+
+  - type: input
+    id: node
+    attributes:
+      label: Node version
+      description: Output of `node --version`. This project targets Node 22.
+      placeholder: "v22.11.0"
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I redacted secrets, tokens, and account identifiers from anything I pasted.
+          required: true
+        - label: I searched existing issues for this behavior.
+          required: true

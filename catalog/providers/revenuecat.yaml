@@ -1,0 +1,25 @@
+schema_version: 1
+id: revenuecat
+version: "1.0.0"
+kind: billing
+title: RevenueCat
+source_ids:
+  - api-revenuecat-com
+  - www-revenuecat-com-docs-api-v1
+  - www-revenuecat-com-docs-tools-experiments-v1
+features:
+  - id: offerings
+    required: true
+    notes: Current offering and packages used by paywall and revenue proof.
+  - id: entitlements
+    required: true
+    notes: Entitlement grant proof required before the revenue lane is done.
+  - id: experiments
+    required: true
+    notes: RevenueCat Experiments used by paywall experiment programs.
+sdk_floor: purchases-js >= 8.0.0
+deprecations: []
+machine_readable_feeds:
+  - url: https://api.revenuecat.com
+    kind: rest_api
+review_cadence_days: 7

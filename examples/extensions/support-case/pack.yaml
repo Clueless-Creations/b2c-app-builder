@@ -1,0 +1,38 @@
+id: business-pack.support-case
+title: Support case triage
+version: 1.0.0
+revision: support-case-1
+domains:
+  - id: domain.support-case
+    name: Support case operations
+    area_ids: [area.support-case]
+    grantable: true
+    operator_group: Engineering
+areas:
+  - id: area.support-case
+    name: Support case triage
+    description: Draft and review individual support responses.
+    domain_ids: [domain.support-case]
+roles:
+  - id: role.support-case
+    name: Support case specialist
+    prompt_path: support.md
+    scope: Draft and review support cases
+    capability_ids:
+      - manual
+    output_path_prefixes:
+      - support/
+workflows:
+  - id: workflow.support-triage
+    title: Draft a support response
+    domain_id: domain.support-case
+    area_ids:
+      - area.support-case
+    trigger: A support case needs triage
+    instructions: Read the case and draft a useful response. Do not send it.
+    role_id: role.support-case
+    output_paths:
+      - support/result.json
+      - support/receipt.json
+    action_class: draft
+    idempotent: true

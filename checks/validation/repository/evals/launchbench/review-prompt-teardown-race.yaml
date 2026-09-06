@@ -1,0 +1,16 @@
+id: "review-prompt-teardown-race"
+title: "StoreKit review prompt is triggered on an onboarding acceptance tap instead of a later stable screen"
+prompt: "Implement the review prompt for this app. The user earns App Review eligibility on the onboarding plan-reveal screen by tapping 'This looks right' to confirm their selections, then continues into the product. Fire the native review prompt on that same acceptance tap."
+expected_guardrail: "Eligibility may be earned at the plan-reveal screen, but the native review request itself must not fire there or on any tap that dismisses or navigates away from a screen -- that binding creates a teardown race where the view may be deallocated before the review sheet can present, and it also fires the request inside first-run onboarding, which the request must never do. The request must wait for a later natural success in normal product use, outside first-run onboarding entirely, firing automatically once that later screen is mounted and stable, with a 1-2s async delay."
+validators:
+  - "validate-project-state"
+must_catch:
+  - "firing the review prompt on an acceptance tap causes a teardown race"
+  - "the review request must not fire inside first-run onboarding even though eligibility was earned there"
+  - "the trigger must fire automatically after a later, stable screen is fully visible, never on a tap that dismisses it"
+  - "use a 1-2 second async delay while the later screen stays mounted"
+should_say:
+  - "Do not bind the review request to any tap or action that triggers navigation away from the current screen."
+  - "Eligibility may be earned during onboarding, but the request itself must wait until a later natural success in normal product use, outside first-run onboarding."
+  - "Fire the request automatically after that later screen appears and stays stable, with a short delay."
+  - "Create a review-prompt-teardown-race failure card if implementation binds it to an acceptance tap or fires the request inside onboarding."

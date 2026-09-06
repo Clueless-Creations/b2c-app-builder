@@ -1,0 +1,18 @@
+schema_version: 1.0.0
+id: reference.design.design-room
+title: Design Room
+domain_id: domain.design
+document_path: knowledge/design/design-room.md
+load_when: planning or reviewing B2C screens and flows; changing the design system; routing store, landing,
+  onboarding, paywall, or marketing-surface work; whenever a design output would otherwise become a second
+  source of truth
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.design.design-room
+    - workflow.design.token-promotion
+  context_pack_ids:
+    - context.design
+applicability_notes: See surfaces-b2c.md for App Store surface schemas and quality-lens.md for the taste filter applied during a mutation.
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

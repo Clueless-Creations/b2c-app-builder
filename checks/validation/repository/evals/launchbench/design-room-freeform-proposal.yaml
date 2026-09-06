@@ -1,0 +1,25 @@
+id: design-room-freeform-proposal
+title: Design proposal produced as one-off HTML instead of a state mutation and render
+prompt: >
+  The launch package has a polished design-proposal.html for onboarding, landing,
+  and an App Store custom product page, but studio/seed/business.json was not updated,
+  no Design Room version log entry exists for the change, and design/design-room.html
+  was not re-rendered from state.
+expected_guardrail: >
+  Design work must follow STATE -> MUTATE -> VERSION -> RENDER. The agent must
+  reject the freeform proposal as the canonical design output, move the decision
+  into studio/seed/business.json and DESIGN.md, validate the state,
+  render design/design-room.html, and version the state with git before asking the
+  founder to review it.
+validators:
+  - check-design-room-contract
+must_catch:
+  - Design proposals must be represented as state mutations, not one-off HTML or Markdown.
+  - studio/seed/business.json and DESIGN.md are the editable design source of truth.
+  - design/design-room.html must be rendered from current state and include the matching design-state-hash.
+  - The accepted design change needs a git-backed version or baseline operation.
+should_say:
+  - Move the onboarding, landing, and custom product page decisions into studio/seed/business.json.
+  - Update theme.tokens.json for any brand/token changes instead of inlining values.
+  - Run validate-state, render-design-room, and check-design-room-contract.
+  - Commit the accepted Design Room state change or create a baseline tag when approved.

@@ -1,0 +1,15 @@
+id: landing-motion-progressive-enhancement-missing
+title: Cinematic landing motion ships without the progressive-enhancement contract (hero gated on JS, reduced motion ignored, magic-number timings)
+prompt: "The founder asks for a motionsites-grade landing page. The agent says: 'Done — the hero headline fades in with a 1.2s JS-driven reveal (the h1 starts empty and the words are injected on load for the stagger effect), sections animate on scroll, and I hand-tuned all the durations in the CSS for maximum drama. Reduced-motion users still get the full experience since the animations are the whole point. Shipping it — animation is what makes it feel premium.'"
+expected_guardrail: "Cinematic and GEO/perf-safe is not a tradeoff — knowledge/design/landing-motion-craft.md carries the enforceable progressive-enhancement contract and check:landing-funnel fails this build. Above-the-fold copy must exist as real text in static HTML (an empty h1 filled by JavaScript hides the headline from crawlers and no-JS readers — landing_funnel.motion.hero_text_not_static); every landing animation must collapse to a calm final state under prefers-reduced-motion (landing_funnel.motion.reduced_motion_missing — 'the animations are the whole point' is precisely the failure the gate exists for); and durations/easings read the promoted --motion-* token scale (--motion-duration-reveal/-cinematic, --motion-easing-emphasis/-spring, --motion-stagger) rather than hand-tuned literals (landing_funnel.motion.untokenized_duration), so one token re-promotion retimes the whole brand. Start from the business/growth/landing/ section library — its reveals are gated on html.js so nothing is hidden without JavaScript — instead of improvising choreography, and run check:landing-funnel before calling the landing lane ready."
+validators:
+  - check-landing-funnel
+must_catch:
+  - "an empty h1 populated by JavaScript gates the headline behind script execution — crawlers, AI answer engines, and no-JS readers see a blank hero"
+  - "ignoring prefers-reduced-motion is an accessibility failure, not a style choice; every effect needs a calm, legible final state"
+  - "hand-tuned duration literals fragment the brand's timing system; the landing scale exists as promoted --motion-* tokens"
+  - "the business/growth/landing/ section library already encodes the contract (js-gated reveals, useReducedMotion checks, token-driven timing) — improvising loses those guarantees"
+should_say:
+  - "keep the headline as real static text and split it into stagger spans only after hydration sets html.js"
+  - "add the prefers-reduced-motion collapse and read durations from var(--motion-duration-reveal) / var(--motion-easing-emphasis)"
+  - "run check:landing-funnel before claiming the landing lane ready"

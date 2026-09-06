@@ -1,0 +1,38 @@
+schema_version: 1.0.0
+id: reference.growth.cro-landing
+title: CRO Landing
+domain_id: domain.growth
+document_path: knowledge/growth/cro-landing.md
+load_when: "before building or auditing a public conversion surface: landing/waitlist, web-to-app, or launch page"
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.growth.pre-launch-funnel-landing-waitlist
+    - workflow.growth.landing-funnel-publication-and-live-proof
+    - workflow.growth.landing-funnel-audit
+  context_pack_ids:
+    - context.growth
+    - context.launch-surfaces
+sources:
+  - id: github-com-coreyhaines31-marketingskills
+    name: github.com
+    source_type: skill_pack
+    url: https://github.com/coreyhaines31/marketingskills
+    review_cadence_days: 90
+    claim_scope: MIT-licensed marketing skill pack (© Corey Haines 2025). Conversion-copywriting/copy-editing craft and
+      landing-page CRO discipline adapted with attribution and reframed for B2C mobile surfaces. Reference-and-adapt
+      only; do not vendor its skill files into templates or business repos. Most other skills in the pack (paid ads,
+      referrals, onboarding, ASO, email, social, SEO/GEO, pricing) are already covered by deeper B2C-mobile references
+      here and were intentionally not duplicated; its B2B skills (cold-email, prospecting, revops, sales-enablement) are
+      out of scope.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: web-dev-articles-vitals
+    name: web.dev
+    source_type: docs
+    url: https://web.dev/articles/vitals
+    review_cadence_days: 7
+    claim_scope: Core Web Vitals (LCP/INP/CLS) current thresholds; a slow landing page caps conversion regardless of copy.
+      Refresh before quoting specific vitals targets in CRO guidance.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

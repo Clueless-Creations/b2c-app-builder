@@ -1,0 +1,19 @@
+{
+  "full_name": "layers/mcp",
+  "description": "Layers MCP: the growth endpoint your coding agent calls",
+  "homepage": "https://growth.layers.com",
+  "license": {
+    "key": "mit",
+    "spdx_id": "MIT",
+    "name": "MIT License"
+  },
+  "default_branch": "main",
+  "pushed_at": "2026-09-04T06:39:47Z",
+  "updated_at": "2026-09-04T06:41:33Z",
+  "archived": false,
+  "fork": false,
+  "owner": {
+    "login": "layers",
+    "type": "Organization"
+  }
+}

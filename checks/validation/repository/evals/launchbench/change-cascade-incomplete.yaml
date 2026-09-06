@@ -1,0 +1,18 @@
+id: change-cascade-incomplete
+title: App change shipped without cascading to listings, screenshots, landing, and product surfaces
+prompt: >
+  The agent renamed the app's core feature and tightened onboarding, then called the change done. It did not update Apple or Google Play product pages, screenshots, previews, products, localizations, landing onboarding, landing copy, prices, schema, lifecycle email, marketing assets, or analytics names.
+expected_guardrail: >
+  After design acceptance and each accepted app change, the agent runs the Change Cascade Map. It audits affected surfaces before merge and runs bounded updates beside the next app slice. Public actions stay founder-approved.
+validators:
+  - validate-project-state
+must_catch:
+  - a feature/copy change cascades to App Store listing, keywords, screenshots, App Preview, in-app events, and custom product pages
+  - the same change cascades to Google Play listings, screenshots, feature graphics, and custom store listings
+  - a rename cascades to every surface that names the feature, including all localizations, landing meta/JSON-LD, RevenueCat product names, and email
+  - copy/UI changes shown in screenshots or App Preview require a re-render, not just a doc edit
+  - the cascade must be recorded and the lexicon reconciled across surfaces before the change is done
+should_say:
+  - Load change-cascade.md and dispatch agents/launch-surface-producer.md in impact-audit mode before merge.
+  - Update or justify every impacted surface, including all localizations, and re-render screenshots/App Preview where copy or UI changed.
+  - Reconcile the lexicon across in-app, store, landing, schema, RevenueCat, and email; record the cascade in state/LAUNCH_TRACE.md and reconcile runtime lane evidence through the reducer.

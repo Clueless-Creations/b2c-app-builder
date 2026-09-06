@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Orchestration</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f7f4ef;
+        --ink: #1b1917;
+        --muted: #635c53;
+        --panel: #fffdf9;
+        --line: #ddd5c9;
+        --accent: #1f6f63;
+        --code-bg: #f0ece4;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #16150f;
+          --ink: #f2ede4;
+          --muted: #b0a89c;
+          --panel: #1f1d17;
+          --line: #3a362d;
+          --accent: #7bcbba;
+          --code-bg: #2a2721;
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Avenir Next", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+        line-height: 1.55;
+      }
+
+      main {
+        width: min(1080px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 32px 0 56px;
+      }
+
+      header {
+        display: grid;
+        gap: 10px;
+        margin-bottom: 24px;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        font-size: clamp(2rem, 5vw, 3.5rem);
+        line-height: 1.02;
+      }
+
+      h2 {
+        font-size: 1.05rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      h3 {
+        font-size: 1rem;
+        margin-top: 18px;
+      }
+
+      .status {
+        color: var(--muted);
+      }
+
+      .status-label {
+        display: inline-block;
+        margin-right: 8px;
+        padding: 2px 10px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--accent);
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .origin {
+        color: var(--muted);
+        font-size: 0.88rem;
+        max-width: 74ch;
+      }
+
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 14px;
+      }
+
+      .card > * + * {
+        margin-top: 12px;
+      }
+
+      p {
+        max-width: 84ch;
+      }
+
+      ul,
+      ol {
+        margin: 0;
+        padding-left: 20px;
+        max-width: 84ch;
+      }
+
+      li + li {
+        margin-top: 8px;
+      }
+
+      code {
+        background: var(--code-bg);
+        border-radius: 4px;
+        padding: 1px 5px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.9em;
+      }
+
+      pre {
+        margin: 0;
+        overflow-x: auto;
+        background: var(--code-bg);
+        border-radius: 8px;
+        padding: 14px;
+      }
+
+      pre code {
+        background: none;
+        padding: 0;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        min-width: 640px;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        border-top: 1px solid var(--line);
+        padding: 10px 8px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        color: var(--muted);
+        font-size: 0.76rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      @media (max-width: 640px) {
+        main {
+          width: calc(100% - 20px);
+          padding: 20px 0 40px;
+        }
+
+        .card {
+          padding: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Orchestration</h1>
+        <p class="origin">This page is written from <code>operations/ORCHESTRATION.md</code>. Change that file and render the page again. Anything typed here is replaced on the next render.</p>
+      </header>
+      <section class="card">
+        <h2>Orchestration Preflight</h2>
+        <p>Current objective:</p>
+        <p>Critical path the orchestrator will keep locally:</p>
+        <p>Parallelism decision:</p>
+        <p>Strategy: <code>not_evaluated</code></p>
+        <p>Rationale:</p>
+        <p>Manager pattern: one orchestrator owns user thread, state, integration, git, provider mutations, and release decisions.</p>
+        <p>Subagent availability:</p>
+        <p>Dispatch reason when no specialist is started:</p>
+        <p>If broad work is kept inline, record why specialists are unavailable, unsafe, or not useful. Do not leave both the dispatch record and the reason empty.</p>
+      </section>
+      <section class="card">
+        <h2>Session Continuity</h2>
+        <p>Last state review:</p>
+        <p>Continuity source set: <code>AGENTS.md</code>, <code>product.yaml</code>, <code>DESIGN.md</code>, <code>state/business-state.json</code>, <code>operations/BUSINESS_ACCESS.md</code>, <code>operations/business-access.json</code>, <code>operations/AGENT_OPERATIONS.md</code>, <code>operations/agent-operations.json</code>, <code>operations/ORCHESTRATION.md</code>, <code>engineering/PRODUCTION_READINESS.md</code>, <code>operations/FAILURE_CARDS.md</code></p>
+        <p>Memory policy: Do not rely on chat memory or prior transcripts as source truth; if they conflict with repo state, repo state wins.</p>
+        <p>Git status reviewed:</p>
+        <p>Drift risks or stale assumptions:</p>
+        <p>Next action:</p>
+        <p>State reconciliation needed:</p>
+      </section>
+      <section class="card">
+        <h2>Compound Engineering Routing</h2>
+        <p>Availability:</p>
+        <p>CE freshness check:</p>
+        <p>CE skill inventory:</p>
+        <p>Route:</p>
+        <ul>
+          <li><code>ce-update</code> or latest-release fallback:</li>
+          <li><code>ce-brainstorm</code>:</li>
+          <li><code>ce-plan</code>:</li>
+          <li><code>ce-work</code>:</li>
+          <li><code>ce-worktree</code>:</li>
+          <li><code>ce-code-review</code>:</li>
+          <li><code>ce-test-browser</code> / <code>ce-test-xcode</code> / MobAI:</li>
+          <li><code>ce-proof</code> / <code>ce-demo-reel</code>:</li>
+        </ul>
+        <p>Fallback reason if unavailable:</p>
+      </section>
+      <section class="card">
+        <h2>Candidate Units</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>ID</th><th>Role</th><th>Objective</th><th>Mode</th><th>Files</th><th>Shared resources</th><th>Parallel safe</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>product-audit</td><td>product leader</td><td>Audit scope, 11-star experience, onboarding, activation, and traceability.</td><td>read_only</td><td><code>PRODUCT.md</code>, <code>11_STAR_EXPERIENCE.md</code>, <code>product/ONBOARDING.md</code>, <code>state/LAUNCH_TRACE.md</code></td><td>none</td><td>yes</td><td>pending</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section class="card">
+        <h2>Parallel Safety Check</h2>
+        <p>File-overlap check:</p>
+        <p>Shared mutable resources:</p>
+        <p>Units forced to serialize:</p>
+        <p>Worktree isolation needed:</p>
+      </section>
+      <section class="card">
+        <h2>File Ownership</h2>
+        <p>The reducer owns <code>state/business-state.json</code>. The orchestrator coordinates its authorized transitions and owns <code>operations/BUSINESS_ACCESS.md</code>, <code>operations/business-access.json</code>, <code>operations/AGENT_OPERATIONS.md</code>, <code>operations/agent-operations.json</code>, <code>operations/ORCHESTRATION.md</code>, <code>engineering/ENGINEERING_PLAN.md</code>, <code>engineering/PRODUCTION_READINESS.md</code>, failure cards, git, and release coordination.</p>
+        <p>Specialists may edit only the file paths assigned in their prompt. Read-only auditors do not edit files.</p>
+      </section>
+      <section class="card">
+        <h2>Serialized Work</h2>
+        <ul>
+          <li>Provider/account mutations</li>
+          <li>Founder gates, business identity, account creation/delegation, recovery, and 2FA</li>
+          <li>Authenticated browser profiles, public replies/posts, and external action ledgers</li>
+          <li>Credentials and secrets</li>
+          <li>MobAI, simulator, or device control on the same target</li>
+          <li>Git staging, commits, merges, pushes, tags, and releases</li>
+          <li>App Store, Google Play, social posting, pricing, legal approval, and final launch decisions</li>
+        </ul>
+      </section>
+      <section class="card">
+        <h2>Subagent Instructions</h2>
+        <p>All specialists receive a predetermined role prompt from <code>APP_AGENTS.md</code> and this bounded assignment:</p>
+        <pre><code>You are not alone in this repo. Do not revert or overwrite work by other agents.
+Allowed write scope: read-only unless a specific path list is assigned.
+Forbidden actions: do not stage files, commit, push, merge, run project-wide suites, mutate providers, change credentials, post publicly, submit builds, or make founder-only decisions.
+Return only this handoff: Scope reviewed; Evidence; Findings; Recommendations; Files changed; Validation; Risks and blockers; Proposed state patch; Knowledge receipt.</code></pre>
+      </section>
+      <section class="card">
+        <h2>Integration Plan</h2>
+        <p>After subagents return, the orchestrator reviews outputs, compares actual modified files, accepts or rejects findings, updates state, runs focused validators, then runs the full relevant suite.</p>
+      </section>
+      <section class="card">
+        <h2>Verification</h2>
+        <p>Focused validators:</p>
+        <p>Full suites:</p>
+        <p>Proof paths:</p>
+      </section>
+      <section class="card">
+        <h2>Founder-Only Gates</h2>
+        <ul>
+          <li>Spending, paid subscriptions, paid render infrastructure, and creator payments</li>
+          <li>Credentials, account access, provider connections, and secret changes</li>
+          <li>Pricing, legal acceptance, public claims, app-store submission, public posting, scheduling, and destructive repo actions</li>
+        </ul>
+      </section>
+      <section class="card">
+        <h2>State Updates</h2>
+        <p>Update this coordination record after preflight, dispatch, integration, and before launch-ready claims. Use the session and work-order operations for execution. Reconcile lane status, evidence, and blockers through authorized reducer transitions in <code>state/business-state.json</code>.</p>
+        <p>After material state changes, report the verified result, next action, and required human decisions.</p>
+      </section>
+      <section class="card">
+        <h2>Review Ledger</h2>
+        <p>Every producer-to-auditor pair is one row. The producer never accepts its own surface, and a surface with no row is not done. Verdict is <code>pending</code>, <code>pass</code>, <code>fail</code>, or <code>blocked</code>; a <code>pass</code> or <code>fail</code> names the rubric version and a findings artifact that exists in the workspace. See <code>reference.orchestration.isolated-review</code>.</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Surface</th><th>Producer</th><th>Auditor</th><th>Rubric</th><th>Verdict</th><th>Findings artifact</th><th>Date</th></tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section class="card">
+        <h2>Failure Cards</h2>
+        <p>Create or update a failure card when:</p>
+        <ul>
+          <li>parallel safety is unclear</li>
+          <li>a subagent finds a launch-grade gap</li>
+          <li>actual modified files collide</li>
+          <li>a founder-only gate blocks progress</li>
+          <li>validators fail or proof is missing</li>
+        </ul>
+      </section>
+    </main>
+  </body>
+</html>

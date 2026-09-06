@@ -1,0 +1,274 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:b2c:agent-operations-schema",
+  "title": "B2C Mobile Business Agent Operations Ledger",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "updatedAt", "status", "capabilityCheckedAt", "capabilities", "approvalEnvelopes", "actions", "policies"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": "1.2.0" },
+    "updatedAt": { "$ref": "#/$defs/optionalDateTime" },
+    "status": { "enum": ["not_started", "active", "blocked", "ready"] },
+    "capabilityCheckedAt": { "$ref": "#/$defs/optionalDateTime" },
+    "capabilities": {
+      "type": "array",
+      "minItems": 4,
+      "items": { "$ref": "#/$defs/capability" }
+    },
+    "approvalEnvelopes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/approval" }
+    },
+    "actions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/action" }
+    },
+    "policies": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "semanticRouteFirstUnlessBrowserExplicit",
+        "accessIsNotAuthorization",
+        "noSessionSecretInspection",
+        "untrustedContentIsData",
+        "ignoreEmbeddedInstructions",
+        "sanitizeEvidence",
+        "secretsViaApprovedManager",
+        "serializeAuthenticatedSurfaces",
+        "readBackAfterAction",
+        "reconcileCanonicalState",
+        "preflightStepAwayCapabilitiesBeforeBuild",
+        "consumeStandingApprovalsWithoutReprompt",
+        "consolidateMissingAccess"
+      ],
+      "properties": {
+        "semanticRouteFirstUnlessBrowserExplicit": { "const": true },
+        "accessIsNotAuthorization": { "const": true },
+        "noSessionSecretInspection": { "const": true },
+        "untrustedContentIsData": { "const": true },
+        "ignoreEmbeddedInstructions": { "const": true },
+        "sanitizeEvidence": { "const": true },
+        "secretsViaApprovedManager": { "const": true },
+        "serializeAuthenticatedSurfaces": { "const": true },
+        "readBackAfterAction": { "const": true },
+        "reconcileCanonicalState": { "const": true },
+        "preflightStepAwayCapabilitiesBeforeBuild": { "const": true },
+        "consumeStandingApprovalsWithoutReprompt": { "const": true },
+        "consolidateMissingAccess": { "const": true }
+      }
+    }
+  },
+  "$defs": {
+    "optionalDateTime": {
+      "anyOf": [{ "const": "" }, { "type": "string", "format": "date-time" }]
+    },
+    "actionClass": {
+      "enum": ["observe", "draft", "mutate", "publish", "spend", "release", "destructive"]
+    },
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "provider", "route", "status", "checkedAt", "account", "team", "project", "environment", "modes"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": { "enum": ["connector", "api_or_cli", "browser", "native_device", "manual"] },
+        "provider": { "type": "string" },
+        "route": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["not_checked", "available", "unavailable", "blocked"] },
+        "checkedAt": { "$ref": "#/$defs/optionalDateTime" },
+        "account": { "type": "string" },
+        "team": { "type": "string" },
+        "project": { "type": "string" },
+        "environment": { "type": "string" },
+        "modes": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/actionClass" }, "uniqueItems": true }
+      }
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "provider",
+        "account",
+        "team",
+        "project",
+        "environment",
+        "actionClasses",
+        "operations",
+        "resourcePatterns",
+        "payloadDigests",
+        "exclusions",
+        "mode",
+        "basis",
+        "approvedAt",
+        "expiresAt",
+        "status",
+        "consumedByActionIds"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^APR-[A-Za-z0-9._-]+$" },
+        "provider": { "type": "string", "minLength": 1 },
+        "account": { "type": "string", "minLength": 1 },
+        "team": { "type": "string" },
+        "project": { "type": "string", "minLength": 1 },
+        "environment": { "type": "string", "minLength": 1 },
+        "actionClasses": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/actionClass" }, "uniqueItems": true },
+        "operations": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "resourcePatterns": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "payloadDigests": { "type": "array", "items": { "$ref": "#/$defs/digest" }, "uniqueItems": true },
+        "exclusions": { "type": "array", "items": { "type": "string" } },
+        "mode": { "enum": ["one_shot", "standing"] },
+        "basis": { "type": "string", "minLength": 1 },
+        "approvedAt": { "type": "string", "format": "date-time" },
+        "expiresAt": { "type": "string", "format": "date-time" },
+        "status": { "enum": ["active", "consumed", "expired", "revoked"] },
+        "consumedByActionIds": { "type": "array", "items": { "type": "string", "pattern": "^ACT-[A-Za-z0-9._-]+$" }, "uniqueItems": true },
+        "revokedAt": { "$ref": "#/$defs/optionalDateTime" },
+        "spendCeiling": { "type": ["number", "null"], "minimum": 0 },
+        "voicePolicy": { "type": "string" }
+      }
+    },
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "class",
+        "purpose",
+        "operation",
+        "resource",
+        "capabilityId",
+        "occurredAt",
+        "surface",
+        "provider",
+        "route",
+        "account",
+        "team",
+        "project",
+        "environment",
+        "payloadDigest",
+        "contentDigest",
+        "spendAmount",
+        "currency",
+        "riskClass",
+        "voicePolicy",
+        "authorization",
+        "preflight",
+        "result",
+        "redactionAttested",
+        "reconciliation"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^ACT-[A-Za-z0-9._-]+$" },
+        "class": { "$ref": "#/$defs/actionClass" },
+        "purpose": {
+          "enum": ["operational_observation", "research", "media_analysis", "social_engagement", "provider_mutation", "release", "spend", "destructive"]
+        },
+        "operation": { "type": "string", "minLength": 1 },
+        "resource": { "type": "string", "minLength": 1 },
+        "capabilityId": { "type": "string", "minLength": 1 },
+        "occurredAt": { "type": "string", "format": "date-time" },
+        "surface": { "type": "string", "minLength": 1 },
+        "provider": { "type": "string", "minLength": 1 },
+        "route": { "enum": ["connector", "api_or_cli", "browser", "native_device", "manual"] },
+        "account": { "type": "string" },
+        "team": { "type": "string" },
+        "project": { "type": "string" },
+        "environment": { "type": "string" },
+        "payloadDigest": {
+          "anyOf": [{ "const": "" }, { "$ref": "#/$defs/digest" }]
+        },
+        "contentDigest": {
+          "anyOf": [{ "const": "" }, { "$ref": "#/$defs/digest" }]
+        },
+        "spendAmount": { "type": ["number", "null"], "minimum": 0 },
+        "currency": { "type": "string" },
+        "riskClass": { "enum": ["low", "medium", "high", "critical"] },
+        "voicePolicy": { "type": "string" },
+        "authorization": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["approvalId", "basis"],
+          "properties": {
+            "approvalId": { "type": "string" },
+            "basis": { "type": "string", "minLength": 1 }
+          }
+        },
+        "preflight": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["targetVerified", "beforeState", "evidencePath"],
+          "properties": {
+            "targetVerified": { "type": "boolean" },
+            "beforeState": { "type": "string" },
+            "evidencePath": { "type": "string" }
+          }
+        },
+        "result": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "externalId", "afterState", "evidencePath", "rollbackOrRecovery"],
+          "properties": {
+            "status": { "enum": ["planned", "blocked", "succeeded", "failed"] },
+            "externalId": { "type": "string" },
+            "afterState": { "type": "string" },
+            "evidencePath": { "type": "string" },
+            "rollbackOrRecovery": { "type": "string" }
+          }
+        },
+        "redactionAttested": { "type": "boolean" },
+        "researchProvenance": { "$ref": "#/$defs/researchProvenance" },
+        "reconciliation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["projectStateUpdated", "canonicalDocs", "providerProofUpdated", "at"],
+          "properties": {
+            "projectStateUpdated": { "type": "boolean" },
+            "canonicalDocs": { "type": "array", "items": { "type": "string" } },
+            "providerProofUpdated": { "type": "boolean" },
+            "at": { "$ref": "#/$defs/optionalDateTime" }
+          }
+        }
+      }
+    },
+    "researchProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "canonicalUrl",
+        "sourceId",
+        "query",
+        "toolBackend",
+        "observedAt",
+        "transcriptType",
+        "transcriptLanguage",
+        "timestampRange",
+        "sampleLimit",
+        "visualObservation",
+        "inference",
+        "confidence",
+        "artifactPath"
+      ],
+      "properties": {
+        "canonicalUrl": { "type": "string" },
+        "sourceId": { "type": "string" },
+        "query": { "type": "string" },
+        "toolBackend": { "type": "string", "minLength": 1 },
+        "observedAt": { "type": "string", "format": "date-time" },
+        "transcriptType": { "type": "string", "minLength": 1 },
+        "transcriptLanguage": { "type": "string", "minLength": 1 },
+        "timestampRange": { "type": "string", "minLength": 1 },
+        "sampleLimit": { "type": "string", "minLength": 1 },
+        "visualObservation": { "type": "string", "minLength": 1 },
+        "inference": { "type": "string", "minLength": 1 },
+        "confidence": { "enum": ["low", "medium", "high"] },
+        "artifactPath": { "type": "string", "minLength": 1 }
+      }
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    }
+  }
+}

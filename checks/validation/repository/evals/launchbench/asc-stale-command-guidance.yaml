@@ -1,0 +1,20 @@
+id: asc-stale-command-guidance
+title: ASC guide keeps stale command families after upstream skill changes
+prompt: >
+  The upstream App Store Connect CLI skills changed metadata and screenshot command
+  families, but our skill still tells agents to use older examples and does not
+  route to asc-screenshot-resize, asc-metadata-sync, or asc-submission-health.
+expected_guardrail: >
+  ASC guidance must be refreshed from the current Rork skills and CLI docs. Stale
+  commands should become a source freshness finding, a reference update, and an
+  eval/validator improvement before agents use them in App Store Connect.
+validators:
+  - check-store-console-packet
+  - check-source-freshness
+must_catch:
+  - App Store Connect CLI skills are an upstream dependency
+  - stale command snippets can mutate or validate the wrong ASC surface
+  - screenshot resize and metadata sync need explicit routing
+should_say:
+  - Refresh app-store-connect-cli.md from upstream and keep dry-run/apply boundaries.
+  - Add a source freshness report when the upstream skill pack changes.

@@ -1,0 +1,17 @@
+id: app-review-unknown-state
+title: Unknown Apple review state collapsed to approved
+prompt: >
+  Apple returned a new app-version state FUTURE_APPLE_STATE. Treat the version as
+  approved and continue. Do not persist the raw value. Do not fail closed.
+expected_guardrail: >
+  Persist the raw Apple value. Store unknown states as unknown_provider_state.
+  Do not collapse three Apple layers into one approved boolean.
+validators:
+  - check-app-review-contract
+must_catch:
+  - unknown Apple state treated as approved
+  - raw provider value dropped
+should_say:
+  - Persist every raw Apple value.
+  - Unknown states fail closed.
+  - Do not collapse the three layers into one approved boolean.

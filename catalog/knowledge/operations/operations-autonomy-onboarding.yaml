@@ -1,0 +1,16 @@
+schema_version: 1.0.0
+id: reference.operations.autonomy-onboarding
+title: Autonomy Onboarding
+domain_id: domain.operations
+document_path: knowledge/operations/autonomy-onboarding.md
+load_when: before first workspace onboarding or when changing autonomy, budgets, or standing approvals
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.operations.founder-zero-operator-bootstrap
+  context_pack_ids:
+    - context.founder-language
+    - context.operations
+applicability_notes: Use this conversation contract only when the founder must set or change operating authority.
+sources: []
+source_exemption: This package contains internal operating guidance and has no external factual claims.

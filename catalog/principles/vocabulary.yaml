@@ -1,0 +1,68 @@
+schema_version: 1
+status: approved
+interview_date: "2026-08-22"
+chosen_terms:
+  - operating graph
+  - operating model
+  - capability pack
+  - business pack
+  - overlay
+  - instance fact
+  - work order
+  - operating service
+  - route decision
+  - selected
+  - ambiguous
+  - blocked
+  - no_match
+  - coverage_gap
+  - context capsule
+  - principle registry
+  - composition fingerprint
+  - party
+  - principal
+  - operating agreement
+  - mandate
+  - observation
+  - evidence
+  - belief
+  - learning
+  - objective
+  - metric
+  - gap
+  - diagnosis
+  - option
+  - decision
+  - expectation
+  - hypothesis
+  - outcome
+schema_terms:
+  - WorkOrderOccurrence
+  - OperatingService
+  - RouteDecision
+  - ContextCapsule
+  - PrincipleRegistry
+  - CompositionFingerprint
+  - OperatingAgreement
+aliases:
+  - from: business twin
+    to: operating model
+  - from: work-order occurrence
+    to: work order
+  - from: pinned business blueprint
+    to: composition fingerprint
+  - from: definition graph
+    to: definition plane
+rejected_terms:
+  - semantic similarity router
+  - run attempt as work order
+  - markdown context map as authority
+  - second engine
+  - primitives repository
+  - kernel-only domain union
+provisional_prefixes:
+  - operating.internal.
+compatibility:
+  - Existing catalog, grant, lane, profile, and workflow IDs stay unchanged.
+  - Existing adapter contract fields stay until an explicit version bump.
+  - Public terms in this record may ship in schema, CLI, MCP, and adapter names.

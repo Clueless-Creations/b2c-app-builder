@@ -1,0 +1,155 @@
+schema_version: 1.0.0
+id: reference.process.tool-recipes.device-capture-and-proof
+title: Device Capture And Proof
+domain_id: domain.process
+document_path: knowledge/process/tool-recipes/device-capture-and-proof.md
+load_when: capturing truthful app UI proof — the Route Ladder from the in-app iOS Simulator through
+  XcodeBuildMCP/SnapshotPreviews/serve-sim — routed from tool-recipes.md
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.store.store-screenshots-production
+    - workflow.engineering.mobai-device-automation-and-demo-videos
+    - workflow.engineering.native-ios-proof-route-ladder
+  context_pack_ids:
+    - context.device
+sources:
+  - id: github-com-mobai-app-desktop-recorder-skill
+    name: github.com
+    source_type: github
+    url: https://github.com/MobAI-App/desktop-recorder-skill
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: github-com-mobai-app-mobile-recorder-skill
+    name: github.com
+    source_type: github
+    url: https://github.com/MobAI-App/mobile-recorder-skill
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: github-com-getsentry-snapshotpreviews
+    name: SnapshotPreviews
+    source_type: github
+    url: https://github.com/getsentry/SnapshotPreviews
+    review_cadence_days: 7
+    claim_scope: Selected preview-export procedures and dependency awareness only. No package source, binary
+      targets, transitive dependencies or example app are incorporated.
+    last_review_date: 2026-09-06
+    reviewer: b2c-contributor source review
+    publisher: Emerge Tools
+    revision: 856a1c1585e31d4113c019050d6d0712cf6ddadc
+    retrieved_at: 2026-09-06T15:57:58.988151Z
+    upstream_id: sentry-snapshotpreviews
+    selectors: &a1
+      - README.md
+      - Package.swift
+    rights:
+      status: verified
+      spdx: MIT
+      evidence: catalog/upstreams/notices/sentry-snapshotpreviews.txt
+      evidence_sha256: d0404079f9a0cfade1fa38c8d4809834851886212359b7ac9d5a20470f719e07
+      notes: Selected guidance adapted; unimported assets and executable dependencies retain separate review
+        requirements.
+  - id: github-com-evanbacon-serve-sim
+    name: serve-sim
+    source_type: github
+    url: https://github.com/EvanBacon/serve-sim
+    review_cadence_days: 7
+    claim_scope: Selected simulator viewing and control guidance only. No Swift helper, injected library, source
+      package, camera integration or external dependency is incorporated. Root LICENSE has no project-specific
+      copyright line; package metadata names Evan Bacon.
+    last_review_date: 2026-09-06
+    reviewer: b2c-contributor source review
+    publisher: Evan Bacon
+    revision: 0ee6fbde40a6b5840d0c6e0379f544feb9fa246b
+    retrieved_at: 2026-09-06T15:58:00.701780Z
+    upstream_id: evanbacon-serve-sim
+    selectors: &a2
+      - packages/serve-sim/README.md
+      - packages/serve-sim/package.json
+    rights:
+      status: verified
+      spdx: Apache-2.0
+      evidence: catalog/upstreams/notices/evanbacon-serve-sim.txt
+      evidence_sha256: 9024cdf56dfe7e66523698a9f63d3a0061eb15f43bd5ea8e3833a56017ae37fd
+      notes: Selected guidance adapted; unimported assets and executable dependencies retain separate review
+        requirements.
+  - id: github-com-getsentry-xcodebuildmcp
+    name: XcodeBuildMCP
+    source_type: github
+    url: https://github.com/getsentry/XcodeBuildMCP
+    review_cadence_days: 7
+    claim_scope: Selected help-first tool routing and capture guidance only. Upstream binaries, templates,
+      third-party packages and THIRD_PARTY_LICENSES components are not redistributed.
+    last_review_date: 2026-09-06
+    reviewer: b2c-contributor source review
+    publisher: Cameron Cooke
+    revision: e6ef59b49b44012c824f0a0de261c96142e37390
+    retrieved_at: 2026-09-06T15:57:57.050471Z
+    upstream_id: sentry-xcodebuildmcp
+    selectors:
+      - README.md
+      - skills/xcodebuildmcp/SKILL.md
+      - skills/xcodebuildmcp-cli/SKILL.md
+    rights:
+      status: verified
+      spdx: MIT
+      evidence: catalog/upstreams/notices/sentry-xcodebuildmcp.txt
+      evidence_sha256: fef28fc4165c72b1f0e4ce94654ba44ad7ff7d5d2538b3d01e66e9cc5be3c4f6
+      notes: Selected guidance adapted; unimported assets and executable dependencies retain separate review
+        requirements.
+derivations:
+  - source_ids:
+      - github-com-getsentry-snapshotpreviews
+    relationship: adapted
+    baseline: 856a1c1585e31d4113c019050d6d0712cf6ddadc
+    selectors: *a1
+    rationale: Reconcile existing selected guidance with the reviewed source while preserving builder artifact
+      ownership, host selection, authority and evidence semantics.
+    omissions:
+      - PreviewLayoutTest exercises layout without producing PNGs; SnapshotTest can produce captures. Neither
+        establishes a real onboarding session, live data, purchases, or whole-business readiness.
+      - PreviewGallery is optional internal tooling, not a production app feature. Select dependency revisions
+        and inspect binary/transitive license and compatibility requirements separately.
+    reviewer: b2c-contributor source review
+    reviewed_at: 2026-09-06
+    notice: catalog/upstreams/notices/sentry-snapshotpreviews.txt
+    evaluation: npm run test:fixtures -- screenshot-upstreams
+  - source_ids:
+      - github-com-evanbacon-serve-sim
+    relationship: adapted
+    baseline: 0ee6fbde40a6b5840d0c6e0379f544feb9fa246b
+    selectors: *a2
+    rationale: Reconcile existing selected guidance with the reviewed source while preserving builder artifact
+      ownership, host selection, authority and evidence semantics.
+    omissions:
+      - Use an explicitly selected simulator and local scoped endpoint; do not attach to every booted device or
+        expose a LAN/tunnel by default. Inspect actual host and Xcode requirements.
+      - Camera injection, webcam capture, host accessibility changes, remote exposure and stopping other
+        sessions require their own authority. Streaming does not certify provider state or signing readiness.
+    reviewer: b2c-contributor source review
+    reviewed_at: 2026-09-06
+    notice: catalog/upstreams/notices/evanbacon-serve-sim.txt
+    evaluation: npm run test:fixtures -- screenshot-upstreams
+  - source_ids:
+      - github-com-getsentry-xcodebuildmcp
+    relationship: adapted
+    baseline: e6ef59b49b44012c824f0a0de261c96142e37390
+    selectors:
+      - README.md
+      - skills/xcodebuildmcp/SKILL.md
+      - skills/xcodebuildmcp-cli/SKILL.md
+    rationale: Reconcile existing selected guidance with the reviewed source while preserving builder artifact
+      ownership, host selection, authority and evidence semantics.
+    omissions:
+      - The upstream preference for XcodeBuildMCP over raw native tools does not override explicit business
+        bindings or adequate host-native tools. No global install or skill init runs during source adoption.
+      - Tool discovery and screenshot capture are not proof of current app correctness, provider behavior, store
+        readiness or independent design acceptance.
+    reviewer: b2c-contributor source review
+    reviewed_at: 2026-09-06
+    notice: catalog/upstreams/notices/sentry-xcodebuildmcp.txt
+    evaluation: npm run test:fixtures -- screenshot-upstreams

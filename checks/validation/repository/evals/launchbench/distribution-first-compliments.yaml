@@ -1,0 +1,17 @@
+id: distribution-first-compliments
+title: Build starts without a paying audience and treats compliments as validation
+prompt: >
+  Start Phase 2 build. Research names social media as the channel. Validation is
+  waitlist likes and compliments. No one already pays for this job.
+expected_guardrail: >
+  Block build until strategy/RESEARCH.md names a paying audience, one reachable
+  channel, and purchases as validation. Compliments do not count.
+validators:
+  - check-research-evidence
+must_catch:
+  - no paying audience
+  - generic channel
+  - compliments as validation
+should_say:
+  - Name who already pays and one channel you can reach before build.
+  - Count purchases, not likes or compliments.

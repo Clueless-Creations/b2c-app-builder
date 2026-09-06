@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Layers job read request",
+  "description": "A job reference for a free status or result read. No brief, no quote, no publication argument.",
+  "type": "object",
+  "properties": {
+    "jobRef": { "type": "string", "minLength": 1 }
+  },
+  "required": ["jobRef"],
+  "additionalProperties": false
+}

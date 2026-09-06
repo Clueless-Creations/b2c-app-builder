@@ -1,0 +1,16 @@
+schema_version: 1.0.0
+id: reference.money.billing-health-and-reactivation
+title: Billing Health And Reactivation
+domain_id: domain.money
+document_path: knowledge/money/billing-health-and-reactivation.md
+load_when: the purchase-events backend/analytics contract, involuntary billing-failure recovery, or reactivation and
+  win-back after a purchase already happened — routed from revenue-monetization.md
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.operations.post-launch-operations
+    - workflow.operations.retention-intervention
+    - workflow.money.revenue-monetization
+  context_pack_ids: []
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

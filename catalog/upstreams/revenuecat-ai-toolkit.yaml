@@ -1,0 +1,98 @@
+schema_version: 1
+id: revenuecat-ai-toolkit
+project: RevenueCat AI Toolkit
+canonical_url: https://github.com/RevenueCat/ai-toolkit
+aliases:
+  - RevenueCat/ai-toolkit
+authors:
+  - name: RevenueCat
+    role: publishing organization and copyright holder per root LICENSE
+maintainers:
+  - name: RevenueCat
+    role: upstream maintaining organization
+license:
+  spdx: MIT
+  status: verified
+  reviewed_revision: b9b77b12da33213c9c2e750b06cd6270c1d8ed65
+  scope: Root LICENSE; only the listed upstream paths were adopted. Dependencies, linked material, and bundled third-party
+    content need separate review.
+  evidence_url: https://github.com/RevenueCat/ai-toolkit/blob/b9b77b12da33213c9c2e750b06cd6270c1d8ed65/LICENSE
+  evidence_sha256: 2e92c72a8e13012a7f53d2bebbee52ab1a1c06cf652092faecf4523a5bc23e3f
+  notice_file: catalog/upstreams/notices/revenuecat-ai-toolkit.txt
+source_ids:
+  - github-com-revenuecat-ai-toolkit
+relationships:
+  - kind: adapted-method
+    consumption: Adapt selected setup and verification procedures as subordinate guidance; no upstream scripts, SDK binaries,
+      or top-level skills are installed.
+    local_owners:
+      - knowledge/money/revenuecat-agent-tooling.md
+    tests:
+      - checks/verification/fixtures/official-upstreams.fixtures.ts
+    upstream_paths:
+      - README.md
+      - revenuecat/skills/create-revenuecat-project/SKILL.md
+      - revenuecat/skills/integrate-revenuecat/SKILL.md
+      - revenuecat/skills/revenuecat-identify-user/SKILL.md
+      - revenuecat/skills/revenuecat-purchase-flow/SKILL.md
+      - revenuecat/skills/revenuecat-entitlements-gate/SKILL.md
+      - revenuecat/skills/revenuecat-cli/SKILL.md
+    pin_authority: Reviewed commit below and the builder package content digest identify the authored guidance; host executables
+      and remotely downloaded skills remain separate compatibility dependencies.
+baselines:
+  reviewed_source:
+    revision: b9b77b12da33213c9c2e750b06cd6270c1d8ed65
+    observed_at: "2026-09-06"
+    by: b2c-contributor source review
+    note: Read-only archive inspected; branch head rechecked via GitHub. This is source review, not a binary execution test.
+  reviewed_guidance:
+    revision: b9b77b12da33213c9c2e750b06cd6270c1d8ed65
+    observed_at: "2026-09-06"
+    by: b2c-contributor source review
+    note: Adapted selected procedures; intentional deviations are recorded locally.
+support:
+  policy: Reviewed source guidance only. No upstream executable or live provider integration was exercised. SDK and tool compatibility
+    must be verified against the selected app and host before execution.
+  versions:
+    - range: b9b77b12da33213c9c2e750b06cd6270c1d8ed65
+      status: untested
+      evidence:
+        - Source inspection only; no live execution or broad SDK-version support claim.
+  operations:
+    - id: revenuecat-project-setup
+      title: Selected project, SDK and test setup guidance
+      keywords: [setup, products, offerings, SDK]
+      owners: [knowledge/money/revenuecat-agent-tooling.md]
+    - id: revenuecat-identity
+      title: Identity, purchase and entitlement verification guidance
+      keywords: [identity, logIn, logOut, restore, entitlement]
+      owners: [knowledge/money/revenuecat-agent-tooling.md]
+    - id: revenuecat-paywalls
+      title: Paywall and purchase-flow guidance
+      keywords: [paywall, purchase, testing]
+      owners: [knowledge/money/revenuecat-agent-tooling.md]
+  unsupported_operations:
+    - id: automatic-setup
+      reason: Installing, authenticating, disclosing source, changing credentials or remote configuration require explicit scoped authority.
+    - id: unreviewed-upstream-features
+      reason: New upstream features require a reviewed integration change and tests, not an automatic tool grant.
+  platforms: []
+adaptations:
+  - id: builder-contracts-win
+    description: Keep product, identity, consent, measurement, evidence, and execution authority with the existing builder owners. Upstream agents never become acceptance authorities.
+    owner: knowledge/money/revenuecat-agent-tooling.md
+    intentional: true
+  - id: identity-docs-over-skill
+    description: The reviewed identity skill overstates anonymous purchase merging and warns against direct account switching. Official Identifying Customers documentation gives conditional merges and permits direct logIn between identified accounts; our guide records that correction.
+    owner: knowledge/money/revenuecat-agent-tooling.md
+    intentional: true
+review:
+  owner: b2c-maintainers
+  cadence_days: 7
+  last_review: "2026-09-06"
+  status: current
+credits:
+  acknowledge: true
+  use: adapted
+  summary: Selected procedures inform knowledge/money/revenuecat-agent-tooling.md. Original notices are retained; no whole-project integration or live support is claimed.
+copyright: Copyright (c) 2024 RevenueCat

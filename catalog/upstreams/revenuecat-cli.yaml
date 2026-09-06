@@ -1,0 +1,70 @@
+schema_version: 1
+id: revenuecat-cli
+project: RevenueCat CLI
+canonical_url: https://github.com/RevenueCat/cli
+aliases: [RevenueCat/cli, rc, "@revenuecat/cli"]
+authors:
+  - name: RevenueCat
+    role: publishing organization and copyright holder per root LICENSE
+maintainers:
+  - name: RevenueCat
+    role: upstream maintaining organization
+license:
+  spdx: MIT
+  status: verified
+  reviewed_revision: 1a3d2820b3166dd6d4cc4775902e43eeeab5f004
+  scope: Root LICENSE; only the listed upstream paths were adopted. Dependencies, linked material, and bundled third-party content need separate review.
+  evidence_url: https://github.com/RevenueCat/cli/blob/1a3d2820b3166dd6d4cc4775902e43eeeab5f004/LICENSE
+  evidence_sha256: 2a966901053e26d85533a8fb524aacf4894911220a41f326c9637ab821029523
+  notice_file: catalog/upstreams/notices/revenuecat-cli.txt
+source_ids: [github-com-revenuecat-cli]
+relationships:
+  - kind: adapted-method
+    consumption: Adapt selected setup and verification procedures as subordinate guidance; no upstream scripts, SDK binaries, or top-level skills are installed.
+    local_owners: [knowledge/money/revenuecat-agent-tooling.md]
+    tests: [checks/verification/fixtures/official-upstreams.fixtures.ts]
+    upstream_paths: [README.md]
+    pin_authority: Reviewed commit below and the builder package content digest identify the authored guidance; host executables and remotely downloaded skills remain separate compatibility dependencies.
+baselines:
+  reviewed_source:
+    revision: 1a3d2820b3166dd6d4cc4775902e43eeeab5f004
+    observed_at: "2026-09-06"
+    by: b2c-contributor source review
+    note: Read-only archive inspected; branch head rechecked via GitHub. This is source review, not a binary execution test.
+  reviewed_guidance:
+    revision: 1a3d2820b3166dd6d4cc4775902e43eeeab5f004
+    observed_at: "2026-09-06"
+    by: b2c-contributor source review
+    note: Adapted selected procedures; intentional deviations are recorded locally.
+support:
+  policy: Reviewed source guidance only. No upstream executable or live provider integration was exercised. SDK and tool compatibility must be verified against the selected app and host before execution.
+  versions:
+    - range: 1a3d2820b3166dd6d4cc4775902e43eeeab5f004
+      status: untested
+      evidence: ["Source inspection only; no live execution or broad SDK-version support claim."]
+  operations:
+    - id: revenuecat-command-discovery
+      title: CLI schema discovery and setup boundary guidance
+      keywords: [commands, schema, setup, paywalls, telemetry]
+      owners: [knowledge/money/revenuecat-agent-tooling.md]
+  unsupported_operations:
+    - id: automatic-setup
+      reason: Installing, authenticating, disclosing source, changing credentials or remote configuration require explicit scoped authority.
+    - id: unreviewed-upstream-features
+      reason: New upstream features require a reviewed integration change and tests, not an automatic tool grant.
+  platforms: []
+adaptations:
+  - id: builder-contracts-win
+    description: Keep product, identity, consent, measurement, evidence, and execution authority with the existing builder owners. Upstream agents never become acceptance authorities.
+    owner: knowledge/money/revenuecat-agent-tooling.md
+    intentional: true
+review:
+  owner: b2c-maintainers
+  cadence_days: 7
+  last_review: "2026-09-06"
+  status: current
+credits:
+  acknowledge: true
+  use: adapted
+  summary: Selected procedures inform knowledge/money/revenuecat-agent-tooling.md. Original notices are retained; no whole-project integration or live support is claimed.
+copyright: Copyright (c) 2024-2026 RevenueCat

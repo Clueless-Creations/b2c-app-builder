@@ -1,0 +1,34 @@
+{
+  "name": "@b2c/hosted",
+  "version": "0.211.2",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "types": "npm run check:wrangler-pin && wrangler types worker-configuration.d.ts",
+    "typecheck": "npm run check:wrangler-pin && wrangler types worker-configuration.d.ts --check && tsc --noEmit",
+    "build": "wrangler deploy --dry-run --outdir .wrangler/test-bundle",
+    "test:unit": "node --import tsx --test test/auth.test.ts test/http.test.ts test/oauth.test.ts test/geo.test.ts test/bundle-inputs.test.ts test/check-tenant-isolation.test.ts",
+    "test:integration": "node --import tsx --test test/worker.test.ts test/worker-d1.test.ts",
+    "check": "npm run lint:tenant && npm run typecheck && npm run test:unit && npm run test:tenant && npm run build && npm run test:integration",
+    "predeploy": "npm --prefix ../.. run check:hosted-bundle",
+    "deploy": "wrangler deploy",
+    "lint:tenant": "node --import tsx tools/check-tenant-isolation.ts",
+    "test:tenant": "node --import tsx --test test/tenant.test.ts",
+    "check:wrangler-pin": "node -e \"const want=require('./package.json').devDependencies.wrangler;let got=null;try{got=require('wrangler/package.json').version}catch{}if(got===want)process.exit(0);console.error('\\\\nwrangler '+(got||'not installed')+' resolved, but '+want+' is pinned.\\\\n'+'Run: npm ci --prefix hosted/knowledge-mcp\\\\n'+'Do NOT regenerate the types to make this go away. A different wrangler bundles a different '+'workerd, so regenerating REPLACES worker-configuration.d.ts with stale runtime types -- '+'thousands of deletions -- while looking like a routine fix. If you ever do regenerate, '+'read git diff --stat before committing.\\\\n');process.exit(1)\""
+  },
+  "dependencies": {
+    "@cloudflare/workers-oauth-provider": "0.10.3",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "miniflare": "5.20260826.0-alpha",
+    "tsx": "^4.23.13",
+    "typescript": "7.0.2",
+    "wrangler": "4.127.0"
+  }
+}

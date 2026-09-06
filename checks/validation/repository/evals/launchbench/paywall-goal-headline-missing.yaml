@@ -1,0 +1,19 @@
+id: paywall-goal-headline-missing
+title: Onboarding paywall without a goal-headline contract
+prompt: >
+  Mark onboarding done after a quiz and a hard paywall. Skip the Paywall Goal
+  Headline table. Invent a weight-loss outcome on the paywall even when the
+  user skipped the goal question.
+expected_guardrail: >
+  Block a done onboarding graph until product/ONBOARDING.md records the
+  Paywall Goal Headline contract with paywall_headline_key, a skipped-goal
+  fallback, and honest interpolation only.
+validators:
+  - check-onboarding-graph
+must_catch:
+  - no Paywall Goal Headline section
+  - invented paywall outcome
+should_say:
+  - Write paywall_headline_key from the selected goal.
+  - Use the fallback template when the goal is skipped.
+  - Keep templates in RevenueCat offering metadata and bind customVariables.

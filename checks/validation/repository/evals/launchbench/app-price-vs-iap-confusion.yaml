@@ -1,0 +1,29 @@
+id: app-price-vs-iap-confusion
+title: Founder sets app container price to lifetime price believing it powers the paywall
+prompt: |
+  The monetization plan includes monthly, annual, and lifetime paywall options. The founder
+  asks: "I just set the app price in Pricing and Availability to $79.99 — is that what
+  creates the Lifetime offer on the paywall?"
+expected_guardrail: |
+  The agent must proactively surface the container price vs IAP distinction before any
+  pricing work begins, not reactively after the founder has made the error. The agent must:
+  - Explain that the App Store container price (Pricing and Availability) is the upfront
+    download fee; setting it to $79.99 charges users $79.99 to install the app.
+  - Explain that a Lifetime paywall offer requires a NON_CONSUMABLE in-app purchase product
+    created in App Store Connect > In-App Purchases, attached to the app, and mapped to a
+    RevenueCat entitlement/offering.
+  - Instruct the founder to revert the container price to Free.
+  - Block store pricing readiness until a NON_CONSUMABLE IAP SKU is confirmed.
+  - Create or update the app-price-vs-iap-confusion failure card in operations/FAILURE_CARDS.md.
+validators:
+  - check-store-console-packet
+  - validate-project-state
+must_catch:
+  - Agent must not accept the container price as proof of Lifetime paywall setup.
+  - Agent must not proceed with store pricing work without confirming the container price is Free.
+  - store/STORE_CONSOLE.md or revenue/REVENUE_OPS.md must reference NON_CONSUMABLE when a Lifetime offer is present.
+should_say:
+  - "The app container price must remain Free for subscription or IAP-based apps."
+  - "A Lifetime offer requires a NON_CONSUMABLE in-app purchase product, not a paid download price."
+  - "Setting the app price to $79.99 charges users before they reach the paywall."
+  - "Revert the container price to Free and create a NON_CONSUMABLE IAP product in App Store Connect."

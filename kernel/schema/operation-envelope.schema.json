@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:b2c:core:operation-envelope-schema",
+  "title": "Operation Envelope",
+  "$comment": "KTD9 mutating-operation binding. Transport surfaces wrap this envelope; none of them accept a raw reducer patch.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "partyId",
+    "principalId",
+    "trustAnchor",
+    "agreementRevision",
+    "mandateId",
+    "expectedBusinessRevision",
+    "idempotencyKey",
+    "recordedAt",
+    "payload"
+  ],
+  "properties": {
+    "partyId": { "type": "string", "minLength": 1 },
+    "principalId": { "type": "string", "minLength": 1 },
+    "trustAnchor": { "type": "string", "minLength": 1 },
+    "agreementRevision": { "type": "string", "minLength": 1 },
+    "mandateId": { "type": "string", "minLength": 1 },
+    "expectedBusinessRevision": { "type": "string", "minLength": 1 },
+    "idempotencyKey": { "type": "string", "minLength": 1 },
+    "recordedAt": { "type": "string", "format": "date-time" },
+    "payload": { "type": "object" }
+  }
+}

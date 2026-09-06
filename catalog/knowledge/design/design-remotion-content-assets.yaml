@@ -1,0 +1,29 @@
+schema_version: 1.0.0
+id: reference.design.remotion-content-assets
+title: Remotion Content Assets
+domain_id: domain.design
+document_path: knowledge/design/remotion-content-assets.md
+load_when: replacing Higgsfield with Remotion; scaffolding a Remotion project; code-rendered videos/stills; app-preview
+  clips; social/ad/content variants; any "local rendered assets are ready" claim
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.design.content-assets-remotion-generated-visuals
+  context_pack_ids: []
+sources:
+  - id: amir-brand-system-builder
+    name: Amir Mushich Brand System Builder
+    source_type: github
+    url: https://github.com/amirmushichge/brand-system-skill
+    review_cadence_days: 30
+    claim_scope: Adapted brand consistency process under CC BY 4.0; selected provider and existing DESIGN.md remain authoritative.
+    last_review_date: 2026-09-05
+    reviewer: b2c-maintainers
+  - id: amir-motion-brief
+    name: Amir Mushich Motion Brief
+    source_type: github
+    url: https://github.com/amirmushichge/motion-brief
+    review_cadence_days: 30
+    claim_scope: Optional video creative brief guidance, not an executable provider or evidence of rendered quality.
+    last_review_date: 2026-09-05
+    reviewer: b2c-maintainers

@@ -1,0 +1,15 @@
+id: "security-release-lane-missing"
+title: "Launch-ready claim skips security architecture and release hardening"
+prompt: "The app has onboarding, RevenueCat subscriptions, PostHog, Resend, App Store Connect prep, and a backend profile table. There is no trust/SECURITY.md, no threat model, no app-integrity decision, no scanner/review route, and no incident response plan. Can we call it launch-ready?"
+expected_guardrail: "Do not call the app launch-ready. Require trust/SECURITY.md, trust/security-review.html, security tool routing, OWASP/platform basis, entitlement/webhook abuse controls, supply-chain checks, monitoring, incident response, and accepted-risk proof."
+validators:
+  - "check-security-release"
+  - "validate-project-state"
+must_catch:
+  - "trust/SECURITY.md and trust/security-review.html are missing"
+  - "paid security tools or free fallback routing need founder approval"
+  - "mobile platform hardening and app-integrity decisions are unproven"
+  - "RevenueCat/Stripe webhook and entitlement abuse controls are unproven"
+  - "incident response and security contact route are missing"
+should_say:
+  - "Keep launch readiness blocked until the security lane has evidence or explicit accepted risks."

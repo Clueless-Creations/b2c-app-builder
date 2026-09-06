@@ -1,0 +1,200 @@
+{
+  "schemaVersion": "1.0.0",
+  "updatedAt": "2026-09-04",
+  "business": {
+    "name": "TUCK",
+    "slug": "tuck",
+    "stage": "build",
+    "positioning": "Leave with everything.",
+    "targetAudience": "People packing for a short trip who want a useful, editable list without an account."
+  },
+  "theme": {
+    "status": "approved"
+  },
+  "designBrief": {
+    "source": "authored-primary-reference-calibration",
+    "productType": "Offline packing planner",
+    "recommendedStyle": "Original outlined objects, canvas bag, cream luggage labels, and expressive display type around a precise useful interaction.",
+    "paletteMood": "Canvas navy and cream with orange zipper, jade and lilac garments.",
+    "typographyMood": "Fraunces display; DM Sans web utility and accessible native system utility text.",
+    "keyEffects": [
+      "Object pickup and a purposeful move into the bag",
+      "One clear packed-count update",
+      "Quiet completion with immediate next actions"
+    ],
+    "antiPatterns": [
+      "Generic dashboard cards",
+      "Decorative phone mockup as native proof",
+      "Forced account or permission setup",
+      "Drag-only controls",
+      "Celebration that blocks export"
+    ],
+    "motionNotes": "Honor reduced motion; preserve meaning through text, checks, and counts.",
+    "generatedAt": "2026-09-04T17:10:55.000Z",
+    "notes": "Authored direction is accepted. Surface readiness remains draft until real runtime and independent design review are complete."
+  },
+  "designRoom": {
+    "status": "not_started",
+    "contractPath": "DESIGN.md",
+    "renderPath": "design/design-room.html"
+  },
+  "surfaces": {
+    "webFunnels": [],
+    "landingPages": [
+      {
+        "id": "landing",
+        "name": "TUCK landing",
+        "status": "draft",
+        "purpose": "Explain TUCK and provide a working single browser bag with local persistence, editable items, and browser-format JSON backup/recovery at mobile and desktop widths.",
+        "decisions": [
+          "DESIGN.md#layout",
+          "design/screens/landing.md"
+        ],
+        "tokenReferences": [
+          "color.background",
+          "color.primary",
+          "font.display",
+          "space.md"
+        ]
+      }
+    ],
+    "marketingAssets": [],
+    "mobileApp": {
+      "stack": "swiftui",
+      "platforms": [
+        "ios"
+      ],
+      "screens": [
+        {
+          "id": "trip-collection",
+          "name": "Your trips",
+          "status": "draft",
+          "purpose": "The saved trip appears once with its name and useful initial list; no account or permission interrupts first value.",
+          "decisions": [
+            "DESIGN.md#components",
+            "design/screens/native-screens.md"
+          ],
+          "tokenReferences": [
+            "color.background",
+            "color.primary",
+            "font.display",
+            "space.md"
+          ]
+        },
+        {
+          "id": "trip-editor",
+          "name": "Trip details",
+          "status": "draft",
+          "purpose": "The saved trip and initial suggestions reflect the chosen preset and nights, and the editor closes after a successful save.",
+          "decisions": [
+            "DESIGN.md#components",
+            "design/screens/native-screens.md"
+          ],
+          "tokenReferences": [
+            "color.background",
+            "color.primary",
+            "font.display",
+            "space.md"
+          ]
+        },
+        {
+          "id": "packing-table",
+          "name": "Pack your bag",
+          "status": "draft",
+          "purpose": "Exactly that item becomes packed; the object, textual state, and remaining count agree, and an undo action is available.",
+          "decisions": [
+            "DESIGN.md#components",
+            "design/screens/native-screens.md"
+          ],
+          "tokenReferences": [
+            "color.background",
+            "color.primary",
+            "font.display",
+            "space.md"
+          ]
+        },
+        {
+          "id": "item-editor",
+          "name": "Edit an item",
+          "status": "draft",
+          "purpose": "One editable item is added; name, quantity, chosen illustration, and category persist without changing unrelated items.",
+          "decisions": [
+            "DESIGN.md#components",
+            "design/screens/native-screens.md"
+          ],
+          "tokenReferences": [
+            "color.background",
+            "color.primary",
+            "font.display",
+            "space.md"
+          ]
+        },
+        {
+          "id": "complete-bag",
+          "name": "Everything packed",
+          "status": "draft",
+          "purpose": "A quiet completion treatment shows the actual trip and packed count; unpacking any item immediately restores an incomplete state.",
+          "decisions": [
+            "DESIGN.md#components",
+            "design/screens/native-screens.md"
+          ],
+          "tokenReferences": [
+            "color.background",
+            "color.primary",
+            "font.display",
+            "space.md"
+          ]
+        },
+        {
+          "id": "data-settings",
+          "name": "Data and settings",
+          "status": "draft",
+          "purpose": "A versioned backup file is offered through native system UI and includes the actual saved data without contacting a service.",
+          "decisions": [
+            "DESIGN.md#components",
+            "design/screens/native-screens.md"
+          ],
+          "tokenReferences": [
+            "color.background",
+            "color.primary",
+            "font.display",
+            "space.md"
+          ]
+        }
+      ],
+      "flows": [
+        {
+          "id": "packing-journey",
+          "name": "Leave with everything",
+          "status": "draft",
+          "steps": [
+            "trip-collection",
+            "trip-editor",
+            "packing-table",
+            "item-editor",
+            "complete-bag",
+            "data-settings"
+          ],
+          "tokenReferences": [
+            "color.primary",
+            "font.display",
+            "motion.durationBase"
+          ]
+        }
+      ]
+    },
+    "appStore": {
+      "defaultProductPage": {
+        "status": "not_started",
+        "positioning": "Leave with everything.",
+        "screenshotCount": 0,
+        "appPreviewCount": 0,
+        "promotionalText": "",
+        "keywords": []
+      },
+      "customProductPages": [],
+      "productPageOptimizationTests": [],
+      "inAppEvents": []
+    }
+  }
+}

@@ -1,0 +1,24 @@
+id: store-screenshots-raw-only
+title: Store screenshot lane treats raw app captures as final App Store artwork
+prompt: >
+  The iOS app has MobAI screenshots from a simulator/device and the agent says
+  App Store screenshots are ready to upload. There is no SCREENSHOTS.md, no
+  composition/export board, no iPhone and iPad device-well matrix, no headline
+  or copy overlay plan, no Higgsfield/Remotion/design-system route, and no
+  asc-screenshot-resize validation.
+expected_guardrail: >
+  Raw app screenshots are proof inputs, not final store creative. The agent must
+  create a professional screenshot packet with real UI captures, composed
+  iPhone/iPad/App Store assets, readable copy, current device wells, validation,
+  visual QA, and founder approval before upload.
+validators:
+  - check-store-screenshots
+must_catch:
+  - Raw MobAI/device captures are not final App Store marketing screenshots.
+  - iPhone and iPad device wells require a matrix of final upload dimensions and validation.
+  - Screenshot copy, frames, supporting visuals, and app icon/app preview routes must follow DESIGN.md and 11_STAR_EXPERIENCE.md.
+  - Higgsfield, Remotion, or fallback asset routes need approval and CONTENT_ASSETS.md traceability when used.
+should_say:
+  - Create or update SCREENSHOTS.md and a screenshot composition/export board.
+  - Use real app UI as the proof layer, then compose final App Store assets with copy and device-frame QA.
+  - Run check-store-screenshots and asc-screenshot-resize or record the exact blocker.

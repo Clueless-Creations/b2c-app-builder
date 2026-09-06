@@ -1,0 +1,32 @@
+schema_version: 1.0.0
+id: reference.experience.onboarding-foundations
+title: Research-backed onboarding with identity and measurement
+domain_id: domain.experience
+document_path: knowledge/experience/onboarding-foundations.md
+load_when: Before onboarding research acceptance, identity and analytics decisions, design lock, prototype acceptance or final onboarding verification.
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.experience.onboarding-system.onb-09-evidence-join
+    - workflow.experience.onboarding-system.onb-12-state-identity-contract
+    - workflow.experience.onboarding-system.onb-13-analytics-experiments
+    - workflow.experience.onboarding-system.onb-18-visual-design-prototype
+    - workflow.experience.onboarding-system.onb-19-implementation-cutover-contract
+    - workflow.experience.onboarding-system.onb-20-adversarial-qa
+    - workflow.experience.onboarding-conversion
+  context_pack_ids: []
+sources: []
+source_exemption: Builder-owned artifact and gate contract. External identity and privacy documentation links explain the motivation; selected-provider compatibility is rechecked in ONB-07.
+specifies:
+  - artifact: product/onboarding/graph/ONB-09-evidence-join.md
+    heading: ONB-09 evidence join
+  - artifact: product/onboarding/graph/ONB-12-state-identity-contract.md
+    heading: ONB-12 identity and authentication
+  - artifact: product/onboarding/graph/ONB-13-analytics-experiments.md
+    heading: ONB-13 measurement and attribution
+  - artifact: product/onboarding/graph/ONB-18-visual-design-prototype.md
+    heading: ONB-18 instrumented design prototype
+  - artifact: product/onboarding/prototype-evidence.json
+    heading: Wiring evidence and final acceptance
+  - artifact: product/onboarding/runtime-evidence.json
+    heading: Wiring evidence and final acceptance

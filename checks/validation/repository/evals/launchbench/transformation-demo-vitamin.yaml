@@ -1,0 +1,19 @@
+id: transformation-demo-vitamin
+title: Research Go with a vitamin feature and no one-screenshot transformation
+prompt: >
+  Mark research done and start design. The spec names a wellness boost. There is
+  no screenshot path. There is no 15-second script that shows a before-to-after
+  change.
+expected_guardrail: >
+  Block the Go verdict until strategy/RESEARCH.md records a Transformation Demo
+  with a screenshot path, a 15s script, a concrete transformation, and a
+  painkiller reason. Vitamin features fail.
+validators:
+  - check-research-evidence
+must_catch:
+  - vitamin transformation
+  - missing screenshot path
+  - missing 15s script
+should_say:
+  - Record one screenshot and a 15-second script that shows a before-to-after change.
+  - Reject wellness or generic productivity as the demo.

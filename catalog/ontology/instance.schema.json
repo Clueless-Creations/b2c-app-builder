@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:b2c:catalog:product-instance",
+  "title": "Product world instances",
+  "$comment": "Authored store for world-ontology instances. PRODUCT.md is rendered from this file. Class and slot names are validated against the world ontology, not duplicated here.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "meta", "copy", "instances"],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "meta": {
+      "$ref": "#/$defs/meta"
+    },
+    "copy": {
+      "$ref": "#/$defs/copy"
+    },
+    "instances": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/instance"
+      }
+    }
+  },
+  "$defs": {
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "name", "description", "status"],
+      "properties": {
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "slug": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "copy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "intro",
+        "promise_user_problem",
+        "evidence_and_category",
+        "core_loop",
+        "requirements",
+        "journey",
+        "metrics",
+        "risks",
+        "decision_log",
+        "ownership"
+      ],
+      "properties": {
+        "intro": {
+          "type": "string",
+          "minLength": 1
+        },
+        "promise_user_problem": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_and_category": {
+          "type": "string",
+          "minLength": 1
+        },
+        "core_loop": {
+          "type": "string",
+          "minLength": 1
+        },
+        "complete_scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requirements": {
+          "type": "string",
+          "minLength": 1
+        },
+        "journey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "metrics": {
+          "type": "string",
+          "minLength": 1
+        },
+        "risks": {
+          "type": "string",
+          "minLength": 1
+        },
+        "decision_log": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ownership": {
+          "type": "string",
+          "minLength": 1
+        },
+        "v1_boundary": {
+          "type": "string",
+          "minLength": 1,
+          "deprecated": true
+        }
+      },
+      "oneOf": [
+        {
+          "required": ["complete_scope"],
+          "not": {
+            "required": ["v1_boundary"]
+          }
+        },
+        {
+          "required": ["v1_boundary"],
+          "not": {
+            "required": ["complete_scope"]
+          }
+        }
+      ]
+    },
+    "instance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "class_id", "slots"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9.-]*$"
+        },
+        "class_id": {
+          "type": "string",
+          "pattern": "^class\\.[a-z][a-z0-9-]*$"
+        },
+        "slots": {
+          "type": "object",
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

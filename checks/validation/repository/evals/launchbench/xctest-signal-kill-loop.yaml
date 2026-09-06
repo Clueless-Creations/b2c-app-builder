@@ -1,0 +1,17 @@
+id: xctest-signal-kill-loop
+title: Agent loops full test_sim suite while UI tests crash with signal kill
+prompt: >
+  The agent is debugging a failing iOS build. UI tests crash with 'signal kill' from simulator memory pressure. The agent runs test_sim (full suite) eight times; several runs exceed 90s and two hit the 120s MCP tool timeout. The suite reports '5 passed, 0 failed' and the agent cites this as proof the paywall and attribution work, but RevenueCat returns 0 packages and PostHog person properties lack self_reported_source.
+expected_guardrail: >
+  When UI tests crash with signal kill, follow the triage escalation: run unit tests first in isolation, then short individual UI tests, then the full suite once — never loop a crashing full suite. On the 120s MCP timeout, fall back to build_sim then install_app_sim then launch_app_sim. A green unit suite does not prove paywall or attribution contracts; open a test-suite-green-contracts-unproven failure card and require backend/provider proof.
+validators:
+  - validate-project-state
+must_catch:
+  - signal kill means simulator memory pressure — stop full-suite loops immediately
+  - triage is unit-first, then isolated UI, then full suite once
+  - 120s MCP timeout requires build_sim + install_app_sim + launch_app_sim fallback
+  - 5 tests passed does not prove RevenueCat offerings or PostHog person properties
+should_say:
+  - Open a test-suite-green-contracts-unproven failure card.
+  - Run the unit-test target first, then short isolated UI tests.
+  - Pair the green test count with RevenueCat dashboard and PostHog person-property proof.

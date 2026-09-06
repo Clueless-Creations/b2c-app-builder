@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "const": "b2c/v1"
+        },
+        "requestId": {
+          "type": "string"
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ok": {
+          "type": "boolean",
+          "const": true
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "workspaceId": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string",
+              "const": "hypothesis"
+            },
+            "revision": {
+              "type": "string",
+              "pattern": "^sha256:[a-f0-9]{64}$"
+            },
+            "nextAction": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "workspaceId",
+            "status",
+            "revision",
+            "nextAction"
+          ],
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "apiVersion",
+        "requestId",
+        "warnings",
+        "ok",
+        "data"
+      ],
+      "additionalProperties": true
+    },
+    {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "const": "b2c/v1"
+        },
+        "requestId": {
+          "type": "string"
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ok": {
+          "type": "boolean",
+          "const": false
+        },
+        "error": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string",
+              "enum": [
+                "INVALID_INPUT",
+                "UNSUPPORTED_VERSION",
+                "UNKNOWN_ENTITY",
+                "UNKNOWN_WORKSPACE",
+                "UNSUPPORTED_ENTITY_VERSION",
+                "UNKNOWN_OPERATION",
+                "INCOMPATIBLE_BINDING",
+                "COMPOSITION_APPLY_UNAVAILABLE",
+                "INTERNAL_ERROR",
+                "LOCAL_OPERATION_REFUSED",
+                "RECOVERY_REQUIRED",
+                "STALE_PREVIEW"
+              ]
+            },
+            "message": {
+              "type": "string"
+            },
+            "fields": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "retryable": {
+              "type": "boolean"
+            },
+            "recovery": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "code",
+            "message",
+            "fields",
+            "retryable",
+            "recovery"
+          ],
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "apiVersion",
+        "requestId",
+        "warnings",
+        "ok",
+        "error"
+      ],
+      "additionalProperties": true
+    }
+  ]
+}

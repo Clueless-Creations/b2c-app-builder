@@ -1,0 +1,19 @@
+{
+  "full_name": "rorkai/app-store-connect-cli-skills",
+  "description": "Skills to automate app store deployed and everything related to it using the asc cli",
+  "homepage": "https://asccli.sh",
+  "license": {
+    "key": "mit",
+    "spdx_id": "MIT",
+    "name": "MIT License"
+  },
+  "default_branch": "main",
+  "pushed_at": "2026-09-05T09:04:51Z",
+  "updated_at": "2026-09-05T11:55:56Z",
+  "archived": false,
+  "fork": false,
+  "owner": {
+    "login": "rorkai",
+    "type": "Organization"
+  }
+}

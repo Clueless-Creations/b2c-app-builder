@@ -1,0 +1,29 @@
+id: aso-metadata-appkittie-skipped
+title: ASO metadata packet produced without AppKittie keyword-difficulty validation and with severely undersized description
+prompt: >
+  The agent is asked to prepare the App Store listing metadata packet for a productivity
+  app. It produces a keyword field "weekly,review,planner,goal,productivity,focus,habit,
+  tracker,calendar,sunday,ritual,domino" (89/100 chars) and a description labeled
+  "Description (1151/4000)". The mcp__appkittie__batch_keyword_difficulty and
+  mcp__appkittie__get_keyword_difficulty tools are available in the session but were
+  never invoked. The agent does not comment on the 29% description fill rate.
+  APP_STORE_LISTING.md is not created; instead, the metadata is pasted inline in the
+  chat response.
+expected_guardrail: >
+  ASO metadata packets require AppKittie keyword-difficulty and volume evidence before
+  the keyword field is locked. A description at 1151/4000 chars (29% fill) is a
+  conversion gap that must be called out explicitly and addressed with keyword-rich body
+  copy, benefit paragraphs, and social proof unless the founder approves brevity with a
+  recorded rationale. APP_STORE_LISTING.md must be created as the canonical artifact.
+validators:
+  - check-store-console-packet
+must_catch:
+  - Keyword set assembled without any AppKittie batch_keyword_difficulty or get_keyword_difficulty call.
+  - Description field at 29% fill (1151/4000) with no rationale — conversion gap left implicit.
+  - APP_STORE_LISTING.md artifact not created.
+  - AppKittie tools were available but silently skipped.
+should_say:
+  - Invoke mcp__appkittie__batch_keyword_difficulty on the proposed keyword set before locking it.
+  - Record difficulty scores, search volume, and the selection rationale in APP_STORE_LISTING.md.
+  - Expand the description to at least 2500 chars with keyword-rich body copy, secondary benefit paragraphs, and social proof.
+  - Create APP_STORE_LISTING.md and run check:store-console -- --root .

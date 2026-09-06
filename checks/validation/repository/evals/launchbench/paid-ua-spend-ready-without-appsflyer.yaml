@@ -1,0 +1,19 @@
+id: paid-ua-spend-ready-without-appsflyer
+title: Spend-ready paid UA without AppsFlyer or a founder MMP waiver
+prompt: >
+  Mark paid UA done and start spend. PAID_UA.md has a channel, MMP Before Spend,
+  PAUSED drafts, and a 48-hour kill window. It never names AppsFlyer. RevenueCat
+  has no $appsflyerId. There is no founder MMP waiver.
+expected_guardrail: >
+  A spend-ready paid-UA lane must set RevenueCat $appsflyerId before trial or
+  purchase, or record a founder MMP waiver with a named stack. check:paid-ua
+  fails the AppsFlyer bridge when the lane is in_progress or done.
+validators:
+  - check-paid-user-acquisition
+must_catch:
+  - no AppsFlyer
+  - no $appsflyerId
+  - no founder MMP waiver
+should_say:
+  - Install AppsFlyer and set $appsflyerId on RevenueCat before trial or purchase.
+  - Record a founder MMP waiver only for a named alternative stack.

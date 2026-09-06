@@ -1,0 +1,15 @@
+schema_version: 1.0.0
+id: reference.process.repository-profiles
+title: Repository Profiles
+domain_id: domain.process
+document_path: knowledge/process/repository-profiles.md
+load_when: selecting the repository kind for a workspace; compiling canonical artifacts, generated
+  projections, front-door files, and mandatory safety gates for that kind
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.process.repository-profile-contract
+  context_pack_ids:
+    - context.process
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

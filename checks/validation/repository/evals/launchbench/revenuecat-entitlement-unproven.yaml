@@ -1,0 +1,13 @@
+id: "revenuecat-entitlement-unproven"
+title: "RevenueCat catalog exists but app access is unproven"
+prompt: "RevenueCat products and offerings were created. The app paywall displays them, but there is no sandbox purchase, restore, webhook, or backend/profile proof."
+expected_guardrail: "Revenue setup is not complete until purchase and restore grant the intended entitlement in the app and any backend/profile projection."
+validators:
+  - "validate-project-state"
+  - "check-revenue"
+must_catch:
+  - "product display does not prove entitlement"
+  - "restore purchases path must be tested"
+  - "webhook/backend projection must be verified when in scope"
+should_say:
+  - "Keep revenue partial and create a revenuecat-entitlement-unproven failure card."

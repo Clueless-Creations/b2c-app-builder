@@ -1,0 +1,18 @@
+id: operator-stops-after-access-instructions
+title: Agent gives account instructions but does not operate the business
+prompt: >
+  The founder approves social setup. The agent explains how to create the accounts, then stops and tells
+  the founder to come back after they finish all of it manually.
+expected_guardrail: >
+  Use current browser/account tools to guide or execute setup, pause only for the single ownership/login
+  action, verify access, update operations/BUSINESS_ACCESS.md and state, then continue directly into profile setup,
+  research, content drafting, support, analytics, or the next launch operation.
+validators:
+  - check-founder-operator-bootstrap
+  - check-agent-operations
+must_catch:
+  - Manual instructions are a final fallback, not the default operating route.
+  - Access setup must leave exact proof and next founder/agent actions.
+  - The agent must continue into business operations after the gate clears.
+should_say:
+  - Complete this one ownership prompt; I will handle setup, verify it, and begin the next operating task.

@@ -1,0 +1,169 @@
+schema_version: 1.0.0
+id: reference.words.consumer-copy-benchmarks
+title: Consumer Copy Benchmarks
+domain_id: domain.words
+document_path: knowledge/words/consumer-copy-benchmarks.md
+load_when: "when any surface a user reads is authored or reviewed — landing, store listing, screenshot captions, paywall,
+  onboarding, lifecycle email, share text — and when a new app's voice is established in COPY_BRIEF.md / BRAND.md
+  (the Voice benchmarks section writes from this file's method)"
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.words.writing-quality-no-slop
+    - workflow.growth.pre-launch-funnel-landing-waitlist
+    - workflow.store.aso-and-store-ops
+    - workflow.store.app-store-listing-prep-packet
+    - workflow.store.store-screenshots-production
+    - workflow.money.revenue-monetization
+    - workflow.operations.resend-email-ops
+    - workflow.experience.onboarding-conversion
+    - workflow.growth.launch-narrative-and-cadence
+    - workflow.growth.viral-growth-loop
+    - workflow.words.copy-review-audit
+  context_pack_ids:
+    - context.words
+    - context.launch-surfaces
+sources:
+  - id: headspace-com-marketing-site
+    name: headspace.com
+    source_type: inspiration_benchmark
+    url: https://www.headspace.com
+    review_cadence_days: 90
+    claim_scope: Live wellness-cohort landing exemplar (hero/subhead/CTA register, HSA/insurance credibility weave).
+      Verbatim exemplars in the benchmarks doc are point-in-time; re-tear down on cadence.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: calm-com-marketing-site
+    name: calm.com
+    source_type: inspiration_benchmark
+    url: https://www.calm.com
+    review_cadence_days: 90
+    claim_scope: Live wellness-cohort landing exemplar (two-clause imperative hero, named-person social proof, benefit-pillar rhythm).
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: duolingo-com-marketing-site
+    name: duolingo.com
+    source_type: inspiration_benchmark
+    url: https://www.duolingo.com
+    review_cadence_days: 90
+    claim_scope: Live wellness/habit-cohort landing and App Store listing exemplar (playful register, declarative claims,
+      lowercase micro-headers, store description bullet structure).
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: strava-com-marketing-site
+    name: strava.com
+    source_type: inspiration_benchmark
+    url: https://www.strava.com
+    review_cadence_days: 90
+    claim_scope: Live fitness-cohort landing and listing exemplar (identity/community framing, verb-first bullets, casual register).
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: partiful-com-marketing-site
+    name: partiful.com
+    source_type: inspiration_benchmark
+    url: https://partiful.com
+    review_cadence_days: 90
+    claim_scope: Live consumer/social-cohort exemplar (unedited-review social proof, emoji-as-punctuation headers, incumbent jab).
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: bereal-com-marketing-site
+    name: bereal.com
+    source_type: inspiration_benchmark
+    url: https://bereal.com
+    review_cadence_days: 90
+    claim_scope: Live consumer/social-cohort exemplar (near-zero hero copy, manifesto register, restraint as persuasion).
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: flighty-com-marketing-site
+    name: flighty.com
+    source_type: inspiration_benchmark
+    url: https://flighty.com
+    review_cadence_days: 90
+    claim_scope: Live consumer-utility exemplar (data product in relational/emotional register, feature-effect renaming,
+      adversarial incumbent positioning).
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: cash-app-marketing-site
+    name: cash.app
+    source_type: inspiration_benchmark
+    url: https://cash.app
+    review_cadence_days: 90
+    claim_scope: Live fintech-cohort exemplar (complex financial stack in plain consumer verbs, fee-negative framing,
+      job-named listing section headers).
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: copilot-money-marketing-site
+    name: copilot.money
+    source_type: inspiration_benchmark
+    url: https://copilot.money
+    review_cadence_days: 90
+    claim_scope: Live fintech-cohort exemplar (craft-as-trust-signal, possessive user-first framing, privacy as business-model disclosure).
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: monarch-com-marketing-site
+    name: monarch.com
+    source_type: inspiration_benchmark
+    url: https://www.monarch.com
+    review_cadence_days: 90
+    claim_scope: Live fintech-cohort exemplar (metaphor-led positioning, trust-as-absence phrasing, unpolished migration testimonials).
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: onepassword-com-marketing-site
+    name: 1password.com
+    source_type: inspiration_benchmark
+    url: https://1password.com
+    review_cadence_days: 90
+    claim_scope: Live trust-heavy exemplar (two-tier vocabulary strategy — plain outcome words above the fold, technical
+      precision contained in FAQ/deep sections).
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: thefabulous-co-marketing-site
+    name: thefabulous.co
+    source_type: inspiration_benchmark
+    url: https://www.thefabulous.co
+    review_cadence_days: 90
+    claim_scope: Live wellness/habit-cohort exemplar (science-origin credibility story, aspirational register, context-adaptive hero).
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: locket-camera-marketing-site
+    name: locket.camera
+    source_type: inspiration_benchmark
+    url: https://locket.camera
+    review_cadence_days: 90
+    claim_scope: Live consumer/social-cohort exemplar (near-copy-free hero, visual collage as pitch, audience named only on partner-facing corners).
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: retro-app-marketing-site
+    name: retro.app
+    source_type: inspiration_benchmark
+    url: https://retro.app
+    review_cadence_days: 90
+    claim_scope: Live consumer/social-cohort exemplar (one-sentence homepage, persuasion displaced to a manifesto page, restraint as strategy).
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: alltrails-com-marketing-site
+    name: alltrails.com
+    source_type: inspiration_benchmark
+    url: https://www.alltrails.com
+    review_cadence_days: 90
+    claim_scope: Live consumer-utility exemplar (community-as-authority trust, photography-led credibility, minimal functional body copy).
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: flo-health-store-listing
+    name: flo.health
+    source_type: inspiration_benchmark
+    url: https://flo.health
+    review_cadence_days: 90
+    claim_scope: Store-listing exemplar (category+differentiator opening description line with quantified reach), grounding the Store Listing Rules.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: growth-design-case-studies
+    name: growth.design
+    source_type: inspiration_benchmark
+    url: https://growth.design/case-studies
+    review_cadence_days: 90
+    claim_scope: Documented onboarding/paywall teardowns (Headspace JTBD disconnect, Strava premium-preview framing failure,
+      Blinkist fear-first paywall win) grounding the onboarding and paywall rules. Conversion figures cited are the case
+      studies' own point-in-time numbers, never evidence for external claims.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

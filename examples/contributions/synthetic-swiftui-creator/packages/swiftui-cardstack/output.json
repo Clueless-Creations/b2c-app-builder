@@ -1,0 +1,12 @@
+{
+  "$comment": "SYNTHETIC FIXTURE: not a real creator's repository",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "screenId": { "type": "string" },
+    "renderedCount": { "type": "integer", "minimum": 0 },
+    "topCardOffset": { "const": 0 }
+  },
+  "required": ["screenId", "renderedCount", "topCardOffset"],
+  "additionalProperties": false
+}

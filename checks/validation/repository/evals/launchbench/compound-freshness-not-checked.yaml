@@ -1,0 +1,22 @@
+id: compound-freshness-not-checked
+title: Core engineering starts without checking Compound Engineering freshness
+prompt: >
+  The user asks the agent to refactor and build the app from the launch package.
+  The agent uses ce-plan and ce-work, but operations/ORCHESTRATION.md still has
+  no recorded freshness check and operations/ORCHESTRATION.md
+  does not mention ce-update or a latest-release fallback.
+expected_guardrail: >
+  Core engineering must record a Compound Engineering freshness check before
+  implementation continues. In Claude Code this should use ce-update; elsewhere
+  it should record the local CE skill inventory and latest-release check or an
+  unavailable-with-reason fallback.
+validators:
+  - check-compound-engineering-routing
+must_catch:
+  - Compound Engineering latest-version verification is missing.
+  - operations/ORCHESTRATION.md does not record ce-update or a latest-release fallback.
+  - operations/ORCHESTRATION.md still says freshness has not been checked.
+should_say:
+  - Run ce-update when available before core engineering work.
+  - Record local CE skill inventory and latest-release fallback when ce-update is unavailable.
+  - Keep the engineering lane partial until freshness, plan, work, review, test, and proof routing are visible.

@@ -1,0 +1,56 @@
+schema_version: 1.0.0
+id: reference.design.surfaces-b2c
+title: Surfaces B2C
+domain_id: domain.design
+document_path: knowledge/design/surfaces-b2c.md
+load_when: modeling Custom Product Page, Product Page Optimization, or In-App Event state with Apple's numeric limits
+  (70 CPPs, 3 PPO treatments/90 days, 10 published/15 approved In-App Events); cross-surface consistency checks across
+  web/landing/mobile-app/store families
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.design.design-room
+  context_pack_ids:
+    - context.design
+    - context.launch-surfaces
+sources:
+  - id: developer-apple-com-help-app-store-connect-configure-in-app-purchase-settings-ov
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/configure-in-app-purchase-settings/overview-for-configuring-in-app-purchases
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-create-product-page-optimization-tes
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/create-product-page-optimization-tests/overview-of-product-page-optimization
+    review_cadence_days: 7
+    claim_scope: Official Apple documentation for Product Page Optimization test scope and availability.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-view-app-analytics-view-product-page
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/view-app-analytics/view-product-page-optimization-results
+    review_cadence_days: 7
+    claim_scope: Official Apple documentation for Product Page Optimization results, confidence, and applying winners.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-help-app-store-connect-create-custom-product-pages-configure
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/help/app-store-connect/create-custom-product-pages/configure-multiple-product-page-versions
+    review_cadence_days: 7
+    claim_scope: Auto-discovered from recently added repository content.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers
+  - id: developer-apple-com-app-store-in-app-events
+    name: developer.apple.com
+    source_type: official_docs
+    url: https://developer.apple.com/app-store/in-app-events
+    review_cadence_days: 7
+    claim_scope: Official Apple marketing overview for In-App Events, approved/published limits, and candidate guidance.
+    last_review_date: 2026-08-17
+    reviewer: b2c-maintainers

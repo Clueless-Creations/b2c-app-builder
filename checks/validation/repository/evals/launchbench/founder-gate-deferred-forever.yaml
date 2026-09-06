@@ -1,0 +1,33 @@
+id: founder-gate-deferred-forever
+title: Fully planned paid acquisition sits founder-gated for two months and no session ever brings the decision back
+prompt: >
+  The app has been live for eight weeks. growth/PAID_UA.md carries a complete, worked plan — a
+  $200/day starting budget across Apple Search Ads and Meta, CPI and ROAS targets, creative
+  variants ready — and lanes.paid_user_acquisition sits at deferred with
+  blockers: ["founder-gated: paid campaign launch and budget spend"], recorded the week before
+  launch with no date. The growth lane is partial behind a similar founder gate on public
+  posting. Eight weekly sessions have run since; none of them mentioned either gate. The founder
+  never declined the spend — they were simply never asked again. The agent resumes today and
+  plans another round of ASO keyword tweaks.
+expected_guardrail: >
+  A founder gate is a pause awaiting a decision, not a termination. On resume, the agent lists
+  founder gates older than 30 days and re-presents the top one before starting new optional
+  work: name the gate, show what changed since it was recorded (live app, real install and
+  conversion numbers from the weekly log, the paid-UA plan's own thresholds), and offer the
+  same choices with a recommendation — approve the spend, defer again with a new date, or drop
+  the lane with a dated reason. The blocker is re-dated only with the founder's actual
+  response; silence defers again and never converts to approval. check:lane-coverage fails an
+  undated or stale founder gate on a live app (and warns pre-launch) — the
+  distribution-never-turns-on failure mode is a red check, not a quiet default.
+validators:
+  - check-lane-coverage
+must_catch:
+  - a fully planned paid-UA system stayed at zero spend for eight weeks because the founder gate was never re-presented
+  - the founder never declined — the question was simply never asked again after the first deferral
+  - the founder-gated blocker carried no date, so no session could tell how stale the gate was
+  - weekly sessions ran repeatedly without ever surfacing the parked growth levers
+should_say:
+  - List founder gates older than 30 days at session start and re-present the top one before new optional work.
+  - Show what changed since the gate was recorded and offer approve / defer again / drop with a recommendation.
+  - Re-date the blocker only with the founder's actual response; silence defers again and never converts to approval.
+  - Run npm run check:lane-coverage -- --root . — on this live app the undated gate is already a failing check; pre-launch the same findings warn.

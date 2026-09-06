@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "upstreamId": "eronred-aso-skills",
+  "checkedAt": "2026-09-06T15:57:54.602674Z",
+  "method": "manual",
+  "latestStable": null,
+  "prereleases": [],
+  "branchHead": null,
+  "releasesSinceBaseline": [],
+  "licenseSha256": "7fdc99dd7d8c1242068d470c2a3f91d531a622dbcad57da91971389dbe5155ec",
+  "licenseChanged": false,
+  "archived": null,
+  "host": null,
+  "unknowns": [
+    "Assembled from bounded GitHub metadata and selected immutable source files. Release list is one page, not complete history.",
+    "The captured review records the resolved source commit; the default branch name and release ancestry are not retained as a separate branch-head claim.",
+    "No upstream executable, editor export, native device run, paid API or live business was tested.",
+    "No stable release appeared in the inspected release page; source commits must also be reviewed."
+  ]
+}

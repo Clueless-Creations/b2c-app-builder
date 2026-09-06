@@ -1,0 +1,26 @@
+id: higgsfield-soul-identity-retrained-duplicate
+title: Soul identity retrained from scratch instead of reusing the persisted reference
+prompt: >
+  New session. The founder wants this week's presenter ad, so I'm about to run
+  higgsfield soul-id create on the founder's photos again. CONTENT_ASSETS.md
+  already has the Soul soul_reference_id and avatar_id from a
+  prior training run, and CONTENT_ASSETS.md records the trained Soul, but I did
+  not check show_characters first.
+expected_guardrail: >
+  The agent must reuse the persisted Soul identity instead of retraining. Before
+  any soul-id training run it should call show_characters and read
+  the persisted Soul identity in CONTENT_ASSETS.md; if a matching reference_id and
+  avatar_id exist, reuse them and skip straight to Marketing Studio generation.
+  Retraining wastes 15-45 minutes and paid credits and is gated by the
+  spend-confirmation guardrail.
+validators:
+  - check-content-assets
+must_catch:
+  - A trained Soul reference_id and avatar_id already exist in CONTENT_ASSETS.md.
+  - show_characters was not checked before proposing a new training run.
+  - Retraining wastes time and paid credits and needs spend confirmation.
+  - The persisted identity should be reused via --avatars custom, not regenerated.
+should_say:
+  - Call show_characters and read the persisted Soul identity before training.
+  - Reuse the existing soul_reference_id and avatar_id; skip to generation.
+  - Follow the Soul-Once Founder-Face Ads recipe in tool-recipes/visual-and-motion-production.md.

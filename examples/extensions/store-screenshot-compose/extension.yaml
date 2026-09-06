@@ -1,0 +1,212 @@
+apiVersion: b2c.extension/v1
+id: store-screenshot-compose/package
+version: 1.0.0
+hostApiVersion: b2c/v1
+title: Store screenshot compositor
+dependencies: []
+imports: []
+resources:
+  - id: store-screenshot-compose/compose-layout-input
+    path: schemas/compose-layout.input.json
+    kind: schema
+    mediaType: application/json
+  - id: store-screenshot-compose/compose-layout-output
+    path: schemas/compose-layout.output.json
+    kind: schema
+    mediaType: application/json
+  - id: store-screenshot-compose/export-localized-input
+    path: schemas/export-localized.input.json
+    kind: schema
+    mediaType: application/json
+  - id: store-screenshot-compose/export-localized-output
+    path: schemas/export-localized.output.json
+    kind: schema
+    mediaType: application/json
+  - id: store-screenshot-compose/validate-deliverables-input
+    path: schemas/validate-deliverables.input.json
+    kind: schema
+    mediaType: application/json
+  - id: store-screenshot-compose/validate-deliverables-output
+    path: schemas/validate-deliverables.output.json
+    kind: schema
+    mediaType: application/json
+  - id: store-screenshot-compose/validate-deliverables-evidence
+    path: schemas/validate-deliverables.evidence.json
+    kind: schema
+    mediaType: application/json
+  - id: store-screenshot-compose/provenance-evidence
+    path: schemas/provenance.evidence.json
+    kind: schema
+    mediaType: application/json
+  - id: store-screenshot-compose/compositor-knowledge
+    path: compositor.md
+    kind: knowledge
+    mediaType: text/markdown
+  - id: store-screenshot-compose/pack
+    path: pack.yaml
+    kind: catalog-pack
+    mediaType: application/yaml
+  - id: store-screenshot-compose/compose-adapter
+    path: compose.mjs
+    kind: adapter
+    mediaType: text/javascript
+  - id: store-screenshot-compose/device-well-template
+    path: templates/device-well.svg.tmpl
+    kind: asset
+    mediaType: image/svg+xml
+  - id: store-screenshot-compose/wells
+    path: wells.json
+    kind: asset
+    mediaType: application/json
+  - id: store-screenshot-compose/copy-sample
+    path: copy.sample.json
+    kind: asset
+    mediaType: application/json
+capabilities:
+  - id: store-screenshot-compose/marketing-screenshots
+    version: 1.0.0
+    title: Marketing screenshot composition
+    description: Compose existing app captures into store screenshot layouts, export them per locale, and validate the deliverables. Capture and upload are outside this capability.
+    targets:
+      - platform: host
+        runtime: node22
+    knowledge:
+      - store-screenshot-compose/compositor-knowledge
+    operations:
+      - id: store-screenshot-compose/marketing-screenshots.compose-layout
+        title: Compose marketing screenshot layouts
+        inputSchema: store-screenshot-compose/compose-layout-input
+        outputSchema: store-screenshot-compose/compose-layout-output
+        evidenceSchema: store-screenshot-compose/provenance-evidence
+        effect: draft
+        acceptance:
+          - One SVG exists per capture and links its source capture by relative path.
+          - provenance.json records notCaptureEvidence true and the sha256 of every source capture.
+          - Two runs over the same inputs and the same --now value produce the same bytes.
+      - id: store-screenshot-compose/marketing-screenshots.export-localized
+        title: Export composed layouts per locale
+        inputSchema: store-screenshot-compose/export-localized-input
+        outputSchema: store-screenshot-compose/export-localized-output
+        evidenceSchema: store-screenshot-compose/provenance-evidence
+        effect: draft
+        acceptance:
+          - Each requested locale has its own directory, SVG set, and provenance.json.
+          - A locale without copy for every capture fails before any file is written.
+      - id: store-screenshot-compose/marketing-screenshots.validate-deliverables
+        title: Validate composed deliverables
+        inputSchema: store-screenshot-compose/validate-deliverables-input
+        outputSchema: store-screenshot-compose/validate-deliverables-output
+        evidenceSchema: store-screenshot-compose/validate-deliverables-evidence
+        effect: observe
+        acceptance:
+          - Every output matches a well, every source capture exists with its recorded sha256, and provenance has no missing field.
+          - A missing capture, a sha mismatch, a wrong dimension, or a missing provenance.json exits 1 with a JSON report.
+implementations:
+  - id: store-screenshot-compose/compose-layout
+    version: 1.0.0
+    operation: store-screenshot-compose/marketing-screenshots.compose-layout
+    description: Runs compose.mjs in compose mode. Reads captures, a wells table, an SVG template, and copy. Writes SVG files and provenance.json.
+    targets:
+      - platform: host
+        runtime: node22
+    mode: command
+    entrypoint: store-screenshot-compose/compose-adapter
+    sdkRange: ">=22.0.0 <23.0.0"
+    limitations:
+      - Composes existing captures only; it never launches an app or captures pixels
+      - No store upload; upload stays with the asc route and founder approval
+      - SVG layouts only; no raster rendering
+    knowledge:
+      - store-screenshot-compose/compositor-knowledge
+    connectionRequired: false
+    maturity: experimental
+  - id: store-screenshot-compose/export-localized
+    version: 1.0.0
+    operation: store-screenshot-compose/marketing-screenshots.export-localized
+    description: Runs compose.mjs in export mode. Re-renders a composed directory once per locale from the same template, captures, and copy.
+    targets:
+      - platform: host
+        runtime: node22
+    mode: command
+    entrypoint: store-screenshot-compose/compose-adapter
+    sdkRange: ">=22.0.0 <23.0.0"
+    limitations:
+      - Composes existing captures only; it never launches an app or captures pixels
+      - No store upload; upload stays with the asc route and founder approval
+      - SVG layouts only; no raster rendering
+    knowledge:
+      - store-screenshot-compose/compositor-knowledge
+    connectionRequired: false
+    maturity: experimental
+  - id: store-screenshot-compose/validate-deliverables
+    version: 1.0.0
+    operation: store-screenshot-compose/marketing-screenshots.validate-deliverables
+    description: Runs compose.mjs in validate mode. Reads provenance.json, the outputs, the source captures, and the wells table. Writes nothing.
+    targets:
+      - platform: host
+        runtime: node22
+    mode: command
+    entrypoint: store-screenshot-compose/compose-adapter
+    sdkRange: ">=22.0.0 <23.0.0"
+    limitations:
+      - Composes existing captures only; it never launches an app or captures pixels
+      - No store upload; upload stays with the asc route and founder approval
+      - SVG layouts only; no raster rendering
+    knowledge:
+      - store-screenshot-compose/compositor-knowledge
+    connectionRequired: false
+    maturity: experimental
+recipes:
+  - id: store-screenshot-compose/pipeline
+    version: 1.0.0
+    title: Compose, export, then validate store screenshots
+    maturity: experimental
+    workflows:
+      - workflow.store-screenshot-compose-layout
+      - workflow.store-screenshot-export-localized
+      - workflow.store-screenshot-validate-deliverables
+    operations:
+      - operation: store-screenshot-compose/marketing-screenshots.compose-layout
+        implementation: store-screenshot-compose/compose-layout
+        required: true
+        workflowIds:
+          - workflow.store-screenshot-compose-layout
+        workflowContexts:
+          - workflowId: workflow.store-screenshot-compose-layout
+            instructions: neutral
+            roleInstructions: neutral
+            neutralReferenceIds: []
+            providerReferenceIds: []
+            neutralContextPackIds: []
+            providerContextPackIds: []
+      - operation: store-screenshot-compose/marketing-screenshots.export-localized
+        implementation: store-screenshot-compose/export-localized
+        required: false
+        workflowIds:
+          - workflow.store-screenshot-export-localized
+        workflowContexts:
+          - workflowId: workflow.store-screenshot-export-localized
+            instructions: neutral
+            roleInstructions: neutral
+            neutralReferenceIds: []
+            providerReferenceIds: []
+            neutralContextPackIds: []
+            providerContextPackIds: []
+      - operation: store-screenshot-compose/marketing-screenshots.validate-deliverables
+        implementation: store-screenshot-compose/validate-deliverables
+        required: true
+        workflowIds:
+          - workflow.store-screenshot-validate-deliverables
+        workflowContexts:
+          - workflowId: workflow.store-screenshot-validate-deliverables
+            instructions: neutral
+            roleInstructions: neutral
+            neutralReferenceIds: []
+            providerReferenceIds: []
+            neutralContextPackIds: []
+            providerContextPackIds: []
+    policy:
+      maxRepairAttempts: 2
+      independentReview: true
+catalogPacks:
+  - store-screenshot-compose/pack

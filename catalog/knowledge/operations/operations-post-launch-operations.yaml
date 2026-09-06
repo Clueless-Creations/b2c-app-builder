@@ -1,0 +1,19 @@
+schema_version: 1.0.0
+id: reference.operations.post-launch-operations
+title: Post-Launch Operations
+domain_id: domain.operations
+document_path: knowledge/operations/post-launch-operations.md
+load_when: once the app is live (phase_6/phase_6b); after first store approval; on "what now"; for weekly ops,
+  incidents, review responses, retention and kill-or-scale reviews, or resuming a live app; when a second business
+  exists
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.operations.post-launch-operations
+    - workflow.operations.support-queue-operations
+    - workflow.operations.retention-intervention
+    - workflow.operations.financial-health-review
+    - workflow.operations.scheduled-autonomy-installation
+  context_pack_ids: []
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

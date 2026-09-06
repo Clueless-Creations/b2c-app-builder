@@ -1,0 +1,13 @@
+{
+  "$comment": "SYNTHETIC FIXTURE: not a real creator's repository",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "screenId": { "type": "string" },
+    "review": { "enum": ["pending", "passed", "failed"] },
+    "reviewer": { "type": "string", "minLength": 1 },
+    "capturePath": { "type": "string", "minLength": 1 }
+  },
+  "required": ["screenId", "review", "reviewer"],
+  "additionalProperties": false
+}

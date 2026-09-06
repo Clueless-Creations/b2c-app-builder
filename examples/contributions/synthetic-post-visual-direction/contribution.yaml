@@ -1,0 +1,142 @@
+# SYNTHETIC FIXTURE: an invented post, not a real creator's writing.
+# Hand-authored contribution manifest (b2c.contribution/v1). Keys are the contract's camelCase
+# names in snake_case, by the same rule as camelToSnake in kernel/contribution/upstreams-load.ts.
+# The revision and the inventory digest are the real sha256 of source/post.md. The
+# contribution-runtime-context fixture suite recomputes them, so a stale digest fails the suite
+# instead of passing as evidence.
+api_version: b2c.contribution/v1
+id: synthetic-post-visual-direction
+goal: improve the visual-direction critique method
+scope: contribution
+routing:
+  intended_target: knowledge/design/audience-derived-identity.md as a cited selectable method, plus this root's candidate/ directory
+  effect: cites one idea on an existing active reference as a selectable method and records one original counterexample. No reference text changes. No provider, no skill, no workspace.
+  verdict: contribution
+  reason: The source informs shared design knowledge. No business workspace owns the result, no maintainer-owned layer is touched, and no upstream pin changes.
+created_at: 2026-09-06T02:00:05Z
+synthetic: true
+sources:
+  - id: synthetic-designer-grayscale-post
+    kind: post
+    title: Kill the gradient, then re-test
+    local_path: source/post.md
+    publisher: Synthetic Designer
+    retrieved_at: 2026-09-06T02:00:05Z
+    reviewed_at: 2026-09-06
+    revision: sha256:f2018aee6db8cd0da4fe403153b1af7739c08298136fd5913e5a01d5bb46816a
+    retrieval:
+      status: complete
+      method: local file read
+      notes: Fixture file inside this repository. No network was used and nothing in the post was executed.
+    rights:
+      status: unknown
+      notes: public post; no license; idea cited, expression not ingested
+    selectors:
+      - paragraph 2
+    directives: []
+    inventory:
+      - path: source/post.md
+        role: documentation
+        bytes: 1235
+        sha256: f2018aee6db8cd0da4fe403153b1af7739c08298136fd5913e5a01d5bb46816a
+    unknowns:
+      - The author's terms for reuse of the text
+      - The source of the +4% completion figure
+batch_overlap: []
+existing_owners:
+  - id: reference.design.audience-derived-identity
+    path: catalog/knowledge/design/design-audience-derived-identity.yaml
+    match: "keyword match: palette, gradient"
+  - id: reference.design.vibecoded-tells
+    path: catalog/knowledge/design/design-vibecoded-tells.yaml
+    match: "keyword match: gradient, hierarchy"
+units:
+  - id: u1
+    kind: knowledge
+    title: grayscale hierarchy check
+    upstream:
+      source_id: synthetic-designer-grayscale-post
+      selector: paragraph 2
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: proposed
+    rationale: >-
+      Four things in the post stay apart. Opinion: the author's taste that color should decorate rather than
+      structure. That stays the author's and is not a rule. Mechanism: the grayscale test, which removes hue and asks
+      whether the reading order holds. That is the idea worth citing. Demonstration: the four-step run on one screen.
+      It shows the test and proves nothing general. Measured evidence: the +4% completion figure has no source and
+      the 10k likes are popularity. Neither counts as evidence. Rights are unknown, so the idea is cited and the
+      expression is not adapted. It lands as a selectable method on the existing owner, never as an always-on default.
+    verification:
+      - b2c contribute check --target examples/contributions/synthetic-post-visual-direction
+      - b2c contribute preview --target examples/contributions/synthetic-post-visual-direction
+      - u2-counterexample
+    kept:
+      - The grayscale test as an idea, cited to the author
+    changed: []
+    omitted:
+      - The author's wording (rights unknown; expression not ingested)
+      - The +4% completion figure (no source)
+      - The 10k likes (popularity is not evidence)
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability: []
+  - id: u2
+    kind: evaluation
+    title: counterexample where color is the only encoding of state
+    upstream: null
+    target:
+      kind: evaluation-case
+      id: u2-counterexample
+    disposition: original
+    status: proposed
+    rationale: An original counterexample. The naive rule reads a monochrome data-dense dashboard as decoration-only and fails it, although its status hues are the only encoding of state. The candidate must name that limit or it is wrong.
+    verification: []
+    kept: []
+    changed: []
+    omitted: []
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability: []
+derivations:
+  - target: reference.design.audience-derived-identity
+    source_ids:
+      - synthetic-designer-grayscale-post
+    relationship: informed
+    baseline: sha256:f2018aee6db8cd0da4fe403153b1af7739c08298136fd5913e5a01d5bb46816a
+    selectors:
+      - paragraph 2
+    rationale: cite the idea; original expression stays with the author
+    omissions:
+      - The author's wording and the four-step run
+      - The +4% completion figure and the 10k likes
+    reviewer: b2c-maintainers
+    reviewed_at: 2026-09-06
+    evaluation: u2-counterexample
+evaluations:
+  - id: u2-counterexample
+    unit_id: u2
+    kind: counterexample
+    description: The grayscale test must fail where color is the only encoding of state and must pass where a gradient carries no information.
+    must_fail:
+      - a monochrome data-dense dashboard where color is the only encoding of state
+    must_pass:
+      - indigo-to-purple hero gradient carrying no information
+    observations: []
+affected_outputs:
+  - examples/contributions/synthetic-post-visual-direction/candidate/critique-heuristic.md (draft candidate, outside knowledge/)
+required_checks:
+  - b2c contribute check
+  - b2c contribute preview
+uncertainties:
+  - "+4% completion claim has no source; treat as anecdote"
+  - popularity is not evidence
+missing_core_mechanism:
+  present: false
+notices: []

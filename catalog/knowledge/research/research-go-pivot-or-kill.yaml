@@ -1,0 +1,16 @@
+schema_version: 1.0.0
+id: reference.research.go-pivot-or-kill
+title: "Go, Pivot, Or Kill: The Pre-Build Research Verdict"
+domain_id: domain.research
+document_path: knowledge/research/go-pivot-or-kill.md
+load_when: writing or updating strategy/RESEARCH.md's Category Revenue Reality or Go, Pivot, Or Kill sections; deciding
+  whether a category and wedge earn a build before Phase 2 design/build spend
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.research.research-backed-spec
+    - workflow.research.spec-red-team-audit
+  context_pack_ids:
+    - context.research
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

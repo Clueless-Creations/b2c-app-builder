@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:b2c:catalog:concept-scheme",
+  "title": "B2C App Builder SKOS concept scheme",
+  "$comment": "Work-vocabulary thesaurus for catalog IDs. Not the world ontology. Not a second catalog. No broader/narrower across facets. Runtime agents must not query this file; check:catalog is the only reader.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "uri", "pref_label", "definition", "hidden_labels", "facets", "concepts", "homonyms"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "uri": { "type": "string", "minLength": 1 },
+    "pref_label": { "type": "string", "minLength": 1 },
+    "definition": { "type": "string", "minLength": 1 },
+    "hidden_labels": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "facets": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/facet" }
+    },
+    "concepts": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/concept" }
+    },
+    "homonyms": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/homonym" }
+    }
+  },
+  "$defs": {
+    "facet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "pref_label", "definition"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^facet\\.[a-z][a-z0-9-]*$"
+        },
+        "pref_label": { "type": "string", "minLength": 1 },
+        "definition": { "type": "string", "minLength": 1 }
+      }
+    },
+    "concept": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "facet_id", "pref_label"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": {
+          "type": "string",
+          "enum": ["area", "domain", "lane", "phase", "role", "context", "kernel", "kind", "status", "unit", "record", "action"]
+        },
+        "facet_id": {
+          "type": "string",
+          "pattern": "^facet\\.[a-z][a-z0-9-]*$"
+        },
+        "pref_label": { "type": "string", "minLength": 1 },
+        "alt_labels": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "definition": { "type": "string", "minLength": 1 }
+      }
+    },
+    "homonym": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "senses"],
+      "properties": {
+        "label": { "type": "string", "minLength": 1 },
+        "senses": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["concept_id", "gloss"],
+            "properties": {
+              "concept_id": { "type": "string", "minLength": 1 },
+              "gloss": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

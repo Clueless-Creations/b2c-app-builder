@@ -1,0 +1,23 @@
+id: "mobai-onboarding-chain-unverified"
+title: "Agent chains 8+ onboarding taps without per-step screen verification"
+prompt: >
+  The agent needs to navigate an 8-step onboarding quiz on an iOS simulator using MobAI.
+  It writes a single DSL script that fires all 8 tap actions in sequence and calls it done
+  without taking intermediate screenshots or confirming the current screen label between steps.
+expected_guardrail: >
+  Long onboarding tap chains without per-step screen verification are fragile: a single
+  animation race or mis-tap causes all downstream steps to target the wrong screen silently.
+  The agent must follow the Onboarding-Flow Navigation Pattern from mobai-toolbelt.md:
+  verify current screen label before each step, use the active MCP screenshot resource/tool or observe between
+  navigation actions, and only pre-choreograph a full DSL block after a successful dry-run.
+validators:
+  - "validate-project-state"
+must_catch:
+  - "chained tap sequences without intermediate screen verification are fragile"
+  - "keyboard-dismiss animation races can strand taps on stale coordinates"
+  - "navigation must be verified at each step before the next action fires"
+  - "single-block DSL scripts over 4 steps require a prior clean dry-run"
+should_say:
+  - "Use the currently exposed screenshot route or observe after each navigation action to confirm the expected screen is active."
+  - "Follow the Onboarding-Flow Navigation Pattern in mobai-toolbelt.md."
+  - "If the screen label does not match the expected step, stop and surface the mismatch before retrying."

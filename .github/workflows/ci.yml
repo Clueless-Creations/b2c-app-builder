@@ -1,0 +1,160 @@
+name: CI
+
+# Fast lane (cheap validators, hosted worker, reference app) on every pull request
+# and push to main. Heavy lane (validator fixtures, engine fixtures, e2e) only when
+# engine/catalog/validation/CI paths change — see tooling/ci-lane.mjs. Docs,
+# knowledge, and Dependabot lockfile-only PRs skip the 15–20 minute suites.
+# Manual dispatch always runs heavy.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  # A pull request shares one group per ref so superseded pushes cancel the run they replace.
+  # A push to main gets a group per commit: GitHub cancels a PENDING run whenever another run
+  # enters its group, so sharing a group across main commits lost every queued main run.
+  group: ci-${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  changes:
+    name: Lane
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      heavy: ${{ steps.lane.outputs.heavy }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: lane
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+        run: node tooling/ci-lane.mjs
+
+  audit-fast:
+    name: Audit (fast)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            hosted/knowledge-mcp/package-lock.json
+            hosted/builder-console/package-lock.json
+
+      - run: npm ci
+
+      # Must run from the repo root (the package root since ADR-0002) — the
+      # .git/.github markers there are what make detectLayout() pick "repo". --lane fast skips serial
+      # suites (test:validators, test:fixtures, test:boundaries, test:parity,
+      # check:engine-e2e). --ci skips only the maintainer-only validate:skill step.
+      - run: npm run audit:ci -- --lane fast
+
+  audit-heavy:
+    name: Audit (heavy)
+    runs-on: ubuntu-latest
+    # Run when the lane job says so. If the lane job itself failed, run heavy
+    # anyway — a path-filter outage must not skip fixture suites.
+    if: ${{ always() && (needs.changes.result != 'success' || needs.changes.outputs.heavy == 'true') }}
+    needs: [changes]
+    timeout-minutes: 60
+    env:
+      # GitHub's standard two-vCPU runners otherwise resolve the fixture shard pool's
+      # cores-minus-two default to one worker. Two workers is the rollback-safe width;
+      # B2C_FIXTURE_CONCURRENCY=1 remains the kill switch.
+      B2C_FIXTURE_CONCURRENCY: "2"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            hosted/knowledge-mcp/package-lock.json
+            hosted/builder-console/package-lock.json
+
+      - run: npm ci
+
+      - run: npm run audit:ci -- --lane heavy
+
+  hosted-check:
+    name: Hosted worker check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            hosted/knowledge-mcp/package-lock.json
+            hosted/builder-console/package-lock.json
+
+      - run: npm ci
+      # hosted/knowledge-mcp/worker.ts imports kernel/knowledge-service/
+      # modules that resolve node_modules starting at the repository root,
+      # not hosted/knowledge-mcp — skipping either install above turns a
+      # missing dependency into a misleading typecheck error.
+      - run: npm ci --prefix hosted/knowledge-mcp
+
+      - run: npm run hosted:check
+
+  app-check:
+    name: App check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            hosted/knowledge-mcp/package-lock.json
+            hosted/builder-console/package-lock.json
+
+      - run: npm ci
+      - run: npm ci --prefix hosted/builder-console
+
+      - run: npm run app:check
+
+  ci-complete:
+    name: CI complete
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [audit-fast, audit-heavy, hosted-check, app-check]
+    timeout-minutes: 5
+    steps:
+      - name: Require fast, hosted, and app; heavy may skip
+        run: |
+          fast="${{ needs.audit-fast.result }}"
+          hosted="${{ needs.hosted-check.result }}"
+          app="${{ needs.app-check.result }}"
+          heavy="${{ needs.audit-heavy.result }}"
+          if [ "$fast" != "success" ] || [ "$hosted" != "success" ] || [ "$app" != "success" ]; then
+            echo "fast=$fast hosted=$hosted app=$app"
+            exit 1
+          fi
+          if [ "$heavy" != "success" ] && [ "$heavy" != "skipped" ]; then
+            echo "heavy=$heavy (expected success or skipped)"
+            exit 1
+          fi

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Layers draft creative request",
+  "description": "A creative brief plus the quote the spend authority was evaluated against. Execution re-quotes and refuses a higher price.",
+  "type": "object",
+  "properties": {
+    "brief": {
+      "type": "object",
+      "properties": {
+        "productBriefId": { "type": "string", "minLength": 1 },
+        "format": { "type": "string", "enum": ["reaction_reel", "slideshow", "still_ad", "remix"] },
+        "personaId": { "type": "string", "minLength": 1 }
+      },
+      "required": ["productBriefId", "format"],
+      "additionalProperties": false
+    },
+    "quote": {
+      "type": "object",
+      "properties": {
+        "maxCredits": { "type": "integer", "minimum": 0 },
+        "unit": { "type": "string", "const": "credits" },
+        "quotedAt": { "type": "string", "format": "date-time" },
+        "forArgumentsSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      },
+      "required": ["maxCredits", "unit", "quotedAt", "forArgumentsSha256"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["brief", "quote"],
+  "additionalProperties": false
+}

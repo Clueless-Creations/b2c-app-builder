@@ -1,0 +1,15 @@
+schema_version: 1.0.0
+id: reference.operations.frontier-agent-operations
+title: Frontier Agent Operations
+domain_id: domain.operations
+document_path: knowledge/operations/frontier-agent-operations.md
+load_when: before authenticated browser/API/CLI/native action on any provider, social, or store account
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.operations.founder-zero-operator-bootstrap
+    - workflow.operations.agent-operations-ledger
+  context_pack_ids:
+    - context.operations
+sources: []
+source_exemption: This package contains internal operating guidance or has no external factual claims.

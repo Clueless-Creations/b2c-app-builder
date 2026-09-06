@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["layer", "superwallVersion", "revenueCatVersion", "providerProof"],
+  "properties": {
+    "layer": {
+      "enum": ["deterministic-state-machine", "native-build"]
+    },
+    "superwallVersion": {
+      "const": "4.16.3"
+    },
+    "revenueCatVersion": {
+      "const": "5.88.0"
+    },
+    "providerProof": {
+      "const": "not_observed"
+    }
+  }
+}

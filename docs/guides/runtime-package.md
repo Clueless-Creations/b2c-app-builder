@@ -64,9 +64,17 @@ anything, and nothing imports `checks`.
 | `checks/`               | Deterministic validators (`validation/`) and behavioral verification (`verification/`)                                                                                                                           |
 | `tooling/`              | Renderers, audit runner, maintenance scripts                                                                                                                                                                     |
 
-## Install locally
+## Install
 
-Use Node.js 22 from the repository root:
+Use Node.js 24. From npm:
+
+```bash
+npm install -g b2c-app-builder
+b2c setup
+b2c doctor
+```
+
+From a source checkout, at the repository root:
 
 ```bash
 npm ci
@@ -140,7 +148,7 @@ The input is canonical unpadded base64url SPKI DER text for an Ed25519 public ke
 
 ## MCP
 
-Register the absolute Node command and the `entrypoints/mcp/b2c-app-builder-mcp.mjs` path that `b2c setup` prints, under the name `b2c-app-builder`. The transport is stdio.
+Register the absolute Node command and the `entrypoints/mcp/b2c-app-builder-mcp.mjs` path that `b2c setup` prints, under the name `b2c-app-builder`. Without a local install, register the portable form instead: command `npx`, arguments `-y -p b2c-app-builder b2c-app-builder-mcp`. The transport is stdio.
 
 The default server exposes public discovery and composition preview plus workspace catalog, workflow, knowledge, status, plan, and operation preview and replay tools. Registered-workspace planning can run read-only provider prerequisite probes. The server resolves workspaces only through `~/.b2c-app-builder/workspaces.json`.
 

@@ -194,6 +194,10 @@ function checkPackStandalone(runtimePkg: PackageJson): void {
     "surfaces/workspace-template/repo-agent-entrypoints/.cursor/rules/agents.mdc",
     "surfaces/workspace-template/repo-agent-entrypoints/AGENTS.md",
     "surfaces/workspace-template/repo-agent-entrypoints/CLAUDE.md",
+    // A global `.claude/` ignore rule dropped this file at the public cutover, and every fresh
+    // clone then failed workspace bootstrap. The pack sees the disk, so a checkout that lacks it
+    // fails here before it fails a consumer.
+    "surfaces/workspace-template/repo-agent-entrypoints/.claude/settings.json",
   ];
   const packedSet = new Set(packed);
   for (const file of required) {

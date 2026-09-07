@@ -18,3 +18,5 @@ hosted/knowledge-mcp/.env*
 hosted/builder-console/.wrangler/
 hosted/builder-console/.dev.vars*
 hosted/builder-console/.env*
+!surfaces/workspace-template/repo-agent-entrypoints/.claude/
+!surfaces/workspace-template/repo-agent-entrypoints/.claude/settings.json

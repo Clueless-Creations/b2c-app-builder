@@ -35,7 +35,7 @@ function requiredNodeMajor(root: string): number {
   } catch {
     // Fall through to the published floor when package.json is unreadable.
   }
-  return 22;
+  return 24;
 }
 
 export function runDoctor(): DoctorFinding[] {

@@ -1,11 +1,12 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.218.9",
+  "version": "0.218.10",
   "updatedAt": "2026-09-07",
   "sourcePath": ".",
   "releaseNotes": [
-    "Stop the console sign-in page promising a refund policy that no longer exists. It read \"The Terms include the 14-day refund policy\" while /terms/ says charges and part-used periods are not refunded except where consumer law requires it, so a buyer read a promise the Terms deny at the moment of purchase.",
-    "Replace it with the cancellation terms that are actually true, matching the wording already used on the plans panel: cancel any time, access runs to the end of the period you have paid for.",
-    "Invert the test that pinned the old sentence. signin-offer now asserts the page contains no refund promise at all rather than asserting one is present, so the copy cannot regress back."
+    "Prepare the package for npm: drop the private flag, keep the two Cloudflare Workers out of the tarball, and add a release workflow that publishes through npm trusted publishing when a GitHub release is published.",
+    "Raise the Node.js floor to 24, the active LTS whose bundled npm supports trusted publishing. .nvmrc, .node-version, engines.node, CI, and @types/node move together.",
+    "The pack smoke test now requires surfaces/workspace-template/repo-agent-entrypoints/.claude/settings.json, restored on main in 0.218.8, so a checkout that lacks it fails the audit before it fails a consumer. .npmignore re-includes it explicitly.",
+    "b2c setup prints the portable npx registration form when the package was installed from npm, and skips the npm link advice that only applies to a checkout."
   ]
 }

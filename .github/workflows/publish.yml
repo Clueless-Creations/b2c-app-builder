@@ -1,0 +1,65 @@
+name: Publish to npm
+
+# Publishes the package when a GitHub release is published. The release tag must be v<version>
+# and match package.json and skill-version.json. Authentication is npm trusted publishing (OIDC):
+# no npm token is stored in this repository or in Actions secrets, and npm attaches provenance on
+# its own. Register the trusted publisher on npmjs.com under the package settings with this
+# repository and this workflow filename (npmjs.com → package → Access). A package's first version
+# cannot use trusted publishing;
+# publish it once from a maintainer machine, then register the publisher.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # A manual run publishes whatever main holds; never a branch.
+    if: ${{ github.event_name == 'release' || github.ref == 'refs/heads/main' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          registry-url: https://registry.npmjs.org
+          cache: npm
+
+      - run: npm ci
+
+      - name: Require one version across package.json, skill-version.json, and the release tag
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          version="$(node -p 'require("./package.json").version')"
+          skill="$(node -p 'require("./skill-version.json").version')"
+          if [ "$version" != "$skill" ]; then
+            echo "package.json is $version but skill-version.json is $skill"
+            exit 1
+          fi
+          if [ "$EVENT" = "release" ] && [ "$TAG" != "v$version" ]; then
+            echo "release tag $TAG does not match v$version"
+            exit 1
+          fi
+          echo "publishing b2c-app-builder@$version with npm $(npm --version)"
+
+      # The pack smoke test: the tarball carries every shipped layer and no development-only tree.
+      - run: npm run check:package-parity
+
+      # --provenance is explicit: npm documents automatic attestation under trusted publishing, but
+      # maintainers report publishes that only succeeded with the flag. It belongs only here: npm
+      # refuses the flag outside a supported CI, so a manual first publish must not pass it.
+      - run: npm publish --provenance

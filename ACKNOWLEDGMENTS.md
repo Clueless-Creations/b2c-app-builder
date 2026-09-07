@@ -17,6 +17,17 @@ B2C App Builder is built on open-source work and adapts published methods. This 
 
 ## Methods and guidance we adapted
 
+**Appllama agent skills**
+
+- Original author: Antmind Ventures Private Limited, original author or copyright holder identified in the reviewed source
+- Current maintainer: Appllama (github.com/Appllama), current upstream maintainer
+- License: MIT (verified)
+- Canonical URL: https://github.com/Appllama/appllama-skills
+- Contributes: Selected Appllama agent-skill methods inform knowledge/design/mobile-flow-craft.md. The app-design and usage skills remain opt-in companion packs. Original authors and license notices are retained; no live integration is claimed.
+- How we consume it:
+  - adapted-method: Selected cross-platform flow-research, navigation-semantics, native-fidelity, anti-generic, motion, and verification methods are reauthored in knowledge/design/mobile-flow-craft.md. No whole skill, executable, native dependency, or asset was installed by this contribution.
+  - selected-skill-guidance: The Expo/React Native app-design skill and the provider-usage skill are named as opt-in companion packs. Installation happens only with founder approval. No SKILL.md is auto-installed as a top-level builder skill, and Appllama MCP is never a default dependency.
+
 **ASO and App Marketing Skills**
 
 - Original author: Erencan, original author or copyright holder identified in the reviewed source

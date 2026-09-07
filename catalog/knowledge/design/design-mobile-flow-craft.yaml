@@ -28,6 +28,20 @@ sources:
     claim_scope: MIT-licensed upstream methods for study-before-build, native fidelity, navigation semantics, anti-generic checks, motion discipline, state cycles, and simulator-oriented verification. B2C App Builder adapts cross-platform invariants and does not import Appllama's proprietary screen corpus.
     last_review_date: 2026-09-07
     reviewer: b2c-maintainers
+    publisher: Antmind Ventures Private Limited
+    revision: dd5caaec3d5d50ad7fc0324da238119c6b7c3707
+    upstream_id: appllama-skills
+    selectors: &app-design
+      - README.md
+      - LICENSE
+      - skills/appllama-app-design-skill/SKILL.md
+    rights:
+      status: verified
+      spdx: MIT
+      evidence: catalog/upstreams/notices/appllama-skills.txt
+      evidence_sha256: 14cffee850f5c761273dfc49798cddc96786b4520c23f3ed1da727c334f07476
+      notes: Selected guidance adapted; proprietary screen corpus, MCP client, and unimported skill text retain
+        separate review requirements.
   - id: appllama-usage-skill
     name: Appllama Usage Skill
     source_type: upstream_method
@@ -36,3 +50,44 @@ sources:
     claim_scope: MIT-licensed research method for question-first, flow-first, cross-app study and saturation. Provider-specific MCP commands remain upstream and are not duplicated into the core runtime.
     last_review_date: 2026-09-07
     reviewer: b2c-maintainers
+    publisher: Antmind Ventures Private Limited
+    revision: dd5caaec3d5d50ad7fc0324da238119c6b7c3707
+    upstream_id: appllama-skills
+    selectors: &usage
+      - README.md
+      - LICENSE
+      - skills/appllama-usage/SKILL.md
+    rights:
+      status: verified
+      spdx: MIT
+      evidence: catalog/upstreams/notices/appllama-skills.txt
+      evidence_sha256: 14cffee850f5c761273dfc49798cddc96786b4520c23f3ed1da727c334f07476
+      notes: Selected research method adapted; provider MCP syntax stays upstream.
+derivations:
+  - source_ids:
+      - appllama-app-design-skill
+    relationship: adapted
+    baseline: dd5caaec3d5d50ad7fc0324da238119c6b7c3707
+    selectors: *app-design
+    rationale: Reauthor selected cross-platform flow, fidelity, anti-generic, motion, and verification methods into
+      builder vocabulary while preserving DESIGN.md ownership, evidence contracts, and stack-neutral semantics.
+    omissions:
+      - Do not import Appllama's proprietary screen corpus.
+      - Do not treat Expo or React Native as the default stack.
+      - Do not copy skill-host install hooks or treat skill installation as design acceptance.
+    reviewer: b2c-maintainers
+    reviewed_at: 2026-09-07
+    notice: catalog/upstreams/notices/appllama-skills.txt
+  - source_ids:
+      - appllama-usage-skill
+    relationship: adapted
+    baseline: dd5caaec3d5d50ad7fc0324da238119c6b7c3707
+    selectors: *usage
+    rationale: Reauthor the question-first, flow-first research method. Leave provider MCP syntax, credits,
+      pagination, and media behavior in the upstream skill.
+    omissions:
+      - Do not fork appllama-usage MCP commands into the core runtime.
+      - Do not require Appllama MCP to use this doctrine.
+    reviewer: b2c-maintainers
+    reviewed_at: 2026-09-07
+    notice: catalog/upstreams/notices/appllama-skills.txt

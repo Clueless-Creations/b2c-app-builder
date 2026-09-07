@@ -2,9 +2,9 @@
 
 Use this file before a Design Room mutation hardens into engineering work.
 
-This file does not replace eleven-star, emotional design, quality-lens, vibecoded-tells, or motion craft.
+This file does not replace eleven-star, emotional design, quality-lens, vibecoded-tells, motion craft, or [mobile-flow-craft.md](mobile-flow-craft.md).
 
-It fills the floor those files leave open: contrast, scale, hierarchy, and a recorded taste decision.
+It fills the floor those files leave open: contrast, scale, hierarchy, native-flow semantics, mechanical anti-generic consistency, and a recorded taste decision.
 
 Do not invent a beauty score.
 
@@ -29,7 +29,7 @@ independent audit receives the complete `DESIGN.md` bytes, so a later change to
 the alternatives or rationale invalidates its input fingerprint. Keep these
 records in the design authority. Do not create parallel concept documents.
 
-## Ten rules
+## Twelve rules
 
 ### 1. One primary emphasis per view
 
@@ -67,11 +67,13 @@ Named standards: WCAG 2.2. Dieter Rams. Apple Human Interface Guidelines.
 
 ### 5. Motion answers a user question
 
-Motion must explain state, order, or feedback.
+Motion must explain state, order, feedback, spatial continuity, comprehension, or an earned moment.
 
-Do not add motion only to decorate.
+Classify its frequency before choosing custom choreography. High-frequency platform interactions default to platform behavior. A deliberate decision to add no custom motion is valid.
 
-Tier: Attested here. Motion craft files own the recipes.
+Do not add motion only to decorate. Reduced-motion behavior belongs to the same contract.
+
+Tier: Attested here. Motion craft files own the recipes and `mobile-flow-craft.md` owns the frequency/purpose gate.
 
 ### 6. Peak and proof before paywall
 
@@ -99,13 +101,29 @@ Bind this rule to vibecoded-tells and audience-derived-identity. Do not copy tho
 
 ### 9. Edge-state thoroughness
 
-Empty, loading, success, error, and offline states must exist for each primary surface.
+Empty, loading, success, error, and offline states must exist for each primary surface when applicable. Permission-denied and platform accessibility states follow the acceptance contract.
 
-Tier: Attested.
+Tier: Attested before implementation; mechanical coverage is enforced by strict design acceptance once the implementation exists.
 
 The screen matrix in `DESIGN.md` owns the rows.
 
-### 10. Taste as a decision gate
+### 10. Native flow semantics are explicit
+
+For each primary native flow, record the presentation/navigation semantic, return expectation, and back behavior. Mark true one-way doors and state why returning would expose an invalid prior state.
+
+Do not use funnel pressure as a reason to trap Back. Do not let a framework's default stack behavior become the product decision by accident.
+
+Tier: Attested for the authored flow; strict runtime interaction evidence verifies the implementation.
+
+### 11. Mechanical anti-generic consistency
+
+Before taste review, check objective drift against the accepted system: accent/token families, shape/radius scale, canonical labels for repeated intents, icon-system consistency, unexplained decorative effects, and required state coverage.
+
+An explicit accepted exception is allowed. An accidental one-off is a finding.
+
+Tier: Mechanical where the repository can derive the fact from authored tokens/contracts; otherwise Attested until a shared validator owns the field. Do not pretend prose review is machine proof.
+
+### 12. Taste as a decision gate
 
 Do not compute a beauty score.
 
@@ -150,7 +168,7 @@ Do not copy design decisions into a second design document. The audit artifact r
 
 ## Gates before build
 
-Run design-worthiness with 11-star and the emotional curve before engineering harden.
+Run design-worthiness with 11-star and the emotional curve before engineering harden. For native flows, apply `mobile-flow-craft.md` before the detailed flow is frozen. Runtime implementation proof belongs to `design-acceptance.md`, not the pre-build taste decision.
 
 ## Evidence dialect coverage
 

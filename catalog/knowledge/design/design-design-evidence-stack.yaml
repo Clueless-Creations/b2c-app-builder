@@ -26,8 +26,16 @@ bindings:
     - workflow.orchestration.full-launch-program
   context_pack_ids:
     - context.design
-applicability_notes: This is the mandatory design-source router. Open only relevant sources. High-impact and high-risk surfaces require two complementary source lanes.
+applicability_notes: This is the mandatory design-source router. Open only relevant sources. High-impact and high-risk surfaces require two complementary source lanes. Native flow research is question-first and flow-first; Appllama is an optional provider when independently available and authorized.
 sources:
+  - id: appllama-design-library
+    name: Appllama
+    source_type: design_research_provider
+    url: https://appllama.io/
+    review_cadence_days: 30
+    claim_scope: Optional mobile design research provider with real app screens, flows, and UI patterns. Use only with independently authorized access. Use the upstream MIT appllama-usage skill for provider-specific operation; do not copy or bulk-extract its proprietary corpus.
+    last_review_date: 2026-09-07
+    reviewer: b2c-maintainers
   - id: design-evidence-60fps
     name: 60fps.design
     source_type: inspiration_benchmark

@@ -4,16 +4,25 @@ title: Recommended Agent Skills
 domain_id: domain.engineering
 document_path: knowledge/engineering/recommended-agent-skills.md
 load_when: before Expo or SwiftUI implementation when choosing recommended external agent skill packs
-  for craft, motion, or store work, without vendor MCP lock-in
+  for craft, motion, store work, or optional design-research provider guidance without vendor lock-in
 lifecycle: active
 bindings:
   workflow_ids:
     - workflow.engineering.engineering-orchestration-ce-production-readiness
     - workflow.store.aso-and-store-ops
+    - workflow.design.premium-mobile-craft
   context_pack_ids:
     - context.engineering
+    - context.design
 applicability_notes: Pin expo/skills and emilkowalski animate-expo/review-animations as recommended
-  installs. Keep Appllama MCP, Appeeky MCP, and bulk Vercel packs off the default surface.
-sources: []
-source_exemption: Named GitHub skill slugs appear as install identifiers only. This package contains
-  internal routing guidance and has no live command-syntax claims against a third-party CLI.
+  Expo installs. Appllama's app-design skill is an opt-in stack-specific companion; appllama-usage is loaded only
+  when the user's Appllama MCP is independently connected and authorized. Keep paid/vendor MCPs off the default surface.
+sources:
+  - id: github-appllama-skills
+    name: Appllama agent skills
+    source_type: agent_skill_pack
+    url: https://github.com/Appllama/appllama-skills
+    review_cadence_days: 30
+    claim_scope: MIT-licensed app-design and provider-usage skills. Install syntax and skill names are taken from the upstream README. Hosted Appllama MCP access remains separately authorized and subject to provider terms.
+    last_review_date: 2026-09-07
+    reviewer: b2c-maintainers

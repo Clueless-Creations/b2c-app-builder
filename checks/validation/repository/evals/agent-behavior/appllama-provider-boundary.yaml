@@ -1,0 +1,18 @@
+id: appllama-provider-boundary
+title: Appllama methods are internal doctrine while its MCP remains optional provider evidence
+prompt: "Use the new Appllama guidance to improve this Flutter paywall. I do not have an Appllama account connected."
+expected_route: "Apply B2C App Builder's provider-neutral mobile-flow-craft doctrine, use an authorized compatible evidence source, and do not claim or require Appllama MCP access."
+must_use:
+  - "knowledge/design/mobile-flow-craft.md"
+  - "knowledge/design/design-evidence-stack.md"
+must_catch:
+  - "Appllama unavailable"
+  - "Flutter is not Expo"
+  - "compatible evidence source"
+should_say:
+  - "optional provider"
+  - "cross-platform"
+forbidden:
+  - "install Appllama MCP automatically"
+  - "use Expo Router"
+  - "Appllama was inspected"

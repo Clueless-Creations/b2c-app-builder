@@ -101,3 +101,30 @@ export function resolveEntitlement(input: ResolveEntitlementInput): ResolvedEnti
   const expired = now.getTime() - Date.parse(since) > PAST_DUE_GRACE_MS;
   return { active: !expired, pastDueSince: since };
 }
+
+/** The two fields `pickCurrentSubscription` reads; `db/tenant.ts`'s `SubscriptionSummary` satisfies it. */
+export interface EntitlementSubject {
+  readonly status: SubscriptionStatus;
+  readonly pastDueSince: string | null;
+}
+
+/**
+ * Which of an account's subscriptions is the plan in force, given the mirror rows newest first
+ * (`db/tenant.ts`'s `listSubscriptionsForAccount`): the newest one that currently entitles
+ * access, or — when none does — the newest of all, so a plan that ended still reads as ended.
+ *
+ * "Newest" alone is the wrong answer, and the reason this function exists: a
+ * `customer.subscription.deleted` for a plan canceled months ago arrives when its final period
+ * closes, which can be long after the replacement plan was created, and would otherwise make
+ * the console describe a paying customer's account as inactive. The same decision feeds the
+ * Billing Portal's cancel deep link, which must name the live subscription.
+ */
+export function pickCurrentSubscription<T extends EntitlementSubject>(newestFirst: readonly T[], now: Date): T | null {
+  // A plan in good standing outranks one in its grace window, whatever their order of
+  // observation — the same ranking `billing/checkout.ts`'s resync applies when it writes them —
+  // so a dunning update to a duplicate past-due subscription cannot make the console describe a
+  // healthy plan as failing, or hide its cancel button.
+  const live = newestFirst.find((subscription) => ENTITLED_WITHOUT_GRACE.has(subscription.status));
+  if (live !== undefined) return live;
+  return newestFirst.find((subscription) => resolveEntitlement({ status: subscription.status, pastDueSince: subscription.pastDueSince, now }).active) ?? newestFirst[0] ?? null;
+}

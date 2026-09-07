@@ -5,9 +5,9 @@
  *      path has not refreshed in a while. `entitlements_by_staleness` (0003_billing.sql) exists
  *      for exactly this, in the migration's own words: "The reconciliation cron scans by
  *      staleness across all tenants." It is the backstop for every way the webhook path can go
- *      quiet without Stripe itself knowing anything is wrong — a paused Worker, a crashed
- *      dispatch after the idempotency row was already written (see the caveat in webhook.ts), a
- *      missed delivery Stripe gave up retrying. `ENTITLEMENT_STALENESS_CEILING_MS`
+ *      quiet without Stripe itself knowing anything is wrong — a paused Worker, a delivery
+ *      whose retries Stripe exhausted after the webhook answered 5xx (webhook.ts, step 5 of its
+ *      own doc comment), a missed delivery Stripe gave up retrying. `ENTITLEMENT_STALENESS_CEILING_MS`
  *      (db/tenant.ts) is the same 24-hour bound `assertEntitled` already enforces at read time;
  *      this sweep's only purpose is to keep real-world staleness close to that nominal ceiling by
  *      running far more often than the ceiling requires, so a stale row is caught within minutes
@@ -28,7 +28,7 @@
 import { z } from "zod";
 import { ENTITLEMENT_STALENESS_CEILING_MS, type AccountId, type TenantDb } from "../../knowledge-mcp/db/tenant.js";
 import { PAST_DUE_GRACE_MS, resolveEntitlement } from "./entitlement-policy.js";
-import { stripeApiRequest } from "./stripe.js";
+import { stripeApiRequest, StripeApiError } from "./stripe.js";
 
 export interface ReconcileEnv {
   readonly STRIPE_RESTRICTED_KEY: string;
@@ -73,6 +73,56 @@ export async function priceIdForLookupKey(lookupKey: string, secretKey: string, 
   return parsed.success ? (parsed.data.data[0]?.id ?? null) : null;
 }
 
+export interface CustomerSubscriptionList {
+  /** Every Subscription object Stripe returned, as sent — callers parse what they need. */
+  readonly data: unknown[];
+  /** False only when the page cap below was reached with `has_more` still true. */
+  readonly complete: boolean;
+}
+
+/** Stripe's maximum page size, and a cap on pages so one pathological Customer cannot hold a sweep or a page render open. */
+const SUBSCRIPTION_PAGE_LIMIT = 100;
+const SUBSCRIPTION_PAGE_CAP = 10;
+
+/**
+ * Every subscription Stripe holds for a Customer, in every status, following `has_more` with
+ * `starting_after` until the list ends or the page cap is hit. `GET /v1/subscriptions` returns
+ * newest first, so a caller that read only one page would miss a long-lived Customer's oldest
+ * subscriptions — and, worse, a live plan pushed off the first page by a run of failed
+ * re-subscriptions. Exported for `billing/checkout.ts`'s `syncSubscriptionsFromStripe`, which
+ * needs the whole objects, so the two readers of this endpoint share one request shape the
+ * same way `priceIdForLookupKey` above is shared. Throws on a response that is not a Stripe
+ * list at all; a caller decides whether that means "try again later" (the sweep counts it as a
+ * failure and leaves the row stale) or "fall back" (the console renders the mirror).
+ */
+export async function listCustomerSubscriptions(
+  stripeCustomerId: string,
+  opts: { readonly secretKey: string; readonly accountId?: string; readonly fetchImpl?: typeof fetch; readonly priceId?: string },
+): Promise<CustomerSubscriptionList> {
+  const data: unknown[] = [];
+  let startingAfter: string | undefined;
+  for (let page = 0; page < SUBSCRIPTION_PAGE_CAP; page += 1) {
+    const params = new URLSearchParams({ customer: stripeCustomerId, status: "all", limit: String(SUBSCRIPTION_PAGE_LIMIT) });
+    if (opts.priceId !== undefined) params.set("price", opts.priceId);
+    if (startingAfter !== undefined) params.set("starting_after", startingAfter);
+    const result = await stripeApiRequest(`/v1/subscriptions?${params.toString()}`, {
+      method: "GET",
+      secretKey: opts.secretKey,
+      accountId: opts.accountId,
+      fetchImpl: opts.fetchImpl,
+    });
+    // `looseObject`, not `object`: the elements are handed on whole, and zod's default object
+    // would strip every field this envelope does not name before a caller could read them.
+    const parsed = z.object({ data: z.array(z.looseObject({ id: z.string() })), has_more: z.boolean().optional().default(false) }).safeParse(result);
+    if (!parsed.success) throw new StripeApiError(502, result);
+    data.push(...parsed.data.data);
+    if (!parsed.data.has_more) return { data, complete: true };
+    startingAfter = parsed.data.data.at(-1)?.id;
+    if (startingAfter === undefined) return { data, complete: false };
+  }
+  return { data, complete: false };
+}
+
 /**
  * Does this Stripe customer currently hold a subscription to this Price in an entitling state?
  * "Entitling" is decided by `resolveEntitlement` (`billing/entitlement-policy.ts`) — the same
@@ -97,13 +147,14 @@ async function resolveStripeEntitlement(
   fetchImpl?: typeof fetch,
   stripeAccountId?: string,
 ): Promise<boolean> {
-  const result = await stripeApiRequest(
-    `/v1/subscriptions?customer=${encodeURIComponent(stripeCustomerId)}&price=${encodeURIComponent(priceId)}&status=all&limit=10`,
-    { method: "GET", secretKey, accountId: stripeAccountId, fetchImpl },
-  );
-  const parsed = z.object({ data: z.array(z.object({ id: z.string(), status: z.string() })) }).safeParse(result);
+  const list = await listCustomerSubscriptions(stripeCustomerId, { secretKey, accountId: stripeAccountId, fetchImpl, priceId });
+  // A list cut off at the page cap says nothing about the subscriptions it did not reach;
+  // concluding "no live plan" from it would revoke on a partial read. Thrown, so the sweep counts
+  // it as a failure and leaves the row stale for the next run, per its own doc comment.
+  if (!list.complete) throw new Error(`reconcile: subscription list for ${stripeCustomerId} was cut off at the page cap`);
+  const parsed = z.array(z.object({ id: z.string(), status: z.string() })).safeParse(list.data);
   if (!parsed.success) return false;
-  const subscriptions = parsed.data.data;
+  const subscriptions = parsed.data;
   if (subscriptions.some((subscription) => subscription.status === "active" || subscription.status === "trialing")) return true;
   const pastDue = subscriptions.find((subscription) => subscription.status === "past_due");
   if (pastDue === undefined) return false;

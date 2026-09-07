@@ -14,6 +14,7 @@ import type { AccountId, ApiKeySummary } from "../../knowledge-mcp/db/tenant.js"
 import { INTENTS, SOURCE_KEYS, SOURCE_LABELS, type Intent, type SourceKey } from "../analytics/events.js";
 import type { SigninFailureReason } from "../analytics/events.js";
 import { PLAN_IDS, PLANS } from "../billing/plans.js";
+import type { PortalFlowName } from "./checkout.js";
 import { escapeHtml, OFFER_PAGE_URL, renderShell, REPOSITORY_URL, SITE_ORIGIN, type ConsoleSection, type ShellNav } from "./chrome.js";
 
 export { escapeHtml };
@@ -221,60 +222,177 @@ ${KEYS_BLOCK}`,
 
 export type EntitlementDisplayState = "none" | "active" | "past_due_in_grace" | "canceled";
 
-const ENTITLEMENT_STATE_MESSAGES: Record<EntitlementDisplayState, string> = {
-  none: "No active plan yet. Your keys cannot use hosted access until a plan is active.",
-  active: "Your Pro plan is active. Your keys can use hosted access.",
-  past_due_in_grace: "Your last payment failed. Access still works while Stripe retries it. Update your payment method before the grace period ends.",
-  canceled: "Your plan is not active. Your keys cannot use hosted access until a plan is active.",
+/**
+ * Everything the plan page says about the account's subscription. Computed by `worker.ts`
+ * from the mirror row (`db/tenant.ts`'s `SubscriptionSummary`) and the account's active
+ * entitlements; this file only renders it. `state` is decided by the same `resolveEntitlement`
+ * the webhook and reconciliation paths call, so this page cannot show "active" for a status
+ * those paths would already treat as revoked — `entitlements.active` alone cannot tell "active"
+ * apart from "past_due but still inside the grace window".
+ */
+export interface PlanView {
+  readonly state: EntitlementDisplayState;
+  /** "Monthly" or "Annual" when an active entitlement names a plan this console sells; null otherwise. */
+  readonly planName: string | null;
+  /** ISO instant the paid period ends, when the mirror knows it. */
+  readonly periodEnd: string | null;
+  /** True when Stripe has a cancellation scheduled for the end of the paid period. */
+  readonly cancelScheduled: boolean;
+  /** ISO instant the past-due grace window closes; only for `past_due_in_grace`. */
+  readonly graceEndsAt: string | null;
+}
+
+/** What `/console?billing=` can say about where a person just came back from. Anything else is ignored. */
+export const BILLING_NOTICES = ["payment_method_updated", "cancel_scheduled", "returned"] as const;
+export type BillingNotice = (typeof BILLING_NOTICES)[number];
+
+export function isBillingNotice(value: string | null): value is BillingNotice {
+  return (BILLING_NOTICES as readonly string[]).includes(value ?? "");
+}
+
+const BILLING_NOTICE_MESSAGES: Record<BillingNotice, string | null> = {
+  payment_method_updated: "Payment method updated.",
+  cancel_scheduled: "Your cancellation is scheduled. Access continues through the period you paid for, and you will not be charged again.",
+  returned: null,
 };
 
-const ENTITLEMENT_STATE_CLASS: Record<EntitlementDisplayState, string> = {
-  none: "",
-  active: " on",
-  past_due_in_grace: " warn",
-  canceled: " warn",
-};
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"] as const;
+
+/**
+ * "5 Oct 2026", in UTC, for a period end or grace deadline. Spelled out by hand rather than
+ * through Intl.DateTimeFormat: the locale data behind `month: "short"` differs between ICU
+ * builds ("Sept" on some, "Sep" on others), and this page must read the same in the Workers
+ * runtime as in the test runner that pins its copy.
+ */
+export function formatDate(iso: string): string {
+  const date = new Date(iso);
+  return `${date.getUTCDate()} ${MONTHS[date.getUTCMonth()]} ${date.getUTCFullYear()}`;
+}
+
+interface PlanStatusLine {
+  readonly message: string;
+  readonly className: string;
+  readonly help: string | null;
+}
+
+function planStatusLine(view: PlanView): PlanStatusLine {
+  switch (view.state) {
+    case "none":
+      return { message: "No active plan yet. Your keys cannot use hosted access until a plan is active.", className: "", help: null };
+    case "active": {
+      const plan = view.planName ? `Your Pro plan (${view.planName})` : "Your Pro plan";
+      if (view.cancelScheduled) {
+        return {
+          message: view.periodEnd
+            ? `Your plan ends on ${formatDate(view.periodEnd)}. Your keys keep working until then, and you will not be charged again.`
+            : "Your plan ends when the period you paid for does. Your keys keep working until then, and you will not be charged again.",
+          className: " warn",
+          help: "Changed your mind? Open Manage billing and choose Renew plan before then.",
+        };
+      }
+      return {
+        message: view.periodEnd
+          ? `${plan} is active and renews on ${formatDate(view.periodEnd)}. Your keys can use hosted access.`
+          : `${plan} is active. Your keys can use hosted access.`,
+        className: " on",
+        help: "To change or cancel your plan, open Manage billing. Access continues through the period you paid for.",
+      };
+    }
+    case "past_due_in_grace":
+      return {
+        message: view.graceEndsAt
+          ? `Your last payment failed. Stripe is retrying it, and access continues until ${formatDate(view.graceEndsAt)}. Update your payment method to keep access.`
+          : "Your last payment failed. Access still works while Stripe retries it. Update your payment method before the grace period ends.",
+        className: " warn",
+        help: null,
+      };
+    case "canceled":
+      return { message: "Your plan is not active. Your keys cannot use hosted access until a plan is active.", className: " warn", help: null };
+  }
+}
 
 export interface ConsolePlansPageInput {
   readonly csrfToken: string;
-  readonly entitlementState: EntitlementDisplayState;
+  readonly plan: PlanView;
   readonly hasStripeCustomer: boolean;
   readonly checkoutQuery: "success" | "cancelled" | null;
+  readonly billingNotice: BillingNotice | null;
   readonly nav?: ShellNav;
 }
 
+/** One POST /console/billing form per button. `flow` is empty for the portal's home page; see console/checkout.ts's PORTAL_FLOWS. */
+function billingButton(csrfToken: string, label: string, flow: "" | PortalFlowName): string {
+  return `<form class="row-form" method="post" action="/console/billing"><input type="hidden" name="csrf" value="${escapeHtml(csrfToken)}">${
+    flow ? `<input type="hidden" name="flow" value="${escapeHtml(flow)}">` : ""
+  }<button class="secondary" type="submit">${escapeHtml(label)}</button></form>`;
+}
+
+/**
+ * Which portal buttons a plan state earns. An active plan gets the two things a subscriber most
+ * often needs without a detour through the portal's home page; a plan already ending or past due
+ * gets only what still applies; an account with a Customer but no live plan still gets the home
+ * page, where its invoices and receipts are.
+ */
+function billingActions(input: ConsolePlansPageInput): string {
+  if (!input.hasStripeCustomer) return "";
+  const { csrfToken, plan } = input;
+  const manage = billingButton(csrfToken, "Manage billing", "");
+  const updateCard = billingButton(csrfToken, "Update payment method", "payment_method_update");
+  const cancel = billingButton(csrfToken, "Cancel plan", "subscription_cancel");
+  const buttons =
+    plan.state === "past_due_in_grace" ? [updateCard, manage] : plan.state === "active" && !plan.cancelScheduled ? [manage, updateCard, cancel] : [manage];
+  return `<div class="actions">${buttons.join("")}</div>`;
+}
+
+/**
+ * The consent line the Terms promise (§7, consumer withdrawal rights): before access starts, the
+ * person agrees to it starting at once and acknowledges what that means for the statutory
+ * withdrawal right. One box for both plan buttons, so it sits in one form with them; the
+ * browser enforces `required`, and POST /console/checkout enforces it again server-side.
+ */
+const CONSENT_LABEL = `I agree to the <a href="${SITE_ORIGIN}/terms/">Terms</a> and want hosted access to start right away. If I am a consumer in the EEA or the UK, I understand this means I give up the 14-day right to withdraw once the service has been fully performed.`;
+
 export function renderConsolePlansPage(input: ConsolePlansPageInput): string {
   const checkoutNotice = input.checkoutQuery === "success"
-    ? `<div class="reveal"><p><strong>Payment received.</strong> Access switches on as soon as Stripe confirms it, usually within a minute.</p></div>`
+    ? `<div class="reveal"><p><strong>Payment received.</strong> ${
+        input.plan.state === "active" ? "Your plan is active." : "Access switches on as soon as Stripe confirms the payment, usually within a minute."
+      }</p></div>`
     : input.checkoutQuery === "cancelled"
       ? `<div class="notice" role="status"><p>Checkout was cancelled. Nothing was charged.</p></div>`
       : "";
+  const billingMessage = input.billingNotice ? BILLING_NOTICE_MESSAGES[input.billingNotice] : null;
+  const billingNoticeBlock = billingMessage ? `<div class="notice" role="status"><p>${escapeHtml(billingMessage)}</p></div>` : "";
+  // One form, one submit button, the plan as a required radio: a submission always carries
+  // `plan` (a submit button's own name/value travels only when that button is the submitter, so
+  // a scripted or implicit submit would have sent none), and pressing Enter on the consent box
+  // cannot silently pick whichever plan button came first.
   const planCards = PLAN_IDS.map((id) => {
     const plan = PLANS[id];
-    return `<div class="plan"><strong>${escapeHtml(plan.displayName)}</strong><div class="price">${escapeHtml(plan.displayPrice)}</div>
-<form method="post" action="/console/checkout">
-<input type="hidden" name="csrf" value="${escapeHtml(input.csrfToken)}">
-<input type="hidden" name="plan" value="${escapeHtml(id)}">
-<button type="submit">Choose ${escapeHtml(plan.displayName.toLowerCase())}</button>
-</form></div>`;
+    return `<label class="plan"><input type="radio" name="plan" value="${escapeHtml(id)}" required> <strong>${escapeHtml(plan.displayName)}</strong><div class="price">${escapeHtml(plan.displayPrice)}</div></label>`;
   }).join("");
-  const manageBilling = input.hasStripeCustomer
-    ? `<form class="row-form" method="post" action="/console/billing"><input type="hidden" name="csrf" value="${escapeHtml(input.csrfToken)}"><button class="secondary" type="submit">Manage billing</button></form>`
-    : "";
-  const offersPlans = input.entitlementState === "none" || input.entitlementState === "canceled";
+  const status = planStatusLine(input.plan);
+  const offersPlans = input.plan.state === "none" || input.plan.state === "canceled";
   const planSection = offersPlans
-    ? `<div class="plans">${planCards}</div><p class="help">Checkout and receipts run on Stripe. Cancel any time from Manage billing; access continues through the period you paid for.</p>`
-    : `<p class="help">To change or cancel your plan, open Manage billing. Access continues through the period you paid for.</p>`;
+    ? `<form method="post" action="/console/checkout">
+<input type="hidden" name="csrf" value="${escapeHtml(input.csrfToken)}">
+<div class="plans">${planCards}</div>
+<label class="radio-row"><input type="checkbox" name="consent" value="on" required>${CONSENT_LABEL}</label>
+<div class="actions"><button type="submit">Continue to payment</button></div>
+</form>
+<p class="help">Checkout and receipts run on Stripe. Cancel any time from Manage billing; access continues through the period you paid for.</p>`
+    : status.help
+      ? `<p class="help">${escapeHtml(status.help)}</p>`
+      : "";
   return renderShell({
     title: "Console",
     nav: input.nav,
     body: `<span class="eyebrow">Console</span><h1>${welcome(input.nav)}</h1>
 <p class="lede">Manage your plan, create keys, and connect the agents you actually use.</p>
-${checkoutNotice}
+${checkoutNotice}${billingNoticeBlock}
 <h2>Your plan</h2>
-<div class="status${ENTITLEMENT_STATE_CLASS[input.entitlementState]}"><span class="dot" aria-hidden="true"></span><span>${escapeHtml(ENTITLEMENT_STATE_MESSAGES[input.entitlementState])}</span></div>
+<div class="status${status.className}"><span class="dot" aria-hidden="true"></span><span>${escapeHtml(status.message)}</span></div>
 ${planSection}
-${manageBilling ? `<div class="actions">${manageBilling}</div>` : ""}
+${billingActions(input)}
 ${KEYS_BLOCK}`,
   });
 }

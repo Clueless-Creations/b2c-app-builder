@@ -25,7 +25,8 @@ state, once `interest/repository.ts` finds a row for the signed-in account) and 
 `/console/keys`. Self-serve Checkout (`console/checkout.ts`, `billing/checkout.ts`) is gated
 behind the `self-serve-checkout` flag (`analytics/flags.ts`) or the operator switch
 `CHECKOUT_ENABLED` in `wrangler.jsonc` — the switch has been `"on"` since release 0.210.0
-(2026-09-04), so GET `/console` renders the plan forms and a "Manage billing" form today; the
+(2026-09-04), so GET `/console` renders the plan form (two plans, a consent box) and the Billing
+Portal buttons today; the
 interest collector above is the fallback whenever the gate resolves closed or a live Checkout call
 fails. The disclosure the interest form makes — "we'll email you a Stripe payment link for the
 monthly or annual plan" — is only shown in that fallback.
@@ -44,7 +45,9 @@ form-action 'self'`. The two fonts are served by this Worker itself from `/fonts
 | `GET /signin`                      | The front door: one button to `/auth/google/start` (carrying `entry_point`), the three steps, the open-source door, and the Terms and Privacy links. A valid session is sent on to `/console`. |
 | `GET /auth/google/start`           | Sets the OAuth state cookie and redirects to Google. `entry_point` is one of `landing`, `header`, `console_guard`, `pricing`, `signin`.                                                         |
 | `GET /auth/google/callback`        | Finishes sign-in and lands on `/console`. Google's own `?error=` lands on `/signin?notice=cancelled`; every other failure renders the sign-in failure page (400).                               |
-| `GET /console`                     | Guarded. The plan forms and the account's plan state, or the ask-for-access fallback.                                                                                                          |
+| `GET /console`                     | Guarded. The plan state (renewal or end date, scheduled cancellation, past-due deadline), the plan forms with their consent box, and the Billing Portal buttons — or the ask-for-access fallback. `?checkout=success\|cancelled` and `?billing=returned\|payment_method_updated\|cancel_scheduled` name where a person came back from; see "Returning from Stripe". |
+| `POST /console/checkout`           | Guarded. `plan` (`monthly`/`annual`) plus the required `consent` field; creates the Stripe Customer on first use and 303s to a Checkout Session. 400 `consent_required` without the box.                                                                                                              |
+| `POST /console/billing`            | Guarded. 303s to a Billing Portal session. Optional `flow`: `payment_method_update` or `subscription_cancel` opens the portal directly on that task and returns to `/console` with the matching `?billing=` flag; no `flow` opens the portal home page (invoices, renew, plan changes if enabled). |
 | `GET/POST /console/keys` and below | Guarded. Keys for the account's agents, with the four connect snippets the offer page publishes.                                                                                                |
 | `POST /auth/signout`               | Guarded. Revokes the session row and clears the cookie; the form in every signed-in page's header posts it, with its own token under the `signout_token` field.                                 |
 | `GET /fonts/<file>.woff2`          | The console's two web fonts.                                                                                                                                                                   |
@@ -62,6 +65,52 @@ the read scope's own key, `b2c:read`, or one of the plans this console sells
 subscription opens the door through that list and nothing else; `test/plans.test.ts` fails if a
 plan is added to `billing/plans.ts` without being added there. An account with no plan is refused
 at the hosted service with 403, and `/console` says so.
+
+## Returning from Stripe
+
+Every Stripe-hosted page this console opens comes back to `/console` with a flag: Checkout's
+`success_url`/`cancel_url` carry `?checkout=`, the Billing Portal's return link carries
+`?billing=returned`, and the two deep links (`payment_method_update`, `subscription_cancel`)
+finish on `?billing=payment_method_updated` / `?billing=cancel_scheduled` through the portal's
+`flow_data[after_completion]` redirect. On any of those returns — and on any visit by an account
+that has a Stripe Customer but no subscription mirror row at all — `worker.ts` calls
+`billing/checkout.ts`'s `syncSubscriptionsFromStripe` before rendering: `GET /v1/subscriptions?customer=`
+(paged, through `billing/reconcile.ts`'s `listCustomerSubscriptions`, the same call the sweep
+makes) and the same `applyParsedSubscription` (`billing/subscription-sync.ts`) the webhook uses, so
+the page shows what the person just did even when the webhook describing it has not arrived, and a
+Checkout whose webhook was lost still opens the gate the next time its owner looks. A key no
+subscription bills any more is retired on the same pass. Stripe's own guidance for the return from
+Checkout is to verify from the API rather than trust the redirect; this is that check, for every
+return. A failed resync is logged and the page falls back to the mirror. Ordinary visits by
+accounts with a mirror row never read Stripe, and both re-read paths are rate-limited per account
+through `FLAGS_KV` (a minute for returns, an hour for the no-mirror case).
+
+The webhook itself (`billing/webhook.ts`) now gives an event id back and answers 500 when its
+dispatch throws (`releaseProcessedStripeEvent`), so Stripe's retry of that id is applied instead of
+being answered as a duplicate. Before this, a first subscription event whose dispatch failed after
+the idempotency row was written left an account with no entitlement row at all — a gap the
+staleness sweep, which only re-derives rows that exist, could never close.
+
+Two things the mirror now records that it did not before, both read back from the live account:
+the paid period's end, which 2025-08-27.basil reports on the subscription *item* rather than the
+subscription (the mirror held `NULL` for every live subscription until `subscription-sync.ts`
+started reading the item), and a scheduled cancellation in either shape Stripe uses for it —
+`cancel_at_period_end` on a classic-billing-mode subscription, `cancel_at` on a flexible-mode one,
+which is what the Billing Portal sets on subscriptions created in this account today. The plan
+page's "renews on", "ends on", and past-due deadline all come from those two fields plus
+`entitlement-policy.ts`.
+
+### The consent box
+
+The public Terms (§7, consumer withdrawal rights) promise that before access starts a person is
+asked to agree to it starting at once and to acknowledge that an EEA/UK consumer thereby gives up
+the 14-day right to withdraw once the service has been fully performed. The plan form carries
+that as one required checkbox above the two plan buttons; POST `/console/checkout` refuses a
+request without it (400 `consent_required`) so the browser's `required` is not the only guard.
+The instant of consent and the Terms URL ride on the subscription Checkout creates, as
+`subscription_data[metadata][terms_accepted_at]` / `[terms_url]`, so the evidence lives next to
+the subscription it covers in Stripe with no table of its own here. Checkout's own pay button
+additionally states the renewal and cancellation terms (`custom_text[submit]`).
 
 Start at [`analytics/EVENT_TAXONOMY.md`](analytics/EVENT_TAXONOMY.md). It is the contract; the
 code is the executable half of it. Its lawful basis is documented separately, in
@@ -406,7 +455,8 @@ AGENTS.md's Authority section. Each milestone adds its own section here as it la
 3. **Create a restricted API key**: Dashboard → Developers → API keys → "Create restricted key",
    scoped to the minimum this Worker calls across M6 and self-serve Checkout (M9) together —
    **Customers (Write)**, **Checkout Sessions (Write)**, **Customer portal, i.e. the Billing
-   Portal, (Write)**, **Prices (Read)**, **Subscriptions (Read)**, **Invoices (Read)**. The key
+   Portal, (Write)**, **Prices (Read)**, **Subscriptions (Read)** (also what the return-from-Stripe
+   resync reads), **Invoices (Read)**. The key
    must start with `rk_`; `stripeApiRequest` (`hosted/builder-console/billing/stripe.ts`) asserts that prefix at
    the point it is used and refuses to call Stripe with anything else, so a full secret key pasted
    into this slot by mistake fails closed on the first request instead of silently running with
@@ -418,6 +468,37 @@ AGENTS.md's Authority section. Each milestone adds its own section here as it la
    configuration has ever been saved for this account, key permission notwithstanding — the
    restricted key's scope and the portal's own configuration are two independent go-live
    requirements, not one.
+
+   What the default configuration should say, so the portal matches what `/console` and the
+   public Terms promise (read back from the live account on 2026-09-06; items marked *set* were
+   already so, items marked *open* were not):
+
+   - Cancel subscription: **on**, mode **at end of billing period**, no proration — *set*. The
+     Terms say access continues to the end of the paid period; the console's "Cancel plan" button
+     deep-links to exactly this flow.
+   - Payment method update: **on** — *set*. The console's "Update payment method" button deep-links
+     to it, and it is where a past-due customer goes.
+   - Invoice history: **on** — *set*. The only place a customer gets receipts.
+   - Customer information: email and address — *set*; add **name** and **tax ID** so a business
+     buyer can correct what Checkout collected (`tax_id_collection` is on in Checkout).
+   - Cancellation reasons: **on**, with Stripe's standard list — *open*. Costs nothing, and the
+     reason lands on the subscription's `cancellation_details` and in the
+     `customer.subscription.updated` event.
+   - Switch plans: **on**, between the two Prices of the one product (`b2c_pro_monthly` and
+     `b2c_pro_annual`), prorating an upgrade immediately and scheduling a downgrade for the end of
+     the period — *open*. `/console` says "To change or cancel your plan, open Manage billing", and
+     without this the portal offers no way to change it. Once enabled, the portal home page shows
+     the switch; no console deep link is added for it, because a deep link to a disabled portal
+     feature fails at session creation.
+   - Pause subscription: **off** — *set*. The entitlement policy never grants access to `paused`.
+   - Business information: headline, and the Terms and Privacy URLs — *set*.
+
+   Also in the Dashboard, outside the portal page: Settings → Billing → Subscriptions and emails
+   — turn on the customer emails for failed payments, upcoming renewals (annual plans in
+   particular), and successful payments/receipts, because the Terms say "Stripe retries it and
+   emails you" and "We email you before each renewal where the law requires it"; and Settings →
+   Business → Public details — the statement descriptor and support email a card statement and a
+   receipt show.
 
    **Self-check the six scopes with curl** before wiring the key into Doppler — a restricted key
    answers `permission_error` (HTTP 403) for a scope it lacks, checked before this Worker's own
@@ -451,8 +532,10 @@ AGENTS.md's Authority section. Each milestone adds its own section here as it la
    `customer.subscription.created`, `customer.subscription.updated`,
    `customer.subscription.deleted`, `invoice.paid`, `invoice.payment_failed` — which is the same
    set `billing/webhook.ts` dispatches; anything else it receives is recorded as `ignored` and
-   answered 200 with no side effect. Copy the signing secret Stripe generates (`whsec_...`) — this
-   is `STRIPE_WEBHOOK_SECRET`.
+   answered 200 with no side effect. A delivery whose dispatch throws is answered 500 with its
+   event id released, so Stripe retries it; a retry that keeps failing shows up in the endpoint's
+   failed deliveries in the Dashboard, which is the place to look. Copy the signing secret Stripe
+   generates (`whsec_...`) — this is `STRIPE_WEBHOOK_SECRET`.
 5. **Put both secrets in Doppler**, under this Worker's project/config (see this file's
    Credentials section, above), as `STRIPE_RESTRICTED_KEY` and `STRIPE_WEBHOOK_SECRET`
    (matching `wrangler.jsonc`'s `secrets.required`), then transfer them with `wrangler secret
@@ -499,6 +582,6 @@ the tenant-repository additions in `hosted/knowledge-mcp/db/tenant.ts` those thr
 - **Account closure.** The public Terms say an account can be closed from the console; no route
   does that yet. Sign-out exists (`POST /auth/signout`); closure needs its own design (what
   happens to keys, the Stripe Customer, and the audit trail).
-- **Post-payment resync.** `?checkout=success` relies on webhook delivery alone; there is no
-  reconcile-on-return, so a delayed webhook leaves the plan state stale for up to the
-  reconciliation sweep.
+- **Plan changes from the console.** Switching between monthly and annual happens in the Billing
+  Portal, and only once the portal configuration allows it (see the Stripe checklist above). The
+  console links to the portal home page for it rather than deep-linking, on purpose.

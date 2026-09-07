@@ -8,68 +8,47 @@
  *      untouched body.
  *   2. Verify the signature. An unsigned or mis-signed request is rejected before it touches D1
  *      at all.
- *   3. `recordProcessedStripeEvent` FIRST, before any billing write. `processed_stripe_events`
- *      is append-only (0003_billing.sql) and its primary key is the Stripe event id, so this
- *      insert IS the idempotency check: a redelivery of the same `evt_...` id collides on the
- *      key and the function returns `false` — this handler stops there and answers 200, because
- *      200 is what tells Stripe to stop retrying a delivery that already succeeded once.
- *   4. Only the delivery that wins step 3 dispatches into `upsertSubscription` /
- *      `upsertEntitlement`.
+ *   3. Parse the object the event carries (`billing/subscription-sync.ts`'s
+ *      `parseSubscriptionObject`, or the invoice schema below) — before any row is written. A
+ *      payload this Worker cannot represent will fail the same way on every redelivery, so it is
+ *      recorded as `failed` and answered 200 in step 4: asking Stripe to retry it would only
+ *      raise the endpoint's failure rate, which Stripe uses to disable endpoints, and would
+ *      leave no row saying the event was ever seen.
+ *   4. `recordProcessedStripeEvent`, before any billing write. `processed_stripe_events` is
+ *      append-only (0003_billing.sql) and its primary key is the Stripe event id, so this insert
+ *      IS the idempotency check: a redelivery of the same `evt_...` id collides on the key and
+ *      the function returns `false` — this handler stops there and answers 200, because 200 is
+ *      what tells Stripe to stop retrying a delivery that already succeeded once. The insert
+ *      comes before the writes, not after, so a redelivery can never re-run a write that has no
+ *      out-of-order guard of its own (`clearPastDueSince` on a redelivered `invoice.paid`).
+ *   5. Only the delivery that wins step 4, for a parsed event with a resolvable account,
+ *      dispatches into the billing writes.
+ *   6. If step 5 throws — a D1 failure, the one thing left that can — the claim step 4 made is
+ *      given back (`releaseProcessedStripeEvent`) and the answer is 500. Stripe retries a non-2xx
+ *      delivery on its own schedule for up to three days, and because the row is gone that retry
+ *      is a first delivery again — it runs step 5 afresh instead of colliding on the key and
+ *      being swallowed as a duplicate. Every billing write is itself idempotent (both upserts
+ *      discard a write that is not newer than what is stored), so a retry after a partial
+ *      failure completes the work rather than doubling it. If the release itself fails — D1
+ *      down for both — the retry is answered as a duplicate; the console's own resync on the
+ *      account's next visit (`worker.ts`, `syncSubscriptionsFromStripe`) and the staleness
+ *      sweep are what remain for that case.
  *
- * A caveat worth being explicit about: `result` is written in step 3 as an optimistic verdict
- * ("applied" for a supported, resolvable event) *before* step 4 runs, because the append-only
- * table has no second write to correct it with. If step 4 then throws, the event is still
- * marked "applied" and a Stripe retry of the same id will see the same primary-key collision
- * and be swallowed as a duplicate — so a genuine mid-dispatch failure does not get a second
- * attempt from Stripe. The backstop for exactly that gap already exists in this design: the
- * scheduled reconciliation sweep (`billing/reconcile.ts`) re-derives `entitlements` from
- * Stripe directly once `synced_at` goes stale, independent of whether any particular webhook
- * delivery fully completed.
+ * The scheduled reconciliation sweep (`billing/reconcile.ts`) remains the backstop for what no
+ * delivery can fix: a row that already exists and has gone stale. Step 6 is what covers the
+ * case reconciliation cannot — a first subscription event for an account that has no
+ * entitlement row yet, which no staleness scan would ever find.
  */
 
 import { z } from "zod";
-import { SUBSCRIPTION_STATUSES, type AccountId, type TenantDb } from "../../knowledge-mcp/db/tenant.js";
+import type { AccountId, TenantDb } from "../../knowledge-mcp/db/tenant.js";
 import { resolveEntitlement } from "./entitlement-policy.js";
 import { verifyStripeSignature } from "./stripe.js";
+import { applyParsedSubscription, lookupKeysOf, parseSubscriptionObject, stripePrice, unixToIso, type ParsedSubscription } from "./subscription-sync.js";
 
 export interface StripeWebhookEnv {
   readonly STRIPE_WEBHOOK_SECRET: string;
 }
-
-const stripePrice = z.object({
-  id: z.string(),
-  // Configured per-Price in the Stripe Dashboard, per this repository's own design note on
-  // upsertEntitlement. A Price with no lookup_key was never meant to gate an entitlement, so an
-  // item referencing one is skipped rather than treated as an error.
-  lookup_key: z.string().nullable().optional(),
-});
-
-const stripeCoupon = z.object({
-  percent_off: z.number().nullable().optional(),
-  duration: z.string().nullable().optional(),
-});
-
-const stripeDiscount = z.object({ coupon: stripeCoupon.nullable().optional() });
-
-const stripeSubscriptionItem = z.object({ price: stripePrice });
-const stripeSubscriptionItems = z.object({ data: z.array(stripeSubscriptionItem) });
-
-/**
- * The fields this handler reads off a Stripe Subscription object. Loose on purpose — Stripe
- * sends many more fields than this, and zod's default (non-strict) object only validates the
- * keys it names, so the rest pass through unread rather than failing the parse.
- */
-const stripeSubscriptionObject = z.object({
-  id: z.string(),
-  status: z.string(),
-  cancel_at_period_end: z.boolean().optional().default(false),
-  // Unverified against a live Stripe payload: Stripe has moved billing-cycle fields onto
-  // subscription items in some API versions. Both shapes are read; either missing resolves to
-  // a null current_period_end, which the schema accepts.
-  current_period_end: z.number().nullable().optional(),
-  discount: stripeDiscount.nullable().optional(),
-  items: stripeSubscriptionItems.optional(),
-});
 
 const stripeInvoiceLine = z.object({ price: stripePrice.nullable().optional() });
 const stripeInvoiceObject = z.object({
@@ -80,6 +59,7 @@ const stripeInvoiceObject = z.object({
   subscription: z.union([z.string(), z.object({ id: z.string() }), z.null()]).optional(),
   lines: z.object({ data: z.array(stripeInvoiceLine) }).optional(),
 });
+type ParsedInvoice = z.infer<typeof stripeInvoiceObject>;
 
 const stripeEventEnvelope = z.object({
   id: z.string(),
@@ -105,66 +85,23 @@ function customerIdOf(object: Record<string, unknown>): string | null {
 }
 
 /** Same shape as customerIdOf, for an invoice's `subscription` field. */
-function subscriptionIdOf(invoice: z.infer<typeof stripeInvoiceObject>): string | null {
+function subscriptionIdOf(invoice: ParsedInvoice): string | null {
   const raw = invoice.subscription;
   if (typeof raw === "string") return raw;
   if (raw !== null && raw !== undefined) return raw.id;
   return null;
 }
 
-function unixToIso(seconds: number | null | undefined): string | null {
-  return seconds === null || seconds === undefined ? null : new Date(seconds * 1000).toISOString();
-}
+type ParsedEventObject = { readonly kind: "subscription"; readonly subscription: ParsedSubscription } | { readonly kind: "invoice"; readonly invoice: ParsedInvoice };
 
-/** A 100%-off forever coupon on a real price — never a hand-set flag. Matches the exact
- * phrase 0003_billing.sql uses to describe the column this feeds. */
-function isGiftedFromDiscount(discount: z.infer<typeof stripeDiscount> | null | undefined): boolean {
-  const coupon = discount?.coupon;
-  return coupon?.percent_off === 100 && coupon?.duration === "forever";
-}
-
-function lookupKeysOf(items: readonly { readonly price?: { readonly lookup_key?: string | null } | null }[]): string[] {
-  const keys = items.map((item) => item.price?.lookup_key).filter((key): key is string => typeof key === "string" && key.length > 0);
-  return Array.from(new Set(keys));
-}
-
-async function dispatchSubscriptionEvent(
-  tenant: TenantDb,
-  accountId: AccountId,
-  stripeCustomerId: string,
-  eventId: string,
-  observedAt: string,
-  rawObject: unknown,
-  now: Date,
-): Promise<void> {
-  const parsed = stripeSubscriptionObject.parse(rawObject);
-  // An unrecognised status fails loudly rather than defaulting to a guess — the same "malformed
-  // state is a fault, not a client input" posture db/tenant.ts already takes with readRow.
-  const status = z.enum(SUBSCRIPTION_STATUSES).parse(parsed.status);
-  const items = parsed.items?.data ?? [];
-  const mirror = await tenant.upsertSubscription(
-    accountId,
-    {
-      id: parsed.id,
-      stripeCustomerId,
-      status,
-      // The mirror stores one price per subscription (0003_billing.sql). A multi-item
-      // subscription's first item stands in; entitlements below are computed from every item.
-      priceId: items[0]?.price.id ?? null,
-      isGifted: isGiftedFromDiscount(parsed.discount),
-      cancelAtPeriodEnd: parsed.cancel_at_period_end,
-      currentPeriodEnd: unixToIso(parsed.current_period_end),
-      observedAt,
-    },
-    now,
-  );
-  // Derived from the mirror row upsertSubscription just returned, not from `status` directly:
-  // an out-of-order delivery discards its own write and hands back what is actually persisted
-  // (upsertSubscription's own doc comment), so `active` must agree with the mirror, not with
-  // whichever event lost the race. entitlement-policy.ts is the one place this decision is made.
-  const { active } = resolveEntitlement({ status: mirror.status, pastDueSince: mirror.pastDueSince, now });
-  for (const lookupKey of lookupKeysOf(items)) {
-    await tenant.upsertEntitlement(accountId, { lookupKey, stripeCustomerId, active, source: "stripe_webhook", stripeEventId: eventId, observedAt }, now);
+/** Step 3. `null` for a payload this Worker cannot represent; the caller records that as `failed`. */
+function parseEventObject(eventType: string, rawObject: unknown): ParsedEventObject | null {
+  try {
+    if (SUBSCRIPTION_EVENT_TYPES.has(eventType)) return { kind: "subscription", subscription: parseSubscriptionObject(rawObject) };
+    return { kind: "invoice", invoice: stripeInvoiceObject.parse(rawObject) };
+  } catch (error) {
+    if (error instanceof z.ZodError) return null;
+    throw error;
   }
 }
 
@@ -175,10 +112,9 @@ async function dispatchInvoiceEvent(
   eventId: string,
   eventType: string,
   observedAt: string,
-  rawObject: unknown,
+  parsed: ParsedInvoice,
   now: Date,
 ): Promise<void> {
-  const parsed = stripeInvoiceObject.parse(rawObject);
   const lookupKeys = lookupKeysOf(parsed.lines?.data ?? []);
   const subscriptionId = subscriptionIdOf(parsed);
 
@@ -244,13 +180,14 @@ export async function handleStripeWebhook(request: Request, env: StripeWebhookEn
   const customerId = customerIdOf(data.object);
   const accountId = customerId === null ? null : await tenant.resolveAccountByStripeCustomerId(customerId);
   const isSupported = SUPPORTED_EVENT_TYPES.has(eventType);
+  const parsed = isSupported && accountId !== null ? parseEventObject(eventType, data.object) : null;
 
   const isNewDelivery = await tenant.recordProcessedStripeEvent(
     {
       id: eventId,
       type: eventType,
       accountId,
-      result: !isSupported ? "ignored" : accountId === null ? "failed" : "applied",
+      result: !isSupported ? "ignored" : accountId === null || parsed === null ? "failed" : "applied",
     },
     now,
   );
@@ -264,15 +201,34 @@ export async function handleStripeWebhook(request: Request, env: StripeWebhookEn
     // delivery alone can act on.
     return json(200, { received: true, unresolved_customer: true });
   }
-  // accountId came from resolving customerId two lines above, and only ever resolves a
-  // non-null input, so customerId is provably a string here even though the type checker
-  // tracks the two variables independently.
+  if (parsed === null) {
+    // Step 3: a payload this Worker cannot represent. Recorded as "failed" above; answered 200
+    // for the same reason as an unresolvable customer — a retry would fail identically. The
+    // event id and type are logged so an operator can pull the payload from the Dashboard; the
+    // payload itself is not, since it carries the customer's email and address.
+    console.error(`stripe webhook ${eventType} ${eventId}: payload not in a shape this Worker can apply; recorded as failed`);
+    return json(200, { received: true, malformed: true });
+  }
+  // accountId came from resolving customerId above, and only ever resolves a non-null input,
+  // so customerId is provably a string here even though the type checker tracks the two
+  // variables independently.
   const resolvedCustomerId = customerId as string;
 
-  if (SUBSCRIPTION_EVENT_TYPES.has(eventType)) {
-    await dispatchSubscriptionEvent(tenant, accountId, resolvedCustomerId, eventId, observedAt, data.object, now);
-  } else {
-    await dispatchInvoiceEvent(tenant, accountId, resolvedCustomerId, eventId, eventType, observedAt, data.object, now);
+  try {
+    if (parsed.kind === "subscription") {
+      await applyParsedSubscription(tenant, accountId, resolvedCustomerId, parsed.subscription, { source: "stripe_webhook", stripeEventId: eventId, observedAt }, now);
+    } else {
+      await dispatchInvoiceEvent(tenant, accountId, resolvedCustomerId, eventId, eventType, observedAt, parsed.invoice, now);
+    }
+  } catch (error) {
+    // Step 6 of this file's own doc comment.
+    console.error(`stripe webhook ${eventType} ${eventId}: write failed, releasing the event for Stripe to retry:`, error instanceof Error ? error.message : error);
+    try {
+      await tenant.releaseProcessedStripeEvent(eventId);
+    } catch (releaseError) {
+      console.error(`stripe webhook ${eventId}: could not release the processed-event row after a failed write; the retry will read as a duplicate:`, releaseError instanceof Error ? releaseError.message : releaseError);
+    }
+    return json(500, { error: "dispatch_failed" });
   }
   return json(200, { received: true });
 }

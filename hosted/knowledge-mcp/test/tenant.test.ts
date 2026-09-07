@@ -413,6 +413,54 @@ test("0008_lazy_stripe_customer's accounts rebuild preserves every dependent row
   assert.equal(result.appendOnlyTriggerStillEnforced, true, "processed_stripe_events_are_append_only must be back in force after the rebuild");
 });
 
+test("listSubscriptionsForAccount returns what the plan page needs — id, price, scheduled cancellation, period end — newest first, and nothing across tenants", async () => {
+  // Later than every seeded row's SEED_STAMP (and than the row findSubscription's own test wrote
+  // above), so this account's most recently observed subscription is the one written here.
+  const older = new Date(Date.parse(SEED_STAMP) + 5_000);
+  const newer = new Date(Date.parse(SEED_STAMP) + 10_000);
+  await repository.upsertSubscription(
+    accountA,
+    { id: "sub_latest0000old", stripeCustomerId: "cus_AAAAAAAAAAAA", status: "canceled", priceId: "price_OLD0001", isGifted: false, cancelAtPeriodEnd: false, currentPeriodEnd: null, observedAt: older.toISOString() },
+    older,
+  );
+  await repository.upsertSubscription(
+    accountA,
+    {
+      id: "sub_latest0000new",
+      stripeCustomerId: "cus_AAAAAAAAAAAA",
+      status: "active",
+      priceId: "price_NEW0001",
+      isGifted: false,
+      cancelAtPeriodEnd: true,
+      currentPeriodEnd: "2026-10-05T12:00:00.000Z",
+      observedAt: newer.toISOString(),
+    },
+    newer,
+  );
+  const listed = await repository.listSubscriptionsForAccount(accountA);
+  assert.deepEqual(listed[0], {
+    id: "sub_latest0000new",
+    status: "active",
+    pastDueSince: null,
+    priceId: "price_NEW0001",
+    cancelAtPeriodEnd: true,
+    currentPeriodEnd: "2026-10-05T12:00:00.000Z",
+  });
+  assert.equal(listed[1]?.id, "sub_latest0000old", "older rows follow, newest first");
+  // Account B has never subscribed and must not see account A's rows through this read either.
+  assert.deepEqual(await repository.listSubscriptionsForAccount(accountB), []);
+});
+
+test("releaseProcessedStripeEvent gives an event id back so the next delivery of it is a first delivery again", async () => {
+  const now = new Date(SEED_STAMP);
+  assert.equal(await repository.recordProcessedStripeEvent({ id: "evt_release_me_01", type: "customer.subscription.created", accountId: accountA, result: "applied" }, now), true);
+  assert.equal(await repository.recordProcessedStripeEvent({ id: "evt_release_me_01", type: "customer.subscription.created", accountId: accountA, result: "applied" }, now), false, "a second insert of the same id is the duplicate case");
+  await repository.releaseProcessedStripeEvent("evt_release_me_01");
+  assert.equal(await repository.recordProcessedStripeEvent({ id: "evt_release_me_01", type: "customer.subscription.created", accountId: accountA, result: "applied" }, now), true, "after release the id must be claimable again");
+  // A malformed id never reaches the database.
+  await assert.rejects(repository.releaseProcessedStripeEvent("not-an-event-id"));
+});
+
 test("missing D1 fails closed without a credential fallback", async () => {
   await assert.rejects(resolveApiKeyAccess({} as Env, keyA), (error: unknown) => error instanceof AccessError && error.status === 503);
 });

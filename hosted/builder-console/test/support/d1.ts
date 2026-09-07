@@ -223,6 +223,9 @@ export interface SubscriptionMirrorSnapshot {
   readonly status: string;
   readonly observedAt: string;
   readonly pastDueSince: string | null;
+  readonly priceId: string | null;
+  readonly cancelAtPeriodEnd: number;
+  readonly currentPeriodEnd: string | null;
 }
 
 export async function createTestDatabase(): Promise<TestDatabase> {
@@ -266,10 +269,19 @@ export async function createTestDatabase(): Promise<TestDatabase> {
 
   async function readSubscriptionMirror(id: string): Promise<SubscriptionMirrorSnapshot | null> {
     const row = await db
-      .prepare(`SELECT status, observed_at, past_due_since FROM subscriptions WHERE id = ?1`)
+      .prepare(`SELECT status, observed_at, past_due_since, price_id, cancel_at_period_end, current_period_end FROM subscriptions WHERE id = ?1`)
       .bind(id)
-      .first<{ status: string; observed_at: string; past_due_since: string | null }>();
-    return row === null ? null : { status: row.status, observedAt: row.observed_at, pastDueSince: row.past_due_since };
+      .first<{ status: string; observed_at: string; past_due_since: string | null; price_id: string | null; cancel_at_period_end: number; current_period_end: string | null }>();
+    return row === null
+      ? null
+      : {
+          status: row.status,
+          observedAt: row.observed_at,
+          pastDueSince: row.past_due_since,
+          priceId: row.price_id,
+          cancelAtPeriodEnd: row.cancel_at_period_end,
+          currentPeriodEnd: row.current_period_end,
+        };
   }
 
   async function readKeyRevokedAt(keyId: string): Promise<string | null | undefined> {

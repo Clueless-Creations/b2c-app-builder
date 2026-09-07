@@ -1,12 +1,12 @@
 /**
  * Console self-serve Checkout: POST /console/checkout and POST /console/billing.
  *
- * GET /console (the plan forms, the entitlement state, and the interest-form fallback) is
- * rendered by worker.ts alongside the rest of the console shell, the same way GET /console/keys
- * is owned by console/keys.ts and the interest form's own shape is owned by console/interest.ts
- * — this file owns only the two write sides. Session resolution (Google OIDC, the session
- * cookie) is M3's concern, not this file's: `handleConsoleCheckoutRequest` takes an
- * already-resolved session, exactly the pattern every other console module uses.
+ * GET /console (the plan forms, the plan state, and the interest-form fallback) is rendered by
+ * worker.ts alongside the rest of the console shell, the same way GET /console/keys is owned by
+ * console/keys.ts and the interest form's own shape is owned by console/interest.ts — this file
+ * owns only the two write sides. Session resolution (Google OIDC, the session cookie) is M3's
+ * concern, not this file's: `handleConsoleCheckoutRequest` takes an already-resolved session,
+ * exactly the pattern every other console module uses.
  *
  * CSRF reuses the same HMAC consent-token pair console/keys.ts and console/interest.ts do, under
  * its own "console-checkout:<account_id>" namespace (pages.ts's issueCheckoutCsrfToken /
@@ -22,17 +22,25 @@
  * (`console/pages.ts`'s `renderConsolePage`), with an explanatory notice above it. Never a 500
  * for any of those: see `billingUnavailable`'s own doc comment for the status this settles on
  * instead.
+ *
+ * POST /console/checkout also requires the consent field the plan form carries
+ * (`console/pages.ts`'s consent box). The public Terms promise that a person is asked, before
+ * access starts, to agree to it starting at once and to acknowledge what that means for a
+ * consumer's statutory withdrawal right; the browser enforces the box with `required`, and this
+ * handler enforces it again so a POST that skipped the page cannot reach Stripe without it.
  */
 
 import type { AccountId, TenantDb } from "../../knowledge-mcp/db/tenant.js";
 import type { CaptureConfig, DedupeStore } from "../analytics/capture.js";
 import { captureConsoleEvent } from "../analytics/console-capture.js";
 import { EVENTS } from "../analytics/events.js";
-import { createBillingPortalSession, createCheckoutSession, ensureStripeCustomer } from "../billing/checkout.js";
+import { createBillingPortalSession, createCheckoutSession, ensureStripeCustomer, type PortalFlow } from "../billing/checkout.js";
+import { StripeApiError } from "../billing/stripe.js";
+import { pickCurrentSubscription } from "../billing/entitlement-policy.js";
 import { isPlanId, PLANS } from "../billing/plans.js";
 import { findInterestSignalByAccount, type D1ReadLike } from "../interest/repository.js";
-import { consoleHtmlResponse as htmlResponse } from "./chrome.js";
-import { issueCheckoutCsrfToken, issueInterestCsrfToken, navFor, type ConsoleNavSource, renderConsolePage, verifyCheckoutCsrfToken } from "./pages.js";
+import { consoleHtmlResponse as htmlResponse, SITE_ORIGIN } from "./chrome.js";
+import { issueInterestCsrfToken, navFor, type ConsoleNavSource, renderConsolePage, verifyCheckoutCsrfToken } from "./pages.js";
 
 /** The resolved session, plus what the shared header shows (console/pages.ts's ConsoleNavSource; optional so a bare test session still type-checks). */
 export interface ConsoleCheckoutSession extends ConsoleNavSource {
@@ -45,7 +53,7 @@ export interface ExecutionContextLike {
 }
 
 /** Only the tenant repository functions this module actually calls. */
-type CheckoutDb = Pick<TenantDb, "getAccountStripeCustomerId" | "setAccountStripeCustomerId" | "getAccountOwnerEmail">;
+type CheckoutDb = Pick<TenantDb, "getAccountStripeCustomerId" | "setAccountStripeCustomerId" | "getAccountOwnerEmail" | "listSubscriptionsForAccount">;
 
 export interface ConsoleCheckoutDeps {
   readonly db: CheckoutDb;
@@ -69,10 +77,19 @@ export interface ConsoleCheckoutDeps {
   /** STRIPE_ACCOUNT_ID, for an organization-level key; undefined for an account-level key. */
   readonly stripeAccountId?: string;
   readonly country: string | null;
+  /** Injectable clock, so a test can pin the consent timestamp recorded on the subscription. */
+  readonly now?: () => Date;
 }
 
 const CHECKOUT_PATH = "/console/checkout";
 const BILLING_PORTAL_PATH = "/console/billing";
+
+/** The `flow` values POST /console/billing accepts; anything else is a 400. An absent or empty `flow` opens the portal's home page. */
+export const PORTAL_FLOWS = ["payment_method_update", "subscription_cancel"] as const;
+export type PortalFlowName = (typeof PORTAL_FLOWS)[number];
+
+/** The Terms the consent box names; recorded on the Checkout Session and subscription in Stripe. */
+export const TERMS_URL = `${SITE_ORIGIN}/terms/`;
 
 export function isConsoleCheckoutPath(pathname: string): boolean {
   return pathname === CHECKOUT_PATH || pathname === BILLING_PORTAL_PATH;
@@ -132,12 +149,16 @@ async function handleCheckout(request: Request, deps: ConsoleCheckoutDeps): Prom
   // just a route that is not there yet.
   if (!deps.checkoutAvailable) return jsonError(404, "not_found");
 
-  const form = parseForm(await request.text(), ["csrf", "plan"]);
+  const form = parseForm(await request.text(), ["csrf", "plan", "consent"]);
   if (form === null) return jsonError(400, "invalid_request");
   if (!(await verifyCheckoutCsrfToken(deps.csrfSecret, form.csrf ?? "", deps.session.accountId))) return jsonError(403, "invalid_csrf");
   const planId = form.plan ?? "";
   if (!isPlanId(planId)) return jsonError(400, "invalid_plan");
+  // The consent box's value. Checked after the plan so the two 400s stay distinguishable, and
+  // before anything reaches Stripe.
+  if (form.consent !== "on") return jsonError(400, "consent_required");
   const plan = PLANS[planId];
+  const termsAcceptedAt = (deps.now ?? (() => new Date()))().toISOString();
 
   // Fired once the request is genuinely a plan click, past CSRF and shape validation — not
   // before, so a forged or malformed POST never inflates this funnel step.
@@ -154,7 +175,7 @@ async function handleCheckout(request: Request, deps: ConsoleCheckoutDeps): Prom
     if (email === null) throw new Error("checkout.ts: no active owner membership on record for this account");
     const customerId = await ensureStripeCustomer(deps.db, deps.session.accountId, email, { secretKey: deps.secretKey, accountId: deps.stripeAccountId });
     const session = await createCheckoutSession(
-      { customerId, lookupKey: plan.lookupKey, accountId: deps.session.accountId },
+      { customerId, lookupKey: plan.lookupKey, accountId: deps.session.accountId, termsAcceptedAt, termsUrl: TERMS_URL },
       { secretKey: deps.secretKey, accountId: deps.stripeAccountId },
     );
     return redirectTo(session.url);
@@ -163,13 +184,34 @@ async function handleCheckout(request: Request, deps: ConsoleCheckoutDeps): Prom
   }
 }
 
+/** Mirror statuses with nothing left to cancel. `cancelAtPeriodEnd` covers the rest: a cancellation already scheduled cannot be scheduled again. */
+const ENDED_STATUSES = new Set(["canceled", "incomplete_expired"]);
+
+/**
+ * Resolves the optional `flow` field to a portal deep link. The cancel link names the plan in
+ * force (`pickCurrentSubscription` over the mirror, the same choice the plan page makes), and
+ * only when that plan is still cancellable: a cancel click for an account whose plan has ended,
+ * or is already set to end, opens the portal home page instead — there is nothing to schedule,
+ * and Stripe refuses a cancel flow for such a subscription at session creation.
+ */
+async function resolvePortalFlow(deps: ConsoleCheckoutDeps, flow: PortalFlowName | undefined): Promise<PortalFlow | undefined> {
+  if (flow === undefined) return undefined;
+  if (flow === "payment_method_update") return { type: "payment_method_update" };
+  const now = (deps.now ?? (() => new Date()))();
+  const current = pickCurrentSubscription(await deps.db.listSubscriptionsForAccount(deps.session.accountId), now);
+  if (current === null || ENDED_STATUSES.has(current.status) || current.cancelAtPeriodEnd) return undefined;
+  return { type: "subscription_cancel", subscriptionId: current.id };
+}
+
 async function handleBillingPortal(request: Request, deps: ConsoleCheckoutDeps): Promise<Response> {
   if (request.method !== "POST") return new Response(null, { status: 405, headers: { Allow: "POST" } });
   if (!deps.checkoutAvailable) return jsonError(404, "not_found");
 
-  const form = parseForm(await request.text(), ["csrf"]);
+  const form = parseForm(await request.text(), ["csrf", "flow"]);
   if (form === null) return jsonError(400, "invalid_request");
   if (!(await verifyCheckoutCsrfToken(deps.csrfSecret, form.csrf ?? "", deps.session.accountId))) return jsonError(403, "invalid_csrf");
+  const requestedFlow = form.flow ?? "";
+  if (requestedFlow !== "" && !(PORTAL_FLOWS as readonly string[]).includes(requestedFlow)) return jsonError(400, "invalid_flow");
 
   try {
     const customerId = await deps.db.getAccountStripeCustomerId(deps.session.accountId);
@@ -177,8 +219,23 @@ async function handleBillingPortal(request: Request, deps: ConsoleCheckoutDeps):
     // (console/pages.ts's renderConsolePlansPage), so a well-behaved client never reaches this,
     // but a direct POST could. Treated the same as any other reason billing is not available.
     if (customerId === null) throw new Error("checkout.ts: no Stripe customer for this account yet");
-    const session = await createBillingPortalSession(customerId, { secretKey: deps.secretKey, accountId: deps.stripeAccountId });
-    return redirectTo(session.url);
+    const stripe = { secretKey: deps.secretKey, accountId: deps.stripeAccountId };
+    const flow = await resolvePortalFlow(deps, requestedFlow === "" ? undefined : (requestedFlow as PortalFlowName));
+    if (flow !== undefined) {
+      // A deep link can be refused for reasons the mirror cannot see — the feature switched off
+      // in the Dashboard's portal configuration, or a subscription whose state changed in another
+      // tab a moment ago. Stripe says so with a 400; the portal's home page still has the same
+      // task one click further in, so that is the fallback, not the "billing is unavailable"
+      // page. Anything else — a network fault, a rate limit, a key without the portal scope —
+      // would fail the plain session the same way, so it is not retried.
+      try {
+        return redirectTo((await createBillingPortalSession(customerId, stripe, flow)).url);
+      } catch (error) {
+        if (!(error instanceof StripeApiError) || error.status !== 400) throw error;
+        console.error(`console: portal deep link ${flow.type} refused by Stripe; opening the portal home page instead`);
+      }
+    }
+    return redirectTo((await createBillingPortalSession(customerId, stripe)).url);
   } catch {
     return await billingUnavailable(deps);
   }

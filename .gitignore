@@ -43,3 +43,10 @@ examples/contributions/**/.build/
 # Deploy with: wrangler deploy --config wrangler.production.jsonc
 hosted/knowledge-mcp/wrangler.production.jsonc
 hosted/builder-console/wrangler.production.jsonc
+
+# The machine-global excludes file ignores .claude/, which silently dropped this
+# tracked template when the repository was published as fresh history. The workspace
+# template ships a .claude/ entrypoint on purpose; git cannot re-include a file inside
+# an excluded directory, so the directory is un-ignored before its contents.
+!surfaces/workspace-template/repo-agent-entrypoints/.claude/
+!surfaces/workspace-template/repo-agent-entrypoints/.claude/**

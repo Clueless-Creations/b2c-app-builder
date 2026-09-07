@@ -729,7 +729,13 @@ function scopeUsesCloudPublicationAsAuthority(
   while (genericTypesChanged) {
     genericTypesChanged = false;
     for (const typeParameter of typeParameters) {
-      const name = typeof typeParameter.name === "string" ? typeParameter.name : "";
+      // Babel 7 stored a type parameter's name as a string; Babel 8 stores an Identifier node.
+      const name =
+        typeof typeParameter.name === "string"
+          ? typeParameter.name
+          : isAstNode(typeParameter.name) && typeof typeParameter.name.name === "string"
+            ? typeParameter.name.name
+            : "";
       const constraintNames = typeNames(isAstNode(typeParameter.constraint) ? typeParameter.constraint : undefined);
       if (!name || parameterCloudTypes.has(name)) continue;
       if (![...constraintNames].some((constraint) => cloudPublicationName.test(constraint) || parameterCloudTypes.has(constraint))) continue;
@@ -1456,8 +1462,17 @@ function resolveSourceModule(fromFile: string, specifier: string, files: Set<str
   return candidates.find((candidate) => files.has(candidate));
 }
 
+/**
+ * Babel 8 reads `<T>(value: T) => value` as an unclosed JSX element whenever the jsx plugin is on,
+ * so the plugin set has to follow the file extension the way tsc does: `.ts`, `.mts`, and `.cts`
+ * never carry JSX; `.tsx` and every JavaScript extension may.
+ */
+function parserPluginsFor(file: string): Array<"typescript" | "jsx"> {
+  return /\.(?:ts|mts|cts)$/u.test(file) ? ["typescript"] : ["typescript", "jsx"];
+}
+
 function collectModuleContracts(file: string, content: string): ModuleContracts {
-  const parsed = parse(content, { sourceType: "unambiguous", plugins: ["typescript", "jsx"], allowUndeclaredExports: true }) as unknown as AstNode;
+  const parsed = parse(content, { sourceType: "unambiguous", plugins: parserPluginsFor(file), allowUndeclaredExports: true }) as unknown as AstNode;
   const program = isAstNode(parsed.program) ? parsed.program : parsed;
   const body = Array.isArray(program.body) ? program.body.filter(isAstNode) : [];
   const contracts: ModuleContracts = {
@@ -2271,6 +2286,7 @@ function importedContractsForFile(file: string, modules: Map<string, ModuleContr
 }
 
 function hasCloudPublicationAuthority(
+  file: string,
   content: string,
   inheritedContracts: ImportedContracts = {
     returnTypes: new Map(),
@@ -2283,7 +2299,7 @@ function hasCloudPublicationAuthority(
 ): boolean {
   const program = parse(content, {
     sourceType: "unambiguous",
-    plugins: ["typescript", "jsx"],
+    plugins: parserPluginsFor(file),
     allowUndeclaredExports: true,
   });
   return scopeUsesCloudPublicationAsAuthority(
@@ -2307,7 +2323,7 @@ const shippedSources = shippedSourceFiles.map((file) => ({ file, content: readFi
 const moduleContracts = new Map(shippedSources.map(({ file, content }) => [file, collectModuleContracts(file, content)]));
 for (const { file, content } of shippedSources) {
   const importedContracts = importedContractsForFile(file, moduleContracts);
-  if (hasCloudPublicationAuthority(content, importedContracts, new Map())) {
+  if (hasCloudPublicationAuthority(file, content, importedContracts, new Map())) {
     issues.push(
       issue(
         "error",

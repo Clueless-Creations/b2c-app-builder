@@ -1,12 +1,11 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.218.10",
+  "version": "0.218.11",
   "updatedAt": "2026-09-07",
   "sourcePath": ".",
   "releaseNotes": [
-    "Prepare the package for npm: drop the private flag, keep the two Cloudflare Workers out of the tarball, and add a release workflow that publishes through npm trusted publishing when a GitHub release is published.",
-    "Raise the Node.js floor to 24, the active LTS whose bundled npm supports trusted publishing. .nvmrc, .node-version, engines.node, CI, and @types/node move together.",
-    "The pack smoke test now requires surfaces/workspace-template/repo-agent-entrypoints/.claude/settings.json, restored on main in 0.218.8, so a checkout that lacks it fails the audit before it fails a consumer. .npmignore re-includes it explicitly.",
-    "b2c setup prints the portable npx registration form when the package was installed from npm, and skips the npm link advice that only applies to a checkout."
+    "Move to @babel/parser 8.0.4. The architecture and repository-boundary validators now choose Babel plugins by file extension: .ts, .mts, and .cts parse with the typescript plugin alone, because Babel 8 reads a generic arrow such as <T>(value: T) => value as an unclosed JSX element when the jsx plugin is on.",
+    "Babel 8 stores a type parameter name as an Identifier node where Babel 7 stored a string. The boundary checker reads both, so apply<T extends CloudPublication>(value: T) stays flagged as cloud-publication authority.",
+    "Update the @anthropic-ai/sdk development dependency to 0.124.0 for the behavioral evals."
   ]
 }

@@ -190,10 +190,19 @@ function lineOf(node: AstNode): number {
   return typeof node.loc?.start?.line === "number" ? node.loc.start.line : 0;
 }
 
+/**
+ * Babel 8 reads `<T>(value: T) => value` as an unclosed JSX element whenever the jsx plugin is on,
+ * so the plugin set has to follow the file extension the way tsc does: `.ts`, `.mts`, and `.cts`
+ * never carry JSX; `.tsx` and every JavaScript extension may.
+ */
+function parserPluginsFor(file: string): Array<"typescript" | "jsx"> {
+  return /\.(?:ts|mts|cts)$/u.test(file) ? ["typescript"] : ["typescript", "jsx"];
+}
+
 function collectSpecifierEdges(file: string, content: string): Array<{ specifier: string; line: number }> {
   const parsed = parse(content, {
     sourceType: "unambiguous",
-    plugins: ["typescript", "jsx"],
+    plugins: parserPluginsFor(file),
     allowUndeclaredExports: true,
     errorRecovery: false,
   }) as unknown as AstNode;

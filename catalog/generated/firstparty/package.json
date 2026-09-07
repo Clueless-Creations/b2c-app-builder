@@ -1,6 +1,6 @@
 {
   "name": "b2c-app-builder",
-  "version": "0.218.10",
+  "version": "0.218.11",
   "description": "Consumer-business primitives for AI agents: capabilities, providers, recipes, and evidence through a CLI, MCP, and skill.",
   "keywords": [
     "mcp",
@@ -240,7 +240,7 @@
     "verify:node": "tsx kernel/session/verify.ts"
   },
   "dependencies": {
-    "@babel/parser": "7.28.4",
+    "@babel/parser": "8.0.4",
     "@google/design.md": "0.4.0",
     "@mdx-js/mdx": "3.1.1",
     "@modelcontextprotocol/sdk": "^1.30.0",
@@ -252,7 +252,7 @@
     "zod": "^4.5.4"
   },
   "devDependencies": {
-    "@anthropic-ai/sdk": "0.123.0",
+    "@anthropic-ai/sdk": "0.124.0",
     "@types/node": "^24.13.3",
     "prettier": "^3.9.6"
   }

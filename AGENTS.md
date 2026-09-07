@@ -32,6 +32,31 @@ creation, launch, growth, monetization, trust, or operation of consumer apps.
 Planes is parked successor work. Do not route current work through it. See
 `docs/timeouts/planes.md`.
 
+## Public boundary
+
+This repository is public. The hosted service that runs this code is operated
+from a private overlay. Nothing that identifies that deployment or its operator
+belongs here.
+
+- `hosted/*/wrangler.jsonc` carry placeholder resource ids on purpose, so that a
+  stranger's `wrangler deploy` cannot reach the operator's account. Production
+  ids live in a gitignored `wrangler.production.jsonc` beside each Worker.
+  Never commit one, and never quote its values in source, a test, a document,
+  an issue, or a pull request.
+- Keep out of every tracked file: secret values, live Cloudflare, Stripe,
+  PostHog, Google, or email-provider identifiers, secret-manager project and
+  config names, deployment ids and timestamps, customer counts, session
+  handoffs, operator status paragraphs, personal email addresses, home
+  directory paths, machine names, and references to a private repository.
+- Cite an external source by a public URL through the source registry. A
+  private repository is never a source and never a link target.
+- `catalog/generated/`, `docs/source-freshness/`, and `docs/upstreams/` embed
+  copies of knowledge documents. Scrub the authored source and re-render.
+  Never edit one copy.
+- Commit as the maintainer organization identity, not a personal address.
+- Report a suspected leak through `.github/SECURITY.md`. Do not open a public
+  issue that quotes the value.
+
 ## Three scopes
 
 Decide the target before you read further. Route by the intended target and the

@@ -1,11 +1,11 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.218.8",
+  "version": "0.218.9",
   "updatedAt": "2026-09-07",
   "sourcePath": ".",
   "releaseNotes": [
-    "Restore surfaces/workspace-template/repo-agent-entrypoints/.claude/settings.json, which the machine-global excludes file dropped when this repository was published as fresh history. Without it install-entrypoints exits 1 and every workspace initialization refuses with business.initialization_bootstrap_refused, so a first clone of the public repository could not create a workspace at all.",
-    "Un-ignore that template directory and its contents in .gitignore. Git cannot re-include a file inside an excluded directory, so the directory rule has to precede the contents rule; without both, a later git add silently drops the file again.",
-    "The failure named a bootstrap refusal rather than a missing file, and test:public-api runs five suites of which only the first passed, so a truncated log read as green. Restoring the file returns test:public-api to passing."
+    "Stop the console sign-in page promising a refund policy that no longer exists. It read \"The Terms include the 14-day refund policy\" while /terms/ says charges and part-used periods are not refunded except where consumer law requires it, so a buyer read a promise the Terms deny at the moment of purchase.",
+    "Replace it with the cancellation terms that are actually true, matching the wording already used on the plans panel: cancel any time, access runs to the end of the period you have paid for.",
+    "Invert the test that pinned the old sentence. signin-offer now asserts the page contains no refund promise at all rather than asserting one is present, so the copy cannot regress back."
   ]
 }

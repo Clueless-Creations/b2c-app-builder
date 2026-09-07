@@ -112,6 +112,61 @@ The instant of consent and the Terms URL ride on the subscription Checkout creat
 the subscription it covers in Stripe with no table of its own here. Checkout's own pay button
 additionally states the renewal and cancellation terms (`custom_text[submit]`).
 
+## Email to customers
+
+`mail/` sends the console's own email through Resend's HTTP API (`mail/resend.ts`, no SDK, one
+`fetch`), from `Clueless Creations <eduardo@clueless-creations.com>`. Three notices exist, each tied
+to one change the Stripe webhook just wrote (`mail/billing-notices.ts`):
+
+| Notice | When | Says |
+|---|---|---|
+| `plan_activated` | a subscription becomes live (first payment, or an `incomplete` one completing) | what is on, when it renews, create a key, connect an agent |
+| `cancellation_scheduled` | the person cancels in the Billing Portal | when access ends, no further charge, how to renew before then |
+| `plan_ended` | a subscription reaches `canceled` and nothing else on the account grants access | keys stop working, the account and keys stay, how to switch back on |
+
+Receipts, failed-payment emails with a pay link, and upcoming-renewal reminders are **Stripe's**
+emails, switched on in the Dashboard (Stripe checklist, step 3); the Terms already promise them.
+The console does not duplicate them.
+
+Rules the module keeps:
+
+- **Off by default.** With `RESEND_API_KEY` unset, `mailConfigFromEnv` returns `null` and every
+  notice is logged as skipped. The writes happen regardless. Same contract as
+  `POSTHOG_PROJECT_TOKEN` for analytics, and for the same reason: a deployment must never depend on
+  a third party to serve the console.
+- **Webhook only.** The console's own resync (`syncSubscriptionsFromStripe`) repairs the mirror
+  silently; a repair is not news, and re-deriving the same state must not mail anyone again.
+- **Once per event.** The notice is decided by comparing the mirror row before and after the
+  write (`detectBillingTransition`), so a redelivery the mirror discarded produces no notice, and
+  the `Idempotency-Key` sent to Resend is `<evt_id>:<kind>`.
+- **After the writes, off the request.** The send runs in `ctx.waitUntil` once every D1 write
+  succeeded; it never throws, so a Resend outage cannot turn a completed webhook into a 500.
+- The customer's address is never logged; the event id is enough to find them in Stripe.
+
+### Setting it up
+
+1. In Resend, add the domain `clueless-creations.com` (Domains → Add domain) and put the DNS
+   records it shows — DKIM, SPF (a `send.` subdomain MX + TXT), and optionally DMARC — into the
+   zone's DNS at Cloudflare, then click Verify. Until the domain verifies, Resend refuses to send
+   from `eduardo@clueless-creations.com`.
+2. Create an API key in Resend scoped to **sending access** only, for this domain. Put it in
+   Doppler under the console's project/config as `RESEND_API_KEY` (Credentials section above).
+3. Transfer it to the Worker on stdin, never as an argument, from `hosted/builder-console`:
+
+   ```bash
+   doppler secrets get RESEND_API_KEY --plain --project <project> --config <config> \
+     | npx wrangler secret put RESEND_API_KEY --config wrangler.production.jsonc
+   ```
+
+4. Deploy the console Worker (`npm run app:deploy:prod` from the repository root), then read back
+   `npx wrangler secret list --config wrangler.production.jsonc` for the name and watch
+   `wrangler tail` for a `mail:` line on the next subscription event. Resend's own Emails page
+   shows delivery per message, tagged with `kind`.
+
+Anything beyond these three notices — announcements, onboarding sequences — is a separate
+decision: marketing email needs its own consent and an unsubscribe link, which nothing in this
+console collects today.
+
 Start at [`analytics/EVENT_TAXONOMY.md`](analytics/EVENT_TAXONOMY.md). It is the contract; the
 code is the executable half of it. Its lawful basis is documented separately, in
 [`analytics/LEGITIMATE_INTERESTS_ASSESSMENT.md`](analytics/LEGITIMATE_INTERESTS_ASSESSMENT.md).
@@ -380,6 +435,7 @@ registered.
 | `B2C_APP_CONSOLE_AUTH_SECRET` | Signs the console's CSRF tokens (M5, `console/pages.ts`) | Secret binding with the same name |
 | `STRIPE_RESTRICTED_KEY`       | Server-side Stripe calls, `rk_`-prefixed (M6)            | Secret binding with the same name |
 | `STRIPE_WEBHOOK_SECRET`       | Verifies `Stripe-Signature` (M6)                         | Secret binding with the same name |
+| `RESEND_API_KEY`              | Sends the billing notices in `mail/` (optional; unset = mail off) | Secret binding with the same name |
 
 All five are `wrangler.jsonc`'s `secrets.required` list; a deployment missing any of them fails
 to start rather than running with a hole in it. Transfer them with `wrangler secret bulk` on
@@ -492,6 +548,16 @@ AGENTS.md's Authority section. Each milestone adds its own section here as it la
      feature fails at session creation.
    - Pause subscription: **off** — *set*. The entitlement policy never grants access to `paused`.
    - Business information: headline, and the Terms and Privacy URLs — *set*.
+
+   **Stripe Tax.** Checkout sends `automatic_tax[enabled]=true` (`billing/checkout.ts`), so Stripe
+   Tax — active on the account, head office in Illinois — collects the billing address and
+   calculates tax only where the account holds a registration; everywhere else the buyer pays the
+   listed price. The two Prices carry no `tax_behavior`, so the account default applies
+   (tax-exclusive for USD). Registrations are not a code decision: Dashboard → Tax → Registrations,
+   guided by Stripe's threshold monitoring on the same page, and by an accountant for the EU and UK,
+   where VAT on consumer digital services starts at the first sale. Adding a registration makes
+   Checkout start charging that jurisdiction's tax on top of the listed price, so the offer page
+   should say "plus tax where it applies" before the first registration is added.
 
    Also in the Dashboard, outside the portal page: Settings → Billing → Subscriptions and emails
    — turn on the customer emails for failed payments, upcoming renewals (annual plans in

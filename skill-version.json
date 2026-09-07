@@ -1,14 +1,13 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.218.12",
+  "version": "0.218.13",
   "updatedAt": "2026-09-07",
   "sourcePath": ".",
   "releaseNotes": [
-    "Console billing: the plan page now says when a plan renews or ends, shows a scheduled cancellation and the past-due grace deadline, and offers Billing Portal deep links for updating the payment method and cancelling, each returning to the console.",
-    "Read the paid period's end from the subscription item, where API version 2025-08-27.basil puts it; the mirror had stored NULL for every live subscription. Record a scheduled cancellation whether Stripe reports it as cancel_at_period_end (classic) or cancel_at (flexible billing mode).",
-    "Re-read the account's subscriptions from Stripe when a person returns from Checkout or the portal, and once an hour when an account has a Customer but no mirror row, so the console reflects the purchase before the webhook lands and a lost webhook no longer leaves a paid account without access. The read is paged, ranks a live plan above a past-due one, and retires entitlements no subscription bills any more.",
-    "Webhook: parse before recording. A payload this Worker cannot represent is recorded as failed and answered 200; a write that throws releases its processed-event row and answers 500, so Stripe's retry is applied instead of swallowed as a duplicate.",
-    "The plan in force is the newest entitled subscription (pickCurrentSubscription), not the newest mirror row, so a late deleted event for an old plan cannot hide the live one or misdirect the cancel deep link.",
-    "Checkout: a required consent box above the plan buttons (the Terms' consumer-withdrawal clause), recorded on the Checkout Session and the subscription as metadata; Checkout saves name and address to the Customer, collects tax IDs, states the renewal terms under the pay button, and the Customer carries the account id in metadata."
+    "Console email through Resend (mail/resend.ts, one fetch, no SDK), from eduardo@clueless-creations.com. RESEND_API_KEY is the switch: unset means mail is off and every notice is logged as skipped, the same contract POSTHOG_PROJECT_TOKEN has for analytics.",
+    "Three billing notices (mail/billing-notices.ts), each tied to one change the Stripe webhook just wrote: the plan went live, a cancellation was scheduled, the plan ended with nothing else on the account granting access. Receipts, failed-payment and renewal emails stay Stripe's own.",
+    "Sent only from the webhook, only after every D1 write succeeded, off the request in ctx.waitUntil, decided by comparing the mirror row before and after the write so a redelivery the mirror discarded mails nobody, with a per-event Idempotency-Key. The console's resync repairs silently.",
+    "Checkout enables Stripe Tax (automatic_tax): the address is collected and tax is calculated only where the account is registered, on top of the listed price for USD; the subscription keeps calculating on renewal. Registrations stay a Dashboard decision guided by Stripe's threshold monitoring.",
+    "README: what each notice says, the rules the module keeps, and the Resend domain, Doppler, and wrangler steps to switch it on."
   ]
 }

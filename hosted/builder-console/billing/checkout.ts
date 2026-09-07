@@ -134,6 +134,13 @@ export interface CreatedCheckoutSession {
  *   - `allow_promotion_codes` keeps the promotion-code field on the page, the only way a gifted
  *     or discounted plan is ever applied (0003_billing.sql's own note on the gift flag).
  *   - `custom_text[submit]` states the renewal and cancellation terms on the page itself.
+ *   - `automatic_tax` hands the tax question to Stripe Tax, which is active on the account:
+ *     Checkout collects the billing address, works out tax only in jurisdictions the account is
+ *     registered in (zero everywhere else), and the subscription it creates keeps calculating on
+ *     every renewal. The Prices carry no `tax_behavior` of their own, so the account's Tax
+ *     default applies, which for USD is tax-exclusive: the listed price stays the listed price
+ *     and tax is added on top where it is owed. Stripe's threshold monitoring, not this code,
+ *     says when a registration becomes due (README, Stripe checklist).
  */
 export async function createCheckoutSession(input: CreateCheckoutSessionInput, opts: StripeCallOptions): Promise<CreatedCheckoutSession> {
   const priceId = await priceIdForLookupKey(input.lookupKey, opts.secretKey, opts.fetchImpl, opts.accountId);
@@ -152,6 +159,7 @@ export async function createCheckoutSession(input: CreateCheckoutSessionInput, o
       "customer_update[name]": "auto",
       "customer_update[address]": "auto",
       "tax_id_collection[enabled]": "true",
+      "automatic_tax[enabled]": "true",
       "metadata[account_id]": input.accountId,
       "metadata[terms_accepted_at]": input.termsAcceptedAt,
       "subscription_data[metadata][account_id]": input.accountId,

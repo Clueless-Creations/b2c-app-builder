@@ -1650,8 +1650,19 @@ sources:
     owner: source-freshness
     locations:
       - kernel/session/digest.ts
-    notes: HTTP endpoint the digest push transport posts to; verify request shape against Resend docs before
-      changing the transport.
+      - hosted/builder-console/mail/resend.ts
+    notes: HTTP endpoint the digest push transport posts to, and the one URL the console's mail module
+      (sendEmail) calls; verify request shape against Resend docs before changing either.
+  - id: resend-com-docs-api-reference-emails-send-email
+    name: Resend — send email API reference
+    source_type: official_docs
+    url: https://resend.com/docs/api-reference/emails/send-email
+    refresh_cadence_days: 30
+    owner: source-freshness
+    locations:
+      - hosted/builder-console/mail/resend.ts
+    notes: Request body (from, to, subject, html, text, tags) and the Idempotency-Key header sendEmail sends;
+      the console mails without the resend SDK, so this page is the contract.
   - id: revenuecat-com-docs-integrations-third-party-integrations-superwall
     name: www.revenuecat.com
     source_type: docs

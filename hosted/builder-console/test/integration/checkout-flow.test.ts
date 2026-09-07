@@ -439,6 +439,7 @@ test("POST /console/checkout creates the Stripe Customer once, reuses it on a se
   assert.equal(firstBody.get("customer_update[name]"), "auto");
   assert.equal(firstBody.get("customer_update[address]"), "auto");
   assert.equal(firstBody.get("tax_id_collection[enabled]"), "true");
+  assert.equal(firstBody.get("automatic_tax[enabled]"), "true", "Stripe Tax decides tax per jurisdiction; the console never hard-codes a rate");
   assert.equal(firstBody.get("subscription_data[metadata][account_id]"), accountId);
   assert.equal(firstBody.get("subscription_data[metadata][terms_url]"), "https://clueless-creations.com/terms/");
   assert.match(firstBody.get("subscription_data[metadata][terms_accepted_at]") ?? "", /^\d{4}-\d{2}-\d{2}T/, "the consent instant must ride on the subscription");

@@ -67,6 +67,7 @@ import { findInterestSignalByAccount, interestDbFromEnv } from "./interest/repos
 
 // --- M6: Stripe webhook and reconciliation — one import line each. ----------------------------
 import { handleStripeWebhook } from "./billing/webhook.js";
+import { mailConfigFromEnv } from "./mail/resend.js";
 import { reconcileStaleEntitlements } from "./billing/reconcile.js";
 
 // --- Self-serve Checkout, routed into the console — one import line each. ---------------------
@@ -83,6 +84,8 @@ import { handleConsoleCheckoutRequest, isConsoleCheckoutPath } from "./console/c
 interface AppEnv extends Env {
   readonly POSTHOG_PROJECT_TOKEN: string;
   readonly POSTHOG_FEATURE_FLAGS_SECURE_KEY?: string;
+  /** Resend, for the billing notices in mail/. Unset means mail is off (mail/resend.ts). Set with `wrangler secret put`, from Doppler. */
+  readonly RESEND_API_KEY?: string;
 }
 
 function securityHeaders(response: Response): Response {
@@ -714,7 +717,7 @@ export default {
           new Response(JSON.stringify({ error: "database_unavailable" }), { status: 503, headers: { "Content-Type": "application/json" } }),
         );
       }
-      return securityHeaders(await handleStripeWebhook(request, env, tenant));
+      return securityHeaders(await handleStripeWebhook(request, env, tenant, new Date(), { mail: mailConfigFromEnv(env), ctx }));
     }
 
     return securityHeaders(new Response(JSON.stringify({ error: "not_found" }), { status: 404, headers: { "Content-Type": "application/json" } }));

@@ -1,11 +1,14 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.218.11",
+  "version": "0.218.12",
   "updatedAt": "2026-09-07",
   "sourcePath": ".",
   "releaseNotes": [
-    "Move to @babel/parser 8.0.4. The architecture and repository-boundary validators now choose Babel plugins by file extension: .ts, .mts, and .cts parse with the typescript plugin alone, because Babel 8 reads a generic arrow such as <T>(value: T) => value as an unclosed JSX element when the jsx plugin is on.",
-    "Babel 8 stores a type parameter name as an Identifier node where Babel 7 stored a string. The boundary checker reads both, so apply<T extends CloudPublication>(value: T) stays flagged as cloud-publication authority.",
-    "Update the @anthropic-ai/sdk development dependency to 0.124.0 for the behavioral evals."
+    "Console billing: the plan page now says when a plan renews or ends, shows a scheduled cancellation and the past-due grace deadline, and offers Billing Portal deep links for updating the payment method and cancelling, each returning to the console.",
+    "Read the paid period's end from the subscription item, where API version 2025-08-27.basil puts it; the mirror had stored NULL for every live subscription. Record a scheduled cancellation whether Stripe reports it as cancel_at_period_end (classic) or cancel_at (flexible billing mode).",
+    "Re-read the account's subscriptions from Stripe when a person returns from Checkout or the portal, and once an hour when an account has a Customer but no mirror row, so the console reflects the purchase before the webhook lands and a lost webhook no longer leaves a paid account without access. The read is paged, ranks a live plan above a past-due one, and retires entitlements no subscription bills any more.",
+    "Webhook: parse before recording. A payload this Worker cannot represent is recorded as failed and answered 200; a write that throws releases its processed-event row and answers 500, so Stripe's retry is applied instead of swallowed as a duplicate.",
+    "The plan in force is the newest entitled subscription (pickCurrentSubscription), not the newest mirror row, so a late deleted event for an old plan cannot hide the live one or misdirect the cancel deep link.",
+    "Checkout: a required consent box above the plan buttons (the Terms' consumer-withdrawal clause), recorded on the Checkout Session and the subscription as metadata; Checkout saves name and address to the Customer, collects tax IDs, states the renewal terms under the pay button, and the Customer carries the account id in metadata."
   ]
 }

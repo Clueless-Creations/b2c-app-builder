@@ -19,7 +19,7 @@ import { readFile } from "node:fs/promises";
 import { after, before, test } from "node:test";
 import { fileURLToPath, URL as NodeURL } from "node:url";
 import { AccessError } from "../../../knowledge-mcp/auth.js";
-import { tenantDb, type AccountId } from "../../../knowledge-mcp/db/tenant.js";
+import { tenantDb, type AccountId, type TenantDb } from "../../../knowledge-mcp/db/tenant.js";
 import { handleStripeWebhook } from "../../billing/webhook.js";
 import { createTestDatabase, type TestDatabase } from "../support/d1.js";
 
@@ -50,6 +50,10 @@ function subscriptionEvent(opts: {
   readonly type?: string;
   readonly lookupKey?: string | null;
   readonly cancelAtPeriodEnd?: boolean;
+  /** Flexible-billing-mode shape of a scheduled cancellation: a timestamp here, `cancel_at_period_end: false`. */
+  readonly cancelAt?: number | null;
+  /** Where 2025-08-27.basil actually puts the period end. Omitted, the item carries none and only the legacy top-level field is present. */
+  readonly itemPeriodEnd?: number;
   readonly gifted?: boolean;
 }) {
   return {
@@ -62,10 +66,14 @@ function subscriptionEvent(opts: {
         customer: opts.customer,
         status: opts.status,
         cancel_at_period_end: opts.cancelAtPeriodEnd ?? false,
+        cancel_at: opts.cancelAt ?? null,
         current_period_end: opts.created + 30 * 24 * 60 * 60,
         discount: opts.gifted === true ? { coupon: { percent_off: 100, duration: "forever" } } : null,
         items: {
-          data: opts.lookupKey === null ? [] : [{ price: { id: "price_abc123", lookup_key: opts.lookupKey ?? LOOKUP_KEY } }],
+          data:
+            opts.lookupKey === null
+              ? []
+              : [{ price: { id: "price_abc123", lookup_key: opts.lookupKey ?? LOOKUP_KEY }, ...(opts.itemPeriodEnd === undefined ? {} : { current_period_end: opts.itemPeriodEnd }) }],
         },
       },
     },
@@ -97,7 +105,7 @@ function invoiceEvent(opts: {
   };
 }
 
-async function post(event: unknown, opts: { readonly timestamp?: number; readonly signature?: string } = {}): Promise<Response> {
+async function post(event: unknown, opts: { readonly timestamp?: number; readonly signature?: string; readonly tenant?: TenantDb } = {}): Promise<Response> {
   const payload = JSON.stringify(event);
   const timestamp = opts.timestamp ?? (event as { created: number }).created;
   const signature = opts.signature ?? stripeSignatureHeader(payload, timestamp);
@@ -109,7 +117,7 @@ async function post(event: unknown, opts: { readonly timestamp?: number; readonl
   // Held to the event's own `created` time, matching what signed the header above — otherwise
   // the 300s tolerance in verifyStripeSignature races the real wall clock against a payload
   // timestamped for a fixed test fixture instant.
-  return handleStripeWebhook(request, { STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET }, tenantDb(harness.db), new Date(timestamp * 1000));
+  return handleStripeWebhook(request, { STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET }, opts.tenant ?? tenantDb(harness.db), new Date(timestamp * 1000));
 }
 
 test("the same evt_ id delivered twice writes exactly one entitlement", async () => {
@@ -705,4 +713,170 @@ test("resolveSessionPrincipal and assertEntitled never reference the information
   const stripped = stripComments(source);
   assert.doesNotMatch(functionBody(stripped, "async function assertEntitled("), giftColumnPattern);
   assert.doesNotMatch(functionBody(stripped, "async function resolveSessionPrincipal("), giftColumnPattern);
+});
+
+test("the mirror stores the item-level period end, which is where the pinned API version puts it, and a legacy top-level value only as the fallback", async () => {
+  const accountId = "acct-period-end";
+  await harness.seedAccount({
+    accountId,
+    userId: "user-period-end",
+    googleSub: "google-period-end",
+    email: "period-end@example.com",
+    stripeCustomerId: "cus_periodend01",
+    keyId: "key-period-end",
+    keyDigest: "5e".repeat(32),
+    entitled: false,
+  });
+  const base = 1_800_900_000;
+  const itemEnd = base + 45 * 24 * 60 * 60;
+
+  await post(
+    subscriptionEvent({
+      eventId: "evt_pe_1",
+      created: base,
+      subscriptionId: "sub_pe_items",
+      customer: "cus_periodend01",
+      status: "active",
+      type: "customer.subscription.created",
+      itemPeriodEnd: itemEnd,
+    }),
+  );
+  const withItem = await harness.readSubscriptionMirror("sub_pe_items");
+  assert.equal(withItem?.currentPeriodEnd, new Date(itemEnd * 1000).toISOString(), "the item's current_period_end must win over the top-level field");
+  assert.equal(withItem?.priceId, "price_abc123");
+
+  // No item-level value at all: the fixture's top-level field (created + 30 days) is what remains.
+  await post(
+    subscriptionEvent({
+      eventId: "evt_pe_2",
+      created: base + 1,
+      subscriptionId: "sub_pe_legacy",
+      customer: "cus_periodend01",
+      status: "active",
+      type: "customer.subscription.created",
+    }),
+  );
+  const legacy = await harness.readSubscriptionMirror("sub_pe_legacy");
+  assert.equal(legacy?.currentPeriodEnd, new Date((base + 1 + 30 * 24 * 60 * 60) * 1000).toISOString());
+});
+
+test("a cancellation scheduled through the portal is recorded whether Stripe reports it as cancel_at_period_end (classic) or cancel_at (flexible), and access stays on until then", async () => {
+  const accountId = "acct-cancel-shapes";
+  await harness.seedAccount({
+    accountId,
+    userId: "user-cancel-shapes",
+    googleSub: "google-cancel-shapes",
+    email: "cancel-shapes@example.com",
+    stripeCustomerId: "cus_cancelshape1",
+    keyId: "key-cancel-shapes",
+    keyDigest: "6f".repeat(32),
+    entitled: false,
+  });
+  const tenant = tenantDb(harness.db);
+  const base = 1_801_000_000;
+  const periodEnd = base + 20 * 24 * 60 * 60;
+
+  // Classic billing mode: the flag.
+  await post(
+    subscriptionEvent({ eventId: "evt_cs_1", created: base, subscriptionId: "sub_cs_classic", customer: "cus_cancelshape1", status: "active", type: "customer.subscription.created", itemPeriodEnd: periodEnd }),
+  );
+  await post(subscriptionEvent({ eventId: "evt_cs_2", created: base + 10, subscriptionId: "sub_cs_classic", customer: "cus_cancelshape1", status: "active", cancelAtPeriodEnd: true, itemPeriodEnd: periodEnd }));
+  const classic = await harness.readSubscriptionMirror("sub_cs_classic");
+  assert.equal(classic?.status, "active");
+  assert.equal(classic?.cancelAtPeriodEnd, 1);
+  assert.equal(classic?.currentPeriodEnd, new Date(periodEnd * 1000).toISOString());
+  await assert.doesNotReject(() => tenant.assertEntitled(accountId as AccountId, LOOKUP_KEY), "a plan scheduled to end keeps access until it does");
+
+  // Flexible billing mode: `cancel_at` set, `cancel_at_period_end` still false — the shape the
+  // live account's own subscription would produce (billing_mode.type = flexible).
+  await post(
+    subscriptionEvent({ eventId: "evt_cs_3", created: base + 20, subscriptionId: "sub_cs_flex", customer: "cus_cancelshape1", status: "active", type: "customer.subscription.created", itemPeriodEnd: periodEnd }),
+  );
+  await post(
+    subscriptionEvent({ eventId: "evt_cs_4", created: base + 30, subscriptionId: "sub_cs_flex", customer: "cus_cancelshape1", status: "active", cancelAtPeriodEnd: false, cancelAt: periodEnd, itemPeriodEnd: periodEnd }),
+  );
+  const flexible = await harness.readSubscriptionMirror("sub_cs_flex");
+  assert.equal(flexible?.cancelAtPeriodEnd, 1, "cancel_at alone must read as a scheduled cancellation");
+  assert.equal(flexible?.status, "active");
+
+  // Renewed from the portal before the date: both shapes cleared.
+  await post(subscriptionEvent({ eventId: "evt_cs_5", created: base + 40, subscriptionId: "sub_cs_flex", customer: "cus_cancelshape1", status: "active", cancelAtPeriodEnd: false, cancelAt: null, itemPeriodEnd: periodEnd }));
+  assert.equal((await harness.readSubscriptionMirror("sub_cs_flex"))?.cancelAtPeriodEnd, 0);
+});
+
+test("a write that throws releases the event id and answers 500, so Stripe's retry of the same id is applied instead of swallowed as a duplicate", async () => {
+  const accountId = "acct-release";
+  await harness.seedAccount({
+    accountId,
+    userId: "user-release",
+    googleSub: "google-release",
+    email: "release@example.com",
+    stripeCustomerId: "cus_release0001",
+    keyId: "key-release",
+    keyDigest: "7a".repeat(32),
+    entitled: false,
+  });
+  const tenant = tenantDb(harness.db);
+  const base = 1_801_100_000;
+
+  // A D1 failure in the middle of the dispatch — after the idempotency row was already written,
+  // the exact gap step 6 of webhook.ts's doc comment closes. Simulated on the repository the
+  // handler is handed, so nothing about the database itself has to be broken and restored.
+  let failuresLeft = 1;
+  const flaky: TenantDb = {
+    ...tenant,
+    upsertSubscription: async (...args) => {
+      if (failuresLeft > 0) {
+        failuresLeft -= 1;
+        throw new Error("test: D1 write failed");
+      }
+      return tenant.upsertSubscription(...args);
+    },
+  };
+  const event = subscriptionEvent({ eventId: "evt_release_1", created: base, subscriptionId: "sub_release", customer: "cus_release0001", status: "active", type: "customer.subscription.created" });
+  const first = await post(event, { tenant: flaky });
+  assert.equal(first.status, 500);
+  assert.deepEqual(await first.json(), { error: "dispatch_failed" });
+  assert.equal(await harness.readProcessedStripeEvent("evt_release_1"), null, "the processed-event claim must be given back");
+  assert.equal(await harness.countRows("subscriptions", accountId), 0);
+  assert.equal(await harness.countRows("entitlements", accountId), 0);
+
+  // Stripe redelivers the same event id.
+  const second = await post(event, { tenant: flaky });
+  assert.equal(second.status, 200);
+  assert.deepEqual(await second.json(), { received: true }, "the retry must be a first delivery again, not a duplicate");
+  assert.equal((await harness.readProcessedStripeEvent("evt_release_1"))?.result, "applied");
+  await assert.doesNotReject(() => tenant.assertEntitled(accountId as AccountId, LOOKUP_KEY));
+
+  // And a genuine redelivery of the now-applied event is still a duplicate.
+  const third = await post(event);
+  assert.deepEqual(await third.json(), { received: true, duplicate: true });
+});
+
+test("a payload this Worker cannot represent is recorded as failed and answered 200, not retried for three days", async () => {
+  const accountId = "acct-malformed";
+  await harness.seedAccount({
+    accountId,
+    userId: "user-malformed",
+    googleSub: "google-malformed",
+    email: "malformed@example.com",
+    stripeCustomerId: "cus_malformed001",
+    keyId: "key-malformed",
+    keyDigest: "8b".repeat(32),
+    entitled: false,
+  });
+  const base = 1_801_200_000;
+  // A status outside SUBSCRIPTION_STATUSES fails the parse before any row is written. Every
+  // redelivery would fail the same way, so asking Stripe to retry would only raise the
+  // endpoint's failure rate; the row is what says the event was seen.
+  const broken = subscriptionEvent({ eventId: "evt_malformed_1", created: base, subscriptionId: "sub_malformed", customer: "cus_malformed001", status: "not_a_stripe_status", type: "customer.subscription.created" });
+  const first = await post(broken);
+  assert.equal(first.status, 200);
+  assert.deepEqual(await first.json(), { received: true, malformed: true });
+  assert.equal((await harness.readProcessedStripeEvent("evt_malformed_1"))?.result, "failed");
+  assert.equal(await harness.countRows("subscriptions", accountId), 0);
+  assert.equal(await harness.countRows("entitlements", accountId), 0);
+
+  const again = await post(broken);
+  assert.deepEqual(await again.json(), { received: true, duplicate: true });
 });

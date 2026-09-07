@@ -20,7 +20,7 @@ import { type CaptureConfig } from "./analytics/capture.js";
 import { captureConsoleEvent } from "./analytics/console-capture.js";
 import { emailDomain, EVENTS, type SigninFailureReason } from "./analytics/events.js";
 import { AccessError, constantTimeEqual, isConsentSecret, sha256 } from "../knowledge-mcp/auth.js";
-import { tenantDbFromEnv, type AccountId, type SubscriptionMirrorState } from "../knowledge-mcp/db/tenant.js";
+import { tenantDbFromEnv, type AccountId, type SubscriptionMirrorState, type SubscriptionSummary } from "../knowledge-mcp/db/tenant.js";
 import { buildGoogleAuthorizeUrl, exchangeGoogleCode, verifyGoogleIdToken, GoogleAuthError, type GoogleIdTokenClaims } from "./auth/google.js";
 import {
   clearOAuthStateCookieHeader,
@@ -33,7 +33,9 @@ import {
   sessionCookieHeader,
   sessionExpiresAt,
 } from "./auth/session.js";
-import { resolveEntitlement } from "./billing/entitlement-policy.js";
+import { syncSubscriptionsFromStripe } from "./billing/checkout.js";
+import { PAST_DUE_GRACE_MS, pickCurrentSubscription, resolveEntitlement } from "./billing/entitlement-policy.js";
+import { PLAN_IDS, PLANS } from "./billing/plans.js";
 import packageJson from "./package.json" with { type: "json" };
 
 // --- M5: API-key management console — one import line. ---------------------------------------
@@ -42,6 +44,7 @@ import { handleConsoleKeysRequest, isConsoleKeysPath, type ConsoleSession } from
 // --- Interest collector, routed into the console — one import line each. ---------------------
 import { handleConsoleInterestRequest, isConsoleInterestPath } from "./console/interest.js";
 import {
+  isBillingNotice,
   isSigninNotice,
   issueCheckoutCsrfToken,
   issueInterestCsrfToken,
@@ -54,7 +57,9 @@ import {
   renderSigninFailedPage,
   renderSigninPage,
   verifySignoutCsrfToken,
+  type BillingNotice,
   type EntitlementDisplayState,
+  type PlanView,
 } from "./console/pages.js";
 import { consoleHtmlResponse } from "./console/chrome.js";
 import { handleFontRequest, isFontPath } from "./console/fonts.js";
@@ -159,6 +164,45 @@ function entitlementDisplayStateFor(mirror: SubscriptionMirrorState | null, now:
   return "canceled";
 }
 
+/**
+ * Everything the plan page shows, from the plan in force (`pickCurrentSubscription` over the
+ * mirror rows) and the account's active entitlements. The plan name comes from the entitlement
+ * side, not the mirror's `price_id`: entitlements are keyed by `lookup_key`, which is what
+ * `billing/plans.ts` names, and the most recently granted active entitlement for one of this
+ * console's plans is "the plan this account is on" — most recent, because after an in-place
+ * switch in the portal the old key's row stays active until the next resync or sweep retires
+ * it (`listActiveEntitlementsForCustomer` returns newest first for exactly this). Period end,
+ * scheduled cancellation, and the grace deadline are only reported for states where they mean
+ * something.
+ */
+function planViewFor(summary: SubscriptionSummary | null, activeLookupKeys: readonly string[], now: Date): PlanView {
+  const state = entitlementDisplayStateFor(summary, now);
+  const live = state === "active" || state === "past_due_in_grace";
+  const planId = activeLookupKeys.map((key) => PLAN_IDS.find((id) => PLANS[id].lookupKey === key)).find((id) => id !== undefined);
+  return {
+    state,
+    planName: live && planId !== undefined ? PLANS[planId].displayName : null,
+    periodEnd: live ? (summary?.currentPeriodEnd ?? null) : null,
+    cancelScheduled: state === "active" && (summary?.cancelAtPeriodEnd ?? false),
+    graceEndsAt: state === "past_due_in_grace" && summary?.pastDueSince ? new Date(Date.parse(summary.pastDueSince) + PAST_DUE_GRACE_MS).toISOString() : null,
+  };
+}
+
+/**
+ * Bounds on the console's own Stripe re-reads (`renderConsoleHome`), kept in FLAGS_KV per
+ * account: a return from Checkout or the portal re-reads at most once a minute (KV's minimum
+ * TTL), so a reload of a `?billing=` URL left in the address bar is not a Stripe round trip
+ * every time; the unprompted re-read for an account with a Customer and no mirror row happens
+ * at most once an hour, because that is also the permanent state of an abandoned Checkout.
+ * Two keys, not one: an idle memo must never suppress the re-read a genuine return asks for.
+ */
+const RESYNC_RETURN_MEMO_TTL_SECONDS = 60;
+const RESYNC_IDLE_MEMO_TTL_SECONDS = 60 * 60;
+
+function resyncMemoKey(kind: "return" | "idle", accountId: AccountId): string {
+  return `billing:resync:${kind}:${accountId}`;
+}
+
 const CHECKOUT_QUERY_VALUES = ["success", "cancelled"] as const;
 type CheckoutQuery = (typeof CHECKOUT_QUERY_VALUES)[number];
 
@@ -188,18 +232,52 @@ async function renderConsoleHome(
   session: ConsoleSession,
   gate: CheckoutGate,
   checkoutQuery: CheckoutQuery | null,
+  billingNotice: BillingNotice | null,
 ): Promise<string> {
   if (gate.checkoutAvailable) {
-    const [stripeCustomerId, subscription, csrfToken] = await Promise.all([
+    const now = new Date();
+    const [stripeCustomerId, csrfToken, mirrored] = await Promise.all([
       tenant.getAccountStripeCustomerId(session.accountId),
-      tenant.findLatestSubscriptionForAccount(session.accountId),
       issueCheckoutCsrfToken(env.B2C_APP_CONSOLE_AUTH_SECRET, session.accountId),
+      tenant.listSubscriptionsForAccount(session.accountId),
     ]);
+    let subscriptions = mirrored;
+    // Re-read this account's subscriptions from Stripe before rendering when the mirror is the
+    // least likely to be current: the person has just come back from Checkout or the Billing
+    // Portal (the webhook describing what they did may still be in flight), or the account has
+    // a Customer and no mirror row at all (a Checkout that completed while its webhook was
+    // lost, or a person who paid and closed the tab). Stripe's own guidance for the return from
+    // Checkout is to verify from the API rather than trust the redirect; this is that check,
+    // for every return. The no-mirror case is rate-limited through FLAGS_KV, because it is also
+    // the permanent state of an account that clicked a plan and abandoned Checkout, and a
+    // Stripe round trip on every page view for that account forever would be the wrong price
+    // for it. A failure here is logged and the page renders whatever the mirror holds — the
+    // reconciliation sweep and the webhook path remain the durable sources.
+    const returned = checkoutQuery === "success" || billingNotice !== null;
+    if (stripeCustomerId !== null && (returned || subscriptions.length === 0)) {
+      const memo = resyncMemoKey(returned ? "return" : "idle", session.accountId);
+      const ttl = returned ? RESYNC_RETURN_MEMO_TTL_SECONDS : RESYNC_IDLE_MEMO_TTL_SECONDS;
+      try {
+        // KV faults must not take the page down, and must not stop the read they only meant to
+        // rate-limit — the same `.catch(() => null)` every other FLAGS_KV read in this Worker uses.
+        const recentlySynced = (await env.FLAGS_KV.get(memo).catch(() => null)) !== null;
+        if (!recentlySynced) {
+          await env.FLAGS_KV.put(memo, now.toISOString(), { expirationTtl: ttl }).catch(() => undefined);
+          await syncSubscriptionsFromStripe(tenant, session.accountId, stripeCustomerId, { secretKey: env.STRIPE_RESTRICTED_KEY, accountId: env.STRIPE_ACCOUNT_ID }, now);
+          subscriptions = await tenant.listSubscriptionsForAccount(session.accountId);
+        }
+      } catch (error) {
+        console.error("console: could not re-read subscriptions from Stripe; rendering the mirror as is:", error instanceof Error ? error.message : error);
+      }
+    }
+    const activeLookupKeys =
+      stripeCustomerId === null ? [] : (await tenant.listActiveEntitlementsForCustomer(session.accountId, stripeCustomerId)).map((row) => row.lookupKey);
     return renderConsolePlansPage({
       csrfToken,
-      entitlementState: entitlementDisplayStateFor(subscription, new Date()),
+      plan: planViewFor(pickCurrentSubscription(subscriptions, now), activeLookupKeys, now),
       hasStripeCustomer: stripeCustomerId !== null,
       checkoutQuery,
+      billingNotice,
       nav: navFor(session, "console"),
     });
   }
@@ -562,7 +640,12 @@ export default {
         if (url.pathname === SIGNOUT_PATH) return securityHeaders(await handleSignout(request, env, resolved));
         if (url.pathname === "/console") {
           const gate = await checkoutGateFor(env, resolved.session.accountId, ctx);
-          return securityHeaders(consoleHtmlResponse(await renderConsoleHome(env, resolved.tenant, resolved.session, gate, checkoutQueryOf(url))));
+          const billing = url.searchParams.get("billing");
+          return securityHeaders(
+            consoleHtmlResponse(
+              await renderConsoleHome(env, resolved.tenant, resolved.session, gate, checkoutQueryOf(url), isBillingNotice(billing) ? billing : null),
+            ),
+          );
         }
         // --- Interest collector, routed into the console --------------------------------------
         if (isConsoleInterestPath(url.pathname)) {

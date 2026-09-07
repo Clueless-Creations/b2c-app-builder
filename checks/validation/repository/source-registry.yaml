@@ -735,6 +735,36 @@ sources:
       - hosted/builder-console/billing/entitlement-policy.ts
     notes: Stripe's retry schedule after a failed subscription charge; the seven-day past_due grace window in
       entitlement-policy.ts is sized so the first retries land inside it.
+  - id: docs-stripe-com-billing-subscriptions-billing-mode-compare
+    name: Stripe — classic vs flexible billing mode
+    source_type: official_docs
+    url: https://docs.stripe.com/billing/subscriptions/billing-mode/compare
+    refresh_cadence_days: 90
+    owner: source-freshness
+    locations:
+      - hosted/builder-console/billing/subscription-sync.ts
+    notes: Documents that a portal cancellation sets cancel_at_period_end on a classic-mode subscription and
+      cancel_at on a flexible-mode one; parseSubscriptionObject reads both shapes into the mirror's one flag.
+  - id: docs-stripe-com-billing-subscriptions-build-subscriptions
+    name: Stripe — build a subscriptions integration
+    source_type: official_docs
+    url: https://docs.stripe.com/billing/subscriptions/build-subscriptions
+    refresh_cadence_days: 90
+    owner: source-freshness
+    locations:
+      - hosted/builder-console/billing/checkout.ts
+    notes: The guide createCheckoutSession follows for a Checkout-based subscription (customer_update,
+      tax_id_collection, custom_text under the pay button, verifying state from the API on return).
+  - id: docs-stripe-com-customer-management-portal-deep-links
+    name: Stripe — customer portal deep links
+    source_type: official_docs
+    url: https://docs.stripe.com/customer-management/portal-deep-links
+    refresh_cadence_days: 90
+    owner: source-freshness
+    locations:
+      - hosted/builder-console/billing/checkout.ts
+    notes: flow_data shapes createBillingPortalSession sends for the payment_method_update and subscription_cancel
+      deep links, and after_completion redirects back to the console.
   - id: docs-stripe-com-webhooks
     name: Stripe — webhook signing docs
     source_type: docs

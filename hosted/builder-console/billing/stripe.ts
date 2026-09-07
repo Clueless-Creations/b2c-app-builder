@@ -104,13 +104,25 @@ export interface CreatedStripeCustomer {
  * history: before 0008, this was called synchronously at first sign-in, which meant a Stripe
  * outage blocked every first-time signup).
  */
+export interface CreateStripeCustomerInput {
+  readonly email: string;
+  /**
+   * This Worker's account id, written to the Customer's `metadata[account_id]`. The mirror
+   * resolves a Customer to an account through `accounts.stripe_customer_id`, never through this
+   * field; it exists so a person reading the Stripe Dashboard can find the account a Customer
+   * belongs to without a database query, and so a Customer orphaned by the race
+   * `ensureStripeCustomer` describes still says which account created it.
+   */
+  readonly accountId: string;
+}
+
 export async function createStripeCustomer(
-  email: string,
+  input: CreateStripeCustomerInput,
   opts: { readonly secretKey: string; readonly fetchImpl?: typeof fetch; readonly accountId?: string },
 ): Promise<CreatedStripeCustomer> {
   const result = await stripeApiRequest("/v1/customers", {
     method: "POST",
-    body: new URLSearchParams({ email }),
+    body: new URLSearchParams({ email: input.email, "metadata[account_id]": input.accountId }),
     secretKey: opts.secretKey,
     accountId: opts.accountId,
     fetchImpl: opts.fetchImpl,

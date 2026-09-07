@@ -257,6 +257,20 @@ export interface SubscriptionMirrorState {
   readonly pastDueSince: string | null;
 }
 
+/**
+ * What the console's plan page shows about one of the account's subscriptions, on top of the
+ * two access-deciding fields above: the Stripe subscription id (so a Billing Portal deep link
+ * can name the subscription to cancel), the Price it bills, whether a cancellation is already
+ * scheduled, and when the paid period ends. Returned by `listSubscriptionsForAccount` only —
+ * nothing on an authorization path reads these.
+ */
+export interface SubscriptionSummary extends SubscriptionMirrorState {
+  readonly id: string;
+  readonly priceId: string | null;
+  readonly cancelAtPeriodEnd: boolean;
+  readonly currentPeriodEnd: string | null;
+}
+
 export interface OverGracePastDueSubscription {
   readonly accountId: AccountId;
   readonly subscriptionId: string;
@@ -1026,25 +1040,46 @@ export function tenantDb(db: D1Database) {
   }
 
   /**
-   * The most recently observed subscription mirror row for this account, if any — what
-   * `hosted/builder-console/worker.ts`'s console-home render reads to compute the entitlement state it shows.
-   * Ordered by `observed_at` (Stripe's own event time, the same field `upsertSubscription` uses
-   * to discard out-of-order deliveries), not `synced_at`, so this reflects what Stripe most
-   * recently reported rather than merely what this Worker most recently happened to write.
-   * `null` for an account that has never had a subscription at all — every account between
-   * creation and its first Checkout attempt. A subscription that was later canceled still has a
-   * mirror row (`status = 'canceled'`) and is returned as one; telling "never subscribed" apart
-   * from "subscribed once, no longer active" is a display decision for the caller, not this
-   * function's job.
+   * Every subscription mirror row for this account, newest first by `observed_at` (Stripe's own
+   * event time, the same field `upsertSubscription` uses to discard out-of-order deliveries).
+   * `hosted/builder-console` decides which of these is the plan in force
+   * (`billing/entitlement-policy.ts`'s `pickCurrentSubscription`): "most recently observed" is
+   * not that — a `customer.subscription.deleted` for an old plan can arrive months after the
+   * replacement was created and would otherwise sit on top. The policy that says which statuses
+   * count lives in that package, not here, so this returns the rows and lets the caller choose.
+   * Empty for an account that has never had a subscription. Bounded: an account accumulates a
+   * handful of these over years, not hundreds.
    */
-  async function findLatestSubscriptionForAccount(accountId: AccountId): Promise<SubscriptionMirrorState | null> {
-    const found = await db
-      .prepare(`SELECT status, past_due_since FROM subscriptions WHERE account_id = ?1 ORDER BY observed_at DESC LIMIT 1`)
-      .bind(accountId)
-      .first();
-    if (found === null) return null;
-    const row = readRow(z.object({ status: z.enum(SUBSCRIPTION_STATUSES), past_due_since: isoTimestamp.nullable() }), found);
-    return { status: row.status, pastDueSince: row.past_due_since };
+  async function listSubscriptionsForAccount(accountId: AccountId, limit = 20): Promise<SubscriptionSummary[]> {
+    const bounded = Math.min(Math.max(Math.trunc(limit), 1), 100);
+    const { results } = await db
+      .prepare(
+        `SELECT id, status, price_id, cancel_at_period_end, current_period_end, past_due_since
+           FROM subscriptions WHERE account_id = ?1 ORDER BY observed_at DESC, id LIMIT ?2`,
+      )
+      .bind(accountId, bounded)
+      .all();
+    return results.map((found) => {
+      const row = readRow(
+        z.object({
+          id: stripeSubscriptionId,
+          status: z.enum(SUBSCRIPTION_STATUSES),
+          price_id: stripePriceId.nullable(),
+          cancel_at_period_end: z.union([z.literal(0), z.literal(1)]),
+          current_period_end: isoTimestamp.nullable(),
+          past_due_since: isoTimestamp.nullable(),
+        }),
+        found,
+      );
+      return {
+        id: row.id,
+        status: row.status,
+        pastDueSince: row.past_due_since,
+        priceId: row.price_id,
+        cancelAtPeriodEnd: row.cancel_at_period_end === 1,
+        currentPeriodEnd: row.current_period_end,
+      };
+    });
   }
 
   /**
@@ -1097,8 +1132,11 @@ export function tenantDb(db: D1Database) {
   async function listActiveEntitlementsForCustomer(accountId: AccountId, rawStripeCustomerId: string): Promise<{ lookupKey: string }[]> {
     const parsed = stripeCustomerId.safeParse(rawStripeCustomerId);
     if (!parsed.success) return [];
+    // Newest first, so a caller that wants "the plan most recently granted" — the console naming
+    // the plan in force after an in-place switch left the old key's row active until the next
+    // sweep — can take the first match.
     const { results } = await db
-      .prepare(`SELECT lookup_key FROM entitlements WHERE account_id = ?1 AND stripe_customer_id = ?2 AND active = 1`)
+      .prepare(`SELECT lookup_key FROM entitlements WHERE account_id = ?1 AND stripe_customer_id = ?2 AND active = 1 ORDER BY observed_at DESC, lookup_key`)
       .bind(accountId, parsed.data)
       .all();
     return results.map((row) => ({ lookupKey: readRow(z.object({ lookup_key: lookupKey }), row).lookup_key }));
@@ -1228,6 +1266,22 @@ export function tenantDb(db: D1Database) {
   }
 
   /**
+   * Withdraws a processed-event row so Stripe's retry of the same `evt_...` id is treated as a
+   * first delivery again. The webhook handler records the row *before* it dispatches (that
+   * insert is the idempotency check, see `recordProcessedStripeEvent`), so a dispatch that then
+   * throws has already claimed the event id; without this, the retry Stripe sends after a 5xx
+   * would collide on the primary key and be answered as a duplicate, and the billing write that
+   * failed would never be attempted again. `processed_stripe_events_are_append_only`
+   * (0003_billing.sql) forbids UPDATE, not DELETE: a row for an event whose effects were never
+   * applied is not a fact to preserve, it is a claim to give back. Only the handler's failure
+   * path calls this, and only for the id it just recorded.
+   */
+  async function releaseProcessedStripeEvent(rawEventId: string): Promise<void> {
+    const parsed = stripeEventId.parse(rawEventId);
+    await db.prepare(`DELETE FROM processed_stripe_events WHERE id = ?1`).bind(parsed).run();
+  }
+
+  /**
    * The reconciliation sweep. `entitlements_by_staleness` (0003_billing.sql) exists for exactly
    * this: "The reconciliation cron scans by staleness across all tenants," in the migration's
    * own words. Every other function in this file takes a caller-resolved `AccountId` first,
@@ -1278,13 +1332,14 @@ export function tenantDb(db: D1Database) {
     getSessionUser,
     upsertSubscription,
     findSubscription,
-    findLatestSubscriptionForAccount,
+    listSubscriptionsForAccount,
     stampPastDueSinceIfUnset,
     clearPastDueSince,
     listActiveEntitlementsForCustomer,
     listOverGracePastDueSubscriptions,
     upsertEntitlement,
     recordProcessedStripeEvent,
+    releaseProcessedStripeEvent,
     listStaleEntitlements,
   };
 }

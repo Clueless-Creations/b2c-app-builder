@@ -5,6 +5,7 @@
   "sourcePath": ".",
   "releaseNotes": [
     "Register knowledge/design/mobile-flow-craft.md in the generated catalog, routing index, and hosted bundle after PR #34 shipped the authored YAML without re-rendering.",
-    "Move the Appllama MIT notice onto catalog/upstreams/notices, add the appllama-skills identity, and delete the unapproved top-level third_party/ directory so Audit (fast) can go green."
+    "Move the Appllama MIT notice onto catalog/upstreams/notices, add the appllama-skills identity, and delete the unapproved top-level third_party/ directory so Audit (fast) can go green.",
+    "Refresh kernel/schema/evidence-schema-version.json so the catalog digest pin matches the rendered graph."
   ]
 }

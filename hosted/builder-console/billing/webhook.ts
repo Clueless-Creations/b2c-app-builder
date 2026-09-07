@@ -42,12 +42,25 @@
 
 import { z } from "zod";
 import type { AccountId, TenantDb } from "../../knowledge-mcp/db/tenant.js";
+import { detectBillingTransition, sendBillingNotice } from "../mail/billing-notices.js";
+import type { MailConfig } from "../mail/resend.js";
 import { resolveEntitlement } from "./entitlement-policy.js";
 import { verifyStripeSignature } from "./stripe.js";
 import { applyParsedSubscription, lookupKeysOf, parseSubscriptionObject, stripePrice, unixToIso, type ParsedSubscription } from "./subscription-sync.js";
 
 export interface StripeWebhookEnv {
   readonly STRIPE_WEBHOOK_SECRET: string;
+}
+
+/**
+ * What the handler needs beyond the database to tell the customer what just happened
+ * (`mail/billing-notices.ts`). Optional as a whole: a caller with no mail configuration gets the
+ * billing writes and nothing else. `ctx.waitUntil` carries the send past the 200 so Stripe's
+ * delivery is never held up by Resend; without a `ctx` (tests) the send is awaited.
+ */
+export interface StripeWebhookSideEffects {
+  readonly mail: MailConfig | null;
+  readonly ctx?: { waitUntil(promise: Promise<unknown>): void };
 }
 
 const stripeInvoiceLine = z.object({ price: stripePrice.nullable().optional() });
@@ -153,7 +166,13 @@ async function dispatchInvoiceEvent(
   }
 }
 
-export async function handleStripeWebhook(request: Request, env: StripeWebhookEnv, tenant: TenantDb, now = new Date()): Promise<Response> {
+export async function handleStripeWebhook(
+  request: Request,
+  env: StripeWebhookEnv,
+  tenant: TenantDb,
+  now = new Date(),
+  effects?: StripeWebhookSideEffects,
+): Promise<Response> {
   if (request.method !== "POST") return json(405, { error: "method_not_allowed" });
   const signatureHeader = request.headers.get("stripe-signature");
   if (!signatureHeader) return json(400, { error: "missing_signature" });
@@ -214,9 +233,22 @@ export async function handleStripeWebhook(request: Request, env: StripeWebhookEn
   // variables independently.
   const resolvedCustomerId = customerId as string;
 
+  let notice: Promise<void> | null = null;
   try {
     if (parsed.kind === "subscription") {
+      // The row as it was, so `detectBillingTransition` can tell a change from a redelivery the
+      // mirror discarded. Read before the write; the whole account's rows are re-read after it.
+      const before = (await tenant.listSubscriptionsForAccount(accountId)).find((row) => row.id === parsed.subscription.id);
       await applyParsedSubscription(tenant, accountId, resolvedCustomerId, parsed.subscription, { source: "stripe_webhook", stripeEventId: eventId, observedAt }, now);
+      if (effects !== undefined) {
+        const accountSubscriptions = await tenant.listSubscriptionsForAccount(accountId);
+        const after = accountSubscriptions.find((row) => row.id === parsed.subscription.id);
+        const transition = after === undefined ? null : detectBillingTransition({ before, after, lookupKeys: parsed.subscription.lookupKeys, accountSubscriptions, now });
+        if (transition !== null) {
+          const to = await tenant.getAccountOwnerEmail(accountId);
+          if (to !== null) notice = sendBillingNotice(effects.mail, to, transition, eventId);
+        }
+      }
     } else {
       await dispatchInvoiceEvent(tenant, accountId, resolvedCustomerId, eventId, eventType, observedAt, parsed.invoice, now);
     }
@@ -229,6 +261,13 @@ export async function handleStripeWebhook(request: Request, env: StripeWebhookEn
       console.error(`stripe webhook ${eventId}: could not release the processed-event row after a failed write; the retry will read as a duplicate:`, releaseError instanceof Error ? releaseError.message : releaseError);
     }
     return json(500, { error: "dispatch_failed" });
+  }
+  // Only after every write succeeded, and never in the way of the 200: `sendBillingNotice` does
+  // not throw, and the idempotency key it builds from the event id means a second delivery of the
+  // same event (which the row above already stops) could not mail twice even if it got this far.
+  if (notice !== null) {
+    if (effects?.ctx !== undefined) effects.ctx.waitUntil(notice);
+    else await notice;
   }
   return json(200, { received: true });
 }

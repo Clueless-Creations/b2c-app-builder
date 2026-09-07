@@ -105,7 +105,26 @@ function invoiceEvent(opts: {
   };
 }
 
-async function post(event: unknown, opts: { readonly timestamp?: number; readonly signature?: string; readonly tenant?: TenantDb } = {}): Promise<Response> {
+/** Every email the handler asked Resend to send, in order. Reset per test that reads it. */
+let sentEmails: { readonly to: string[]; readonly subject: string; readonly idempotencyKey: string | null; readonly text: string }[] = [];
+
+/** A Resend stub in place of `fetch`, so the webhook's `sendBillingNotice` is proven end to end without a network. */
+function resendStub(): typeof fetch {
+  return (async (input: string | URL | Request, init?: RequestInit) => {
+    const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
+    assert.equal(url, "https://api.resend.com/emails", `unexpected fetch from the webhook: ${url}`);
+    const body = JSON.parse(String(init?.body)) as { to: string[]; subject: string; text: string };
+    sentEmails.push({ to: body.to, subject: body.subject, idempotencyKey: new Headers(init?.headers).get("Idempotency-Key"), text: body.text });
+    return new Response(JSON.stringify({ id: `email_${sentEmails.length}` }), { status: 200, headers: { "Content-Type": "application/json" } });
+  }) as typeof fetch;
+}
+
+const MAIL_ON = { mail: { apiKey: "re_test_webhook", fetchImpl: resendStub() } };
+
+async function post(
+  event: unknown,
+  opts: { readonly timestamp?: number; readonly signature?: string; readonly tenant?: TenantDb; readonly effects?: Parameters<typeof handleStripeWebhook>[4] } = {},
+): Promise<Response> {
   const payload = JSON.stringify(event);
   const timestamp = opts.timestamp ?? (event as { created: number }).created;
   const signature = opts.signature ?? stripeSignatureHeader(payload, timestamp);
@@ -117,7 +136,7 @@ async function post(event: unknown, opts: { readonly timestamp?: number; readonl
   // Held to the event's own `created` time, matching what signed the header above — otherwise
   // the 300s tolerance in verifyStripeSignature races the real wall clock against a payload
   // timestamped for a fixed test fixture instant.
-  return handleStripeWebhook(request, { STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET }, opts.tenant ?? tenantDb(harness.db), new Date(timestamp * 1000));
+  return handleStripeWebhook(request, { STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET }, opts.tenant ?? tenantDb(harness.db), new Date(timestamp * 1000), opts.effects);
 }
 
 test("the same evt_ id delivered twice writes exactly one entitlement", async () => {
@@ -879,4 +898,89 @@ test("a payload this Worker cannot represent is recorded as failed and answered 
 
   const again = await post(broken);
   assert.deepEqual(await again.json(), { received: true, duplicate: true });
+});
+
+test("the customer is emailed once when a plan goes live, once when a cancellation is scheduled, and once when it ends — never for a redelivery or a renewal", async () => {
+  const accountId = "acct-mail";
+  await harness.seedAccount({
+    accountId,
+    userId: "user-mail",
+    googleSub: "google-mail",
+    email: "mail@example.com",
+    stripeCustomerId: "cus_mail00000001",
+    keyId: "key-mail",
+    keyDigest: "9c".repeat(32),
+    entitled: false,
+  });
+  sentEmails = [];
+  const base = 1_801_300_000;
+  const periodEnd = Date.UTC(2026, 9, 5, 12) / 1000;
+  const sub = { subscriptionId: "sub_mail_1", customer: "cus_mail00000001", lookupKey: "b2c_pro_monthly", itemPeriodEnd: periodEnd };
+
+  // Live.
+  await post(subscriptionEvent({ ...sub, eventId: "evt_mail_1", created: base, status: "active", type: "customer.subscription.created" }), { effects: MAIL_ON });
+  assert.equal(sentEmails.length, 1);
+  assert.deepEqual(sentEmails[0]!.to, ["mail@example.com"]);
+  assert.equal(sentEmails[0]!.subject, "Your hosted access is on");
+  assert.match(sentEmails[0]!.text, /Your Monthly plan is active and renews on 5 Oct 2026\./);
+  assert.equal(sentEmails[0]!.idempotencyKey, "evt_mail_1:plan_activated");
+
+  // Stripe redelivers the same event: the idempotency row stops it before any mail.
+  await post(subscriptionEvent({ ...sub, eventId: "evt_mail_1", created: base, status: "active", type: "customer.subscription.created" }), { effects: MAIL_ON });
+  assert.equal(sentEmails.length, 1);
+
+  // A routine update that changes nothing the customer would want to hear about.
+  await post(subscriptionEvent({ ...sub, eventId: "evt_mail_2", created: base + 10, status: "active" }), { effects: MAIL_ON });
+  assert.equal(sentEmails.length, 1);
+
+  // Cancelled from the portal (flexible billing mode's shape).
+  await post(subscriptionEvent({ ...sub, eventId: "evt_mail_3", created: base + 20, status: "active", cancelAt: periodEnd }), { effects: MAIL_ON });
+  assert.equal(sentEmails.length, 2);
+  assert.equal(sentEmails[1]!.subject, "Your plan ends on 5 Oct 2026");
+  assert.match(sentEmails[1]!.text, /you will not be charged again/);
+
+  // Renewed before the date: quiet.
+  await post(subscriptionEvent({ ...sub, eventId: "evt_mail_4", created: base + 30, status: "active", cancelAt: null }), { effects: MAIL_ON });
+  assert.equal(sentEmails.length, 2);
+
+  // Cancelled again, then the period closes.
+  await post(subscriptionEvent({ ...sub, eventId: "evt_mail_5", created: base + 40, status: "active", cancelAtPeriodEnd: true }), { effects: MAIL_ON });
+  await post(subscriptionEvent({ ...sub, eventId: "evt_mail_6", created: base + 50, status: "canceled", type: "customer.subscription.deleted" }), { effects: MAIL_ON });
+  assert.equal(sentEmails.length, 4);
+  assert.equal(sentEmails[3]!.subject, "Your hosted access has ended");
+  assert.match(sentEmails[3]!.text, /Your Monthly plan ended on 5 Oct 2026\./);
+  assert.equal(sentEmails[3]!.idempotencyKey, "evt_mail_6:plan_ended");
+});
+
+test("an old plan ending while a replacement is live sends no 'ended' email, and mail off sends nothing at all", async () => {
+  const accountId = "acct-mail-switch";
+  await harness.seedAccount({
+    accountId,
+    userId: "user-mail-switch",
+    googleSub: "google-mail-switch",
+    email: "mail-switch@example.com",
+    stripeCustomerId: "cus_mailswitch0001",
+    keyId: "key-mail-switch",
+    keyDigest: "ad".repeat(32),
+    entitled: false,
+  });
+  sentEmails = [];
+  const base = 1_801_400_000;
+  const customer = "cus_mailswitch0001";
+
+  // The monthly plan, with mail off for this deployment: the writes happen, no email does.
+  await post(subscriptionEvent({ eventId: "evt_sw_1", created: base, subscriptionId: "sub_sw_monthly", customer, status: "active", type: "customer.subscription.created", lookupKey: "b2c_pro_monthly" }), { effects: { mail: null } });
+  assert.equal(sentEmails.length, 0);
+  assert.equal((await harness.readSubscriptionMirror("sub_sw_monthly"))?.status, "active");
+
+  // Mail on: the annual replacement goes live (one email), then the monthly one is deleted (none).
+  await post(subscriptionEvent({ eventId: "evt_sw_2", created: base + 10, subscriptionId: "sub_sw_annual", customer, status: "active", type: "customer.subscription.created", lookupKey: "b2c_pro_annual" }), { effects: MAIL_ON });
+  assert.equal(sentEmails.length, 1);
+  assert.match(sentEmails[0]!.text, /Your Annual plan is active/);
+  await post(subscriptionEvent({ eventId: "evt_sw_3", created: base + 20, subscriptionId: "sub_sw_monthly", customer, status: "canceled", type: "customer.subscription.deleted", lookupKey: "b2c_pro_monthly" }), { effects: MAIL_ON });
+  assert.equal(sentEmails.length, 1, "the account still has a live plan, so nothing ended for the customer");
+
+  // Without `effects` at all (a caller that wires no mail), still nothing.
+  await post(subscriptionEvent({ eventId: "evt_sw_4", created: base + 30, subscriptionId: "sub_sw_annual", customer, status: "active", cancelAtPeriodEnd: true, lookupKey: "b2c_pro_annual" }));
+  assert.equal(sentEmails.length, 1);
 });

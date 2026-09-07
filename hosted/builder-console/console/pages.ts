@@ -127,7 +127,7 @@ ${notice}
 <div class="door"><h2>Run it yourself</h2><p>The open-source version runs on your machine. You operate it and bring the tools your project needs.</p><a class="btn btn--secondary" href="${REPOSITORY_URL}">Open source on GitHub</a></div>
 <div class="door"><h2>See what you’re buying</h2><p>The public page shows the workflows, examples, a real routing trace, pricing, and exactly what hosted access can and cannot do.</p><a class="btn btn--secondary" href="${OFFER_PAGE_URL}">See how it works</a></div>
 </div>
-<p class="help">By continuing you agree to the <a href="${SITE_ORIGIN}/terms/">Terms</a> and <a href="${SITE_ORIGIN}/privacy/">Privacy notice</a>. The Terms include the 14-day refund policy.</p>`,
+<p class="help">By continuing you agree to the <a href="${SITE_ORIGIN}/terms/">Terms</a> and <a href="${SITE_ORIGIN}/privacy/">Privacy notice</a>. Cancel any time; access runs to the end of the period you have paid for.</p>`,
   });
 }
 

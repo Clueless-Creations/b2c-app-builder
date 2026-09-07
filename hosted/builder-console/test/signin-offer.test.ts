@@ -15,7 +15,9 @@ test("signed-out front door states the paid four-step purchase path before Googl
   assert.match(html, /04[\s\S]*Connect your agent/);
   assert.match(html, /through Stripe/);
   assert.match(html, /Model usage, coding-agent costs, infrastructure, and third-party services are separate/i);
-  assert.match(html, /14-day refund policy/i);
+  // The 14-day refund policy was withdrawn on 2026-09-06. The console must never promise one.
+  assert.doesNotMatch(html, /refund/i);
+  assert.match(html, /Cancel any time/i);
   assert.match(html, /\/auth\/google\/start\?entry_point=landing/);
 });
 

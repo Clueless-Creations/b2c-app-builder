@@ -20,6 +20,7 @@ import {
   secureResponse,
   uniqueParams,
 } from "./http.js";
+import { HOSTED_INSTRUCTIONS } from "./instructions.js";
 import { browserAuthorizationFailure, createOAuthProvider } from "./oauth.js";
 
 // Only immutable authored knowledge is shared. Servers, transports and auth props are request-local.
@@ -39,6 +40,7 @@ function getService(): KnowledgeService {
   return (knowledgeService ??= createKnowledgeService(knowledgeBundle));
 }
 const metadataPaths = ["/.well-known/oauth-authorization-server", "/.well-known/oauth-protected-resource", "/.well-known/oauth-protected-resource/mcp"];
+
 const authPaths = ["/oauth/authorize", "/oauth/register", "/oauth/token"];
 
 function stringList(raw: unknown): string[] {
@@ -62,8 +64,11 @@ async function mcpResponse(request: Request, env: Env, ctx: ExecutionContext): P
   const server = new McpServer(
     { name: "b2c-hosted", version: service.metadata.engineVersion },
     {
-      instructions:
-        "B2C App Builder provides read-only, versioned knowledge for consumer-app work. Start with b2c_catalog or b2c_knowledge_search. Follow reference IDs to retrieve guidance and provenance. These tools do not access local files, plan a workspace, approve actions, or execute applications.",
+      // Pinned by hosted/knowledge-mcp/test/worker.test.ts. This is the only orientation a client
+      // that installed nothing else ever receives, so it names the whole route rather than just
+      // the first call, and it states what the service cannot observe — ARCH-11: a prerequisite
+      // this service does not report is unknown, not satisfied and not absent.
+      instructions: HOSTED_INSTRUCTIONS,
     },
   );
   registerKnowledgeTools(server, service);

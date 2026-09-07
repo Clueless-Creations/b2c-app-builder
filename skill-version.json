@@ -1,13 +1,13 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.218.13",
+  "version": "0.218.14",
   "updatedAt": "2026-09-07",
   "sourcePath": ".",
   "releaseNotes": [
-    "Console email through Resend (mail/resend.ts, one fetch, no SDK), from eduardo@clueless-creations.com. RESEND_API_KEY is the switch: unset means mail is off and every notice is logged as skipped, the same contract POSTHOG_PROJECT_TOKEN has for analytics.",
-    "Three billing notices (mail/billing-notices.ts), each tied to one change the Stripe webhook just wrote: the plan went live, a cancellation was scheduled, the plan ended with nothing else on the account granting access. Receipts, failed-payment and renewal emails stay Stripe's own.",
-    "Sent only from the webhook, only after every D1 write succeeded, off the request in ctx.waitUntil, decided by comparing the mirror row before and after the write so a redelivery the mirror discarded mails nobody, with a per-event Idempotency-Key. The console's resync repairs silently.",
-    "Checkout enables Stripe Tax (automatic_tax): the address is collected and tax is calculated only where the account is registered, on top of the listed price for USD; the subscription keeps calculating on renewal. Registrations stay a Dashboard decision guided by Stripe's threshold monitoring.",
-    "README: what each notice says, the rules the module keeps, and the Resend domain, Doppler, and wrangler steps to switch it on."
+    "Store screenshots production now names App Store Connect in its trigger and phrasings, and the App Store Connect CLI reference binds to it. A founder asking to produce screenshots and upload them used to get one result — the upload automation — because \"connect\" appeared nowhere in the screenshot workflow's authored text and one absent term suppresses every partial match.",
+    "Catalog ranking reads a separate field from the strict-match partition, so authored founderPhrasings improve ranking without widening the every-term filter. Proven monotone over 607 queries: no result set shrank. A new store-utterance golden corpus and hosted-discovery fixture ratchet erasure and rank, measured at 11 unreachable and 33 outside the top three across 90 needed-workflow slots, down from 14 and 41.",
+    "The hosted MCP instructions name the whole route — catalog or search, then b2c_workflow, then route.expand and b2c_knowledge_get — and state what the service cannot observe: whether a prerequisite ran, an artifact exists, or an account is connected is unknown there, not done and not undone. The string is pinned by a test and lives in its own module, since workerd rejects a non-handler named export from the Worker entry.",
+    "Dispatch briefs emit referenceId beside path on context-pack entries, so all 2784 resolve through b2c_knowledge_get, which refuses paths by construction.",
+    "LaunchBench scenarios declare a surface, defaulting to local. The App Store Connect auth rubric graded an agent down for reporting it cannot reach the account — right with a shell, wrong without one — so the imperative is now conditioned on having an execution route, the key-scope claim is corrected to role-scoped reality, an authorization-failure rung is added, and a knowledge-only scenario covers the surface that could not previously be expressed."
   ]
 }

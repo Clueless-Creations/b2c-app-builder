@@ -2,7 +2,7 @@
 
 Generated from active, bound knowledge source declarations and catalog/upstreams. This is a maintainer review queue, not a second registry. A cited repository may be an example, optional tool, adapted method or runtime dependency; the report does not infer adoption or permission from a URL. Only an explicit reviewed contribution changes support or acknowledgments.
 
-Scope: 38 referenced repositories, 88 source bindings, 71 bindings needing review or linkage.
+Scope: 35 referenced repositories, 83 source bindings, 66 bindings needing review or linkage.
 
 The scan excludes inactive/unbound knowledge, self-references, non-GitHub sources, undeclared prose URLs, package-manager dependencies and resources outside knowledge manifests. An empty queue is not proof that every dependency is tracked. Inspect those other surfaces during contribution review. Repository aliases are matched only when declared in an upstream manifest.
 
@@ -17,14 +17,9 @@ Use b2c contribute plan for an untracked source. For a maintained project, inspe
 | amirmushichge/motion-brief | `knowledge/design/remotion-content-assets.md` | amir-motion-brief | none | untracked | Referenced repository has no maintained upstream identity. Review use and rights before adopting or crediting it. |
 | appllama/top-welcome-screens | `knowledge/design/motion-craft-benchmarks.md` | github-appllama-top-welcome-screens | none | untracked | Referenced repository has no maintained upstream identity. Review use and rights before adopting or crediting it. |
 | appllama/top-welcome-screens | `knowledge/engineering/external-skill-packs.md` | github-appllama-top-welcome-screens | none | untracked | Referenced repository has no maintained upstream identity. Review use and rights before adopting or crediting it. |
-| clueless-creations/clueless-creations-site | `knowledge/design/editorial-scrollytelling.md` | github-clueless-creations-site | none | untracked | Referenced repository has no maintained upstream identity. Review use and rights before adopting or crediting it. |
 | coreyhaines31/marketingskills | `knowledge/engineering/external-skill-packs.md` | github-com-coreyhaines31-marketingskills | none | untracked | Referenced repository has no maintained upstream identity. Review use and rights before adopting or crediting it. |
 | coreyhaines31/marketingskills | `knowledge/growth/cro-landing.md` | github-com-coreyhaines31-marketingskills | none | untracked | Referenced repository has no maintained upstream identity. Review use and rights before adopting or crediting it. |
 | coreyhaines31/marketingskills | `knowledge/words/conversion-copy.md` | github-com-coreyhaines31-marketingskills | none | untracked | Referenced repository has no maintained upstream identity. Review use and rights before adopting or crediting it. |
-| emuthmartinez/eduardomuth-site | `knowledge/design/editorial-scrollytelling.md` | github-eduardomuth-site | none | untracked | Referenced repository has no maintained upstream identity. Review use and rights before adopting or crediting it. |
-| emuthmartinez/retention-mechanics-mcp | `knowledge/experience/emotional-design-system.md` | retention-mechanics-mcp | none | untracked | Referenced repository has no maintained upstream identity. Review use and rights before adopting or crediting it. |
-| emuthmartinez/retention-mechanics-mcp | `knowledge/experience/experience-cards.md` | retention-mechanics-mcp | none | untracked | Referenced repository has no maintained upstream identity. Review use and rights before adopting or crediting it. |
-| emuthmartinez/retention-mechanics-mcp | `knowledge/operations/paid-tool-routing.md` | retention-mechanics-mcp | none | untracked | Referenced repository has no maintained upstream identity. Review use and rights before adopting or crediting it. |
 | everyinc/compound-engineering-plugin | `knowledge/orchestration/compound-engineering-routing.md` | github-com-everyinc-compound-engineering-plugin-releases | none | untracked | Referenced repository has no maintained upstream identity. Review use and rights before adopting or crediting it. |
 | florianbruniaux/claude-code-ultimate-guide | `knowledge/engineering/engineering-orchestration.md` | github-com-florianbruniaux-claude-code-ultimate-guide-ai-unit-economics | none | untracked | Referenced repository has no maintained upstream identity. Review use and rights before adopting or crediting it. |
 | florianbruniaux/claude-code-ultimate-guide | `knowledge/engineering/engineering-orchestration.md` | github-com-florianbruniaux-claude-code-ultimate-guide-claude-code-releases | none | untracked | Referenced repository has no maintained upstream identity. Review use and rights before adopting or crediting it. |

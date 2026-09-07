@@ -1,0 +1,464 @@
+{
+  "metadata": {
+    "corpus": "store-utterances",
+    "purpose": "Hosted discovery gate for App Store, screenshot, and release work (issue #32). Measures b2c_catalog against the shipped bundle: whether a needed workflow is reachable at all, and where it ranks. Authored because the router corpora under this directory are structurally blind to this class — no entry contains \"screenshot\" and neither Apple nor Play media workflow is any entry's target. Grades retrieval only; it never chooses a constant.",
+    "frozenOn": "2026-09-07",
+    "sampleSize": 50,
+    "neededWorkflowSlots": 90,
+    "shapes": {
+      "terse": 10,
+      "single": 16,
+      "compound": 14,
+      "casual": 10
+    },
+    "baseline": {
+      "measuredOn": "2026-09-07",
+      "absentSlots": 11,
+      "outsideTopThreeSlots": 33,
+      "priorToIssue32": { "absentSlots": 14, "outsideTopThreeSlots": 41 },
+      "note": "Ceilings, not targets: a change may lower these, never raise them. Recorded after issue #32's catalog vocabulary edit, ASC reference binding, and the ranking/strict-match split. priorToIssue32 is what the same corpus measured before those landed, kept so the ratchet's direction stays legible. Raising a ceiling to make a change pass inverts this gate — lower the number or leave it alone."
+    }
+  },
+  "entries": [
+    {
+      "id": "store-001",
+      "utterance": "screenshots",
+      "shape": "terse",
+      "needs": [
+        "workflow.store.store-screenshots-production"
+      ]
+    },
+    {
+      "id": "store-002",
+      "utterance": "app store screenshots",
+      "shape": "terse",
+      "needs": [
+        "workflow.store.store-screenshots-production"
+      ]
+    },
+    {
+      "id": "store-003",
+      "utterance": "store assets",
+      "shape": "terse",
+      "needs": [
+        "workflow.store.store-screenshots-production",
+        "workflow.store.app-store-listing-prep-packet"
+      ]
+    },
+    {
+      "id": "store-004",
+      "utterance": "upload build",
+      "shape": "terse",
+      "needs": [
+        "workflow.store.apple-signing-and-release-readiness",
+        "workflow.store.asc-cli-automation"
+      ]
+    },
+    {
+      "id": "store-005",
+      "utterance": "testflight",
+      "shape": "terse",
+      "needs": [
+        "workflow.store.apple-signing-and-release-readiness",
+        "workflow.store.asc-cli-automation"
+      ]
+    },
+    {
+      "id": "store-006",
+      "utterance": "submit to app store",
+      "shape": "terse",
+      "needs": [
+        "workflow.orchestration.full-launch-closeout",
+        "workflow.store.app-review-resubmit",
+        "workflow.store.apple-signing-and-release-readiness"
+      ]
+    },
+    {
+      "id": "store-007",
+      "utterance": "release",
+      "shape": "terse",
+      "needs": [
+        "workflow.store.apple-signing-and-release-readiness"
+      ]
+    },
+    {
+      "id": "store-008",
+      "utterance": "asc",
+      "shape": "terse",
+      "needs": [
+        "workflow.store.asc-cli-automation"
+      ]
+    },
+    {
+      "id": "store-009",
+      "utterance": "store listing",
+      "shape": "terse",
+      "needs": [
+        "workflow.store.app-store-listing-prep-packet",
+        "workflow.store.aso-and-store-ops"
+      ]
+    },
+    {
+      "id": "store-010",
+      "utterance": "App Store Connect",
+      "shape": "terse",
+      "needs": [
+        "workflow.store.asc-cli-automation",
+        "workflow.store.store-console-workflow"
+      ]
+    },
+    {
+      "id": "store-011",
+      "utterance": "I need App Store screenshots for my app",
+      "shape": "single",
+      "needs": [
+        "workflow.store.store-screenshots-production"
+      ]
+    },
+    {
+      "id": "store-012",
+      "utterance": "make the screenshots for the App Store listing",
+      "shape": "single",
+      "needs": [
+        "workflow.store.store-screenshots-production"
+      ]
+    },
+    {
+      "id": "store-013",
+      "utterance": "generate marketing screenshots from real app screens",
+      "shape": "single",
+      "needs": [
+        "workflow.store.store-screenshots-production"
+      ]
+    },
+    {
+      "id": "store-014",
+      "utterance": "capture screenshots on the simulator",
+      "shape": "single",
+      "needs": [
+        "workflow.engineering.native-ios-proof-route-ladder",
+        "workflow.store.store-screenshots-production"
+      ]
+    },
+    {
+      "id": "store-015",
+      "utterance": "upload screenshots to App Store Connect",
+      "shape": "single",
+      "needs": [
+        "workflow.store.asc-cli-automation",
+        "workflow.store.store-screenshots-production"
+      ]
+    },
+    {
+      "id": "store-016",
+      "utterance": "push metadata to App Store Connect",
+      "shape": "single",
+      "needs": [
+        "workflow.store.asc-cli-automation",
+        "workflow.store.store-console-workflow"
+      ]
+    },
+    {
+      "id": "store-017",
+      "utterance": "write the App Store description and keywords",
+      "shape": "single",
+      "needs": [
+        "workflow.store.aso-and-store-ops",
+        "workflow.store.app-store-listing-prep-packet"
+      ]
+    },
+    {
+      "id": "store-018",
+      "utterance": "get the app signed and archived for release",
+      "shape": "single",
+      "needs": [
+        "workflow.store.apple-signing-and-release-readiness"
+      ]
+    },
+    {
+      "id": "store-019",
+      "utterance": "my app got rejected by App Review",
+      "shape": "single",
+      "needs": [
+        "workflow.store.app-review-observe",
+        "workflow.store.app-review-remediate"
+      ]
+    },
+    {
+      "id": "store-020",
+      "utterance": "resubmit the app after fixing the rejection",
+      "shape": "single",
+      "needs": [
+        "workflow.store.app-review-resubmit"
+      ]
+    },
+    {
+      "id": "store-021",
+      "utterance": "set up the privacy manifest before uploading",
+      "shape": "single",
+      "needs": [
+        "workflow.store.apple-app-store-requirements-privacy-manifest"
+      ]
+    },
+    {
+      "id": "store-022",
+      "utterance": "fill out the App Privacy questionnaire",
+      "shape": "single",
+      "needs": [
+        "workflow.store.apple-app-store-requirements-privacy-manifest",
+        "workflow.store.app-store-listing-prep-packet"
+      ]
+    },
+    {
+      "id": "store-023",
+      "utterance": "where do I click in App Store Connect",
+      "shape": "single",
+      "needs": [
+        "workflow.store.store-console-workflow"
+      ]
+    },
+    {
+      "id": "store-024",
+      "utterance": "publish the android app to Google Play",
+      "shape": "single",
+      "needs": [
+        "workflow.store.google-play-release"
+      ]
+    },
+    {
+      "id": "store-025",
+      "utterance": "Play Store screenshots and feature graphic",
+      "shape": "single",
+      "needs": [
+        "workflow.store.google-play-media-standing-envelope",
+        "workflow.store.store-screenshots-production"
+      ]
+    },
+    {
+      "id": "store-026",
+      "utterance": "ship version 1.1 to the App Store",
+      "shape": "single",
+      "needs": [
+        "workflow.store.apple-signing-and-release-readiness",
+        "workflow.orchestration.full-launch-closeout"
+      ]
+    },
+    {
+      "id": "store-027",
+      "utterance": "make store screenshots and upload them to App Store Connect",
+      "shape": "compound",
+      "needs": [
+        "workflow.store.store-screenshots-production",
+        "workflow.store.asc-cli-automation"
+      ]
+    },
+    {
+      "id": "store-028",
+      "utterance": "store screenshots App Store Connect upload",
+      "shape": "compound",
+      "needs": [
+        "workflow.store.store-screenshots-production",
+        "workflow.store.asc-cli-automation"
+      ]
+    },
+    {
+      "id": "store-029",
+      "utterance": "capture screenshots and write the store listing copy",
+      "shape": "compound",
+      "needs": [
+        "workflow.store.store-screenshots-production",
+        "workflow.store.app-store-listing-prep-packet"
+      ]
+    },
+    {
+      "id": "store-030",
+      "utterance": "generate the screenshots then submit the build for review",
+      "shape": "compound",
+      "needs": [
+        "workflow.store.store-screenshots-production",
+        "workflow.store.app-review-resubmit"
+      ]
+    },
+    {
+      "id": "store-031",
+      "utterance": "sign the build, upload to TestFlight, and push the screenshots",
+      "shape": "compound",
+      "needs": [
+        "workflow.store.apple-signing-and-release-readiness",
+        "workflow.store.asc-cli-automation",
+        "workflow.store.store-screenshots-production"
+      ]
+    },
+    {
+      "id": "store-032",
+      "utterance": "do the ASO keywords and the screenshots",
+      "shape": "compound",
+      "needs": [
+        "workflow.store.aso-and-store-ops",
+        "workflow.store.store-screenshots-production"
+      ]
+    },
+    {
+      "id": "store-033",
+      "utterance": "screenshots for both the App Store and Google Play",
+      "shape": "compound",
+      "needs": [
+        "workflow.store.store-screenshots-production",
+        "workflow.store.google-play-media-standing-envelope"
+      ]
+    },
+    {
+      "id": "store-034",
+      "utterance": "finish the listing: description, keywords, screenshots, privacy answers",
+      "shape": "compound",
+      "needs": [
+        "workflow.store.app-store-listing-prep-packet",
+        "workflow.store.aso-and-store-ops",
+        "workflow.store.store-screenshots-production",
+        "workflow.store.apple-app-store-requirements-privacy-manifest"
+      ]
+    },
+    {
+      "id": "store-035",
+      "utterance": "I want to launch: build the app, make screenshots, write the listing, submit it",
+      "shape": "compound",
+      "needs": [
+        "workflow.orchestration.full-launch-program",
+        "workflow.store.store-screenshots-production",
+        "workflow.store.app-store-listing-prep-packet",
+        "workflow.orchestration.full-launch-closeout"
+      ]
+    },
+    {
+      "id": "store-036",
+      "utterance": "update the screenshots and bump the version in App Store Connect",
+      "shape": "compound",
+      "needs": [
+        "workflow.store.store-screenshots-production",
+        "workflow.store.asc-cli-automation"
+      ]
+    },
+    {
+      "id": "store-037",
+      "utterance": "make screenshots and a demo video for the store",
+      "shape": "compound",
+      "needs": [
+        "workflow.store.store-screenshots-production",
+        "workflow.design.content-assets-remotion-generated-visuals"
+      ]
+    },
+    {
+      "id": "store-038",
+      "utterance": "prep the App Store listing and get it through review",
+      "shape": "compound",
+      "needs": [
+        "workflow.store.app-store-listing-prep-packet",
+        "workflow.store.app-review-observe"
+      ]
+    },
+    {
+      "id": "store-039",
+      "utterance": "screenshot the onboarding flow and use it for the store",
+      "shape": "compound",
+      "needs": [
+        "workflow.engineering.native-ios-proof-route-ladder",
+        "workflow.store.store-screenshots-production"
+      ]
+    },
+    {
+      "id": "store-040",
+      "utterance": "new screenshots plus a metadata update in App Store Connect",
+      "shape": "compound",
+      "needs": [
+        "workflow.store.store-screenshots-production",
+        "workflow.store.asc-cli-automation"
+      ]
+    },
+    {
+      "id": "store-041",
+      "utterance": "appstore screenshots",
+      "shape": "casual",
+      "needs": [
+        "workflow.store.store-screenshots-production"
+      ]
+    },
+    {
+      "id": "store-042",
+      "utterance": "app store connect screenshots upload",
+      "shape": "casual",
+      "needs": [
+        "workflow.store.store-screenshots-production",
+        "workflow.store.asc-cli-automation"
+      ]
+    },
+    {
+      "id": "store-043",
+      "utterance": "screenshoots for the app store",
+      "shape": "casual",
+      "needs": [
+        "workflow.store.store-screenshots-production"
+      ]
+    },
+    {
+      "id": "store-044",
+      "utterance": "need pics for the store listing",
+      "shape": "casual",
+      "needs": [
+        "workflow.store.store-screenshots-production",
+        "workflow.store.app-store-listing-prep-packet"
+      ]
+    },
+    {
+      "id": "store-045",
+      "utterance": "gotta get the store images done",
+      "shape": "casual",
+      "needs": [
+        "workflow.store.store-screenshots-production"
+      ]
+    },
+    {
+      "id": "store-046",
+      "utterance": "how do i put my app on the app store",
+      "shape": "casual",
+      "needs": [
+        "workflow.store.apple-signing-and-release-readiness",
+        "workflow.orchestration.full-launch-closeout"
+      ]
+    },
+    {
+      "id": "store-047",
+      "utterance": "wanna ship to testflight tonight",
+      "shape": "casual",
+      "needs": [
+        "workflow.store.apple-signing-and-release-readiness",
+        "workflow.store.asc-cli-automation"
+      ]
+    },
+    {
+      "id": "store-048",
+      "utterance": "asc cli screenshot upload",
+      "shape": "casual",
+      "needs": [
+        "workflow.store.asc-cli-automation",
+        "workflow.store.store-screenshots-production"
+      ]
+    },
+    {
+      "id": "store-049",
+      "utterance": "make the store shots",
+      "shape": "casual",
+      "needs": [
+        "workflow.store.store-screenshots-production"
+      ]
+    },
+    {
+      "id": "store-050",
+      "utterance": "redo the app store pics and send em to apple",
+      "shape": "casual",
+      "needs": [
+        "workflow.store.store-screenshots-production",
+        "workflow.store.asc-cli-automation"
+      ]
+    }
+  ]
+}

@@ -12,7 +12,7 @@ Derive each visual decision from the current audience, evidence, brand, product,
 
 ## Audited Reference Lessons
 
-The [Clueless Creations audit](https://github.com/Clueless-Creations/clueless-creations-site/commit/2a3935bfbc03efa36778792db3cca71494e57725) contributed four mechanics:
+A first-party audit of a production brand site contributed four mechanics:
 
 - evidence-first situation-to-mechanism-to-outcome-to-proof stories;
 - semantic `StoryScene`, `StoryAnchor`, and `StoryVisual` roles;
@@ -21,7 +21,7 @@ The [Clueless Creations audit](https://github.com/Clueless-Creations/clueless-cr
 
 Its current mobile layout can let later states move beyond the inline visual. Large scroll jumps do not always sample each intermediate state deterministically.
 
-The [Eduardo Martinez portfolio audit](https://github.com/Emuthmartinez/eduardomuth-site/commit/3f7574c178decbf2edfce997d8c6b9d0928cece8) contributed these mechanics:
+A first-party audit of a production portfolio site contributed these mechanics:
 
 - typed bilingual scene data;
 - measured step centers and one shared progress protocol;

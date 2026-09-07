@@ -15,6 +15,12 @@ bindings:
     - workflow.store.app-review-remediate
     - workflow.store.app-review-resubmit
     - workflow.machine.asc-command-contract-maintainer
+    # The screenshot producer reads this for the upload half of its own done bar: its
+    # SCREENSHOTS.md table carries an upload-status column, and the commands plus the auth
+    # recovery ladder that fill it live here. Without this binding the workflow's route
+    # references are design and copy documents only, and the upload guidance is reachable
+    # solely by a second, lucky search.
+    - workflow.store.store-screenshots-production
   context_pack_ids:
     - context.store
 sources:

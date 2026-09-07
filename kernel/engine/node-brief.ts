@@ -44,6 +44,12 @@ export interface NodeBrief {
   route: Array<{
     packId: string;
     packTitle: string;
+    /**
+     * The catalog reference id, when the builder had it in scope (ARCH-06: pin resources, not
+     * paths). Optional because the local compiler resolves packs to workspace paths and never
+     * holds the id here; the hosted builder does, and a hosted reader cannot fetch by path.
+     */
+    referenceId?: string;
     path: string;
     title: string;
     loadWhen: string;

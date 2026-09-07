@@ -16,14 +16,14 @@ bindings:
   context_pack_ids:
     - context.operations
 sources:
-  - id: retention-mechanics-mcp
-    name: Retention Mechanics MCP server
-    source_type: api
-    url: https://github.com/Emuthmartinez/retention-mechanics-mcp
+  - id: experience-card-deck
+    name: Experience Card deck (bundled)
+    source_type: official_docs
+    url: https://github.com/Clueless-Creations/b2c-app-builder/tree/main/knowledge/experience/experience-cards
     review_cadence_days: 30
-    claim_scope: First-party MCP over the Experience Card deck (mechanic search with risk ceilings, versioned card content,
-      ethics attestation scaffolds). Optional tooling - the bundled deck under knowledge/experience/experience-cards/ is
-      the frozen offline contract and every validator reads it; the server is preferred only when connected. Private
-      repo; local stdio during development.
+    claim_scope: The frozen offline contract for Experience Card content - mechanic definitions with risk ceilings,
+      versioned card text, and ethics attestation scaffolds. Every validator reads this deck, so it is the source of
+      record for every claim here. An optional first-party MCP server can serve the same deck over stdio when one is
+      connected; it carries no claim the deck does not already carry, and is tooling rather than a source.
     last_review_date: 2026-08-17
     reviewer: b2c-maintainers

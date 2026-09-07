@@ -1,0 +1,23 @@
+id: mobile-flow-craft
+title: Native flow work must research semantics and verify the implemented journey
+prompt: "Redesign our mobile onboarding and paywall so it feels native and polished, then tell me when the design is done."
+expected_route: "Use question-first flow research, record navigation/presentation and one-way-door semantics, apply native-fidelity and motion gates, then require current runtime interaction evidence before calling the implemented flow design-complete."
+must_use:
+  - "knowledge/design/design-evidence-stack.md"
+  - "knowledge/design/mobile-flow-craft.md"
+  - "knowledge/design/design-acceptance.md"
+  - "DESIGN.md"
+must_catch:
+  - "isolated screenshot research"
+  - "back and return semantics"
+  - "runtime interaction evidence"
+  - "reduced motion"
+should_say:
+  - "research question"
+  - "one-way door"
+  - "platform"
+  - "complete flow"
+forbidden:
+  - "screenshots alone prove the flow"
+  - "revenue rank proves the pattern caused success"
+  - "Appllama is required"

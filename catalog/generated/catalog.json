@@ -1,6 +1,6 @@
 {
   "schemaVersion": "2.0.0",
-  "skillVersion": "0.218.15",
+  "skillVersion": "0.218.16",
   "areas": [
     {
       "id": "area.operating-system",
@@ -1762,6 +1762,8 @@
       "id": "context.experience",
       "title": "Experience",
       "referenceIds": [
+        "reference.design.design-worthiness",
+        "reference.design.mobile-flow-craft",
         "reference.experience.commitment-funnel",
         "reference.experience.eleven-star-experience",
         "reference.experience.ethics-guardrail",
@@ -1779,10 +1781,12 @@
         "reference.design.design-visual-system",
         "reference.design.design-worthiness",
         "reference.design.editorial-scrollytelling",
+        "reference.design.mobile-flow-craft",
         "reference.design.premium-mobile-craft",
         "reference.design.quality-lens",
         "reference.design.surfaces-b2c",
-        "reference.design.vibecoded-tells"
+        "reference.design.vibecoded-tells",
+        "reference.engineering.recommended-agent-skills"
       ]
     },
     {
@@ -2431,8 +2435,18 @@
       "title": "Design Evidence Stack",
       "loadWhen": "before planning, creating, revising, auditing, or implementing any user-facing surface, component, interaction, onboarding flow, paywall, store frame, or marketing design; use it to classify the decision, select evidence sources, and record the evidence pass before mutation",
       "lifecycle": "active",
-      "applicabilityNotes": "This is the mandatory design-source router. Open only relevant sources. High-impact and high-risk surfaces require two complementary source lanes.",
+      "applicabilityNotes": "This is the mandatory design-source router. Open only relevant sources. High-impact and high-risk surfaces require two complementary source lanes. Native flow research is question-first and flow-first; Appllama is an optional provider when independently available and authorized.",
       "sources": [
+        {
+          "id": "appllama-design-library",
+          "name": "Appllama",
+          "sourceType": "design_research_provider",
+          "url": "https://appllama.io/",
+          "reviewCadenceDays": 30,
+          "claimScope": "Optional mobile design research provider with real app screens, flows, and UI patterns. Use only with independently authorized access. Use the upstream MIT appllama-usage skill for provider-specific operation; do not copy or bulk-extract its proprietary corpus.",
+          "lastReviewDate": "2026-09-07",
+          "reviewer": "b2c-maintainers"
+        },
         {
           "id": "design-evidence-60fps",
           "name": "60fps.design",
@@ -2497,7 +2511,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/design/design-evidence-stack.md",
-        "sha256": "sha256:e983dc91ba096f9bf2b23b5c7681cfc7bf79393c506c5d2536552d38fbc6c487",
+        "sha256": "sha256:5b204e23977f8bff6ef51256fe3f40fd43e1325a16a26330dede5ee9e690bff3",
         "origin": "skill"
       }
     },
@@ -2679,15 +2693,15 @@
       "path": "knowledge/design/design-worthiness.md",
       "domainId": "domain.design",
       "title": "Design Worthiness",
-      "loadWhen": "when a Design Room mutation needs the mechanical worthiness floor or its independent audit must record the delegated taste decision before engineering harden, with no beauty score",
+      "loadWhen": "when a Design Room mutation needs the mechanical worthiness floor or its independent audit must record the delegated taste decision before engineering harden, including native flow semantics and mechanical anti-generic consistency, with no beauty score",
       "lifecycle": "active",
-      "applicabilityNotes": "Orchestrate holes only. Do not rewrite eleven-star, emotional design, quality-lens, vibecoded-tells, or motion craft. DESIGN.md stays producer-owned. Mechanical, attested, and independently bound taste tiers decide what an agent may assert.",
+      "applicabilityNotes": "Orchestrate holes only. Do not rewrite eleven-star, emotional design, quality-lens, vibecoded-tells, motion recipes, or mobile-flow-craft. DESIGN.md stays producer-owned. Mechanical, attested, and independently bound taste tiers decide what an agent may assert; runtime proof remains design-acceptance's job.",
       "sourceExemption": "Named standards (WCAG 2.2, Dieter Rams, Apple Human Interface Guidelines, Nielsen Norman Group progressive disclosure) appear as names only. This package contains internal operating guidance and has no external command-syntax claims.",
       "sources": [],
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/design/design-worthiness.md",
-        "sha256": "sha256:41cccf1e3745cb1a9198e11772ca81ba28c625602c8c4afca30cf80a9cba6a98",
+        "sha256": "sha256:3748ff32713ffc83589a8603f8b352663cda13d5cd00d8f63c19b1617ad03717",
         "origin": "skill"
       }
     },
@@ -2741,6 +2755,116 @@
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/design/landing-motion-craft.md",
         "sha256": "sha256:e1211b33119f4b8e465771f07890be6b20f71a069dab71da1dd17b324bee10e6",
+        "origin": "skill"
+      }
+    },
+    {
+      "id": "reference.design.mobile-flow-craft",
+      "path": "knowledge/design/mobile-flow-craft.md",
+      "domainId": "domain.design",
+      "title": "Mobile Flow Craft",
+      "loadWhen": "designing, implementing, or auditing a native mobile screen or flow; deciding navigation and presentation semantics; hardening native fidelity; defining motion; or preparing runtime design acceptance",
+      "lifecycle": "active",
+      "applicabilityNotes": "Cross-platform mobile craft doctrine. It adapts selected MIT-licensed Appllama methods into B2C App Builder invariants while leaving Appllama MCP operation to the upstream provider skill. Framework-specific prescriptions apply only when the selected stack matches them.",
+      "sources": [
+        {
+          "id": "appllama-app-design-skill",
+          "name": "Appllama App Design Skill",
+          "sourceType": "upstream_method",
+          "url": "https://github.com/Appllama/appllama-skills/blob/main/skills/appllama-app-design-skill/SKILL.md",
+          "reviewCadenceDays": 30,
+          "claimScope": "MIT-licensed upstream methods for study-before-build, native fidelity, navigation semantics, anti-generic checks, motion discipline, state cycles, and simulator-oriented verification. B2C App Builder adapts cross-platform invariants and does not import Appllama's proprietary screen corpus.",
+          "lastReviewDate": "2026-09-07",
+          "reviewer": "b2c-maintainers",
+          "publisher": "Antmind Ventures Private Limited",
+          "revision": "dd5caaec3d5d50ad7fc0324da238119c6b7c3707",
+          "rights": {
+            "status": "verified",
+            "spdx": "MIT",
+            "evidence": "catalog/upstreams/notices/appllama-skills.txt",
+            "evidenceSha256": "14cffee850f5c761273dfc49798cddc96786b4520c23f3ed1da727c334f07476",
+            "notes": "Selected guidance adapted; proprietary screen corpus, MCP client, and unimported skill text retain separate review requirements."
+          },
+          "selectors": [
+            "README.md",
+            "LICENSE",
+            "skills/appllama-app-design-skill/SKILL.md"
+          ],
+          "upstreamId": "appllama-skills"
+        },
+        {
+          "id": "appllama-usage-skill",
+          "name": "Appllama Usage Skill",
+          "sourceType": "upstream_method",
+          "url": "https://github.com/Appllama/appllama-skills/blob/main/skills/appllama-usage/SKILL.md",
+          "reviewCadenceDays": 30,
+          "claimScope": "MIT-licensed research method for question-first, flow-first, cross-app study and saturation. Provider-specific MCP commands remain upstream and are not duplicated into the core runtime.",
+          "lastReviewDate": "2026-09-07",
+          "reviewer": "b2c-maintainers",
+          "publisher": "Antmind Ventures Private Limited",
+          "revision": "dd5caaec3d5d50ad7fc0324da238119c6b7c3707",
+          "rights": {
+            "status": "verified",
+            "spdx": "MIT",
+            "evidence": "catalog/upstreams/notices/appllama-skills.txt",
+            "evidenceSha256": "14cffee850f5c761273dfc49798cddc96786b4520c23f3ed1da727c334f07476",
+            "notes": "Selected research method adapted; provider MCP syntax stays upstream."
+          },
+          "selectors": [
+            "README.md",
+            "LICENSE",
+            "skills/appllama-usage/SKILL.md"
+          ],
+          "upstreamId": "appllama-skills"
+        }
+      ],
+      "derivations": [
+        {
+          "sourceIds": [
+            "appllama-app-design-skill"
+          ],
+          "relationship": "adapted",
+          "baseline": "dd5caaec3d5d50ad7fc0324da238119c6b7c3707",
+          "selectors": [
+            "README.md",
+            "LICENSE",
+            "skills/appllama-app-design-skill/SKILL.md"
+          ],
+          "rationale": "Reauthor selected cross-platform flow, fidelity, anti-generic, motion, and verification methods into builder vocabulary while preserving DESIGN.md ownership, evidence contracts, and stack-neutral semantics.",
+          "omissions": [
+            "Do not import Appllama's proprietary screen corpus.",
+            "Do not treat Expo or React Native as the default stack.",
+            "Do not copy skill-host install hooks or treat skill installation as design acceptance."
+          ],
+          "reviewer": "b2c-maintainers",
+          "reviewedAt": "2026-09-07",
+          "notice": "catalog/upstreams/notices/appllama-skills.txt"
+        },
+        {
+          "sourceIds": [
+            "appllama-usage-skill"
+          ],
+          "relationship": "adapted",
+          "baseline": "dd5caaec3d5d50ad7fc0324da238119c6b7c3707",
+          "selectors": [
+            "README.md",
+            "LICENSE",
+            "skills/appllama-usage/SKILL.md"
+          ],
+          "rationale": "Reauthor the question-first, flow-first research method. Leave provider MCP syntax, credits, pagination, and media behavior in the upstream skill.",
+          "omissions": [
+            "Do not fork appllama-usage MCP commands into the core runtime.",
+            "Do not require Appllama MCP to use this doctrine."
+          ],
+          "reviewer": "b2c-maintainers",
+          "reviewedAt": "2026-09-07",
+          "notice": "catalog/upstreams/notices/appllama-skills.txt"
+        }
+      ],
+      "replacementIds": [],
+      "resource": {
+        "path": "catalog/generated/firstparty/knowledge/design/mobile-flow-craft.md",
+        "sha256": "sha256:d97e666787127fae75ce23060dd560a378f73ef7426480ae65f9b369a34a9ad4",
         "origin": "skill"
       }
     },
@@ -3578,15 +3702,41 @@
       "path": "knowledge/engineering/recommended-agent-skills.md",
       "domainId": "domain.engineering",
       "title": "Recommended Agent Skills",
-      "loadWhen": "before Expo or SwiftUI implementation when choosing recommended external agent skill packs for craft, motion, or store work, without vendor MCP lock-in",
+      "loadWhen": "before Expo or SwiftUI implementation when choosing recommended external agent skill packs for craft, motion, store work, or optional design-research provider guidance without vendor lock-in",
       "lifecycle": "active",
-      "applicabilityNotes": "Pin expo/skills and emilkowalski animate-expo/review-animations as recommended installs. Keep Appllama MCP, Appeeky MCP, and bulk Vercel packs off the default surface.",
-      "sourceExemption": "Named GitHub skill slugs appear as install identifiers only. This package contains internal routing guidance and has no live command-syntax claims against a third-party CLI.",
-      "sources": [],
+      "applicabilityNotes": "Pin expo/skills and emilkowalski animate-expo/review-animations as recommended Expo installs. Appllama's app-design skill is an opt-in stack-specific companion; appllama-usage is loaded only when the user's Appllama MCP is independently connected and authorized. Keep paid/vendor MCPs off the default surface.",
+      "sources": [
+        {
+          "id": "github-appllama-skills",
+          "name": "Appllama agent skills",
+          "sourceType": "agent_skill_pack",
+          "url": "https://github.com/Appllama/appllama-skills",
+          "reviewCadenceDays": 30,
+          "claimScope": "MIT-licensed app-design and provider-usage skills. Install syntax and skill names are taken from the upstream README. Hosted Appllama MCP access remains separately authorized and subject to provider terms.",
+          "lastReviewDate": "2026-09-07",
+          "reviewer": "b2c-maintainers",
+          "publisher": "Antmind Ventures Private Limited",
+          "revision": "dd5caaec3d5d50ad7fc0324da238119c6b7c3707",
+          "rights": {
+            "status": "verified",
+            "spdx": "MIT",
+            "evidence": "catalog/upstreams/notices/appllama-skills.txt",
+            "evidenceSha256": "14cffee850f5c761273dfc49798cddc96786b4520c23f3ed1da727c334f07476",
+            "notes": "Skill names and install syntax only; no SKILL.md is copied into the builder."
+          },
+          "selectors": [
+            "README.md",
+            "LICENSE",
+            "skills/appllama-app-design-skill/SKILL.md",
+            "skills/appllama-usage/SKILL.md"
+          ],
+          "upstreamId": "appllama-skills"
+        }
+      ],
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/engineering/recommended-agent-skills.md",
-        "sha256": "sha256:c2681ebc14286204333a1218d63de62bd016403f140fbb2503869404fb32adc9",
+        "sha256": "sha256:6e95cc848a7275951d99f4b1586313211b9754c71d97a1345205ac3d28234b09",
         "origin": "skill"
       }
     },
@@ -9515,6 +9665,7 @@
       "referenceIds": [
         "reference.design.consumer-craft-benchmarks",
         "reference.design.design-evidence-stack",
+        "reference.design.mobile-flow-craft",
         "reference.engineering.external-skill-packs",
         "reference.operations.paid-tool-routing",
         "reference.orchestration.full-launch-program",
@@ -11099,6 +11250,7 @@
         "reference.design.design-worthiness",
         "reference.design.editorial-scrollytelling",
         "reference.design.landing-motion-craft",
+        "reference.design.mobile-flow-craft",
         "reference.design.quality-lens",
         "reference.design.surfaces-b2c",
         "reference.design.vibecoded-tells",
@@ -11167,6 +11319,7 @@
         "reference.design.design-evidence-stack",
         "reference.design.design-visual-system",
         "reference.design.design-worthiness",
+        "reference.design.mobile-flow-craft",
         "reference.design.quality-lens",
         "reference.design.vibecoded-tells",
         "reference.engineering.external-skill-packs",
@@ -11232,7 +11385,8 @@
       "referenceIds": [
         "reference.design.consumer-craft-benchmarks",
         "reference.design.design-acceptance",
-        "reference.design.design-visual-system"
+        "reference.design.design-visual-system",
+        "reference.design.mobile-flow-craft"
       ],
       "roleId": "role.design-guru",
       "laneIds": [
@@ -12228,6 +12382,8 @@
       "consults": [],
       "referenceIds": [
         "reference.design.design-evidence-stack",
+        "reference.design.design-worthiness",
+        "reference.design.mobile-flow-craft",
         "reference.experience.commitment-funnel",
         "reference.experience.onboarding-conversion",
         "reference.experience.paywall-goal-headline"
@@ -12285,6 +12441,8 @@
       "referenceIds": [
         "reference.data.analytics-attribution",
         "reference.design.design-evidence-stack",
+        "reference.design.design-worthiness",
+        "reference.design.mobile-flow-craft",
         "reference.experience.onboarding-conversion",
         "reference.experience.onboarding-foundations"
       ],
@@ -12589,8 +12747,10 @@
       ],
       "referenceIds": [
         "reference.design.design-evidence-stack",
+        "reference.design.mobile-flow-craft",
         "reference.design.motion-craft-benchmarks",
-        "reference.design.premium-mobile-craft"
+        "reference.design.premium-mobile-craft",
+        "reference.engineering.recommended-agent-skills"
       ],
       "roleId": "role.design-guru",
       "laneIds": [
@@ -13307,6 +13467,7 @@
       "referenceIds": [
         "reference.design.design-evidence-stack",
         "reference.design.design-visual-system",
+        "reference.design.mobile-flow-craft",
         "reference.design.quality-lens",
         "reference.engineering.mobai-toolbelt",
         "reference.process.tool-recipes.device-capture-and-proof",
@@ -17751,14 +17912,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "a49944213ff1a2d2c1e9d91d1e87a191397a0a4941172042144d21dd1790f496",
+    "fingerprint": "e027ad44de9a30cb8174a8ad9b910e3574844931ea6b14d98e4abe89a68eea3c",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
-        "version": "0.218.15",
-        "revision": "0.218.15",
-        "contentDigest": "ae99de1fc6aed07512aad47fe086108109133888e04609df584b4a0e19aba590"
+        "version": "0.218.16",
+        "revision": "0.218.16",
+        "contentDigest": "bddb147be1def572efc462db409ebc8c6fe3fe468560219bbbc52e7f61856645"
       }
     ],
     "base": {
@@ -17770,7 +17931,7 @@
       "business-pack.consumer-business": {
         "domains": 15,
         "workflows": 111,
-        "references": 141
+        "references": 142
       }
     }
   }

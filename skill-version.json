@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.218.15",
+  "version": "0.218.16",
   "updatedAt": "2026-09-07",
   "sourcePath": ".",
   "releaseNotes": [
-    "Public writing guidance now points at knowledge/words/no-slop-writing.md. The deleted root VOICE.md file is no longer named in the agent read order, the change contract, the docs index, or the architecture root-file inventory.",
-    "The repository-boundary allowlist and the version-discipline exclude list no longer treat VOICE.md as a root entry point, matching the file's removal from the public toolkit."
+    "Register knowledge/design/mobile-flow-craft.md in the generated catalog, routing index, and hosted bundle after PR #34 shipped the authored YAML without re-rendering.",
+    "Move the Appllama MIT notice onto catalog/upstreams/notices, add the appllama-skills identity, and delete the unapproved top-level third_party/ directory so Audit (fast) can go green."
   ]
 }

@@ -4,6 +4,7 @@ Generated from catalog/upstreams for maintainers. It states what the builder sup
 
 | Id | Project | Relationships | Reviewed source | Reviewed guidance | Supported ranges | Latest observed stable | Observed | Installed executable | Review | Local owners | Tests |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| appllama-skills | Appllama agent skills | adapted-method, selected-skill-guidance | dd5caaec3d5d50ad7fc0324da238119c6b7c3707@2026-09-07 | dd5caaec3d5d50ad7fc0324da238119c6b7c3707@2026-09-07 | `dd5caaec3d5d50ad7fc0324da238119c6b7c3707` untested | unknown (no observation) | none | not observed | current; last 2026-09-07; due 2026-10-07 | 2 | 1 |
 | eronred-aso-skills | ASO and App Marketing Skills | adapted-method | 4df730f456c21e42b9a2ea2be89fb32caf787728@2026-09-06 | 4df730f456c21e42b9a2ea2be89fb32caf787728@2026-09-06 | `4df730f456c21e42b9a2ea2be89fb32caf787728` untested | unknown (observation records no stable release) | 2026-09-06 | not observed | current; last 2026-09-06; due 2026-09-13 | 3 | 1 |
 | evanbacon-serve-sim | serve-sim | adapted-method | 0ee6fbde40a6b5840d0c6e0379f544feb9fa246b@2026-09-06 | 0ee6fbde40a6b5840d0c6e0379f544feb9fa246b@2026-09-06 | `0ee6fbde40a6b5840d0c6e0379f544feb9fa246b` untested | unknown (observation records no stable release) | 2026-09-06 | not observed | current; last 2026-09-06; due 2026-09-13 | 2 | 1 |
 | layers-growth-mcp | Layers Growth MCP and CLI | remote-service, adapted-method | unknown | docs and README read 2026-09-05 (no immutable revision published for the docs page; layers/mcp main pushed 2026-09-04T06:39:47Z)@2026-09-05 | `hosted (unversioned)` untested | unknown (no observation) | none | not observed | current; last 2026-09-05; due 2026-10-05 | 8 | 2 |
@@ -16,6 +17,27 @@ Generated from catalog/upstreams for maintainers. It states what the builder sup
 | rork-app-store-connect-cli-skills | App Store Connect CLI skills (asc skill pack) | selected-skill-guidance | unknown | unrecorded@2026-08-18 | `main (unpinned by the builder)` untested | unknown (no observation) | none | not observed | current; last 2026-09-05; due 2026-09-12 | 2 | 1 |
 | sentry-snapshotpreviews | SnapshotPreviews | adapted-method | 856a1c1585e31d4113c019050d6d0712cf6ddadc@2026-09-06 | 856a1c1585e31d4113c019050d6d0712cf6ddadc@2026-09-06 | `856a1c1585e31d4113c019050d6d0712cf6ddadc` untested | v0.18.0 (published 2026-07-07) | 2026-09-06 | not observed | current; last 2026-09-06; due 2026-09-13 | 2 | 1 |
 | sentry-xcodebuildmcp | XcodeBuildMCP | adapted-method | e6ef59b49b44012c824f0a0de261c96142e37390@2026-09-06 | e6ef59b49b44012c824f0a0de261c96142e37390@2026-09-06 | `e6ef59b49b44012c824f0a0de261c96142e37390` untested | v2.7.0 (published 2026-07-23) | 2026-09-06 | not observed | current; last 2026-09-06; due 2026-09-13 | 2 | 1 |
+
+## appllama-skills
+
+Appllama agent skills. Canonical URL: https://github.com/Appllama/appllama-skills
+
+Unsupported operations:
+
+- appllama-mcp-default: Appllama MCP stays an independently authorized provider. The builder never installs or authorizes it as a default.
+- proprietary-screen-corpus: The upstream screen library is not imported. Design evidence uses the builder's own evidence stack.
+- automatic-install-or-upgrade: Requires explicit target, selected compatible revision, scoped authority and independent verification. No host installation, business repin or publication is automatic.
+
+Intentional adaptations:
+
+- no-proprietary-corpus: Do not import Appllama's proprietary screen library. Comparable-journey research uses authorized evidence through the design evidence stack. (owner: knowledge/design/mobile-flow-craft.md)
+- no-mcp-fork: Provider-specific MCP commands remain upstream in appllama-usage. Do not duplicate them into the core runtime. (owner: knowledge/design/mobile-flow-craft.md)
+- not-the-default-stack: Framework-specific prescriptions apply only when the selected stack matches them. Expo or React Native is not the default by citing this pack. (owner: knowledge/design/mobile-flow-craft.md)
+- not-required: Citing adapted methods does not require installing the upstream skill or connecting Appllama MCP. (owner: knowledge/engineering/recommended-agent-skills.md)
+
+Unknowns:
+
+- No observation recorded.
 
 ## eronred-aso-skills
 

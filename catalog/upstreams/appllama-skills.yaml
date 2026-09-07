@@ -1,0 +1,129 @@
+schema_version: 1
+id: appllama-skills
+project: Appllama agent skills
+canonical_url: https://github.com/Appllama/appllama-skills
+aliases:
+  - Appllama/appllama-skills
+authors:
+  - name: Antmind Ventures Private Limited
+    role: original author or copyright holder identified in the reviewed source
+maintainers:
+  - name: Appllama (github.com/Appllama)
+    role: current upstream maintainer
+copyright: Copyright (c) 2026 Antmind Ventures Private Limited (appllama.io)
+license:
+  spdx: MIT
+  status: verified
+  evidence_url: https://github.com/Appllama/appllama-skills/blob/dd5caaec3d5d50ad7fc0324da238119c6b7c3707/LICENSE
+  evidence_sha256: 14cffee850f5c761273dfc49798cddc96786b4520c23f3ed1da727c334f07476
+  reviewed_revision: dd5caaec3d5d50ad7fc0324da238119c6b7c3707
+  notice_file: catalog/upstreams/notices/appllama-skills.txt
+  scope: Selected published methods from appllama-app-design-skill and appllama-usage only. No proprietary
+    screen corpus, MCP client, install hook, or skill text is imported.
+source_ids:
+  - github-appllama-skills
+  - appllama-app-design-skill
+  - appllama-usage-skill
+  - appllama-skills-license
+relationships:
+  - kind: adapted-method
+    consumption: Selected cross-platform flow-research, navigation-semantics, native-fidelity, anti-generic,
+      motion, and verification methods are reauthored in knowledge/design/mobile-flow-craft.md. No whole
+      skill, executable, native dependency, or asset was installed by this contribution.
+    local_owners: &craft
+      - knowledge/design/mobile-flow-craft.md
+    tests:
+      - checks/validation/repository/evals/agent-behavior/mobile-flow-craft.yaml
+    upstream_paths:
+      - README.md
+      - LICENSE
+      - skills/appllama-app-design-skill/SKILL.md
+      - skills/appllama-usage/SKILL.md
+    pin_authority: Reviewed immutable source commit pins this guidance. Host skill installation and Appllama
+      MCP access are selected and authorized separately.
+  - kind: selected-skill-guidance
+    consumption: The Expo/React Native app-design skill and the provider-usage skill are named as opt-in
+      companion packs. Installation happens only with founder approval. No SKILL.md is auto-installed as a
+      top-level builder skill, and Appllama MCP is never a default dependency.
+    local_owners:
+      - knowledge/engineering/recommended-agent-skills.md
+    tests:
+      - checks/validation/repository/evals/agent-behavior/mobile-flow-craft.yaml
+    upstream_paths:
+      - README.md
+      - skills/appllama-app-design-skill/SKILL.md
+      - skills/appllama-usage/SKILL.md
+    pin_authority: npx skills add carries no pin. Reviewed commit below identifies the README and skill names this routing cites.
+baselines:
+  reviewed_source:
+    revision: dd5caaec3d5d50ad7fc0324da238119c6b7c3707
+    observed_at: "2026-09-07"
+    by: b2c-maintainers
+    note: Read-only license, README, and selected SKILL.md inspection; no MCP call, skill install, or live
+      provider execution.
+  reviewed_guidance:
+    revision: dd5caaec3d5d50ad7fc0324da238119c6b7c3707
+    observed_at: "2026-09-07"
+    by: b2c-maintainers
+    note: Selected methods adapted into mobile-flow-craft; skill names routed as opt-in guidance only.
+support:
+  policy: Source-reviewed guidance only. Listed operations are mapped procedures, not newly executable
+    provider bindings or certification of installed versions.
+  versions:
+    - range: dd5caaec3d5d50ad7fc0324da238119c6b7c3707
+      status: untested
+      evidence:
+        - Source inspection and the mobile-flow-craft routing eval only; no live Appllama MCP or skill-host
+          execution.
+  operations:
+    - id: appllama-flow-craft-guidance
+      title: Selected Appllama flow, fidelity, and verification methods
+      keywords:
+        - flow
+        - native fidelity
+        - motion
+        - simulator
+      owners: *craft
+  unsupported_operations:
+    - id: appllama-mcp-default
+      reason: Appllama MCP stays an independently authorized provider. The builder never installs or
+        authorizes it as a default.
+    - id: proprietary-screen-corpus
+      reason: The upstream screen library is not imported. Design evidence uses the builder's own evidence
+        stack.
+    - id: automatic-install-or-upgrade
+      reason: Requires explicit target, selected compatible revision, scoped authority and independent
+        verification. No host installation, business repin or publication is automatic.
+  platforms: []
+adaptations:
+  - id: no-proprietary-corpus
+    description: Do not import Appllama's proprietary screen library. Comparable-journey research uses
+      authorized evidence through the design evidence stack.
+    owner: knowledge/design/mobile-flow-craft.md
+    intentional: true
+  - id: no-mcp-fork
+    description: Provider-specific MCP commands remain upstream in appllama-usage. Do not duplicate them
+      into the core runtime.
+    owner: knowledge/design/mobile-flow-craft.md
+    intentional: true
+  - id: not-the-default-stack
+    description: Framework-specific prescriptions apply only when the selected stack matches them. Expo or
+      React Native is not the default by citing this pack.
+    owner: knowledge/design/mobile-flow-craft.md
+    intentional: true
+  - id: not-required
+    description: Citing adapted methods does not require installing the upstream skill or connecting
+      Appllama MCP.
+    owner: knowledge/engineering/recommended-agent-skills.md
+    intentional: true
+review:
+  owner: b2c-maintainers
+  cadence_days: 30
+  last_review: "2026-09-07"
+  status: current
+credits:
+  acknowledge: true
+  use: adapted
+  summary: Selected Appllama agent-skill methods inform knowledge/design/mobile-flow-craft.md. The
+    app-design and usage skills remain opt-in companion packs. Original authors and license notices are
+    retained; no live integration is claimed.

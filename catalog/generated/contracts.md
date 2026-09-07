@@ -113,7 +113,7 @@ _Founder asks for a complete end-to-end consumer delivery — app, full web funn
 - **Consults:** `PRODUCT.md`, `DESIGN.md`, `operations/ORCHESTRATION.md`, `strategy/TOOL_DECISIONS.md`, `operations/BUSINESS_ACCESS.md`
 - **Produces:** `operations/LAUNCH_PROGRAM.md`
 - **Gates:** `check:orchestration`
-- **Knowledge:** [Consumer Craft Benchmarks](../../knowledge/design/consumer-craft-benchmarks.md), [Design Evidence Stack](../../knowledge/design/design-evidence-stack.md), [External Skill Packs](../../knowledge/engineering/external-skill-packs.md), [Paid Tool Routing](../../knowledge/operations/paid-tool-routing.md), [Full Launch Program](../../knowledge/orchestration/full-launch-program.md), [Isolated Review](../../knowledge/orchestration/isolated-review.md), [Parallel Agent Orchestration](../../knowledge/orchestration/parallel-agent-orchestration.md), [Launch Coverage](../../knowledge/process/launch-coverage.md)
+- **Knowledge:** [Consumer Craft Benchmarks](../../knowledge/design/consumer-craft-benchmarks.md), [Design Evidence Stack](../../knowledge/design/design-evidence-stack.md), [Mobile Flow Craft](../../knowledge/design/mobile-flow-craft.md), [External Skill Packs](../../knowledge/engineering/external-skill-packs.md), [Paid Tool Routing](../../knowledge/operations/paid-tool-routing.md), [Full Launch Program](../../knowledge/orchestration/full-launch-program.md), [Isolated Review](../../knowledge/orchestration/isolated-review.md), [Parallel Agent Orchestration](../../knowledge/orchestration/parallel-agent-orchestration.md), [Launch Coverage](../../knowledge/process/launch-coverage.md)
 
 ### Full launch closeout (definition of done)
 
@@ -589,7 +589,7 @@ _Specify every onboarding screen, copy key, control, action, paywall state, fail
 - **Consults:** —
 - **Produces:** `product/onboarding/graph/ONB-17-screen-control-paywall-contract.md`
 - **Gates:** `check:onboarding-evidence-onb-17`
-- **Knowledge:** [Design Evidence Stack](../../knowledge/design/design-evidence-stack.md), [Commitment Funnel](../../knowledge/experience/commitment-funnel.md), [Onboarding Conversion](../../knowledge/experience/onboarding-conversion.md), [Paywall Goal Headline](../../knowledge/experience/paywall-goal-headline.md)
+- **Knowledge:** [Design Evidence Stack](../../knowledge/design/design-evidence-stack.md), [Design Worthiness](../../knowledge/design/design-worthiness.md), [Mobile Flow Craft](../../knowledge/design/mobile-flow-craft.md), [Commitment Funnel](../../knowledge/experience/commitment-funnel.md), [Onboarding Conversion](../../knowledge/experience/onboarding-conversion.md), [Paywall Goal Headline](../../knowledge/experience/paywall-goal-headline.md)
 
 ### Onboarding ONB-18: visual design and prototype
 
@@ -602,7 +602,7 @@ _Produce actual high-fidelity onboarding design, motion, an interactive prototyp
 - **Consults:** —
 - **Produces:** `product/onboarding/graph/ONB-18-visual-design-prototype.md`, `product/onboarding/prototype-evidence.json`
 - **Gates:** `check:onboarding-evidence-onb-18`, `check:onboarding-foundations-prototype`
-- **Knowledge:** [Analytics And Attribution](../../knowledge/data/analytics-attribution.md), [Design Evidence Stack](../../knowledge/design/design-evidence-stack.md), [Onboarding Conversion](../../knowledge/experience/onboarding-conversion.md), [Research-backed onboarding with identity and measurement](../../knowledge/experience/onboarding-foundations.md)
+- **Knowledge:** [Analytics And Attribution](../../knowledge/data/analytics-attribution.md), [Design Evidence Stack](../../knowledge/design/design-evidence-stack.md), [Design Worthiness](../../knowledge/design/design-worthiness.md), [Mobile Flow Craft](../../knowledge/design/mobile-flow-craft.md), [Onboarding Conversion](../../knowledge/experience/onboarding-conversion.md), [Research-backed onboarding with identity and measurement](../../knowledge/experience/onboarding-foundations.md)
 
 ### Onboarding ONB-19: implementation and cutover contract
 
@@ -695,7 +695,7 @@ _Any design/visual-system/cross-surface/store-creative/landing/onboarding/paywal
 - **Consults:** `studio/seed/business.json`
 - **Produces:** `DESIGN.md`, `studio/seed/business.json`, `design/design-room.html`
 - **Gates:** `validate:design-state`, `check:design-md`, `render:design-room`, `check:design-room`, `check:design-worthiness-mechanical`
-- **Knowledge:** [Audience-Derived Identity](../../knowledge/design/audience-derived-identity.md), [Design Evidence Stack](../../knowledge/design/design-evidence-stack.md), [Design Room](../../knowledge/design/design-room.md), [Design Worthiness](../../knowledge/design/design-worthiness.md), [Evidence-Led Editorial Scrollytelling](../../knowledge/design/editorial-scrollytelling.md), [Landing Motion Craft](../../knowledge/design/landing-motion-craft.md), [Quality Lens](../../knowledge/design/quality-lens.md), [Surfaces B2C](../../knowledge/design/surfaces-b2c.md), [Vibecoded Tells](../../knowledge/design/vibecoded-tells.md), [Artifact Contracts](../../knowledge/process/artifact-contracts.md)
+- **Knowledge:** [Audience-Derived Identity](../../knowledge/design/audience-derived-identity.md), [Design Evidence Stack](../../knowledge/design/design-evidence-stack.md), [Design Room](../../knowledge/design/design-room.md), [Design Worthiness](../../knowledge/design/design-worthiness.md), [Evidence-Led Editorial Scrollytelling](../../knowledge/design/editorial-scrollytelling.md), [Landing Motion Craft](../../knowledge/design/landing-motion-craft.md), [Mobile Flow Craft](../../knowledge/design/mobile-flow-craft.md), [Quality Lens](../../knowledge/design/quality-lens.md), [Surfaces B2C](../../knowledge/design/surfaces-b2c.md), [Vibecoded Tells](../../knowledge/design/vibecoded-tells.md), [Artifact Contracts](../../knowledge/process/artifact-contracts.md)
 
 ### Design system audit (isolated)
 
@@ -708,7 +708,7 @@ _After DESIGN.md or the Design Room changes for a high-impact surface, before th
 - **Consults:** —
 - **Produces:** `design/reviews/DESIGN_SYSTEM_REVIEW.md`
 - **Gates:** `check:design-md`, `check:design-worthiness`, `check:audience-identity`
-- **Knowledge:** [Audience-Derived Identity](../../knowledge/design/audience-derived-identity.md), [Consumer Craft Benchmarks](../../knowledge/design/consumer-craft-benchmarks.md), [Design Acceptance Evidence](../../knowledge/design/design-acceptance.md), [Design Evidence Stack](../../knowledge/design/design-evidence-stack.md), [Design Visual System](../../knowledge/design/design-visual-system.md), [Design Worthiness](../../knowledge/design/design-worthiness.md), [Quality Lens](../../knowledge/design/quality-lens.md), [Vibecoded Tells](../../knowledge/design/vibecoded-tells.md), [External Skill Packs](../../knowledge/engineering/external-skill-packs.md), [Isolated Review](../../knowledge/orchestration/isolated-review.md)
+- **Knowledge:** [Audience-Derived Identity](../../knowledge/design/audience-derived-identity.md), [Consumer Craft Benchmarks](../../knowledge/design/consumer-craft-benchmarks.md), [Design Acceptance Evidence](../../knowledge/design/design-acceptance.md), [Design Evidence Stack](../../knowledge/design/design-evidence-stack.md), [Design Visual System](../../knowledge/design/design-visual-system.md), [Design Worthiness](../../knowledge/design/design-worthiness.md), [Mobile Flow Craft](../../knowledge/design/mobile-flow-craft.md), [Quality Lens](../../knowledge/design/quality-lens.md), [Vibecoded Tells](../../knowledge/design/vibecoded-tells.md), [External Skill Packs](../../knowledge/engineering/external-skill-packs.md), [Isolated Review](../../knowledge/orchestration/isolated-review.md)
 
 ### Implemented mobile and landing craft audit
 
@@ -721,7 +721,7 @@ _The native app and landing page run and their required behavior has evidence, b
 - **Consults:** —
 - **Produces:** `design/proofs/design-acceptance.json`, `design/reviews/IMPLEMENTATION_REVIEW.md`
 - **Gates:** `check:design-acceptance`
-- **Knowledge:** [Consumer Craft Benchmarks](../../knowledge/design/consumer-craft-benchmarks.md), [Design Acceptance Evidence](../../knowledge/design/design-acceptance.md), [Design Visual System](../../knowledge/design/design-visual-system.md)
+- **Knowledge:** [Consumer Craft Benchmarks](../../knowledge/design/consumer-craft-benchmarks.md), [Design Acceptance Evidence](../../knowledge/design/design-acceptance.md), [Design Visual System](../../knowledge/design/design-visual-system.md), [Mobile Flow Craft](../../knowledge/design/mobile-flow-craft.md)
 
 ### Token promotion
 
@@ -760,7 +760,7 @@ _Before in-app UI build/polish, press-state/haptics/loading-empty wiring, live-s
 - **Consults:** `product/experience/ux-patterns/UX_PATTERNS.md`
 - **Produces:** —
 - **Gates:** `check:motion-contract`
-- **Knowledge:** [Design Evidence Stack](../../knowledge/design/design-evidence-stack.md), [Motion Craft Benchmarks](../../knowledge/design/motion-craft-benchmarks.md), [Premium Mobile Craft](../../knowledge/design/premium-mobile-craft.md)
+- **Knowledge:** [Design Evidence Stack](../../knowledge/design/design-evidence-stack.md), [Mobile Flow Craft](../../knowledge/design/mobile-flow-craft.md), [Motion Craft Benchmarks](../../knowledge/design/motion-craft-benchmarks.md), [Premium Mobile Craft](../../knowledge/design/premium-mobile-craft.md), [Recommended Agent Skills](../../knowledge/engineering/recommended-agent-skills.md)
 
 ### Content assets / Remotion / generated visuals
 
@@ -1039,7 +1039,7 @@ _Store screenshots needed (raw capture → composed iPhone/iPad/Play assets), in
 - **Consults:** —
 - **Produces:** `store/app-store-listing/SCREENSHOTS.md`
 - **Gates:** `check:design-md`, `check:design-room`, `check:store-screenshots`
-- **Knowledge:** [Design Evidence Stack](../../knowledge/design/design-evidence-stack.md), [Design Visual System](../../knowledge/design/design-visual-system.md), [Quality Lens](../../knowledge/design/quality-lens.md), [MobAI Toolbelt](../../knowledge/engineering/mobai-toolbelt.md), [Device Capture And Proof](../../knowledge/process/tool-recipes/device-capture-and-proof.md), [App Store Connect CLI](../../knowledge/store/app-store-connect-cli.md), [ASO Store Ops](../../knowledge/store/aso-store-ops.md), [Screenshot Toolchain and Source Adoption](../../knowledge/store/screenshot-toolchain.md), [Consumer Copy Benchmarks](../../knowledge/words/consumer-copy-benchmarks.md), [Conversion Copy](../../knowledge/words/conversion-copy.md)
+- **Knowledge:** [Design Evidence Stack](../../knowledge/design/design-evidence-stack.md), [Design Visual System](../../knowledge/design/design-visual-system.md), [Mobile Flow Craft](../../knowledge/design/mobile-flow-craft.md), [Quality Lens](../../knowledge/design/quality-lens.md), [MobAI Toolbelt](../../knowledge/engineering/mobai-toolbelt.md), [Device Capture And Proof](../../knowledge/process/tool-recipes/device-capture-and-proof.md), [App Store Connect CLI](../../knowledge/store/app-store-connect-cli.md), [ASO Store Ops](../../knowledge/store/aso-store-ops.md), [Screenshot Toolchain and Source Adoption](../../knowledge/store/screenshot-toolchain.md), [Consumer Copy Benchmarks](../../knowledge/words/consumer-copy-benchmarks.md), [Conversion Copy](../../knowledge/words/conversion-copy.md)
 
 ### Google Play release
 

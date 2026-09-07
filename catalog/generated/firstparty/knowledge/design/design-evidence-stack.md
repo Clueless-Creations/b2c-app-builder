@@ -14,6 +14,8 @@ Use at least two sources for a high-impact or high-risk surface. These surfaces 
 
 Apply the B2C App Builder Craft Lens to every substantive design decision. It is internal design doctrine. It does not replace audience, behavior, trust, component, or experiment evidence.
 
+For native mobile work, also apply [mobile-flow-craft.md](mobile-flow-craft.md). Research complete comparable journeys when the decision is flow-level. A gallery of disconnected screenshots cannot establish navigation grammar, interruption behavior, or one-way-door semantics.
+
 ## B2C App Builder Craft Lens
 
 Before you converge on a solution:
@@ -29,10 +31,24 @@ Before you converge on a solution:
 9. Separate structure, interaction, content, visual expression, and motion before you recombine them. Tune one variable at a time and compare it with the prior state.
 10. Remove anything that does not improve the user job or a named quality facet. Compare the result with the current industry standard. State where it meets, exceeds, or deliberately breaks that standard.
 
+## Flow-first research discipline
+
+When the question concerns onboarding, paywalls, authentication, checkout, core loops, permissions, recovery, or another journey:
+
+1. Name the exact question before opening a catalog.
+2. Study the complete relevant flow for each selected product, not a cherry-picked hero screen.
+3. Compare several relevant products when authorized evidence exists. Record the common spine and meaningful divergence.
+4. Treat commercial success or ranking as context, not proof that a particular screen caused the outcome.
+5. Stop at saturation: when another comparable flow no longer changes the working spec, record that and move on.
+6. Preserve observations and stable source IDs in the reference pack. Expiring provider media is not durable evidence unless a permitted inspected capture is retained and hashed.
+
+This method is adapted in part from Appllama's MIT-licensed research skill. It is provider-neutral. Do not harvest a provider library or turn a task-scoped research method into dataset extraction.
+
 ## Source Router
 
 | Source                       | Use it for                                                                                                             | Evidence to capture                                                                                                 | Boundary                                                                                                                                                 |
 | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Appllama`                   | Native mobile screen, complete-flow, and component research when the customer has authorized access                    | Question, selected apps/flows, stable source IDs, inspected screens/interactions, convergence, divergence, local decision | Optional provider. Use its upstream `appllama-usage` skill when connected. Do not copy its proprietary corpus, bulk extract it, or treat revenue rank as causal proof. |
 | `60fps.design`               | Motion, transitions, gestures, loading, success, and the magical moment                                                | Two to four relevant examples; the trigger, timing, state change, interruption, and reduced-motion result           | Transfer mechanics only. Do not copy brand, assets, copy, exact layout, or generated code without adapting it to the product and token system.           |
 | `catalogue.projectsbyif.com` | AI decisions, automation, trust, consent, sign-in, permissions, sensitive data, user control, and takeover or recovery | The pattern, its advantages, its limitations, and the reason for adoption or rejection                              | Prefer agency and clear limits. Keep attribution when an adapted artifact requires it.                                                                   |
 | `abtest.design`              | Conversion, onboarding, paywall, checkout, engagement, retention, monetization awareness, and referral hypotheses      | The tested change, audience and context, metric, cited source, counter-metric, and a local validation plan          | Treat a result as a hypothesis seed. It is not transferable causal proof. Do not repeat a number or claim if its primary or cited source is unavailable. |
@@ -40,16 +56,19 @@ Before you converge on a solution:
 | `UXSnaps`                    | Journey teardown, information hierarchy, onboarding, dashboards, content discovery, and flow critique                  | The observed pattern, claimed rationale, applicability gap, and local evidence that is still needed                 | Treat the breakdown as critique, not authority or causal proof.                                                                                          |
 | `UI Playbook`                | Standard component selection and specification                                                                         | Function, states, focus and keyboard behavior, accessibility semantics, collision behavior, and responsive behavior | Use it as a specification seed. Confirm implementation details in current official platform or WAI-ARIA guidance.                                        |
 
+When the Appllama MCP is connected and authorized for the acting member, load the upstream `appllama-usage` skill rather than duplicating its tool map here. The B2C workflow owns the research question, scope, adoption decision, and evidence contract. Appllama owns its provider-specific search syntax, pagination, credits, media behavior, and catalog semantics. If it is unavailable, choose a declared compatible source lane; do not imply Appllama was inspected.
+
 When the 60fps MCP is connected, use `60fps_search_shots`, `60fps_get_shot`, `60fps_get_motion_breakdown`, and `60fps_get_related_shots`. If it is not connected, use the public catalog and the distilled recipes in `motion-craft-benchmarks.md`.
 
 ## Task Routing
 
 | Design task                                                 | Suggested source lanes                                                                          |
 | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Native mobile flow grammar or category convention           | Appllama when authorized; otherwise an approved mobile reference source plus official platform guidance |
 | Motion or gesture                                           | 60fps.design; add UI Playbook when a standard component owns the interaction                    |
 | AI, consent, authentication, permissions, or sensitive data | IF Design Patterns Catalogue; add UI Playbook for the component contract                        |
-| Onboarding, paywall, checkout, retention, or referral       | abtest.design plus UXSnaps; add 60fps.design only when motion affects comprehension or feedback |
-| Core journey or information hierarchy                       | UXSnaps; add UI Playbook for each standard component that needs a full state contract           |
+| Onboarding, paywall, checkout, retention, or referral       | Appllama when authorized for complete-flow structure, plus abtest.design/UXSnaps for hypotheses; add 60fps.design only when motion affects comprehension or feedback |
+| Core journey or information hierarchy                       | Appllama when authorized or UXSnaps; add UI Playbook for each standard component that needs a full state contract |
 | Brand delight, success, empty state, or a magical moment    | Design Spells plus 60fps.design when the idea moves                                             |
 | Standard control, overlay, input, or notification           | UI Playbook; add IF when the control changes trust, consent, or user agency                     |
 
@@ -62,10 +81,11 @@ The B2C App Builder Craft Lens applies across every design decision. It does not
 1. Define the user job, surface, decision, and risk.
 2. Decide which sources fit the decision. Say why a source does not apply.
 3. Open only the sources you need. Apply the untrusted-content rules in `knowledge/operations/frontier-agent-operations.md`.
-4. Collect two to four useful observations. Do not save a screenshot without analysis.
-5. Adopt or reject each principle. Map an adopted principle to an exact state path, semantic token, surface, or component.
+4. Collect two to four useful observations. For flow research, observations may summarize a complete comparable journey rather than four arbitrary frames. Do not save a screenshot without analysis.
+5. Adopt or reject each principle. Map an adopted principle to an exact state path, semantic token, surface, component, or flow semantic.
 6. Define the test, metric, counter-metric, accessibility result, and fallback that apply.
 7. Mutate state. Update `DESIGN.md`. Validate, version, and render through the Design Room loop.
+8. For implemented native flows, carry the accepted semantics into runtime interaction evidence through `design-acceptance.md`; the reference pack alone is not completion.
 
 For a complete-business mandate, use [consumer-craft-benchmarks.md](consumer-craft-benchmarks.md) to calibrate the relevant native and landing surfaces. Record whether you actually viewed an image, observed an interaction, or read a description. Freeze the per-surface criteria before production. Keep the complete product scope through independent review and repair; a Design Room rendering alone cannot establish native or browser quality.
 
@@ -77,11 +97,13 @@ Source use is not acceptance. Audience research, product constraints, accessibil
 
 - You can name the sources you used and the sources you skipped.
 - Substantive design work applies the B2C App Builder Craft Lens.
-- An adopted principle has an adaptation, a state path, and a validation method.
+- Flow-level work names the research question and studies journeys rather than isolated frames.
+- An adopted principle has an adaptation, a state path or flow semantic, and a validation method.
 - A high-impact or high-risk surface uses two complementary sources.
-- A cited experiment is a hypothesis unless local evidence proves it.
+- A cited experiment or commercial rank is context/hypothesis evidence unless local evidence proves more.
 - No decision copies source branding, assets, copy, or an exact layout.
 - `DESIGN.md`, structured state, tokens, version, and render agree.
+- Implemented native flows are not called design-complete without the applicable runtime evidence.
 
 ## Resolution and compatible alternatives
 
@@ -92,7 +114,7 @@ whose bytes are retained and hashed. A signed URL expiring after a valid capture
 that capture; conversely, an expired catalog response is not a successful observation.
 
 Select alternatives in the order declared for the task's evidence requirement. For a static
-onboarding-layout question, an authorized Refero source can be followed by an authorized AppKittie
+onboarding-layout question, an authorized Appllama or Refero source can be followed by an authorized AppKittie
 screen source when it supplies the required scope. A motion requirement needs an observed
 interaction or recording, such as a suitable authorized 60fps shot. An internal procedure can
 explain how to search, but cannot stand in for either of those observations.

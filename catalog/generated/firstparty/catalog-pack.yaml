@@ -1,8 +1,8 @@
 id: business-pack.consumer-business
 title: Consumer business
 kind: business-pack
-version: 0.218.15
-revision: 0.218.15
+version: 0.218.16
+revision: 0.218.16
 depends_on: []
 creates_provider_spend: false
 domains:
@@ -303,6 +303,7 @@ workflows:
     reference_ids:
       - reference.design.consumer-craft-benchmarks
       - reference.design.design-evidence-stack
+      - reference.design.mobile-flow-craft
       - reference.engineering.external-skill-packs
       - reference.operations.paid-tool-routing
       - reference.orchestration.full-launch-program
@@ -1523,6 +1524,7 @@ workflows:
       - reference.design.design-worthiness
       - reference.design.editorial-scrollytelling
       - reference.design.landing-motion-craft
+      - reference.design.mobile-flow-craft
       - reference.design.quality-lens
       - reference.design.surfaces-b2c
       - reference.design.vibecoded-tells
@@ -1579,6 +1581,7 @@ workflows:
       - reference.design.design-evidence-stack
       - reference.design.design-visual-system
       - reference.design.design-worthiness
+      - reference.design.mobile-flow-craft
       - reference.design.quality-lens
       - reference.design.vibecoded-tells
       - reference.engineering.external-skill-packs
@@ -1632,6 +1635,7 @@ workflows:
       - reference.design.consumer-craft-benchmarks
       - reference.design.design-acceptance
       - reference.design.design-visual-system
+      - reference.design.mobile-flow-craft
     role_id: role.design-guru
     lane_ids:
       - design
@@ -2384,6 +2388,8 @@ workflows:
     consults: []
     reference_ids:
       - reference.design.design-evidence-stack
+      - reference.design.design-worthiness
+      - reference.design.mobile-flow-craft
       - reference.experience.commitment-funnel
       - reference.experience.onboarding-conversion
       - reference.experience.paywall-goal-headline
@@ -2428,6 +2434,8 @@ workflows:
     reference_ids:
       - reference.data.analytics-attribution
       - reference.design.design-evidence-stack
+      - reference.design.design-worthiness
+      - reference.design.mobile-flow-craft
       - reference.experience.onboarding-conversion
       - reference.experience.onboarding-foundations
     role_id: role.product-leader
@@ -2668,8 +2676,10 @@ workflows:
       - product/experience/ux-patterns/UX_PATTERNS.md
     reference_ids:
       - reference.design.design-evidence-stack
+      - reference.design.mobile-flow-craft
       - reference.design.motion-craft-benchmarks
       - reference.design.premium-mobile-craft
+      - reference.engineering.recommended-agent-skills
     role_id: role.design-guru
     lane_ids:
       - design
@@ -3223,6 +3233,7 @@ workflows:
     reference_ids:
       - reference.design.design-evidence-stack
       - reference.design.design-visual-system
+      - reference.design.mobile-flow-craft
       - reference.design.quality-lens
       - reference.engineering.mobai-toolbelt
       - reference.process.tool-recipes.device-capture-and-proof
@@ -5108,8 +5119,16 @@ references:
     path: knowledge/design/design-evidence-stack.md
     load_when: before planning, creating, revising, auditing, or implementing any user-facing surface, component, interaction, onboarding flow, paywall, store frame, or marketing design; use it to classify the decision, select evidence sources, and record the evidence pass before mutation
     lifecycle: active
-    applicability_notes: This is the mandatory design-source router. Open only relevant sources. High-impact and high-risk surfaces require two complementary source lanes.
+    applicability_notes: This is the mandatory design-source router. Open only relevant sources. High-impact and high-risk surfaces require two complementary source lanes. Native flow research is question-first and flow-first; Appllama is an optional provider when independently available and authorized.
     sources:
+      - id: appllama-design-library
+        name: Appllama
+        source_type: design_research_provider
+        url: https://appllama.io/
+        review_cadence_days: 30
+        claim_scope: Optional mobile design research provider with real app screens, flows, and UI patterns. Use only with independently authorized access. Use the upstream MIT appllama-usage skill for provider-specific operation; do not copy or bulk-extract its proprietary corpus.
+        last_review_date: 2026-09-07
+        reviewer: b2c-maintainers
       - id: design-evidence-60fps
         name: 60fps.design
         source_type: inspiration_benchmark
@@ -5293,9 +5312,9 @@ references:
     title: Design Worthiness
     domain_id: domain.design
     path: knowledge/design/design-worthiness.md
-    load_when: when a Design Room mutation needs the mechanical worthiness floor or its independent audit must record the delegated taste decision before engineering harden, with no beauty score
+    load_when: when a Design Room mutation needs the mechanical worthiness floor or its independent audit must record the delegated taste decision before engineering harden, including native flow semantics and mechanical anti-generic consistency, with no beauty score
     lifecycle: active
-    applicability_notes: Orchestrate holes only. Do not rewrite eleven-star, emotional design, quality-lens, vibecoded-tells, or motion craft. DESIGN.md stays producer-owned. Mechanical, attested, and independently bound taste tiers decide what an agent may assert.
+    applicability_notes: Orchestrate holes only. Do not rewrite eleven-star, emotional design, quality-lens, vibecoded-tells, motion recipes, or mobile-flow-craft. DESIGN.md stays producer-owned. Mechanical, attested, and independently bound taste tiers decide what an agent may assert; runtime proof remains design-acceptance's job.
     source_exemption: Named standards (WCAG 2.2, Dieter Rams, Apple Human Interface Guidelines, Nielsen Norman Group progressive disclosure) appear as names only. This package contains internal operating guidance and has no external command-syntax claims.
     sources: []
     replacement_ids: []
@@ -5332,6 +5351,89 @@ references:
         claim_scope: Motion (framer-motion's successor, import from motion/react) React animation docs. Web-surface library used by the Design Room render app and launch web surfaces (landing, funnel); never used in the shipped mobile binary. Refresh before changing motion API/setup guidance.
         last_review_date: 2026-08-17
         reviewer: b2c-maintainers
+    replacement_ids: []
+  - id: reference.design.mobile-flow-craft
+    title: Mobile Flow Craft
+    domain_id: domain.design
+    path: knowledge/design/mobile-flow-craft.md
+    load_when: designing, implementing, or auditing a native mobile screen or flow; deciding navigation and presentation semantics; hardening native fidelity; defining motion; or preparing runtime design acceptance
+    lifecycle: active
+    applicability_notes: Cross-platform mobile craft doctrine. It adapts selected MIT-licensed Appllama methods into B2C App Builder invariants while leaving Appllama MCP operation to the upstream provider skill. Framework-specific prescriptions apply only when the selected stack matches them.
+    sources:
+      - id: appllama-app-design-skill
+        name: Appllama App Design Skill
+        source_type: upstream_method
+        url: https://github.com/Appllama/appllama-skills/blob/main/skills/appllama-app-design-skill/SKILL.md
+        review_cadence_days: 30
+        claim_scope: MIT-licensed upstream methods for study-before-build, native fidelity, navigation semantics, anti-generic checks, motion discipline, state cycles, and simulator-oriented verification. B2C App Builder adapts cross-platform invariants and does not import Appllama's proprietary screen corpus.
+        last_review_date: 2026-09-07
+        reviewer: b2c-maintainers
+        publisher: Antmind Ventures Private Limited
+        revision: dd5caaec3d5d50ad7fc0324da238119c6b7c3707
+        rights:
+          status: verified
+          spdx: MIT
+          evidence: catalog/upstreams/notices/appllama-skills.txt
+          evidence_sha256: 14cffee850f5c761273dfc49798cddc96786b4520c23f3ed1da727c334f07476
+          notes: Selected guidance adapted; proprietary screen corpus, MCP client, and unimported skill text retain separate review requirements.
+        selectors:
+          - README.md
+          - LICENSE
+          - skills/appllama-app-design-skill/SKILL.md
+        upstream_id: appllama-skills
+      - id: appllama-usage-skill
+        name: Appllama Usage Skill
+        source_type: upstream_method
+        url: https://github.com/Appllama/appllama-skills/blob/main/skills/appllama-usage/SKILL.md
+        review_cadence_days: 30
+        claim_scope: MIT-licensed research method for question-first, flow-first, cross-app study and saturation. Provider-specific MCP commands remain upstream and are not duplicated into the core runtime.
+        last_review_date: 2026-09-07
+        reviewer: b2c-maintainers
+        publisher: Antmind Ventures Private Limited
+        revision: dd5caaec3d5d50ad7fc0324da238119c6b7c3707
+        rights:
+          status: verified
+          spdx: MIT
+          evidence: catalog/upstreams/notices/appllama-skills.txt
+          evidence_sha256: 14cffee850f5c761273dfc49798cddc96786b4520c23f3ed1da727c334f07476
+          notes: Selected research method adapted; provider MCP syntax stays upstream.
+        selectors:
+          - README.md
+          - LICENSE
+          - skills/appllama-usage/SKILL.md
+        upstream_id: appllama-skills
+    derivations:
+      - source_ids:
+          - appllama-app-design-skill
+        relationship: adapted
+        rationale: Reauthor selected cross-platform flow, fidelity, anti-generic, motion, and verification methods into builder vocabulary while preserving DESIGN.md ownership, evidence contracts, and stack-neutral semantics.
+        reviewer: b2c-maintainers
+        reviewed_at: 2026-09-07
+        baseline: dd5caaec3d5d50ad7fc0324da238119c6b7c3707
+        selectors:
+          - README.md
+          - LICENSE
+          - skills/appllama-app-design-skill/SKILL.md
+        omissions:
+          - Do not import Appllama's proprietary screen corpus.
+          - Do not treat Expo or React Native as the default stack.
+          - Do not copy skill-host install hooks or treat skill installation as design acceptance.
+        notice: catalog/upstreams/notices/appllama-skills.txt
+      - source_ids:
+          - appllama-usage-skill
+        relationship: adapted
+        rationale: Reauthor the question-first, flow-first research method. Leave provider MCP syntax, credits, pagination, and media behavior in the upstream skill.
+        reviewer: b2c-maintainers
+        reviewed_at: 2026-09-07
+        baseline: dd5caaec3d5d50ad7fc0324da238119c6b7c3707
+        selectors:
+          - README.md
+          - LICENSE
+          - skills/appllama-usage/SKILL.md
+        omissions:
+          - Do not fork appllama-usage MCP commands into the core runtime.
+          - Do not require Appllama MCP to use this doctrine.
+        notice: catalog/upstreams/notices/appllama-skills.txt
     replacement_ids: []
   - id: reference.design.motion-craft-benchmarks
     title: Motion Craft Benchmarks
@@ -5937,11 +6039,32 @@ references:
     title: Recommended Agent Skills
     domain_id: domain.engineering
     path: knowledge/engineering/recommended-agent-skills.md
-    load_when: before Expo or SwiftUI implementation when choosing recommended external agent skill packs for craft, motion, or store work, without vendor MCP lock-in
+    load_when: before Expo or SwiftUI implementation when choosing recommended external agent skill packs for craft, motion, store work, or optional design-research provider guidance without vendor lock-in
     lifecycle: active
-    applicability_notes: Pin expo/skills and emilkowalski animate-expo/review-animations as recommended installs. Keep Appllama MCP, Appeeky MCP, and bulk Vercel packs off the default surface.
-    source_exemption: Named GitHub skill slugs appear as install identifiers only. This package contains internal routing guidance and has no live command-syntax claims against a third-party CLI.
-    sources: []
+    applicability_notes: Pin expo/skills and emilkowalski animate-expo/review-animations as recommended Expo installs. Appllama's app-design skill is an opt-in stack-specific companion; appllama-usage is loaded only when the user's Appllama MCP is independently connected and authorized. Keep paid/vendor MCPs off the default surface.
+    sources:
+      - id: github-appllama-skills
+        name: Appllama agent skills
+        source_type: agent_skill_pack
+        url: https://github.com/Appllama/appllama-skills
+        review_cadence_days: 30
+        claim_scope: MIT-licensed app-design and provider-usage skills. Install syntax and skill names are taken from the upstream README. Hosted Appllama MCP access remains separately authorized and subject to provider terms.
+        last_review_date: 2026-09-07
+        reviewer: b2c-maintainers
+        publisher: Antmind Ventures Private Limited
+        revision: dd5caaec3d5d50ad7fc0324da238119c6b7c3707
+        rights:
+          status: verified
+          spdx: MIT
+          evidence: catalog/upstreams/notices/appllama-skills.txt
+          evidence_sha256: 14cffee850f5c761273dfc49798cddc96786b4520c23f3ed1da727c334f07476
+          notes: Skill names and install syntax only; no SKILL.md is copied into the builder.
+        selectors:
+          - README.md
+          - LICENSE
+          - skills/appllama-app-design-skill/SKILL.md
+          - skills/appllama-usage/SKILL.md
+        upstream_id: appllama-skills
     replacement_ids: []
   - id: reference.engineering.technical-documentation-ste100
     title: Technical Documentation In ASD-STE100
@@ -11669,6 +11792,8 @@ context_packs:
   - id: context.experience
     title: Experience
     reference_ids:
+      - reference.design.design-worthiness
+      - reference.design.mobile-flow-craft
       - reference.experience.commitment-funnel
       - reference.experience.eleven-star-experience
       - reference.experience.ethics-guardrail
@@ -11683,10 +11808,12 @@ context_packs:
       - reference.design.design-visual-system
       - reference.design.design-worthiness
       - reference.design.editorial-scrollytelling
+      - reference.design.mobile-flow-craft
       - reference.design.premium-mobile-craft
       - reference.design.quality-lens
       - reference.design.surfaces-b2c
       - reference.design.vibecoded-tells
+      - reference.engineering.recommended-agent-skills
   - id: context.experience-cards
     title: Implemented emotional experience cards
     reference_ids:

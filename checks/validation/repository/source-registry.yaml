@@ -2281,3 +2281,48 @@ sources:
       - catalog/upstreams/notices/evanbacon-serve-sim.txt
     notes: Literal URL preserved from upstream Apache-2.0 notice. HTTPS fetch is separate from preserving the exact
       notice text; not a product implementation dependency.
+  - id: github-appllama-skills
+    name: Appllama agent skills
+    source_type: github
+    url: https://github.com/Appllama/appllama-skills
+    refresh_cadence_days: 30
+    owner: source-freshness
+    locations:
+      - catalog/upstreams/appllama-skills.yaml
+      - knowledge/engineering/recommended-agent-skills.md
+      - catalog/knowledge/engineering/engineering-recommended-agent-skills.yaml
+    notes: Reviewed source and opt-in skill-pack routing. Immutable reviewed source selectors and rights remain in
+      the upstream manifest.
+  - id: appllama-app-design-skill
+    name: Appllama App Design Skill
+    source_type: github
+    url: https://github.com/Appllama/appllama-skills/blob/main/skills/appllama-app-design-skill/SKILL.md
+    refresh_cadence_days: 30
+    owner: source-freshness
+    locations:
+      - catalog/upstreams/appllama-skills.yaml
+      - knowledge/design/mobile-flow-craft.md
+      - catalog/knowledge/design/design-mobile-flow-craft.yaml
+    notes: Skill-file reference retained from existing guidance. Immutable reviewed source selectors and rights
+      remain in the upstream manifest.
+  - id: appllama-usage-skill
+    name: Appllama Usage Skill
+    source_type: github
+    url: https://github.com/Appllama/appllama-skills/blob/main/skills/appllama-usage/SKILL.md
+    refresh_cadence_days: 30
+    owner: source-freshness
+    locations:
+      - catalog/upstreams/appllama-skills.yaml
+      - knowledge/design/mobile-flow-craft.md
+      - catalog/knowledge/design/design-mobile-flow-craft.yaml
+    notes: Skill-file reference retained from existing guidance. Provider-specific MCP commands stay upstream.
+  - id: appllama-skills-license
+    name: Appllama agent skills reviewed license
+    source_type: github
+    url: https://github.com/Appllama/appllama-skills/blob/dd5caaec3d5d50ad7fc0324da238119c6b7c3707/LICENSE
+    refresh_cadence_days: 365
+    owner: b2c-maintainers
+    locations:
+      - catalog/upstreams/appllama-skills.yaml
+    notes: Immutable license evidence reviewed with the selected upstream commit. A new adoption must review and
+      retain its own license; this entry is not live executable verification.

@@ -2,7 +2,7 @@
 
 Generated from active, bound knowledge source declarations and catalog/upstreams. This is a maintainer review queue, not a second registry. A cited repository may be an example, optional tool, adapted method or runtime dependency; the report does not infer adoption or permission from a URL. Only an explicit reviewed contribution changes support or acknowledgments.
 
-Scope: 35 referenced repositories, 83 source bindings, 66 bindings needing review or linkage.
+Scope: 36 referenced repositories, 86 source bindings, 66 bindings needing review or linkage.
 
 The scan excludes inactive/unbound knowledge, self-references, non-GitHub sources, undeclared prose URLs, package-manager dependencies and resources outside knowledge manifests. An empty queue is not proof that every dependency is tracked. Inspect those other surfaces during contribution review. Repository aliases are matched only when declared in an upstream manifest.
 
@@ -83,6 +83,9 @@ Use b2c contribute plan for an untracked source. For a maintained project, inspe
 
 | Repository | Knowledge owner | Source ID | Upstream | Status | Action or limit |
 | --- | --- | --- | --- | --- | --- |
+| appllama/appllama-skills | `knowledge/design/mobile-flow-craft.md` | appllama-app-design-skill | appllama-skills | tracked | Source identity and reviewed commit are linked. This does not certify executable compatibility or live results. |
+| appllama/appllama-skills | `knowledge/design/mobile-flow-craft.md` | appllama-usage-skill | appllama-skills | tracked | Source identity and reviewed commit are linked. This does not certify executable compatibility or live results. |
+| appllama/appllama-skills | `knowledge/engineering/recommended-agent-skills.md` | github-appllama-skills | appllama-skills | tracked | Source identity and reviewed commit are linked. This does not certify executable compatibility or live results. |
 | eronred/aso-skills | `knowledge/process/tool-recipes/growth-and-store-routing.md` | github-com-eronred-aso-skills | eronred-aso-skills | tracked | Source identity and reviewed commit are linked. This does not certify executable compatibility or live results. |
 | eronred/aso-skills | `knowledge/store/app-store-listing-prep.md` | github-com-eronred-aso-skills | eronred-aso-skills | tracked | Source identity and reviewed commit are linked. This does not certify executable compatibility or live results. |
 | eronred/aso-skills | `knowledge/store/app-store-listing-prep.md` | github-com-eronred-aso-skills-tree-main-skills | eronred-aso-skills | tracked | Source identity and reviewed commit are linked. This does not certify executable compatibility or live results. |

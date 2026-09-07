@@ -5,6 +5,7 @@ import { createHash } from "node:crypto";
 import { Miniflare, Log, LogLevel, convertV4MiniflareOptions, type V4WorkerOptions } from "miniflare";
 import { attachD1, seedAccountInto, revokeSeedKey } from "./support/d1.js";
 import { sha256 } from "../auth.js";
+import { HOSTED_INSTRUCTIONS } from "../instructions.js";
 import type { HostedCatalogResult, HostedKnowledgeGetResult, HostedKnowledgeSearchResult } from "../../../kernel/knowledge-service/types.js";
 
 const origin = "https://b2c.test";
@@ -32,9 +33,9 @@ before(async () => {
       B2C_APP_BUILDER_AUTH_SECRET: "c".repeat(43),
     },
     ratelimits: {
-      INGRESS_LIMITER: { namespace_id: "256003", simple: { limit: 10_000, period: 60 } },
-      AUTH_LIMITER: { namespace_id: "256001", simple: { limit: 10_000, period: 60 } },
-      API_LIMITER: { namespace_id: "256002", simple: { limit: 10_000, period: 60 } },
+      INGRESS_LIMITER: { namespace_id: "1001", simple: { limit: 10_000, period: 60 } },
+      AUTH_LIMITER: { namespace_id: "1002", simple: { limit: 10_000, period: 60 } },
+      API_LIMITER: { namespace_id: "1003", simple: { limit: 10_000, period: 60 } },
     },
     log: new Log(LogLevel.ERROR),
   };
@@ -178,7 +179,15 @@ test("real MCP initialization and tool discovery expose only the four read-only 
     }),
   });
   assert.equal(initialize.status, 200);
-  assert.equal(((await initialize.json()) as { result: { serverInfo: { name: string } } }).result.serverInfo.name, "b2c-hosted");
+  const handshake = (await initialize.json()) as { result: { serverInfo: { name: string }; instructions: string } };
+  assert.equal(handshake.result.serverInfo.name, "b2c-hosted");
+  // The instructions string is the whole briefing for a client that installed nothing else, so it
+  // is asserted rather than left to drift. Assert the route it must name, not the prose around it.
+  assert.equal(handshake.result.instructions, HOSTED_INSTRUCTIONS);
+  for (const required of ["b2c_catalog", "b2c_knowledge_search", "b2c_workflow", "route.expand", "b2c_knowledge_get"]) {
+    assert.ok(HOSTED_INSTRUCTIONS.includes(required), `hosted instructions must name ${required}`);
+  }
+  assert.match(HOSTED_INSTRUCTIONS, /unknown here, not done and not undone/);
   const response = await fetchPath("/mcp", {
     method: "POST",
     headers: mcpHeaders,

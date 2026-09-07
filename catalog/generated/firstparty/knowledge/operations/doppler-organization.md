@@ -41,7 +41,7 @@ feature. Do not depend on it. Compose at the consumer instead — this works on
 every plan and keeps the precedence rule in code we can test:
 
 ```bash
-doppler run -p b2c -c prd -- doppler run -p <business> -c prd_server -- <command>
+doppler run -p <account> -c <config> -- doppler run -p <business> -c <config> -- <command>
 ```
 
 The inner injection wins, so a business may override a shared account-tier value. The

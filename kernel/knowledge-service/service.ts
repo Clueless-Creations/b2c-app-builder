@@ -317,10 +317,23 @@ export function createKnowledgeService(bundle: HostedKnowledgeBundle): Knowledge
   const workflows = [...catalog.workflows].sort((left, right) => compareId(left.id, right.id));
   const workflowsById = new Map<string, (typeof workflows)[number]>(workflows.map((workflow) => [workflow.id, workflow]));
   if (workflowsById.size !== workflows.length) invalidBundle();
-  const workflowIndex = workflows.map((workflow) => ({
-    workflow,
-    searchText: [workflow.id, workflow.title, workflow.trigger, workflow.instructions].join("\n").toLowerCase(),
-  }));
+  const workflowIndex = workflows.map((workflow) => {
+    const searchText = [workflow.id, workflow.title, workflow.trigger, workflow.instructions].join("\n").toLowerCase();
+    return {
+      workflow,
+      searchText,
+      /**
+       * Ranking-only text: `searchText` plus the authored `founderPhrasings`. Deliberately NOT
+       * merged into `searchText`, which `catalog()` also uses for its every-term strict partition.
+       * Merging them lets a term borrowed from one workflow's phrasing bind a narrow strict set
+       * that suppresses every other workflow — measured, it erased the store-screenshot workflow
+       * from "make store screenshots" outright. Feeding phrasings to `matchRank` alone keeps the
+       * strict set byte-identical and makes matchedTermCount monotone non-decreasing, so the
+       * result set can only grow.
+       */
+      rankText: [searchText, ...workflow.founderPhrasings].join("\n").toLowerCase(),
+    };
+  });
   const domainSummaries = [...catalog.domains]
     .sort((left, right) => left.order - right.order || compareId(left.id, right.id))
     .map((domain) => ({ domainId: domain.id, title: domain.name, routeWhen: domain.routeWhen }));
@@ -548,7 +561,11 @@ export function createKnowledgeService(bundle: HostedKnowledgeBundle): Knowledge
             const reference = references.get(referenceId);
             if (!reference || seenPaths.has(reference.path)) return [];
             seenPaths.add(reference.path);
-            return [{ packId: pack.id, packTitle: pack.title, path: reference.path, title: reference.title, loadWhen: reference.loadWhen }];
+            // referenceId alongside path (ARCH-06: pin resources, not paths). A hosted reader has
+            // no filesystem and b2c_knowledge_get refuses a path by construction, so a pack entry
+            // carrying only `path` is unfetchable there — and unlike the `load` entries, these
+            // have no id anywhere else in the response to recover it from.
+            return [{ packId: pack.id, packTitle: pack.title, referenceId: reference.id, path: reference.path, title: reference.title, loadWhen: reference.loadWhen }];
           });
         })
       : [];
@@ -596,7 +613,9 @@ export function createKnowledgeService(bundle: HostedKnowledgeBundle): Knowledge
             : (strict.length > 0 ? strict : candidates)
                 .map((entry) => ({
                   ...entry,
-                  rank: matchRank(entry.searchText, entry.workflow.title, entry.workflow.trigger, queryTerms),
+                  // rankText, not searchText: `strict` above owns the every-term partition and
+                  // keeps the narrower field. See rankText's own comment for why they differ.
+                  rank: matchRank(entry.rankText, entry.workflow.title, entry.workflow.trigger, queryTerms),
                 }))
                 .filter((entry) => strict.length > 0 || entry.rank.matchedTermCount >= partialMatchFloor(queryTerms))
                 .sort(

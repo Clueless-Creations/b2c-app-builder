@@ -16,24 +16,9 @@ bindings:
     - context.launch-surfaces
 applicability_notes: Use the story qualification step before selecting scrollytelling. Transfer controller, state,
   semantic, progressive-enhancement, and verification mechanics. Never transfer source identity, claims, copy, or assets.
-sources:
-  - id: github-clueless-creations-site
-    name: Clueless Creations website repository
-    source_type: github
-    url: https://github.com/Clueless-Creations/clueless-creations-site/commit/2a3935bfbc03efa36778792db3cca71494e57725
-    review_cadence_days: 90
-    claim_scope: Audited practice evidence at commit 2a3935bfbc03efa36778792db3cca71494e57725 for stable semantic story
-      states, code-native evidence visuals, and a situation-to-mechanism-to-outcome-to-proof narrative. Transfer
-      mechanics only.
-    last_review_date: 2026-08-21
-    reviewer: b2c-maintainers
-  - id: github-eduardomuth-site
-    name: Eduardo Martinez portfolio website repository
-    source_type: github
-    url: https://github.com/Emuthmartinez/eduardomuth-site/commit/3f7574c178decbf2edfce997d8c6b9d0928cece8
-    review_cadence_days: 90
-    claim_scope: Audited practice evidence at commit 3f7574c178decbf2edfce997d8c6b9d0928cece8 for measured step-center
-      control, shared scroll progress, responsive sticky composition, mobile guidance, and progressive-enhancement
-      verification. Transfer mechanics only.
-    last_review_date: 2026-08-21
-    reviewer: b2c-maintainers
+source_exemption: Internal operating guidance. The transferable content here is scrollytelling mechanics - stable
+  semantic story states, measured step-center control, shared scroll progress, responsive sticky composition, mobile
+  guidance, code-native evidence visuals, a situation-to-mechanism-to-outcome-to-proof narrative, and
+  progressive-enhancement verification - established by first-party audits of production implementations the maintainers
+  own and operate. Those implementations are not public sources and are deliberately left uncited - the mechanics are
+  the claim, and they are verified by this package's own checks rather than by an external document.

@@ -111,6 +111,15 @@ const knownValidators = new Set([
   "render-credits",
 ]);
 
+/**
+ * Tool surfaces a scenario can grade. `local` is the default and the assumption behind every
+ * scenario authored before the field existed: shell, workspace, and the `b2c` CLI are present.
+ * `knowledge-only` is the hosted MCP — four read-only tools, no filesystem, no commands, and no
+ * view of workspace state.
+ */
+const SCENARIO_SURFACES = new Set(["local", "knowledge-only"]);
+const DEFAULT_SCENARIO_SURFACE = "local";
+
 // Flagship scenarios that must stay in the live behavioral subset
 // (run-behavioral-evals.ts; opted in with `behavioral: true`).
 const requiredBehavioral = new Set([
@@ -163,6 +172,28 @@ if (!existsSync(scenarioDir)) {
 
     if (parsed.behavioral !== undefined && typeof parsed.behavioral !== "boolean") {
       issues.push(issue("error", `launchbench.${file}.behavioral.invalid`, `${file} behavioral must be true or false when present.`, fullPath));
+    }
+
+    /**
+     * Which tool surface the graded agent is on. Absent means `local`, which is what every
+     * scenario authored before this field assumed: a shell, a workspace, and the `b2c` CLI.
+     *
+     * The distinction is load-bearing, not bookkeeping. A rubric written for `local` can grade an
+     * agent DOWN for reporting that it cannot reach a provider — correct guidance when the CLI is
+     * installed, and the opposite of correct on `knowledge-only`, where no command can be run and
+     * "not verified from this connection" is the honest answer. ARCH-11 keeps available execution
+     * route separate from observed proof; a scenario that does not say which surface it grades
+     * silently collapses the two.
+     */
+    if (parsed.surface !== undefined && !SCENARIO_SURFACES.has(String(parsed.surface))) {
+      issues.push(
+        issue(
+          "error",
+          `launchbench.${file}.surface.invalid`,
+          `${file} surface must be one of ${[...SCENARIO_SURFACES].join(", ")} when present; omit it for the default (${DEFAULT_SCENARIO_SURFACE}).`,
+          fullPath,
+        ),
+      );
     }
     const scenarioId = asString(parsed.id);
     if (scenarioId && requiredBehavioral.has(scenarioId) && parsed.behavioral !== true) {

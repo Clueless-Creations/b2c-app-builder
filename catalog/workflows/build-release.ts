@@ -271,11 +271,16 @@ export const workflows = [
       "get real screenshots for the store listing, not mockups",
       "produce store screenshots from actual app captures",
       "capture and compose the store images we need",
+      "upload the store screenshots to App Store Connect",
     ],
     title: "Store screenshots production",
     domainId: "domain.store",
     areaIds: ["area.build-release"],
-    trigger: "Store screenshots needed (raw capture → composed iPhone/iPad/Play assets)",
+    // Names App Store Connect on purpose. A founder asking for this job almost always names the
+    // destination, and catalog search keeps only workflows matching every query term whenever any
+    // workflow does — so before this phrase existed, "store screenshots App Store Connect upload"
+    // matched the upload automation alone and suppressed this node, which produces the asset.
+    trigger: "Store screenshots needed (raw capture → composed iPhone/iPad/Play assets), including the set uploaded to App Store Connect",
     instructions:
       "Capture raw app UI first through a provider that covers the selected platform and required capture operations. Prefer native tools already exposed by the agent host; use MobAI or another provider for explicit bindings or uncovered requirements — and treat those raw captures as proof inputs, never final store creative. Before this node enters the dispatch frontier, the orchestration manager must invalidate workflow.design.design-room in run state (mark it stale, clear its blocker and accepted output fingerprint, and mark its output bindings unaccepted), recompute the frontier, redispatch that Design Room node with a store-first-frame change classification and affected scope, accept its refreshed DESIGN.md, screen map, and Design Room outputs, and only then recompute and dispatch this screenshot node. The screenshot worker never writes Design Room outputs. Read root DESIGN.md and run check:design-md plus check:design-room before composing or materially changing a store frame; an accepted Design Room dependency from an earlier or unrelated scope is not evidence for new store creative. Compose final assets from the Asset Knowledge Brief (strategy/RESEARCH.md's user/problem, 11_STAR_EXPERIENCE.md's magical moment, the emotion/card from EMOTIONAL_DESIGN.md, DESIGN.md's tokens) with headline, copy overlay, device frame, and export every required iPhone/iPad/Play well — never a generic, knowledge-free hook. Run every composed frame through quality-lens.md's Anti-Generic Checks before calling the deck done, and write the raw-path/composition-path/upload-status table to SCREENSHOTS.md. Pass `npm run check:store-screenshots -- --root .`; a technically correct, on-brand screenshot that still reads as generic fails the done bar.",
     reads: [

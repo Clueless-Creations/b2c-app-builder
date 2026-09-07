@@ -1,8 +1,8 @@
 id: business-pack.consumer-business
 title: Consumer business
 kind: business-pack
-version: 0.218.13
-revision: 0.218.13
+version: 0.218.14
+revision: 0.218.14
 depends_on: []
 creates_provider_spend: false
 domains:
@@ -3205,11 +3205,12 @@ workflows:
     domain_id: domain.store
     area_ids:
       - area.build-release
-    trigger: Store screenshots needed (raw capture → composed iPhone/iPad/Play assets)
+    trigger: Store screenshots needed (raw capture → composed iPhone/iPad/Play assets), including the set uploaded to App Store Connect
     founder_phrasings:
       - get real screenshots for the store listing, not mockups
       - produce store screenshots from actual app captures
       - capture and compose the store images we need
+      - upload the store screenshots to App Store Connect
     instructions: Capture raw app UI first through a provider that covers the selected platform and required capture operations. Prefer native tools already exposed by the agent host; use MobAI or another provider for explicit bindings or uncovered requirements — and treat those raw captures as proof inputs, never final store creative. Before this node enters the dispatch frontier, the orchestration manager must invalidate workflow.design.design-room in run state (mark it stale, clear its blocker and accepted output fingerprint, and mark its output bindings unaccepted), recompute the frontier, redispatch that Design Room node with a store-first-frame change classification and affected scope, accept its refreshed DESIGN.md, screen map, and Design Room outputs, and only then recompute and dispatch this screenshot node. The screenshot worker never writes Design Room outputs. Read root DESIGN.md and run check:design-md plus check:design-room before composing or materially changing a store frame; an accepted Design Room dependency from an earlier or unrelated scope is not evidence for new store creative. Compose final assets from the Asset Knowledge Brief (strategy/RESEARCH.md's user/problem, 11_STAR_EXPERIENCE.md's magical moment, the emotion/card from EMOTIONAL_DESIGN.md, DESIGN.md's tokens) with headline, copy overlay, device frame, and export every required iPhone/iPad/Play well — never a generic, knowledge-free hook. Run every composed frame through quality-lens.md's Anti-Generic Checks before calling the deck done, and write the raw-path/composition-path/upload-status table to SCREENSHOTS.md. Pass `npm run check:store-screenshots -- --root .`; a technically correct, on-brand screenshot that still reads as generic fails the done bar.
     reads:
       - DESIGN.md
@@ -3225,6 +3226,7 @@ workflows:
       - reference.design.quality-lens
       - reference.engineering.mobai-toolbelt
       - reference.process.tool-recipes.device-capture-and-proof
+      - reference.store.app-store-connect-cli
       - reference.store.aso-store-ops
       - reference.store.screenshot-toolchain
       - reference.words.consumer-copy-benchmarks
@@ -5304,23 +5306,8 @@ references:
     load_when: before planning, building, changing, or auditing a scroll-led story on a landing page, funnel page, portfolio, case study, or other public web surface
     lifecycle: active
     applicability_notes: Use the story qualification step before selecting scrollytelling. Transfer controller, state, semantic, progressive-enhancement, and verification mechanics. Never transfer source identity, claims, copy, or assets.
-    sources:
-      - id: github-clueless-creations-site
-        name: Clueless Creations website repository
-        source_type: github
-        url: https://github.com/Clueless-Creations/clueless-creations-site/commit/2a3935bfbc03efa36778792db3cca71494e57725
-        review_cadence_days: 90
-        claim_scope: Audited practice evidence at commit 2a3935bfbc03efa36778792db3cca71494e57725 for stable semantic story states, code-native evidence visuals, and a situation-to-mechanism-to-outcome-to-proof narrative. Transfer mechanics only.
-        last_review_date: 2026-08-21
-        reviewer: b2c-maintainers
-      - id: github-eduardomuth-site
-        name: Eduardo Martinez portfolio website repository
-        source_type: github
-        url: https://github.com/Emuthmartinez/eduardomuth-site/commit/3f7574c178decbf2edfce997d8c6b9d0928cece8
-        review_cadence_days: 90
-        claim_scope: Audited practice evidence at commit 3f7574c178decbf2edfce997d8c6b9d0928cece8 for measured step-center control, shared scroll progress, responsive sticky composition, mobile guidance, and progressive-enhancement verification. Transfer mechanics only.
-        last_review_date: 2026-08-21
-        reviewer: b2c-maintainers
+    source_exemption: Internal operating guidance. The transferable content here is scrollytelling mechanics - stable semantic story states, measured step-center control, shared scroll progress, responsive sticky composition, mobile guidance, code-native evidence visuals, a situation-to-mechanism-to-outcome-to-proof narrative, and progressive-enhancement verification - established by first-party audits of production implementations the maintainers own and operate. Those implementations are not public sources and are deliberately left uncited - the mechanics are the claim, and they are verified by this package's own checks rather than by an external document.
+    sources: []
     replacement_ids: []
   - id: reference.design.landing-motion-craft
     title: Landing Motion Craft
@@ -6397,12 +6384,12 @@ references:
     lifecycle: active
     hub: true
     sources:
-      - id: retention-mechanics-mcp
-        name: Retention Mechanics MCP server
-        source_type: api
-        url: https://github.com/Emuthmartinez/retention-mechanics-mcp
+      - id: experience-card-deck
+        name: Experience Card deck (bundled)
+        source_type: official_docs
+        url: https://github.com/Clueless-Creations/b2c-app-builder/tree/main/knowledge/experience/experience-cards
         review_cadence_days: 30
-        claim_scope: First-party MCP over the Experience Card deck (mechanic search with risk ceilings, versioned card content, ethics attestation scaffolds). Optional tooling - the bundled deck under knowledge/experience/experience-cards/ is the frozen offline contract and every validator reads it; the server is preferred only when connected. Private repo; local stdio during development.
+        claim_scope: The frozen offline contract for Experience Card content - mechanic definitions with risk ceilings, versioned card text, and ethics attestation scaffolds. Every validator reads this deck, so it is the source of record for every claim here. An optional first-party MCP server can serve the same deck over stdio when one is connected; it carries no claim the deck does not already carry, and is tooling rather than a source.
         last_review_date: 2026-08-17
         reviewer: b2c-maintainers
     replacement_ids: []
@@ -6449,12 +6436,12 @@ references:
     lifecycle: active
     applicability_notes: See experience-cards.md for the card deck, emotional-experience-design.md for full producer detail, emotional-experience-measurement.md for instrumentation, and ethics-guardrail.md for the regulatory/legal contract.
     sources:
-      - id: retention-mechanics-mcp
-        name: Retention Mechanics MCP server
-        source_type: api
-        url: https://github.com/Emuthmartinez/retention-mechanics-mcp
+      - id: experience-card-deck
+        name: Experience Card deck (bundled)
+        source_type: official_docs
+        url: https://github.com/Clueless-Creations/b2c-app-builder/tree/main/knowledge/experience/experience-cards
         review_cadence_days: 30
-        claim_scope: First-party MCP over the Experience Card deck (mechanic search with risk ceilings, versioned card content, ethics attestation scaffolds). Optional tooling - the bundled deck under knowledge/experience/experience-cards/ is the frozen offline contract and every validator reads it; the server is preferred only when connected. Private repo; local stdio during development.
+        claim_scope: The frozen offline contract for Experience Card content - mechanic definitions with risk ceilings, versioned card text, and ethics attestation scaffolds. Every validator reads this deck, so it is the source of record for every claim here. An optional first-party MCP server can serve the same deck over stdio when one is connected; it carries no claim the deck does not already carry, and is tooling rather than a source.
         last_review_date: 2026-08-17
         reviewer: b2c-maintainers
     replacement_ids: []
@@ -7224,12 +7211,12 @@ references:
     load_when: before using or replacing any paid/account-gated tool, before running a free fallback, or when a service is missing from the runtime
     lifecycle: active
     sources:
-      - id: retention-mechanics-mcp
-        name: Retention Mechanics MCP server
-        source_type: api
-        url: https://github.com/Emuthmartinez/retention-mechanics-mcp
+      - id: experience-card-deck
+        name: Experience Card deck (bundled)
+        source_type: official_docs
+        url: https://github.com/Clueless-Creations/b2c-app-builder/tree/main/knowledge/experience/experience-cards
         review_cadence_days: 30
-        claim_scope: First-party MCP over the Experience Card deck (mechanic search with risk ceilings, versioned card content, ethics attestation scaffolds). Optional tooling - the bundled deck under knowledge/experience/experience-cards/ is the frozen offline contract and every validator reads it; the server is preferred only when connected. Private repo; local stdio during development.
+        claim_scope: The frozen offline contract for Experience Card content - mechanic definitions with risk ceilings, versioned card text, and ethics attestation scaffolds. Every validator reads this deck, so it is the source of record for every claim here. An optional first-party MCP server can serve the same deck over stdio when one is connected; it carries no claim the deck does not already carry, and is tooling rather than a source.
         last_review_date: 2026-08-17
         reviewer: b2c-maintainers
     replacement_ids: []

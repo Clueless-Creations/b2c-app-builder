@@ -1030,7 +1030,7 @@ _After bounded App Review remediation is independently verified, before any furt
 
 ### Store screenshots production
 
-_Store screenshots needed (raw capture → composed iPhone/iPad/Play assets)_
+_Store screenshots needed (raw capture → composed iPhone/iPad/Play assets), including the set uploaded to App Store Connect_
 
 - **Role:** Design guru
 - **Phases:** 3
@@ -1039,7 +1039,7 @@ _Store screenshots needed (raw capture → composed iPhone/iPad/Play assets)_
 - **Consults:** —
 - **Produces:** `store/app-store-listing/SCREENSHOTS.md`
 - **Gates:** `check:design-md`, `check:design-room`, `check:store-screenshots`
-- **Knowledge:** [Design Evidence Stack](../../knowledge/design/design-evidence-stack.md), [Design Visual System](../../knowledge/design/design-visual-system.md), [Quality Lens](../../knowledge/design/quality-lens.md), [MobAI Toolbelt](../../knowledge/engineering/mobai-toolbelt.md), [Device Capture And Proof](../../knowledge/process/tool-recipes/device-capture-and-proof.md), [ASO Store Ops](../../knowledge/store/aso-store-ops.md), [Screenshot Toolchain and Source Adoption](../../knowledge/store/screenshot-toolchain.md), [Consumer Copy Benchmarks](../../knowledge/words/consumer-copy-benchmarks.md), [Conversion Copy](../../knowledge/words/conversion-copy.md)
+- **Knowledge:** [Design Evidence Stack](../../knowledge/design/design-evidence-stack.md), [Design Visual System](../../knowledge/design/design-visual-system.md), [Quality Lens](../../knowledge/design/quality-lens.md), [MobAI Toolbelt](../../knowledge/engineering/mobai-toolbelt.md), [Device Capture And Proof](../../knowledge/process/tool-recipes/device-capture-and-proof.md), [App Store Connect CLI](../../knowledge/store/app-store-connect-cli.md), [ASO Store Ops](../../knowledge/store/aso-store-ops.md), [Screenshot Toolchain and Source Adoption](../../knowledge/store/screenshot-toolchain.md), [Consumer Copy Benchmarks](../../knowledge/words/consumer-copy-benchmarks.md), [Conversion Copy](../../knowledge/words/conversion-copy.md)
 
 ### Google Play release
 

@@ -33,9 +33,9 @@ before(async () => {
       B2C_APP_BUILDER_AUTH_SECRET: "s".repeat(43),
     },
     ratelimits: {
-      INGRESS_LIMITER: { namespace_id: "256003", simple: { limit: 10_000, period: 60 } },
-      AUTH_LIMITER: { namespace_id: "256001", simple: { limit: 10_000, period: 60 } },
-      API_LIMITER: { namespace_id: "256002", simple: { limit: 10_000, period: 60 } },
+      INGRESS_LIMITER: { namespace_id: "1001", simple: { limit: 10_000, period: 60 } },
+      AUTH_LIMITER: { namespace_id: "1002", simple: { limit: 10_000, period: 60 } },
+      API_LIMITER: { namespace_id: "1003", simple: { limit: 10_000, period: 60 } },
     },
     log: new Log(LogLevel.ERROR),
   };

@@ -1,13 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.218.14",
+  "version": "0.218.15",
   "updatedAt": "2026-09-07",
   "sourcePath": ".",
   "releaseNotes": [
-    "Store screenshots production now names App Store Connect in its trigger and phrasings, and the App Store Connect CLI reference binds to it. A founder asking to produce screenshots and upload them used to get one result — the upload automation — because \"connect\" appeared nowhere in the screenshot workflow's authored text and one absent term suppresses every partial match.",
-    "Catalog ranking reads a separate field from the strict-match partition, so authored founderPhrasings improve ranking without widening the every-term filter. Proven monotone over 607 queries: no result set shrank. A new store-utterance golden corpus and hosted-discovery fixture ratchet erasure and rank, measured at 11 unreachable and 33 outside the top three across 90 needed-workflow slots, down from 14 and 41.",
-    "The hosted MCP instructions name the whole route — catalog or search, then b2c_workflow, then route.expand and b2c_knowledge_get — and state what the service cannot observe: whether a prerequisite ran, an artifact exists, or an account is connected is unknown there, not done and not undone. The string is pinned by a test and lives in its own module, since workerd rejects a non-handler named export from the Worker entry.",
-    "Dispatch briefs emit referenceId beside path on context-pack entries, so all 2784 resolve through b2c_knowledge_get, which refuses paths by construction.",
-    "LaunchBench scenarios declare a surface, defaulting to local. The App Store Connect auth rubric graded an agent down for reporting it cannot reach the account — right with a shell, wrong without one — so the imperative is now conditioned on having an execution route, the key-scope claim is corrected to role-scoped reality, an authorization-failure rung is added, and a knowledge-only scenario covers the surface that could not previously be expressed."
+    "Public writing guidance now points at knowledge/words/no-slop-writing.md. The deleted root VOICE.md file is no longer named in the agent read order, the change contract, the docs index, or the architecture root-file inventory.",
+    "The repository-boundary allowlist and the version-discipline exclude list no longer treat VOICE.md as a root entry point, matching the file's removal from the public toolkit."
   ]
 }

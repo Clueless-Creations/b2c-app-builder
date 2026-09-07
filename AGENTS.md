@@ -76,7 +76,7 @@ provenance. A contributor or maintainer does not reason as a business worker.
 
 1. `README.md`
 2. The router for your scope: `SKILL.md` for a business, or the contributor or maintainer router named above
-3. `VOICE.md` for public-facing copy, console copy, launch writing, naming, or other builder-facing prose
+3. `knowledge/words/no-slop-writing.md` for public-facing copy, console copy, launch writing, or other builder-facing prose
 4. `docs/guides/runtime-package.md`
 5. `docs/public-interface.md` and `docs/north-star-architecture.md`
 6. For architecture, provider, composition, or runtime changes: the assigned unit in the [migration roadmap](docs/plans/2026-09-04-1747-refactor-consumer-business-primitives-plan.md)
@@ -144,7 +144,7 @@ Pause for user authority before access or secret changes, spend, pricing, legal 
 
 - Update the public operation registry before changing CLI or MCP projections. Run `npm run render:public-api` and preserve saved v1 fixtures.
 - Keep README, package guide, routing skill, workspace templates, setup and help output, generated reference, and public schemas aligned. The docs index states authority. Historical plans do not override it.
-- For public-facing product copy, console copy, launch writing, or naming, follow `VOICE.md`. Do not casually rename technical `b2c` contracts because the display name changes.
+- For public-facing product copy, console copy, launch writing, or naming, follow `knowledge/words/no-slop-writing.md`. Do not casually rename technical `b2c` contracts because the display name changes.
 - Within a public major version, preserve supported inputs and meanings. Add operations and optional fields. Do not expose internal state or caller-authored grants. Breaking changes need an architecture decision and a migration.
 - Edit catalog definitions before generated catalog files.
 - Render generated projections after a catalog or knowledge change. A bare `skill-version.json` bump also stales `catalog/generated/catalog.json` and `catalog/generated/hosted-knowledge.json`, which embed the version. Run `npm run render:all` to regenerate both.

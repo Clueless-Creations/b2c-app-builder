@@ -59,7 +59,6 @@ const REPOSITORY_ONLY_PATHS = [
   "AGENTS.md",
   "CLAUDE.md",
   "CONTRIBUTING.md",
-  "VOICE.md",
   "LICENSE",
   ".gitignore",
   ".npmignore",

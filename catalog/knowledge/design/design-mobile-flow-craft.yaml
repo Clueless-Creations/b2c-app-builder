@@ -1,0 +1,38 @@
+schema_version: 1.0.0
+id: reference.design.mobile-flow-craft
+title: Mobile Flow Craft
+domain_id: domain.design
+document_path: knowledge/design/mobile-flow-craft.md
+load_when: designing, implementing, or auditing a native mobile screen or flow; deciding navigation and presentation semantics; hardening native fidelity; defining motion; or preparing runtime design acceptance
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.design.design-room
+    - workflow.design.premium-mobile-craft
+    - workflow.design.design-system-audit
+    - workflow.design.implementation-craft-audit
+    - workflow.experience.onboarding-system.onb-17-screen-control-paywall-contract
+    - workflow.experience.onboarding-system.onb-18-visual-design-prototype
+    - workflow.store.store-screenshots-production
+    - workflow.orchestration.full-launch-program
+  context_pack_ids:
+    - context.design
+    - context.experience
+applicability_notes: Cross-platform mobile craft doctrine. It adapts selected MIT-licensed Appllama methods into B2C App Builder invariants while leaving Appllama MCP operation to the upstream provider skill. Framework-specific prescriptions apply only when the selected stack matches them.
+sources:
+  - id: appllama-app-design-skill
+    name: Appllama App Design Skill
+    source_type: upstream_method
+    url: https://github.com/Appllama/appllama-skills/blob/main/skills/appllama-app-design-skill/SKILL.md
+    review_cadence_days: 30
+    claim_scope: MIT-licensed upstream methods for study-before-build, native fidelity, navigation semantics, anti-generic checks, motion discipline, state cycles, and simulator-oriented verification. B2C App Builder adapts cross-platform invariants and does not import Appllama's proprietary screen corpus.
+    last_review_date: 2026-09-07
+    reviewer: b2c-maintainers
+  - id: appllama-usage-skill
+    name: Appllama Usage Skill
+    source_type: upstream_method
+    url: https://github.com/Appllama/appllama-skills/blob/main/skills/appllama-usage/SKILL.md
+    review_cadence_days: 30
+    claim_scope: MIT-licensed research method for question-first, flow-first, cross-app study and saturation. Provider-specific MCP commands remain upstream and are not duplicated into the core runtime.
+    last_review_date: 2026-09-07
+    reviewer: b2c-maintainers

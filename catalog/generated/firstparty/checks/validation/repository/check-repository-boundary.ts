@@ -69,9 +69,6 @@ const allowedTopLevelFiles = new Set([
   "README.md",
   "SKILL.md",
   "THIRD_PARTY_NOTICES.md",
-  // Founder voice standard (commit 4361d873): the writing and naming standard that the AGENTS.md
-  // read order and Change contract cite. Recorded under "Source layers" in docs/architecture.md.
-  "VOICE.md",
   "package-lock.json",
   "package.json",
   "skill-version.json",

@@ -101,7 +101,7 @@ A runtime change updates:
 - the generated stamps, via `npm run render:all` and `npm run render:evidence-schema-version`
 
 Hosted Worker packages version independently. `README.md`, `AGENTS.md`,
-`CLAUDE.md`, `CONTRIBUTING.md`, `VOICE.md`, and `docs/` are repository-only
+`CLAUDE.md`, `CONTRIBUTING.md`, and `docs/` are repository-only
 paths and need no version bump.
 
 Use a valid semantic version. Set `updatedAt` to the change date. Keep release

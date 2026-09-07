@@ -7,7 +7,7 @@
  * prompt stays inside one Clueless Creations visual system.
  *
  * Keep this chrome product-name neutral. The customer-facing name may change, while the technical
- * `b2c` identifiers are stable contracts. See `VOICE.md`.
+ * `b2c` identifiers are stable contracts.
  */
 
 import { BRAND_MARK_SVG, themeCss } from "../../knowledge-mcp/theme.js";

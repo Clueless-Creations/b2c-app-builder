@@ -6,7 +6,7 @@
  * strict enough that a script tag could not run even if one were added by mistake.
  *
  * Voice: this is a utility surface. Use plain labels, explain consequences, and save the kitchen
- * metaphor for the marketing page where it actually helps. Follow `VOICE.md`.
+ * metaphor for the marketing page where it actually helps.
  */
 
 import { issueConsentToken, verifyConsentToken } from "../../knowledge-mcp/auth.js";

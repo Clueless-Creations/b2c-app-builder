@@ -12,7 +12,7 @@ B2C App Builder supplies consumer-business primitives through a skill, CLI, and 
 | Add a provider, capability, or recipe | [Extension guide](guides/extend-the-system.md)                                                                                                                       |
 | Work on the platform                  | [Contributing](../CONTRIBUTING.md), then [AGENTS.md](../AGENTS.md)                                                                                                   |
 | Decide which scope you are in         | The three-scope table that opens [AGENTS.md](../AGENTS.md): one business, a reusable contribution, or the builder itself                                             |
-| Write builder-facing or console copy  | [Voice standard](../VOICE.md)                                                                                                                                        |
+| Write builder-facing or console copy  | [No-slop writing](../knowledge/words/no-slop-writing.md)                                                                                                              |
 | Look up a check                       | [Validator map](validators.md)                                                                                                                                       |
 | Understand founder authority grants   | [Authority envelopes](authority-envelopes.md)                                                                                                                        |
 | Audit an architectural change         | [North-star architecture](north-star-architecture.md), [conformance protocol](architecture-conformance.md), and [decision records](decisions/README.md)              |

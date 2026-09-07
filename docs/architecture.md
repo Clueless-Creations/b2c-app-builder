@@ -180,10 +180,8 @@ anything; nothing imports `checks`.
 Root files beside the layers are not layers. The package manifests
 (`package.json`, `package-lock.json`, `tsconfig.json`, `skill-version.json`),
 the tool dotfiles, and the entry documents (`README.md`, `AGENTS.md`,
-`CLAUDE.md`, `CONTRIBUTING.md`, `LICENSE`, `VOICE.md`, and the generated
-`ACKNOWLEDGMENTS.md` and `THIRD_PARTY_NOTICES.md`) sit at the root. `VOICE.md`
-is the writing and naming standard for public-facing copy, console copy, and
-launch writing; the `AGENTS.md` read order and Change contract cite it.
+`CLAUDE.md`, `CONTRIBUTING.md`, `LICENSE`, and the generated
+`ACKNOWLEDGMENTS.md` and `THIRD_PARTY_NOTICES.md`) sit at the root.
 `check:repository-boundary` allowlists exactly these files and the layer
 directories. A new root file needs a note here or a decision record in the same
 change. Being allowed at the root is a separate decision from being exempt from

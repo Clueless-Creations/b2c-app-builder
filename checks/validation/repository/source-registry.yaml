@@ -1632,6 +1632,16 @@ sources:
       - docs/north-star-architecture.md
       - docs/plans/2026-09-04-1747-refactor-consumer-business-primitives-plan.md
     notes: Auto-discovered from repository content.
+  - id: registry-npmjs-org
+    name: npm registry
+    source_type: api
+    url: https://registry.npmjs.org/
+    refresh_cadence_days: 180
+    owner: maintainer
+    locations:
+      - .github/workflows/publish.yml
+    notes: Publish target for the package. actions/setup-node writes it to .npmrc so `npm publish` authenticates
+      through trusted publishing; no token is stored in the repository.
   - id: scripts-sil-org-ofl
     name: scripts.sil.org
     source_type: website
@@ -1670,9 +1680,9 @@ sources:
       - README.md
     notes: Reads the detected license from the repo, so it tracks LICENSE automatically.
   - id: shields-io-badge-node-version
-    name: Shields.io badge, Node 22
+    name: Shields.io badge, Node 24
     source_type: badge_endpoint
-    url: https://img.shields.io/badge/node-22-informational
+    url: https://img.shields.io/badge/node-24-informational
     refresh_cadence_days: 180
     owner: maintainer
     locations:

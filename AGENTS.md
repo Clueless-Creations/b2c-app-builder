@@ -101,7 +101,7 @@ The source map describes current placement, not the permanent public API. Migrat
 
 ## Operating contract
 
-- Use Node.js 22.
+- Use Node.js 24.
 - Store local registry state under `~/.b2c-app-builder`.
 - Use the `B2C_APP_BUILDER_*` environment namespace.
 - MCP resolves workspace access through the local registry. The CLI may use an explicit operator-supplied path; registration gives it a stable ID and makes it available to MCP.

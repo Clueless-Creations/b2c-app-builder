@@ -32,31 +32,46 @@ evidence.
 
 ## Get started
 
-Use Node.js 22. The package is not published to npm, so install it from source.
+Use Node.js 24.
+
+```bash
+npm install -g b2c-app-builder
+b2c setup
+```
+
+Setup creates the local workspace registry and prints the MCP registration
+command for Claude Code, Cursor, and Codex. The portable form needs no install
+at all:
+
+```bash
+claude mcp add --scope user b2c-app-builder -- npx -y -p b2c-app-builder b2c-app-builder-mcp
+```
+
+To work from source instead, clone the repository and run the same setup:
 
 ```bash
 git clone https://github.com/Clueless-Creations/b2c-app-builder.git
 cd b2c-app-builder
 npm ci
+npm run setup
+```
 
+From a checkout, setup runs `npm link`, so `b2c` resolves to that checkout.
+Either way, the first commands are the same:
+
+```bash
 # List the public capabilities, providers, and recipes.
-node entrypoints/cli/b2c.mjs catalog --json
+b2c catalog --json
 
 # Preview a composition. This creates and changes nothing.
-node entrypoints/cli/b2c.mjs compose \
-  --config contracts/public-api/examples/subscription-app.json --json
+b2c compose --config contracts/public-api/examples/subscription-app.json --json
 ```
 
 The preview resolves each operation to a provider and lists any blockers.
 This declaration preview reports `canApply: false`. To activate an installed
 package recipe, use the separate revision-checked
 [composition plan and activation commands](docs/guides/composition-activation.md).
-
-To connect an agent, run `npm run setup` and follow the MCP registration line
-it prints. Setup runs `npm link`, which installs the `b2c` command globally,
-then creates a local workspace registry. After setup, `b2c` replaces
-`node entrypoints/cli/b2c.mjs` in every command below. The
-[`b2c-app-builder` skill](SKILL.md) routes broad consumer-app work to the
+The [`b2c-app-builder` skill](SKILL.md) routes broad consumer-app work to the
 right workflow.
 
 Then give the agent a mandate:

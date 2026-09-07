@@ -413,7 +413,7 @@ tooling/                          renderers and maintenance commands
 
 ## Development checks
 
-Use Node.js 22. Start with checks that match the change:
+Use Node.js 24. Start with checks that match the change:
 
 ```bash
 npm run validate:skill

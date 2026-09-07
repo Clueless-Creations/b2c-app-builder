@@ -10,7 +10,7 @@ Start with the [documentation index](docs/README.md), the
 
 ## Start
 
-Use Node.js 22.
+Use Node.js 24.
 
 ```bash
 npm ci
@@ -106,6 +106,23 @@ paths and need no version bump.
 
 Use a valid semantic version. Set `updatedAt` to the change date. Keep release
 notes short and specific to the current version.
+
+## Releasing to npm
+
+[`.github/workflows/publish.yml`](.github/workflows/publish.yml) publishes the
+package when a GitHub release is published. The release tag must be
+`v<version>` and match `package.json` and `skill-version.json`. Authentication
+is npm trusted publishing, so no npm token lives in this repository or in
+Actions secrets.
+
+```bash
+gh release create "v$(node -p 'require("./package.json").version')" --generate-notes
+```
+
+The first version of a package cannot use trusted publishing. Publish it once
+from a maintainer machine, then register the trusted publisher on npmjs.com
+under the package settings: owner `Clueless-Creations`, repository
+`b2c-app-builder`, workflow `publish.yml`.
 
 ## Checks
 

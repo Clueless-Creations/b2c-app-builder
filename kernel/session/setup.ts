@@ -36,6 +36,10 @@ function main(): number {
   const mcpServer = path.join(skillRoot, "entrypoints", "mcp", "b2c-app-builder-mcp.mjs");
   const cli = path.join(skillRoot, "entrypoints", "cli", "b2c.mjs");
   const node = process.execPath;
+  // An npm tarball never carries .git; a source checkout always does. That one fact decides which
+  // install advice applies: `npm link` only means something from a checkout, and the portable npx
+  // form only resolves once the package is on the registry, which an npm install proves.
+  const fromCheckout = existsSync(path.join(skillRoot, ".git"));
   console.log(
     [
       "",
@@ -49,12 +53,19 @@ function main(): number {
       `  3. Add the runtime when needed:  b2c bootstrap --workspace <where> --apply`,
       `  4. Register it:                  b2c workspaces register <slug> <where>`,
       "",
-      `Global \`b2c\` command (optional): run \`npm link\` from ${skillRoot}`,
-      `Without linking, the command is: ${node} ${cli}`,
+      ...(fromCheckout
+        ? [`Global \`b2c\` command (optional): run \`npm link\` from ${skillRoot}`, `Without linking, the command is: ${node} ${cli}`]
+        : [`Installed from npm: \`b2c\` is on PATH and the MCP server is ${mcpServer}`]),
       "",
       "Register the MCP server with the agent runtime(s) on this machine — same server, three configs:",
       "",
       `  Claude Code:  claude mcp add --scope user b2c-app-builder -- ${node} ${mcpServer}`,
+      ...(fromCheckout
+        ? []
+        : [
+            "    Portable form, no machine paths (any client: command npx, args -y -p b2c-app-builder b2c-app-builder-mcp):",
+            "    claude mcp add --scope user b2c-app-builder -- npx -y -p b2c-app-builder b2c-app-builder-mcp",
+          ]),
       `    Then set "alwaysLoad": true on this entry in ~/.claude.json — the router's first call is almost always b2c_catalog or b2c_knowledge_search, so deferral costs a wasted round trip.`,
       "",
       '  Cursor — merge into ~/.cursor/mcp.json under "mcpServers":',

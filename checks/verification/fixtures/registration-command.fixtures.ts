@@ -5,8 +5,8 @@ import { assert, type Harness } from "./_harness.js";
 export function register(harness: Harness): void {
   harness.check("registration command quotes Windows spaces and apostrophes with double quotes", () => {
     const target = "C:\\Business Files\\Owner's App";
-    assert(registerCommand(target, "win32") === `cmd.exe: b2c workspaces register <id> "${target}"`, "cmd.exe must receive double-quoted path");
-    assert(registerCommand("C:\\", "win32") === 'cmd.exe: b2c workspaces register <id> "C:\\\\"', "trailing backslash must not escape closing quote");
+    assert(registerCommand(target, "win32") === `b2c workspaces register <id> "${target}"`, "cmd.exe must receive double-quoted path");
+    assert(registerCommand("C:\\", "win32") === 'b2c workspaces register <id> "C:\\\\"', "trailing backslash must not escape closing quote");
   });
   harness.check("Windows expansion characters require literal argument passing", () => {
     for (const target of ["C:\\%TEMP%", "C:\\!APP!"]) {

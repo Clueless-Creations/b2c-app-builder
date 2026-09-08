@@ -243,7 +243,7 @@ export function registerCommand(target: string, platform: NodeJS.Platform = proc
     // cmd expands these even inside quotes. Keep exceptional paths out of shell text.
     if (/[%!"\r\n]/.test(target))
       return "b2c workspaces register <id> <path> (pass the workspace path as one literal process argument; it contains shell expansion characters)";
-    return `cmd.exe: b2c workspaces register <id> "${target.replace(/\\+$/, (slashes) => slashes + slashes)}"`;
+    return `b2c workspaces register <id> "${target.replace(/\\+$/, (slashes) => slashes + slashes)}"`;
   }
   return `b2c workspaces register <id> '${target.replace(/'/g, "'\\''")}'`;
 }

@@ -55,7 +55,7 @@ export function runDoctor(): DoctorFinding[] {
     finding(
       "error",
       "doctor.tsx_missing",
-      `tsx is not installed — no local node_modules/.bin/tsx was found, so "${tsxBin}" was taken from PATH, and PATH does not provide it either. Run npm ci in this checkout.`,
+      `tsx is not installed — no local or package-resolved tsx dependency was found, so "${tsxBin}" was taken from PATH, and PATH does not provide it either. Reinstall b2c-app-builder or run npm ci in a source checkout.`,
     );
 
   const versionFile = path.join(skillRoot, "skill-version.json");

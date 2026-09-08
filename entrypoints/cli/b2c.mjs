@@ -21,8 +21,7 @@
  * Every subcommand runs the TypeScript implementation under kernel/ and adapters/. This file adds one stable
  * command address and passes exit codes through unchanged.
  */
-import { spawnSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { launchTypeScript } from "../../tooling/lib/tsx-launcher.mjs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -155,11 +154,6 @@ function usage(code) {
   return code;
 }
 
-function resolveTsx() {
-  const local = path.join(skillRoot, "node_modules", ".bin", process.platform === "win32" ? "tsx.cmd" : "tsx");
-  return existsSync(local) ? local : "tsx";
-}
-
 const [command, ...rest] = process.argv.slice(2);
 if (!command || command === "--help" || command === "-h" || command === "help") {
   process.exit(usage(command ? 0 : 1));
@@ -171,10 +165,8 @@ if (!target) {
 }
 // The CLIs run with cwd at the package root (their own relative reads depend on it); the
 // caller's directory rides along so path arguments can resolve where the user typed them.
-const runtimePath = [path.dirname(process.execPath), process.env.PATH].filter(Boolean).join(path.delimiter);
-const result = spawnSync(resolveTsx(), [path.join(skillRoot, target.script), ...(target.prefixArgs ?? []), ...rest], {
-  stdio: "inherit",
-  cwd: skillRoot,
-  env: { ...process.env, PATH: runtimePath, B2C_APP_BUILDER_CALLER_CWD: process.cwd() },
-});
-process.exit(result.status ?? 1);
+process.exit(
+  launchTypeScript(skillRoot, [path.join(skillRoot, target.script), ...(target.prefixArgs ?? []), ...rest], {
+    B2C_APP_BUILDER_CALLER_CWD: process.cwd(),
+  }),
+);

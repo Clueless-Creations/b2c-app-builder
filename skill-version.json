@@ -1,12 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.218.21",
+  "version": "0.218.22",
   "updatedAt": "2026-09-07",
   "sourcePath": ".",
   "releaseNotes": [
-    "Stop the shipped mobile-flow-craft knowledge text pointing hosted workers at THIRD_PARTY_NOTICES.md, a repository file no worker can open; the Appllama MIT attribution stays and travels with the package notices.",
-    "Re-pin design-worthiness.md after PR #34 grew it from ten rules to twelve, move the taste-gate dimensions' citations from rule 10 to rule 12, and declare rules 10 and 11 unmapped instead of leaving a silent hole.",
-    "Assert every design-worthiness rule is either mapped to a dimension or declared unmapped, so the next rule added to the document fails loudly rather than widening the gap.",
-    "Correct the firstparty reference count to 142 after mobile-flow-craft joined the generated catalog."
+    "Split the heavy CI lane across two runners with a new --shard i/n on the audit runner, so the multi-minute serial suites stop running one after another in a single two-vCPU job.",
+    "Partition serial steps round-robin in audit-plan.ts and prove in audit.fixtures.ts that every serial step runs in exactly one shard at every width, so a suite added later cannot land in no shard at all."
   ]
 }

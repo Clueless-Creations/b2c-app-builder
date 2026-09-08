@@ -3,7 +3,7 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { assert, createHarness, repoCheckoutPresent, repoRoot, skillRoot, type Harness } from "./_harness.js";
 import { resolveTsxBin } from "../../../tooling/lib/tsx-bin.js";
-import { buildAuditPlan, stepSkippedByLane } from "../../../tooling/lib/audit-plan.js";
+import { buildAuditPlan, parseAuditShard, serialStepIds, stepSkippedByLane, stepSkippedByShard } from "../../../tooling/lib/audit-plan.js";
 import { getPath, loadProjectState, parseCliArgs } from "../../../tooling/lib/launch-state.js";
 import { SHARD_RESULT_MARKER, parseShardOutput } from "../../../tooling/lib/shard-pool.js";
 import { laneKeys, type Status } from "../../../kernel/schema/types.js";
@@ -162,6 +162,70 @@ export function register(harness: Harness): void {
 
   // --- all suites registered: every runner-discoverable file exports register(), and every ------
   // --- checks/verification/scenarios/ file is actually wired into scenarios.fixtures.ts -----------------
+
+  // CI splits the heavy lane across shards, so the question that matters is not "is the split
+  // balanced" but "can a serial step run in NO shard". Round-robin makes that impossible by
+  // construction; this proves it for every width CI might use, including the degenerate 1.
+  harness.check("heavy-lane shards partition the serial suites: every step runs in exactly one shard, at every width", () => {
+    const plan = buildAuditPlan("repo");
+    const serial = serialStepIds(plan);
+    assert(serial.length > 0, "the plan must declare serial steps for sharding to mean anything");
+    for (const total of [1, 2, 3, 4, serial.length, serial.length + 1]) {
+      const owners = new Map<string, number[]>();
+      for (let index = 1; index <= total; index += 1) {
+        const shard = parseAuditShard(`${index}/${total}`);
+        for (const step of plan) {
+          if (!step.serial) {
+            assert(stepSkippedByShard(plan, step, shard) === undefined, `${step.id} is not serial and must run in every shard`);
+            continue;
+          }
+          if (stepSkippedByShard(plan, step, shard) === undefined) {
+            owners.set(step.id, [...(owners.get(step.id) ?? []), index]);
+          }
+        }
+      }
+      for (const id of serial) {
+        const running = owners.get(id) ?? [];
+        assert(running.length === 1, `at width ${total}, ${id} runs in ${running.length} shard(s) (${running.join(", ")}); it must run in exactly one`);
+      }
+    }
+  });
+
+  // Regression: --only used to filter the plan BEFORE shard ownership was computed, which
+  // renumbered the serial steps so whatever you selected became shard 1's. Both selections below
+  // are skips, and they point at different shards on purpose — if ownership were computed from the
+  // --only subset, each step would be owned by shard 1 and the first of these would run instead.
+  harness.check("--only does not renumber shard ownership", () => {
+    const run = (stepId: string, shard: string) =>
+      spawnSync(tsxBin, [path.join(skillRoot, "tooling/run-audit.ts"), "--ci", "--lane", "heavy", "--shard", shard, "--only", stepId], {
+        cwd: skillRoot,
+        encoding: "utf8",
+      });
+    for (const [stepId, shard] of [
+      ["test:parity", "1/2"],
+      ["test:boundaries", "2/2"],
+    ] as const) {
+      const result = run(stepId, shard);
+      assert(result.status === 0, `${stepId} on shard ${shard} must exit 0: ${result.stdout}${result.stderr}`);
+      assert(
+        result.stdout.includes("SKIPPED") && result.stdout.includes("1 skipped"),
+        `${stepId} is not owned by shard ${shard} and must be skipped there, not run: ${result.stdout}`,
+      );
+    }
+  });
+
+  harness.check("--shard rejects a spelling that would silently drop suites", () => {
+    for (const bad of ["", "1", "0/2", "3/2", "-1/2", "1/0", "one/two", "1/2/3", "1.5/2"]) {
+      let rejected = false;
+      try {
+        parseAuditShard(bad);
+      } catch {
+        rejected = true;
+      }
+      assert(rejected, `--shard ${JSON.stringify(bad)} must be rejected, not silently accepted`);
+    }
+    assert(parseAuditShard("2/3").index === 2 && parseAuditShard("2/3").total === 3, "a valid shard must parse");
+  });
 
   harness.check("all suites registered: every *.fixtures.ts / *.boundaries.ts / *.parity.ts file exports a register(harness) function", () => {
     const roots: Array<{ dir: string; suffix: string }> = [

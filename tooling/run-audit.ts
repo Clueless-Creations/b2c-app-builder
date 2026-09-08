@@ -18,13 +18,24 @@
  *   tsx tooling/run-audit.ts --list     # print the resolved plan and exit
  *   tsx tooling/run-audit.ts --ci --lane fast   # cheap validators (every PR)
  *   tsx tooling/run-audit.ts --ci --lane heavy  # fixture suites + engine e2e
+ *   tsx tooling/run-audit.ts --ci --lane heavy --shard 1/2   # one CI shard of the serial suites
  */
 import { spawn } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { cpus } from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { buildAuditPlan, stepSkippedByLane, type AuditLane, type AuditLayout, type AuditStep, AUDIT_LANES } from "./lib/audit-plan.js";
+import {
+  buildAuditPlan,
+  parseAuditShard,
+  stepSkippedByLane,
+  stepSkippedByShard,
+  type AuditLane,
+  type AuditLayout,
+  type AuditShard,
+  type AuditStep,
+  AUDIT_LANES,
+} from "./lib/audit-plan.js";
 
 interface StepResult {
   step: AuditStep;
@@ -42,6 +53,7 @@ interface Options {
   list: boolean;
   packageRoot: string;
   lane: AuditLane;
+  shard: AuditShard | undefined;
 }
 
 function parseLane(value: string | undefined): AuditLane {
@@ -60,6 +72,7 @@ function parseOptions(argv: string[]): Options {
     list: false,
     packageRoot: process.cwd(),
     lane: "all",
+    shard: undefined,
   };
   for (let index = 0; index < argv.length; index += 1) {
     const token = argv[index];
@@ -84,6 +97,9 @@ function parseOptions(argv: string[]): Options {
       index += 1;
     } else if (token === "--lane" && value) {
       options.lane = parseLane(value);
+      index += 1;
+    } else if (token === "--shard" && value) {
+      options.shard = parseAuditShard(value);
       index += 1;
     }
   }
@@ -222,7 +238,10 @@ export async function main(): Promise<void> {
   }
   const layout = detectLayout(options.packageRoot);
   const scripts = readScripts(options.packageRoot);
-  let plan = buildAuditPlan(layout);
+  // Shard ownership is a property of the WHOLE plan, never of a --only subset: filtering first
+  // would renumber the serial steps and hand shard 1 a step that shard 2 owns.
+  const fullPlan = buildAuditPlan(layout);
+  let plan = fullPlan;
   if (options.only.size > 0) {
     plan = plan.filter((step) => options.only.has(step.id));
   }
@@ -242,7 +261,9 @@ export async function main(): Promise<void> {
   }
 
   console.log(
-    `Maintainer audit (${layout} layout, ${options.ci ? "ci" : "full"} mode, lane ${options.lane}, concurrency ${options.serial ? 1 : options.concurrency})`,
+    `Maintainer audit (${layout} layout, ${options.ci ? "ci" : "full"} mode, lane ${options.lane}${
+      options.shard ? `, shard ${options.shard.index}/${options.shard.total}` : ""
+    }, concurrency ${options.serial ? 1 : options.concurrency})`,
   );
 
   const results = new Array<StepResult | undefined>(plan.length);
@@ -284,6 +305,11 @@ export async function main(): Promise<void> {
     const laneSkip = stepSkippedByLane(step, options.lane);
     if (laneSkip) {
       record(index, { step, skipped: laneSkip, code: 0, output: "", durationMs: 0 });
+      continue;
+    }
+    const shardSkip = stepSkippedByShard(fullPlan, step, options.shard);
+    if (shardSkip) {
+      record(index, { step, skipped: shardSkip, code: 0, output: "", durationMs: 0 });
       continue;
     }
     if (step.serial || options.serial) {

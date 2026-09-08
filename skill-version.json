@@ -1,11 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.218.17",
+  "version": "0.218.19",
   "updatedAt": "2026-09-07",
   "sourcePath": ".",
   "releaseNotes": [
-    "Scope check:repository-boundary's top-level allowlist to git-tracked files and untracked files git would absorb, so ignored local files no longer fail the audit.",
-    "Keep the same allowlist and still fail on an untracked unignored root file or directory, including fixtures that model .gitignore and .git/info/exclude.",
-    "Refresh kernel/schema/evidence-schema-version.json so the catalog digest pin matches 0.218.17."
+    "check:version-discipline's monotonicity check now counts commits ahead of the merge base through the same skill pathspec the pending-change diff already uses, so a documentation-only branch (README.md, AGENTS.md, and the rest of REPOSITORY_ONLY_PATHS) is no longer forced into a spurious version bump. A nested skill root (skill-root a subdirectory of repo-root) gets the same REPOSITORY_ONLY_PATHS exclusion, closing the same bug on that code path.",
+    "Added fixture coverage pinning three outcomes: a repository-only branch passes without a version bump, a branch that actually touches the skill (kernel/) still fails when the version hasn't moved, and a nested skill root's documentation-only branch also passes."
   ]
 }

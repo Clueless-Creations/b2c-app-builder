@@ -676,18 +676,20 @@ export function register(h: Harness): void {
   // A branch holding a number chosen before a sibling merged used to pass every gate and take main
   // backwards. These pin all four outcomes, including the one that must NOT fire: a checkout sitting
   // on the base with nothing pending is the base, not a downgrade.
-  const versionBranchRepo = (name: string, branchVersion: string): string => {
+  const versionBranchRepo = (name: string, branchVersion: string, followUpFile = "kernel/a.ts", followUpContent = "export const a = 2;\n"): string => {
     const root = makeEmptyFixture(name);
     const manifest = (version: string): string =>
       `${JSON.stringify({ version, updatedAt: "2026-09-06", releaseNotes: ["fixture release note one", "fixture release note two"] }, null, 2)}\n`;
     writeFileSync(path.join(root, "skill-version.json"), manifest("0.1.0"), "utf8");
     mkdirSync(path.join(root, "kernel"), { recursive: true });
     writeFileSync(path.join(root, "kernel", "a.ts"), "export const a = 1;\n", "utf8");
+    writeFileSync(path.join(root, "README.md"), "# fixture\n", "utf8");
     versionGit(root, ["init", "-q", "-b", "main"]);
     versionGit(root, ["add", "-A"]);
     versionGit(root, ["commit", "-q", "--no-verify", "-m", "baseline"]);
     versionGit(root, ["checkout", "-q", "-b", "feature"]);
-    writeFileSync(path.join(root, "kernel", "a.ts"), "export const a = 2;\n", "utf8");
+    mkdirSync(path.dirname(path.join(root, followUpFile)), { recursive: true });
+    writeFileSync(path.join(root, followUpFile), followUpContent, "utf8");
     writeFileSync(path.join(root, "skill-version.json"), manifest(branchVersion), "utf8");
     versionGit(root, ["add", "-A"]);
     versionGit(root, ["commit", "-q", "--no-verify", "-m", "feature work"]);
@@ -733,6 +735,52 @@ export function register(h: Harness): void {
     "version discipline does not fail a clean checkout that is itself the base",
     "check-version-discipline.ts",
     ["--repo-root", versionOnBase, "--skill-root", versionOnBase],
+    0,
+  );
+
+  // --- check-version-discipline (monotonicity scoped to the skill pathspec, #30) ---
+  // The "ahead of base" count used to ignore which paths a commit touched, so a branch whose only
+  // change was a REPOSITORY_ONLY_PATHS file (README.md, AGENTS.md, ...) was still counted as ahead
+  // and forced to bump skill-version.json for a documentation-only change. versionEqual above (a
+  // kernel/ change with no version bump) already proves a real skill change still fails; this pins
+  // the fix: the same shape of branch, but touching only README.md, must pass.
+  const versionRepoOnlyBranch = versionBranchRepo(
+    "version-discipline-repo-only-branch",
+    "0.1.0", // same as the base version; the manifest rewrite is then a no-op diff
+    "README.md",
+    "# fixture\n\nDocumentation-only change.\n",
+  );
+  runScriptArgs(
+    "version discipline does not count a documentation-only branch as ahead of the merge base",
+    "check-version-discipline.ts",
+    ["--repo-root", versionRepoOnlyBranch, "--skill-root", versionRepoOnlyBranch],
+    0,
+  );
+
+  // A nested skill root (skillRoot a subdirectory of gitRoot) took the OTHER branch of
+  // skillPathspecs(), which had no REPOSITORY_ONLY_PATHS exclusion at all - so the same #30 bug
+  // reproduced there too, just scoped under the nested skill's own directory.
+  const versionNestedRepoOnly = makeEmptyFixture("version-discipline-nested-repo-only");
+  const nestedSkillRoot = path.join(versionNestedRepoOnly, "skills", "my-skill");
+  mkdirSync(path.join(nestedSkillRoot, "kernel"), { recursive: true });
+  writeFileSync(path.join(nestedSkillRoot, "kernel", "a.ts"), "export const a = 1;\n", "utf8");
+  writeFileSync(path.join(nestedSkillRoot, "README.md"), "# fixture\n", "utf8");
+  writeFileSync(
+    path.join(nestedSkillRoot, "skill-version.json"),
+    `${JSON.stringify({ version: "0.1.0", updatedAt: "2026-09-06", releaseNotes: ["fixture release note one", "fixture release note two"] }, null, 2)}\n`,
+    "utf8",
+  );
+  versionGit(versionNestedRepoOnly, ["init", "-q", "-b", "main"]);
+  versionGit(versionNestedRepoOnly, ["add", "-A"]);
+  versionGit(versionNestedRepoOnly, ["commit", "-q", "--no-verify", "-m", "baseline"]);
+  versionGit(versionNestedRepoOnly, ["checkout", "-q", "-b", "feature"]);
+  writeFileSync(path.join(nestedSkillRoot, "README.md"), "# fixture\n\nDocumentation-only change.\n", "utf8");
+  versionGit(versionNestedRepoOnly, ["add", "-A"]);
+  versionGit(versionNestedRepoOnly, ["commit", "-q", "--no-verify", "-m", "docs-only follow-up"]);
+  runScriptArgs(
+    "version discipline does not count a nested skill root's documentation-only branch as ahead",
+    "check-version-discipline.ts",
+    ["--repo-root", versionNestedRepoOnly, "--skill-root", nestedSkillRoot],
     0,
   );
 

@@ -79,7 +79,12 @@ function realPath(value: string): string {
 
 function skillPathspecs(gitRoot: string, skillRoot: string): string[] {
   const relative = path.relative(realPath(gitRoot), realPath(skillRoot));
-  if (relative && relative !== ".") return [relative];
+  if (relative && relative !== ".") {
+    // A nested skill root has its own README/docs/etc. that are repository-only for IT, same as
+    // the root-layout case below — otherwise #30 (a docs-only branch wrongly counted as ahead of
+    // the skill) still reproduces here, just scoped under the nested skill's own directory.
+    return [relative, ...REPOSITORY_ONLY_PATHS.map((entry) => `:(exclude)${path.join(relative, entry)}`)];
+  }
   return [".", ...REPOSITORY_ONLY_PATHS.map((entry) => `:(exclude)${entry}`)];
 }
 
@@ -116,7 +121,7 @@ if (gitRoot) {
     );
   }
 
-  monotonicityCheck(gitRoot, relativeManifest, manifest?.version, changed.size > 0);
+  monotonicityCheck(gitRoot, relativeManifest, manifest?.version, changed.size > 0, skillSpecs);
 
   const meaningfulChanges = Array.from(changed).filter((file) => !file.endsWith("skill-version.json") && !file.includes("/node_modules/"));
   if (meaningfulChanges.length > 0 && !changed.has(relativeManifest)) {
@@ -190,7 +195,13 @@ function git(argv: string[], cwd: string): { status: number | null; stdout: stri
  * no upstream remote and the initial commit itself all legitimately have nothing to compare against,
  * and this check must not turn those into failures.
  */
-function monotonicityCheck(gitRoot: string, relativeManifest: string, currentVersion: string | undefined, hasPendingChanges: boolean): void {
+function monotonicityCheck(
+  gitRoot: string,
+  relativeManifest: string,
+  currentVersion: string | undefined,
+  hasPendingChanges: boolean,
+  skillSpecs: string[],
+): void {
   if (!currentVersion) return;
 
   const base = resolveComparisonBase(gitRoot);
@@ -209,7 +220,11 @@ function monotonicityCheck(gitRoot: string, relativeManifest: string, currentVer
   // A checkout sitting ON the base with nothing pending is not "behind" — it IS the base, and its
   // version legitimately equals the base's. Comparing there would fail a clean main checkout against
   // itself. Only a branch that introduces something must move the number forward.
-  const ahead = git(["rev-list", "--count", `${base}..HEAD`], gitRoot);
+  //
+  // "Ahead" must be scoped to skillSpecs (#30): unscoped, a branch whose only committed change is a
+  // REPOSITORY_ONLY_PATHS file (README.md, AGENTS.md, ...) still counted as commits ahead, forcing a
+  // version bump on documentation-only branches even though the skill itself never changed.
+  const ahead = git(["rev-list", "--count", `${base}..HEAD`, "--", ...skillSpecs], gitRoot);
   const commitsAhead = ahead.status === 0 ? Number(ahead.stdout.trim()) : 0;
   if (!hasPendingChanges && (!Number.isFinite(commitsAhead) || commitsAhead === 0)) return;
 

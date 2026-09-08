@@ -159,7 +159,9 @@ A store-ready binary with a generic landing, a carousel onboarding, unaudited co
 
 Use the founder-zero contract: two or three choices, one recommendation, consequences, a defer path, and a revisit trigger, in plain language.
 
-Pause for: workspace registration, paid-tool access or spend, Go/Pivot/Kill, brand and taste, pricing, legal identity, Apple enrollment and agreements, the TestFlight versus submit envelope, and the live domain deploy.
+The user's authorization to create or adopt a local workspace covers its registration. Pause when that authorization does not cover the target or registration, or when it would affect a different existing business.
+
+Pause for: paid-tool access or spend, Go/Pivot/Kill, brand and taste, pricing, legal identity, Apple enrollment and agreements, the TestFlight versus submit envelope, and the live domain deploy.
 
 The agent never submits for review, releases to production, enrolls or rotates certificates, sets prices, spends without a ceiling, publishes legal text as final, or copies another app's secrets.
 

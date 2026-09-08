@@ -1,3 +1,5 @@
+import YAML from "yaml";
+import { boundedFileBytes } from "../kernel/lib/bounded-file.js";
 import { existsSync, lstatSync, mkdirSync, readFileSync, realpathSync, renameSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -58,8 +60,41 @@ function writeRegistry(registry: WorkspaceRegistry): void {
   renameSync(tmp, file);
 }
 
-/** Address registration needs a planning or runtime marker, not a claim of readiness. */
+/** Recognize B2C identity without treating a partial contract as proof of readiness. */
 export const WORKSPACE_SCAFFOLD_MARKERS = ["product.yaml", "catalog.json", "state/business-state.json", "run/run-state.json"] as const;
+
+export const WORKSPACE_SCAFFOLD_BYTE_CAP = 4 * 1024 * 1024;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function recognizableScaffold(relative: string, value: unknown): boolean {
+  if (!isRecord(value)) return false;
+  if (relative === "product.yaml") {
+    return (
+      value.schema_version === 1 &&
+      isRecord(value.meta) &&
+      typeof value.meta.name === "string" &&
+      typeof value.meta.status === "string" &&
+      isRecord(value.copy) &&
+      typeof value.copy.promise_user_problem === "string" &&
+      Array.isArray(value.instances)
+    );
+  }
+  if (relative === "catalog.json") {
+    return (
+      typeof value.version === "string" &&
+      Array.isArray(value.artifacts) &&
+      Array.isArray(value.workflows) &&
+      value.workflows.some((workflow: unknown) => isRecord(workflow) && typeof workflow.id === "string" && workflow.id.startsWith("workflow."))
+    );
+  }
+  if (relative === "state/business-state.json") {
+    return value.schemaVersion === "2.0.0" && isRecord(value.project) && isRecord(value.lanes) && isRecord(value.founderGates);
+  }
+  return value.schemaVersion === "1.0.0" && typeof value.runId === "string" && typeof value.planId === "string" && isRecord(value.nodes);
+}
 
 export function hasWorkspaceScaffold(root: string): boolean {
   return WORKSPACE_SCAFFOLD_MARKERS.some((relative) => {
@@ -69,7 +104,8 @@ export function hasWorkspaceScaffold(root: string): boolean {
         target = path.join(target, segment);
         if (lstatSync(target).isSymbolicLink()) return false;
       }
-      return lstatSync(target).isFile();
+      const bytes = boundedFileBytes(target, WORKSPACE_SCAFFOLD_BYTE_CAP).toString("utf8");
+      return recognizableScaffold(relative, relative === "product.yaml" ? YAML.parse(bytes, { maxAliasCount: 20 }) : JSON.parse(bytes));
     } catch {
       return false;
     }

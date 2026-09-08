@@ -2,7 +2,7 @@ import { cpSync, mkdirSync, realpathSync, symlinkSync, writeFileSync } from "nod
 import path from "node:path";
 import { createRequire } from "node:module";
 import { spawnSync } from "node:child_process";
-import { resolveTsxBin } from "../../../tooling/lib/tsx-bin.js";
+import { resolveTsxCommand } from "../../../tooling/lib/tsx-bin.js";
 import { assert, skillRoot, type Harness } from "./_harness.js";
 
 function fixturePackage(h: Harness, name: string, dependency: boolean): string {
@@ -40,7 +40,13 @@ export function register(h: Harness): void {
       "Node or caller context changed",
     );
     assert(observed.args.join(" ") === "business-status --workspace example", "CLI arguments changed");
-    assert(resolveTsxBin(root).endsWith("/tsx/dist/cli.mjs"), "deeper subprocess resolver misses hoisted dependency");
+    const command = resolveTsxCommand(root, [path.join(root, "entrypoints/cli/business.ts"), "probe"]);
+    assert(
+      command.executable === process.execPath && command.args[0]!.endsWith("/tsx/dist/cli.mjs"),
+      "resolved JavaScript would be executed directly on Windows",
+    );
+    const deeper = spawnSync(command.executable, command.args, { cwd, env: { ...process.env, PATH: "" }, encoding: "utf8" });
+    assert(deeper.status === 0 && JSON.parse(deeper.stdout).args[0] === "probe", "deeper subprocess invocation failed");
   });
   h.check("runtime-launchers: MCP preserves stdio through the hoisted dependency with no global tsx", () => {
     const root = fixturePackage(h, "launcher-hoisted-mcp", true);

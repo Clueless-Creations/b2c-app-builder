@@ -22,7 +22,7 @@ import { loadControlFile, resolveWorkspacePaths, type WorkspacePaths } from "./r
 import { buildBudgetBalances, buildGrantsPatch, buildWaivers, loadAnswers, type OnboardingAnswers } from "./onboard.js";
 import { validateBudgetLedger, validateBusinessState, validateControl, validateGrants, validateWaivers } from "../schema/index.js";
 import { laneKeys, type BudgetLedgerDocument, type BusinessStateV2, type ControlFile, type LanesMap } from "../schema/types.js";
-import { describeTsxSpawnFailure, resolveTsxBin } from "../../tooling/lib/tsx-bin.js";
+import { describeTsxSpawnFailure, resolveTsxCommand } from "../../tooling/lib/tsx-bin.js";
 import { loadWorkspaceCatalogIfPresent, renderCatalogRefusal } from "./catalog-contract.js";
 import { resolveCliWorkspace } from "./status.js";
 
@@ -40,14 +40,14 @@ function report(entries: StepReport[], step: string, action: StepReport["action"
 }
 
 function runSkillCli(relativePath: string, cliArgs: string[]): { code: number; output: string } {
-  const tsxBin = resolveTsxBin(skillRoot());
-  const result = spawnSync(tsxBin, [path.join(skillRoot(), relativePath), ...cliArgs], {
+  const command = resolveTsxCommand(skillRoot(), [path.join(skillRoot(), relativePath), ...cliArgs]);
+  const result = spawnSync(command.executable, command.args, {
     cwd: skillRoot(),
     encoding: "utf8",
   });
   // Same blank-diagnostic shape as runReducer: name the launch or signal cause the child could not
   // report itself, and keep it at the tail so the `.slice(-400)` in the fail reports preserves it.
-  const failure = describeTsxSpawnFailure(tsxBin, result);
+  const failure = describeTsxSpawnFailure(command.executable, result);
   return { code: result.status ?? -1, output: `${result.stdout ?? ""}\n${result.stderr ?? ""}${failure ? `\n${failure}` : ""}` };
 }
 

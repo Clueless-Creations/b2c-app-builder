@@ -31,7 +31,7 @@ import { fileURLToPath } from "node:url";
 import { areas } from "../catalog/areas.js";
 import { domains } from "../catalog/domains.js";
 import { roles } from "../catalog/roles.js";
-import { resolveTsxBin } from "./lib/tsx-bin.js";
+import { resolveTsxCommand } from "./lib/tsx-bin.js";
 
 const realSkillRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const WORKFLOW_FILES = ["build-release.ts", "growth-revenue.ts", "maintenance.ts", "operating-system.ts", "operations-trust.ts", "product-experience.ts"];
@@ -150,7 +150,8 @@ function addWorkflow(): void {
   writeFileSync(fixturePath, fixture.replace(countPattern, `composition.base.workflows === ${next}, \`expected base ${next} workflows`), "utf8");
 
   if (!opts.has("no-render")) {
-    const render = spawnSync(resolveTsxBin(skillRoot), [path.join(skillRoot, "catalog", "render-routing.ts")], { cwd: skillRoot, encoding: "utf8" });
+    const command = resolveTsxCommand(skillRoot, [path.join(skillRoot, "catalog", "render-routing.ts")]);
+    const render = spawnSync(command.executable, command.args, { cwd: skillRoot, encoding: "utf8" });
     if (render.status !== 0) throw new Error(`catalog render failed after the insert: ${(render.stderr ?? "").slice(-400)}`);
   }
 

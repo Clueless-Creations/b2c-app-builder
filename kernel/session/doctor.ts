@@ -14,7 +14,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { resolveTsxBin, tsxBinResolves } from "../../tooling/lib/tsx-bin.js";
+import { resolveTsxCommand, tsxBinResolves } from "../../tooling/lib/tsx-bin.js";
 import { detectWorkerRuntimes } from "./executor.js";
 import { b2cAppBuilderHome, loadRegistry, registryPath } from "../../adapters/registry.js";
 import { isMainModule } from "../lib/cli.js";
@@ -49,7 +49,8 @@ export function runDoctor(): DoctorFinding[] {
   if (Number.isFinite(nodeMajor) && nodeMajor >= requiredMajor) finding("ok", "doctor.node", `node ${process.versions.node}`);
   else finding("error", "doctor.node_too_old", `node ${process.versions.node} — the engine needs node ${requiredMajor} or newer`);
 
-  const tsxBin = resolveTsxBin(skillRoot);
+  const command = resolveTsxCommand(skillRoot, []);
+  const tsxBin = command.executable === process.execPath ? command.args[0]! : command.executable;
   if (tsxBinResolves(tsxBin)) finding("ok", "doctor.tsx", `tsx at ${tsxBin}`);
   else
     finding(

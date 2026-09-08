@@ -7,18 +7,23 @@ import { describeSpawnFailure, spawnErrorCode, type SpawnOutcome } from "./spawn
 export const TSX_PATH_FALLBACK = "tsx";
 
 /**
- * Preserve local executable precedence for existing subprocess callers, then use Node's package
- * resolution for hoisted installs. A bare PATH fallback remains for legacy host-provided tsx.
+ * Preserve local executable precedence for existing subprocess callers, with a legacy executable-only return type.
+ * New subprocess callers use resolveTsxCommand for hoisted dependencies on every platform. A bare PATH fallback remains for legacy host-provided tsx.
  * Public entrypoints use the same dependency resolver and invoke it under process.execPath.
  */
 export function resolveTsxBin(skillRoot: string): string {
   const candidates = [path.join(skillRoot, "node_modules/.bin/tsx"), path.resolve(skillRoot, "../..", "node_modules/.bin/tsx")];
   const local = candidates.find((candidate) => existsSync(candidate));
   if (local) return local;
+  return TSX_PATH_FALLBACK;
+}
+
+/** Node launches resolved JavaScript on every platform; only legacy PATH tsx stays executable. */
+export function resolveTsxCommand(skillRoot: string, args: string[]): { executable: string; args: string[] } {
   try {
-    return resolveTsxCli(skillRoot);
+    return { executable: process.execPath, args: [resolveTsxCli(skillRoot), ...args] };
   } catch {
-    return TSX_PATH_FALLBACK;
+    return { executable: resolveTsxBin(skillRoot), args };
   }
 }
 

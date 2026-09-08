@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.218.27",
+  "version": "0.218.28",
   "updatedAt": "2026-09-08",
   "sourcePath": ".",
   "releaseNotes": [
-    "Route new businesses through creation and existing scaffolds through adoption, with consistent CLI, MCP, skill and workflow guidance and safe recovery.",
-    "Resolve installed TypeScript tooling through npm dependency resolution so CLI, MCP and initialization work with hoisted dependencies and report launch failures."
+    "Keep new-business creation, existing-workspace adoption and safe conflict recovery consistent across CLI, MCP, skill and launch guidance.",
+    "Resolve packaged runtime dependencies without global tooling, make setup help read-only, and honor existing authorization for local workspace registration."
   ]
 }

@@ -31,7 +31,7 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { loadRegistry } from "../adapters/registry.js";
 import { resolveScriptPath } from "./lib/script-paths.js";
-import { resolveTsxBin } from "./lib/tsx-bin.js";
+import { resolveTsxCommand } from "./lib/tsx-bin.js";
 
 const skillRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -86,7 +86,6 @@ function tallyFromLogsDir(logsDir: string): Map<string, Tally> {
 function tallyFromRegisteredWorkspaces(): { tallies: Map<string, Tally>; workspacesRun: number; workspacesFailedToRun: string[] } {
   const tallies = new Map<string, Tally>();
   const scriptPath = path.join(skillRoot, resolveScriptPath(skillRoot, "check-research-evidence"));
-  const tsxBin = resolveTsxBin(skillRoot);
   const registry = loadRegistry();
   const workspacesFailedToRun: string[] = [];
   let workspacesRun = 0;
@@ -94,7 +93,8 @@ function tallyFromRegisteredWorkspaces(): { tallies: Map<string, Tally>; workspa
   for (const workspace of registry.workspaces) {
     // Read-only: check-research-evidence.ts never writes to --root. No workspace file is
     // touched by running this report.
-    const result = spawnSync(tsxBin, [scriptPath, "--root", workspace.path], { encoding: "utf8", timeout: 60_000 });
+    const command = resolveTsxCommand(skillRoot, [scriptPath, "--root", workspace.path]);
+    const result = spawnSync(command.executable, command.args, { encoding: "utf8", timeout: 60_000 });
     if (result.error) {
       workspacesFailedToRun.push(`${workspace.id}: ${result.error.message}`);
       continue;

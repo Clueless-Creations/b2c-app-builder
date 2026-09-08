@@ -212,7 +212,10 @@ export function register(harness: Harness): void {
       const home = harness.makeTempDir("status-degraded-half-home");
       const dir = harness.makeTempDir("status-degraded-half-dir");
       mkdirSync(path.join(dir, "run"), { recursive: true });
-      writeFileSync(path.join(dir, "run", "run-state.json"), JSON.stringify({ runId: "run-fixture-1", updatedAt: "2026-08-05T00:00:00.000Z", nodes: {} }));
+      writeFileSync(
+        path.join(dir, "run", "run-state.json"),
+        JSON.stringify({ schemaVersion: "1.0.0", planId: "plan-fixture-1", runId: "run-fixture-1", updatedAt: "2026-08-05T00:00:00.000Z", nodes: {} }),
+      );
       const result = callStatusOverMcp(harness, home, { cwd: dir });
       assert(result.isError !== true, `expected no error for a half-scaffolded folder, got ${JSON.stringify(result)}`);
       const structured = result.structuredContent;
@@ -245,7 +248,12 @@ export function register(harness: Harness): void {
       writeFileSync(path.join(workspace, "catalog.json"), "{}"); // bootstrapped, no run yet -> a non-trivial, non-default state
       let baselineText = "";
       withIsolatedHome(home, () => {
+        writeFileSync(
+          path.join(workspace, "product.yaml"),
+          "schema_version: 1\nmeta: {name: Fixture, status: hypothesis}\ncopy: {promise_user_problem: Fixture}\ninstances: []\n",
+        );
         registerWorkspace("status-degraded-registered-ws", workspace);
+        rmSync(path.join(workspace, "product.yaml"));
         baselineText = renderWorkspaceStatus(readWorkspaceStatus(workspace));
       });
       const result = callStatusOverMcp(harness, home, { workspace: "status-degraded-registered-ws" });
@@ -281,7 +289,12 @@ export function register(harness: Harness): void {
     mkdirSync(path.join(workspace, "run"), { recursive: true });
     writeFileSync(path.join(workspace, "run", "run-state.json"), "{ this is not valid json");
     withIsolatedHome(home, () => {
+      writeFileSync(
+        path.join(workspace, "product.yaml"),
+        "schema_version: 1\nmeta: {name: Fixture, status: hypothesis}\ncopy: {promise_user_problem: Fixture}\ninstances: []\n",
+      );
       registerWorkspace("status-degraded-corrupt-ws", workspace);
+      rmSync(path.join(workspace, "product.yaml"));
     });
     const result = callStatusOverMcp(harness, home, { workspace: "status-degraded-corrupt-ws" });
     assert(result.isError !== true, `expected no error (a corrupt run-state is a reported state, not a tool error), got ${JSON.stringify(result)}`);
@@ -357,7 +370,10 @@ export function register(harness: Harness): void {
     const subdir = path.join(workspace, "nested", "deeper");
     mkdirSync(subdir, { recursive: true });
     withIsolatedHome(home, () => {
-      writeFileSync(path.join(workspace, "product.yaml"), "# Planning scaffold fixture\n");
+      writeFileSync(
+        path.join(workspace, "product.yaml"),
+        "schema_version: 1\nmeta: {name: Fixture, status: hypothesis}\ncopy: {promise_user_problem: Fixture}\ninstances: []\n",
+      );
       registerWorkspace("status-degraded-inside-fixture-ws", workspace);
       rmSync(path.join(workspace, "product.yaml"));
     });
@@ -379,7 +395,10 @@ export function register(harness: Harness): void {
     const home = harness.makeTempDir("status-degraded-stale-home");
     const workspace = harness.makeTempDir("status-degraded-stale-ws");
     withIsolatedHome(home, () => {
-      writeFileSync(path.join(workspace, "product.yaml"), "# Planning scaffold fixture\n");
+      writeFileSync(
+        path.join(workspace, "product.yaml"),
+        "schema_version: 1\nmeta: {name: Fixture, status: hypothesis}\ncopy: {promise_user_problem: Fixture}\ninstances: []\n",
+      );
       registerWorkspace("status-degraded-stale-fixture-ws", workspace);
       rmSync(path.join(workspace, "product.yaml"));
     });

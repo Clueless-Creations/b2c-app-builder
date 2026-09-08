@@ -20,6 +20,22 @@ import { isMainModule } from "../lib/cli.js";
 const skillRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 
 function main(): number {
+  if (process.argv.slice(2).some((arg) => arg === "--help" || arg === "-h")) {
+    console.log(
+      [
+        "Usage: b2c setup [--help|-h]",
+        "",
+        "Prepare this machine for B2C App Builder.",
+        "Without flags, create the builder home and an empty workspace registry when absent,",
+        "run doctor health checks, and print MCP registration and business creation commands.",
+        "Existing workspace registrations are preserved. Setup does not install software or create a business.",
+        "",
+        "--help, -h  Show this help without creating files or running health checks.",
+        "Run b2c doctor for a read-only health report.",
+      ].join("\n"),
+    );
+    return 0;
+  }
   const home = b2cAppBuilderHome();
   if (!existsSync(home)) {
     mkdirSync(home, { recursive: true });

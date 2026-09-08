@@ -12,7 +12,8 @@
  *   - Only the files named in MARKER_ALLOWLIST are ever read. Nothing else in the folder —
  *     no directory listing, no recursive walk — is touched.
  *   - A symlinked marker is refused (`lstat`-checked before any read) — never followed.
- *   - Each marker is capped at MARKER_BYTE_CAP bytes; a file over the cap is treated as absent
+ *   - Scaffold identity uses the shared bounded registry reader (4 MiB per known marker).
+ *   - Each evidence marker is capped at MARKER_BYTE_CAP bytes; a file over the cap is treated as absent
  *     rather than partially read.
  *   - Every excerpt returned to a caller is capped at EVIDENCE_EXCERPT_CAP characters — far below
  *     MARKER_BYTE_CAP — so evidence is bounded independently of the read cap, never a raw dump.
@@ -274,7 +275,7 @@ export function inspectWorkspace(cwd: string): InspectResult {
           kind: "unregistered",
           suggestedFix: hasWorkspaceScaffold(absoluteCwd)
             ? registerCommand(absoluteCwd)
-            : `b2c business-create --workspace <id> --directory '${absoluteCwd.replace(/'/g, "'\\''")}' --name "<name>" --hypothesis "<hypothesis>"`,
+            : 'b2c business-create --workspace <id> --directory <empty-directory> --name "<name>" --hypothesis "<hypothesis>"',
         };
   }
 

@@ -1,7 +1,14 @@
 import { existsSync, mkdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
-import { loadRegistry, registerWorkspace, registryPath, removeWorkspace } from "../../../adapters/registry.js";
+import {
+  loadRegistry,
+  registerWorkspace,
+  registryPath,
+  removeWorkspace,
+  hasWorkspaceScaffold,
+  WORKSPACE_SCAFFOLD_BYTE_CAP,
+} from "../../../adapters/registry.js";
 import { inspectWorkspace } from "../../../kernel/session/inspect.js";
 import { readWorkspaceStatus, renderWorkspaceStatus, renderWorkspaceStatusSummary } from "../../../kernel/session/status.js";
 import { routeUtterance } from "../../../kernel/session/route-utterance.js";
@@ -76,7 +83,7 @@ export function register(h: Harness): void {
     const linked = h.makeTempDir("onboarding-linked");
     isolated(h.makeTempDir("onboarding-runtime-home"), () => {
       mkdirSync(path.join(runtime, "state"));
-      writeFileSync(path.join(runtime, "state/business-state.json"), "{}");
+      writeFileSync(path.join(runtime, "state/business-state.json"), JSON.stringify({ schemaVersion: "2.0.0", project: {}, lanes: {}, founderGates: {} }));
       registerWorkspace("runtime", runtime);
       symlinkSync(path.join(runtime, "state"), path.join(linked, "state"));
       let refused = false;
@@ -89,6 +96,32 @@ export function register(h: Harness): void {
     });
   });
 
+  h.check("onboarding: coincident filenames and oversized markers do not adopt unrelated content", () => {
+    const root = h.makeTempDir("onboarding-unrelated-markers");
+    isolated(h.makeTempDir("onboarding-unrelated-home"), () => {
+      writeFileSync(path.join(root, "product.yaml"), "name: Inventory item\nprice: 12\n");
+      writeFileSync(path.join(root, "catalog.json"), JSON.stringify({ products: [] }));
+      assert(!hasWorkspaceScaffold(root), "unrelated product or catalog was accepted");
+      const inspected = inspectWorkspace(root);
+      assert(
+        inspected.ok &&
+          inspected.registration.kind === "unregistered" &&
+          inspected.registration.suggestedFix.includes("--directory <empty-directory>") &&
+          !inspected.registration.suggestedFix.includes(root),
+        "occupied cwd suggested as empty creation target",
+      );
+      let refused = false;
+      try {
+        registerWorkspace("unrelated", root);
+      } catch {
+        refused = true;
+      }
+      assert(refused && loadRegistry().workspaces.length === 0, "unrelated directory was registered");
+      writeFileSync(path.join(root, "product.yaml"), "x".repeat(WORKSPACE_SCAFFOLD_BYTE_CAP + 1));
+      assert(!hasWorkspaceScaffold(root), "oversized marker accepted");
+    });
+  });
+
   h.check("onboarding: a pre-existing mistaken registration has public recovery and requires explicit removal", () => {
     const root = h.makeTempDir("onboarding-old-trap");
     const home = h.makeTempDir("onboarding-old-trap-home");
@@ -97,6 +130,8 @@ export function register(h: Harness): void {
         registryPath(),
         JSON.stringify({ schemaVersion: "1.0.0", workspaces: [{ id: "mistake", path: root, registeredAt: "2026-01-01T00:00:00.000Z" }] }),
       );
+      registerWorkspace("mistake", root);
+      assert(loadRegistry().workspaces.length === 1, "existing degraded registration cannot be re-registered");
       const before = readFileSync(registryPath(), "utf8");
       const input = { workspaceId: "mistake", directory: root, name: "Recovered", hypothesis: "A consumer utility" };
       const result = callPublicOperation("business.create", input);

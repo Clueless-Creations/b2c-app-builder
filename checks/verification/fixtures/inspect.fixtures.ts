@@ -132,7 +132,10 @@ export function register(harness: Harness): void {
     const subdir = path.join(workspace, "nested", "deeper");
     mkdirSync(subdir, { recursive: true });
     withIsolatedHome(home, () => {
-      writeFileSync(path.join(workspace, "product.yaml"), "# Planning scaffold fixture\n");
+      writeFileSync(
+        path.join(workspace, "product.yaml"),
+        "schema_version: 1\nmeta: {name: Fixture, status: hypothesis}\ncopy: {promise_user_problem: Fixture}\ninstances: []\n",
+      );
       registerWorkspace("inspect-inside-fixture-ws", workspace);
       rmSync(path.join(workspace, "product.yaml"));
       const result = inspectWorkspace(subdir);
@@ -151,7 +154,10 @@ export function register(harness: Harness): void {
     const home = harness.makeTempDir("inspect-stale-home");
     const workspace = harness.makeTempDir("inspect-stale-workspace");
     withIsolatedHome(home, () => {
-      writeFileSync(path.join(workspace, "product.yaml"), "# Planning scaffold fixture\n");
+      writeFileSync(
+        path.join(workspace, "product.yaml"),
+        "schema_version: 1\nmeta: {name: Fixture, status: hypothesis}\ncopy: {promise_user_problem: Fixture}\ninstances: []\n",
+      );
       registerWorkspace("inspect-stale-fixture-ws", workspace);
       rmSync(path.join(workspace, "product.yaml"));
       rmSync(workspace, { recursive: true, force: true });

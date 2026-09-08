@@ -1,10 +1,11 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.218.19",
+  "version": "0.218.20",
   "updatedAt": "2026-09-07",
   "sourcePath": ".",
   "releaseNotes": [
-    "check:version-discipline's monotonicity check now counts commits ahead of the merge base through the same skill pathspec the pending-change diff already uses, so a documentation-only branch (README.md, AGENTS.md, and the rest of REPOSITORY_ONLY_PATHS) is no longer forced into a spurious version bump. A nested skill root (skill-root a subdirectory of repo-root) gets the same REPOSITORY_ONLY_PATHS exclusion, closing the same bug on that code path.",
-    "Added fixture coverage pinning three outcomes: a repository-only branch passes without a version bump, a branch that actually touches the skill (kernel/) still fails when the version hasn't moved, and a nested skill root's documentation-only branch also passes."
+    "Give the craft-audit routing fixture the frozen rubric its locked DESIGN.md declared, so a missing acceptance report is the only gate failure and stays on the audit's own retry budget instead of reopening product producers.",
+    "Build the canonical product and its offer evidence in the monetization conformance fixture, which check-revenue reads before any provider branch whenever the revenue lane is active.",
+    "Share one offer-evidence document between the monetization and porchwatch fixtures instead of keeping two copies that can drift."
   ]
 }

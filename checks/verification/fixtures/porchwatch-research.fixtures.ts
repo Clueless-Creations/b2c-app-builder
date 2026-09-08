@@ -10,6 +10,7 @@ import { validateProductPriceEvidence } from "../../validation/business/money/pr
 import { validateOfferTest } from "../../validation/business/research/offer-evidence.js";
 import { type Issue } from "../../../tooling/lib/launch-state.js";
 import { assert, skillRoot, type Harness } from "./_harness.js";
+import { OFFER_TEST_FIXTURE } from "./product-fixture.js";
 
 const query = {
   provider: "fixture/research",
@@ -18,29 +19,7 @@ const query = {
   operation: "category-estimates",
   parameters: { category: "parcel-trackers", country: "US" },
 };
-const offer = `# Offer test
-## Test Contract
-| Field | Value |
-| --- | --- |
-| Audience | people who repeatedly abandon habit streaks |
-| Exact discovery location | r/habits |
-| Native format | case-study post |
-| Offer | join a recovery waitlist |
-| Owned relationship | email waitlist |
-| Primary response | waitlist signup |
-| Stop rule | 1000 qualified visits |
-## Exposure And Conversion
-| Date | Channel | Evidence source | Exposure type | Exposure | CTA conversions | Conversion rate | Cost | Result |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 2026-07-20 | Reddit | fixture cohort TRACE-003 | qualified visits | 840 | 31 | 3.69% | 0 | continue |
-## Decision
-| Status | Date | Evidence | Decision | Decided by |
-| --- | --- | --- | --- | --- |
-| run | 2026-07-21 | 840 visits and 31 signups in TRACE-003 | use the recovery offer | founder |
-## Founder Waiver
-| Date | Founder | Reason | Residual risk accepted |
-| --- | --- | --- | --- |
-`;
+const offer = OFFER_TEST_FIXTURE;
 
 export function register(h: Harness): void {
   let count = 0;

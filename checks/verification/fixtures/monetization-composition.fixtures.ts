@@ -6,6 +6,7 @@ import { validateMonetizationOutcomes } from "../../../adapters/providers/moneti
 import type { ProviderContract } from "../../../adapters/providers/contract.js";
 import { findProvisioningProvider } from "../../../adapters/provisioning/requirements.js";
 import { assert, skillRoot, type Harness } from "./_harness.js";
+import { writeOfferTestFixture, writeProductFixture } from "./product-fixture.js";
 const contract: ProviderContract = {
   schemaVersion: 1,
   id: "custompay",
@@ -23,6 +24,10 @@ const contract: ProviderContract = {
 };
 function setup(harness: Harness) {
   const root = harness.makeTempDir("monetization-outcomes");
+  // check-revenue reads the canonical product and its offer evidence before any provider branch:
+  // an active revenue lane without them is a pricing defect, not a provider-contract result.
+  writeProductFixture(root, "Monetization conformance fixture");
+  writeOfferTestFixture(root);
   mkdirSync(path.join(root, "revenue"), { recursive: true });
   mkdirSync(path.join(root, "state"), { recursive: true });
   mkdirSync(path.join(root, "catalog/providers"), { recursive: true });

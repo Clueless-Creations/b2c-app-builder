@@ -2,7 +2,7 @@
 
 Use this reference when designing, implementing, or auditing a native mobile flow. It strengthens the Design Room with flow-level research, navigation semantics, native fidelity, mechanical anti-generic checks, motion budgeting, and runtime verification.
 
-This doctrine adapts selected methods from Appllama's MIT-licensed `appllama-app-design-skill` and `appllama-usage` skills into B2C App Builder's cross-platform contracts. See `THIRD_PARTY_NOTICES.md`. It does not copy Appllama's proprietary screen library, require its MCP, or make Expo/React Native the default stack.
+This doctrine adapts selected methods from Appllama's MIT-licensed `appllama-app-design-skill` and `appllama-usage` skills into B2C App Builder's cross-platform contracts; the MIT notice travels with the package's third-party notices. It does not copy Appllama's proprietary screen library, require its MCP, or make Expo/React Native the default stack.
 
 ## 1. Research the question, not the gallery
 

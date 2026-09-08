@@ -1,6 +1,6 @@
 {
   "schemaVersion": "2.0.0",
-  "skillVersion": "0.218.20",
+  "skillVersion": "0.218.21",
   "areas": [
     {
       "id": "area.operating-system",
@@ -2864,7 +2864,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/design/mobile-flow-craft.md",
-        "sha256": "sha256:d97e666787127fae75ce23060dd560a378f73ef7426480ae65f9b369a34a9ad4",
+        "sha256": "sha256:143cf9865c01a50f2d9090e966118c160c0d42e777910210a99a2eb76ccf80bb",
         "origin": "skill"
       }
     },
@@ -17912,14 +17912,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "27d151cd3a494a844223a77de3600dc896da5307e90d330ed247260fa1bb61dc",
+    "fingerprint": "f897d4ea11c6a998d40ec2233768d75b63e0712897202155e76d81301f047e56",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
-        "version": "0.218.20",
-        "revision": "0.218.20",
-        "contentDigest": "2b1c3a4389a5bf97ddad574cd48e3949ef99747254652d1cc4f6799a0d60947a"
+        "version": "0.218.21",
+        "revision": "0.218.21",
+        "contentDigest": "4715243770e71e738a417db0c69d3f62d0650d72b8b47213fe48ed7c42ba521c"
       }
     ],
     "base": {

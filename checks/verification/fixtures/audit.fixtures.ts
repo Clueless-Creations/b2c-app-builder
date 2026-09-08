@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, readdirSync, unlinkSync, writeFileSync } from "node:fs";
+import { symlinkSync, mkdirSync, readFileSync, readdirSync, unlinkSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { assert, createHarness, repoCheckoutPresent, repoRoot, skillRoot, type Harness } from "./_harness.js";
@@ -49,6 +49,87 @@ function runCheckPackageParity(args: string[]): { code: number; output: string }
 }
 
 export function register(harness: Harness): void {
+  const validOwnership = { schemaVersion: 1, sourceVersion: "unknown", syncedAt: "2026-09-08T00:00:00Z", files: { "a.txt": "a".repeat(64) } };
+  harness.check("audit layout: real checkout and linked worktree retain repository gates", () => {
+    const root = harness.makeTempDir("audit-real-git");
+    const checkout = path.join(root, "checkout"),
+      worktree = path.join(root, "worktree");
+    mkdirSync(checkout);
+    writeFileSync(path.join(checkout, "package.json"), '{"scripts":{}}\n');
+    const git = (args: string[]) => {
+      const result = spawnSync("git", ["-c", "user.name=fixture", "-c", "user.email=fixture@example.test", ...args], { cwd: checkout, encoding: "utf8" });
+      assert(result.status === 0, `fixture git failed: ${result.stderr}`);
+    };
+    git(["init", "-q"]);
+    git(["add", "package.json"]);
+    git(["commit", "-qm", "fixture"]);
+    git(["worktree", "add", "--detach", worktree]);
+    for (const target of [checkout, worktree]) {
+      writeFileSync(path.join(target, ".runtime-sync-manifest.json"), JSON.stringify(validOwnership));
+      const result = spawnSync(
+        process.execPath,
+        [resolveTsxBin(skillRoot), path.join(skillRoot, "tooling/run-audit.ts"), "--package-root", target, "--list", "--only", "check:repository-boundary"],
+        { encoding: "utf8" },
+      );
+      assert(
+        result.status === 0 && result.stdout.includes("check:repository-boundary"),
+        `real Git target lost repository gates: ${result.stdout} ${result.stderr}`,
+      );
+    }
+  });
+  const layouts: Array<{ label: string; git?: "file" | "directory"; github?: boolean; manifest?: string; repo: boolean }> = [
+    { label: "plain package", repo: false },
+    { label: "source archive github fallback", github: true, repo: true },
+    { label: "managed runtime with copied github", github: true, manifest: JSON.stringify(validOwnership), repo: false },
+    { label: "managed runtime without github", manifest: JSON.stringify(validOwnership), repo: false },
+    { label: "git directory outranks valid ownership", git: "directory", manifest: JSON.stringify(validOwnership), repo: true },
+    { label: "git worktree file outranks valid ownership", git: "file", manifest: JSON.stringify(validOwnership), repo: true },
+    ...[
+      "{",
+      "null",
+      "[]",
+      JSON.stringify({ ...validOwnership, files: null }),
+      JSON.stringify({ ...validOwnership, files: [] }),
+      JSON.stringify({ ...validOwnership, schemaVersion: 2 }),
+      JSON.stringify({ ...validOwnership, sourceVersion: "" }),
+      JSON.stringify({ ...validOwnership, syncedAt: "bad" }),
+      JSON.stringify({ ...validOwnership, files: { "../escape": "a".repeat(64) } }),
+      JSON.stringify({ ...validOwnership, files: { "a.txt": 12 } }),
+    ].map((manifest, i) => ({ label: `invalid ownership without github ${i}`, manifest, repo: true })),
+  ];
+  for (const item of layouts)
+    harness.check(`audit layout: ${item.label}`, () => {
+      const root = harness.makeTempDir(`audit-layout-${item.label.replaceAll(" ", "-")}`);
+      writeFileSync(path.join(root, "package.json"), '{"scripts":{}}');
+      if (item.github) mkdirSync(path.join(root, ".github"));
+      if (item.git === "directory") mkdirSync(path.join(root, ".git"));
+      if (item.git === "file") writeFileSync(path.join(root, ".git"), "gitdir: fixture\n");
+      if (item.manifest !== undefined) writeFileSync(path.join(root, ".runtime-sync-manifest.json"), item.manifest);
+      const result = spawnSync(
+        process.execPath,
+        [resolveTsxBin(skillRoot), path.join(skillRoot, "tooling/run-audit.ts"), "--package-root", root, "--list", "--only", "check:repository-boundary"],
+        { encoding: "utf8" },
+      );
+      assert(result.status === 0, `layout command failed: ${result.stderr}`);
+      assert(result.stdout.includes("check:repository-boundary") === item.repo, `wrong repository gate selection: ${result.stdout}`);
+    });
+  harness.check("audit layout: symlinked ownership never grants managed runtime classification", () => {
+    const root = harness.makeTempDir("audit-layout-link");
+    writeFileSync(path.join(root, "package.json"), '{"scripts":{}}');
+    const outside = path.join(root, "manifest.json");
+    writeFileSync(outside, JSON.stringify(validOwnership));
+    symlinkSync(outside, path.join(root, ".runtime-sync-manifest.json"));
+    for (const broken of [false, true]) {
+      if (broken) unlinkSync(outside);
+      const result = spawnSync(
+        process.execPath,
+        [resolveTsxBin(skillRoot), path.join(skillRoot, "tooling/run-audit.ts"), "--package-root", root, "--list", "--only", "check:repository-boundary"],
+        { encoding: "utf8" },
+      );
+      assert(result.status === 0 && result.stdout.includes("check:repository-boundary"), "symlinked manifest bypassed repository gate");
+    }
+  });
+
   // --- audit-plan parity: a check:* script the plan doesn't know about must fail the gate -------
 
   // These two read the repository's own package.json/package-lock.json to build their fixture.

@@ -21,7 +21,8 @@
  *   tsx tooling/run-audit.ts --ci --lane heavy --shard 1/2   # one CI shard of the serial suites
  */
 import { spawn } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, lstatSync, readFileSync } from "node:fs";
+import { isSyncManifest } from "./lib/runtime-sync-lib.js";
 import { cpus } from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -136,12 +137,23 @@ function resolveBin(packageRoot: string, name: string): string {
 
 /**
  * ADR-0002 put SKILL.md at the repository root, so the skill entrypoint no longer
- * distinguishes a source checkout from an installed copy. A checkout carries the
- * repository-only scaffolding (.git, .github); a packed or copied install does not.
+ * distinguishes a source checkout from an installed copy.
+ * .git proves a checkout (directory) or worktree (file). Sync copies .github too,
+ * so a valid ownership manifest takes precedence over that archive fallback.
  */
 function detectLayout(packageRoot: string): AuditLayout {
-  const repoMarkers = [".git", ".github"];
-  return repoMarkers.some((marker) => existsSync(path.join(packageRoot, marker))) ? "repo" : "skill";
+  if (existsSync(path.join(packageRoot, ".git"))) return "repo";
+  const manifestPath = path.join(packageRoot, ".runtime-sync-manifest.json");
+  const stat = lstatSync(manifestPath, { throwIfNoEntry: false });
+  if (stat) {
+    if (!stat.isFile()) return "repo";
+    try {
+      return isSyncManifest(JSON.parse(readFileSync(manifestPath, "utf8"))) ? "skill" : "repo";
+    } catch {
+      return "repo";
+    }
+  }
+  return existsSync(path.join(packageRoot, ".github")) ? "repo" : "skill";
 }
 
 function runCommand(command: string, commandArgs: string[], cwd: string): Promise<{ code: number | null; output: string }> {

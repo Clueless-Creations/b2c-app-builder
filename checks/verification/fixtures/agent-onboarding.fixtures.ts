@@ -65,7 +65,9 @@ export function register(h: Harness): void {
       const before = readFileSync(path.join(root, "product.yaml"), "utf8");
       const inspected = inspectWorkspace(root);
       assert(
-        inspected.ok && inspected.registration.kind === "unregistered" && inspected.registration.suggestedFix.startsWith("b2c workspaces register"),
+        inspected.ok &&
+          inspected.registration.kind === "unregistered" &&
+          inspected.registration.suggestedFix.startsWith(process.platform === "win32" ? "cmd.exe: b2c workspaces register" : "b2c workspaces register"),
         "planning scaffold not adoptable",
       );
       const route = routeUtterance({ utterance, cwd: root, mandateScope: "complete_business" });

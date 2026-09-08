@@ -236,11 +236,15 @@ function inferPhase(projectState: MarkerRead, runState: MarkerRead): InspectorPh
 
 // --- registration probe (KTD4 step 2) ----------------------------------------------------------
 
-function registerCommand(target: string): string {
-  // Same literal command shape used across the CLI/MCP surface (`adapters/registry.ts`'s
-  // refusal message, `kernel/session/workspaces.ts`'s usage banner, `entrypoints/mcp/server.ts`'s tool
-  // description): "b2c workspaces register <id> <path>". The id is left as a placeholder — only
-  // the founder can choose it — but the path is concrete, since the inspector already knows it.
+export function registerCommand(target: string, platform: NodeJS.Platform = process.platform): string {
+  // Windows cmd.exe treats single quotes as path characters. Double quotes preserve spaces
+  // and apostrophes; double a trailing backslash so it cannot escape the closing quote.
+  if (platform === "win32") {
+    // cmd expands these even inside quotes. Keep exceptional paths out of shell text.
+    if (/[%!"\r\n]/.test(target))
+      return "b2c workspaces register <id> <path> (pass the workspace path as one literal process argument; it contains shell expansion characters)";
+    return `cmd.exe: b2c workspaces register <id> "${target.replace(/\\+$/, (slashes) => slashes + slashes)}"`;
+  }
   return `b2c workspaces register <id> '${target.replace(/'/g, "'\\''")}'`;
 }
 

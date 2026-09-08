@@ -11,7 +11,7 @@
  */
 
 import { z } from "zod";
-import type { CaptureConfig } from "../analytics/capture.js";
+import type { CaptureConfig, DedupeStore } from "../analytics/capture.js";
 import { captureConsoleEvent } from "../analytics/console-capture.js";
 import { emailDomain, EVENTS, INTENTS, SOURCE_KEYS, SOURCE_LABELS } from "../analytics/events.js";
 import { saveInterestSignal, type D1Like } from "./repository.js";
@@ -77,6 +77,7 @@ export async function handleInterestSubmission(
   db: D1Like,
   analytics: CaptureConfig,
   ctx: { waitUntil(promise: Promise<unknown>): void },
+  flagsKv: DedupeStore | undefined,
   now = new Date(),
 ): Promise<InterestResult> {
   const parsed = submissionSchema.safeParse(body);
@@ -118,13 +119,11 @@ export async function handleInterestSubmission(
   if (distinctId !== undefined) {
     const capturedAt = now.toISOString();
     const hasOtherText = input.source_other !== undefined && input.source_other.trim().length > 0;
-    // Excluded from the objection-record check by LEGITIMATE_INTERESTS_ASSESSMENT.md's scope
-    // section — `interest_submitted` needs its own basis analysis, which this document does not
-    // attempt — so no `objectionSubject` here, and only the geography check applies. `flagsKv`
-    // is `undefined` for the same reason `signin_started`/`signin_failed` pass it: there is
-    // nothing for this call to check it against.
-    captureConsoleEvent(ctx, undefined, analytics, session.country, {
+    // A resolved account uses the console's objection store. Anonymous signals have no account
+    // subject and retain the geography-only gate. Neither decision changes the durable row.
+    captureConsoleEvent(ctx, flagsKv, analytics, session.country, {
       distinctId,
+      objectionSubject: session.accountId,
       event: EVENTS.interestSubmitted,
       authState: session.accountId === undefined ? "anonymous" : "authenticated",
       properties: {

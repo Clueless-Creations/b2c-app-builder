@@ -665,6 +665,7 @@ export default {
               db,
               session: resolved.session,
               analytics: analyticsConfig(env),
+              flagsKv: env.FLAGS_KV,
               ctx,
               csrfSecret: env.B2C_APP_CONSOLE_AUTH_SECRET,
               country: countryOf(request),

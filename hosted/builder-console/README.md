@@ -231,11 +231,11 @@ Two checks, always in this order, always before any KV read or network call:
 1. **Geography.** `analyticsSuppressedByCountry()` — the same predicate `interest/handler.ts` and
    the MCP Worker already used — runs first and synchronously. A suppressed request returns with
    nothing scheduled: no KV read, no capture, no exception.
-2. **Objection**, for the four events that already have a stable `account_id`
-   (`signin_completed`, `account_created`, `api_key_created`, `api_key_revoked`).
+2. **Objection**, for events with a stable `account_id`: `signin_completed`, `account_created`,
+   `api_key_created`, `api_key_revoked`, `upgrade_intent_clicked`, and authenticated `interest_submitted`. Interest storage precedes analytics.
    `isAnalyticsSuppressed()` checks `analytics:optout:<account_id>` in `FLAGS_KV` — the console's
    own namespace, never the MCP Worker's `OAUTH_KV` — and fails **closed**. `signin_started` and
-   `signin_failed` fire before an account exists, so they get the geography check only; see
+   `signin_failed`, plus anonymous interest submissions, have no account subject and get geography only; see
    `EVENT_TAXONOMY.md`'s "Which console event checks what" table for the complete list.
 
 See `EVENT_TAXONOMY.md`'s "Objection, and how it is honoured" section for the opt-out command

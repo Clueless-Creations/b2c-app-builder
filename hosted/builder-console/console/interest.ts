@@ -20,7 +20,7 @@
  */
 
 import type { AccountId } from "../../knowledge-mcp/db/tenant.js";
-import type { CaptureConfig } from "../analytics/capture.js";
+import type { CaptureConfig, DedupeStore } from "../analytics/capture.js";
 import { handleInterestSubmission } from "../interest/handler.js";
 import type { D1Like } from "../interest/repository.js";
 import { consoleHtmlResponse as htmlResponse } from "./chrome.js";
@@ -40,6 +40,8 @@ export interface ConsoleInterestDeps {
   readonly db: D1Like;
   readonly session: ConsoleInterestSession;
   readonly analytics: CaptureConfig;
+  /** Console FLAGS_KV, never the knowledge Worker's OAuth store. */
+  readonly flagsKv: DedupeStore | undefined;
   readonly ctx: ExecutionContextLike;
   /** Same secret as console/keys.ts's csrfSecret; a different namespace string keeps tokens apart. */
   readonly csrfSecret: string;
@@ -101,6 +103,7 @@ export async function handleConsoleInterestRequest(request: Request, deps: Conso
     deps.db,
     deps.analytics,
     deps.ctx,
+    deps.flagsKv,
   );
 
   if (result.status === 200) {

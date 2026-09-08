@@ -642,6 +642,7 @@ test("POST /console/interest with a valid CSRF token writes one interest_signals
   const { sessionCookie, accountId } = await signedInIdentity();
   const csrf = await interestCsrfTokenFor(sessionCookie);
   const capturedBefore = capturedEvents.length;
+  const readsBefore = flagsKv.getCallCount();
   const body = new URLSearchParams({ csrf, email: "interest-us@example.com", source_key: "hacker_news", intent: "evaluating" }).toString();
 
   const response = await dispatch(new Request(`${ORIGIN}/console/interest`, { method: "POST", headers: { Cookie: sessionCookie, ...US_HEADERS }, body }));
@@ -653,16 +654,46 @@ test("POST /console/interest with a valid CSRF token writes one interest_signals
   assert.equal(rows[0]!.email, "interest-us@example.com");
   assert.equal(rows[0]!.intent, "evaluating");
 
-  const event = capturedEvents.slice(capturedBefore).find((captured) => captured.event === "interest_submitted");
-  assert.ok(event, "interest_submitted must be captured for a resolvable country");
-  assert.equal(event!.distinct_id, accountId);
+  const events = capturedEvents.slice(capturedBefore).filter((captured) => captured.event === "interest_submitted");
+  assert.equal(events.length, 1, "capture the intended event exactly once");
+  assert.equal(events[0]!.distinct_id, accountId);
+  assert.equal(events[0]!.properties.auth_state, "authenticated");
+  assert.equal(events[0]!.properties.source_key, "hacker_news");
+  assert.equal(flagsKv.getCallCount(), readsBefore + 1, "check the console objection store before capture");
 });
+
+for (const state of ["objected", "unavailable"] as const) {
+  test(`POST /console/interest stores the submission but suppresses analytics when objections are ${state}`, async () => {
+    const { sessionCookie, accountId } = await signedInIdentity();
+    const csrf = await interestCsrfTokenFor(sessionCookie);
+    const capturedBefore = capturedEvents.length;
+    const readsBefore = flagsKv.getCallCount();
+    if (state === "objected") flagsKv.map.set(`analytics:optout:${accountId}`, "1");
+    else flagsKv.setBroken(true);
+    try {
+      const body = new URLSearchParams({ csrf, email: `interest-${state}@example.com`, source_key: "github", intent: "evaluating" }).toString();
+      const response = await dispatch(new Request(`${ORIGIN}/console/interest`, { method: "POST", headers: { Cookie: sessionCookie, ...US_HEADERS }, body }));
+      assert.equal(response.status, 303);
+      assert.equal(response.headers.get("Location"), "/console");
+      const rows = (await harness.readInterestSignals()).filter((row) => row.account_id === accountId);
+      assert.equal(rows.length, 1, "analytics suppression must not prevent durable interest storage");
+      assert.equal(rows[0]!.email, `interest-${state}@example.com`);
+      assert.equal(rows[0]!.intent, "evaluating");
+      assert.equal(capturedEvents.length, capturedBefore, "no event may escape the objection check");
+      assert.equal(flagsKv.getCallCount(), readsBefore + 1);
+    } finally {
+      flagsKv.setBroken(false);
+      flagsKv.map.delete(`analytics:optout:${accountId}`);
+    }
+  });
+}
 
 test("POST /console/interest from cf-ipcountry DE still writes the row but never captures interest_submitted", async () => {
   const { sessionCookie, accountId } = await signedInIdentity();
   const csrf = await interestCsrfTokenFor(sessionCookie);
   const capturedBefore = capturedEvents.length;
   const body = new URLSearchParams({ csrf, email: "interest-de@example.com", source_key: "github", intent: "just_curious" }).toString();
+  const readsBefore = flagsKv.getCallCount();
 
   const response = await dispatch(
     new Request(`${ORIGIN}/console/interest`, { method: "POST", headers: { Cookie: sessionCookie, "cf-ipcountry": "DE" }, body }),
@@ -671,6 +702,7 @@ test("POST /console/interest from cf-ipcountry DE still writes the row but never
 
   const rows = (await harness.readInterestSignals()).filter((row) => row.account_id === accountId);
   assert.equal(rows.length, 1, "the D1 write is the source of record and must not be gated on geography");
+  assert.equal(flagsKv.getCallCount(), readsBefore, "geography suppresses before any objection-store read");
   assert.equal(
     capturedEvents.slice(capturedBefore).filter((captured) => captured.event === "interest_submitted").length,
     0,
@@ -711,6 +743,7 @@ test("a second GET /console shows the submitted state instead of the form", asyn
 
 test("an unauthenticated POST /console/interest redirects to sign-in and writes nothing", async () => {
   const rowsBefore = (await harness.readInterestSignals()).length;
+  const capturedBefore = capturedEvents.length;
   const response = await dispatch(
     new Request(`${ORIGIN}/console/interest`, {
       method: "POST",
@@ -722,6 +755,7 @@ test("an unauthenticated POST /console/interest redirects to sign-in and writes 
   assert.equal(location.pathname, "/signin");
   assert.equal(location.searchParams.get("entry_point"), "console_guard");
   assert.equal((await harness.readInterestSignals()).length, rowsBefore);
+  assert.equal(capturedEvents.length, capturedBefore, "the authentication redirect must not capture interest");
 });
 
 test("a second tenant's GET /console never shows the first tenant's submitted state, and its row stays isolated", async () => {

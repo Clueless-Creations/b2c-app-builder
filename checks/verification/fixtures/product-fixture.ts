@@ -76,3 +76,39 @@ export function initializeProductFixture(workspace: string, name: string): void 
   const output = `${result.stdout ?? ""}\n${result.stderr ?? ""}`.trim();
   throw new Error(`Fixture initialization failed: ${cause}${output ? `\n${output}` : "\nThe child produced no output."}`);
 }
+
+/**
+ * The one valid offer-evidence document the fixtures share. `validateProductPriceEvidence` reads it
+ * whenever the revenue lane is active, so any workspace fixture that approves a price needs it —
+ * a second, divergent copy is how a fixture starts asserting a contract nobody authored.
+ * Keep the founder decider intact: `isDecider` in price-evidence.ts rejects agent-shaped names.
+ */
+export const OFFER_TEST_FIXTURE = `# Offer test
+## Test Contract
+| Field | Value |
+| --- | --- |
+| Audience | people who repeatedly abandon habit streaks |
+| Exact discovery location | r/habits |
+| Native format | case-study post |
+| Offer | join a recovery waitlist |
+| Owned relationship | email waitlist |
+| Primary response | waitlist signup |
+| Stop rule | 1000 qualified visits |
+## Exposure And Conversion
+| Date | Channel | Evidence source | Exposure type | Exposure | CTA conversions | Conversion rate | Cost | Result |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-07-20 | Reddit | fixture cohort TRACE-003 | qualified visits | 840 | 31 | 3.69% | 0 | continue |
+## Decision
+| Status | Date | Evidence | Decision | Decided by |
+| --- | --- | --- | --- | --- |
+| run | 2026-07-21 | 840 visits and 31 signups in TRACE-003 | use the recovery offer | founder |
+## Founder Waiver
+| Date | Founder | Reason | Residual risk accepted |
+| --- | --- | --- | --- |
+`;
+
+/** Write the shared offer evidence a price-approving workspace fixture needs. */
+export function writeOfferTestFixture(workspace: string): void {
+  mkdirSync(path.join(workspace, "strategy"), { recursive: true });
+  writeFileSync(path.join(workspace, "strategy/OFFER_TEST.md"), OFFER_TEST_FIXTURE);
+}

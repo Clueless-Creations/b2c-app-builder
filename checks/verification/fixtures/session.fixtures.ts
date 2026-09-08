@@ -42,6 +42,8 @@ import { composeCatalog } from "../../../catalog/index.js";
 import { toCatalogInput } from "../../../catalog/bridge.js";
 import { acceptVerification, beginAttempt, reconcilePatch, requestVerificationRepair } from "../../../kernel/engine/runstate.js";
 import { workerEnvironment } from "../../../kernel/session/executor.js";
+import { stringify as stringifyYaml } from "yaml";
+import { DESIGN_FACETS, designArtifact } from "../../validation/business/design/design-acceptance.js";
 
 /**
  * U5 session-runner fixtures: exercises kernel/session/run.ts as a real subprocess (mirroring
@@ -1389,11 +1391,68 @@ function seedImplementationCraftAuditRetry(handle: WorkspaceHandle, catalog: Cat
   writeRunState(path.join(handle.dir, "run/run-state.json"), run);
 }
 
-/** Keep a missing-report routing fixture free of unrelated product/scope parse failures. */
+/**
+ * Keep a missing-report routing fixture free of unrelated product/scope parse failures.
+ *
+ * `check:design-acceptance` runs `validateDesignSourceReferences` first, and a DESIGN.md that
+ * declares `acceptance:` is a locked design: every surface's frozen rubric must parse and resolve.
+ * A workspace that named a rubric path without writing the rubric therefore failed the gate with
+ * `design_source.contract_invalid` alongside the missing report — two codes, so
+ * isRetryableDesignAuditGateFailure() saw a mixed result, declined the audit-only retry route, and
+ * sent a Design Room rubric defect to product producers this audit never reviewed. Write the whole
+ * locked design, so the only thing wrong with this workspace is the audit's own missing report.
+ *
+ * The references are documentation-kind on purpose: the rubric schema constrains only their count
+ * and criteria coverage, and documentation evidence keeps the fixture free of the image and
+ * interaction artifacts a visual reference would have to retain for a routing test that never
+ * reads them.
+ */
 function writeAcceptedDesignInputsWithoutAuditReport(handle: WorkspaceHandle): void {
-  writeFileSync(path.join(handle.dir, "product.yaml"), "meta:\n  status: accepted\n", "utf8");
-  writeFileSync(
-    path.join(handle.dir, "DESIGN.md"),
+  const put = (relative: string, data: string): void => {
+    mkdirSync(path.dirname(path.join(handle.dir, relative)), { recursive: true });
+    writeFileSync(path.join(handle.dir, relative), data, "utf8");
+  };
+  put("product.yaml", "meta:\n  status: accepted\n");
+  put(
+    "design/reference-packs/hierarchy.md",
+    "# Fixture hierarchy reference\n\nThe source keeps one dominant action per screen with a quiet supporting hierarchy.\n",
+  );
+  put(
+    "design/reference-packs/behavior.md",
+    "# Fixture behavior reference\n\nThe source explains keyboard and screen-reader behavior for the primary task.\n",
+  );
+  const reference = (id: string, relative: string, observation: string) => ({
+    id,
+    // Observed before the rubric was frozen, so the chronology rule holds.
+    resolution: { status: "retained_snapshot" as const, observedAt: "2026-09-01T00:00:00.000Z", provider: "session-fixture", sourceId: id },
+    url: `https://example.com/${id}`,
+    kind: "documentation" as const,
+    artifact: designArtifact(handle.dir, relative),
+    observation,
+  });
+  put(
+    "design/reviews/rubrics/fixture.md",
+    `---\n${stringifyYaml({
+      designRubric: {
+        schemaVersion: 2,
+        id: "fixture-craft-rubric",
+        frozenAt: "2026-09-02T00:00:00.000Z",
+        references: [
+          reference("hierarchy", "design/reference-packs/hierarchy.md", "The source keeps one dominant action with a quiet content hierarchy."),
+          reference("behavior", "design/reference-packs/behavior.md", "The source explains keyboard and screen-reader behavior for the primary task."),
+        ],
+        criteria: DESIGN_FACETS.map((facet) => ({
+          id: facet,
+          facet,
+          minimum: "meets",
+          condition: `Observe the product-specific ${facet} criterion during the complete user task.`,
+          referenceIds: ["hierarchy", "behavior"],
+        })),
+      },
+    })}---\n# Frozen fixture craft rubric\n`,
+  );
+  put(
+    "DESIGN.md",
     [
       "---",
       "acceptance:",
@@ -1422,7 +1481,6 @@ function writeAcceptedDesignInputsWithoutAuditReport(handle: WorkspaceHandle): v
       "# Accepted fixture design",
       "",
     ].join("\n"),
-    "utf8",
   );
   writeJson(path.join(handle.dir, "studio/seed/business.json"), {});
 }

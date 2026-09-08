@@ -1,0 +1,128 @@
+schema_version: 1
+id: last30days-skill
+project: last30days agent skill
+canonical_url: https://github.com/mvanhorn/last30days-skill
+aliases:
+  - mvanhorn/last30days-skill
+authors:
+  - name: Matt Van Horn
+    role: original author or copyright holder identified in the reviewed source
+maintainers:
+  - name: mvanhorn (github.com/mvanhorn)
+    role: current upstream maintainer
+copyright: Copyright (c) 2026 Matt Van Horn
+license:
+  spdx: MIT
+  status: verified
+  evidence_url: https://github.com/mvanhorn/last30days-skill/blob/310f0b405db2d84adb4993bbf140cef9584057d2/LICENSE
+  evidence_sha256: 31803213a789825dc419de43542381e1d570b4408cf2bcf2e8a9947a6d3fd2ab
+  reviewed_revision: 310f0b405db2d84adb4993bbf140cef9584057d2
+  notice_file: catalog/upstreams/notices/last30days-skill.txt
+  scope: Selected published recency-research methods from README.md and skills/last30days/SKILL.md
+    only. No engine, vendor tree, install hook, setup wizard, cookie capture, or skill text is imported.
+source_ids:
+  - github-mvanhorn-last30days-skill
+  - last30days-skill-file
+  - last30days-skill-license
+relationships:
+  - kind: adapted-method
+    consumption: Selected recency-window, engagement ranking, entity resolution, and honest source-coverage
+      methods are reauthored in knowledge/process/tool-recipes/research-intelligence.md. No whole skill,
+      executable, native dependency, or asset was installed by this contribution.
+    local_owners: &recency
+      - knowledge/process/tool-recipes/research-intelligence.md
+    tests:
+      - checks/validation/repository/evals/agent-behavior/last30days-research-boundary.yaml
+    upstream_paths:
+      - README.md
+      - LICENSE
+      - skills/last30days/SKILL.md
+    pin_authority: Reviewed immutable source commit pins this guidance. Host skill installation and live
+      engine runs are selected and authorized separately.
+  - kind: selected-skill-guidance
+    consumption: The last30days skill is named as an opt-in companion pack. Installation happens only with
+      founder approval. No SKILL.md is auto-installed as a top-level builder skill, and the engine is never
+      a default provider.
+    local_owners:
+      - knowledge/engineering/recommended-agent-skills.md
+    tests:
+      - checks/validation/repository/evals/agent-behavior/last30days-research-boundary.yaml
+    upstream_paths:
+      - README.md
+      - skills/last30days/SKILL.md
+    pin_authority: npx skills add carries no pin. Reviewed commit below identifies the README and skill name this routing cites.
+baselines:
+  reviewed_source:
+    revision: 310f0b405db2d84adb4993bbf140cef9584057d2
+    observed_at: "2026-09-08"
+    by: b2c-maintainers
+    note: Read-only license, README, and selected SKILL.md inspection; no engine run, skill install from
+      this contribution, or live source query.
+  reviewed_guidance:
+    revision: 310f0b405db2d84adb4993bbf140cef9584057d2
+    observed_at: "2026-09-08"
+    by: b2c-maintainers
+    note: Selected methods adapted into research-intelligence; skill name routed as opt-in guidance only.
+support:
+  policy: Source-reviewed guidance only. Listed operations are mapped procedures, not newly executable
+    provider bindings or certification of installed versions.
+  versions:
+    - range: 310f0b405db2d84adb4993bbf140cef9584057d2
+      status: untested
+      evidence:
+        - Source inspection and the last30days-research-boundary routing eval only; no live last30days
+          engine or host-skill execution from this repository.
+  operations:
+    - id: last30days-recency-research-guidance
+      title: Selected last30days recency, engagement, and coverage methods
+      keywords:
+        - recency
+        - reddit
+        - hacker news
+        - github
+        - research
+      owners: *recency
+  unsupported_operations:
+    - id: last30days-engine-default
+      reason: The host engine stays independently authorized. The builder never installs or authorizes it
+        as a default provider.
+    - id: setup-wizard-cookie-or-cli-install
+      reason: Upstream setup, browser-cookie capture, and extra CLI installs are refused directives. They
+        remain host-side founder work.
+    - id: silent-xpoz-or-appkittie-fallback
+      reason: last30days does not replace XPOZ, AppKittie, or Firecrawl. Paid-tool routing still owns those
+        fallbacks.
+    - id: automatic-install-or-upgrade
+      reason: Requires explicit target, selected compatible revision, scoped authority and independent
+        verification. No host installation, business repin or publication is automatic.
+  platforms: []
+adaptations:
+  - id: no-engine-vendor
+    description: Do not vendor the Python engine, scripts, or bird-search tree. Host execution stays in the
+      installed skill.
+    owner: knowledge/process/tool-recipes/research-intelligence.md
+    intentional: true
+  - id: not-xpoz-fallback
+    description: Do not treat last30days as the free fallback for XPOZ, AppKittie, or Firecrawl.
+    owner: knowledge/process/tool-recipes/research-intelligence.md
+    intentional: true
+  - id: not-required
+    description: Citing adapted methods does not require installing the upstream skill.
+    owner: knowledge/engineering/recommended-agent-skills.md
+    intentional: true
+  - id: host-output-contract-stays-upstream
+    description: Badges, engine footers, and host formatting laws stay in the upstream skill. B2C App Builder
+      still requires dated, resolvable sources in strategy/RESEARCH.md.
+    owner: knowledge/process/tool-recipes/research-intelligence.md
+    intentional: true
+review:
+  owner: b2c-maintainers
+  cadence_days: 30
+  last_review: "2026-09-08"
+  status: current
+credits:
+  acknowledge: true
+  use: adapted
+  summary: Selected last30days recency-research methods inform
+    knowledge/process/tool-recipes/research-intelligence.md. The host skill remains an opt-in companion
+    pack. Original authors and license notices are retained; no live integration is claimed.

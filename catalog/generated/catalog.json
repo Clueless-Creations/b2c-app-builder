@@ -1,6 +1,6 @@
 {
   "schemaVersion": "2.0.0",
-  "skillVersion": "0.219.3",
+  "skillVersion": "0.219.4",
   "areas": [
     {
       "id": "area.operating-system",
@@ -4042,9 +4042,9 @@
       "path": "knowledge/engineering/recommended-agent-skills.md",
       "domainId": "domain.engineering",
       "title": "Recommended Agent Skills",
-      "loadWhen": "before Expo or SwiftUI implementation when choosing recommended external agent skill packs for craft, motion, store work, or optional design-research provider guidance without vendor lock-in",
+      "loadWhen": "before Expo or SwiftUI implementation when choosing recommended external agent skill packs for craft, motion, store work, optional recency research, or optional design-research provider guidance without vendor lock-in",
       "lifecycle": "active",
-      "applicabilityNotes": "Pin expo/skills and emilkowalski animate-expo/review-animations as recommended Expo installs. Appllama's app-design skill is an opt-in stack-specific companion; appllama-usage is loaded only when the user's Appllama MCP is independently connected and authorized. Keep paid/vendor MCPs off the default surface.",
+      "applicabilityNotes": "Pin expo/skills and emilkowalski animate-expo/review-animations as recommended Expo installs. Appllama's app-design skill is an opt-in stack-specific companion; appllama-usage is loaded only when the user's Appllama MCP is independently connected and authorized. last30days is an opt-in host engine for scored recency briefs; it is not a default and does not replace AppKittie, XPOZ, or Firecrawl. Keep paid/vendor MCPs off the default surface.",
       "sources": [
         {
           "id": "github-appllama-skills",
@@ -4071,12 +4071,37 @@
             "skills/appllama-usage/SKILL.md"
           ],
           "upstreamId": "appllama-skills"
+        },
+        {
+          "id": "github-mvanhorn-last30days-skill",
+          "name": "last30days agent skill",
+          "sourceType": "agent_skill_pack",
+          "url": "https://github.com/mvanhorn/last30days-skill",
+          "reviewCadenceDays": 30,
+          "claimScope": "MIT-licensed recency research skill. Install syntax and the skill name are taken from the upstream README. Host engine execution, setup, and secrets remain separately authorized.",
+          "lastReviewDate": "2026-09-08",
+          "reviewer": "b2c-maintainers",
+          "publisher": "Matt Van Horn",
+          "revision": "310f0b405db2d84adb4993bbf140cef9584057d2",
+          "rights": {
+            "status": "verified",
+            "spdx": "MIT",
+            "evidence": "catalog/upstreams/notices/last30days-skill.txt",
+            "evidenceSha256": "31803213a789825dc419de43542381e1d570b4408cf2bcf2e8a9947a6d3fd2ab",
+            "notes": "Skill name and install syntax only; no SKILL.md is copied into the builder."
+          },
+          "selectors": [
+            "README.md",
+            "LICENSE",
+            "skills/last30days/SKILL.md"
+          ],
+          "upstreamId": "last30days-skill"
         }
       ],
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/engineering/recommended-agent-skills.md",
-        "sha256": "sha256:6e95cc848a7275951d99f4b1586313211b9754c71d97a1345205ac3d28234b09",
+        "sha256": "sha256:52c18bab21c9028b4c9a9ee40debc5f430c846e18151cbc4bc37111e8efe0143",
         "origin": "skill"
       }
     },
@@ -6765,7 +6790,7 @@
       ],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/process/artifact-contracts.md",
-        "sha256": "sha256:3cf09f697ab1436bb33b0cb8246a51d5a2b43facd80f153da99f3337fdcae750",
+        "sha256": "sha256:b5d251212fa1c7c7e6a6ecab18497ea1cd80ea577a69b2769cf54e5229296055",
         "origin": "skill"
       }
     },
@@ -7306,7 +7331,7 @@
       "path": "knowledge/process/tool-recipes/research-intelligence.md",
       "domainId": "domain.process",
       "title": "Research Intelligence",
-      "loadWhen": "delegating AppKittie store intelligence, XPOZ social-language, Firecrawl web intelligence, Refero UX pattern research, or name/keyword collision checks — routed from tool-recipes.md; complements the Market research rows",
+      "loadWhen": "delegating AppKittie store intelligence, XPOZ social-language, last30days recency briefs, Firecrawl web intelligence, Refero UX pattern research, or name/keyword collision checks — routed from tool-recipes.md; complements the Market research rows",
       "lifecycle": "active",
       "sources": [
         {
@@ -7328,12 +7353,37 @@
           "claimScope": "Auto-discovered from recently added repository content.",
           "lastReviewDate": "2026-08-17",
           "reviewer": "b2c-maintainers"
+        },
+        {
+          "id": "github-mvanhorn-last30days-skill",
+          "name": "last30days agent skill",
+          "sourceType": "agent_skill_pack",
+          "url": "https://github.com/mvanhorn/last30days-skill",
+          "reviewCadenceDays": 30,
+          "claimScope": "MIT-licensed recency research skill. Selected methods are adapted into this reference. Host skill installation, setup wizard, cookie capture, extra CLIs, and live engine runs remain separately authorized.",
+          "lastReviewDate": "2026-09-08",
+          "reviewer": "b2c-maintainers",
+          "publisher": "Matt Van Horn",
+          "revision": "310f0b405db2d84adb4993bbf140cef9584057d2",
+          "rights": {
+            "status": "verified",
+            "spdx": "MIT",
+            "evidence": "catalog/upstreams/notices/last30days-skill.txt",
+            "evidenceSha256": "31803213a789825dc419de43542381e1d570b4408cf2bcf2e8a9947a6d3fd2ab",
+            "notes": "Methods only; no SKILL.md, engine, or host install is copied into the builder."
+          },
+          "selectors": [
+            "README.md",
+            "LICENSE",
+            "skills/last30days/SKILL.md"
+          ],
+          "upstreamId": "last30days-skill"
         }
       ],
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/process/tool-recipes/research-intelligence.md",
-        "sha256": "sha256:e3595a6fa50a103ac4129a608a246b6b8ea05e5ea9a357c5d188250101f274bb",
+        "sha256": "sha256:84cc90e5d9f5dfa1380d0e7607ee5ea371a3b4e7823789c9927b35286c1fa76e",
         "origin": "skill"
       }
     },
@@ -7418,7 +7468,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/process/tool-recipes.md",
-        "sha256": "sha256:97f960200e63c596a79b5081ba2b79eb62d1fb5191bdb184afa69b843516caa5",
+        "sha256": "sha256:b709a79f3b3ffa682e7fe8ba4b2fc0d9ac3eeac8d825fda98140e1d2117c6e28",
         "origin": "skill"
       }
     },
@@ -18270,14 +18320,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "8c0746903471709ae208cc40f2ac1f5becc397fac989ec19d63665ab333d4c68",
+    "fingerprint": "be3ca747c378c096fdb190ad4a071e299481d07d733af5809cee5a8ce6c96d00",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
-        "version": "0.219.3",
-        "revision": "0.219.3",
-        "contentDigest": "b3bb451cc982c58a02aa858e8d34de161fed0c026506db369cf843f2056d1090"
+        "version": "0.219.4",
+        "revision": "0.219.4",
+        "contentDigest": "ad3053972a0bc2f61c5665ac1f074c94f0168379ca0f5c4707032195d4d75f62"
       }
     ],
     "base": {

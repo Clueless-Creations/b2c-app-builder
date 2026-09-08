@@ -2,7 +2,7 @@
 
 Use this before an Expo or SwiftUI implementation session.
 
-Use it when the session needs an external agent skill pack for craft, motion, or store work.
+Use it when the session needs an external agent skill pack for craft, motion, store work, or opt-in recency research.
 
 This file is not a substitute for B2C App Builder validators. B2C App Builder owns graph execution, evidence, and done gates. External packs reduce craft mistakes inside a build session.
 
@@ -35,6 +35,7 @@ Use these packs only when the product path matches:
 - `Appllama/appllama-skills` `appllama-usage` — only when the acting user has independently authorized Appllama MCP access and the task needs its proprietary mobile-design evidence. Let the upstream skill own provider syntax, credits, pagination, and media behavior. B2C App Builder owns the research question, evidence contract, and adoption decision.
 - `vercel-labs/agent-skills` React Native skill — only after a LICENSE file exists on that repo.
 - `twostraws/SwiftUI-Agent-Skill` — SwiftUI archetype or a native SwiftUI brownfield app only.
+- `mvanhorn/last30days-skill` `last30days` — optional host engine for scored recency briefs. B2C App Builder already adapts the method in `knowledge/process/tool-recipes/research-intelligence.md`. Load the upstream skill only when the host already has it or the founder approved install. It does not replace AppKittie, XPOZ, or Firecrawl.
 
 Do not install an external skill merely because B2C App Builder cites methods derived from it. The internal doctrine is sufficient when the provider/stack-specific instructions add no value.
 
@@ -46,6 +47,7 @@ Do not add these to the default B2C App Builder surface:
 - Appeeky MCP or any paid UA vendor MCP.
 - Appllama MCP as an automatic/default dependency. It is optional, user-authorized design evidence when available.
 - Bulk install of every skill named in a social roundup.
+- The last30days Claude Code marketplace plugin on a host that already installed the skill with `npx skills add`. The two copies duplicate.
 
 ## 4. Install Commands
 
@@ -68,6 +70,12 @@ Optional ASO pack (see `aso-store-ops.md`):
 
 ```bash
 npx skills add Eronred/aso-skills --skill '*' --yes
+```
+
+Optional last30days recency-research skill, only after founder approval. The host engine needs Python 3.12 or newer. Do not run the upstream setup wizard, cookie capture, or extra CLI installs from a business session:
+
+```bash
+npx skills add mvanhorn/last30days-skill --skill last30days -g
 ```
 
 ## 5. Evidence Rule

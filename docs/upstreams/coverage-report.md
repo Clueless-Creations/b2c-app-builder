@@ -2,7 +2,7 @@
 
 Generated from active, bound knowledge source declarations and catalog/upstreams. This is a maintainer review queue, not a second registry. A cited repository may be an example, optional tool, adapted method or runtime dependency; the report does not infer adoption or permission from a URL. Only an explicit reviewed contribution changes support or acknowledgments.
 
-Scope: 37 referenced repositories, 88 source bindings, 64 bindings needing review or linkage.
+Scope: 38 referenced repositories, 90 source bindings, 64 bindings needing review or linkage.
 
 The scan excludes inactive/unbound knowledge, self-references, non-GitHub sources, undeclared prose URLs, package-manager dependencies and resources outside knowledge manifests. An empty queue is not proof that every dependency is tracked. Inspect those other surfaces during contribution review. Repository aliases are matched only when declared in an upstream manifest.
 
@@ -99,6 +99,8 @@ Use b2c contribute plan for an untracked source. For a maintained project, inspe
 | getsentry/snapshotpreviews | `knowledge/process/tool-recipes/device-capture-and-proof.md` | github-com-getsentry-snapshotpreviews | sentry-snapshotpreviews | tracked | Source identity and reviewed commit are linked. This does not certify executable compatibility or live results. |
 | getsentry/xcodebuildmcp | `knowledge/engineering/xcodebuildmcp-testing.md` | github-com-getsentry-xcodebuildmcp | sentry-xcodebuildmcp | tracked | Source identity and reviewed commit are linked. This does not certify executable compatibility or live results. |
 | getsentry/xcodebuildmcp | `knowledge/process/tool-recipes/device-capture-and-proof.md` | github-com-getsentry-xcodebuildmcp | sentry-xcodebuildmcp | tracked | Source identity and reviewed commit are linked. This does not certify executable compatibility or live results. |
+| mvanhorn/last30days-skill | `knowledge/engineering/recommended-agent-skills.md` | github-mvanhorn-last30days-skill | last30days-skill | tracked | Source identity and reviewed commit are linked. This does not certify executable compatibility or live results. |
+| mvanhorn/last30days-skill | `knowledge/process/tool-recipes/research-intelligence.md` | github-mvanhorn-last30days-skill | last30days-skill | tracked | Source identity and reviewed commit are linked. This does not certify executable compatibility or live results. |
 | parthjadhav/app-store-screenshots | `knowledge/store/app-store-listing-prep.md` | github-com-parthjadhav-app-store-screenshots | parth-app-store-screenshots | tracked | Source identity and reviewed commit are linked. This does not certify executable compatibility or live results. |
 | parthjadhav/app-store-screenshots | `knowledge/store/screenshot-toolchain.md` | github-com-parthjadhav-app-store-screenshots | parth-app-store-screenshots | tracked | Source identity and reviewed commit are linked. This does not certify executable compatibility or live results. |
 | parthjadhav/app-store-screenshots | `knowledge/store/store-console-workflow.md` | github-com-parthjadhav-app-store-screenshots | parth-app-store-screenshots | tracked | Source identity and reviewed commit are linked. This does not certify executable compatibility or live results. |

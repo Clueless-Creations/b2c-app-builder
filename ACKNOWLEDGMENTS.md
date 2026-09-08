@@ -64,6 +64,17 @@ B2C App Builder is built on open-source work and adapts published methods. This 
 - How we consume it:
   - adapted-method: Selected published methods and tool procedures are adapted into existing builder guidance. No whole skill, executable, native dependency or asset was installed by this contribution.
 
+**last30days agent skill**
+
+- Original author: Matt Van Horn, original author or copyright holder identified in the reviewed source
+- Current maintainer: mvanhorn (github.com/mvanhorn), current upstream maintainer
+- License: MIT (verified)
+- Canonical URL: https://github.com/mvanhorn/last30days-skill
+- Contributes: Selected last30days recency-research methods inform knowledge/process/tool-recipes/research-intelligence.md. The host skill remains an opt-in companion pack. Original authors and license notices are retained; no live integration is claimed.
+- How we consume it:
+  - adapted-method: Selected recency-window, engagement ranking, entity resolution, and honest source-coverage methods are reauthored in knowledge/process/tool-recipes/research-intelligence.md. No whole skill, executable, native dependency, or asset was installed by this contribution.
+  - selected-skill-guidance: The last30days skill is named as an opt-in companion pack. Installation happens only with founder approval. No SKILL.md is auto-installed as a top-level builder skill, and the engine is never a default provider.
+
 **App Store Screenshots**
 
 - Original author: Parth Jadhav, original author or copyright holder identified in the reviewed source

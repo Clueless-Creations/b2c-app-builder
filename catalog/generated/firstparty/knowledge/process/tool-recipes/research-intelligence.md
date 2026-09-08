@@ -66,6 +66,7 @@ Preferred local tool:
 - Put global flags before the platform: `xpoz-cli --output json tiktok search_posts ...`
 - Check auth first: `xpoz-cli --output pretty auth status`
 - Useful platforms/methods: `reddit search_posts`, `reddit search_comments`, `reddit get_subreddit_with_posts`, `tiktok search_posts`, `tiktok search_users`, `tiktok get_posts_by_user`, `twitter search_posts`, `twitter count_posts`, `instagram search_posts`, `instagram get_posts_by_user`.
+- For a scored recency brief across those platforms, see Last30days Recency Research below. last30days is not the XPOZ free fallback.
 
 Access:
 
@@ -94,6 +95,55 @@ Rules:
 - Keep sensitive or copyrighted material summarized unless the source allows direct quotation.
 - Prefer creator handles, subreddits, compact hashtags, and competitor names over broad generic phrases; broad XPOZ queries are often noisy.
 - Record query, platform, date, result URL/post ID/creator handle where possible, and how the evidence changed positioning or copy.
+
+## Last30days Recency Research
+
+Purpose: collect what people are saying about a topic, person, product, or comparison inside a dated recency window (default last 30 days), ranked by engagement rather than search-engine rank.
+
+This method adapts selected procedures from the MIT-licensed `mvanhorn/last30days-skill` host skill. It does not copy that skill, vendor its Python engine, or add a B2C App Builder capability, provider, or recipe. Host installation stays founder-approved and outside the business workspace.
+
+When to use:
+
+- Recent community consensus, objections, comparisons, and "what moved this month" questions
+- Person, company, or product recency before a competitive brief
+- Discovery of currently discussed topics when the host skill is already installed
+
+When not to use:
+
+- App-store economics, downloads, revenue estimates, or keyword difficulty (AppKittie)
+- Targeted per-platform social-language queries XPOZ already covers
+- Competitor page, pricing, policy, or funnel extraction (Firecrawl)
+- As a silent substitute for XPOZ, AppKittie, or Firecrawl
+- As a generic "last 30 days of X" web-search essay when the engine did not run
+
+Access:
+
+- The host skill name is `last30days`. Citing this method does not require installing it.
+- Reddit, Hacker News, Polymarket, and GitHub can return evidence without keys when the engine is present.
+- X, TikTok, Instagram, YouTube transcripts, and similar sources need host binaries or keys. Treat those as founder-gated secrets or spend. Do not run the upstream setup wizard, browser-cookie capture, CLI auto-install, or publish path from a business session.
+- The engine needs Python 3.12 or newer on the host. Missing Python is a host blocker, not a reason to improvise an equivalent brief.
+- Do not also add the Claude Code marketplace plugin when `npx skills add` already installed the skill. The two installs duplicate.
+
+Run, when the skill is already installed:
+
+- Load the installed `last30days` skill and follow its engine. Do not invent a parallel research prompt.
+- Resolve people, repositories, and communities before a keyword sweep.
+- Record source coverage honestly. A failed, unconfigured, rate-limited, or skipped source is not proof that the platform was quiet.
+- In a registered planning workspace, checkpoint through `research-lookup` and `research-record` before and after the authorized dispatch.
+
+Record:
+
+- topic, recency window, run date, and installed skill version when known
+- sources that returned evidence versus sources that failed or were skipped
+- engagement-backed quotes with URLs, post IDs, or equivalent resolvable references
+- what the brief changed in positioning, copy, or the spec
+
+Rules:
+
+- Engine output is an observation, not accepted product truth and not permission to ship a claim.
+- Partial coverage stays partial. Do not fill gaps with unsourced narrative.
+- Keep the upstream output contract (badges, engine footers, host formatting laws) inside the host skill. B2C App Builder still requires dated, resolvable sources in `strategy/RESEARCH.md`.
+- Do not copy `SKILL.md` into the business or into this repository.
 
 ## Firecrawl Web Intelligence
 

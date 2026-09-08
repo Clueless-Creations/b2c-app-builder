@@ -722,6 +722,39 @@ Notice sha256: 7fdc99dd7d8c1242068d470c2a3f91d531a622dbcad57da91971389dbe5155ec
 
 Notice sha256: 9024cdf56dfe7e66523698a9f63d3a0061eb15f43bd5ea8e3833a56017ae37fd
 
+## last30days agent skill
+
+- Upstream: https://github.com/mvanhorn/last30days-skill
+- License: MIT
+- Copyright: Copyright (c) 2026 Matt Van Horn
+- Scope: Selected published recency-research methods from README.md and skills/last30days/SKILL.md only. No engine, vendor tree, install hook, setup wizard, cookie capture, or skill text is imported.
+
+```text
+MIT License
+
+Copyright (c) 2026 Matt Van Horn
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+Notice sha256: 31803213a789825dc419de43542381e1d570b4408cf2bcf2e8a9947a6d3fd2ab
+
 ## Layers Growth MCP and CLI
 
 - Upstream: https://github.com/layers/mcp

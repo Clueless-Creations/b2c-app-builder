@@ -4,7 +4,8 @@ title: Recommended Agent Skills
 domain_id: domain.engineering
 document_path: knowledge/engineering/recommended-agent-skills.md
 load_when: before Expo or SwiftUI implementation when choosing recommended external agent skill packs
-  for craft, motion, store work, or optional design-research provider guidance without vendor lock-in
+  for craft, motion, store work, optional recency research, or optional design-research provider guidance without
+  vendor lock-in
 lifecycle: active
 bindings:
   workflow_ids:
@@ -16,7 +17,9 @@ bindings:
     - context.design
 applicability_notes: Pin expo/skills and emilkowalski animate-expo/review-animations as recommended
   Expo installs. Appllama's app-design skill is an opt-in stack-specific companion; appllama-usage is loaded only
-  when the user's Appllama MCP is independently connected and authorized. Keep paid/vendor MCPs off the default surface.
+  when the user's Appllama MCP is independently connected and authorized. last30days is an opt-in host engine for
+  scored recency briefs; it is not a default and does not replace AppKittie, XPOZ, or Firecrawl. Keep paid/vendor MCPs
+  off the default surface.
 sources:
   - id: github-appllama-skills
     name: Appllama agent skills
@@ -40,3 +43,24 @@ sources:
       evidence: catalog/upstreams/notices/appllama-skills.txt
       evidence_sha256: 14cffee850f5c761273dfc49798cddc96786b4520c23f3ed1da727c334f07476
       notes: Skill names and install syntax only; no SKILL.md is copied into the builder.
+  - id: github-mvanhorn-last30days-skill
+    name: last30days agent skill
+    source_type: agent_skill_pack
+    url: https://github.com/mvanhorn/last30days-skill
+    review_cadence_days: 30
+    claim_scope: MIT-licensed recency research skill. Install syntax and the skill name are taken from the upstream README. Host engine execution, setup, and secrets remain separately authorized.
+    last_review_date: 2026-09-08
+    reviewer: b2c-maintainers
+    publisher: Matt Van Horn
+    revision: 310f0b405db2d84adb4993bbf140cef9584057d2
+    upstream_id: last30days-skill
+    selectors:
+      - README.md
+      - LICENSE
+      - skills/last30days/SKILL.md
+    rights:
+      status: verified
+      spdx: MIT
+      evidence: catalog/upstreams/notices/last30days-skill.txt
+      evidence_sha256: 31803213a789825dc419de43542381e1d570b4408cf2bcf2e8a9947a6d3fd2ab
+      notes: Skill name and install syntax only; no SKILL.md is copied into the builder.

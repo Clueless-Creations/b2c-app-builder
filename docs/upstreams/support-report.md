@@ -9,6 +9,7 @@ Generated from catalog/upstreams for maintainers. It states what the builder sup
 | appllama-skills | Appllama agent skills | adapted-method, selected-skill-guidance | dd5caaec3d5d50ad7fc0324da238119c6b7c3707@2026-09-07 | dd5caaec3d5d50ad7fc0324da238119c6b7c3707@2026-09-07 | `dd5caaec3d5d50ad7fc0324da238119c6b7c3707` untested | unknown (no observation) | none | not observed | current; last 2026-09-07; due 2026-10-07 | 2 | 1 |
 | eronred-aso-skills | ASO and App Marketing Skills | adapted-method | 4df730f456c21e42b9a2ea2be89fb32caf787728@2026-09-06 | 4df730f456c21e42b9a2ea2be89fb32caf787728@2026-09-06 | `4df730f456c21e42b9a2ea2be89fb32caf787728` untested | unknown (observation records no stable release) | 2026-09-06 | not observed | current; last 2026-09-06; due 2026-09-13 | 3 | 1 |
 | evanbacon-serve-sim | serve-sim | adapted-method | 0ee6fbde40a6b5840d0c6e0379f544feb9fa246b@2026-09-06 | 0ee6fbde40a6b5840d0c6e0379f544feb9fa246b@2026-09-06 | `0ee6fbde40a6b5840d0c6e0379f544feb9fa246b` untested | unknown (observation records no stable release) | 2026-09-06 | not observed | current; last 2026-09-06; due 2026-09-13 | 2 | 1 |
+| last30days-skill | last30days agent skill | adapted-method, selected-skill-guidance | 310f0b405db2d84adb4993bbf140cef9584057d2@2026-09-08 | 310f0b405db2d84adb4993bbf140cef9584057d2@2026-09-08 | `310f0b405db2d84adb4993bbf140cef9584057d2` untested | unknown (no observation) | none | not observed | current; last 2026-09-08; due 2026-10-08 | 2 | 1 |
 | layers-growth-mcp | Layers Growth MCP and CLI | remote-service, adapted-method | unknown | docs and README read 2026-09-05 (no immutable revision published for the docs page; layers/mcp main pushed 2026-09-04T06:39:47Z)@2026-09-05 | `hosted (unversioned)` untested | unknown (no observation) | none | not observed | current; last 2026-09-05; due 2026-10-05 | 8 | 2 |
 | parth-app-store-screenshots | App Store Screenshots | adapted-method | 18951ddc4e06c53a3d34207732c16d9568f88d11@2026-09-06 | 18951ddc4e06c53a3d34207732c16d9568f88d11@2026-09-06 | `18951ddc4e06c53a3d34207732c16d9568f88d11` untested | unknown (observation records no stable release) | 2026-09-06 | not observed | current; last 2026-09-06; due 2026-09-13 | 3 | 1 |
 | posthog-context-mill | PostHog context mill | selected-skill-guidance | bbc88864bf8ba2efac43bb4c2782e4406bc0dfa6@2026-09-06 | unknown | `bbc88864bf8ba2efac43bb4c2782e4406bc0dfa6` untested | v1.51.0 (published 2026-09-03) | 2026-09-06 | not observed | deferred; last 2026-09-06; due 2026-09-13 | 1 | 1 |
@@ -115,6 +116,28 @@ Unknowns (observation 2026-09-06, method manual):
 - The captured review records the resolved source commit; the default branch name and release ancestry are not retained as a separate branch-head claim.
 - No upstream executable, editor export, native device run, paid API or live business was tested.
 - No stable release appeared in the inspected release page; source commits must also be reviewed.
+
+## last30days-skill
+
+last30days agent skill. Canonical URL: https://github.com/mvanhorn/last30days-skill
+
+Unsupported operations:
+
+- last30days-engine-default: The host engine stays independently authorized. The builder never installs or authorizes it as a default provider.
+- setup-wizard-cookie-or-cli-install: Upstream setup, browser-cookie capture, and extra CLI installs are refused directives. They remain host-side founder work.
+- silent-xpoz-or-appkittie-fallback: last30days does not replace XPOZ, AppKittie, or Firecrawl. Paid-tool routing still owns those fallbacks.
+- automatic-install-or-upgrade: Requires explicit target, selected compatible revision, scoped authority and independent verification. No host installation, business repin or publication is automatic.
+
+Intentional adaptations:
+
+- no-engine-vendor: Do not vendor the Python engine, scripts, or bird-search tree. Host execution stays in the installed skill. (owner: knowledge/process/tool-recipes/research-intelligence.md)
+- not-xpoz-fallback: Do not treat last30days as the free fallback for XPOZ, AppKittie, or Firecrawl. (owner: knowledge/process/tool-recipes/research-intelligence.md)
+- not-required: Citing adapted methods does not require installing the upstream skill. (owner: knowledge/engineering/recommended-agent-skills.md)
+- host-output-contract-stays-upstream: Badges, engine footers, and host formatting laws stay in the upstream skill. B2C App Builder still requires dated, resolvable sources in strategy/RESEARCH.md. (owner: knowledge/process/tool-recipes/research-intelligence.md)
+
+Unknowns:
+
+- No observation recorded.
 
 ## layers-growth-mcp
 

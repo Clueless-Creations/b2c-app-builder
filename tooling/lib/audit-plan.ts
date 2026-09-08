@@ -36,6 +36,54 @@ export function stepSkippedByLane(step: AuditStep, lane: AuditLane): string | un
   }
 }
 
+/**
+ * A CI shard of the heavy lane, spelled "1/2" on the command line.
+ *
+ * Only `serial` steps are partitioned: they are the multi-minute suites that spawn real
+ * subprocesses, and on a two-vCPU runner they otherwise run one after another inside a single
+ * job. Everything else (today just the typecheck barrier) runs in every shard, because it is
+ * seconds and every shard wants the compile to fail fast.
+ */
+export interface AuditShard {
+  readonly index: number;
+  readonly total: number;
+}
+
+export function parseAuditShard(value: string | undefined): AuditShard {
+  const match = /^(\d+)\/(\d+)$/.exec((value ?? "").trim());
+  const index = Number(match?.[1]);
+  const total = Number(match?.[2]);
+  if (!match || !Number.isInteger(index) || !Number.isInteger(total) || total < 1 || index < 1 || index > total) {
+    throw new Error(`--shard must be spelled i/n with 1 <= i <= n (got ${value ?? "(missing)"}).`);
+  }
+  return { index, total };
+}
+
+/** The serial steps of a plan, in plan order — the only steps a shard partitions. */
+export function serialStepIds(plan: readonly AuditStep[]): string[] {
+  return plan.filter((step) => step.serial).map((step) => step.id);
+}
+
+/**
+ * Which shard owns a serial step: round-robin over the serial steps in plan order.
+ *
+ * Round-robin rather than a hand-tuned cost table on purpose. A table would have to be revisited
+ * every time a suite's runtime moved, and a step missing from it would run in no shard at all —
+ * the silent-coverage-loss failure this repository keeps re-learning. Here, every serial step has
+ * an owner by construction, so adding one later cannot make it vanish from CI.
+ */
+export function shardOwnerOf(plan: readonly AuditStep[], stepId: string, total: number): number | undefined {
+  const position = serialStepIds(plan).indexOf(stepId);
+  return position < 0 ? undefined : (position % total) + 1;
+}
+
+/** Why a serial step is skipped on this shard. Non-serial steps are never skipped by sharding. */
+export function stepSkippedByShard(plan: readonly AuditStep[], step: AuditStep, shard: AuditShard | undefined): string | undefined {
+  if (!shard || shard.total === 1 || !step.serial) return undefined;
+  const owner = shardOwnerOf(plan, step.id, shard.total);
+  return owner === shard.index ? undefined : `shard ${owner} of ${shard.total} (--shard ${shard.index}/${shard.total})`;
+}
+
 export interface AuditStep {
   /** npm script name in the governing package.json, or a special kind id. */
   id: string;

@@ -63,13 +63,22 @@ jobs:
       - run: npm run audit:ci -- --lane fast
 
   audit-heavy:
-    name: Audit (heavy)
+    name: Audit (heavy ${{ matrix.shard }})
     runs-on: ubuntu-latest
     # Run when the lane job says so. If the lane job itself failed, run heavy
     # anyway — a path-filter outage must not skip fixture suites.
     if: ${{ always() && (needs.changes.result != 'success' || needs.changes.outputs.heavy == 'true') }}
     needs: [changes]
     timeout-minutes: 60
+    # The serial suites are ~89% of this lane's wall clock and used to run one after another in a
+    # single job: 28m50s on the run that merged #47, against ~19m on a ten-core laptop. The runner
+    # is the constraint, so spread the suites across runners. --shard partitions them round-robin
+    # in tooling/lib/audit-plan.ts, and audit.fixtures.ts proves every serial step runs in exactly
+    # one shard at every width — a suite added later cannot land in no shard at all.
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ["1/2", "2/2"]
     env:
       # GitHub's standard two-vCPU runners otherwise resolve the fixture shard pool's
       # cores-minus-two default to one worker. Two workers is the rollback-safe width;
@@ -89,7 +98,7 @@ jobs:
 
       - run: npm ci
 
-      - run: npm run audit:ci -- --lane heavy
+      - run: npm run audit:ci -- --lane heavy --shard ${{ matrix.shard }}
 
   hosted-check:
     name: Hosted worker check

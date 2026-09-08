@@ -20,7 +20,7 @@ license:
   status: verified
   evidence_url: https://github.com/rorkai/App-Store-Connect-CLI/blob/main/LICENSE
   evidence_sha256: 56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b
-  reviewed_revision: main@3a2318a756f78ef6d2d9101f68124ce26cbb056c (2026-09-05); release 4.11.0 tag shares the same LICENSE text
+  reviewed_revision: main@ca759a3b6ab88c8c39aed13325461248436615ca (2026-09-08); release 5.1.0 tag shares the same LICENSE text
   notice_file: catalog/upstreams/notices/rork-app-store-connect-cli.txt
   scope: Root LICENSE of the CLI repository. The builder distributes no copied CLI source; the notice is retained because the executable is a direct upstream relationship and the command procedures are adapted from its documentation.
   notes: GitHub reports license key mit for this repository. The Homebrew formula also records MIT. Neither is legal advice.
@@ -63,27 +63,24 @@ relationships:
     pin_authority: knowledge manifest last_review_date and the reviewed baselines below
 baselines:
   reviewed_source:
-    revision: "4.4.3"
-    observed_at: "2026-08-17"
+    revision: "5.1.0"
+    observed_at: "2026-09-08"
     by: b2c-maintainers
-    note: Local `asc --help` of the installed 4.4.3 binary and the GitHub source read on 2026-08-17 (knowledge/store/app-store-connect-cli.md, Current Sources To Refresh).
+    note: Local `asc --help` of the PATH-winning 5.1.0 binary and the GitHub 5.1.0 tag on 2026-09-08 (knowledge/store/app-store-connect-cli.md, Current Sources To Refresh).
   reviewed_guidance:
-    revision: "4.9.0"
-    observed_at: "2026-08-24"
+    revision: "5.1.0"
+    observed_at: "2026-09-08"
     by: b2c-maintainers
-    note: Release notes for 4.9.0 reviewed for metadata validate, metadata push --dry-run, and web agreements status (catalog/knowledge/store/store-app-review-observe.yaml). Releases 4.9.1 through 4.11.0 are observed, not reviewed.
+    note: 5.0.0 is the hard break (`apps view --id`, `--build-id`, `auth logout --confirm`). 5.1.0 adds web-session deadline renewal after 2FA and `--session-from-env` on selected web reads. Reviewed guidance tracks this latest stable; it is not a workspace pin and doctor does not upgrade the host.
 support:
-  policy: Executable guidance is stored per exact reviewed revision. Any other installed version re-verifies each command with `asc <cmd> --help` before first use (Verified Command Cookbook rule). A passing live probe proves the probed tokens on the probed binary only, never a version range. Major versions below 4 are unsupported.
+  policy: Executable guidance is stored per exact reviewed revision. Any other installed version re-verifies each command with `asc <cmd> --help` before first use (Verified Command Cookbook rule). A passing live probe proves the probed tokens on the probed binary only, never a version range. Support is `>= 5.0.0 < 6.0.0`. Major versions below 5 are unsupported. Web-login handoff is refused unless the winning binary is `>= 5.1.0`.
   versions:
-    - range: "4.4.3"
+    - range: ">=5.0.0 <6.0.0"
       status: supported
       evidence:
-        - knowledge/store/app-store-connect-cli.md Verified Command Cookbook (local --help, 2026-08-17)
-    - range: ">=4.5.0 <5.0.0"
-      status: untested
-      evidence:
-        - check:asc-command-contract probes whichever asc is first on PATH; a pass on 4.11.0 (2026-09-05) proves the probed help tokens only
-    - range: "<4.0.0"
+        - knowledge/store/app-store-connect-cli.md Verified Command Cookbook (local --help, 2026-09-08)
+        - GitHub releases 5.0.0 (2026-09-06) and 5.1.0 (2026-09-08)
+    - range: "<5.0.0"
       status: unsupported
       evidence:
         - check-asc-command-contract.ts warns asc_command_contract.live_cli_stale
@@ -163,6 +160,8 @@ support:
       reason: Fixture-only. Production ingress goes through `b2c app-review-ingress`; --allow-remote and --exec on a public bind are refused.
     - id: asc.apps.get
       reason: Known-invalid command form. check:asc-command-contract fails closed when it appears in stored guidance.
+    - id: asc.apps.view.app
+      reason: Known-invalid 5.x form. Use `asc apps view --id`. check:asc-command-contract fails closed when `asc apps view --app` appears in stored guidance.
     - id: asc.validate.app-store-version
       reason: Known-invalid subcommand form. Use --version or --version-id with --app.
   platforms:
@@ -170,8 +169,12 @@ support:
     - macOS amd64, Linux amd64/arm64, Windows amd64 (release assets exist; not exercised by the builder)
 adaptations:
   - id: forbidden-command-forms
-    description: Stored guidance must not contain `asc apps get` or `asc validate app-store-version`; the contract check fails closed when either appears.
+    description: Stored guidance must not contain `asc apps get`, `asc apps view --app`, or `asc validate app-store-version`; the contract check fails closed when any appear.
     owner: checks/validation/business/store/check-asc-command-contract.ts
+    intentional: true
+  - id: session-from-env-flag-only
+    description: "The --session-from-env flag may appear as a flag name. Session cookie or env values are never stored in knowledge, observations, receipts, or evals."
+    owner: knowledge/store/app-store-connect-cli.md
     intentional: true
   - id: observe-mandate-refusals
     description: The App Review observe mandate refuses submit, cancel, agreement acceptance, and webhook serving regardless of what the CLI allows.
@@ -200,7 +203,7 @@ host_probe:
 review:
   owner: b2c-maintainers
   cadence_days: 7
-  last_review: "2026-09-05"
+  last_review: "2026-09-08"
   status: current
 credits:
   acknowledge: true

@@ -30,11 +30,11 @@ sources:
     url: https://github.com/rorkai/App-Store-Connect-CLI
     review_cadence_days: 7
     claim_scope: Command families, auth ladder, safe automation boundaries, telemetry disclosure, and the verified command cookbook are adapted from the CLI README, local --help output, and release notes.
-    last_review_date: 2026-08-18
+    last_review_date: 2026-09-08
     reviewer: b2c-maintainers
     publisher: Rudrank Riyam (author); Rork (maintainer)
-    revision: 4.11.0 latest stable observed 2026-09-05; reviewed baseline 4.4.3 (2026-08-17) and 4.9.0 notes (2026-08-24)
-    retrieved_at: "2026-09-05"
+    revision: 5.1.0 latest stable and reviewed guidance 2026-09-08
+    retrieved_at: "2026-09-08"
     rights:
       status: verified
       spdx: MIT
@@ -52,7 +52,7 @@ sources:
     url: https://github.com/rorkai/app-store-connect-cli-skills
     review_cadence_days: 7
     claim_scope: The routed skill names and their purposes; no SKILL.md text is copied.
-    last_review_date: 2026-08-18
+    last_review_date: 2026-09-08
     reviewer: b2c-maintainers
     publisher: Rudrank Riyam (author); Rork (maintainer)
     revision: main@f52c4f04323bb2dfb21ca8be82e6494e9cd0b4d8 observed 2026-09-05; reviewed routing 2026-08-18 without a recorded commit
@@ -72,7 +72,7 @@ derivations:
     source_ids:
       - github-com-rorkai-app-store-connect-cli
       - github-com-rorkai-app-store-connect-cli-skills
-    baseline: 4.4.3 help (2026-08-17); 4.9.0 release notes (2026-08-24)
+    baseline: 5.1.0 help and release notes (2026-09-08)
     selectors:
       - README.md
       - asc --help
@@ -81,7 +81,7 @@ derivations:
       - asc install-skills without founder approval
       - asc web agreements accept
       - asc webhooks serve as production ingress
-      - asc apps get and asc validate app-store-version (invalid forms)
+      - asc apps get, asc apps view --app, and asc validate app-store-version (invalid forms)
     reviewer: b2c-maintainers
-    reviewed_at: "2026-09-05"
+    reviewed_at: "2026-09-08"
     evaluation: check:asc-command-contract; LaunchBench asc-flag-drift-runtime and asc-stale-command-guidance

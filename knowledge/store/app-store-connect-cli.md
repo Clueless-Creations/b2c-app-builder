@@ -34,7 +34,11 @@ Refresh these before running or writing commands:
 - Official Apple App Store Connect docs referenced in `store-console-workflow.md`
 - Official Apple signing/account docs referenced in `apple-signing-release.md`
 
-As of the August 17, 2026 GitHub source and local `asc` 4.4.3 help, the CLI is a scriptable, JSON-first App Store Connect API tool for TestFlight, builds, submissions, signing, analytics, screenshots, subscriptions, Apple Ads, and related workflows. Use `asc apps view --id` to read app details. The skills repo is a community-maintained, unofficial agent-skill pack and is not affiliated with Apple.
+As of the September 8, 2026 GitHub 5.1.0 release and local `asc` 5.1.0 help, the CLI is a scriptable, JSON-first App Store Connect API tool for TestFlight, builds, submissions, signing, analytics, screenshots, subscriptions, Apple Ads, and related workflows. Reviewed guidance tracks this latest stable line. Use `asc apps view --id` to read app details — never `asc apps view --app`. The skills repo is a community-maintained, unofficial agent-skill pack and is not affiliated with Apple.
+
+API-key health and an Apple web session are two proofs. `asc auth status --validate` and `asc auth doctor` speak only to the API key. `asc web auth status` speaks only to the web session. A healthy API key is not "ASC connected" and does not unlock `asc web *` reads.
+
+Refuse an `asc web auth login` handoff unless the winning `asc` binary is `>= 5.1.0`. 5.0.0 may continue API reads with a warn. A 503 while Apple's status page is green is a stale-client signature, not an Apple outage.
 
 ## When To Use
 
@@ -159,7 +163,10 @@ These notes exist because agents repeatedly burned live-store cycles guessing fl
 
 - **Pre-use `--help` rule.** Before the first use of any `asc` subcommand not shown in this file, run `asc <subcommand> --help` and record the confirmed flags. If a command errors on a flag, run `asc <cmd> --help` before retrying — never retry a mutating command with a guessed alternate flag. (Failure card: `asc-flag-drift`.)
 - **`--confirm` is a CLI-required gate, not just a founder gate.** Destructive/mutating commands (`asc review cancel`, `asc review submit`, `asc subscriptions review submit`, release actions) error and do nothing unless `--confirm` is passed. So they need _both_ the CLI `--confirm` flag _and_ explicit founder approval before you run them. Omitting `--confirm` does not "safely no-op into a dry run" — it just errors; check `--help` for the required flags before the first live call.
-- **`validate` form.** In `asc 4.4.3`, validation accepts either `--version <VERSION_STRING>` or `--version-id <VERSION_ID>` with `--app`; there is no `asc validate app-store-version` subcommand. Always confirm current local help before use.
+- **`validate` form.** In `asc` 5.1.0, validation accepts either `--version <VERSION_STRING>` or `--version-id <VERSION_ID>` with `--app`; there is no `asc validate app-store-version` subcommand. Always confirm current local help before use.
+- **5.x identifier flags.** App details use `asc apps view --id`. Build-scoped reads use `--build-id`, not `--build`. Credential removal is `asc auth logout --confirm` (or `--name` / `--all` with `--confirm`).
+- **`--session-from-env` is a flag name only.** Some 5.1.0 web reads accept `--session-from-env`. Never persist a session cookie, `ASC_WEB_SESSION` value, or any filled env assignment in knowledge, receipts, doctor-host, or evals. Pass the flag, not a value.
+- **Web-login handoff floor.** Do not walk the founder through `asc web auth login` unless the winning binary reports `>= 5.1.0`. 5.1.0 renews request deadlines after interactive 2FA. API reads on `>= 5.0.0` may continue.
 - **Auth env vars.** The `asc` CLI reads `ASC_KEY_ID`, `ASC_ISSUER_ID`, and `ASC_PRIVATE_KEY_PATH` (the **path** to the `.p8`, confirmed from the CLI's own auth hint — not the key contents). Keep these names consistent with `state/business-state.json`. See "ASC Auth Setup And Recovery" above for the full auth ladder (keychain profiles, account-level keys, `asc auth init/login`). Do not `source` a `.env`/`clueless.env` that contains comments or unquoted values — that throws `command not found` on every invocation; extract single values with the awk pattern in [`secrets-management.md`](../operations/secrets-management.md) ("Env file extraction — never `source`").
 - **Internal TestFlight groups auto-distribute.** Internal groups deliver to all internal testers automatically; do not pass a skip flag unless you intend to block internal delivery. External distribution always needs founder approval.
 - **Test notes are idempotent updates.** Updating a build's test notes is an update, not a create — do not create a second build record when one already exists.

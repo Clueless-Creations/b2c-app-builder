@@ -8,7 +8,7 @@ validators:
   - check-store-console-packet
   - check-source-freshness
 must_catch:
-  - asc 4.4.3 validate uses --app with either --version or --version-id, not an app-store-version subcommand
+  - asc 5.1.0 validate uses --app with either --version or --version-id, not an app-store-version subcommand
   - --confirm is required on cancel/submit/destructive ASC commands; omitting it errors and does nothing
   - retrying a mutating command with a guessed flag instead of running --help is not allowed
 should_say:

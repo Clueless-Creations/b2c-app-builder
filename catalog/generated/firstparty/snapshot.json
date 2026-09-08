@@ -2,7 +2,7 @@
   "extension": {
     "apiVersion": "b2c.extension/v1",
     "id": "b2c/consumer-business",
-    "version": "0.218.16",
+    "version": "0.218.17",
     "hostApiVersion": "b2c/v1",
     "title": "Consumer business",
     "dependencies": [],
@@ -15144,8 +15144,8 @@
     ]
   },
   "files": {
-    "extension.yaml": "54ee350830dc61203d58ab4928d4ba3095ce55ed88665223424cf8a4c60e4478",
-    "catalog-pack.yaml": "c8fcb05126dbe078c6bc8791dcd4d65337788030513eaa199d1919a58bfc5af0",
+    "extension.yaml": "d80f105c777597550e37cb974c41ade91e82cc8ff98d69dd7224e14c92d11e49",
+    "catalog-pack.yaml": "890714e40cc9ec0b5b176af5604295c9248104f1df3714ab5e18d2047f848ad3",
     "knowledge/data/analytics-attribution.md": "0bba4685b2188b9e80b7fcc14fdac9472c6c4aeac5bc59703188eaa5e26f234a",
     "knowledge/data/posthog-agent-tooling.md": "61ffdbc79a985a41a11fbe6e1c7c5663050104208baa9d05b8ebe33186ab93cc",
     "knowledge/design/audience-derived-identity.md": "007a400f27edc31b71233e8cdadf665f1ed9a6d724d9aa4ca6eb0333310690b7",
@@ -15289,7 +15289,7 @@
     "knowledge/words/conversion-copy.md": "68739b91f0f977f28718f48dd2368bb8c59a03a3f3d44a30efa08d12eb2956ab",
     "knowledge/words/no-slop-writing.md": "43a82efe1c0e03ba7315fded03a971f83777e1d7092eb5c6c97bb3eb28f171a8",
     "checks/validation/repository/audit-skill-links.ts": "781b1715e075b59ce673fbefad9bacab29eceb93e9f96ef60944bfda884eaf5c",
-    "package.json": "6f0d13affd76ea0b7169a1f1b387a843392cbce339f2c28a844d10155fe18565",
+    "package.json": "92af1dad36401b9db5185a04ea3b5fbd2ba39863a2d2ae9df4f437cee4dc0ecb",
     "tooling/catalog-scaffold.ts": "21b0d6053edd016e645d0d0e8c52ae11b36df0d248c7c8a8df9da9be4afff90c",
     "catalog/render-routing.ts": "f170fbd755998b843a057be9ae83dc1cc3ec5c9952fcebd4982d253621dd161a",
     "checks/validation/repository/check-agent-entrypoints.ts": "58486e6e69f424c422a3d005cfc432f92fd0bd4cb7dc168f2dafeedfbe137be5",
@@ -15365,7 +15365,7 @@
     "tooling/render-public-api.ts": "2a2f2e3cfe38f2ba7d76794ab2deeb35fc295631392a53d1b7e3cbb99ebc41ae",
     "checks/validation/business/engineering/check-readiness-coverage.ts": "55c2503548df4eb4d7176974be807cfc6c58e4f7587072f21bd9b124da384a5c",
     "checks/validation/repository/check-reference-size.ts": "534bc5a83694fb293c01d3a17dfa71272dc11ceb1591e189f56da31a223d78e1",
-    "checks/validation/repository/check-repository-boundary.ts": "37a02ed88a5fb43431b103a684ae70e67826df7063319c05883262dd05f9e33f",
+    "checks/validation/repository/check-repository-boundary.ts": "d60b5de8de42d3f32900f70a5c061201658c881c0fef338cf71b13aab144c13f",
     "checks/validation/business/process/check-repository-profile.ts": "4db81e9d23547a75c858eaa34327b6dd6418cad1dec40ec9a16c80a653457eaa",
     "checks/validation/business/research/check-research-evidence.ts": "b6ad53ea6faf26c65df70183b4489a5276183b4762fca56331c9f0a218e6a6e9",
     "checks/validation/business/money/check-revenue.ts": "a7b186ca2624d4a92809ee8115217fbed546b37e446f2eebaa0e9d1048a4c39b",
@@ -15596,5 +15596,5 @@
     "catalog/upstreams/notices/parth-app-store-screenshots.txt": "a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a"
   },
   "dependencies": [],
-  "digest": "sha256:1019a8c3056e5b2e68a4cae038b102bdad43f65c8f67e4e5863480993231338b"
+  "digest": "sha256:9f205e58bec0bcc854a490a4760c3e99b2664e6d3f9caabedaa307bfe0ec431b"
 }

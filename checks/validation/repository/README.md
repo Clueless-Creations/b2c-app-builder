@@ -9,7 +9,7 @@ The same line decides where a validator lives. **`checks/validation/business/` g
 | Validator                      | Grades                                                                                                                                             |
 | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `check-package-parity.ts`      | the root and runtime package manifests and lockfiles agree with `skill-version.json`                                                               |
-| `check-repository-boundary.ts` | hosted product UI and publication authority stay outside the local B2C App Builder package                                                         |
+| `check-repository-boundary.ts` | hosted product UI and publication authority stay outside the local B2C App Builder package; the top-level allowlist ignores gitignored local files |
 | `check-skill-version.ts`       | the installed runtime is not behind source                                                                                                         |
 | `check-version-discipline.ts`  | a pending change carries a matching version bump and release notes                                                                                 |
 | `check-source-freshness.ts`    | every tracked external source in `source-registry.yaml` is current                                                                                 |

@@ -13,6 +13,27 @@ function seedRepo(harness: Harness, name: string): string {
   return root;
 }
 
+const fixtureGitEnv: NodeJS.ProcessEnv = {
+  ...process.env,
+  GIT_AUTHOR_NAME: "fixture",
+  GIT_AUTHOR_EMAIL: "fixture@example.com",
+  GIT_COMMITTER_NAME: "fixture",
+  GIT_COMMITTER_EMAIL: "fixture@example.com",
+};
+delete fixtureGitEnv.GIT_DIR;
+delete fixtureGitEnv.GIT_WORK_TREE;
+
+function gitAt(root: string, args: string[]): void {
+  const result = spawnSync("git", ["-c", "commit.gpgsign=false", ...args], { cwd: root, env: fixtureGitEnv, encoding: "utf8" });
+  if (result.status !== 0) throw new Error(`fixture git ${args.join(" ")} failed: ${result.stderr}`);
+}
+
+function commitGitRepo(root: string): void {
+  gitAt(root, ["init", "-q", "-b", "main"]);
+  gitAt(root, ["add", "-A"]);
+  gitAt(root, ["commit", "-q", "--no-verify", "-m", "fixture"]);
+}
+
 /** Performance regressions must fail within a bounded interval rather than hang the suite. */
 function runBounded(harness: Harness, label: string, _script: "check-repository-boundary", args: string[], expectedCode: number, expectedText?: string): void {
   const result = spawnSync(process.execPath, ["--import", "tsx", path.join(skillRoot, "checks/validation/repository/check-repository-boundary.ts"), ...args], {
@@ -527,6 +548,52 @@ export function register(harness: Harness): void {
     "repository boundary applies the top-level allowlist to hidden directories",
     "check-repository-boundary",
     ["--repo-root", hiddenWeb],
+    1,
+    "repository_boundary.cloud_ui_source",
+  );
+
+  const gitIgnoredRootFile = seedRepo(harness, "repository-boundary-git-ignored-root-file");
+  writeFileSync(path.join(gitIgnoredRootFile, ".gitignore"), ".b2c-guard-baseline\n");
+  writeFileSync(path.join(gitIgnoredRootFile, ".b2c-guard-baseline"), "local operator state\n");
+  commitGitRepo(gitIgnoredRootFile);
+  harness.runScriptArgs("repository boundary ignores a gitignored top-level file", "check-repository-boundary", ["--repo-root", gitIgnoredRootFile], 0);
+
+  const gitIgnoredRootDir = seedRepo(harness, "repository-boundary-git-ignored-root-dir");
+  writeFileSync(path.join(gitIgnoredRootDir, ".gitignore"), "third_party/\n");
+  mkdirSync(path.join(gitIgnoredRootDir, "third_party"), { recursive: true });
+  writeFileSync(path.join(gitIgnoredRootDir, "third_party/NOTICE"), "ignored local notice\n");
+  commitGitRepo(gitIgnoredRootDir);
+  harness.runScriptArgs("repository boundary ignores a gitignored top-level directory", "check-repository-boundary", ["--repo-root", gitIgnoredRootDir], 0);
+
+  const gitExcludeRootFile = seedRepo(harness, "repository-boundary-git-exclude-root-file");
+  commitGitRepo(gitExcludeRootFile);
+  writeFileSync(path.join(gitExcludeRootFile, ".git/info/exclude"), "scratch.txt\n");
+  writeFileSync(path.join(gitExcludeRootFile, "scratch.txt"), "excluded locally\n");
+  harness.runScriptArgs(
+    "repository boundary ignores a top-level file listed in git exclude",
+    "check-repository-boundary",
+    ["--repo-root", gitExcludeRootFile],
+    0,
+  );
+
+  const gitUntrackedRootFile = seedRepo(harness, "repository-boundary-git-untracked-root-file");
+  commitGitRepo(gitUntrackedRootFile);
+  writeFileSync(path.join(gitUntrackedRootFile, "index.html"), "<main>B2C App Builder</main>\n");
+  harness.runScriptArgs(
+    "repository boundary still rejects an untracked unignored top-level file",
+    "check-repository-boundary",
+    ["--repo-root", gitUntrackedRootFile],
+    1,
+    "repository_boundary.cloud_ui_source",
+  );
+
+  const gitTrackedRootFile = seedRepo(harness, "repository-boundary-git-tracked-root-file");
+  writeFileSync(path.join(gitTrackedRootFile, "index.html"), "<main>B2C App Builder</main>\n");
+  commitGitRepo(gitTrackedRootFile);
+  harness.runScriptArgs(
+    "repository boundary still rejects a tracked unapproved top-level file",
+    "check-repository-boundary",
+    ["--repo-root", gitTrackedRootFile],
     1,
     "repository_boundary.cloud_ui_source",
   );

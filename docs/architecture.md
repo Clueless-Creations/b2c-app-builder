@@ -183,7 +183,9 @@ the tool dotfiles, and the entry documents (`README.md`, `AGENTS.md`,
 `CLAUDE.md`, `CONTRIBUTING.md`, `LICENSE`, and the generated
 `ACKNOWLEDGMENTS.md` and `THIRD_PARTY_NOTICES.md`) sit at the root.
 `check:repository-boundary` allowlists exactly these files and the layer
-directories. A new root file needs a note here or a decision record in the same
+directories. When `--repo-root` is a git toplevel, that walk uses tracked paths
+and untracked paths git would absorb; ignored local files are not repository
+contents. A new root file needs a note here or a decision record in the same
 change. Being allowed at the root is a separate decision from being exempt from
 the version gate: the Versioning section of `CONTRIBUTING.md` owns the list of
 repository-only paths that need no version bump.

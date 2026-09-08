@@ -47,7 +47,8 @@ at all:
 claude mcp add --scope user b2c-app-builder -- npx -y -p b2c-app-builder b2c-app-builder-mcp
 ```
 
-To work from source instead, clone the repository and run the same setup:
+To work from source, or if the package is unavailable from npm, clone the
+repository and run the same setup:
 
 ```bash
 git clone https://github.com/Clueless-Creations/b2c-app-builder.git
@@ -73,6 +74,20 @@ package recipe, use the separate revision-checked
 [composition plan and activation commands](docs/guides/composition-activation.md).
 The [`b2c-app-builder` skill](SKILL.md) routes broad consumer-app work to the
 right workflow.
+
+For a new business, create and register its planning workspace in one command:
+
+```bash
+b2c business-create --workspace my-app --directory /absolute/path/to/my-app --name "My App" --hypothesis "The consumer problem to research" --json
+b2c business-status --workspace my-app --json
+b2c business-plan --workspace my-app --json
+```
+
+The target must be empty or absent. For an existing planning or runtime workspace,
+use `b2c workspaces register` to adopt it, then resume through status and plan.
+Creation records a hypothesis; research and an explicit product decision precede
+initialization.
+
 
 Then give the agent a mandate:
 

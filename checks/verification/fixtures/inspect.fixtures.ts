@@ -132,7 +132,9 @@ export function register(harness: Harness): void {
     const subdir = path.join(workspace, "nested", "deeper");
     mkdirSync(subdir, { recursive: true });
     withIsolatedHome(home, () => {
+      writeFileSync(path.join(workspace, "product.yaml"), "# Planning scaffold fixture\n");
       registerWorkspace("inspect-inside-fixture-ws", workspace);
+      rmSync(path.join(workspace, "product.yaml"));
       const result = inspectWorkspace(subdir);
       assert(result.ok, `expected ok:true, got ${JSON.stringify(result)}`);
       if (!result.ok) return;
@@ -149,7 +151,9 @@ export function register(harness: Harness): void {
     const home = harness.makeTempDir("inspect-stale-home");
     const workspace = harness.makeTempDir("inspect-stale-workspace");
     withIsolatedHome(home, () => {
+      writeFileSync(path.join(workspace, "product.yaml"), "# Planning scaffold fixture\n");
       registerWorkspace("inspect-stale-fixture-ws", workspace);
+      rmSync(path.join(workspace, "product.yaml"));
       rmSync(workspace, { recursive: true, force: true });
       const result = inspectWorkspace(workspace);
       assert(result.ok, `expected ok:true (a stale registered path is a successful classification, not an error), got ${JSON.stringify(result)}`);

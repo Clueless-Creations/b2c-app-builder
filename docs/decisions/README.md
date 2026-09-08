@@ -24,6 +24,8 @@ roadmap's decision text in place.
 | [0006](0006-onboarding-foundations-before-design.md)          | Onboarding research, identity and measurement precede design       | accepted | ARCH-02, 03, 07, 09, 10, 11, 12                 |
 | [0007](0007-upstream-lifecycle-and-agent-scopes.md)           | Upstream lifecycle handoff, relationship kinds, and agent scopes   | accepted | ADR-0005; ARCH-06, 07, 09                       |
 
+| [0008](0008-agent-onboarding-entry-path.md) | Distinguish business creation from workspace adoption | accepted | ARCH-07, 09, 11; U25 |
+
 ## Write a record
 
 1. Copy [0000-template.md](0000-template.md) to `NNNN-short-slug.md` with the next

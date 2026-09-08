@@ -141,6 +141,8 @@ export function renderWorkspaceStatus(status: WorkspaceStatus): string {
   } else if (status.state === "run") {
     lines.push(`Run ${status.run?.runId ?? "(unknown)"} — updated ${status.run?.updatedAt ?? "(unknown)"}`);
     lines.push(status.run?.counts.map((entry) => `${entry.status}: ${entry.count}`).join(", ") ?? "");
+  } else if (status.resume) {
+    lines.push("Planning workspace — research and review the hypothesis before business-initialize.");
   } else {
     lines.push("No durable run yet — bootstrap the workspace and run a session first.");
   }
@@ -163,6 +165,7 @@ export function renderWorkspaceStatusSummary(status: WorkspaceStatus): string {
   if (status.state === "missing") return "MISSING — path no longer exists";
   if (status.state === "erasure_incomplete") return "evidence recovery required";
   if (status.state === "composition_incomplete") return "composition recovery required";
+  if (status.resume) return "planning — research before initialization";
   if (status.state === "not_bootstrapped") return "not bootstrapped";
   if (status.state === "no_run") return "bootstrapped, no session yet";
   if (status.state === "run_state_unreadable") return "run state unreadable";
@@ -197,9 +200,9 @@ export interface DegradedWorkspaceStatus {
  * Builds the degraded status payload for an unregistered folder (R6). Pure data, no I/O — every
  * input is already the shared inspector's own classification.
  *
- * `nextAgentAction` reuses `suggestedFix` (the inspector's own "b2c workspaces register <id>
- * <path>" text) verbatim rather than reformatting it, EXCEPT when `productKind` is "mismatch"
- * (R9): the register suggestion is suppressed — registering the wrong kind of project is worse
+ * `nextAgentAction` reuses `suggestedFix` (the inspector's creation or adoption command)
+ * verbatim rather than reformatting it, EXCEPT when `productKind` is "mismatch"
+ * (R9): the setup suggestion is suppressed — registering the wrong kind of project is worse
  * than asking first — and replaced with a founder-language prompt to confirm the folder, which is
  * also when `founderAction` (a soft `FounderQuestion` — see founder-gate.ts) is populated instead
  * of null. It is built via `buildSoftQuestion`, never `buildGoNoGoQuestion`: confirming the folder
@@ -230,7 +233,11 @@ export function buildDegradedWorkspaceStatus(input: {
           class: "confirm-product-kind",
           prompt: "This folder doesn't look like a consumer app yet — is this the right place to build one?",
           choices: [
-            { label: "Yes, build the app here", consequence: "I'll register this folder and start setting up the business here.", recommended: true },
+            {
+              label: "Yes, build the app here",
+              consequence: "I'll inspect the existing files and choose a safe creation or adoption path.",
+              recommended: true,
+            },
             { label: "No, this is something else", consequence: "I'll leave this folder alone and look for the right one.", recommended: false },
           ],
         })

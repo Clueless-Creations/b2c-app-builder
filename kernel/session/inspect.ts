@@ -9,7 +9,7 @@
  * this one classifier, so they cannot disagree about the same folder).
  *
  * Bounds, by construction (R2, R20):
- *   - Only the five files named in MARKER_ALLOWLIST are ever read. Nothing else in the folder —
+ *   - Only the files named in MARKER_ALLOWLIST are ever read. Nothing else in the folder —
  *     no directory listing, no recursive walk — is touched.
  *   - A symlinked marker is refused (`lstat`-checked before any read) — never followed.
  *   - Each marker is capped at MARKER_BYTE_CAP bytes; a file over the cap is treated as absent
@@ -27,12 +27,20 @@
  */
 import { existsSync, lstatSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { findContainingWorkspace, loadRegistry, resolveRegisteredWorkspace } from "../../adapters/registry.js";
+import { findContainingWorkspace, hasWorkspaceScaffold, loadRegistry, resolveRegisteredWorkspace } from "../../adapters/registry.js";
 
 // --- marker allowlist (KTD4 step 3) -----------------------------------------------------------
 
 /** Fixed allowlist: the inspector never reads any file outside this list. */
-export const MARKER_ALLOWLIST = ["package.json", "PRODUCT.md", "README.md", "state/business-state.json", "run/run-state.json"] as const;
+export const MARKER_ALLOWLIST = [
+  "package.json",
+  "PRODUCT.md",
+  "README.md",
+  "product.yaml",
+  "catalog.json",
+  "state/business-state.json",
+  "run/run-state.json",
+] as const;
 export type MarkerName = (typeof MARKER_ALLOWLIST)[number];
 
 /** Per-file read cap in bytes. An oversized marker is treated as absent — never partially read. */
@@ -232,7 +240,7 @@ function registerCommand(target: string): string {
   // refusal message, `kernel/session/workspaces.ts`'s usage banner, `entrypoints/mcp/server.ts`'s tool
   // description): "b2c workspaces register <id> <path>". The id is left as a placeholder — only
   // the founder can choose it — but the path is concrete, since the inspector already knows it.
-  return `b2c workspaces register <id> ${target}`;
+  return `b2c workspaces register <id> '${target.replace(/'/g, "'\\''")}'`;
 }
 
 // --- entry point -------------------------------------------------------------------------------
@@ -260,7 +268,14 @@ export function inspectWorkspace(cwd: string): InspectResult {
     return { ok: false, code: "cwd_not_found", message: `inspect.cwd_not_found: "${absoluteCwd}" does not exist` };
   } else {
     const containing = findContainingWorkspace(absoluteCwd);
-    registration = containing ? { kind: "inside-registered", id: containing.id } : { kind: "unregistered", suggestedFix: registerCommand(absoluteCwd) };
+    registration = containing
+      ? { kind: "inside-registered", id: containing.id }
+      : {
+          kind: "unregistered",
+          suggestedFix: hasWorkspaceScaffold(absoluteCwd)
+            ? registerCommand(absoluteCwd)
+            : `b2c business-create --workspace <id> --directory '${absoluteCwd.replace(/'/g, "'\\''")}' --name "<name>" --hypothesis "<hypothesis>"`,
+        };
   }
 
   // From here the folder either exists, or it is a stale registered path that was removed —

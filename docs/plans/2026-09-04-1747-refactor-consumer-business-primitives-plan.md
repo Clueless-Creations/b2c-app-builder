@@ -1203,6 +1203,8 @@ release remains a separate user-owned action after review and required CI.
 
 ### U25 — Versioned business lifecycle facade
 
+**Entry-path decision:** [ADR-0008](../decisions/0008-agent-onboarding-entry-path.md) distinguishes greenfield creation from existing-scaffold adoption.
+
 **Goal:** Extend the stable interface to business creation, inspection, planning,
 execution, and evidence while keeping consumers independent of runtime internals.
 

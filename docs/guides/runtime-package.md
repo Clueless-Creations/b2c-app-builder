@@ -89,20 +89,30 @@ Setup creates `~/.b2c-app-builder/workspaces.json` and prints the MCP registrati
 ```bash
 b2c --help
 b2c doctor
-b2c new my-app --dir ~/businesses/my-app --idea "A short product hypothesis"
-b2c bootstrap --workspace ~/businesses/my-app --apply --answers answers.json  # --workspace accepts a registered ID or a path
-b2c workspaces register my-app ~/businesses/my-app
-b2c status --workspace my-app
-b2c plan --workspace my-app
+b2c business-create --workspace my-app --directory ./my-app --name "Working name" --hypothesis "A short product hypothesis" --mandate "The full user request" --json
+b2c business-plan --workspace my-app --json
 ```
 
-The CLI is the preferred write surface. Commands that affect providers or releases still require their own authority checks.
+Create uses an absent or empty directory and registers it as part of the same
+operation. Do not pre-register it or write files into it. Use `--workspace` on
+the CLI; `workspaceId` is the JSON field.
 
-Set product status to `accepted` in `product.yaml` and render `PRODUCT.md` with
-`b2c render-product --workspace <id-or-path>` before
-the first bootstrap. The same command can add the durable runtime to an existing
-app once its target product and design are defined. The answers file records work
-authority. Without it, the runtime stays parked. A focused change does not need bootstrap.
+Research first. After explicit acceptance, set product status to `accepted` in
+`product.yaml` and render `PRODUCT.md` with `b2c render-product --workspace my-app`.
+Read `b2c business-plan --workspace my-app --json`, then initialize with
+`b2c business-initialize --workspace my-app --revision <revision-from-plan> --json`.
+Initialization grants no work authority. Record approved authority with `b2c onboard`
+and inspect the current plan before a bounded `business-run`.
+
+Resume an existing registered workspace. Use `b2c workspaces register <id> <path>`
+only for an existing unregistered scaffold. The legacy `b2c new` and `b2c bootstrap`
+commands remain supported for explicit scaffold and runtime maintenance. An existing
+app needs inspection before installing workspace files; a focused change needs no
+full runtime. See [creation recovery](../../contracts/public-api/REFERENCE.md#creation-recovery)
+for occupied targets and conflicting registrations.
+
+The CLI is the preferred write surface. Provider and release actions require
+their own authority checks.
 
 New app workspaces include only the day-zero product, design, research, route, and
 agent files. Later workflows create their artifacts when they become relevant.

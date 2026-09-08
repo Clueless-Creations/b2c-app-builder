@@ -23,7 +23,13 @@ export function createBusiness(input: { workspaceId: string; directory: string; 
   const directory = path.resolve(input.directory),
     registry = loadRegistry();
   if (registry.workspaces.some((entry) => entry.id === input.workspaceId || path.resolve(entry.path) === directory))
-    throw new Error("business.registration_conflict");
+    throw new Error(
+      "business.registration_conflict: The workspace ID or directory is already registered. " +
+        "Inspect b2c workspaces list and resume an existing business with b2c business-status --workspace <registered-id>. " +
+        "For a separate business choose an unused ID and a new empty directory. " +
+        "If the entry was registered by mistake, verify its ID and path before explicitly removing only the registration with b2c workspaces remove <id>, then retry business-create against an empty directory. " +
+        "No workspace files or registry entries were changed.",
+    );
   createPlanningWorkspace({
     directory,
     slug: input.workspaceId,

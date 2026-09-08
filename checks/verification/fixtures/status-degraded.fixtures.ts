@@ -143,25 +143,31 @@ const CONSUMER_APP_PACKAGE_JSON = JSON.stringify({
 export function register(harness: Harness): void {
   // --- 1. empty folder via cwd: the release-gate scenario ------------------------------------
 
-  harness.check("status: an empty folder via cwd returns a degraded unregistered result with the exact register command, never an error (release gate)", () => {
-    const home = harness.makeTempDir("status-degraded-empty-home");
-    const dir = harness.makeTempDir("status-degraded-empty-dir");
-    const result = callStatusOverMcp(harness, home, { cwd: dir });
-    assert(result.isError !== true, `expected no error for an empty folder, got ${JSON.stringify(result)}`);
-    const structured = result.structuredContent;
-    assert(structured?.kind === "unregistered", `expected kind unregistered, got ${JSON.stringify(structured)}`);
-    assert(
-      structured?.nextAgentAction === `b2c workspaces register <id> ${dir}`,
-      `expected the exact register command, got ${JSON.stringify(structured?.nextAgentAction)}`,
-    );
-    assert(structured?.phase === "no-engagement", `expected no-engagement phase, got ${JSON.stringify(structured?.phase)}`);
-    assert(structured?.productKind === "unknown", `expected productKind unknown, got ${JSON.stringify(structured?.productKind)}`);
-    assert(structured?.founderAction === null, `expected founderAction null for a plain unregistered folder, got ${JSON.stringify(structured?.founderAction)}`);
-    assert(
-      Array.isArray(structured?.blockers) && structured.blockers.length > 0,
-      `expected a typed blockers[] with at least one entry, got ${JSON.stringify(structured?.blockers)}`,
-    );
-  });
+  harness.check(
+    "status: an empty folder via cwd returns a degraded unregistered result with the business-create command, never an error (release gate)",
+    () => {
+      const home = harness.makeTempDir("status-degraded-empty-home");
+      const dir = harness.makeTempDir("status-degraded-empty-dir");
+      const result = callStatusOverMcp(harness, home, { cwd: dir });
+      assert(result.isError !== true, `expected no error for an empty folder, got ${JSON.stringify(result)}`);
+      const structured = result.structuredContent;
+      assert(structured?.kind === "unregistered", `expected kind unregistered, got ${JSON.stringify(structured)}`);
+      assert(
+        typeof structured?.nextAgentAction === "string" && structured.nextAgentAction.startsWith("b2c business-create --workspace <id>"),
+        `expected the business-create command, got ${JSON.stringify(structured?.nextAgentAction)}`,
+      );
+      assert(structured?.phase === "no-engagement", `expected no-engagement phase, got ${JSON.stringify(structured?.phase)}`);
+      assert(structured?.productKind === "unknown", `expected productKind unknown, got ${JSON.stringify(structured?.productKind)}`);
+      assert(
+        structured?.founderAction === null,
+        `expected founderAction null for a plain unregistered folder, got ${JSON.stringify(structured?.founderAction)}`,
+      );
+      assert(
+        Array.isArray(structured?.blockers) && structured.blockers.length > 0,
+        `expected a typed blockers[] with at least one entry, got ${JSON.stringify(structured?.blockers)}`,
+      );
+    },
+  );
 
   // --- 2. clothing-brand folder: mismatch surfaced, register suggestion suppressed (R9) -------
 
@@ -213,7 +219,7 @@ export function register(harness: Harness): void {
       assert(structured?.kind === "unregistered", `expected kind unregistered, got ${JSON.stringify(structured)}`);
       assert(structured?.phase === "engaged-with-run", `expected engaged-with-run phase, got ${JSON.stringify(structured?.phase)}`);
       assert(
-        structured?.nextAgentAction === `b2c workspaces register <id> ${dir}`,
+        structured?.nextAgentAction === `b2c workspaces register <id> '${dir}'`,
         `expected registration to remain the next action, got ${JSON.stringify(structured?.nextAgentAction)}`,
       );
     },
@@ -351,7 +357,9 @@ export function register(harness: Harness): void {
     const subdir = path.join(workspace, "nested", "deeper");
     mkdirSync(subdir, { recursive: true });
     withIsolatedHome(home, () => {
+      writeFileSync(path.join(workspace, "product.yaml"), "# Planning scaffold fixture\n");
       registerWorkspace("status-degraded-inside-fixture-ws", workspace);
+      rmSync(path.join(workspace, "product.yaml"));
     });
     const result = callStatusOverMcp(harness, home, { cwd: subdir });
     assert(result.isError !== true, `expected no error, got ${JSON.stringify(result)}`);
@@ -371,7 +379,9 @@ export function register(harness: Harness): void {
     const home = harness.makeTempDir("status-degraded-stale-home");
     const workspace = harness.makeTempDir("status-degraded-stale-ws");
     withIsolatedHome(home, () => {
+      writeFileSync(path.join(workspace, "product.yaml"), "# Planning scaffold fixture\n");
       registerWorkspace("status-degraded-stale-fixture-ws", workspace);
+      rmSync(path.join(workspace, "product.yaml"));
     });
     rmSync(workspace, { recursive: true, force: true });
     const result = callStatusOverMcp(harness, home, { cwd: workspace });

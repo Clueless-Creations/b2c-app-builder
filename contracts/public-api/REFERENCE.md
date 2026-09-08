@@ -9,6 +9,7 @@ The public API version is `b2c/v1`. Engine/package versions and entity versions 
 Read matching workspace research observations under an explicit freshness limit. No provider calls, writes or spending authority. Pending and uncertain requests require reconciliation.
 
 - CLI: `b2c research-lookup`
+- Accepted CLI flags: `--workspace`, `--query`, `--max-age`, `--json`. See `b2c research-lookup --help` for usage.
 - MCP: `b2c_research_lookup`
 - [Input schema](schemas/business.research.lookup.input.schema.json)
 - [Result schema](schemas/business.research.lookup.result.schema.json)
@@ -18,6 +19,7 @@ Read matching workspace research observations under an explicit freshness limit.
 Record a bounded non-secret planning observation in a registered workspace at an exact revision. Does not call providers or accept proof. Retains immutable prior observations; never blindly repeats uncertain paid work.
 
 - CLI: `b2c research-record`
+- Accepted CLI flags: `--workspace`, `--revision`, `--observation`, `--json`. See `b2c research-record --help` for usage.
 - MCP: unavailable (CLI operator only)
 - [Input schema](schemas/business.research.record.input.schema.json)
 - [Result schema](schemas/business.research.record.result.schema.json)
@@ -27,6 +29,7 @@ Record a bounded non-secret planning observation in a registered workspace at an
 List versioned capabilities, provider declarations, and recipes. Declaration is distinct from executable support. Reads bundled metadata only; no workspace or provider access.
 
 - CLI: `b2c catalog`
+- Accepted CLI flags: `--kind`, `--id`, `--json`. See `b2c catalog --help` for usage.
 - MCP: `b2c_discover`
 - [Input schema](schemas/catalog.list.input.schema.json)
 - [Result schema](schemas/catalog.list.result.schema.json)
@@ -36,6 +39,7 @@ List versioned capabilities, provider declarations, and recipes. Declaration is 
 Validate a b2c/v1 composition and resolve operation-level provider selections. Returns explicit support blockers. No workspace access, provider calls, package execution, grants, or state changes. mode=apply is reserved and returns COMPOSITION_APPLY_UNAVAILABLE.
 
 - CLI: `b2c compose`
+- Accepted CLI flags: `--config`, `--json`, `--schema`, `--apply`. See `b2c compose --help` for usage.
 - MCP: `b2c_compose`
 - [Input schema](schemas/composition.preview.input.schema.json)
 - [Result schema](schemas/composition.preview.result.schema.json)
@@ -45,6 +49,7 @@ Validate a b2c/v1 composition and resolve operation-level provider selections. R
 Read sanitized lifecycle and aggregate work counts for one registered workspace ID. Reads existing local runtime state only. Does not expose workspace paths, state documents, grants or digest content, and does not observe providers or prove business outcomes.
 
 - CLI: `b2c business-status`
+- Accepted CLI flags: `--workspace`, `--json`. See `b2c business-status --help` for usage.
 - MCP: `b2c_business_status`
 - [Input schema](schemas/business.status.input.schema.json)
 - [Result schema](schemas/business.status.result.schema.json)
@@ -54,6 +59,7 @@ Read sanitized lifecycle and aggregate work counts for one registered workspace 
 Read verified immutable package metadata in one registered workspace. No source paths or package code execution.
 
 - CLI: `b2c packages`
+- Accepted CLI flags: `--workspace`, `--json`. See `b2c packages --help` for usage.
 - MCP: `b2c_packages`
 - [Input schema](schemas/packages.list.input.schema.json)
 - [Result schema](schemas/packages.list.result.schema.json)
@@ -63,6 +69,7 @@ Read verified immutable package metadata in one registered workspace. No source 
 CLI operator-only import into the registered workspace immutable package store. Dependencies use explicit installed digests. Does not activate or execute package code.
 
 - CLI: `b2c package-import`
+- Accepted CLI flags: `--workspace`, `--source`, `--dependencies`, `--json`. See `b2c package-import --help` for usage.
 - MCP: unavailable (CLI operator only)
 - [Input schema](schemas/packages.import.input.schema.json)
 - [Result schema](schemas/packages.import.result.schema.json)
@@ -72,6 +79,7 @@ CLI operator-only import into the registered workspace immutable package store. 
 Resolve authored b2c.yaml against explicit installed package digests and preview a recoverable local pin transaction. Does not grant authority or execute providers.
 
 - CLI: `b2c composition-plan`
+- Accepted CLI flags: `--workspace`, `--packages`, `--json`. See `b2c composition-plan --help` for usage.
 - MCP: `b2c_composition_plan`
 - [Input schema](schemas/composition.plan.input.schema.json)
 - [Result schema](schemas/composition.plan.result.schema.json)
@@ -81,6 +89,7 @@ Resolve authored b2c.yaml against explicit installed package digests and preview
 CLI-only local activation with an exact current preview digest. Refuses changed inputs and unreconciled run history. No grants or provider effects.
 
 - CLI: `b2c composition-activate`
+- Accepted CLI flags: `--workspace`, `--packages`, `--preview`, `--json`. See `b2c composition-activate --help` for usage.
 - MCP: unavailable (CLI operator only)
 - [Input schema](schemas/composition.activate.input.schema.json)
 - [Result schema](schemas/composition.activate.result.schema.json)
@@ -90,6 +99,7 @@ CLI-only local activation with an exact current preview digest. Refuses changed 
 CLI-only resume or restore of the existing durable local activation journal. Does not repin mutable sources.
 
 - CLI: `b2c composition-recover`
+- Accepted CLI flags: `--workspace`, `--mode`, `--json`. See `b2c composition-recover --help` for usage.
 - MCP: unavailable (CLI operator only)
 - [Input schema](schemas/composition.recover.input.schema.json)
 - [Result schema](schemas/composition.recover.result.schema.json)
@@ -99,6 +109,7 @@ CLI-only resume or restore of the existing durable local activation journal. Doe
 Read registered independent businesses from existing metric contracts and accepted observations. Separates synthetic evidence, partial completion, and comparable outcomes. Grants no authority and proves no live launch.
 
 - CLI: `b2c market-report`
+- Accepted CLI flags: `--workspace`, `--experiment`, `--json`. See `b2c market-report --help` for usage.
 - MCP: `b2c_market_report`
 - [Input schema](schemas/market.report.input.schema.json)
 - [Result schema](schemas/market.report.result.schema.json)
@@ -108,6 +119,7 @@ Read registered independent businesses from existing metric contracts and accept
 CLI-only scaffold and registration in an explicitly selected empty directory. Creates no grants, providers or accepted product decision.
 
 - CLI: `b2c business-create`
+- Accepted CLI flags: `--workspace`, `--directory`, `--name`, `--hypothesis`, `--mandate`, `--json`. See `b2c business-create --help` for usage.
 - MCP: unavailable (CLI operator only)
 - [Input schema](schemas/business.create.input.schema.json)
 - [Result schema](schemas/business.create.result.schema.json)
@@ -117,6 +129,7 @@ CLI-only scaffold and registration in an explicitly selected empty directory. Cr
 CLI-only initialization of an accepted authored product through the existing bootstrap and reducer. Refuses active composition replacement and grants no authority.
 
 - CLI: `b2c business-initialize`
+- Accepted CLI flags: `--workspace`, `--revision`, `--json`. See `b2c business-initialize --help` for usage.
 - MCP: unavailable (CLI operator only)
 - [Input schema](schemas/business.initialize.input.schema.json)
 - [Result schema](schemas/business.initialize.result.schema.json)
@@ -126,6 +139,7 @@ CLI-only initialization of an accepted authored product through the existing boo
 Passive registered-workspace frontier from existing compiler and autonomy owner. No network or provider prerequisite probes; unobserved prerequisites remain held.
 
 - CLI: `b2c business-plan`
+- Accepted CLI flags: `--workspace`, `--concurrency`, `--json`. See `b2c business-plan --help` for usage.
 - MCP: `b2c_business_plan`
 - [Input schema](schemas/business.plan.input.schema.json)
 - [Result schema](schemas/business.plan.result.schema.json)
@@ -135,6 +149,7 @@ Passive registered-workspace frontier from existing compiler and autonomy owner.
 CLI-only bounded execution through the existing runner, exact revision and durable request identity. Uses existing grants. Notifications disabled. Selected operations require trusted host routes.
 
 - CLI: `b2c business-run`
+- Accepted CLI flags: `--workspace`, `--revision`, `--request`, `--scope`, `--seconds`, `--concurrency`, `--json`. See `b2c business-run --help` for usage.
 - MCP: unavailable (CLI operator only)
 - [Input schema](schemas/business.run.input.schema.json)
 - [Result schema](schemas/business.run.result.schema.json)
@@ -144,6 +159,7 @@ CLI-only bounded execution through the existing runner, exact revision and durab
 CLI-only revision-checked recovery of a settled request through the session owner. Refuses live sessions and uncertain effects; records interruption without dispatch or acceptance.
 
 - CLI: `b2c business-recover`
+- Accepted CLI flags: `--workspace`, `--revision`, `--request`, `--json`. See `b2c business-recover --help` for usage.
 - MCP: unavailable (CLI operator only)
 - [Input schema](schemas/business.recover.input.schema.json)
 - [Result schema](schemas/business.recover.result.schema.json)
@@ -153,9 +169,19 @@ CLI-only revision-checked recovery of a settled request through the session owne
 Project current run attempts, artifact identities and validated acceptance. No raw state, grants or provider credentials. Synthetic proof and stale evidence remain explicit.
 
 - CLI: `b2c business-evidence`
+- Accepted CLI flags: `--workspace`, `--workflow`, `--json`. See `b2c business-evidence --help` for usage.
 - MCP: `b2c_business_evidence`
 - [Input schema](schemas/business.evidence.input.schema.json)
 - [Result schema](schemas/business.evidence.result.schema.json)
+
+## Creation recovery
+
+Create and register a new planning workspace with `b2c business-create --workspace my-app --directory ./my-app --name "Working name" --hypothesis "A short product hypothesis" --mandate "The full user request" --json`. `--mandate` is optional; supply it to preserve the complete request. The CLI flag `--workspace` maps to JSON `workspaceId`; `--workspace-id` is not a supported flag. The target must be absent or empty. Do not add agent files or register it before creation.
+
+- `business.registration_conflict`: the requested ID or directory already belongs to a registry entry. Inspect `b2c workspaces list`. Resume a valid existing workspace with `b2c business-plan --workspace <registered-id> --json`. If inspection confirms a stale registration from a failed attempt, remove only that registration with `b2c workspaces remove <id>`; this leaves workspace files intact. Retry creation only when the intended ID is free and the target is absent or empty. Preserve other businesses and their registrations.
+- `business.target_occupied`: the destination contains files. Inspect and preserve them. Resume an existing registered scaffold, or register an existing unregistered scaffold with `b2c workspaces register <id> <path>`. For a new business, choose an absent or empty destination. Do not delete unfamiliar files or retry creation over an existing app.
+
+Registration makes an existing scaffold visible to local MCP; it does not create a planning workspace. The legacy `b2c new` and `b2c bootstrap` commands remain supported for explicit scaffold and runtime maintenance. Public business creation and initialization remain CLI-only.
 
 ## Composition
 

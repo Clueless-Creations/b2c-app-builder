@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, realpathSync, renameSync, writeFileSync } from "node:fs";
+import { existsSync, lstatSync, mkdirSync, readFileSync, realpathSync, renameSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
@@ -58,6 +58,24 @@ function writeRegistry(registry: WorkspaceRegistry): void {
   renameSync(tmp, file);
 }
 
+/** Address registration needs a planning or runtime marker, not a claim of readiness. */
+export const WORKSPACE_SCAFFOLD_MARKERS = ["product.yaml", "catalog.json", "state/business-state.json", "run/run-state.json"] as const;
+
+export function hasWorkspaceScaffold(root: string): boolean {
+  return WORKSPACE_SCAFFOLD_MARKERS.some((relative) => {
+    let target = root;
+    try {
+      for (const segment of relative.split("/")) {
+        target = path.join(target, segment);
+        if (lstatSync(target).isSymbolicLink()) return false;
+      }
+      return lstatSync(target).isFile();
+    } catch {
+      return false;
+    }
+  });
+}
+
 export function registerWorkspace(id: string, workspacePath: string, now = new Date().toISOString()): WorkspaceRegistry {
   if (!WORKSPACE_ID.test(id)) throw new Error(`registry.invalid_id: "${id}" — ids are lowercase letters, digits, and hyphens`);
   const absolute = path.resolve(workspacePath);
@@ -66,6 +84,13 @@ export function registerWorkspace(id: string, workspacePath: string, now = new D
   const existing = registry.workspaces.find((entry) => entry.id === id);
   if (existing && path.resolve(existing.path) !== absolute) {
     throw new Error(`registry.id_taken: "${id}" already points at ${existing.path} — remove it first if the move is intentional`);
+  }
+  if (!existing && !hasWorkspaceScaffold(absolute)) {
+    throw new Error(
+      `registry.scaffold_missing: ${absolute} has no planning or runtime workspace scaffold. ` +
+        'Start a new business with b2c business-create --workspace <id> --directory <empty-directory> --name "<name>" --hypothesis "<hypothesis>". ' +
+        "Registration adopts an existing scaffold; it does not create one. No registry entry was added.",
+    );
   }
   const next: WorkspaceRegistry = {
     schemaVersion: "1.0.0",
@@ -103,7 +128,7 @@ export function resolveRegisteredWorkspace(reference: string): { path: string } 
   return {
     refused: true,
     message:
-      `"${reference}" is not a registered workspace. Register it first: b2c workspaces register <id> <path> — ` +
+      `"${reference}" is not a registered workspace. For a new business use b2c business-create --help. To adopt an existing scaffold: b2c workspaces register <id> <path> — ` +
       (registry.workspaces.length > 0 ? `registered ids: ${registry.workspaces.map((entry) => entry.id).join(", ")}` : "nothing is registered yet"),
   };
 }

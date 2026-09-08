@@ -452,7 +452,7 @@ export function routeUtterance(request: RouteUtteranceRequest): RouteOutcome {
       : undefined;
   const registrationCommand = inspection?.ok && inspection.registration.kind === "unregistered" ? inspection.registration.suggestedFix : undefined;
   const completeNext = registrationRequired
-    ? `Register a planning workspace before managed business writes. ${registrationCommand ? `Use ${registrationCommand} with an explicitly selected provisional ID. ` : "Use business-create with an explicitly selected directory and provisional workspace ID. "}The workspace ID is not a final brand. Preserve the complete-business mandate; research is the first obligation, not the delivered business.`
+    ? `Create or adopt a planning workspace before managed business writes. ${registrationCommand ? `Use ${registrationCommand} with an explicitly selected provisional ID. ` : 'Use b2c business-create --workspace <id> --directory <empty-directory> --name "<name>" --hypothesis "<hypothesis>" with an explicitly selected provisional ID. '}Creation requires an empty directory; choose a new empty directory if this folder already contains files. Include --mandate with the complete user request when creating the business. The workspace ID is not a final brand. Preserve the complete-business mandate; research is the first obligation, not the delivered business.`
     : "Resume the registered business and preserve its complete-business mandate. Finish research and its independent review, initialize the accepted product, then use business-plan through design, implementation, verification and closeout. A research pass cannot end the mandate.";
   const match = matchWorkflows(request.utterance, workflows);
 

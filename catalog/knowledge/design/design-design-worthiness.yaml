@@ -21,7 +21,20 @@ bindings:
 applicability_notes: Orchestrate holes only. Do not rewrite eleven-star, emotional design, quality-lens,
   vibecoded-tells, motion recipes, or mobile-flow-craft. DESIGN.md stays producer-owned. Mechanical, attested,
   and independently bound taste tiers decide what an agent may assert; runtime proof remains design-acceptance's job.
-sources: []
-source_exemption: Named standards (WCAG 2.2, Dieter Rams, Apple Human Interface Guidelines, Nielsen Norman
-  Group progressive disclosure) appear as names only. This package contains internal operating guidance
-  and has no external command-syntax claims.
+sources:
+  - id: w3c-wcag22-text-contrast
+    name: W3C WCAG 2.2 text contrast
+    source_type: standard
+    url: https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html
+    review_cadence_days: 180
+    claim_scope: Text contrast thresholds and exceptions; no universal7:1 rule.
+    last_review_date: "2026-09-07"
+    reviewer: b2c-maintainers
+  - id: w3c-wcag22-non-text-contrast
+    name: W3C WCAG 2.2 non-text contrast
+    source_type: standard
+    url: https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html
+    review_cadence_days: 180
+    claim_scope: Essential graphical object and control contrast with applicable exceptions.
+    last_review_date: "2026-09-07"
+    reviewer: b2c-maintainers

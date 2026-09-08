@@ -1,12 +1,14 @@
 import { createHash } from "node:crypto";
-import { lstatSync, readFileSync, readdirSync, realpathSync } from "node:fs";
+import { existsSync, lstatSync, readFileSync, readdirSync, realpathSync } from "node:fs";
 import path from "node:path";
 import { inflateSync } from "node:zlib";
 import { parse as parseYaml } from "yaml";
 import { z } from "zod";
 import { outputFingerprintPath } from "../../../../kernel/engine/artifact-fingerprint.js";
+import { boundedFileBytes } from "../../../../kernel/lib/bounded-file.js";
 import { fingerprintAppSource } from "../../../../kernel/engine/source-fingerprint.js";
-import { loadDesignSystem } from "../../../../tooling/lib/design-md.js";
+import { loadDesignSystem, parseFrontmatter, typographyDependencyPaths } from "../../../../tooling/lib/design-md.js";
+import { contentAssetDependencyPaths, CONTENT_ASSETS_VERSION } from "../../../../tooling/lib/content-assets.js";
 import { isRecord, issue, type Issue } from "../../../../tooling/lib/launch-state.js";
 
 /** Evidence integrity, not a beauty scorer or an approval authority. The existing
@@ -683,7 +685,28 @@ export function designCandidateFingerprint(root: string, scope: DesignAcceptance
       return 1;
     }
   };
-  const authoredPaths = [...scope.designContractPaths, ...scope.surfaces.flatMap((surface) => surface.implementationPaths)];
+  // Resource declarations extend candidate identity even if implementation roots omit them.
+  // The canonical DESIGN.md digest remains separately bound by the report's authored inputs.
+  const frontmatter = parseFrontmatter(boundedFileBytes(localPath(root, "DESIGN.md"), 1024 * 1024).toString("utf8"), []);
+  const assetDependencies: string[] = [];
+  // Match the content validator: the first nonempty manifest owns this packet.
+  // An unrelated root manifest must not override the selected primary location.
+  for (const assetsPath of ["growth/content-assets/manifest.json", "manifest.json"]) {
+    if (!existsSync(path.join(root, assetsPath))) continue;
+    const manifestText = boundedFileBytes(localPath(root, assetsPath), 4 * 1024 * 1024).toString("utf8");
+    if (!manifestText) continue;
+    const manifest: unknown = JSON.parse(manifestText);
+    if (isRecord(manifest) && manifest.schema_version === CONTENT_ASSETS_VERSION) {
+      assetDependencies.push(assetsPath, ...contentAssetDependencyPaths(manifest));
+    }
+    break;
+  }
+  const authoredPaths = [
+    ...scope.designContractPaths,
+    ...scope.surfaces.flatMap((surface) => surface.implementationPaths),
+    ...typographyDependencyPaths(frontmatter),
+    ...assetDependencies,
+  ];
   for (const relative of new Set(authoredPaths)) {
     if (visit(relative) === 0) throw new Error(`Empty candidate source root: ${relative}`);
   }

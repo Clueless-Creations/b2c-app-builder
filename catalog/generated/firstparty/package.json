@@ -1,6 +1,6 @@
 {
   "name": "b2c-app-builder",
-  "version": "0.218.22",
+  "version": "0.219.0",
   "description": "Consumer-business primitives for AI agents: capabilities, providers, recipes, and evidence through a CLI, MCP, and skill.",
   "keywords": [
     "mcp",
@@ -93,10 +93,12 @@
     "check:component-contracts": "tsx checks/validation/business/design/check-component-contracts.ts --root .",
     "check:compound-engineering": "tsx checks/validation/business/engineering/check-compound-engineering-routing.ts",
     "check:content-assets": "tsx checks/validation/business/design/check-content-assets.ts",
+    "check:content-assets-foundation": "tsx checks/validation/business/design/check-content-assets.ts --require-foundation",
     "check:continuity-contract": "tsx checks/validation/business/orchestration/check-continuity-contract.ts --skill-root .",
     "check:credits": "tsx tooling/render-credits.ts --check",
     "check:design-acceptance": "tsx checks/validation/business/design/check-design-acceptance.ts",
     "check:design-md": "tsx checks/validation/business/design/check-design-md.ts",
+    "check:design-foundation": "tsx checks/validation/business/design/check-design-md.ts --require-foundation",
     "check:design-room": "tsx checks/validation/business/design/check-design-room-contract.ts --root examples/workspace/business",
     "check:design-worthiness": "tsx checks/validation/business/design/check-design-worthiness.ts",
     "check:design-worthiness-mechanical": "tsx checks/validation/business/design/check-design-worthiness.ts --mechanical-only",

@@ -1,0 +1,78 @@
+schema_version: 1
+id: amir-brand-system
+project: Amir Mushich Brand System Skill
+canonical_url: https://github.com/amirmushichge/brand-system-skill
+aliases:
+- amirmushichge/brand-system-skill
+authors:
+- name: Amir Mushich
+  role: original author
+maintainers:
+- name: Amir Mushich
+  role: upstream maintainer
+copyright: Created by Amir Mushich. Licensed under CC BY 4.0; attribution required.
+license:
+  spdx: CC-BY-4.0
+  status: verified
+  evidence_url: https://github.com/amirmushichge/brand-system-skill/blob/30f6084ddf6adf4173cf882fce266015f8872c17/LICENSE
+  evidence_sha256: f5b745ef98087f531e719ee8ca6a96809444573ecc7173c6fa68eaad39b3cc3f
+  reviewed_revision: 30f6084ddf6adf4173cf882fce266015f8872c17
+  notice_file: catalog/upstreams/notices/amir-brand-system.txt
+  scope: Selected reauthored methods only. Third-party fonts, imagery, marks and hosted services excluded.
+source_ids:
+- amir-brand-system-builder
+relationships:
+- kind: adapted-method
+  consumption: Provider-neutral brand kit and reference roles. No source executable or assets imported.
+  local_owners:
+  - knowledge/design/design-visual-system.md
+  - knowledge/design/remotion-content-assets.md
+  tests:
+  - examples/contributions/bespoke-design-methods/ADOPTION_MAP.md
+  upstream_paths:
+  - SKILL.md
+  - README.md
+  - LICENSE
+  pin_authority: Reviewed immutable source commit; no host or business installation.
+baselines:
+  reviewed_source:
+    revision: 30f6084ddf6adf4173cf882fce266015f8872c17
+    observed_at: '2026-09-07'
+    by: b2c-maintainers
+    note: Source method inspection. No executed scene, live service or empirical quality result.
+  reviewed_guidance:
+    revision: 30f6084ddf6adf4173cf882fce266015f8872c17
+    observed_at: '2026-09-07'
+    by: b2c-maintainers
+    note: Source method inspection. No executed scene, live service or empirical quality result.
+support:
+  policy: Reviewed guidance; runtime support and product outcomes require separate evidence.
+  versions:
+  - range: 30f6084ddf6adf4173cf882fce266015f8872c17
+    status: untested
+    evidence:
+    - Source inspection only; actual comparative evaluation is separate.
+  operations:
+  - id: amir-brand-system-method
+    title: Provider-neutral brand kit and reference roles
+    owners:
+    - knowledge/design/design-visual-system.md
+  platforms: []
+adaptations:
+- id: conditional-provider-neutral-method
+  description: No mandatory Google Fonts, Lovart, per-generation approvals or benchmark score. Identity stays in
+    DESIGN.md and existing controller owns narrative state.
+  owner: knowledge/design/design-visual-system.md
+  intentional: true
+review:
+  owner: b2c-maintainers
+  cadence_days: 30
+  last_review: '2026-09-07'
+  status: current
+credits:
+  acknowledge: true
+  use: adapted
+  summary: Provider-neutral brand kit and reference roles. Reauthored for existing design authorities; original
+    author and license retained. No endorsement or demonstrated uplift claimed.
+transfers:
+- Former repository name lovart-brand-system-skill redirects to brand-system-skill.

@@ -16,11 +16,53 @@ colors:
   danger: "#b3261e"
 typography:
   display:
-    fontFamily: Fraunces, Georgia, serif
+    fontFamily: Georgia
     fontWeight: "700"
+    fontSize: 2rem
+    lineHeight: 1.2
+    letterSpacing: 0px
+    nativeSize: 32
+    nativeTracking: 0
+    fallbacks: [serif]
+    resourceId: system-display
   body:
-    fontFamily: Source Sans 3, Avenir Next, sans-serif
+    fontFamily: system-ui
     fontWeight: "400"
+    fontSize: 1rem
+    lineHeight: 1.5
+    letterSpacing: 0px
+    nativeSize: 16
+    nativeTracking: 0
+    fallbacks: [sans-serif]
+    resourceId: system-body
+foundation:
+  version: 1
+  communicationPriorities:
+    - The next action and its consequence come before decorative explanation.
+  identityInvariants:
+    - Preserve the selected Anchor Brand Kit roles across app and acquisition surfaces.
+  rationale:
+    - decision: Begin with readable system resources until the product direction is selected.
+      kind: legibility
+      reason: A working fallback allows content and layout review without a font download.
+  referenceInfluences: []
+  typographyResources:
+    - id: system-display
+      family: Georgia
+      mode: system
+      source: Platform font availability; verify on selected targets.
+      license: Platform supplied; no font bytes redistributed.
+      scripts: [Latin]
+      fallbacks: [serif]
+      expansionTest: Pending implementation; inspect long headings, target scripts, and largest supported text setting.
+    - id: system-body
+      family: system-ui
+      mode: system
+      source: Platform default font; adapter resolves the native family.
+      license: Platform supplied; no font bytes redistributed.
+      scripts: [Latin]
+      fallbacks: [sans-serif]
+      expansionTest: Pending implementation; inspect localized body text and controls at largest supported text setting.
 rounded:
   sm: 4px
   md: 8px
@@ -79,7 +121,25 @@ The frontmatter owns exact semantic color values. Explain each role here after t
 
 ## Typography
 
-The frontmatter owns the display and body roles. Define the hierarchy, supported dynamic type range, truncation policy, and localization behavior before implementation.
+The frontmatter owns role metrics and font resources. These starter values are
+unselected defaults. Replace the communication priorities, rationale, reference
+influences, and Anchor Brand Kit constraints when choosing the product direction.
+Use `evidence` with a source locator for factual rationale, `hypothesis` for a
+creative bet, `legibility` for readability, and `medium-constraint` for platform
+limits. A source locator is a claim to review, not proof by itself.
+
+Declare every role's web size, line-height multiplier, tracking, weight, resource,
+and fallbacks. Native size and tracking are explicit logical values; an adapter
+must apply platform text scaling. CSS rem is relative to browser text settings,
+not an automatic native unit conversion. Semantic headings describe content
+structure independently of visual size.
+
+Each resource declares system, local, or remote mode, supported scripts, and an
+expansion test plan or evidence locator. Local font resources also require `path`,
+`sha256`, and `licensePath` for the actual workspace files. Remote URLs and system
+availability declarations do not prove loading. Verify actual rendering, fallback,
+large text, long localized strings, and truncation on every selected platform.
+Do not mark a pending expansion test as completed evidence.
 
 ## Layout
 

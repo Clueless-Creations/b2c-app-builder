@@ -1,8 +1,8 @@
 id: business-pack.consumer-business
 title: Consumer business
 kind: business-pack
-version: 0.218.22
-revision: 0.218.22
+version: 0.219.0
+revision: 0.219.0
 depends_on: []
 creates_provider_spend: false
 domains:
@@ -1347,7 +1347,7 @@ workflows:
       - make this feature something people get attached to
       - build in a reward loop that keeps people coming back
       - add the psychological hooks that build a habit
-    instructions: Implement all four required Experience Cards (Commitment, Variable Reward, Perceived Effort Delay, Intent Mirroring) per emotional-experience-design.md's producer recipes, each with its deterministic guardrail satisfied (e.g. Variable Reward's result must differ across at least 30% of consecutive completions, Commitment's goal must be user-editable at any time) and evidence recorded in engineering/PRODUCTION_READINESS.md — a card that cannot be verified on a running app does not ship. Route any additional card from the 12-card deck (experience-cards.md's Card Routing table) only when the product moment genuinely fits; give every emotional moment a named PostHog event per emotional-experience-measurement.md before build, not invented ad hoc. Apply the three-question bright-line test from ethics-guardrail.md (goal alignment, truthfulness, informed exit) to each card before it ships — any NO answer means redesign, not a documented exception — and check:emotional-design enforces the resulting attestation fields in EMOTIONAL_DESIGN.md.
+    instructions: Evaluate the Experience Cards against the actual product moment and record selected or not-applicable with a reason. No card is universally required. Implement each selected card with its applicable truthfulness, user-control, accessibility, and exit guardrails and evidence in engineering/PRODUCTION_READINESS.md. Never invent delay, randomness, or a commitment step merely to satisfy a card. Claims about emotional or conversion effects require observed evidence. Select additional cards from experience-cards.md only when the product moment fits; give every emotional moment a named PostHog event per emotional-experience-measurement.md before build, not invented ad hoc. Apply the three-question bright-line test from ethics-guardrail.md (goal alignment, truthfulness, informed exit) to each card before it ships — any NO answer means redesign, not a documented exception — and check:emotional-design enforces the resulting attestation fields in EMOTIONAL_DESIGN.md.
     reads:
       - product/experience/11-star-experience/11_STAR_EXPERIENCE.md
       - analytics/ANALYTICS.md
@@ -1387,7 +1387,7 @@ workflows:
       - check whether the emotional design actually holds up
       - audit the reward and habit mechanics we built
       - grade this feature's emotional design against the spec
-    instructions: "Audit EMOTIONAL_DESIGN.md against every card the app actually implements — for each, verify the specific bright-line/dark-line test from that card's own file (experience-cards/<name>-card.md) and consumer-product-design-agency.md's four-required-card checklist actually passes, not just that a card is named. HIGH-risk cards (Variable Reward, Streak & Loss Aversion) get the strictest read: confirm the escape hatch, counter-metric, and non-empty fallback are real, not aspirational language. Write findings as EMOTIONAL_AUDIT.md's Audit Output Contract, and any dark-pattern violation or missing per-card attestation field becomes a failure card per failure-cards.md rather than a note to fix later — check:emotional-design enforces the attestation fields this audit must produce."
+    instructions: "Audit EMOTIONAL_DESIGN.md against every card the app actually implements — for each, verify the specific bright-line/dark-line test from that card's own file (experience-cards/<name>-card.md) and verify the selection rationale against the actual product moment, not just that a card is named. When no card is selected, independently review the visible, explicit not-applicable decision and alternative; do not invent four required mechanisms. HIGH-risk cards (Variable Reward, Streak & Loss Aversion) get the strictest read: confirm the escape hatch, counter-metric, and non-empty fallback are real, not aspirational language. Write findings as EMOTIONAL_AUDIT.md's Audit Output Contract, and any dark-pattern violation or missing per-card attestation field becomes a failure card per failure-cards.md rather than a note to fix later — check:emotional-design enforces the attestation fields this audit must produce."
     reads:
       - product/experience/emotional-design/EMOTIONAL_DESIGN.md
     consults: []
@@ -1502,12 +1502,12 @@ workflows:
     domain_id: domain.design
     area_ids:
       - area.product-experience
-    trigger: "Any design/visual-system/cross-surface/store-creative/landing/onboarding/paywall work. Founder phrasing: design how every screen looks and feels."
+    trigger: "New or substantively revised design systems, concepts, or cross-surface direction. Founder phrasing: design how every screen looks and feels. A bounded correction to an accepted legacy contract uses the direct focused-maintenance procedure in quality-lens, not full Design Room execution."
     founder_phrasings:
       - design how every screen in the app looks and feels
       - lock the visual system before we build more screens
       - get the paywall and onboarding visuals designed
-    instructions: Read PRODUCT.md first. DESIGN.md is the design authority; studio/seed/business.json is its structured screen and flow map. Load only the bound evidence and craft references needed for the affected surface. For substantive work, develop at least three distinct concepts before selecting one. Preserve them in DESIGN.md frontmatter under exploration with unique concept IDs, reference-to-principle mappings, native/mobile-web/desktop-web treatments, a distinguishing mechanic, one selected decision, rejected decisions, and the rationale for each. The generated Design Room must expose this evidence beside the selected system. Derive identity from user evidence, give objects a physical model, use motion to explain structure, recompose each form factor, and protect hierarchy with quiet space. Keep durable decisions in DESIGN.md. Add screen or flow files only when the structured route is not enough. Use platform-neutral component contracts and the selected stack adapter. Update one coherent scope, validate it, and render the read-only Design Room. Git records revisions. When the opening mandate delegates design direction, choose and record the strongest direction. Otherwise, recommend it for founder approval.
+    instructions: "Read PRODUCT.md first. DESIGN.md is the design authority; studio/seed/business.json is its structured screen and flow map. Load only the bound evidence and craft references needed for the affected surface. For substantive work, develop at least three distinct concepts before selecting one. Preserve them in DESIGN.md frontmatter under exploration with unique concept IDs, reference-to-principle mappings, native/mobile-web/desktop-web treatments, a distinguishing mechanic, one selected decision, rejected decisions, and the rationale for each. The generated Design Room must expose this evidence beside the selected system. For new substantive design work, author the versioned foundation in DESIGN.md: communication priorities, material decision rationale, identity invariants, reference influence, and typography resources. Distinguish researched facts from creative hypotheses and platform or legibility constraints. Explore mechanisms that differ in communication and composition, not just names, palettes, or prose. For bounded maintenance of an accepted legacy design, the same Design Room owner follows quality-lens Focused review using direct compatible checks and fresh independent review; that procedure does not execute or accept this full workflow. Within this full workflow, repairs preserve accepted exploration and the required foundation while correcting the affected contract and dependencies. A physical metaphor, expressive motion, or layered composition is selected only when it improves the user job. Recompose each form factor with representative content and protect hierarchy. Keep durable decisions in DESIGN.md. Add screen or flow files only when the structured route is not enough. Use platform-neutral component contracts and the selected stack adapter. Update one coherent scope, validate it, and render the read-only Design Room. Git records revisions. When the opening mandate delegates design direction, choose and record the strongest direction. Otherwise, recommend it for founder approval."
     reads:
       - PRODUCT.md
       - DESIGN.md
@@ -1521,6 +1521,7 @@ workflows:
       - reference.design.audience-derived-identity
       - reference.design.design-evidence-stack
       - reference.design.design-room
+      - reference.design.design-visual-system
       - reference.design.design-worthiness
       - reference.design.editorial-scrollytelling
       - reference.design.landing-motion-craft
@@ -1545,7 +1546,7 @@ workflows:
       - design/design-room.html
     gate_commands:
       - validate:design-state
-      - check:design-md
+      - check:design-foundation
       - render:design-room
       - check:design-room
       - check:design-worthiness-mechanical
@@ -1566,7 +1567,7 @@ workflows:
       - have a fresh pair of eyes judge the design system
       - is this design actually good or just neat
       - audit the design room before I look at it
-    instructions: "Audit DESIGN.md, studio/seed/business.json, and design/design-room.html in a fresh context that never saw the producer's transcript, against the frozen rubric under design/reviews/rubrics/ and the reference pack for the surface. Apply the quality-lens facets, the design-worthiness questions, the vibecoded tells, the audience-derived-identity checklist, and the twelve craft-bar conditions from the full-launch-program reference; score each condition meet, exceed, deliberately break with a reason, or fail. Run npx @google/design.md lint on DESIGN.md and diff it against the last accepted version; run the Impeccable critique and audit commands as read-only lenses when installed. Regenerate design/reviews/DESIGN_SYSTEM_REVIEW.md during every audit attempt; the engine rejects unchanged pre-existing review bytes instead of rebinding a stale decision. Write a ## Findings section with exactly one `Severity: <value>.` line; allowed values are none, minor, major, high, high-severity, and blocker, and any explanation follows the period. Also include `Candidate input fingerprint: <ENGINE-BOUND INPUT FINGERPRINT>` exactly once and `Frozen rubric: design/reviews/rubrics/<file> version <version>`. Read the immutable `ENGINE-ISSUED DESIGN TASTE DELEGATION` authority block. It is the externally trusted signed receipt snapshot captured for this exact attempt before dispatch. A delegation recorded after dispatch never authorizes these audit bytes and requires a fresh attempt. When its status is approved, also write exactly one ## Delegated Taste Decision table with columns Decision authority, Date, Surfaces reviewed, One-product stranger test, Copy-test, and Verdict. Omit that table when the status is rejected, absent, or stale; never infer delegation from workspace files or read run/run-state.json. Decision authority must be exactly Founder opening mandate; Verdict must be pass or fail; the three observations must be substantive. A pass cannot coexist with an unresolved blocker, a high or high-severity finding, or a major finding. Do not write or trust a reviewer identity or delegation claim in the artifact: the gate derives the current engine-issued audit identity, the current-run signed founder delegation, and producer exclusion from engine-owned state, the protected trust binding, its audit chain, and the exact artifact binding. A direct signed founder pass for the exact current DESIGN.md may resolve only a delegated taste fail after Findings contains no unresolved major, high, high-severity, or blocker issue; it never clears an independent finding. Do not edit DESIGN.md, restyle, edit copy, or mark the review done. A structured fail or an unresolved high or high-severity finding rejects the product direction and returns actionable findings only to the Design Room producer for bounded internal repair and a fresh independent review. Missing, malformed, stale, changed-after-gate, or non-independent audit evidence consumes a bounded retry of this audit node only and never reopens Design Room; persistent invalid audit evidence blocks at the audit cap. If product repair makes no progress, change the approach using the frozen rubric; ask the founder only for retained authority or a decision the mandate did not delegate. Exhausted repair attempts remain incomplete rather than lowering the bar."
+    instructions: "Audit DESIGN.md, studio/seed/business.json, and design/design-room.html in a fresh context that never saw the producer's transcript, against the frozen rubric under design/reviews/rubrics/ and the reference pack for the surface. Use quality-lens defect diagnosis to separate brief, concept, composition, identity drift, typography, implementation, and claim failures. Inspect actual representative states; record a consequential defect, its evidence, the smallest appropriate repair, and any justified exception. Similar vocabulary or a completed checklist does not prove quality. Apply the quality-lens facets, the design-worthiness questions, the vibecoded tells, the audience-derived-identity checklist, and the twelve craft-bar conditions from the full-launch-program reference; score each condition meet, exceed, deliberately break with a reason, or fail. Run npx @google/design.md lint on DESIGN.md and diff it against the last accepted version; run the Impeccable critique and audit commands as read-only lenses when installed. Regenerate design/reviews/DESIGN_SYSTEM_REVIEW.md during every audit attempt; the engine rejects unchanged pre-existing review bytes instead of rebinding a stale decision. Write a ## Findings section with exactly one `Severity: <value>.` line; allowed values are none, minor, major, high, high-severity, and blocker, and any explanation follows the period. Also include `Candidate input fingerprint: <ENGINE-BOUND INPUT FINGERPRINT>` exactly once and `Frozen rubric: design/reviews/rubrics/<file> version <version>`. Read the immutable `ENGINE-ISSUED DESIGN TASTE DELEGATION` authority block. It is the externally trusted signed receipt snapshot captured for this exact attempt before dispatch. A delegation recorded after dispatch never authorizes these audit bytes and requires a fresh attempt. When its status is approved, also write exactly one ## Delegated Taste Decision table with columns Decision authority, Date, Surfaces reviewed, One-product stranger test, Copy-test, and Verdict. Omit that table when the status is rejected, absent, or stale; never infer delegation from workspace files or read run/run-state.json. Decision authority must be exactly Founder opening mandate; Verdict must be pass or fail; the three observations must be substantive. A pass cannot coexist with an unresolved blocker, a high or high-severity finding, or a major finding. Do not write or trust a reviewer identity or delegation claim in the artifact: the gate derives the current engine-issued audit identity, the current-run signed founder delegation, and producer exclusion from engine-owned state, the protected trust binding, its audit chain, and the exact artifact binding. A direct signed founder pass for the exact current DESIGN.md may resolve only a delegated taste fail after Findings contains no unresolved major, high, high-severity, or blocker issue; it never clears an independent finding. Do not edit DESIGN.md, restyle, edit copy, or mark the review done. A structured fail or an unresolved high or high-severity finding rejects the product direction and returns actionable findings only to the Design Room producer for bounded internal repair and a fresh independent review. Missing, malformed, stale, changed-after-gate, or non-independent audit evidence consumes a bounded retry of this audit node only and never reopens Design Room; persistent invalid audit evidence blocks at the audit cap. If product repair makes no progress, change the approach using the frozen rubric; ask the founder only for retained authority or a decision the mandate did not delegate. Exhausted repair attempts remain incomplete rather than lowering the bar."
     reads:
       - DESIGN.md
       - studio/seed/business.json
@@ -1620,7 +1621,7 @@ workflows:
       - prove the actual mobile app and landing page meet the reference quality
       - review the finished consumer experience before closeout
       - check that every implemented surface clears its craft bar
-    instructions: "Independently inspect the actual native app and desktop/mobile landing runtime against the accepted DESIGN.md acceptance scope and frozen reference rubrics. Apply reference.design.consumer-craft-benchmarks principles only where they serve this product. Regenerate design/proofs/design-acceptance.json and design/reviews/IMPLEMENTATION_REVIEW.md during every audit attempt; write exactly one `Acceptance report SHA-256: <64 lowercase hex>` line in the Markdown bound to the current JSON bytes. Set report.reviewer.sessionId to the immutable engine-issued execution identity for this exact audit attempt. Both audit files must remain exact output bindings produced by that same attempt; never invent a reviewer label or reuse another attempt's output. The engine rejects unchanged pre-existing audit bytes instead of rebinding stale evidence. Use reference.design.design-acceptance and record actionable findings. Load the optional Interfaces review guidance in reference.design.design-visual-system when available; scope it to implemented screens and states, record unreviewed domains, and keep its findings in this same review. Companion review never substitutes for the independent acceptance evidence. The report may only index capture and interaction receipts with `{id, receipt, producer}`. Consume machine-produced native evidence from the selected proof/ios-* or proof/android-* lane and browser evidence from growth/landing/proof/. Each strict producer receipt owns the evidence artifact byte digest, candidate and runtime identity, observed timestamp, surface and evidence IDs, platform, tool, and exact device or browser identity. Never author or repair producer receipts inside this audit. Register each installed native runtime in nativeRuntimes[] with id, platform (ios or android), its platform-specific target, candidateSha256, sourceFingerprint, deviceId, and receipt path/hash. Register each landing runtime in browserRuntimes[] from the immutable receipt selected by growth/landing/proof/browser-proof.json. Bind its current candidate and source fingerprint, exact build fingerprint, served origin and URL, browser and OS identity, new browser context ID, launch and navigation transcript hashes, and receipt path/hash. The browser receipt sessionId must equal the current accepted landing producer attempt that ran `b2c browser-proof --session-id`; reject a copied, hand-authored, older, or relabeled page even when its screenshot looks plausible. Require every browser surface, capture, and interaction to cite the matching runtime and browser context. iOS runtimes bind bundleId, buildNumber, executableSha256, and bundleContentSha256 identity. Consume simulator rung-2 receipts from proof/ios-simulator/ and physical-ios-install receipts from proof/ios-device/; physical iPhones also bind deviceModelIdentifier, osVersion, and osBuild plus the four hashed tool transcripts. Android runtimes bind packageName, integer versionCode, built APK-or-AAB format/hash, exact installation APK hash, device model/API/OS identity, and an android-emulator-install receipt from proof/android-emulator/ or physical-android-install receipt from proof/android-device/. For every Android receipt, builtPackage.source.root must equal the canonical business root and builtPackage.source.roots must equal the sorted, deduplicated Android native implementationPaths in accepted DESIGN.md. Consume only a named machine-produced strict receipt; never reconstruct or hand-author one from MobAI output. If the built package is an AAB, require the derived installation APK and a distinct hashed conversion transcript; install and read back that derived APK's package/version identity. All receipt timelines must build, install, read back the installed identity, and launch on the same target after candidate production and before review. Each native surface lists matching runtimeIds[]; every native capture and interaction receipt cites its matching runtimeId. screenReader: true is valid only for a physical-device runtime, and its VoiceOver or TalkBack interaction must cite that same physical runtime. For every evidence reference, require current accepted run-state provenance from the declared native or landing producer workflow and exact attempt, recompute the current ancestor artifact binding, and reject the implementation-craft audit as producedBy. Reject any identity, chronology, target, producer, or hash mismatch. Require every calibrated facet and every required state on each surface to meet its floor; never average away a failing native experience. Do not repair product code or weaken scope, references, or criteria during review. A product or craft rejection routes each finding only to a declared reviewOf producer for a fresh bounded repair attempt. A missing declared report, malformed report schema or worker knowledge receipt, stale report/candidate hash, invented or same-identity review, invalid review chronology, or audit output changed after its gate retries this audit node alone within its attempt budget; it never reopens a product producer. Other failed acceptance criteria route their actionable findings to the declared producer that owns the evidence. Continue while producer evidence changes, stop after two consecutive unchanged product rounds or eight audit attempts, and keep the work incomplete rather than lowering the bar. Mechanical integrity checks and independent rendered judgment must both pass."
+    instructions: "Independently inspect the actual native app and desktop/mobile landing runtime against the accepted DESIGN.md acceptance scope and frozen reference rubrics. Apply reference.design.consumer-craft-benchmarks principles only where they serve this product. Diagnose brief, concept, composition, identity drift, typography, implementation, and claim defects separately using reference.design.quality-lens. Inspect actual font loading, script coverage, text expansion, fallback behavior, recovery, and repeated controls. Reject unsupported claims and report unobserved capabilities as missing evidence. A conventional control, system font, monochrome palette, or quiet surface can be the correct result. Regenerate design/proofs/design-acceptance.json and design/reviews/IMPLEMENTATION_REVIEW.md during every audit attempt; write exactly one `Acceptance report SHA-256: <64 lowercase hex>` line in the Markdown bound to the current JSON bytes. Set report.reviewer.sessionId to the immutable engine-issued execution identity for this exact audit attempt. Both audit files must remain exact output bindings produced by that same attempt; never invent a reviewer label or reuse another attempt's output. The engine rejects unchanged pre-existing audit bytes instead of rebinding stale evidence. Use reference.design.design-acceptance and record actionable findings. Load the optional Interfaces review guidance in reference.design.design-visual-system when available; scope it to implemented screens and states, record unreviewed domains, and keep its findings in this same review. Companion review never substitutes for the independent acceptance evidence. The report may only index capture and interaction receipts with `{id, receipt, producer}`. Consume machine-produced native evidence from the selected proof/ios-* or proof/android-* lane and browser evidence from growth/landing/proof/. Each strict producer receipt owns the evidence artifact byte digest, candidate and runtime identity, observed timestamp, surface and evidence IDs, platform, tool, and exact device or browser identity. Never author or repair producer receipts inside this audit. Register each installed native runtime in nativeRuntimes[] with id, platform (ios or android), its platform-specific target, candidateSha256, sourceFingerprint, deviceId, and receipt path/hash. Register each landing runtime in browserRuntimes[] from the immutable receipt selected by growth/landing/proof/browser-proof.json. Bind its current candidate and source fingerprint, exact build fingerprint, served origin and URL, browser and OS identity, new browser context ID, launch and navigation transcript hashes, and receipt path/hash. The browser receipt sessionId must equal the current accepted landing producer attempt that ran `b2c browser-proof --session-id`; reject a copied, hand-authored, older, or relabeled page even when its screenshot looks plausible. Require every browser surface, capture, and interaction to cite the matching runtime and browser context. iOS runtimes bind bundleId, buildNumber, executableSha256, and bundleContentSha256 identity. Consume simulator rung-2 receipts from proof/ios-simulator/ and physical-ios-install receipts from proof/ios-device/; physical iPhones also bind deviceModelIdentifier, osVersion, and osBuild plus the four hashed tool transcripts. Android runtimes bind packageName, integer versionCode, built APK-or-AAB format/hash, exact installation APK hash, device model/API/OS identity, and an android-emulator-install receipt from proof/android-emulator/ or physical-android-install receipt from proof/android-device/. For every Android receipt, builtPackage.source.root must equal the canonical business root and builtPackage.source.roots must equal the sorted, deduplicated Android native implementationPaths in accepted DESIGN.md. Consume only a named machine-produced strict receipt; never reconstruct or hand-author one from MobAI output. If the built package is an AAB, require the derived installation APK and a distinct hashed conversion transcript; install and read back that derived APK's package/version identity. All receipt timelines must build, install, read back the installed identity, and launch on the same target after candidate production and before review. Each native surface lists matching runtimeIds[]; every native capture and interaction receipt cites its matching runtimeId. screenReader: true is valid only for a physical-device runtime, and its VoiceOver or TalkBack interaction must cite that same physical runtime. For every evidence reference, require current accepted run-state provenance from the declared native or landing producer workflow and exact attempt, recompute the current ancestor artifact binding, and reject the implementation-craft audit as producedBy. Reject any identity, chronology, target, producer, or hash mismatch. Require every calibrated facet and every required state on each surface to meet its floor; never average away a failing native experience. Do not repair product code or weaken scope, references, or criteria during review. A product or craft rejection routes each finding only to a declared reviewOf producer for a fresh bounded repair attempt. A missing declared report, malformed report schema or worker knowledge receipt, stale report/candidate hash, invented or same-identity review, invalid review chronology, or audit output changed after its gate retries this audit node alone within its attempt budget; it never reopens a product producer. Other failed acceptance criteria route their actionable findings to the declared producer that owns the evidence. Continue while producer evidence changes, stop after two consecutive unchanged product rounds or eight audit attempts, and keep the work incomplete rather than lowering the bar. Mechanical integrity checks and independent rendered judgment must both pass."
     reads:
       - product.yaml
       - DESIGN.md
@@ -1636,6 +1637,7 @@ workflows:
       - reference.design.design-acceptance
       - reference.design.design-visual-system
       - reference.design.mobile-flow-craft
+      - reference.design.quality-lens
     role_id: role.design-guru
     lane_ids:
       - design
@@ -2706,7 +2708,7 @@ workflows:
       - make demo videos from our real app screens
       - produce ad creative from the actual product UI
       - generate app preview clips for the store
-    instructions: "Read the accepted Anchor Brand Kit in DESIGN.md and follow reference.design.remotion-content-assets brand consistency procedure before producing a still or video: bind kit revision, reference roles, permitted variation, approved claims, selected model and inputs; review the actual output before scaling variants. Decide the production route per asset before generating anything: Higgsfield for net-new AI-generated imagery, mascots, or presenter/UGC video; Remotion for reproducible compositions built from real app UI, DESIGN.md tokens, screenshots, copy, and data where many variants (hooks, formats, dimensions, locales) are needed. Do not generate when the founder has not approved the intended paid route's fallback, Remotion commercial-license eligibility for this business is unclear, or the source UI/asset rights are missing. Record every produced asset in growth/content-assets/CONTENT_ASSETS.md (and its content-assets.html) with its route, token/source inputs, and license basis — check:content-assets proves the manifest matches what actually rendered, and this node is not idempotent because each run can legitimately produce new asset variants."
+    instructions: "For new content production, write manifest schema_version 2 with provider-neutral asset kinds and structured briefs; check:content-assets-foundation prevents a legacy downgrade. Read the accepted Anchor Brand Kit in DESIGN.md and follow reference.design.remotion-content-assets brand consistency procedure before producing a still or video: bind kit revision, reference roles, permitted variation, approved claims, selected model and inputs; review the actual output before scaling variants. Select the production route per asset from actual capability and rights evidence. A supported generation provider may supply new imagery or presenter video; a supported composition renderer may assemble real UI, tokens, screenshots, copy, and data into variants. Higgsfield and Remotion are conditional supported examples, not requirements for every asset. Do not generate when the founder has not approved the intended paid route's fallback, the selected provider or renderer commercial-license eligibility for this business is unclear, or the source UI/asset rights are missing. Record every produced asset in growth/content-assets/CONTENT_ASSETS.md (and its content-assets.html) with its route, token/source inputs, and license basis — check:content-assets validates the packet and declared local inputs; separate execution receipts and inspection of actual output establish what rendered and whether it meets the brief, and this node is not idempotent because each run can legitimately produce new asset variants."
     reads:
       - DESIGN.md
       - design/reference-packs/
@@ -2731,7 +2733,7 @@ workflows:
       - growth/content-assets/CONTENT_ASSETS.md
       - growth/content-assets/content-assets.html
     gate_commands:
-      - check:content-assets
+      - check:content-assets-foundation
     provider_ids:
       - provider.higgsfield
     founder_only_actions: []
@@ -4962,49 +4964,104 @@ references:
     title: Audience-Derived Identity
     domain_id: domain.design
     path: knowledge/design/audience-derived-identity.md
-    load_when: when DESIGN.md is created or revised, when a visual direction is drafted or reviewed, and when the Design Room needs the anti-generic review — derives palette/type/motion/imagery from strategy/RESEARCH.md audience facts and names the generic-template tells
+    load_when: Creating or materially revising DESIGN.md, choosing a direction, or independently reviewing communication, composition and audience fit.
     lifecycle: active
     sources:
-      - id: design-duolingo-com-identity-color
-        name: design.duolingo.com
-        source_type: official_docs
-        url: https://design.duolingo.com/identity/color
+      - id: video-satori-survive
+        name: How A Graphic Designer MUST Think in 2026 To Survive!
+        source_type: video
+        url: https://www.youtube.com/watch?v=WFkGbyH24AY
         review_cadence_days: 90
-        claim_scope: Duolingo's published brand color system, grounding the character-led case study (palette values and the against-category-default rationale).
-        last_review_date: 2026-08-17
+        claim_scope: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source expression imported.
+        last_review_date: 2026-09-07
         reviewer: b2c-maintainers
-      - id: developer-whoop-com-design-guidelines
-        name: developer.whoop.com
-        source_type: official_docs
-        url: https://developer.whoop.com/docs/developing/design-guidelines/
+        publisher: Satori Graphics
+        rights:
+          status: unknown
+          notes: Informational citation of ideas only. Full transcript, artwork, music and video are not redistributed.
+      - id: video-shapes-layout
+        name: 5 laws of design layout & composition golden rules
+        source_type: video
+        url: https://www.youtube.com/watch?v=eEWRbpDu6CU
         review_cadence_days: 90
-        claim_scope: WHOOP's published design guidelines, grounding the performance/dark/data-dense case study (locked semantic color system, numeral typeface split, dark-canvas usage rationale).
-        last_review_date: 2026-08-17
+        claim_scope: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source expression imported.
+        last_review_date: 2026-09-07
         reviewer: b2c-maintainers
-      - id: styles-refero-design-flighty
-        name: styles.refero.design
-        source_type: website
-        url: https://styles.refero.design/
+        publisher: Shapes By Sean
+        rights:
+          status: unknown
+          notes: Informational citation of ideas only. Full transcript, artwork, music and video are not redistributed.
+      - id: video-futur-great-design
+        name: The Secret To Great Design Is Simpler Than You Think
+        source_type: video
+        url: https://www.youtube.com/watch?v=SdCzIDmfDAA
         review_cadence_days: 90
-        claim_scope: Refero's captured design-system records, grounding the Flighty case study (achromatic ramp, single action color, platform-native type rule, pill radius system).
-        last_review_date: 2026-08-17
+        claim_scope: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source expression imported.
+        last_review_date: 2026-09-07
         reviewer: b2c-maintainers
-      - id: developer-apple-com-behind-the-design-flighty
-        name: developer.apple.com
-        source_type: official_docs
-        url: https://developer.apple.com/news/?id=970ncww4
+        publisher: The Futur
+        rights:
+          status: unknown
+          notes: Informational citation of ideas only. Full transcript, artwork, music and video are not redistributed.
+      - id: video-satori-think-like
+        name: How To Actually Think Like A Graphic Designer!
+        source_type: video
+        url: https://www.youtube.com/watch?v=2zr9vXdsN94
         review_cadence_days: 90
-        claim_scope: Apple's Behind the Design interview on Flighty, grounding the aviation-insider audience framing of that case study.
-        last_review_date: 2026-08-17
+        claim_scope: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source expression imported.
+        last_review_date: 2026-09-07
         reviewer: b2c-maintainers
-      - id: dev-to-tailwind-indigo-default-analysis
-        name: dev.to
-        source_type: website
-        url: https://dev.to/alanwest/why-every-ai-built-website-looks-the-same-blame-tailwinds-indigo-500-3h2p
+        publisher: Satori Graphics
+        rights:
+          status: unknown
+          notes: Informational citation of ideas only. Full transcript, artwork, music and video are not redistributed.
+      - id: video-omar-premium-branding
+        name: The Psychology of Premium Branding
+        source_type: video
+        url: https://www.youtube.com/watch?v=1kcxUhjuW_0
         review_cadence_days: 90
-        claim_scope: The documented mechanism behind the indigo/purple-gradient generic-AI tell (Tailwind UI default propagating through training corpora), grounding the Generic-Design Tells table.
-        last_review_date: 2026-08-17
+        claim_scope: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source expression imported.
+        last_review_date: 2026-09-07
         reviewer: b2c-maintainers
+        publisher: Omar Eddaoudi
+        rights:
+          status: unknown
+          notes: Informational citation of ideas only. Full transcript, artwork, music and video are not redistributed.
+      - id: video-netflix-paula-scher
+        name: "Abstract: The Art of Design, Paula Scher: Graphic Design"
+        source_type: video
+        url: https://www.youtube.com/watch?v=LCfBYE97rFk
+        review_cadence_days: 90
+        claim_scope: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source expression imported.
+        last_review_date: 2026-09-07
+        reviewer: b2c-maintainers
+        publisher: Netflix
+        rights:
+          status: unknown
+          notes: Informational citation of ideas only. Full transcript, artwork, music and video are not redistributed.
+    specifies:
+      - artifact: DESIGN.md
+        heading: Communication Brief
+      - artifact: DESIGN.md
+        heading: The Derivation Chain
+      - artifact: DESIGN.md
+        heading: Composition Review
+    derivations:
+      - source_ids:
+          - video-satori-survive
+          - video-shapes-layout
+          - video-futur-great-design
+          - video-satori-think-like
+          - video-omar-premium-branding
+          - video-netflix-paula-scher
+        relationship: informed
+        rationale: Original synthesis of conditional brief, composition, comparison and critique methods; no source prose or visual assets copied.
+        reviewer: b2c-maintainers
+        reviewed_at: 2026-09-07
+        selectors:
+          - See chronological source-unit register in examples/contributions/bespoke-design-methods/ADOPTION_MAP.md
+        omissions:
+          - Universal aesthetic mandates, commercial efficacy claims, biographies and promotions.
     replacement_ids: []
   - id: reference.design.consumer-craft-benchmarks
     title: Consumer Craft Benchmarks
@@ -5195,6 +5252,22 @@ references:
     load_when: creating or changing the authored root DESIGN.md contract, visual systems, UI mockups, generated visual concepts, Higgsfield-backed visuals/motion/icons/mascots, mobile screen specs, App Store creative, screenshot frames, design audits, or HTML visual artifacts
     lifecycle: active
     sources:
+      - id: w3c-css-values-4
+        name: W3C CSS Values and Units Level 4
+        source_type: standard
+        url: https://www.w3.org/TR/css-values-4/#absolute-lengths
+        review_cadence_days: 180
+        claim_scope: CSS absolute and relative units; no physical display-size guarantee.
+        last_review_date: 2026-09-07
+        reviewer: b2c-maintainers
+      - id: w3c-wcag22-text-contrast
+        name: W3C WCAG 2.2 text contrast
+        source_type: standard
+        url: https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html
+        review_cadence_days: 180
+        claim_scope: Text contrast thresholds and exceptions; no universal7:1 rule.
+        last_review_date: 2026-09-07
+        reviewer: b2c-maintainers
       - id: api-refero-design-mcp
         name: api.refero.design
         source_type: website
@@ -5300,13 +5373,69 @@ references:
         last_review_date: 2026-09-05
         reviewer: b2c-maintainers
       - id: amir-brand-system-builder
-        name: Amir Mushich Brand System Builder
+        name: Amir Mushich brand-system-skill
         source_type: github
         url: https://github.com/amirmushichge/brand-system-skill
         review_cadence_days: 30
-        claim_scope: Adapted brand kit, reference roles, generation brief and consistency audit process under CC BY 4.0; no Lovart dependency.
-        last_review_date: 2026-09-05
+        claim_scope: Provider-neutral brand kit and reference roles. No mandatory Google Fonts, Lovart, per-generation approvals or benchmark score
+        last_review_date: 2026-09-07
         reviewer: b2c-maintainers
+        publisher: Amir Mushich
+        revision: 30f6084ddf6adf4173cf882fce266015f8872c17
+        rights:
+          status: verified
+          spdx: CC-BY-4.0
+          evidence: https://github.com/amirmushichge/brand-system-skill/blob/30f6084ddf6adf4173cf882fce266015f8872c17/LICENSE
+          evidence_sha256: f5b745ef98087f531e719ee8ca6a96809444573ecc7173c6fa68eaad39b3cc3f
+          notes: Selected method adaptation only; third-party assets excluded.
+        selectors:
+          - SKILL.md
+          - README.md
+          - LICENSE
+        upstream_id: amir-brand-system
+      - id: video-designspo-typography
+        name: The ULTIMATE Guide To Typography For Beginners
+        source_type: video
+        url: https://www.youtube.com/watch?v=AXpxZMRM1EY
+        review_cadence_days: 90
+        claim_scope: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source expression imported.
+        last_review_date: 2026-09-07
+        reviewer: b2c-maintainers
+        publisher: DesignSpo
+        rights:
+          status: unknown
+          notes: Informational citation of ideas only. Full transcript, artwork, music and video are not redistributed.
+    specifies:
+      - artifact: DESIGN.md
+        heading: Communication And Composition Decisions
+      - artifact: DESIGN.md
+        heading: Typography In Use
+    derivations:
+      - source_ids:
+          - amir-brand-system-builder
+        relationship: adapted
+        rationale: Provider-neutral brand kit and reference roles reauthored into existing local authority.
+        reviewer: b2c-maintainers
+        reviewed_at: 2026-09-07
+        baseline: 30f6084ddf6adf4173cf882fce266015f8872c17
+        selectors:
+          - SKILL.md
+          - README.md
+          - LICENSE
+        omissions:
+          - No mandatory Google Fonts, Lovart, per-generation approvals or benchmark score
+          - No source artwork, fonts, code, prompt text or third-party trademarks imported.
+        notice: catalog/upstreams/notices/amir-brand-system.txt
+      - source_ids:
+          - video-designspo-typography
+        relationship: informed
+        rationale: Original role-based typography synthesis. Technical standards and actual resources govern units, contrast and supported rendering.
+        reviewer: b2c-maintainers
+        reviewed_at: 2026-09-07
+        selectors:
+          - V07.01–V07.18; chronological register in examples/contributions/bespoke-design-methods/ADOPTION_MAP.md
+        omissions:
+          - Source expression, universal font associations, faulty point/pixel conversions, thin-small-text advice and promotions.
     replacement_ids: []
   - id: reference.design.design-worthiness
     title: Design Worthiness
@@ -5315,8 +5444,23 @@ references:
     load_when: when a Design Room mutation needs the mechanical worthiness floor or its independent audit must record the delegated taste decision before engineering harden, including native flow semantics and mechanical anti-generic consistency, with no beauty score
     lifecycle: active
     applicability_notes: Orchestrate holes only. Do not rewrite eleven-star, emotional design, quality-lens, vibecoded-tells, motion recipes, or mobile-flow-craft. DESIGN.md stays producer-owned. Mechanical, attested, and independently bound taste tiers decide what an agent may assert; runtime proof remains design-acceptance's job.
-    source_exemption: Named standards (WCAG 2.2, Dieter Rams, Apple Human Interface Guidelines, Nielsen Norman Group progressive disclosure) appear as names only. This package contains internal operating guidance and has no external command-syntax claims.
-    sources: []
+    sources:
+      - id: w3c-wcag22-text-contrast
+        name: W3C WCAG 2.2 text contrast
+        source_type: standard
+        url: https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html
+        review_cadence_days: 180
+        claim_scope: Text contrast thresholds and exceptions; no universal7:1 rule.
+        last_review_date: 2026-09-07
+        reviewer: b2c-maintainers
+      - id: w3c-wcag22-non-text-contrast
+        name: W3C WCAG 2.2 non-text contrast
+        source_type: standard
+        url: https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html
+        review_cadence_days: 180
+        claim_scope: Essential graphical object and control contrast with applicable exceptions.
+        last_review_date: 2026-09-07
+        reviewer: b2c-maintainers
     replacement_ids: []
   - id: reference.design.editorial-scrollytelling
     title: Evidence-Led Editorial Scrollytelling
@@ -5325,8 +5469,46 @@ references:
     load_when: before planning, building, changing, or auditing a scroll-led story on a landing page, funnel page, portfolio, case study, or other public web surface
     lifecycle: active
     applicability_notes: Use the story qualification step before selecting scrollytelling. Transfer controller, state, semantic, progressive-enhancement, and verification mechanics. Never transfer source identity, claims, copy, or assets.
-    source_exemption: Internal operating guidance. The transferable content here is scrollytelling mechanics - stable semantic story states, measured step-center control, shared scroll progress, responsive sticky composition, mobile guidance, code-native evidence visuals, a situation-to-mechanism-to-outcome-to-proof narrative, and progressive-enhancement verification - established by first-party audits of production implementations the maintainers own and operate. Those implementations are not public sources and are deliberately left uncited - the mechanics are the claim, and they are verified by this package's own checks rather than by an external document.
-    sources: []
+    sources:
+      - id: amir-cinematic-scroll-prompt-kit
+        name: Amir Mushich cinematic-scroll-prompt-kit
+        source_type: github
+        url: https://github.com/amirmushichge/cinematic-scroll-prompt-kit
+        review_cadence_days: 30
+        claim_scope: Conditional layer planning and forward/reverse checkpoints. No fixed serif, portal, sticky stage, card rail or scroll length
+        last_review_date: 2026-09-07
+        reviewer: b2c-maintainers
+        publisher: Amir Mushich
+        revision: 39ac222e385061c1eeab7f063b869950ee7cca1b
+        rights:
+          status: verified
+          spdx: MIT
+          evidence: https://github.com/amirmushichge/cinematic-scroll-prompt-kit/blob/39ac222e385061c1eeab7f063b869950ee7cca1b/LICENSE
+          evidence_sha256: 8ee01d7b14659f2cb90cd33f3f259e039269b384d3970eed41805912c5a0a525
+          notes: Selected method adaptation only; third-party assets excluded.
+        selectors:
+          - PROMPT.txt
+          - examples/PROJECT_BRIEF.example.md
+          - examples/assets.example.json
+          - LICENSE
+        upstream_id: amir-cinematic-scroll
+    derivations:
+      - source_ids:
+          - amir-cinematic-scroll-prompt-kit
+        relationship: adapted
+        rationale: Conditional layer planning and forward/reverse checkpoints reauthored into existing local authority.
+        reviewer: b2c-maintainers
+        reviewed_at: 2026-09-07
+        baseline: 39ac222e385061c1eeab7f063b869950ee7cca1b
+        selectors:
+          - PROMPT.txt
+          - examples/PROJECT_BRIEF.example.md
+          - examples/assets.example.json
+          - LICENSE
+        omissions:
+          - No fixed serif, portal, sticky stage, card rail or scroll length
+          - No source artwork, fonts, code, prompt text or third-party trademarks imported.
+        notice: catalog/upstreams/notices/amir-cinematic-scroll.txt
     replacement_ids: []
   - id: reference.design.landing-motion-craft
     title: Landing Motion Craft
@@ -5547,6 +5729,13 @@ references:
     lifecycle: active
     source_exemption: This package contains internal operating guidance or has no external factual claims.
     sources: []
+    specifies:
+      - artifact: design/reviews/DESIGN_SYSTEM_REVIEW.md
+        heading: Defect diagnosis
+      - artifact: design/reviews/IMPLEMENTATION_REVIEW.md
+        heading: Defect diagnosis
+      - artifact: DESIGN.md
+        heading: Focused review
     replacement_ids: []
   - id: reference.design.refero-ux-patterns
     title: Refero UX Patterns
@@ -5613,10 +5802,10 @@ references:
         reviewer: b2c-maintainers
     replacement_ids: []
   - id: reference.design.remotion-content-assets
-    title: Remotion Content Assets
+    title: Content Asset Production
     domain_id: domain.design
     path: knowledge/design/remotion-content-assets.md
-    load_when: replacing Higgsfield with Remotion; scaffolding a Remotion project; code-rendered videos/stills; app-preview clips; social/ad/content variants; any "local rendered assets are ready" claim
+    load_when: planning or producing generated, composed, captured or licensed assets; binding a versioned asset brief to the current brand kit; selecting compositing or interactive media; Remotion implementation; app-preview clips; social/ad/content variants; any rendered assets readiness claim
     lifecycle: active
     sources:
       - id: amir-brand-system-builder
@@ -5625,8 +5814,43 @@ references:
         url: https://github.com/amirmushichge/brand-system-skill
         review_cadence_days: 30
         claim_scope: Adapted brand consistency process under CC BY 4.0; selected provider and existing DESIGN.md remain authoritative.
-        last_review_date: 2026-09-05
+        last_review_date: 2026-09-07
         reviewer: b2c-maintainers
+        publisher: Amir Mushich
+        revision: 30f6084ddf6adf4173cf882fce266015f8872c17
+        rights:
+          status: verified
+          spdx: CC-BY-4.0
+          evidence: https://github.com/amirmushichge/brand-system-skill/blob/30f6084ddf6adf4173cf882fce266015f8872c17/LICENSE
+          evidence_sha256: f5b745ef98087f531e719ee8ca6a96809444573ecc7173c6fa68eaad39b3cc3f
+          notes: Selected method adaptation only; third-party assets excluded.
+        selectors:
+          - SKILL.md
+          - README.md
+          - LICENSE
+        upstream_id: amir-brand-system
+      - id: amir-cinematic-scroll-prompt-kit
+        name: Amir Mushich cinematic-scroll-prompt-kit
+        source_type: github
+        url: https://github.com/amirmushichge/cinematic-scroll-prompt-kit
+        review_cadence_days: 30
+        claim_scope: Conditional compositing layer requirements and reversible sequence inspection; no fixed visual style or renderer selection.
+        last_review_date: 2026-09-07
+        reviewer: b2c-maintainers
+        publisher: Amir Mushich
+        revision: 39ac222e385061c1eeab7f063b869950ee7cca1b
+        rights:
+          status: verified
+          spdx: MIT
+          evidence: https://github.com/amirmushichge/cinematic-scroll-prompt-kit/blob/39ac222e385061c1eeab7f063b869950ee7cca1b/LICENSE
+          evidence_sha256: 8ee01d7b14659f2cb90cd33f3f259e039269b384d3970eed41805912c5a0a525
+          notes: Selected method adaptation only; third-party assets excluded.
+        selectors:
+          - PROMPT.txt
+          - examples/PROJECT_BRIEF.example.md
+          - examples/assets.example.json
+          - LICENSE
+        upstream_id: amir-cinematic-scroll
       - id: amir-motion-brief
         name: Amir Mushich Motion Brief
         source_type: github
@@ -5635,6 +5859,38 @@ references:
         claim_scope: Optional video creative brief guidance, not an executable provider or evidence of rendered quality.
         last_review_date: 2026-09-05
         reviewer: b2c-maintainers
+    derivations:
+      - source_ids:
+          - amir-brand-system-builder
+        relationship: adapted
+        rationale: Brand-kit and reference-role method reauthored into the existing provider-neutral asset owner with byte-bound briefs.
+        reviewer: b2c-maintainers
+        reviewed_at: 2026-09-07
+        baseline: 30f6084ddf6adf4173cf882fce266015f8872c17
+        selectors:
+          - SKILL.md
+          - README.md
+          - LICENSE
+        omissions:
+          - No mandatory provider, presentation format or per-generation approval ceremony.
+          - No source artwork, fonts, prompt expression or third-party trademarks imported.
+        notice: catalog/upstreams/notices/amir-brand-system.txt
+      - source_ids:
+          - amir-cinematic-scroll-prompt-kit
+        relationship: adapted
+        rationale: Layer roles, alignment and responsive sequence checks adapted as conditional compositing fields.
+        reviewer: b2c-maintainers
+        reviewed_at: 2026-09-07
+        baseline: 39ac222e385061c1eeab7f063b869950ee7cca1b
+        selectors:
+          - PROMPT.txt
+          - examples/PROJECT_BRIEF.example.md
+          - examples/assets.example.json
+          - LICENSE
+        omissions:
+          - No required cinematic technique, scroll distance, typeface or scene order.
+          - No source media or prompt expression imported.
+        notice: catalog/upstreams/notices/amir-cinematic-scroll.txt
     replacement_ids: []
   - id: reference.design.surfaces-b2c
     title: Surfaces B2C
@@ -6530,7 +6786,7 @@ references:
     title: Consumer Product Design Agency
     domain_id: domain.experience
     path: knowledge/experience/consumer-product-design-agency.md
-    load_when: grounding the emotional/behavioral layer in its research tiers, or auditing whether the four required Experience Cards are implemented
+    load_when: grounding the emotional/behavioral layer in its research tiers, or auditing whether the four foundational Experience Cards are implemented
     lifecycle: active
     source_exemption: This package contains internal operating guidance or has no external factual claims.
     sources: []
@@ -6572,7 +6828,7 @@ references:
     title: Emotional Experience Design
     domain_id: domain.experience
     path: knowledge/experience/emotional-experience-design.md
-    load_when: implementing one of the four required Experience Cards (Commitment, Variable Reward, Perceived Effort Delay, Intent Mirroring) — full psychological basis, trigger timing, deterministic guardrail tests, named PostHog events, and the Six-Lens Design Review Framework in full
+    load_when: implementing one of the four foundational Experience Cards (Commitment, Variable Reward, Perceived Effort Delay, Intent Mirroring) — full psychological basis, trigger timing, deterministic guardrail tests, named PostHog events, and the Six-Lens Design Review Framework in full
     lifecycle: active
     source_exemption: This package contains internal operating guidance or has no external factual claims.
     sources: []
@@ -11068,6 +11324,12 @@ gates:
     script_path: checks/validation/business/design/check-content-assets.ts
     owner_domain_id: domain.process
     audit: required
+  - id: gate.check-content-assets-foundation
+    command: check:content-assets-foundation
+    command_manifest_path: package.json
+    script_path: checks/validation/business/design/check-content-assets.ts
+    owner_domain_id: domain.process
+    audit: excluded
   - id: gate.check-continuity-contract
     command: check:continuity-contract
     command_manifest_path: package.json
@@ -11084,6 +11346,12 @@ gates:
     command: check:design-acceptance
     command_manifest_path: package.json
     script_path: checks/validation/business/design/check-design-acceptance.ts
+    owner_domain_id: domain.design
+    audit: excluded
+  - id: gate.check-design-foundation
+    command: check:design-foundation
+    command_manifest_path: package.json
+    script_path: checks/validation/business/design/check-design-md.ts
     owner_domain_id: domain.design
     audit: excluded
   - id: gate.check-design-md

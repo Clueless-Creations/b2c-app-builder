@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.218.22",
-  "updatedAt": "2026-09-07",
+  "version": "0.219.0",
+  "updatedAt": "2026-09-08",
   "sourcePath": ".",
   "releaseNotes": [
-    "Split the heavy CI lane across two runners with a new --shard i/n on the audit runner, so the multi-minute serial suites stop running one after another in a single two-vCPU job.",
-    "Partition serial steps round-robin in audit-plan.ts and prove in audit.fixtures.ts that every serial step runs in exactly one shard at every width, so a suite added later cannot land in no shard at all."
+    "Add communication, identity, typography and vendor-neutral asset foundations to existing design workflows, with explicit technique selection and independent defect diagnosis.",
+    "Bind local design resources to candidate acceptance, verify notices at output boundaries, and preserve legacy validation through explicit new-work profiles."
   ]
 }

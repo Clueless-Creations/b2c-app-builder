@@ -125,6 +125,10 @@ export const auditExcludedScripts: Record<string, string> = {
 
   "check:mobai-proof-workflow":
     "Requires captured MobAI evidence in a business workspace; the shipped scaffold is intentionally unproven. The base contract remains in the maintainer audit, strict provider workflows retain this gate, and MobAI fixtures cover acceptance and refusal.",
+  "check:content-assets-foundation":
+    "The content-production workflow's strict mode of check:content-assets. The general audit retains the compatible base gate; content-assets fixtures cover current-schema acceptance and legacy refusal in strict mode.",
+  "check:design-foundation":
+    "The substantive Design Room workflow's strict mode of check:design-md. The general audit retains the compatible base gate; design-contract fixtures exercise strict missing, removed, and valid foundations.",
   "check:design-acceptance": "Requires rendered native and web evidence; seed workspace is a draft. Covered by design-acceptance fixtures.",
   "check:browser-runtime-proof":
     "The landing producer's own strict runtime gate requires a current engine attempt and a live browser proof bundle in a generated business workspace. Browser-runtime-proof fixtures cover its pass and tamper paths.",

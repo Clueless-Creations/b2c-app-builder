@@ -39,6 +39,16 @@ Do not use it for a list of unrelated benefits. Use a normal section, table, dia
 
 Optional sections stay optional. Do not add a default stack of hero animation, marquee, bento grid, scrollytelling, stats, testimonials, and pricing.
 
+## Optional Cinematic Layer Method
+
+When depth helps explain the selected story, plan layered composition before generating assets. For each layer record its semantic role, source and rights, dimensions, alpha requirement, alignment or anchor, depth relationship, critical content and mobile treatment. Add camera and lighting constraints only where the scene needs them. Identity and claims remain owned by the accepted brand kit.
+
+Declare entry, hold and exit checkpoints for the scene using the existing shared progress controller. Inspect those checkpoints forward, reverse, after a large jump and after restoration. Essential labels remain semantic text. A prerecorded sequence must not pretend to be an interactive three-dimensional object.
+
+Select ordinary HTML/SVG, layered 2.5D, actual 3D or media according to the task, available support, performance and meaningful fallback. A sticky stage, portal, serif face, card rail or a prescribed scroll distance is never required by this method. Real 3D requires actual geometry, picking and renderer proof on selected targets; declaring a technique does not install an implementation.
+
+This section adapts selected asset-planning and checkpoint ideas from Amir Mushich's [Cinematic Scroll Prompt Kit](https://github.com/amirmushichge/cinematic-scroll-prompt-kit), reviewed at commit `39ac222e385061c1eeab7f063b869950ee7cca1b` under MIT. The adaptation removes the example's fixed visual treatment and uses this reference's existing semantic controller and fallback contracts. No scene assets or executable demo are imported.
+
 ## Build Order
 
 Use this order:

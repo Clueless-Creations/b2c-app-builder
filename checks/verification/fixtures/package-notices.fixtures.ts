@@ -1,5 +1,17 @@
 import { createHash } from "node:crypto";
-import { appendFileSync, cpSync, existsSync, mkdirSync, readdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
+import {
+  appendFileSync,
+  cpSync,
+  existsSync,
+  linkSync,
+  unlinkSync,
+  symlinkSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  realpathSync,
+  writeFileSync,
+} from "node:fs";
 import path from "node:path";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 import { loadKnowledgePackages } from "../../../catalog/knowledge-packages.js";
@@ -187,6 +199,18 @@ export function register(harness: Harness): void {
       assert(document.includes("  - Sources/CardStack/CardStack.swift"), "document must list the covered path");
       assert(document.includes("```text\n"), "the notice must sit in a fenced block tagged text");
       assert(writeOutputNotices(output, []) === null, "an empty entry list writes nothing");
+      const outside = path.join(harness.makeTempDir("notice-outside"), "keep.txt");
+      writeFileSync(outside, "outside inode must remain intact");
+      unlinkSync(written);
+      linkSync(outside, written);
+      refuses(() => writeOutputNotices(output, needed), "notices.output_path_hardlinked", "hardlinked output");
+      assert(readFileSync(outside, "utf8") === "outside inode must remain intact", "hardlink refusal must precede truncation");
+      unlinkSync(written);
+      symlinkSync(outside, written);
+      refuses(() => writeOutputNotices(output, needed), "notices.output_path_not_a_file", "symlink output");
+      assert(readFileSync(outside, "utf8") === "outside inode must remain intact", "symlink refusal must preserve target bytes");
+      unlinkSync(written);
+
       refuses(() => writeOutputNotices("relative/output", needed), "notices.output_dir_not_absolute", "relative output directory");
       refuses(() => writeOutputNotices(path.join(output, "missing"), needed), "notices.output_dir_missing", "missing output directory");
       assert(!existsSync(path.join(output, "missing", OUTPUT_NOTICES_FILE)), "a refused write must not create the directory");

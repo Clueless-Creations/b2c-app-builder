@@ -191,3 +191,9 @@ candidate.
 ## Limits
 
 Regular-file checks, confined paths, image parsing, digests, engine-owned producer bindings, receipt identity, runtime links, and chronology prevent common invalid evidence. They cannot establish that a named tool or reviewer is truthful if the trusted execution boundary itself is compromised. Installed-build readback on iOS and installed-package/version readback on Android, physical-device tool transcripts, actual runtime inspection, and the independent session must supply that trust. Do not describe a passing synthetic fixture as an award-quality app or a profitable business.
+
+## Foundation resource invalidation
+
+The existing candidate fingerprint includes local typography resources and their notice files from DESIGN.md foundation, plus version-2 content-asset manifest inputs (including the supported root manifest fallback), kit assets, reference records, lineage, and claim-source records. These dependencies remain bound even if an author omits their directory from implementationPaths. Missing or out-of-workspace dependencies refuse fingerprinting. Parse-only dependency discovery bounds DESIGN metadata to 1 MiB and manifest metadata to 4 MiB before the existing source inventory checks resource bytes. Current bytes, not an unchanged declared digest, determine candidate identity.
+
+The asset gate separately checks declared hashes and brief compatibility. Font metadata and notice presence are not font-loading or license-coverage proof. Review actual rendered text and incorporated-resource output evidence. A focused repair can narrow review work but cannot preserve a stale global acceptance.

@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { closeSync, constants, lstatSync, openSync, realpathSync, statSync, writeFileSync } from "node:fs";
+import { closeSync, constants, fstatSync, ftruncateSync, lstatSync, openSync, realpathSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import type { Resource } from "../../contracts/extensions/contract.js";
 import { readPackageResourceFile, readSnapshotResource, verifySnapshot, type PackageDependency } from "./resources.js";
@@ -128,7 +128,13 @@ export function assertRedistributable(packages: readonly PackageDependency[], re
   const noticed = new Set(entries.filter((entry) => entry.noticeText.trim().length > 0).flatMap((entry) => entry.covers));
   const declaredCovered = new Set(packages.flatMap((dependency) => (dependency.snapshot.extension.thirdParty ?? []).flatMap((entry) => entry.covers)));
   const resources = new Map<string, Resource>();
-  for (const dependency of packages) for (const [id, resource] of resourceMap(dependency)) resources.set(id, resource);
+  for (const dependency of packages) {
+    verifySnapshot(dependency.directory, dependency.snapshot);
+    for (const [id, resource] of resourceMap(dependency)) {
+      if (resources.has(id)) throw new Error(`notices.ambiguous_resource:${id}`);
+      resources.set(id, resource);
+    }
+  }
   for (const id of resourceIds) {
     const resource = resources.get(id);
     if (!resource) throw new Error(`notices.unknown_resource:${id}`);
@@ -204,8 +210,14 @@ export function writeOutputNotices(outputDir: string, entries: readonly ThirdPar
     existing = undefined;
   }
   if (existing && !existing.isFile()) throw new Error("notices.output_path_not_a_file");
-  const descriptor = openSync(target, constants.O_WRONLY | constants.O_CREAT | constants.O_TRUNC | constants.O_NOFOLLOW, 0o644);
+  if (existing && existing.nlink !== 1) throw new Error("notices.output_path_hardlinked");
+  // Never truncate until the opened inode is known to be an unshared regular file.
+  const descriptor = openSync(target, constants.O_WRONLY | constants.O_CREAT | constants.O_NOFOLLOW | constants.O_NONBLOCK, 0o644);
   try {
+    const opened = fstatSync(descriptor);
+    if (!opened.isFile() || opened.nlink !== 1 || (existing && (opened.dev !== existing.dev || opened.ino !== existing.ino)))
+      throw new Error("notices.output_path_changed_or_hardlinked");
+    ftruncateSync(descriptor, 0);
     writeFileSync(descriptor, renderThirdPartyNotices(entries), "utf8");
   } finally {
     closeSync(descriptor);

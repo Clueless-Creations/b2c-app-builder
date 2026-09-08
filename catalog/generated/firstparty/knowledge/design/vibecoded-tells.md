@@ -1,6 +1,6 @@
 # Vibecoded Tells: The Default-Design Smell List
 
-Use this reference before you build or review a landing page, funnel page, web marketing surface, or app screen. Also load it when the vibecode audit pass (see §Audit Pass) is dispatched. It names the concrete surface smells that make a page read as unedited AI output. Viewers now recognize these defaults on sight, so each one taxes trust and conversion.
+Use this reference before you build or review a landing page, funnel page, web marketing surface, or app screen. Also load it when the vibecode audit pass (see §Audit Pass) is dispatched. It lists patterns worth inspecting in context. Their presence does not identify how an artifact was made or establish a loss of trust or conversion.
 
 This list adapts a widely shared 30-item "reasons your site looks vibecoded" checklist to this engine's doctrine. It extends the Generic-Design Tells table in [`audience-derived-identity.md`](./audience-derived-identity.md). That file explains why the defaults exist. This file gives the reviewable smell list and the audit pass that applies it.
 
@@ -17,7 +17,7 @@ This list adapts a widely shared 30-item "reasons your site looks vibecoded" che
 
 ## The Rule
 
-A visual tell is a default, not a ban. A default becomes a decision only through the derivation chain in [`audience-derived-identity.md`](./audience-derived-identity.md). The chain must start from an audience fact in `strategy/RESEARCH.md`. Record that derivation in `DESIGN.md` before the tell ships. A tell with no recorded derivation fails review.
+A visual tell is a default, not a ban. A default becomes a decision only through the derivation chain in [`audience-derived-identity.md`](./audience-derived-identity.md). Record material decisions in `DESIGN.md` using audience evidence, an explicit creative hypothesis, legibility, or platform constraints. Review the actual result against the user job; do not invent an audience fact to justify a form.
 
 Tier 1 items are different. They are honesty and completeness requirements. No derivation can earn a fake testimonial or a missing privacy policy.
 
@@ -35,33 +35,33 @@ These fail a surface on a single hit. Each one has an owning artifact, so the fi
 
 ## Tier 2: Visual Default Tells
 
-Each row names the smell, why it reads as vibecoded, and the only path that earns it. "Earned" always means: a recorded derivation from an audience fact, per §The Rule.
+Each row prompts a contextual question and gives a possible justification. Audience evidence, a creative hypothesis, communication needs, legibility, or platform conventions can support a choice. These examples are not exclusive permission rules. Review material decisions and actual behavior; do not require an invented audience fact.
 
 | Smell                                                           | Why it reads as vibecoded                                  | Earned when                                                                                     |
 | --------------------------------------------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| Harsh gradients (indigo-to-purple hero, gradient headline text) | The documented statistical default of AI-generated pages   | The palette derivation names the gradient's role and its brand hues                             |
-| Default icon packs (Lucide, Heroicons, generic thin-line sets)  | The training-corpus icon stand-in; portable to any product | Never as-shipped. Derive an icon system from the brand's own shapes                             |
+| Harsh gradients (indigo-to-purple hero, gradient headline text) | Can compete with hierarchy when used without purpose   | The palette derivation names the gradient's role and its brand hues                             |
+| Default icon packs (Lucide, Heroicons, generic thin-line sets)  | An unexamined choice may create inconsistent or ambiguous controls | Consistent, recognizable functional controls; custom identity marks where the product needs them                             |
 | Pure white background with no surface system                    | A canvas nobody decided; no depth or zoning model          | An editorial direction states white as a choice with a surface scale                            |
 | Rainbow coloring (many hues, no semantic system)                | Color without a system reads as unowned decoration         | Each hue carries a recorded semantic role                                                       |
 | Default drop shadows on every card                              | One shadow token stamped everywhere; no light model        | A stated elevation system with few, purposeful levels                                           |
 | Three feature cards in a row                                    | The tutorial demo layout                                   | The content genuinely has three parallel items and the layout derivation says so                |
-| Emoji as icons or in headings                                   | A shortcut where an icon system was owed                   | Brand voice in `strategy/BRAND.md` explicitly claims emoji, and never as functional icons       |
-| Liquid glass and glassmorphism                                  | A borrowed costume outside its category                    | Category convention (fintech dashboards) with a disciplined accent                              |
-| Inter, Geist, or Space Grotesk with no rationale                | The corpus default standing in for a typography decision   | The type derivation defends the face against the category default                               |
-| Colored left-stripe callouts                                    | Documentation-site chrome pasted onto marketing            | Almost never on a landing surface; keep it in docs                                              |
+| Emoji as icons or in headings                                   | A shortcut where an icon system was owed                   | Meaning is clear, labels remain accessible, and the tone fits the task; functional use needs recognizable semantics       |
+| Liquid glass and glassmorphism                                  | Transparency can obscure content or weaken hierarchy                    | A legible, purposeful layer with acceptable performance                              |
+| Inter, Geist, or Space Grotesk with no rationale                | The corpus default standing in for a typography decision   | The face supports representative content, platform behavior, and the intended voice                               |
+| Colored left-stripe callouts                                    | Documentation-site chrome pasted onto marketing            | The stripe groups or distinguishes meaningful content without relying on color alone                                              |
 | Bento grids                                                     | The current template fashion; portable everywhere          | The content is truly modular and the derivation names why a grid beats a narrative flow         |
 | Fake terminal or code windows                                   | Generic tech garnish on a non-developer product            | The product is a developer tool showing real commands                                           |
 | Checkmark bullet walls                                          | Feature-dump formatting that replaces persuasion           | Short, verified capability lists; never as the page's main argument                             |
 | Three pricing tiers by default                                  | A pricing UI copied before the offer was designed          | Pricing state in `revenue/REVENUE_OPS.md` actually defines the tiers                            |
 | Uniform soft corner radius everywhere                           | One radius token set once and never revisited              | A radius scale tied to component meaning                                                        |
 | Purple-and-black SaaS chrome                                    | Category mismatch on most consumer products                | A recorded dark-canvas rationale, as in the Whoop case study                                    |
-| Radial orbs and blurred blob shapes                             | Decorative filler for undecided space                      | Effectively never; replace with product truth or nothing                                        |
-| Dot-grid backgrounds                                            | Template texture with no meaning                           | The product's own domain uses the grid (mapping, engineering)                                   |
+| Radial orbs and blurred blob shapes                             | Decorative filler for undecided space                      | A stated compositional purpose that survives actual surface review                                        |
+| Dot-grid backgrounds                                            | Template texture with no meaning                           | The texture supports composition without competing with reading or interaction                                   |
 | Sparkle icons for AI features                                   | The generic "AI" costume                                   | The brand system derives its own marker for generated content                                   |
 | Animated scroll arrows and bouncing cues                        | Motion that begs instead of guiding                        | Motion doctrine in [`landing-motion-craft.md`](./landing-motion-craft.md) assigns the cue a job |
 | Decorative hover animations everywhere                          | Motion without hierarchy; every card wiggles               | Hover states that communicate affordance, per the motion tokens                                 |
-| Neon glow accents                                               | Loudness standing in for identity                          | The audience derivation lands on a neon-native culture                                          |
-| Basic pastel palette                                            | The soft default when nobody chose saturation              | Category convention (wellness) with a recorded derivation                                       |
+| Neon glow accents                                               | Loudness standing in for identity                          | The accent supports emphasis or an explicit identity hypothesis while preserving legibility                                          |
+| Basic pastel palette                                            | The soft default when nobody chose saturation              | Saturation supports the intended communication and semantic contrast, independent of category stereotypes                                       |
 
 ## Tier 3: Copy Tells
 
@@ -73,11 +73,11 @@ Two reel items are writing smells, and [`no-slop-writing.md`](../words/no-slop-w
 ## Scoring A Review
 
 - Any Tier 1 hit fails the surface. Fix the artifact, not the wording.
-- Two or more unearned Tier 2 tells fail the surface. This matches the anti-generic review rule in `audience-derived-identity.md`.
-- One unearned Tier 2 tell is a warning. Either record the derivation or remove the default.
+- Tier 2 patterns prompt contextual inspection. Their number does not decide acceptance. Fail a material communication, usability, identity, or truthfulness defect with evidence.
+- A Tier 2 warning can be resolved by a justified accepted choice; novelty is not required.
 - Copy tells route to the no-slop review, not this one.
 
-A surface passes only with the evidence trail: each present tell maps to a derivation row in `DESIGN.md`.
+Review material choices against the accepted contract and actual output. Conventional controls do not each need a separate rationale row.
 
 ## Mechanical Detection
 
@@ -85,7 +85,7 @@ A surface passes only with the evidence trail: each present tell maps to a deriv
 
 | Check code                        | Catches                                                                    | Severity |
 | --------------------------------- | -------------------------------------------------------------------------- | -------- |
-| `vibecode.default_icon_pack`      | Lucide or Heroicons imports in web-surface source                          | error    |
+| `vibecode.default_icon_pack`      | Lucide or Heroicons imports in web-surface source                          | warning    |
 | `vibecode.legal_links_missing`    | A site-shaped landing with no terms or privacy link                        | error    |
 | `vibecode.emoji_in_markup`        | Emoji characters inside JSX or HTML markup                                 | warning  |
 | `vibecode.default_font`           | Inter, Geist, or Space Grotesk in tokens or CSS without a rationale marker | warning  |
@@ -96,7 +96,7 @@ A surface passes only with the evidence trail: each present tell maps to a deriv
 | `vibecode.checkmark_wall`         | Three or more checkmark bullets in one file                                | warning  |
 | `vibecode.bouncing_cue`           | Bounce-animated arrows or scroll cues                                      | warning  |
 
-A warning from this gate is a demand for a derivation row, not an automatic removal order. The font rationale marker is a `font-rationale:` comment beside the font declaration, pointing at the `DESIGN.md` row.
+A warning identifies a pattern for review, not a proven defect or automatic removal order. The font rationale marker is a `font-rationale:` comment beside the font declaration, pointing at the `DESIGN.md` row.
 
 ## Audit Pass
 
@@ -126,4 +126,4 @@ The pass returns the standard handoff headings from `APP_AGENTS.md`. It proposes
 - `check:emotional-design` owns the fake-social-proof trust breaker with its truthfulness proof.
 - `check:landing-funnel` owns the deploy gates a landing must pass; the terms and privacy requirement rides with it.
 - The quality lens ([`quality-lens.md`](./quality-lens.md) §Anti-Generic Checks) applies this list during Design Room review.
-- The anti-generic review in `audience-derived-identity.md` §Gates supplies the two-hit fail rule this file reuses.
+- The anti-generic review in `audience-derived-identity.md` §Gates owns the contextual identity review this file supports.

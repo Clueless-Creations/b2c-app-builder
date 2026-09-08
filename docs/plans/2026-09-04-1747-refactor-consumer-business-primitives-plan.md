@@ -976,6 +976,8 @@ and live stages are separate; live release requires actual authority and proof.
 
 ### U19 — Distinct sibling and reuse proof
 
+[ADR-0008](../decisions/0008-bespoke-design-foundations.md) refines the design method and compatibility. The [bespoke comparison protocol](../../checks/verification/scenarios/bespoke-design.md) defines the comparative design evidence; it does not replace U18 whole-business proof.
+
 **Goal:** Show that reusable primitives allow a different product approach.
 
 **Requirements:** R11; AE4; KTD8; ARCH-03, ARCH-13, ARCH-14.

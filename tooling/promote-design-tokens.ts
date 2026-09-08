@@ -1,26 +1,33 @@
 #!/usr/bin/env node
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import { hashDesignTokens, loadDesignSystem, type PortableDesignTokens } from "./lib/design-md.js";
 import { parseCliArgs, reportAndExit, type Issue } from "./lib/launch-state.js";
 
-const args = parseCliArgs(process.argv.slice(2));
-const design = loadDesignSystem(args.root);
-const issues: Issue[] = [...design.issues];
-
-if (design.tokens) {
-  const outputDir = path.join(args.root, "design/system");
-  const tokenHash = hashDesignTokens(design.tokens);
-  mkdirSync(outputDir, { recursive: true });
-  writeFileSync(path.join(outputDir, "tokens.json"), `${JSON.stringify(renderDtcg(design.tokens, tokenHash), null, 2)}\n`, "utf8");
-  writeFileSync(path.join(outputDir, "tokens.css"), renderCss(design.tokens, tokenHash), "utf8");
-  writeFileSync(path.join(outputDir, "DesignTokens.swift"), renderSwift(design.tokens, tokenHash), "utf8");
-  writeFileSync(path.join(outputDir, "design-tokens.ts"), renderTypeScript(design.tokens, tokenHash), "utf8");
-  writeFileSync(path.join(outputDir, "design_tokens.dart"), renderDart(design.tokens, tokenHash), "utf8");
-  console.log(`Promoted DESIGN.md tokens to ${path.relative(args.root, outputDir)} with hash ${tokenHash}`);
+export function renderTokenOutputs(tokens: PortableDesignTokens): Record<string, string> {
+  const hash = hashDesignTokens(tokens);
+  return {
+    "tokens.json": `${JSON.stringify(renderDtcg(tokens, hash), null, 2)}\n`,
+    "tokens.css": renderCss(tokens, hash),
+    "DesignTokens.swift": renderSwift(tokens, hash),
+    "design-tokens.ts": renderTypeScript(tokens, hash),
+    "design_tokens.dart": renderDart(tokens, hash),
+  };
 }
 
-reportAndExit("Design token promotion", issues);
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+  const args = parseCliArgs(process.argv.slice(2));
+  const design = loadDesignSystem(args.root);
+  const issues: Issue[] = [...design.issues];
+  if (design.tokens && !issues.some((finding) => finding.severity === "error")) {
+    const outputDir = path.join(args.root, "design/system");
+    mkdirSync(outputDir, { recursive: true });
+    for (const [name, output] of Object.entries(renderTokenOutputs(design.tokens))) writeFileSync(path.join(outputDir, name), output, "utf8");
+    console.log(`Promoted DESIGN.md tokens to ${path.relative(args.root, outputDir)} with hash ${hashDesignTokens(design.tokens)}`);
+  }
+  reportAndExit("Design token promotion", issues);
+}
 
 function renderDtcg(tokens: PortableDesignTokens, tokenHash: string): Record<string, unknown> {
   const dimensions = (values: Record<string, string | number>) =>
@@ -29,7 +36,18 @@ function renderDtcg(tokens: PortableDesignTokens, tokenHash: string): Record<str
   const typography = Object.fromEntries(
     Object.entries(tokens.tokens.font).map(([name, value]) => [
       name,
-      { $type: "typography", $value: { fontFamily: value.family, fontWeight: Number(value.weight) || value.weight } },
+      value.size !== undefined && value.lineHeight !== undefined && value.letterSpacing !== undefined
+        ? {
+            $type: "typography",
+            $value: {
+              fontFamily: [value.family, ...(value.fallbacks ?? [])],
+              fontWeight: Number(value.weight),
+              fontSize: dimensionValue(value.size),
+              lineHeight: value.lineHeight,
+              letterSpacing: dimensionValue(value.letterSpacing),
+            },
+          }
+        : { fontFamily: { $type: "fontFamily", $value: value.family }, fontWeight: { $type: "fontWeight", $value: Number(value.weight) || value.weight } },
     ]),
   );
   const motion = Object.fromEntries(
@@ -63,6 +81,12 @@ function renderCss(tokens: PortableDesignTokens, tokenHash: string): string {
   for (const [name, value] of Object.entries(tokens.tokens.font)) {
     lines.push(`  --font-${kebab(name)}: ${value.family};`);
     lines.push(`  --font-${kebab(name)}-weight: ${String(value.weight)};`);
+    if (value.size !== undefined) {
+      lines.push(`  --font-${kebab(name)}-size: ${value.size};`);
+      lines.push(`  --font-${kebab(name)}-line-height: ${value.lineHeight};`);
+      lines.push(`  --font-${kebab(name)}-letter-spacing: ${value.letterSpacing};`);
+      lines.push(`  --font-${kebab(name)}-fallbacks: ${(value.fallbacks ?? []).join(", ")};`);
+    }
   }
   lines.push("}", "");
   return lines.join("\n");
@@ -76,6 +100,12 @@ function renderSwift(tokens: PortableDesignTokens, tokenHash: string): string {
   for (const [name, value] of Object.entries(tokens.tokens.font)) {
     lines.push(`    static let ${identifier(name)}Family = ${JSON.stringify(value.family)}`);
     lines.push(`    static let ${identifier(name)}Weight = ${JSON.stringify(String(value.weight))}`);
+    if (value.size !== undefined) {
+      lines.push(`    static let ${identifier(name)}Size: Double = ${value.nativeSize}`);
+      lines.push(`    static let ${identifier(name)}LineHeight: Double = ${value.lineHeight}`);
+      lines.push(`    static let ${identifier(name)}Tracking: Double = ${value.nativeTracking}`);
+      lines.push(`    static let ${identifier(name)}Fallbacks = ${JSON.stringify(value.fallbacks)}`);
+    }
   }
   lines.push("  }", "  enum Radius {");
   for (const [name, value] of Object.entries(tokens.tokens.radius)) lines.push(`    static let ${identifier(name)}: Double = ${pixelNumber(value)}`);
@@ -117,6 +147,26 @@ function renderDart(tokens: PortableDesignTokens, tokenHash: string): string {
     "abstract final class DesignTokens {",
     `  static const color = <String, String>${colors};`,
     `  static const fontFamily = <String, String>${fonts};`,
+    `  static const fontWeight = <String, String>${dartMap(Object.fromEntries(Object.entries(tokens.tokens.font).map(([name, value]) => [name, String(value.weight)])), (value) => JSON.stringify(value))};`,
+    ...["nativeSize", "lineHeight", "nativeTracking"].map(
+      (field) =>
+        `  static const ${field} = <String, double>${dartMap(
+          Object.fromEntries(
+            Object.entries(tokens.tokens.font)
+              .filter(([, value]) => value.size !== undefined)
+              .map(([name, value]) => [name, value[field as keyof typeof value]]),
+          ),
+          (value) => dartDouble(Number(value)),
+        )};`,
+    ),
+    `  static const fontFallbacks = <String, List<String>>${dartMap(
+      Object.fromEntries(
+        Object.entries(tokens.tokens.font)
+          .filter(([, value]) => value.fallbacks !== undefined)
+          .map(([name, value]) => [name, value.fallbacks]),
+      ),
+      (value) => JSON.stringify(value),
+    )};`,
     `  static const radius = <String, double>${radius};`,
     `  static const space = <String, double>${space};`,
     `  static const motionMilliseconds = <String, int>${durations};`,
@@ -126,12 +176,20 @@ function renderDart(tokens: PortableDesignTokens, tokenHash: string): string {
   ].join("\n");
 }
 
-function dtcgColor(hex: string): Record<string, unknown> {
-  const match = hex.match(/^#([0-9a-f]{6})$/i);
-  if (!match) return { colorSpace: "srgb", components: [0, 0, 0], hex };
-  const value = match[1]!;
+function dtcgColor(color: string): Record<string, unknown> {
+  const match = color.trim().match(/^#([0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})$/i);
+  if (!match) throw new Error(`token_promotion.unsupported_color: ${color}; use an explicit 3, 4, 6, or 8 digit hexadecimal color for portable export.`);
+  const input = match[1]!;
+  const expanded = input.length <= 4 ? [...input].map((digit) => digit + digit).join("") : input;
+  const value = expanded.slice(0, 6).toLowerCase();
   const components = [0, 2, 4].map((offset) => Number.parseInt(value.slice(offset, offset + 2), 16) / 255);
-  return { colorSpace: "srgb", components: components.map((component) => Number(component.toFixed(4))), hex: `#${value.toLowerCase()}` };
+  const alpha = expanded.length === 8 ? Number.parseInt(expanded.slice(6), 16) / 255 : undefined;
+  return {
+    colorSpace: "srgb",
+    components: components.map((component) => Number(component.toFixed(4))),
+    ...(alpha === undefined ? {} : { alpha }),
+    hex: `#${value}`,
+  };
 }
 
 function dimensionValue(value: string | number): Record<string, unknown> {

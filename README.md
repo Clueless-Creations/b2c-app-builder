@@ -25,6 +25,21 @@ is the mise en place that helps the agent decide well. You are the executive
 chef. You choose the opportunity and the product, set the bar, and let your
 agents cook. The [ethos](docs/ethos.md) explains the stations and who runs them.
 
+Skills and sourced knowledge are part of that foundation, and this repository
+ships a lot of both. Each one describes how to do a single job well. What it
+leaves open is which job comes next, what the last job decided, which provider
+will run this one, whether the result holds up, and what happens when it fails.
+Capabilities, recipes, planning, bounded execution, evidence, and recovery
+answer those questions. They are what keep several specialized agents and
+providers working on the same consumer business rather than on disconnected
+pieces of it.
+
+You run all of this yourself. You bring the agent and model, the infrastructure,
+the provider accounts and credentials, and the environment the work executes in.
+The method is here in full under the MIT licence: the capabilities, recipes,
+knowledge, planning, execution, review, evidence, recovery, and the extension
+contracts for adding your own.
+
 The goal is to move human attention from building one app to designing and
 testing businesses. Produce one excellent consumer business first. Then reuse
 its foundations for a different approach to the same market, with comparable

@@ -17,6 +17,24 @@ B2C App Builder is built on open-source work and adapts published methods. This 
 
 ## Methods and guidance we adapted
 
+**Amir Mushich Brand System Skill**
+
+- Original author: Amir Mushich, original author
+- License: CC-BY-4.0 (verified)
+- Canonical URL: https://github.com/amirmushichge/brand-system-skill
+- Contributes: Provider-neutral brand kit and reference roles. Reauthored for existing design authorities; original author and license retained. No endorsement or demonstrated uplift claimed.
+- How we consume it:
+  - adapted-method: Provider-neutral brand kit and reference roles. No source executable or assets imported.
+
+**Amir Mushich Cinematic Scroll Prompt Kit**
+
+- Original author: Amir Mushich, original author
+- License: MIT (verified)
+- Canonical URL: https://github.com/amirmushichge/cinematic-scroll-prompt-kit
+- Contributes: Conditional layer planning and forward/reverse checkpoints. Reauthored for existing design authorities; original author and license retained. No endorsement or demonstrated uplift claimed.
+- How we consume it:
+  - adapted-method: Conditional layer planning and forward/reverse checkpoints. No source executable or assets imported.
+
 **Appllama agent skills**
 
 - Original author: Antmind Ventures Private Limited, original author or copyright holder identified in the reviewed source

@@ -3,7 +3,7 @@ id: reference.experience.consumer-product-design-agency
 title: Consumer Product Design Agency
 domain_id: domain.experience
 document_path: knowledge/experience/consumer-product-design-agency.md
-load_when: grounding the emotional/behavioral layer in its research tiers, or auditing whether the four required
+load_when: grounding the emotional/behavioral layer in its research tiers, or auditing whether the four foundational
   Experience Cards are implemented
 lifecycle: active
 bindings:

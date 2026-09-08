@@ -57,9 +57,11 @@ Tier: Mechanical.
 
 Body text on its background must meet WCAG 2.2 AA at 4.5:1.
 
-Large text and UI accents must meet 3:1.
+Applicable large text requires 3:1. Essential non-text indicators require 3:1 against adjacent colors. Decorative accents, inactive controls, and logotypes have specific exceptions; a token name cannot establish actual usage.
 
-Dark body text that only meets AA is a design signal. Prefer a stronger contrast near 7:1.
+For body text on dark backgrounds, review whether the 7:1 AAA target improves legibility. This is a contextual signal, not an APCA calculation or a universal design requirement. Review actual text/control combinations and states; this palette check alone is not an accessibility audit.
+
+See [WCAG text contrast](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html) and [non-text contrast](https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html).
 
 Tier: Mechanical.
 

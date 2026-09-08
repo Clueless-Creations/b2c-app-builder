@@ -41,11 +41,11 @@ const EMOJI_IN_MARKUP = /[\u{1F000}-\u{1FAFF}\u{2600}-\u{26FF}\u{2764}\u{2B50}\u
 export const TELLS: Tell[] = [
   {
     code: "vibecode.default_icon_pack",
-    severity: "error",
+    severity: "warning",
     extensions: CODE_EXTENSIONS,
     detect: (source) => /(?:from\s+|require\(\s*)["'](?:lucide-react|lucide|@heroicons\/)/.test(source),
     message:
-      "Default icon pack import (Lucide/Heroicons) — the never-earned tell in knowledge/design/vibecoded-tells.md §Tier 2. Derive an icon system from the brand's own shapes instead.",
+      "Recognized icon pack import. Review consistency, recognizability, and fit with DESIGN.md; a conventional functional icon is valid. This scan does not prove visual misuse.",
   },
   {
     code: "vibecode.emoji_in_markup",
@@ -72,23 +72,21 @@ export const TELLS: Tell[] = [
       /gradient\([^)]*(?:#6366f1|#4f46e5|#818cf8)[^)]*(?:#7c3aed|#8b5cf6|#a855f7|#c084fc)/i.test(source) ||
       /gradient\([^)]*(?:#7c3aed|#8b5cf6|#a855f7|#c084fc)[^)]*(?:#6366f1|#4f46e5|#818cf8)/i.test(source),
     message:
-      "Indigo-to-purple gradient — the documented statistical default of AI-generated pages. Earned only when the palette derivation names the gradient's role and its brand hues.",
+      "Indigo-to-purple gradient — a review cue, not evidence of authorship or poor quality. Inspect whether the palette derivation names the gradient's role and its brand hues.",
   },
   {
     code: "vibecode.glassmorphism",
     severity: "warning",
     extensions: STYLE_EXTENSIONS,
     detect: (source) => /backdrop-blur|backdrop-filter\s*:/.test(source),
-    message:
-      "Glassmorphism (backdrop blur) — a borrowed costume outside its category. Earned by fintech-dashboard convention with a disciplined accent; record the derivation or remove it.",
+    message: "Backdrop blur detected. Inspect legibility, performance, and its role in the accepted composition; category alone does not decide suitability.",
   },
   {
     code: "vibecode.decorative_blob",
     severity: "warning",
     extensions: STYLE_EXTENSIONS,
     detect: (source) => /(?:blur-2xl|blur-3xl|filter\s*:\s*blur\()/.test(source) && /(?:rounded-full|radial-gradient)/.test(source),
-    message:
-      "Blurred radial orb / blob shapes — decorative filler for undecided space. Replace with product truth or nothing (knowledge/design/vibecoded-tells.md §Tier 2).",
+    message: "Blurred radial shape detected. Inspect whether it supports composition or competes with the task; its presence alone is not a failure.",
   },
   {
     code: "vibecode.sparkle_icon",

@@ -3,60 +3,117 @@ id: reference.design.audience-derived-identity
 title: Audience-Derived Identity
 domain_id: domain.design
 document_path: knowledge/design/audience-derived-identity.md
-load_when: "when DESIGN.md is created or revised, when a visual direction is drafted or reviewed, and when the
-  Design Room needs the anti-generic review — derives palette/type/motion/imagery from strategy/RESEARCH.md audience
-  facts and names the generic-template tells"
+load_when: Creating or materially revising DESIGN.md, choosing a direction, or independently reviewing communication,
+  composition and audience fit.
 lifecycle: active
 bindings:
   workflow_ids:
-    - workflow.design.brand-definition
-    - workflow.design.design-room
-    - workflow.design.design-system-audit
+  - workflow.design.brand-definition
+  - workflow.design.design-room
+  - workflow.design.design-system-audit
   context_pack_ids:
-    - context.design
+  - context.design
 sources:
-  - id: design-duolingo-com-identity-color
-    name: design.duolingo.com
-    source_type: official_docs
-    url: https://design.duolingo.com/identity/color
-    review_cadence_days: 90
-    claim_scope: Duolingo's published brand color system, grounding the character-led case study (palette values and the
-      against-category-default rationale).
-    last_review_date: 2026-08-17
-    reviewer: b2c-maintainers
-  - id: developer-whoop-com-design-guidelines
-    name: developer.whoop.com
-    source_type: official_docs
-    url: https://developer.whoop.com/docs/developing/design-guidelines/
-    review_cadence_days: 90
-    claim_scope: WHOOP's published design guidelines, grounding the performance/dark/data-dense case study (locked semantic
-      color system, numeral typeface split, dark-canvas usage rationale).
-    last_review_date: 2026-08-17
-    reviewer: b2c-maintainers
-  - id: styles-refero-design-flighty
-    name: styles.refero.design
-    source_type: website
-    url: https://styles.refero.design/
-    review_cadence_days: 90
-    claim_scope: Refero's captured design-system records, grounding the Flighty case study (achromatic ramp, single action
-      color, platform-native type rule, pill radius system).
-    last_review_date: 2026-08-17
-    reviewer: b2c-maintainers
-  - id: developer-apple-com-behind-the-design-flighty
-    name: developer.apple.com
-    source_type: official_docs
-    url: https://developer.apple.com/news/?id=970ncww4
-    review_cadence_days: 90
-    claim_scope: Apple's Behind the Design interview on Flighty, grounding the aviation-insider audience framing of that
-      case study.
-    last_review_date: 2026-08-17
-    reviewer: b2c-maintainers
-  - id: dev-to-tailwind-indigo-default-analysis
-    name: dev.to
-    source_type: website
-    url: https://dev.to/alanwest/why-every-ai-built-website-looks-the-same-blame-tailwinds-indigo-500-3h2p
-    review_cadence_days: 90
-    claim_scope: The documented mechanism behind the indigo/purple-gradient generic-AI tell (Tailwind UI default propagating
-      through training corpora), grounding the Generic-Design Tells table.
-    last_review_date: 2026-08-17
-    reviewer: b2c-maintainers
+- id: video-satori-survive
+  name: How A Graphic Designer MUST Think in 2026 To Survive!
+  source_type: video
+  url: https://www.youtube.com/watch?v=WFkGbyH24AY
+  review_cadence_days: 90
+  claim_scope: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source
+    expression imported.
+  last_review_date: '2026-09-07'
+  reviewer: b2c-maintainers
+  publisher: Satori Graphics
+  rights:
+    status: unknown
+    notes: Informational citation of ideas only. Full transcript, artwork, music and video are not redistributed.
+- id: video-shapes-layout
+  name: 5 laws of design layout & composition golden rules
+  source_type: video
+  url: https://www.youtube.com/watch?v=eEWRbpDu6CU
+  review_cadence_days: 90
+  claim_scope: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source
+    expression imported.
+  last_review_date: '2026-09-07'
+  reviewer: b2c-maintainers
+  publisher: Shapes By Sean
+  rights:
+    status: unknown
+    notes: Informational citation of ideas only. Full transcript, artwork, music and video are not redistributed.
+- id: video-futur-great-design
+  name: The Secret To Great Design Is Simpler Than You Think
+  source_type: video
+  url: https://www.youtube.com/watch?v=SdCzIDmfDAA
+  review_cadence_days: 90
+  claim_scope: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source
+    expression imported.
+  last_review_date: '2026-09-07'
+  reviewer: b2c-maintainers
+  publisher: The Futur
+  rights:
+    status: unknown
+    notes: Informational citation of ideas only. Full transcript, artwork, music and video are not redistributed.
+- id: video-satori-think-like
+  name: How To Actually Think Like A Graphic Designer!
+  source_type: video
+  url: https://www.youtube.com/watch?v=2zr9vXdsN94
+  review_cadence_days: 90
+  claim_scope: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source
+    expression imported.
+  last_review_date: '2026-09-07'
+  reviewer: b2c-maintainers
+  publisher: Satori Graphics
+  rights:
+    status: unknown
+    notes: Informational citation of ideas only. Full transcript, artwork, music and video are not redistributed.
+- id: video-omar-premium-branding
+  name: The Psychology of Premium Branding
+  source_type: video
+  url: https://www.youtube.com/watch?v=1kcxUhjuW_0
+  review_cadence_days: 90
+  claim_scope: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source
+    expression imported.
+  last_review_date: '2026-09-07'
+  reviewer: b2c-maintainers
+  publisher: Omar Eddaoudi
+  rights:
+    status: unknown
+    notes: Informational citation of ideas only. Full transcript, artwork, music and video are not redistributed.
+- id: video-netflix-paula-scher
+  name: 'Abstract: The Art of Design, Paula Scher: Graphic Design'
+  source_type: video
+  url: https://www.youtube.com/watch?v=LCfBYE97rFk
+  review_cadence_days: 90
+  claim_scope: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source
+    expression imported.
+  last_review_date: '2026-09-07'
+  reviewer: b2c-maintainers
+  publisher: Netflix
+  rights:
+    status: unknown
+    notes: Informational citation of ideas only. Full transcript, artwork, music and video are not redistributed.
+derivations:
+- source_ids:
+  - video-satori-survive
+  - video-shapes-layout
+  - video-futur-great-design
+  - video-satori-think-like
+  - video-omar-premium-branding
+  - video-netflix-paula-scher
+  relationship: informed
+  rationale: Original synthesis of conditional brief, composition, comparison and critique methods; no source prose
+    or visual assets copied.
+  omissions:
+  - Universal aesthetic mandates, commercial efficacy claims, biographies and promotions.
+  reviewer: b2c-maintainers
+  reviewed_at: '2026-09-07'
+  selectors:
+  - See chronological source-unit register in examples/contributions/bespoke-design-methods/ADOPTION_MAP.md
+
+specifies:
+  - artifact: DESIGN.md
+    heading: Communication Brief
+  - artifact: DESIGN.md
+    heading: The Derivation Chain
+  - artifact: DESIGN.md
+    heading: Composition Review

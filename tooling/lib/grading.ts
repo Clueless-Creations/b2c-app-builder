@@ -68,6 +68,8 @@ export function selectRecommendedNextEdit(findings: readonly GradingFinding[]): 
     return describeFinding(strongest);
   }
 
+  const reviewCue = findings.find((finding) => finding.tier === "mechanical" && finding.severity === "warning");
+  if (reviewCue) return `Inspect in context; no automatic restyle: ${describeFinding(reviewCue)}`;
   return NO_FURTHER_EDIT_MESSAGE;
 }
 

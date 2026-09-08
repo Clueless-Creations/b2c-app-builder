@@ -8,6 +8,12 @@ This artifact defines the emotional experience contract for {{APP_NAME}}: the in
 
 ---
 
+## Applicability Of This Example
+
+The populated card blocks illustrate one product that selected these mechanics. They are not a required bundle for every app, and the intended emotional ratings are hypotheses rather than observed user outcomes. Keep the cards that serve the accepted user job; remove unused example rows and blocks. Every retained card keeps its truth, exit, accessibility and measurement obligations.
+
+For a product that needs zero cards, remove all applied `experience_card:` blocks and record one fenced YAML mapping named `experience_card_selection` in the design artifact. Set `status` to `not_applicable` and provide product-specific `user_job`, `rationale` and `alternative` text, each at least 30 characters without placeholders. The auditor independently records the same fields in the audit artifact. See `knowledge/experience/emotional-design-system.md` for the exact shape. Do not insert that zero-card marker alongside this populated example. A score or empty map cannot replace the decision.
+
 ## Emotional North Star
 
 The one feeling {{APP_NAME}} exists to create:
@@ -58,14 +64,14 @@ Replace placeholder rows with product-specific steps. The rendered Emotional Cur
 
 ## Card Application Map
 
-Each row maps a product moment to one of the four required Experience Cards, the emotional beat it is designed to produce, where the producer recipe lives, the PostHog event that measures it, the bright-line guardrail, and the reduced-motion fallback.
+Each example row maps a product moment to a selected Experience Card, the emotional beat it is designed to produce, where the producer recipe lives, the PostHog event that measures it, the bright-line guardrail, and the reduced-motion fallback.
 
 All four cards are required. Mark a card `deferred` only with a founder-approved rationale recorded through the reducer in `state/business-state.json lanes.emotional_design.deferred_cards`.
 
 | Feature / Moment                         | Card Applied                     | Emotional Beat Intended                                                        | Producer Recipe Ref                                                                | Measurement Event                                                         | Bright-Line Guardrail                                                                                       | Reduced-Motion Fallback                                                                          |
 | ---------------------------------------- | -------------------------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
 | Goal-setting question in onboarding      | Commitment Card                  | Ownership — user feels the product is now working toward their goal            | `knowledge/experience/emotional-experience-design.md §Commitment Card`             | `commitment_made`, `commitment_echoed`                                    | Commitment editable from Settings at any time; never used as cancellation friction                          | Soft fade on echo replaced with instant text highlight; no animation                             |
-| Plan generation / personalization reveal | Perceived Effort Delay Card      | Valued — user believes the plan was crafted for them                           | `knowledge/experience/emotional-experience-design.md §Perceived Effort Delay Card` | `perceived_effort_started`, `perceived_effort_completed`                  | ≥50% of displayed steps correspond to real computation; step-to-operation map in `engineering/TECH_SPEC.md` | Static step list with no animation; progress count visible without motion                        |
+| Plan generation / personalization reveal | Perceived Effort Delay Card      | Valued — user believes the plan was crafted for them                           | `knowledge/experience/emotional-experience-design.md §Perceived Effort Delay Card` | `perceived_effort_started`, `perceived_effort_completed`                  | Every displayed step corresponds to real computation; step-to-operation map in `engineering/TECH_SPEC.md` | Static step list with no animation; progress count visible without motion                        |
 | First result / value reveal              | Variable Reward Card             | Energized — the result varies and the anticipation makes the reveal meaningful | `knowledge/experience/emotional-experience-design.md §Variable Reward Card`        | `variable_reward_anticipation_started`, `variable_reward_revealed`        | Variation is genuine (content differs, not only framing); no spend prompt on same screen                    | Instant reveal with static badge; no anticipation animation; plain text summary always available |
 | Pre-paywall pause                        | Intent Mirroring Card            | Ready — the user sees their own goal before the purchase ask                   | `knowledge/experience/emotional-experience-design.md §Intent Mirroring Card`       | `intent_mirror_shown`, `intent_mirror_continued`                          | Mirror uses only fields the user explicitly provided; not placed on cancel/downgrade path                   | Static text block fades in instantly; no deliberate slow-fade entrance                           |
 | Return session after N-day absence       | Intent Mirroring Card (return)   | Recommitted — the product remembers them without nagging                       | `knowledge/experience/emotional-experience-design.md §Intent Mirroring Card`       | `intent_mirror_shown` (surface: re_engagement), `intent_mirror_continued` | Mirror copy is warm, not guilt-laden; user can dismiss without penalty                                      | Static welcome text; no transition animation                                                     |
@@ -140,9 +146,8 @@ experience_card:
     content the user had already earned. None of these patterns are permitted.
   guardrail: >
     No spend prompt on the same screen as the reward reveal, nor within 30 seconds of it.
-    Reward variation is genuine: two consecutive completions of the same action produce
-    observably different content at least 30% of the time, OR personalization convergence
-    is documented in engineering/PRODUCTION_READINESS.md. Prefers-reduced-motion fallback: instant
+    Reward variation is genuine: representative controlled inputs demonstrate the actual source of variation; deterministic
+    outcomes are shown directly. The method and limitations are documented in engineering/PRODUCTION_READINESS.md. Prefers-reduced-motion fallback: instant
     plain-text result with no anticipation animation. Escape hatch: Settings > Accessibility >
     Disable animated reward reveals. Documented in engineering/TECH_SPEC.md.
   user_control_escape_hatch: >
@@ -159,8 +164,8 @@ experience_card:
     matching "addictive" / "slot machine" / "gambling". Investigated weekly while the card is live.
   reward_variation_proof: >
     engineering/PRODUCTION_READINESS.md §Experience Cards records that the PostHog property reward_variant
-    returns at least two distinct non-null values in production with ≥30% real content
-    differentiation, OR documents the personalization-convergence rationale. Cosmetic-only
+    corresponds to actual content differences on representative controlled inputs. The source
+    of variation and deterministic cases are documented. Cosmetic-only
     variation (same backend output, different label/colour) is rejected.
 ```
 
@@ -180,8 +185,8 @@ experience_card:
     a model inference call, a sorting/filtering pass, or a real UI composition step that
     incorporates the user's answers. The user sees the system working on their specific inputs
     ("Building from your 3 goals…" reflects actual fields they provided). Three-question test:
-    (1) goal alignment YES — the delay makes the user value the plan more; (2) truthfulness YES —
-    steps correspond to real operations (≥50% real step ratio documented in engineering/TECH_SPEC.md);
+    (1) goal alignment YES — truthful progress helps explain pending work; (2) truthfulness YES —
+    steps correspond to real operations (all displayed steps mapped to real operations in engineering/TECH_SPEC.md);
     (3) informed exit YES — user can cancel the processing view and see the result in a simpler
     loading state.
   dark_line: >
@@ -190,14 +195,14 @@ experience_card:
     requires without any user-visible benefit; if the step copy referenced data the user did not
     provide. None of these patterns are permitted.
   guardrail: >
-    Step-to-operation map documented in engineering/TECH_SPEC.md with ≥50% real operation ratio verified
-    before ship. Minimum: data fetch + model/personalization step + formatting step. No
+    Step-to-operation map documented in engineering/TECH_SPEC.md with every displayed step verified against an actual operation
+    before ship. Select only the operations this product actually performs. No
     artificial sleep timers appended after computation completes. Cancel affordance available
     during processing. Prefers-reduced-motion fallback: static step list, no transition
     animation between steps.
   effort_truthfulness_attestation: >
     Computation steps documented in engineering/TECH_SPEC.md §Perceived Effort Delay. Real operation ratio
-    is [record the actual ratio; must be ≥50%]. Step copy keys reference actual user-provided
+    is complete: every displayed step maps to a real operation. Step copy keys reference actual user-provided
     fields. Verified by engineering review before launch. Attestation evidence stored in
     engineering/PRODUCTION_READINESS.md §Experience Cards.
   computation_type: real_data_processing
@@ -319,7 +324,7 @@ This artifact integrates with the following surfaces. Do not duplicate their con
 | `knowledge/experience/emotional-experience-design.md`      | Producer recipes for all four cards, Six-Lens Design Review framework, Emotional Curve artifact format, bright-line governance.                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | `knowledge/experience/emotional-experience-measurement.md` | Full per-card event catalogs, counter-metric thresholds, A/B experiment templates, dark-pattern detection protocol.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | `knowledge/experience/ethics-guardrail.md`                 | Guardrail Contract, per-mechanism risk table, non-negotiable prohibitions, validator rules for `check:emotional-design`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| `engineering/PRODUCTION_READINESS.md`                      | Evidence for each card's bright-line compliance: commitment editability verified on device; variable reward variation proven (30% differentiation or personalization convergence documented); effort step-to-operation map verified; intent mirror content sources confirmed.                                                                                                                                                                                                                                                                                                                                 |
+| `engineering/PRODUCTION_READINESS.md`                      | Evidence for each card's bright-line compliance: commitment editability verified on device; variable reward variation proven (representative controlled-input evidence and its limitations); effort step-to-operation map verified; intent mirror content sources confirmed.                                                                                                                                                                                                                                                                                                                                 |
 
 ---
 
@@ -330,11 +335,11 @@ Before any feature that applies an Experience Card is called build-ready:
 - [ ] Emotional North Star is product-specific — it describes an emotion specific to this user's job-to-be-done, not a generic category.
 - [ ] Target Emotional Journey table is product-specific with named steps; valence scores assigned to each step; paywall marker placed at the correct step.
 - [ ] Emotional Curve rendered in `emotional-design.html` from the journey table. Curve peaks at or before the paywall marker.
-- [ ] Card Application Map covers all four required cards or records a founder-approved deferral in `state/business-state.json lanes.emotional_design.deferred_cards`.
+- [ ] Card Application Map covers all selected cards or records a founder-approved deferral in `state/business-state.json lanes.emotional_design.deferred_cards`.
 - [ ] Every row in Card Application Map has a populated Measurement Event. Unmeasured moments are not accepted.
-- [ ] All four Ethics Attestation blocks are filled. Every field is product-specific. `bright_line`, `dark_line`, and `guardrail` fields are non-empty.
+- [ ] Every selected card has a completed Ethics Attestation block. Every field is product-specific. `bright_line`, `dark_line`, and `guardrail` fields are non-empty.
 - [ ] Variable Reward Card: `user_control_escape_hatch` and `ethics_attestation` filled (HIGH-tier card — required by `knowledge/experience/ethics-guardrail.md`).
-- [ ] Perceived Effort Delay Card: `effort_truthfulness_attestation` filled with actual real-operation ratio (≥50%).
+- [ ] Perceived Effort Delay Card: `effort_truthfulness_attestation` filled with a complete map of displayed steps to actual operations.
 - [ ] Three-question operational test (goal alignment, truthfulness, informed exit) resolves YES for every applied card. Recorded in attestation blocks.
 - [ ] All Measurement Plan events added to `analytics/ANALYTICS.md` before implementation.
 - [ ] PostHog "Emotional Experience — Card Signals" dashboard exists with Dark-Pattern Watch insight configured with alerts.

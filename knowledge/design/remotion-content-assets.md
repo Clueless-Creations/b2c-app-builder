@@ -1,14 +1,17 @@
-# Remotion Content Assets
+# Content Asset Production
 
-Use this when a launch needs reusable videos, stills, store-art compositions, app-preview clips, demo loops, social posts, ad variants, UGC overlays, or campaign assets and Higgsfield is unavailable, not approved, too expensive for the lane, or less appropriate than code-rendered product truth.
+Use this when a launch needs videos, stills, store compositions, app previews, demo loops, social posts, ad variants or campaign assets. Classify the job before selecting a provider. This reference owns the shared asset brief and includes Remotion implementation guidance for jobs that select it.
 
-Remotion is not a drop-in replacement for Higgsfield. Higgsfield is the premium generative route for net-new imagery, mascots, presenter ads, image-to-video, photoreal scenes, Marketing Studio, and Virality Predictor. Remotion is the deterministic route for assets built from real app UI, founder-owned media, licensed/public-domain inputs, `DESIGN.md` tokens, copy variants, data, captions, and repeatable React compositions.
+Generation, composition, capture and licensed-media reuse are different operations. A selected provider implements the operation; its name does not establish output quality, rights, compatibility or execution. Remotion can compose real UI, permitted media, tokens, copy, data and captions. A generation provider can create supporting imagery when the job calls for it. Neither route makes an unsupported product claim true.
 
 ## Contents
 
 - Route Decision
 - Founder And License Gates
 - Source Inputs
+- Brand Consistency Before Production
+- Versioned Asset Brief
+- Technique Selection
 - Project Shape
 - Remotion Skill Routing
 - Composition Standards
@@ -19,18 +22,18 @@ Remotion is not a drop-in replacement for Higgsfield. Higgsfield is the premium 
 
 ## Route Decision
 
-Prefer Higgsfield when:
+Select generation when:
 
 - the asset requires new AI-generated visuals, mascots, product/lifestyle scenes, presenter/UGC ad generation, image-to-video, or creative exploration
-- the user wants Higgsfield, Marketing Studio, Soul ID, Seedance, Nano Banana, GPT Image, or Virality Predictor specifically
-- the output should be a high-polish generated campaign visual rather than a reusable code-rendered template
+- an explicitly selected provider covers the required operation and its access and spending authority are available
+- generated supporting imagery serves the communication problem
 
-Prefer Remotion when:
+Select composition when:
 
 - the asset should be reproducible from product truth, screenshots, recordings, copy, tokens, or data
 - many variants are needed: hooks, formats, dimensions, locales, CTAs, captions, App Store custom product pages, ads, or creator briefs
 - real app UI must stay visible and distinguishable from generated supporting art
-- the user does not want to pay for Higgsfield, Higgsfield access is blocked, or local code-rendering is a better fit
+- reproducible composition serves the job; use Remotion only when it is the selected implementation
 
 Do not create the asset yet when:
 
@@ -39,6 +42,11 @@ Do not create the asset yet when:
 - the source app UI, screenshots, recordings, or asset rights are missing
 - the asset would imply unsupported functionality, pricing, endorsements, outcomes, urgency, scarcity, or store claims
 - the next step is public posting, scheduling, paid spend, or store upload without founder approval
+
+An unavailable provider does not authorize a replacement. Preserve explicit
+selection and use the existing capability handoff for missing runtime access.
+Hosted guidance can describe the brief and proof required; it cannot claim a
+local renderer, device or paid provider is installed or connected.
 
 ## Founder And License Gates
 
@@ -95,6 +103,75 @@ review the new output before multiplying variants. Raw model output and a
 correct manifest do not establish visual acceptance. The same procedure applies
 to store frames, landing imagery, UGC, ads, and video; do not invent a separate
 brand state store for each format.
+
+## Versioned Asset Brief
+
+New asset packets use `schema_version: "2"` in the existing
+`growth/content-assets/manifest.json`. Existing unversioned arrays and version
+`"1"` packets remain supported with their existing checks. Do not relabel a
+legacy packet as version 2 without recording the required evidence. The default
+for new work is the structured brief below, including for previously unknown
+providers. A design-related phrase in a prompt is not a replacement.
+
+Keep the existing asset fields (`asset_id`, `surface`, `route`, `status`,
+`inputs`, `outputs`, `truth_constraints`, `approvals`, `license_status`). In
+version 2, `dimensions` is `{ "width": 1080, "height": 1920 }` in output pixels.
+Record positive `duration_seconds` for video kinds.
+
+| Field | Required meaning |
+| --- | --- |
+| `production_kind` | `generated`, `composed`, `captured` or `licensed`. The operation class is independent of `route`, which records the selected provider. |
+| `asset_kind` | `still`, `video`, `ugc`, `product_ad`, `b_roll`, `demo`, `app_preview` or `interactive_3d`. A UGC asset retains the script, judge and believability checks regardless of provider. |
+| `brief.purpose`, `brief.placement` | Communication problem and destination role. |
+| `brief.kit` | `path: "DESIGN.md"`, `revision` matching its frontmatter `version`, a full SHA-256 of its bytes, and `assets: [{path, sha256}]` for the linked kit files used. An explicit empty array means no external kit assets are used. |
+| `brief.lineage` | `{path, sha256, rights}` for every `inputs` entry. Use workspace-relative files. For an external fact, retain a permitted local source record containing the public URL and the supported claim; a URL is not locally verified media. |
+| `brief.references` | `{path, sha256, rights, roles, permitted_influence, forbidden_transfers}`. Roles are `identity`, `scene`, `product`, `composition`, `motion`. Permitted influences are `color`, `typography`, `logo`, `voice`, `composition`, `lighting`, `camera`, `material`, `motion`, `product`. Only an identity role can influence color, typography, logo or voice. Claims have a separate source. |
+| `brief.claims` | `{text, source, sha256}` for each product claim and its local evidence file. Use an explicit empty array if there are no claims. A matching digest binds the evidence, but does not establish the claim's truth. |
+| `brief.allowed_variation`, `brief.forbidden_changes` | Explicit arrays defining the campaign's freedom and identity constraints. Empty allowed variation means no variation is authorized by this brief. |
+| `brief.contains_text`, `brief.fonts` | Boolean plus resource IDs from `DESIGN.md` `foundation.typographyResources`. Text requires at least one owned resource. Local font files are checked against their recorded bytes. System and remote font declarations still require actual output/load inspection. |
+| `technique` | Selected medium, reason, required capabilities, renderer declaration, meaningful fallback and proof obligations as described below. |
+
+Kit, source, reference and claim files must remain inside the business workspace,
+including after resolving symlinks. Changed bytes invalidate the brief even if
+the kit's human-readable revision stayed the same. Reassess affected outputs
+before updating their recorded inputs. Never update a digest just to preserve a
+previous acceptance claim.
+
+Use an explicit empty `references` or `claims` array when applicable. Do not
+invent a reference, font, asset or claim to fill the schema. Keep original
+source expression out of the workspace unless its use is permitted. A source
+record, a manifest check and a provider execution receipt are different evidence.
+
+## Technique Selection
+
+Set `technique.kind` to `native`, `semantic_web`, `layered_2_5d`, `real_3d` or
+`media`. State the product reason, `required_capabilities`, and
+`renderer: {id, capabilities}` from the selected implementation. These are
+compatibility declarations, not proof that the renderer ran. Record
+`fallback: {mode, preserved_job, limitations}` and a non-empty
+`proof_requirements` array before production.
+
+| Technique | Select for | Proof and fallback |
+| --- | --- | --- |
+| Native or semantic web | Frequent actions, forms, settings, reading and comparison. | Actual platform/keyboard/reading order, user text settings and recovery. Preserve the task when decoration or motion is unavailable. |
+| Layered 2.5D | A meaningful sequence explaining a process or transformation. | Forward/reverse timeline, jumps, responsive crops, text clearance and touch/keyboard. A static sequence must preserve the explanation. |
+| Real 3D | Inspectable depth and spatial manipulation are part of the job. | Require `depth`, `camera`, `picking` capabilities and `interactive_3d` kind. Inspect alternate angles, controls, deformation/recovery when selected, export and measured environment behavior. A still cannot pass as the interaction. |
+| Media | Campaign imagery or explanation requiring no live spatial simulation. | Inspect actual files, crop, identity, truth, playback and destination fit. Label conceptual or mock material. |
+
+Layered 2.5D requires `compositing`. Other techniques include it only when they
+combine layers. Record `alignment`, `camera`, `lighting`, `mobile_variant`,
+`required_layers` IDs, and `layers: [{id, input, origin, anchor, depth, alpha}]`.
+`input` names a lineage entry; origin and anchor are normalized `[x,y]` pairs
+from zero to one; depth is finite; alpha declares required transparency. Every
+required layer must exist. These declarations do not prove actual transparency,
+camera alignment or correct layering; inspect the rendered output.
+
+Use a bounded production loop: establish a useful checkpoint, repair the largest
+defect, inspect the actual result and exercise relevant interactions. Retain the
+best working checkpoint. Repeated non-progress calls for a changed approach.
+Record iteration and spending ceilings through existing job authority. No
+provider-name match, passed manifest or attractive still proves motion, frame
+rate, truthful product behavior or independent visual acceptance.
 
 ## Project Shape
 
@@ -223,7 +300,7 @@ Before marking a content asset done:
 
 - real app UI is visible where the asset claims to show the app
 - source screenshots/recordings, design tokens, copy, and legal/pricing claims are traceable
-- Remotion license status and Higgsfield fallback approval are recorded
+- selected-provider license status and any required fallback authority are recorded
 - public claims match `APP_STORE_LISTING.md`, `revenue/REVENUE_OPS.md`, `trust/PRIVACY.md`, `trust/TERMS.md`, and onboarding/paywall copy
 - no generated or mock UI is presented as real production functionality
 - captions, silent playback, text fit, safe areas, and mobile readability are checked
@@ -236,11 +313,11 @@ For store screenshots and previews, app UI must be truthful and Apple/Google pol
 
 ## Artifacts
 
-Create `CONTENT_ASSETS.md` when Remotion, Higgsfield, local recordings, or generated/edited campaign assets are in scope.
+Create `CONTENT_ASSETS.md` when generated, composed, captured or licensed assets are in scope.
 
 Include:
 
-- route matrix: Higgsfield, Remotion, raw screenshots, founder-owned media, blocked, or deferred
+- route matrix: operation class, selected provider, permitted sources and blocked or deferred requirements
 - license and fallback approvals
 - source input inventory and rights notes
 - composition manifest
@@ -250,7 +327,8 @@ Include:
 - output registry
 - blocked assets and founder-only gates
 
-Create `growth/content-assets/manifest.json` for machine-readable assets. Each asset should include:
+Create `growth/content-assets/manifest.json` for machine-readable assets. New
+packets use the version 2 contract above. Legacy packets retain these fields:
 
 - `asset_id`
 - `surface`
@@ -268,7 +346,9 @@ Create `growth/content-assets/manifest.json` for machine-readable assets. Each a
 
 Create or update `content-assets.html` as the founder-facing proof board. It should show route decisions, asset thumbnails/placeholders, target surfaces, source inputs, output paths, QA status, and blocked approvals.
 
-Update `state/business-state.json`:
+Record lane and selected-tool evidence through the existing workflow and reducer.
+Do not edit `state/business-state.json` directly. For a selected Remotion job,
+the existing evidence paths include:
 
 - `lanes.content_assets.status`
 - `lanes.content_assets.evidence`

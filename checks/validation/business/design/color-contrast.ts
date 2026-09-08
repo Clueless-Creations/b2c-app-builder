@@ -37,7 +37,7 @@ export function contrastRatio(foreground: string, background: string): number | 
   return (lighter + 0.05) / (darker + 0.05);
 }
 
-/** True when the background is dark enough that APCA/AAA is the design signal. */
+/** True when the background is dark enough that the AAA body-text target is a contextual review signal. */
 export function isDarkBackground(background: string): boolean {
   const rgb = parseHex(background);
   if (!rgb) return false;

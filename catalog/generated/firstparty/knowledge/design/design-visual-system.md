@@ -89,6 +89,16 @@ landing, ad, UGC, or video assets, follow the brand consistency procedure in
 [`remotion-content-assets.md`](./remotion-content-assets.md). Keep design
 research before the kit and the kit before campaign variants.
 
+## Communication And Composition Decisions
+
+Record a concise communication brief in `DESIGN.md`: audience and situation, task, intended takeaway, next action, and uncertainty. Then state notice/read/understand/action order, related information groups, alignment, scale, text measure and the role of imagery. A decision may follow evidence, task clarity, accessibility, platform convention or a creative hypothesis; label which. Do not manufacture an audience fact to justify a font.
+
+Define identity invariants separately from allowed variation. A campaign may change a scene, crop or rhythm while keeping the accepted voice, typography roles, product geometry and truthful claims. Record keep/remove/refine decisions against inspected output. If the concept fails the brief, restart the direction instead of accumulating surface patches. Inspect one derivative before scaling a batch.
+
+Reference roles may include identity, behavior, typography, composition, scene, material, motion or product geometry. Each reference needs permitted influence, forbidden transfers and evidence modality. A text description of motion is not a viewed animation. A scene reference cannot supply a new certification, endorsement or product feature. Font resources and third-party imagery need their own rights evidence.
+
+For a focused edit, load the affected section and preserve the accepted direction unless the brief or identity actually changed. Revalidate affected artifacts and acceptance inputs; a small edit does not preserve a stale global acceptance fingerprint.
+
 ## Root `DESIGN.md`
 
 Keep global, durable decisions in root `DESIGN.md`:
@@ -135,6 +145,20 @@ Do not list empty adapters. Do not infer cross-platform parity. A platform witho
 The bundled reference adapter currently covers SwiftUI. Expo, React Native, and Flutter remain valid adapter targets, not claimed implementations.
 
 New screens use verified components by default. If a required component does not exist, make the component a design task before screen polish.
+
+## Typography In Use
+
+Choose type with the actual product text, target scripts and reading conditions. Serif, sans, script, handwriting, display and monospace describe possibilities; they do not establish modernity, luxury, emotional response or universal legibility. A distinctive display role must not silently become the font for small settings controls or error labels. Tabular numerals can align values without making the whole interface monospace.
+
+Define heading, body, button, label and data roles in the existing typography contract. Include the actual family or system selection, supported weight, size, line-height, tracking and fallback; name font resources, rights, supported scripts and axes when using files. Semantic heading level follows the content hierarchy independently of apparent size. Test requested weights and glyphs rather than relying on the family name.
+
+Inspect representative strings at their destination. Compare cap height, x-height, ascenders, descenders and diacritics: equal nominal sizes can appear and wrap differently. Leading is baseline-to-baseline distance; tight headings and loose body text are options, not fixed percentages. Tracking must respect shaping and ligatures. Refine prominent wordmark pairs optically without turning one pair adjustment into a global body-text rule. Small essential labels need readable weight and contrast rather than automatic thinness.
+
+Use the implementation's actual sizing context. CSS absolute units satisfy `1in = 96px = 72pt`; this is a reference-unit relationship, not a hardware-pixel claim. `em` and `rem` depend on their element and root contexts. Native size and tracking mappings must be authored for their platform; do not silently convert a web relative unit into native points. Relative units alone do not establish accessible text resizing.
+
+Check actual text contrast under the applicable standard and state. WCAG AA uses 4.5:1 for normal text and 3:1 for qualifying large text, with its stated exceptions; 7:1 is not the universal AA requirement. Contrast is one part of text accessibility. Keep dense or expressive compositions readable under supported user settings.
+
+Before acceptance, inspect font loading failure, fallback wrapping, long localized labels, missing-glyph behavior, supported text scaling, user spacing and narrow layouts. Recompose grids and measure for the platform; neither twelve columns nor a fixed spacing increment is compulsory. Correct clipping or unavailable resources in the rendered output. A well-formed typography token proves its fields, not the appearance of the text.
 
 ## Tokens And Motion
 

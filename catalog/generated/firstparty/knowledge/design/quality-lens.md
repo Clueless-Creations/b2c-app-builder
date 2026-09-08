@@ -50,15 +50,41 @@ The result should be a state mutation: token, surface, claim, flow, screenshot, 
 Before a design state mutation is accepted:
 
 - the page or screen uses the business's actual nouns and verbs
-- the palette is not a single-hue default
-- typography is purposeful and tied to the category
+- the palette supports semantic roles; a single hue is valid when sufficient
+- typography serves the actual audience, content, language, and viewing conditions
 - mobile frames, store screenshots, and web panels share tokens
 - app and store claims match real implementation scope
 - generated visuals support real app UI instead of replacing it
 - edge states are represented when they affect conversion or trust
-- every visual decision traces to an audience fact in `strategy/RESEARCH.md`, and the direction shows no generic-template tell. [`audience-derived-identity.md`](./audience-derived-identity.md) carries the tells table, the derivation chain, and the logo-swap test.
+- material decisions distinguish audience evidence, creative hypotheses, legibility, and platform constraints; the reviewer judges their effect on the user job. [`audience-derived-identity.md`](./audience-derived-identity.md) carries the tells table, the derivation chain, and the logo-swap test.
 
 If the mutation cannot pass these checks, keep the state in `draft` or `blocked`.
+
+## Defect diagnosis
+
+Review the actual candidate against its accepted communication priorities and constraints. A hash proves identity; a validator proves only the facts it checks. Neither proves comprehension or quality.
+
+| Defect class | Distinguishing observation | Repair owner and smallest useful action |
+| --- | --- | --- |
+| Brief | The intended audience, first message, or next action is contradictory or unsupported | Product/design producer resolves the communication priority before restyling |
+| Concept | The organizing idea conveys the wrong meaning or requires an irrelevant puzzle | Design producer revisits the concept; polishing spacing cannot fix the premise |
+| Composition | Correct content is grouped incorrectly, focal points compete, or responsive stacking changes the message | Design producer changes grouping, hierarchy, rhythm, scale, or layers |
+| Identity drift | A derivative changes the accepted logo, font, palette role, motif, or repeated control without an allowed variation | Asset or interface producer restores the invariant or requests an explicit contract revision |
+| Typography | Actual font fails to load, glyphs fall back unexpectedly, role metrics collapse, or representative text clips | Interface/asset producer fixes the resource, role, fallback, or layout and re-renders |
+| Implementation | Navigation, state recovery, keyboard order, reduced motion, or the selected renderer differs from the accepted contract | Implementation producer repairs behavior and supplies current runtime evidence |
+| Claim | Copy or imagery asserts an unverified result, certification, testimonial, price, or implemented feature | Owning producer substantiates the claim from the approved source or removes it |
+
+For each material finding name the surface/state, evidence, expected behavior, observed difference, consequence, severity, owner, and repair test. A high-impact concept failure can require new exploration. A local implementation defect usually preserves the accepted direction. Keep judgments and measurements separate; do not describe a predicted emotional response as observed.
+
+A familiar icon pack, system font, rectangular list, monochrome palette, symmetry, or zero custom motion is a valid exception when it serves the audience and task. Several aesthetic warnings are prompts for inspection, never an automatic failure by count. Conversely, a novel hero cannot excuse broken recovery or false product claims.
+
+A fresh reviewer must find a consequential seeded defect, explain a useful repair, and accept an appropriate conventional example without coaching. The repair producer then changes the artifact and supplies new evidence. Repeating design vocabulary does not pass this transfer exercise.
+
+## Focused review
+
+For a small repair, load the relevant knowledge section, accepted DESIGN.md decision, and affected dependencies. Keep accepted alternatives and identity intact unless evidence requires changing them. Review the affected states and shared consumers. The acceptance fingerprint remains global: a focused review does not preserve an old overall acceptance after any bound input changes.
+
+For a bounded correction to an already accepted legacy design, the Design Room owner may use direct maintenance: preserve the accepted exploration and any existing foundation, change only the identified defect and affected dependencies, run `check:design-md`, regenerate the Design Room, run `check:design-room`, and run the affected token, asset, or implementation checks. Compare the change against the accepted contract in a fresh independent review. Adding a new product direction or replacing exploration is substantive work and uses the full Design Room workflow with its foundation requirement. Direct maintenance does not execute or mark that engine workflow accepted; a current acceptance requires its usual independent evidence.
 
 ## Review Prompt
 

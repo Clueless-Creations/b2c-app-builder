@@ -4,6 +4,8 @@ Generated from catalog/upstreams for maintainers. It states what the builder sup
 
 | Id | Project | Relationships | Reviewed source | Reviewed guidance | Supported ranges | Latest observed stable | Observed | Installed executable | Review | Local owners | Tests |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| amir-brand-system | Amir Mushich Brand System Skill | adapted-method | 30f6084ddf6adf4173cf882fce266015f8872c17@2026-09-07 | 30f6084ddf6adf4173cf882fce266015f8872c17@2026-09-07 | `30f6084ddf6adf4173cf882fce266015f8872c17` untested | unknown (no observation) | none | not observed | current; last 2026-09-07; due 2026-10-07 | 2 | 1 |
+| amir-cinematic-scroll | Amir Mushich Cinematic Scroll Prompt Kit | adapted-method | 39ac222e385061c1eeab7f063b869950ee7cca1b@2026-09-07 | 39ac222e385061c1eeab7f063b869950ee7cca1b@2026-09-07 | `39ac222e385061c1eeab7f063b869950ee7cca1b` untested | unknown (no observation) | none | not observed | current; last 2026-09-07; due 2026-10-07 | 2 | 1 |
 | appllama-skills | Appllama agent skills | adapted-method, selected-skill-guidance | dd5caaec3d5d50ad7fc0324da238119c6b7c3707@2026-09-07 | dd5caaec3d5d50ad7fc0324da238119c6b7c3707@2026-09-07 | `dd5caaec3d5d50ad7fc0324da238119c6b7c3707` untested | unknown (no observation) | none | not observed | current; last 2026-09-07; due 2026-10-07 | 2 | 1 |
 | eronred-aso-skills | ASO and App Marketing Skills | adapted-method | 4df730f456c21e42b9a2ea2be89fb32caf787728@2026-09-06 | 4df730f456c21e42b9a2ea2be89fb32caf787728@2026-09-06 | `4df730f456c21e42b9a2ea2be89fb32caf787728` untested | unknown (observation records no stable release) | 2026-09-06 | not observed | current; last 2026-09-06; due 2026-09-13 | 3 | 1 |
 | evanbacon-serve-sim | serve-sim | adapted-method | 0ee6fbde40a6b5840d0c6e0379f544feb9fa246b@2026-09-06 | 0ee6fbde40a6b5840d0c6e0379f544feb9fa246b@2026-09-06 | `0ee6fbde40a6b5840d0c6e0379f544feb9fa246b` untested | unknown (observation records no stable release) | 2026-09-06 | not observed | current; last 2026-09-06; due 2026-09-13 | 2 | 1 |
@@ -17,6 +19,38 @@ Generated from catalog/upstreams for maintainers. It states what the builder sup
 | rork-app-store-connect-cli-skills | App Store Connect CLI skills (asc skill pack) | selected-skill-guidance | unknown | unrecorded@2026-08-18 | `main (unpinned by the builder)` untested | unknown (no observation) | none | not observed | current; last 2026-09-05; due 2026-09-12 | 2 | 1 |
 | sentry-snapshotpreviews | SnapshotPreviews | adapted-method | 856a1c1585e31d4113c019050d6d0712cf6ddadc@2026-09-06 | 856a1c1585e31d4113c019050d6d0712cf6ddadc@2026-09-06 | `856a1c1585e31d4113c019050d6d0712cf6ddadc` untested | v0.18.0 (published 2026-07-07) | 2026-09-06 | not observed | current; last 2026-09-06; due 2026-09-13 | 2 | 1 |
 | sentry-xcodebuildmcp | XcodeBuildMCP | adapted-method | e6ef59b49b44012c824f0a0de261c96142e37390@2026-09-06 | e6ef59b49b44012c824f0a0de261c96142e37390@2026-09-06 | `e6ef59b49b44012c824f0a0de261c96142e37390` untested | v2.7.0 (published 2026-07-23) | 2026-09-06 | not observed | current; last 2026-09-06; due 2026-09-13 | 2 | 1 |
+
+## amir-brand-system
+
+Amir Mushich Brand System Skill. Canonical URL: https://github.com/amirmushichge/brand-system-skill
+
+Unsupported operations:
+
+- None recorded.
+
+Intentional adaptations:
+
+- conditional-provider-neutral-method: No mandatory Google Fonts, Lovart, per-generation approvals or benchmark score. Identity stays in DESIGN.md and existing controller owns narrative state. (owner: knowledge/design/design-visual-system.md)
+
+Unknowns:
+
+- No observation recorded.
+
+## amir-cinematic-scroll
+
+Amir Mushich Cinematic Scroll Prompt Kit. Canonical URL: https://github.com/amirmushichge/cinematic-scroll-prompt-kit
+
+Unsupported operations:
+
+- None recorded.
+
+Intentional adaptations:
+
+- conditional-provider-neutral-method: No fixed serif, portal, sticky stage, card rail or scroll length. Identity stays in DESIGN.md and existing controller owns narrative state. (owner: knowledge/design/editorial-scrollytelling.md)
+
+Unknowns:
+
+- No observation recorded.
 
 ## appllama-skills
 

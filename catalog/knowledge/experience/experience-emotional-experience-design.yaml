@@ -3,7 +3,7 @@ id: reference.experience.emotional-experience-design
 title: Emotional Experience Design
 domain_id: domain.experience
 document_path: knowledge/experience/emotional-experience-design.md
-load_when: implementing one of the four required Experience Cards (Commitment, Variable Reward, Perceived Effort Delay,
+load_when: implementing one of the four foundational Experience Cards (Commitment, Variable Reward, Perceived Effort Delay,
   Intent Mirroring) — full psychological basis, trigger timing, deterministic guardrail tests, named PostHog events, and
   the Six-Lens Design Review Framework in full
 lifecycle: active

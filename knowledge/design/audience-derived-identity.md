@@ -1,100 +1,55 @@
-# Audience-Derived Identity: From Research Facts To Design Decisions
+# Audience-Derived Identity: From Brief To Design Decisions
 
-Use this reference when `DESIGN.md` is created or revised, and when a visual direction needs review. It turns audience research into concrete palette, type, motion, and imagery decisions. It also defines the generic-design anti-pattern so a review can name it.
+Use this reference when creating or materially revising `DESIGN.md`, and when reviewing a direction. The required discipline is to explain, compare, implement and inspect consequential choices. No palette, font class, metaphor, layout or motion style is universally required.
 
-The rule this file exists for: every visual decision must trace to a fact about the target user in `strategy/RESEARCH.md`. A design that only cites a trend is not a decision. It is a default.
+## Communication Brief
 
-## Contents
+Record the audience, situation, user task, intended takeaway and next action in `DESIGN.md` under Audience And Identity. Link relevant `strategy/RESEARCH.md` evidence. Distinguish observed facts from assumptions and creative hypotheses. Research does not prove that a particular typeface produces an emotion.
 
-- Sources To Refresh
-- Case Studies: How Identity Encodes Audience
-- The Derivation Chain
-- The Generic-Design Tells
-- The Audience Checklist For design.md
-- Category Conventions
-- Gates
-
-## Sources To Refresh
-
-Study these brand systems on the manifest cadence. Update the case rows when a brand reworks its identity:
-
-- Duolingo brand guidelines: `https://design.duolingo.com/identity/color`
-- WHOOP developer design guidelines: `https://developer.whoop.com/docs/developing/design-guidelines/`
-- Flighty design system record: `https://styles.refero.design/`
-- Apple, Behind the Design (Flighty and peers): `https://developer.apple.com/news/?id=970ncww4`
-- The indigo-default analysis that named the generic-AI look: `https://dev.to/alanwest/why-every-ai-built-website-looks-the-same-blame-tailwinds-indigo-500-3h2p`
-
-## Case Studies: How Identity Encodes Audience
-
-Five brands, each with one audience fact and the decisions that fact produced. Study the trace, not the surface.
-
-| Brand    | Audience fact                                                   | Palette                                                                                | Type                                                                          | Motion                                                                | Imagery                                                         |
-| -------- | --------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------- |
-| Duolingo | Learners treat it as a game, not homework                       | Saturated lime green, chosen against edtech's classroom blues                          | Bespoke face built from the mascot's shapes                                   | Celebratory: flame bursts, spring counters, scaled confetti           | A character cast with one visual grammar, no sharp angles       |
-| Calm     | Stressed adults want to feel tended to, unhurried               | Cool low-saturation blues and nature tones                                             | Light weights, generous line height; heaviness reads as urgency               | Breath-paced: the bubble expands and contracts on real breath cadence | Commissioned nature photography as the mental-state metaphor    |
-| Whoop    | Athletes want to read as elite, not wellness-casual             | Near-black plus one signal red; a locked 3-color semantic system, no arbitrary accents | Words in one face, numbers in a technical numeral face at display size        | Restrained tier transitions that preserve spatial context; no bounce  | The data is the imagery; moody athlete photography in marketing |
-| Flighty  | Aviation nerds want control-tower competence                    | Achromatic ramp plus exactly one action blue                                           | Platform-native stack by rule, one serif accent as an airport-print reference | Minimal; whisper-thin shadows over dynamic transitions                | Flight data itself is the hero; no travel-lifestyle photos      |
-| Partiful | Young hosts want the invite to look enviably fun, not corporate | "Dopamine" maximalism, deliberately unsystematized                                     | Per-invite theme fonts; the type system is a user toolkit                     | Kinetic and bouncy; meme-able                                         | Guest-generated photos and reactions are the imagery            |
-
-The one-line diagnostic: each brand made at least one choice that would look wrong on a direct competitor. Whoop's dark canvas would break Calm. Calm's pastels would break Whoop. Generic design is recognizable because none of its choices would look wrong anywhere.
+For each material decision, name its reason: audience evidence, task clarity, accessibility, platform convention, product identity, or an explicit creative hypothesis. Record the uncertainty and how the actual result will be judged. Pleasure, familiarity and restraint are legitimate purposes. A small correction needs a bounded rationale, not a new research workshop.
 
 ## The Derivation Chain
 
-Run this chain when design.md's direction is drafted. Record the results in design.md's Audience And Identity section.
+1. Read the accepted promise and audience context. Separate the product identity from features and campaigns. Establish the communication problem before styling.
+2. Inspect relevant references and ordinary product-world material. Name each reference's permitted influence and forbidden transfers. Palette, typography, composition and behavior are separate dimensions.
+3. Compare meaningful alternatives when establishing a direction. Vary the organizing idea, information priorities, type relationships or imagery role; changing colors alone is not a new concept. Preserve familiar controls when they help the task.
+4. Select the direction against the brief. Record rejected alternatives and the concrete reason. A physical metaphor, conceptual substitution, editorial density, or purposeful imbalance is available when it helps; a direct quiet interface is equally eligible.
+5. Explain the system through actual content and states. Define alignment, grouping, reading order, emphasis, rhythm, text measure and image relationships. Test mobile composition separately from desktop.
+6. Keep stable identity decisions and permitted variation in the Anchor Brand Kit inside `DESIGN.md`. Apply it to core work, recovery, settings, offers and marketing; a hero alone cannot demonstrate the system.
+7. Inspect representative unbranded outputs. Ask which choices serve this audience and which are inherited defaults. Compare same-category audiences as well as unrelated products. Shared navigation or accessible controls are not failures of originality.
 
-1. **Collect the audience facts** from `strategy/RESEARCH.md`: who the user is, and what they aspire to feel or be seen as. Add the 2-3 apps they already love. Those loved apps are the audience's native visual language.
-2. **Name the category default to avoid.** State what every competitor already looks like. A design.md without an anti-reference did no differentiation work.
-3. **Pick one physical or sensory metaphor from the audience's real world.** An owl playing a game. Breath. A cockpit. A departure board. A party flyer. Trends are not metaphors.
-4. **Derive the palette from the metaphor**, not from a trend board. State the derivation in one sentence.
-5. **Derive type from the metaphor and the density need.** Decide whether the product needs a personality face or arm's-length numerals, and say why.
-6. **Derive motion from the emotional tempo** the audience wants: celebratory, breath-paced, precise, or kinetic. Name the tempo in the motion table.
-7. **Derive the imagery approach**: character system, commissioned photography, data-as-hero, or user content as hero.
-8. **Run the logo-swap test.** Strip the wordmark from five screens. If the target user could not recognize their app, a decision upstream came from a trend, not from the audience.
+## Composition Review
 
-## The Generic-Design Tells
+Check what the viewer notices first, reads next, understands and can act on. The focal image need not be the first readable message. Proximity must group related information; an aligned layout can still imply the wrong relationship. A grid supports this work, but a fixed column count cannot decide it.
 
-The recognizable marks of template output. Each row is a review check; two or more hits fail the anti-generic review.
+Compare a conventional composition with an exception only when the exception has a useful role. Overlap, counterpoint, unusual scale and negative space may connect ideas. Reject them when they hide qualifications, confuse choice mapping or break text expansion. Pricing, consent and recovery must not depend on solving a visual puzzle.
 
-| Tell                                                          | Why it means no decision was made                                                                          |
-| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| Indigo-to-purple gradient hero or gradient headline text      | The documented statistical default of AI-generated pages; the single loudest tell                          |
-| Inter or bare system font with no stated rationale            | The training-corpus default standing in for a typography decision                                          |
-| Identical corner radius on buttons, cards, inputs, and images | A radius token set once and never revisited per component's meaning                                        |
-| Three evenly-spaced feature cards with thin-line icons        | The tutorial demo layout, portable to any product                                                          |
-| Glassmorphism on a wellness or social app                     | Legitimate mostly in fintech dashboards; elsewhere it is a borrowed costume                                |
-| Floating blurred blob shapes                                  | Decorative filler for undecided space                                                                      |
-| Emoji as functional icons                                     | A shortcut where an icon system was owed                                                                   |
-| Stock 3D isometric illustration                               | Generic tech optimism with zero product specificity                                                        |
-| Dark-purple SaaS chrome on a consumer wellness product        | Category mismatch; Whoop earns dark with a usage-time rationale, a sleep app borrowing it is cargo-culting |
-| A headline that could ship on any of ten competitors          | The composite tell; interchangeability is the definition of the generic                                    |
+## Generic-Design Diagnostics
 
-## The Audience Checklist For design.md
+A familiar treatment prompts a question; it is not a mechanical taste failure. A gradient, system font, uniform radius, icon library, card row or dark canvas may be appropriate. Review whether it serves the current task, preserves clarity and belongs to the chosen identity. Do not infer the absence of thought from a style's name or count two familiar patterns as an automatic failure.
 
-Ask these questions of a drafted design.md. A "no" on any of them means the Audience And Identity section is not done.
-
-1. Does the palette rationale name the audience fact it serves, with a `strategy/RESEARCH.md` reference?
-2. Is the primary color defended against the category default, or is it an unexamined indigo/purple safe choice?
-3. Does the type system name faces with a stated reason tied to the audience or density need?
-4. Does the motion spec name an emotional tempo tied to how the user wants to feel?
-5. Is the imagery direction specific enough to brief a photographer or illustrator?
-6. Does the document name 2-3 explicit anti-references — aesthetics this product must not resemble?
-7. Does it state which category convention it follows, which it breaks, and why?
-8. Would five unbranded screens pass the logo-swap test with the target user?
-9. Does every decision row carry evidence, not adjectives?
+Name the actual defect: interchangeable message, unrelated grouping, unexplained decorative emphasis, identity drift, weak contrast, inaccessible control, or repetitive composition across different briefs. The repair must address that defect. Replacing a gradient with another fashionable treatment is not sufficient.
 
 ## Category Conventions
 
-The visual codes each B2C category's audience expects. Follow or break them only with a stated reason.
+Treat category codes as hypotheses to inspect, not audience facts. A novice running companion and an advanced club-analysis app may share controls while differing in information density, language and emotional pace. A household utility may benefit from familiar typography and calm order. A regional food publication may need expressive editorial relationships. None requires a prescribed palette.
 
-- **Wellness**: pastel and nature-adjacent palettes, soft gradients, light type, slow motion, organic shapes. Flag: SaaS dashboard chrome transplanted onto a sanctuary product.
-- **Fitness**: two lanes split by seriousness. Mass-market motivational: saturated primaries, condensed athletic display type, energetic photography. Quantified-self: dark canvas, locked semantic colors, technical numerals, data as hero. Flag: pastel wellness codes on a performance product.
-- **Fintech**: an anchor trust color (navy/slate/charcoal), one disciplined accent for actions, tabular figures, minimal motion. Glassmorphism is genuine convention here when paired with a disciplined accent. Flag: bouncy celebratory motion around money.
-- **Social**: bright saturated color, loud display type over minimal chrome, kinetic meme-able motion, user content as the imagery. Caveat: audience, not the "social" label, decides — professional networks invert toward fintech restraint.
-- **Productivity**: near-monochrome, one restrained accent, almost no motion, no imagery; the tool recedes behind the user's content. Flag: gamified confetti on a daily-driver work tool.
+Record which conventions help users, which need changing and why. Anti-references are useful when a specific confusion or unwanted association exists; inventing three enemies is not a requirement. Do not force difference at the expense of usability.
+
+## Selectable Creative Methods
+
+Use conceptual substitution when combining familiar meanings makes the product's message clearer. State the intended reading and compare a direct treatment. Use predictive empathy as an explicit hypothesis about the user's next concern; check comprehension separately from reported reassurance. A moment of curiosity does not prove later recall.
+
+For premium positioning, distinguish genuine exclusivity, audience identification and storytelling. Exclusivity may concern craftsmanship or meaningful belonging; it is not permission to invent scarcity. Research the segment, maintain a coherent direction across variants, then measure relevant behavior with an exposure window and denominator. A campaign narrative or brand anecdote cannot prove revenue causality. Utility and accessibility can outweigh status signaling.
+
+Treat typography as a working language: compare weights, widths, scale, measure and type/image counterpoint with actual product text. See `design-visual-system.md` for roles and resources. Personal creative practice may inspire bounded exploration; biography, work hours, popularity and artistic distortion are not requirements or factual evidence.
+
+## Critique And Transfer
+
+Give an independent reviewer the accepted brief and actual candidate before the producer's explanation. Ask for a diagnosis and concrete repair, including a valid purposeful exception. Separate brief misunderstanding, weak concept, composition, typography, implementation and unsupported claims. Then compare the author's reasoning with the review; neither prose nor confidence proves correctness.
+
+Source lessons are hypotheses until tested in the present work. Described demonstrations, career claims, historical anecdotes and popularity are not evidence of conversion, memory or superiority. A useful method should help identify a consequential defect on a new brief, not merely repeat its vocabulary.
 
 ## Gates
 
-- `check:design-room` requires design.md's Audience And Identity section and its `strategy/RESEARCH.md` evidence reference, and fails placeholder text once the Design Room claims review-ready status.
-- `check:design-room` also warns on the single-hue palette drift this file's tells describe.
-- The quality lens (`quality-lens.md` §Anti-Generic Checks) applies this file's tells during Design Room review.
-- `seed:design-brief` seeds the designBrief skeleton; fill its audience fields from `strategy/RESEARCH.md`, not from memory.
+`check:design-room` checks the authored section, evidence references and placeholder state. It cannot establish originality, emotional response or effective composition. Token and schema checks establish their declared facts. Independent inspection and representative task evidence establish whether the actual direction works. Keep failures open until an inspected repair resolves them.

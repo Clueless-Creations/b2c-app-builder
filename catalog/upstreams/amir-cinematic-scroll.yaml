@@ -1,0 +1,84 @@
+schema_version: 1
+id: amir-cinematic-scroll
+project: Amir Mushich Cinematic Scroll Prompt Kit
+canonical_url: https://github.com/amirmushichge/cinematic-scroll-prompt-kit
+aliases:
+  - amirmushichge/cinematic-scroll-prompt-kit
+authors:
+  - name: Amir Mushich
+    role: original author
+maintainers:
+  - name: Amir Mushich
+    role: upstream maintainer
+license:
+  spdx: MIT
+  status: verified
+  evidence_url: https://github.com/amirmushichge/cinematic-scroll-prompt-kit/blob/39ac222e385061c1eeab7f063b869950ee7cca1b/LICENSE
+  evidence_sha256: 8ee01d7b14659f2cb90cd33f3f259e039269b384d3970eed41805912c5a0a525
+  reviewed_revision: 39ac222e385061c1eeab7f063b869950ee7cca1b
+  notice_file: catalog/upstreams/notices/amir-cinematic-scroll.txt
+  scope: Selected reauthored methods only. Third-party fonts, imagery, marks and
+    hosted services excluded.
+source_ids:
+  - amir-cinematic-scroll-prompt-kit
+relationships:
+  - kind: adapted-method
+    consumption: Conditional layer planning and forward/reverse checkpoints. No
+      source executable or assets imported.
+    local_owners:
+      - knowledge/design/editorial-scrollytelling.md
+      - knowledge/design/remotion-content-assets.md
+    tests:
+      - examples/contributions/bespoke-design-methods/ADOPTION_MAP.md
+    upstream_paths:
+      - PROMPT.txt
+      - examples/PROJECT_BRIEF.example.md
+      - examples/assets.example.json
+      - LICENSE
+    pin_authority: Reviewed immutable source commit; no host or business installation.
+baselines:
+  reviewed_source:
+    revision: 39ac222e385061c1eeab7f063b869950ee7cca1b
+    observed_at: 2026-09-07
+    by: b2c-maintainers
+    note: Source method inspection. No executed scene, live service or empirical
+      quality result.
+  reviewed_guidance:
+    revision: 39ac222e385061c1eeab7f063b869950ee7cca1b
+    observed_at: 2026-09-07
+    by: b2c-maintainers
+    note: Source method inspection. No executed scene, live service or empirical
+      quality result.
+support:
+  policy: Reviewed guidance; runtime support and product outcomes require separate
+    evidence.
+  versions:
+    - range: 39ac222e385061c1eeab7f063b869950ee7cca1b
+      status: untested
+      evidence:
+        - Source inspection only; actual comparative evaluation is separate.
+  operations:
+    - id: amir-cinematic-scroll-method
+      title: Conditional layer planning and forward/reverse checkpoints
+      owners:
+        - knowledge/design/editorial-scrollytelling.md
+        - knowledge/design/remotion-content-assets.md
+  platforms: []
+adaptations:
+  - id: conditional-provider-neutral-method
+    description: No fixed serif, portal, sticky stage, card rail or scroll length.
+      Identity stays in DESIGN.md and existing controller owns narrative state.
+    owner: knowledge/design/editorial-scrollytelling.md
+    intentional: true
+review:
+  owner: b2c-maintainers
+  cadence_days: 30
+  last_review: 2026-09-07
+  status: current
+credits:
+  acknowledge: true
+  use: adapted
+  summary: Conditional layer planning and forward/reverse checkpoints. Reauthored
+    for existing design authorities; original author and license retained. No
+    endorsement or demonstrated uplift claimed.
+copyright: Copyright (c) 2026 Amir Mushich

@@ -186,6 +186,8 @@ npm run test:fixtures
 
 Run broader checks when the affected contract requires them.
 
+When changing the Chrome browser-proof adapter, run `npm run test:browser-proof-chrome` on a host with Chrome installed. This optional check serves a local page and exercises the real observer, including screenshots, typed interactions, resource retention and refusal cases. It does not download a browser. Injected fixture observers remain useful for deterministic contract checks; the Chrome check covers the production adapter. A successful observer check does not establish an accepted engine workflow or deployment.
+
 ## Interrupted public requests
 
 `business-recover` closes a pending public request after its session and effects

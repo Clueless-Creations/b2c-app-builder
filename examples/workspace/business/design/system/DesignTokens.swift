@@ -1,4 +1,4 @@
-// source: DESIGN.md; design-token-hash: 4c86cf0df4992ecd
+// source: DESIGN.md; design-token-hash: 158d186692209d33
 import Foundation
 
 enum DesignTokens {
@@ -16,10 +16,18 @@ enum DesignTokens {
     static let danger = "#b3261e"
   }
   enum Font {
-    static let displayFamily = "Fraunces, Georgia, serif"
+    static let displayFamily = "Georgia"
     static let displayWeight = "700"
-    static let bodyFamily = "Source Sans 3, Avenir Next, sans-serif"
+    static let displaySize: Double = 32
+    static let displayLineHeight: Double = 1.2
+    static let displayTracking: Double = 0
+    static let displayFallbacks = ["serif"]
+    static let bodyFamily = "system-ui"
     static let bodyWeight = "400"
+    static let bodySize: Double = 16
+    static let bodyLineHeight: Double = 1.5
+    static let bodyTracking: Double = 0
+    static let bodyFallbacks = ["sans-serif"]
   }
   enum Radius {
     static let sm: Double = 4

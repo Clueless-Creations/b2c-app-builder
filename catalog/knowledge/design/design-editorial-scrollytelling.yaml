@@ -8,17 +8,49 @@ load_when: before planning, building, changing, or auditing a scroll-led story o
 lifecycle: active
 bindings:
   workflow_ids:
-    - workflow.design.design-room
-    - workflow.growth.pre-launch-funnel-landing-waitlist
-    - workflow.growth.landing-funnel-audit
+  - workflow.design.design-room
+  - workflow.growth.pre-launch-funnel-landing-waitlist
+  - workflow.growth.landing-funnel-audit
   context_pack_ids:
-    - context.design
-    - context.launch-surfaces
+  - context.design
+  - context.launch-surfaces
 applicability_notes: Use the story qualification step before selecting scrollytelling. Transfer controller, state,
-  semantic, progressive-enhancement, and verification mechanics. Never transfer source identity, claims, copy, or assets.
-source_exemption: Internal operating guidance. The transferable content here is scrollytelling mechanics - stable
-  semantic story states, measured step-center control, shared scroll progress, responsive sticky composition, mobile
-  guidance, code-native evidence visuals, a situation-to-mechanism-to-outcome-to-proof narrative, and
-  progressive-enhancement verification - established by first-party audits of production implementations the maintainers
-  own and operate. Those implementations are not public sources and are deliberately left uncited - the mechanics are
-  the claim, and they are verified by this package's own checks rather than by an external document.
+  semantic, progressive-enhancement, and verification mechanics. Never transfer source identity, claims, copy, or
+  assets.
+sources:
+- id: amir-cinematic-scroll-prompt-kit
+  name: Amir Mushich cinematic-scroll-prompt-kit
+  source_type: github
+  url: https://github.com/amirmushichge/cinematic-scroll-prompt-kit
+  review_cadence_days: 30
+  claim_scope: Conditional layer planning and forward/reverse checkpoints. No fixed serif, portal, sticky stage,
+    card rail or scroll length
+  last_review_date: '2026-09-07'
+  reviewer: b2c-maintainers
+  publisher: Amir Mushich
+  revision: 39ac222e385061c1eeab7f063b869950ee7cca1b
+  upstream_id: amir-cinematic-scroll
+  rights:
+    status: verified
+    spdx: MIT
+    evidence: https://github.com/amirmushichge/cinematic-scroll-prompt-kit/blob/39ac222e385061c1eeab7f063b869950ee7cca1b/LICENSE
+    evidence_sha256: 8ee01d7b14659f2cb90cd33f3f259e039269b384d3970eed41805912c5a0a525
+    notes: Selected method adaptation only; third-party assets excluded.
+  selectors: &id001
+  - PROMPT.txt
+  - examples/PROJECT_BRIEF.example.md
+  - examples/assets.example.json
+  - LICENSE
+derivations:
+- source_ids:
+  - amir-cinematic-scroll-prompt-kit
+  relationship: adapted
+  baseline: 39ac222e385061c1eeab7f063b869950ee7cca1b
+  selectors: *id001
+  rationale: Conditional layer planning and forward/reverse checkpoints reauthored into existing local authority.
+  omissions:
+  - No fixed serif, portal, sticky stage, card rail or scroll length
+  - No source artwork, fonts, code, prompt text or third-party trademarks imported.
+  reviewer: b2c-maintainers
+  reviewed_at: '2026-09-07'
+  notice: catalog/upstreams/notices/amir-cinematic-scroll.txt

@@ -57,7 +57,7 @@ export interface PinnedKnowledgeReference {
 }
 
 /** Bump only on a deliberate, reviewed change to the dimension list below or a knowingly-accepted knowledge-doc edit. */
-export const DESIGN_TASTE_RUBRIC_VERSION = "1.1.2";
+export const DESIGN_TASTE_RUBRIC_VERSION = "1.2.0";
 
 /**
  * design-worthiness.md rule numbers this rubric maps to at least one dimension below.
@@ -86,12 +86,12 @@ export const PINNED_KNOWLEDGE_REFERENCES: readonly PinnedKnowledgeReference[] = 
   {
     referenceId: "reference.design.vibecoded-tells",
     documentPath: "knowledge/design/vibecoded-tells.md",
-    sourceSha256: "c4f613532f20a6c5802ff17850ab9b66860d470ba629b2ad6406ba1272aa53f6",
+    sourceSha256: "dd734cb5892448dc23836783fcb100973aa3e6f0245c3a69d66135ddb91c0919",
   },
   {
     referenceId: "reference.design.design-worthiness",
     documentPath: "knowledge/design/design-worthiness.md",
-    sourceSha256: "3748ff32713ffc83589a8603f8b352663cda13d5cd00d8f63c19b1617ad03717",
+    sourceSha256: "25fdf492aecd9e67a54c59ce7cb48c6bcb9a3411311596b2e565a17a46d37560",
   },
 ];
 
@@ -100,9 +100,9 @@ export const DESIGN_TASTE_DIMENSIONS: readonly RubricDimension[] = [
   {
     key: "vibecode.default_icon_pack",
     tier: "mechanical",
-    severity: "error",
+    severity: "warning",
     sourceReferenceId: "reference.design.vibecoded-tells",
-    description: "Lucide or Heroicons imports in web-surface source — the never-earned default icon pack tell.",
+    description: "Lucide or Heroicons import detection; contextual review decides fit. Conventional functional icons are valid.",
     automatedByGrader: true,
   },
   {
@@ -135,7 +135,7 @@ export const DESIGN_TASTE_DIMENSIONS: readonly RubricDimension[] = [
     tier: "mechanical",
     severity: "warning",
     sourceReferenceId: "reference.design.vibecoded-tells",
-    description: "Indigo-to-purple gradient utilities or hex pairs — the documented statistical default of AI-generated pages.",
+    description: "Indigo-to-purple gradient utilities or hex pairs — a contextual review cue, not an authorship or quality determination.",
     automatedByGrader: true,
   },
   {
@@ -143,7 +143,7 @@ export const DESIGN_TASTE_DIMENSIONS: readonly RubricDimension[] = [
     tier: "mechanical",
     severity: "warning",
     sourceReferenceId: "reference.design.vibecoded-tells",
-    description: "Backdrop-blur glass panels outside their earned category (fintech dashboards with a disciplined accent).",
+    description: "Backdrop-blur panels; inspect legibility, performance, and compositional purpose.",
     automatedByGrader: true,
   },
   {
@@ -151,7 +151,7 @@ export const DESIGN_TASTE_DIMENSIONS: readonly RubricDimension[] = [
     tier: "mechanical",
     severity: "warning",
     sourceReferenceId: "reference.design.vibecoded-tells",
-    description: "Blurred radial-gradient orb elements — decorative filler for undecided space.",
+    description: "Blurred radial-gradient elements; inspect whether the effect supports the accepted composition.",
     automatedByGrader: true,
   },
   {
@@ -191,9 +191,9 @@ export const DESIGN_TASTE_DIMENSIONS: readonly RubricDimension[] = [
   {
     key: "worthiness.contrast_primary",
     tier: "mechanical",
-    severity: "error",
+    severity: "warning",
     sourceReferenceId: "reference.design.design-worthiness",
-    description: "Rule 4, Contrast floor: large text and UI accents must meet 3:1.",
+    description: "Rule 4: low primary/background contrast prompts actual-use review; decorative accents do not share every text or control requirement.",
     automatedByGrader: true,
   },
   {
@@ -201,7 +201,8 @@ export const DESIGN_TASTE_DIMENSIONS: readonly RubricDimension[] = [
     tier: "mechanical",
     severity: "warning",
     sourceReferenceId: "reference.design.design-worthiness",
-    description: "Rule 4, Contrast floor: dark body text that only meets AA is a design signal; prefer a stronger contrast near 7:1 (APCA/AAA proxy).",
+    description:
+      "Rule 4, Contrast floor: dark body text that only meets AA is a design signal; prefer a stronger contrast near the 7:1 AAA body target. The stable code name is historical; this is not an APCA calculation.",
     automatedByGrader: true,
   },
   {

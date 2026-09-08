@@ -4,139 +4,212 @@ title: Design Visual System
 domain_id: domain.design
 document_path: knowledge/design/design-visual-system.md
 load_when: creating or changing the authored root DESIGN.md contract, visual systems, UI mockups, generated visual
-  concepts, Higgsfield-backed visuals/motion/icons/mascots, mobile screen specs, App Store creative, screenshot frames,
-  design audits, or HTML visual artifacts
+  concepts, Higgsfield-backed visuals/motion/icons/mascots, mobile screen specs, App Store creative, screenshot
+  frames, design audits, or HTML visual artifacts
 lifecycle: active
 bindings:
   workflow_ids:
-    - workflow.design.implementation-craft-audit
-    - workflow.design.brand-definition
-    - workflow.design.token-promotion
-    - workflow.design.content-assets-remotion-generated-visuals
-    - workflow.store.store-screenshots-production
-    - workflow.design.design-system-audit
+  - workflow.design.implementation-craft-audit
+  - workflow.design.brand-definition
+  - workflow.design.token-promotion
+  - workflow.design.content-assets-remotion-generated-visuals
+  - workflow.store.store-screenshots-production
+  - workflow.design.design-system-audit
   context_pack_ids:
-    - context.design
+  - context.design
 sources:
-  - id: api-refero-design-mcp
-    name: api.refero.design
-    source_type: website
-    url: https://api.refero.design/mcp
-    review_cadence_days: 7
-    claim_scope: Auto-discovered from recently added repository content.
-    last_review_date: 2026-08-17
-    reviewer: b2c-maintainers
-  - id: doc-refero-design-llms-txt
-    name: doc.refero.design
-    source_type: website
-    url: https://doc.refero.design/llms.txt
-    review_cadence_days: 7
-    claim_scope: Auto-discovered from recently added repository content.
-    last_review_date: 2026-08-17
-    reviewer: b2c-maintainers
-  - id: github-com-google-labs-code-design-md
-    name: github.com
-    source_type: github
-    url: https://github.com/google-labs-code/design.md
-    review_cadence_days: 7
-    claim_scope: Auto-discovered from recently added repository content.
-    last_review_date: 2026-08-17
-    reviewer: b2c-maintainers
-  - id: github-com-jamiemill-layers-skills
-    name: github.com
-    source_type: github
-    url: https://github.com/jamiemill/layers-skills
-    review_cadence_days: 7
-    claim_scope: Auto-discovered from recently added repository content.
-    last_review_date: 2026-08-17
-    reviewer: b2c-maintainers
-  - id: github-com-leonxlnx-taste-skill
-    name: github.com
-    source_type: github
-    url: https://github.com/Leonxlnx/taste-skill
-    review_cadence_days: 7
-    claim_scope: Auto-discovered from recently added repository content.
-    last_review_date: 2026-08-17
-    reviewer: b2c-maintainers
-  - id: github-com-pbakaus-impeccable
-    name: github.com
-    source_type: github
-    url: https://github.com/pbakaus/impeccable
-    review_cadence_days: 7
-    claim_scope: Auto-discovered from recently added repository content.
-    last_review_date: 2026-08-17
-    reviewer: b2c-maintainers
-  - id: styles-refero-design
-    name: styles.refero.design
-    source_type: website
-    url: https://styles.refero.design/
-    review_cadence_days: 7
-    claim_scope: Auto-discovered from recently added repository content.
-    last_review_date: 2026-08-17
-    reviewer: b2c-maintainers
-  - id: github-com-nextlevelbuilder-ui-ux-pro-max-skill
-    name: github.com
-    source_type: github
-    url: https://github.com/nextlevelbuilder/ui-ux-pro-max-skill
-    review_cadence_days: 7
-    claim_scope: MIT-licensed UI/UX design-intelligence skill (styles, palettes, font pairings, UX guidelines,
-      framer-motion/Magic UI motion patterns, anti-pattern checklists). Reference-only for web-surface UI and
-      design-system reasoning; do not vendor its CSV data into templates or business repos.
-    last_review_date: 2026-08-17
-    reviewer: b2c-maintainers
-  - id: x-com-60fpsdesign-catalog
-    name: 60fps.design best-in-class app details catalog
-    source_type: inspiration_benchmark
-    url: https://60fps.design/
-    review_cadence_days: 30
-    claim_scope: Curated catalog (X @60fpsdesign, 1800+ entries) of motion/interaction details from best-in-class consumer
-      apps. Inspiration benchmark for the in-app motion lane — the mobile counterpart to motionsites-ai for landing.
-      Engagement figures cited from it are point-in-time and unverified.
-    last_review_date: 2026-08-17
-    reviewer: b2c-maintainers
-  - id: sixty-fps-design-mcp
-    name: 60fps.design MCP server
-    source_type: api
-    url: https://60fps.design/mcp
-    review_cadence_days: 30
-    claim_scope: Live MCP endpoint over the 60fps.design catalog (shot search, motion breakdowns, SwiftUI starter code).
-      Optional tooling — the distilled recipes in motion-craft-benchmarks.md remain the contract when the server is not
-      connected. Generated code must be rewritten onto the token scale before shipping.
-    last_review_date: 2026-08-17
-    reviewer: b2c-maintainers
-  - id: motion-dev-docs-react
-    name: motion.dev
-    source_type: docs
-    url: https://motion.dev/docs/react
-    review_cadence_days: 7
-    claim_scope: Motion (framer-motion's successor, import from motion/react) React animation docs. Web-surface library used
-      by the Design Room render app and launch web surfaces (landing, funnel); never used in the shipped mobile binary.
-      Refresh before changing motion API/setup guidance.
-    last_review_date: 2026-08-17
-    reviewer: b2c-maintainers
-  - id: builder-io-blog-claude-code-figma-mcp-server
-    name: www.builder.io
-    source_type: website
-    url: https://www.builder.io/blog/claude-code-figma-mcp-server
-    review_cadence_days: 30
-    claim_scope: Figma MCP-driven design ingestion, mapped through a base/composite/semantic token
-      hierarchy, as the higher-fidelity source path when a founder or designer supplies an existing
-      Figma file.
-    last_review_date: 2026-09-02
-    reviewer: b2c-maintainers
-  - id: interfaces-agent-skills
-    name: Jakub Krehel Interfaces skills
-    source_type: github
-    url: https://github.com/jakubkrehel/skills
-    review_cadence_days: 30
-    claim_scope: Optional implementation review companions and change-scoped interface review; not art direction or acceptance authority.
-    last_review_date: 2026-09-05
-    reviewer: b2c-maintainers
-  - id: amir-brand-system-builder
-    name: Amir Mushich Brand System Builder
-    source_type: github
-    url: https://github.com/amirmushichge/brand-system-skill
-    review_cadence_days: 30
-    claim_scope: Adapted brand kit, reference roles, generation brief and consistency audit process under CC BY 4.0; no Lovart dependency.
-    last_review_date: 2026-09-05
-    reviewer: b2c-maintainers
+- id: w3c-css-values-4
+  name: W3C CSS Values and Units Level 4
+  source_type: standard
+  url: https://www.w3.org/TR/css-values-4/#absolute-lengths
+  review_cadence_days: 180
+  claim_scope: CSS absolute and relative units; no physical display-size guarantee.
+  last_review_date: "2026-09-07"
+  reviewer: b2c-maintainers
+- id: w3c-wcag22-text-contrast
+  name: W3C WCAG 2.2 text contrast
+  source_type: standard
+  url: https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html
+  review_cadence_days: 180
+  claim_scope: Text contrast thresholds and exceptions; no universal7:1 rule.
+  last_review_date: "2026-09-07"
+  reviewer: b2c-maintainers
+- id: api-refero-design-mcp
+  name: api.refero.design
+  source_type: website
+  url: https://api.refero.design/mcp
+  review_cadence_days: 7
+  claim_scope: Auto-discovered from recently added repository content.
+  last_review_date: 2026-08-17
+  reviewer: b2c-maintainers
+- id: doc-refero-design-llms-txt
+  name: doc.refero.design
+  source_type: website
+  url: https://doc.refero.design/llms.txt
+  review_cadence_days: 7
+  claim_scope: Auto-discovered from recently added repository content.
+  last_review_date: 2026-08-17
+  reviewer: b2c-maintainers
+- id: github-com-google-labs-code-design-md
+  name: github.com
+  source_type: github
+  url: https://github.com/google-labs-code/design.md
+  review_cadence_days: 7
+  claim_scope: Auto-discovered from recently added repository content.
+  last_review_date: 2026-08-17
+  reviewer: b2c-maintainers
+- id: github-com-jamiemill-layers-skills
+  name: github.com
+  source_type: github
+  url: https://github.com/jamiemill/layers-skills
+  review_cadence_days: 7
+  claim_scope: Auto-discovered from recently added repository content.
+  last_review_date: 2026-08-17
+  reviewer: b2c-maintainers
+- id: github-com-leonxlnx-taste-skill
+  name: github.com
+  source_type: github
+  url: https://github.com/Leonxlnx/taste-skill
+  review_cadence_days: 7
+  claim_scope: Auto-discovered from recently added repository content.
+  last_review_date: 2026-08-17
+  reviewer: b2c-maintainers
+- id: github-com-pbakaus-impeccable
+  name: github.com
+  source_type: github
+  url: https://github.com/pbakaus/impeccable
+  review_cadence_days: 7
+  claim_scope: Auto-discovered from recently added repository content.
+  last_review_date: 2026-08-17
+  reviewer: b2c-maintainers
+- id: styles-refero-design
+  name: styles.refero.design
+  source_type: website
+  url: https://styles.refero.design/
+  review_cadence_days: 7
+  claim_scope: Auto-discovered from recently added repository content.
+  last_review_date: 2026-08-17
+  reviewer: b2c-maintainers
+- id: github-com-nextlevelbuilder-ui-ux-pro-max-skill
+  name: github.com
+  source_type: github
+  url: https://github.com/nextlevelbuilder/ui-ux-pro-max-skill
+  review_cadence_days: 7
+  claim_scope: MIT-licensed UI/UX design-intelligence skill (styles, palettes, font pairings, UX guidelines, framer-motion/Magic
+    UI motion patterns, anti-pattern checklists). Reference-only for web-surface UI and design-system reasoning;
+    do not vendor its CSV data into templates or business repos.
+  last_review_date: 2026-08-17
+  reviewer: b2c-maintainers
+- id: x-com-60fpsdesign-catalog
+  name: 60fps.design best-in-class app details catalog
+  source_type: inspiration_benchmark
+  url: https://60fps.design/
+  review_cadence_days: 30
+  claim_scope: Curated catalog (X @60fpsdesign, 1800+ entries) of motion/interaction details from best-in-class
+    consumer apps. Inspiration benchmark for the in-app motion lane — the mobile counterpart to motionsites-ai for
+    landing. Engagement figures cited from it are point-in-time and unverified.
+  last_review_date: 2026-08-17
+  reviewer: b2c-maintainers
+- id: sixty-fps-design-mcp
+  name: 60fps.design MCP server
+  source_type: api
+  url: https://60fps.design/mcp
+  review_cadence_days: 30
+  claim_scope: Live MCP endpoint over the 60fps.design catalog (shot search, motion breakdowns, SwiftUI starter
+    code). Optional tooling — the distilled recipes in motion-craft-benchmarks.md remain the contract when the server
+    is not connected. Generated code must be rewritten onto the token scale before shipping.
+  last_review_date: 2026-08-17
+  reviewer: b2c-maintainers
+- id: motion-dev-docs-react
+  name: motion.dev
+  source_type: docs
+  url: https://motion.dev/docs/react
+  review_cadence_days: 7
+  claim_scope: Motion (framer-motion's successor, import from motion/react) React animation docs. Web-surface library
+    used by the Design Room render app and launch web surfaces (landing, funnel); never used in the shipped mobile
+    binary. Refresh before changing motion API/setup guidance.
+  last_review_date: 2026-08-17
+  reviewer: b2c-maintainers
+- id: builder-io-blog-claude-code-figma-mcp-server
+  name: www.builder.io
+  source_type: website
+  url: https://www.builder.io/blog/claude-code-figma-mcp-server
+  review_cadence_days: 30
+  claim_scope: Figma MCP-driven design ingestion, mapped through a base/composite/semantic token hierarchy, as the
+    higher-fidelity source path when a founder or designer supplies an existing Figma file.
+  last_review_date: 2026-09-02
+  reviewer: b2c-maintainers
+- id: interfaces-agent-skills
+  name: Jakub Krehel Interfaces skills
+  source_type: github
+  url: https://github.com/jakubkrehel/skills
+  review_cadence_days: 30
+  claim_scope: Optional implementation review companions and change-scoped interface review; not art direction or
+    acceptance authority.
+  last_review_date: 2026-09-05
+  reviewer: b2c-maintainers
+- id: amir-brand-system-builder
+  name: Amir Mushich brand-system-skill
+  source_type: github
+  url: https://github.com/amirmushichge/brand-system-skill
+  review_cadence_days: 30
+  claim_scope: Provider-neutral brand kit and reference roles. No mandatory Google Fonts, Lovart, per-generation
+    approvals or benchmark score
+  last_review_date: '2026-09-07'
+  reviewer: b2c-maintainers
+  publisher: Amir Mushich
+  revision: 30f6084ddf6adf4173cf882fce266015f8872c17
+  upstream_id: amir-brand-system
+  rights:
+    status: verified
+    spdx: CC-BY-4.0
+    evidence: https://github.com/amirmushichge/brand-system-skill/blob/30f6084ddf6adf4173cf882fce266015f8872c17/LICENSE
+    evidence_sha256: f5b745ef98087f531e719ee8ca6a96809444573ecc7173c6fa68eaad39b3cc3f
+    notes: Selected method adaptation only; third-party assets excluded.
+  selectors: &id001
+  - SKILL.md
+  - README.md
+  - LICENSE
+- id: video-designspo-typography
+  name: The ULTIMATE Guide To Typography For Beginners
+  source_type: video
+  url: https://www.youtube.com/watch?v=AXpxZMRM1EY
+  review_cadence_days: 90
+  claim_scope: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source
+    expression imported.
+  last_review_date: '2026-09-07'
+  reviewer: b2c-maintainers
+  publisher: DesignSpo
+  rights:
+    status: unknown
+    notes: Informational citation of ideas only. Full transcript, artwork, music and video are not redistributed.
+derivations:
+- source_ids:
+  - amir-brand-system-builder
+  relationship: adapted
+  baseline: 30f6084ddf6adf4173cf882fce266015f8872c17
+  selectors: *id001
+  rationale: Provider-neutral brand kit and reference roles reauthored into existing local authority.
+  omissions:
+  - No mandatory Google Fonts, Lovart, per-generation approvals or benchmark score
+  - No source artwork, fonts, code, prompt text or third-party trademarks imported.
+  reviewer: b2c-maintainers
+  reviewed_at: '2026-09-07'
+  notice: catalog/upstreams/notices/amir-brand-system.txt
+- source_ids:
+  - video-designspo-typography
+  relationship: informed
+  selectors:
+  - V07.01–V07.18; chronological register in examples/contributions/bespoke-design-methods/ADOPTION_MAP.md
+  rationale: Original role-based typography synthesis. Technical standards and actual resources govern units, contrast
+    and supported rendering.
+  omissions:
+  - Source expression, universal font associations, faulty point/pixel conversions, thin-small-text advice and promotions.
+  reviewer: b2c-maintainers
+  reviewed_at: '2026-09-07'
+
+specifies:
+  - artifact: DESIGN.md
+    heading: Communication And Composition Decisions
+  - artifact: DESIGN.md
+    heading: Typography In Use

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
+import { renderTokenOutputs } from "../../../../tooling/promote-design-tokens.js";
 import { hashDesignTokens, loadDesignSystem } from "../../../../tooling/lib/design-md.js";
 import { issue, parseCliArgs, reportAndExit, type Issue } from "../../../../tooling/lib/launch-state.js";
 
@@ -10,6 +11,7 @@ const issues: Issue[] = [...design.issues];
 
 if (design.tokens) {
   const expectedHash = hashDesignTokens(design.tokens);
+  const expectedOutputs = renderTokenOutputs(design.tokens);
   const outputDir = path.join(args.root, "design/system");
   const outputs = ["tokens.json", "tokens.css", "DesignTokens.swift", "design-tokens.ts", "design_tokens.dart"] as const;
 
@@ -20,7 +22,7 @@ if (design.tokens) {
       continue;
     }
     const raw = readFileSync(filePath, "utf8");
-    if (!raw.includes(expectedHash)) {
+    if (!raw.includes(expectedHash) || raw !== expectedOutputs[name]) {
       issues.push(
         issue("error", "token_promotion.output_stale", `design/system/${name} does not match the authored DESIGN.md token hash.`, `design/system/${name}`),
       );

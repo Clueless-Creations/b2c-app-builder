@@ -22,12 +22,12 @@ import { contrastRatio, isDarkBackground } from "../color-contrast.js";
 
 export const AA_BODY = 4.5;
 export const AA_LARGE = 3;
-export const APCA_PROXY = 7;
+export const AAA_BODY_SIGNAL = 7;
 export const HAIRLINE_PX = new Set([0, 1, 2]);
 
 /**
  * design-worthiness.md rule 4, Contrast floor. Body text needs WCAG AA (4.5:1); large text and
- * UI accents need 3:1; a dark background that only clears AA gets an APCA/AAA (7:1) warning,
+ * meaningful graphical objects need 3:1 in applicable contexts. Token names do not prove usage. A dark background below the 7:1 AAA body target gets a warning,
  * since dark body text at exactly the AA floor is itself a design signal worth a second look.
  * Returns no issues when the token record is missing or malformed — the caller's own
  * `design.issues` already reports that.
@@ -50,12 +50,12 @@ export function checkContrastMechanical(tokens: unknown): Issue[] {
         "DESIGN.md",
       ),
     );
-  } else if (textRatio !== undefined && isDarkBackground(background) && textRatio < APCA_PROXY) {
+  } else if (textRatio !== undefined && isDarkBackground(background) && textRatio < AAA_BODY_SIGNAL) {
     issues.push(
       issue(
         "warning",
         "worthiness.apca_dark_body",
-        `Dark color.background with body contrast ${textRatio.toFixed(2)}:1 meets AA but not the 7:1 APCA/AAA design signal.`,
+        `Dark color.background with body contrast ${textRatio.toFixed(2)}:1 meets AA but is below the 7:1 AAA body-text target. This is a contextual review signal, not an APCA calculation.`,
         "DESIGN.md",
       ),
     );
@@ -65,9 +65,9 @@ export function checkContrastMechanical(tokens: unknown): Issue[] {
   if (primaryRatio !== undefined && primaryRatio < AA_LARGE) {
     issues.push(
       issue(
-        "error",
+        "warning",
         "worthiness.contrast_primary",
-        `color.primary on color.background is ${primaryRatio.toFixed(2)}:1. Large text and UI accents need at least 3:1.`,
+        `color.primary on color.background is ${primaryRatio.toFixed(2)}:1. Check its actual use: large text and essential non-text indicators generally require 3:1; decorative accents do not. This token comparison alone cannot establish a violation.`,
         "DESIGN.md",
       ),
     );

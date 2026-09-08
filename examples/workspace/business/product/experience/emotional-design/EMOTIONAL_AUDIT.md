@@ -1,10 +1,10 @@
 # {{APP_NAME}} Emotional Design Audit
 
-Use this when you need a systematic record of the emotional quality of each user journey — onboarding, core loop, paywall, return sessions, failure states — against the four required Experience Cards and the Six-Lens Design Review Framework. Complete this artifact before marking any journey "build-ready" or "launch-ready." Discoveries map back to `eleven-star-experience.md` (star level), `analytics-attribution.md` (missing events), `failure-cards.md` (open cards), and `engineering/PRODUCTION_READINESS.md` (compliance evidence).
+Use this when you need a systematic record of the emotional quality of each user journey — onboarding, core loop, paywall, return sessions, failure states — against the selected Experience Cards and the Six-Lens Design Review Framework. Complete this artifact before marking any journey "build-ready" or "launch-ready." Discoveries map back to `eleven-star-experience.md` (star level), `analytics-attribution.md` (missing events), `failure-cards.md` (open cards), and `engineering/PRODUCTION_READINESS.md` (compliance evidence).
 
 Load before this audit:
 
-- `knowledge/experience/emotional-experience-design.md` — Six-Lens Framework, four required cards, bright-line checklist
+- `knowledge/experience/emotional-experience-design.md` — Six-Lens Framework, selected cards, bright-line checklist
 - `knowledge/experience/emotional-experience-measurement.md` — per-card PostHog event catalog
 - `knowledge/experience/eleven-star-experience.md` — star ladder and UX audit output contract
 - `knowledge/data/analytics-attribution.md` — master event catalog; do not invent event names outside it
@@ -18,6 +18,12 @@ Load before this audit:
 **MobAI bridge active:** {{YES_NO}}
 
 ---
+
+## Applicability Of This Example
+
+The populated card blocks illustrate one product that selected these mechanics. They are not a required bundle for every app, and the intended emotional ratings are hypotheses rather than observed user outcomes. Keep the cards that serve the accepted user job; remove unused example rows and blocks. Every retained card keeps its truth, exit, accessibility and measurement obligations.
+
+For a product that needs zero cards, remove all applied `experience_card:` blocks and record one fenced YAML mapping named `experience_card_selection` in the design artifact. Set `status` to `not_applicable` and provide product-specific `user_job`, `rationale` and `alternative` text, each at least 30 characters without placeholders. The auditor independently records the same fields in the audit artifact. See `knowledge/experience/emotional-design-system.md` for the exact shape. Do not insert that zero-card marker alongside this populated example. A score or empty map cannot replace the decision.
 
 ## Contents
 
@@ -95,23 +101,17 @@ For each Experience Card that is present and correctly triggered at this step, a
 
 `step_score = clamp(base_score + card_adjustment, 0, 10)`
 
-**Score Bands — What Each Band Means**
+**Using scores in review**
 
-| Score      | Band        | Meaning                                                                              | Required Action                                                          |
-| ---------- | ----------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
-| 0.0 – 3.0  | Broken      | The step actively harms the emotional journey or fails multiple lenses.              | Redesign before build handoff. Open a `high` or `critical` failure card. |
-| 3.1 – 5.9  | Functional  | The step works but delivers no emotional value. Users tolerate it.                   | Identify one lens to improve. Target 6+ before build handoff.            |
-| 6.0 – 7.9  | Competent   | The step advances the goal and creates mild positive emotion. Meets 6-star.          | Add at least one card or lens improvement to reach 8+.                   |
-| 8.0 – 8.9  | Elevated    | Clear emotional intent, one card implemented, rising arc contribution. Meets 7-star. | Verify card events fire. Record in engineering/PRODUCTION_READINESS.md.  |
-| 9.0 – 10.0 | Exceptional | All cards applicable to this step are present, measured, and on-brand.               | Ship with evidence. Record bright-line compliance.                       |
+Scores summarize the reviewer's observations and uncertainty. They do not establish user emotion, prescribe a card, or authorize build or launch. Diagnose each material defect and inspect its repair. A quiet, predictable flow may be appropriate without additional mechanics.
 
 **Per-Journey Score**
 
-Average the step scores for all steps in the journey. A journey scoring ≥ 7.5 average with no step below 4.0 is journey-ready. A journey with any step below 4.0 requires a remediation plan regardless of average.
+A journey average can help prioritize investigation. Record the underlying findings so an average cannot conceal a serious failure or recovery defect.
 
 **Per-App Score**
 
-Average the per-journey scores across all audited journeys, weighted by journey priority (Critical × 3, High × 2, Medium × 1). A per-app score ≥ 7.0 (weighted) with no Critical journey below 6.5 is the minimum threshold for a launch-ready emotional design claim.
+An aggregate is a discussion aid. Acceptance requires current evidence for the selected product and all critical journeys, regardless of the total.
 
 **Score vs Star Ladder Cross-Reference**
 
@@ -144,7 +144,7 @@ Roll up the per-step Six-Lens scores into one app-level read. The per-journey ta
 
 ## Card Application Inventory
 
-Where each of the four named Experience Cards is currently present, missing, or misused across the audited journeys. This is the bridge from audit findings to the Card Application Map in `EMOTIONAL_DESIGN.md`. Add rows for any additional deck cards (Endowed Progress, Peak-End, Streak, etc.) that the app uses or should use.
+Where each selected Experience Card is currently present, missing, or misused across the audited journeys. This is the bridge from audit findings to the Card Application Map in `EMOTIONAL_DESIGN.md`. Add rows for any additional deck cards (Endowed Progress, Peak-End, Streak, etc.) that the app uses or should use.
 
 | Experience Card             | Present At | Missing / Misused At | Star Level Affected | Dark-Pattern Flag | Pathway Priority |
 | --------------------------- | ---------- | -------------------- | ------------------- | ----------------- | ---------------- |
@@ -446,9 +446,9 @@ Answer all six for every finding. All must be Yes to pass. Any No is a dark-patt
 - [ ] The user can always choose to leave, cancel, or skip without a penalty or guilt-laden interstitial.
 - [ ] The commitment is editable by the user at any time from a settings or profile screen.
 - [ ] The variable reward variation is real content variation, not cosmetic (label or animation change only).
-- [ ] The perceived effort steps correspond to real computational operations (≥50% mapping in `engineering/TECH_SPEC.md`).
+- [ ] The perceived effort steps correspond to real computational operations (complete step-to-operation mapping in `engineering/TECH_SPEC.md`).
 - [ ] The intent mirror uses only fields the user explicitly provided — no inferred or manufactured emotional states.
-- [ ] None of the four required card triggers are coupled to a paywall CTA on the same screen.
+- [ ] None of the selected card triggers are coupled to a paywall CTA on the same screen.
 
 ---
 
@@ -502,7 +502,7 @@ validator: "npm run check:emotional-design -- --root ."
 | Perceived Effort Delay uses a sleep timer with no real computation mapped | `experience-card-dark-pattern`       | critical |
 | Intent Mirror reflects inferred or manufactured emotional state           | `experience-card-dark-pattern`       | critical |
 | Commitment is not editable from settings                                  | `experience-card-dark-pattern`       | critical |
-| Any required card is missing entirely from a Critical journey             | `experience-card-not-implemented`    | high     |
+| An accepted selected card is missing from its intended journey             | `experience-card-not-implemented`    | high     |
 | Named PostHog event absent from activity view                             | `experience-card-event-missing`      | medium   |
 | Emotional Curve not rendered in `emotional-design.html`                   | `emotional-curve-missing`            | medium   |
 | Emotional Curve peaks after the paywall marker                            | `emotional-curve-missing`            | medium   |

@@ -1,0 +1,3560 @@
+api_version: b2c.contribution/v1
+id: bespoke-design-methods
+goal: Strengthen brief-driven design, source-informed creative methods and independent production judgment.
+scope: contribution
+routing:
+  intended_target: Existing design knowledge and maintained upstream identities
+  effect: Original video synthesis and selected method adaptations; no provider execution.
+  verdict: contribution
+  reason: Reusable design knowledge fits existing owners and contracts.
+created_at: 2026-09-08T03:35:46Z
+synthetic: false
+sources:
+  - id: video-satori-survive
+    kind: other
+    title: Satori Graphics design instruction
+    canonical_url: https://www.youtube.com/watch?v=WFkGbyH24AY
+    publisher: Satori Graphics
+    reviewed_at: 2026-09-07
+    retrieval:
+      status: complete
+      method: Transcript and corresponding subtitle cue inspection
+      notes: Transcript fingerprint identifies reviewed text, not video bytes. Demonstrations and motion remain
+        visually uninspected.
+    rights:
+      status: unknown
+      notes: Ideas cited; expression and media excluded.
+    selectors:
+      - 01.01–01.12
+    registry_source_id: video-satori-survive
+    unknowns:
+      - Visual demonstration quality
+      - Empirical efficacy in a new product
+    revision: sha256:b2d85906b7703e6cdaa8f799a7c296b0092b86c842f6e84127ab47fc23eeb50a
+  - id: video-shapes-layout
+    kind: other
+    title: Shapes By Sean design instruction
+    canonical_url: https://www.youtube.com/watch?v=eEWRbpDu6CU
+    publisher: Shapes By Sean
+    reviewed_at: 2026-09-07
+    retrieval:
+      status: complete
+      method: Transcript and corresponding subtitle cue inspection
+      notes: Transcript fingerprint identifies reviewed text, not video bytes. Demonstrations and motion remain
+        visually uninspected.
+    rights:
+      status: unknown
+      notes: Ideas cited; expression and media excluded.
+    selectors:
+      - 02.01–02.11
+    registry_source_id: video-shapes-layout
+    unknowns:
+      - Visual demonstration quality
+      - Empirical efficacy in a new product
+    revision: sha256:eac03bf54ab7ca33769ae5b38854af2611f486279af47a72da43929d4b8f2fa7
+  - id: video-futur-great-design
+    kind: other
+    title: The Futur design instruction
+    canonical_url: https://www.youtube.com/watch?v=SdCzIDmfDAA
+    publisher: The Futur
+    reviewed_at: 2026-09-07
+    retrieval:
+      status: complete
+      method: Transcript and corresponding subtitle cue inspection
+      notes: Transcript fingerprint identifies reviewed text, not video bytes. Demonstrations and motion remain
+        visually uninspected.
+    rights:
+      status: unknown
+      notes: Ideas cited; expression and media excluded.
+    selectors:
+      - 03.01–03.11
+    registry_source_id: video-futur-great-design
+    unknowns:
+      - Visual demonstration quality
+      - Empirical efficacy in a new product
+    revision: sha256:7119389f38f74fcd93d75dd18d17ea924c6d49b1b8d374333b9174f97107b991
+  - id: video-satori-think-like
+    kind: other
+    title: Satori Graphics design instruction
+    canonical_url: https://www.youtube.com/watch?v=2zr9vXdsN94
+    publisher: Satori Graphics
+    reviewed_at: 2026-09-07
+    retrieval:
+      status: complete
+      method: Transcript and corresponding subtitle cue inspection
+      notes: Transcript fingerprint identifies reviewed text, not video bytes. Demonstrations and motion remain
+        visually uninspected.
+    rights:
+      status: unknown
+      notes: Ideas cited; expression and media excluded.
+    selectors:
+      - 04.01–04.10
+    registry_source_id: video-satori-think-like
+    unknowns:
+      - Visual demonstration quality
+      - Empirical efficacy in a new product
+    revision: sha256:00249fa14f98d891bdc07728235bbfe2413eb7e6ddc683928363df354bc7fbab
+  - id: video-omar-premium-branding
+    kind: other
+    title: Omar Eddaoudi design instruction
+    canonical_url: https://www.youtube.com/watch?v=1kcxUhjuW_0
+    publisher: Omar Eddaoudi
+    reviewed_at: 2026-09-07
+    retrieval:
+      status: complete
+      method: Transcript and corresponding subtitle cue inspection
+      notes: Transcript fingerprint identifies reviewed text, not video bytes. Demonstrations and motion remain
+        visually uninspected.
+    rights:
+      status: unknown
+      notes: Ideas cited; expression and media excluded.
+    selectors:
+      - 05.01–05.14
+    registry_source_id: video-omar-premium-branding
+    unknowns:
+      - Visual demonstration quality
+      - Empirical efficacy in a new product
+    revision: sha256:beeb0fc1bde70d4f410aaf7132c2a93e73cbeb91c8e87600b1c0cf7030da47b5
+  - id: video-netflix-paula-scher
+    kind: other
+    title: Netflix design instruction
+    canonical_url: https://www.youtube.com/watch?v=LCfBYE97rFk
+    publisher: Netflix
+    reviewed_at: 2026-09-07
+    retrieval:
+      status: complete
+      method: Transcript and corresponding subtitle cue inspection
+      notes: Transcript fingerprint identifies reviewed text, not video bytes. Demonstrations and motion remain
+        visually uninspected.
+    rights:
+      status: unknown
+      notes: Ideas cited; expression and media excluded.
+    selectors:
+      - 06.01–06.27
+    registry_source_id: video-netflix-paula-scher
+    unknowns:
+      - Visual demonstration quality
+      - Empirical efficacy in a new product
+    revision: sha256:3744e73c9ae17ecafb0b0fa5c2486553ef6795881f7fdfe49abaa4bd4fe2d13d
+  - id: video-designspo-typography
+    kind: other
+    title: DesignSpo design instruction
+    canonical_url: https://www.youtube.com/watch?v=AXpxZMRM1EY
+    publisher: DesignSpo
+    reviewed_at: 2026-09-07
+    retrieval:
+      status: complete
+      method: Transcript and corresponding subtitle cue inspection
+      notes: Transcript fingerprint identifies reviewed text, not video bytes. Demonstrations and motion remain
+        visually uninspected.
+    rights:
+      status: unknown
+      notes: Ideas cited; expression and media excluded.
+    selectors:
+      - 07.01–07.18
+    registry_source_id: video-designspo-typography
+    unknowns:
+      - Visual demonstration quality
+      - Empirical efficacy in a new product
+    revision: sha256:13c910076748c35aa75cf19ff9bf05c5c968cf4dbc87e9515c83fa77da9b7d37
+  - id: amir-brand-system-builder
+    kind: repository
+    title: Amir Mushich brand-system-skill
+    canonical_url: https://github.com/amirmushichge/brand-system-skill
+    publisher: Amir Mushich
+    revision: 30f6084ddf6adf4173cf882fce266015f8872c17
+    reviewed_at: 2026-09-07
+    retrieval:
+      status: complete
+      method: Pinned source and root-license inspection
+      notes: No code, host installation or service executed.
+    rights:
+      status: verified
+      spdx: CC-BY-4.0
+      evidence: https://github.com/amirmushichge/brand-system-skill/blob/30f6084ddf6adf4173cf882fce266015f8872c17/LICENSE
+      evidence_sha256: f5b745ef98087f531e719ee8ca6a96809444573ecc7173c6fa68eaad39b3cc3f
+      scope: Selected source method; third-party media excluded.
+    selectors:
+      - SKILL.md
+      - README.md
+      - LICENSE
+    registry_source_id: amir-brand-system-builder
+    upstream_id: amir-brand-system
+    directives:
+      - text: "Source prescriptions (paraphrased): use the Lovart workflow, constrained font selection and staged
+          approval prompts."
+        action: refused
+        category: other
+        location: SKILL.md, README.md, LICENSE
+    unknowns:
+      - Product-specific empirical benefit
+  - id: amir-cinematic-scroll-prompt-kit
+    kind: repository
+    title: Amir Mushich cinematic-scroll-prompt-kit
+    canonical_url: https://github.com/amirmushichge/cinematic-scroll-prompt-kit
+    publisher: Amir Mushich
+    revision: 39ac222e385061c1eeab7f063b869950ee7cca1b
+    reviewed_at: 2026-09-07
+    retrieval:
+      status: complete
+      method: Pinned source and root-license inspection
+      notes: No code, host installation or service executed.
+    rights:
+      status: verified
+      spdx: MIT
+      evidence: https://github.com/amirmushichge/cinematic-scroll-prompt-kit/blob/39ac222e385061c1eeab7f063b869950ee7cca1b/LICENSE
+      evidence_sha256: 8ee01d7b14659f2cb90cd33f3f259e039269b384d3970eed41805912c5a0a525
+      scope: Selected source method; third-party media excluded.
+    selectors:
+      - PROMPT.txt
+      - examples/PROJECT_BRIEF.example.md
+      - examples/assets.example.json
+      - LICENSE
+    registry_source_id: amir-cinematic-scroll-prompt-kit
+    upstream_id: amir-cinematic-scroll
+    directives:
+      - text: "Source prescriptions (paraphrased): build the specified sticky cinematic treatment with fixed visual
+          and scroll choices."
+        action: refused
+        category: other
+        location: PROMPT.txt, examples/PROJECT_BRIEF.example.md, examples/assets.example.json, LICENSE
+    unknowns:
+      - Product-specific empirical benefit
+units:
+  - id: v01-01
+    kind: knowledge
+    title: Interchangeable polish
+    upstream:
+      source_id: video-satori-survive
+      selector: L1–19, 00:00–00:42 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Reference/reject capability claim.. J compares actual outputs beyond color.
+      Symmetry is not a failure; palette-only repetition is a proposed counterexample. Evidence: Orderly AI
+      layouts are described as polished but predictable and interchangeable. Promotion and speaker
+      generalization."
+    verification:
+      - J compares actual outputs beyond color. Symmetry is not a failure; palette-only repetition is a
+        proposed counterexample.
+    kept:
+      - Orderly AI layouts are described as polished but predictable and interchangeable. Promotion and
+        speaker generalization.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "S: contracts/contribution/contract.ts; contextual source accounting only"
+  - id: v01-02
+    kind: knowledge
+    title: Purposeful imbalance
+    upstream:
+      source_id: video-satori-survive
+      selector: L20–38, 00:42–01:26 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt, D/J.. Compare a relevant exception with a conventional candidate. Random
+      offsets without communication benefit fail; quiet order may win. Evidence: Purposeful rhythm, tension,
+      breathing room and controlled imbalance can disrupt formulaic order without chaos. Speaker heuristic."
+    verification:
+      - Compare a relevant exception with a conventional candidate. Random offsets without communication
+        benefit fail; quiet order may win.
+    kept:
+      - Purposeful rhythm, tension, breathing room and controlled imbalance can disrupt formulaic order
+        without chaos. Speaker heuristic.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "D: knowledge/design/design-visual-system.md"
+      - "J: knowledge/design/design-worthiness.md"
+  - id: v01-03
+    kind: knowledge
+    title: Product and type relationships
+    upstream:
+      source_id: video-satori-survive
+      selector: L39–80, 01:25–03:00 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt; defer visual judgment.. D/A specify anchors and text clearance using
+      product-specific material. Check actual sizes, legibility and clear pricing. Copy neither the artwork
+      nor its emotional claims. Evidence: Perfume hero reportedly gains relationships through bottle/type
+      overlap, background lettering and a line linking product to price/details. Described demonstration and
+      interpretation."
+    verification:
+      - D/A specify anchors and text clearance using product-specific material. Check actual sizes, legibility
+        and clear pricing. Copy neither the artwork nor its emotional claims.
+    kept:
+      - Perfume hero reportedly gains relationships through bottle/type overlap, background lettering and a
+        line linking product to price/details. Described demonstration and interpretation.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred:
+      - Visual judgment remains unavailable for described demonstrations.
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "S: contracts/contribution/contract.ts; contextual source accounting only"
+  - id: v01-04
+    kind: knowledge
+    title: Intentionality versus career claims
+    upstream:
+      source_id: video-satori-survive
+      selector: L81–113, 02:59–04:12 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Duplicate intentionality; reject exclusivity and earnings promise.. J must accept
+      a suitable conventional utility. No artificial imperfection requirement. Evidence: Intentional
+      originality is linked to better work/earnings and human-only intent. Opinion and commercial claims."
+    verification:
+      - J must accept a suitable conventional utility. No artificial imperfection requirement.
+    kept:
+      - Intentional originality is linked to better work/earnings and human-only intent. Opinion and
+        commercial claims.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "S: contracts/contribution/contract.ts; contextual source accounting only"
+  - id: v01-05
+    kind: knowledge
+    title: Reasons for consequential choices
+    upstream:
+      source_id: video-satori-survive
+      selector: L114–138, 04:11–05:12 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt, B/D.. Attach reasons to material decisions. Pleasure or identity may be
+      valid purposes. A “premium” rationale with no identifiable role fails critique. Evidence: **Why before
+      what:** choices should have reasons beyond looking cool; the speaker qualifies rather than absolutely
+      bans decoration. Heuristic."
+    verification:
+      - Attach reasons to material decisions. Pleasure or identity may be valid purposes. A “premium”
+        rationale with no identifiable role fails critique.
+    kept:
+      - "**Why before what:** choices should have reasons beyond looking cool; the speaker qualifies rather
+        than absolutely bans decoration. Heuristic."
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "B: knowledge/design/audience-derived-identity.md"
+      - "D: knowledge/design/design-visual-system.md"
+  - id: v01-06
+    kind: knowledge
+    title: Conceptual substitution
+    upstream:
+      source_id: video-satori-survive
+      selector: L139–178, 05:11–06:53 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt selectable conceptual substitution, D.. Compare with direct communication.
+      Essential payment, consent and recovery information cannot require solving a metaphor. Evidence:
+      AI-awareness poster substitutes an off switch for the Thinker’s head and removes generic tech motifs.
+      Described comparison and interpretation."
+    verification:
+      - Compare with direct communication. Essential payment, consent and recovery information cannot require
+        solving a metaphor.
+    kept:
+      - AI-awareness poster substitutes an off switch for the Thinker’s head and removes generic tech motifs.
+        Described comparison and interpretation.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "D: knowledge/design/design-visual-system.md"
+  - id: v01-07
+    kind: knowledge
+    title: Anticipated audience response
+    upstream:
+      source_id: video-satori-survive
+      selector: L179–216, 06:52–08:27 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Covered/adapt, E.. Record an explicit audience sequence hypothesis. Test
+      comprehension separately from felt reassurance. Never invent a trust credential. Evidence: **Predictive
+      empathy:** design for what the viewer feels next; a loud poster becomes softer, more spacious and
+      reassuring. Heuristic and unverified emotional claim."
+    verification:
+      - Record an explicit audience sequence hypothesis. Test comprehension separately from felt reassurance.
+        Never invent a trust credential.
+    kept:
+      - "**Predictive empathy:** design for what the viewer feels next; a loud poster becomes softer, more
+        spacious and reassuring. Heuristic and unverified emotional claim."
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "E: knowledge/experience/emotional-design-system.md"
+  - id: v01-08
+    kind: knowledge
+    title: Competing interpretations
+    upstream:
+      source_id: video-satori-survive
+      selector: L217–234, 08:26–09:06 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt, J.. Preserve competing readings. Reject a blanket rule that quiet design
+      always communicates better; use non-leading participant interpretation if material. Evidence: The loud
+      poster could instead mean finding peace amid chaos. Alternative interpretation and qualification."
+    verification:
+      - Preserve competing readings. Reject a blanket rule that quiet design always communicates better; use
+        non-leading participant interpretation if material.
+    kept:
+      - The loud poster could instead mean finding peace amid chaos. Alternative interpretation and
+        qualification.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "J: knowledge/design/design-worthiness.md"
+  - id: v01-09
+    kind: knowledge
+    title: Combining recognizable meanings
+    upstream:
+      source_id: video-satori-survive
+      selector: L235–262, 09:05–10:10 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt relationship; defer memory efficacy, D/E/M.. Check message comprehension
+      first. Later recall requires participants; remembered cleverness with a misunderstood product is
+      failure. Evidence: Records arranged into a heart combine music and romance and are claimed to aid
+      memory. Described example and cognitive claim."
+    verification:
+      - Check message comprehension first. Later recall requires participants; remembered cleverness with a
+        misunderstood product is failure.
+    kept:
+      - Records arranged into a heart combine music and romance and are claimed to aid memory. Described
+        example and cognitive claim.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "D: knowledge/design/design-visual-system.md"
+      - "E: knowledge/experience/emotional-design-system.md"
+      - "M: knowledge/experience/emotional-experience-measurement.md"
+  - id: v01-10
+    kind: knowledge
+    title: Absence and curiosity
+    upstream:
+      source_id: video-satori-survive
+      selector: L263–281, 10:09–10:57 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt optional curiosity, D.. State the intended question and risk. A pause is
+      not proof of memory. Puzzle-like pricing is a negative fixture. Evidence: Empty clothes create
+      body-shaped absence, interpreted as depersonalization; resolving the image is called memory encoding.
+      Interpretation and causal assertion."
+    verification:
+      - State the intended question and risk. A pause is not proof of memory. Puzzle-like pricing is a
+        negative fixture.
+    kept:
+      - Empty clothes create body-shaped absence, interpreted as depersonalization; resolving the image is
+        called memory encoding. Interpretation and causal assertion.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "D: knowledge/design/design-visual-system.md"
+  - id: v01-11
+    kind: knowledge
+    title: Originality recap
+    upstream:
+      source_id: video-satori-survive
+      selector: L282–301, 10:56–11:46 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Duplicate/reject capability limit.. J judges actual fit and clarity; unusualness
+      alone earns no acceptance. Evidence: Metaphorical or unusual work is praised alongside human-only
+      claims. Opinion and recap."
+    verification:
+      - J judges actual fit and clarity; unusualness alone earns no acceptance.
+    kept:
+      - Metaphorical or unusual work is praised alongside human-only claims. Opinion and recap.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "S: contracts/contribution/contract.ts; contextual source accounting only"
+  - id: v01-12
+    kind: knowledge
+    title: Promotion
+    upstream:
+      source_id: video-satori-survive
+      selector: L302–311, 11:45–12:04 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Reference only, S.. Exclude instructions and commercial promises from delivered
+      guidance. Evidence: Engagement and next-video invitation. Promotion."
+    verification:
+      - Exclude instructions and commercial promises from delivered guidance.
+    kept: []
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose, assets and unsupported commercial or causal claims.
+      - Exclude instructions and commercial promises from delivered guidance.
+    deferred: []
+    conflicts: []
+    selection: reference-only
+    applicability:
+      - "S: contracts/contribution/contract.ts"
+  - id: v02-01
+    kind: knowledge
+    title: Five-law promise
+    upstream:
+      source_id: video-shapes-layout
+      selector: L1–4, 00:00–00:08 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Reference only.. No guaranteed professionalism or engagement outcome. Evidence:
+      Promises immediate improvement from five laws. Promotion."
+    verification:
+      - No guaranteed professionalism or engagement outcome.
+    kept: []
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose, assets and unsupported commercial or causal claims.
+      - No guaranteed professionalism or engagement outcome.
+    deferred: []
+    conflicts: []
+    selection: reference-only
+    applicability:
+      - "S: contracts/contribution/contract.ts; contextual source accounting only"
+  - id: v02-02
+    kind: knowledge
+    title: Grid organization
+    upstream:
+      source_id: video-shapes-layout
+      selector: L5–14, 00:07–00:30 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Covered/adapt, D.. Define project-specific alignment. Check accidental
+      misalignment; do not require a modular grid everywhere. Evidence: **Grid systems:** rows, columns and
+      modules organize text and imagery. Technical description and heuristic."
+    verification:
+      - Define project-specific alignment. Check accidental misalignment; do not require a modular grid
+        everywhere.
+    kept:
+      - "**Grid systems:** rows, columns and modules organize text and imagery. Technical description and
+        heuristic."
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "D: knowledge/design/design-visual-system.md"
+  - id: v02-03
+    kind: knowledge
+    title: Print-grid demonstration
+    upstream:
+      source_id: video-shapes-layout
+      selector: L15–40, 00:29–01:31 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt principle; reference settings, D/N.. Translate to responsive/native layout.
+      Fixed counts, millimeters and shortcuts are not screen requirements. Test content expansion. Evidence:
+      Illustrator demonstration uses inset, six columns, eight rows, gutters and snapping guides. Described
+      procedure."
+    verification:
+      - Translate to responsive/native layout. Fixed counts, millimeters and shortcuts are not screen
+        requirements. Test content expansion.
+    kept:
+      - Illustrator demonstration uses inset, six columns, eight rows, gutters and snapping guides. Described
+        procedure.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred:
+      - Visual judgment remains unavailable for described demonstrations.
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "D: knowledge/design/design-visual-system.md"
+      - "N: knowledge/design/mobile-flow-craft.md"
+  - id: v02-04
+    kind: knowledge
+    title: Reading order and proximity
+    upstream:
+      source_id: video-shapes-layout
+      selector: L41–78, 01:30–02:38 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt, D.. Record notice/read/understand/action order and related groups. Actual
+      eye movement is unmeasured. Decorative branding must not outrank the task. Evidence: **Hierarchy and
+      proximity:** headline, discount, logo, details and subdued photograph create an intended order and pace.
+      Described example and attention heuristic."
+    verification:
+      - Record notice/read/understand/action order and related groups. Actual eye movement is unmeasured.
+        Decorative branding must not outrank the task.
+    kept:
+      - "**Hierarchy and proximity:** headline, discount, logo, details and subdued photograph create an
+        intended order and pace. Described example and attention heuristic."
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "D: knowledge/design/design-visual-system.md"
+  - id: v02-05
+    kind: knowledge
+    title: Pace failure despite alignment
+    upstream:
+      source_id: video-shapes-layout
+      selector: L79–89, 02:37–02:58 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt evaluation, J.. Aligned-but-wrong-grouping fixture must produce a
+      communication repair, not only token approval. Evidence: Technically plausible hierarchy still fails
+      when elements bunch together and lack pace. Described failure comparison."
+    verification:
+      - Aligned-but-wrong-grouping fixture must produce a communication repair, not only token approval.
+    kept:
+      - Technically plausible hierarchy still fails when elements bunch together and lack pace. Described
+        failure comparison.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "J: knowledge/design/design-worthiness.md"
+  - id: v02-06
+    kind: knowledge
+    title: Layer relationships
+    upstream:
+      source_id: video-shapes-layout
+      selector: L90–123, 02:57–03:59 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt selectable technique, D/A/N.. Specify layers and semantics. A second font,
+      blue border and annotations are not defaults. Test narrow widths, focus and text visibility. Evidence:
+      **Layering:** Blue Skies combines foreground/background type, photo, border, grid and annotations to
+      suggest uplift and creativity. Described sequence and interpretation."
+    verification:
+      - Specify layers and semantics. A second font, blue border and annotations are not defaults. Test narrow
+        widths, focus and text visibility.
+    kept:
+      - "**Layering:** Blue Skies combines foreground/background type, photo, border, grid and annotations to
+        suggest uplift and creativity. Described sequence and interpretation."
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "D: knowledge/design/design-visual-system.md"
+      - "A: knowledge/design/remotion-content-assets.md"
+      - "N: knowledge/design/mobile-flow-craft.md"
+  - id: v02-07
+    kind: knowledge
+    title: Palette sampling
+    upstream:
+      source_id: video-shapes-layout
+      selector: L124–154, 03:58–05:00 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Covered/adapt, T.. Sampled color is a candidate. Approved brand and functional
+      status colors remain separate. Low contrast or corrupted warning meaning fails. Evidence: **Harmonize
+      colors:** sample photo colors, adjust them and create global swatches. Described procedure."
+    verification:
+      - Sampled color is a candidate. Approved brand and functional status colors remain separate. Low
+        contrast or corrupted warning meaning fails.
+    kept:
+      - "**Harmonize colors:** sample photo colors, adjust them and create global swatches. Described
+        procedure."
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "T: tooling/lib/design-md.ts"
+  - id: v02-08
+    kind: knowledge
+    title: Shared swatches
+    upstream:
+      source_id: video-shapes-layout
+      selector: L155–171, 04:59–05:32 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Covered, T.. Use existing semantic-token authority. Verify propagation and
+      preserved contrast; hard-coded residual color is a fixture. Evidence: Global swatches propagate changes
+      across text, shapes and artboards. Described technical workflow."
+    verification:
+      - Use existing semantic-token authority. Verify propagation and preserved contrast; hard-coded residual
+        color is a fixture.
+    kept:
+      - Global swatches propagate changes across text, shapes and artboards. Described technical workflow.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "T: tooling/lib/design-md.ts"
+  - id: v02-09
+    kind: knowledge
+    title: Image-search discovery
+    upstream:
+      source_id: video-shapes-layout
+      selector: L172–180, 05:31–05:48 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Reference optional discovery, R.. Search labels do not prove rights or audience
+      fit. Record the original source and learned relationship. Evidence: Simple image searches can find
+      palette ideas. Personal practice."
+    verification:
+      - Search labels do not prove rights or audience fit. Record the original source and learned relationship.
+    kept:
+      - Simple image searches can find palette ideas. Personal practice.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "R: knowledge/design/design-evidence-stack.md"
+  - id: v02-10
+    kind: knowledge
+    title: Focal image and action
+    upstream:
+      source_id: video-shapes-layout
+      selector: L181–207, 05:47–06:35 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt, D/J.. Distinguish focal image from first readable message. Competing peaks
+      or hidden qualification fail. Yellow does not establish conversion. Evidence: **Focal points:** figure,
+      quote, qualification and CTA band have distinct visual/read/action roles. Described composition and
+      predicted action."
+    verification:
+      - Distinguish focal image from first readable message. Competing peaks or hidden qualification fail.
+        Yellow does not establish conversion.
+    kept:
+      - "**Focal points:** figure, quote, qualification and CTA band have distinct visual/read/action roles.
+        Described composition and predicted action."
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "D: knowledge/design/design-visual-system.md"
+      - "J: knowledge/design/design-worthiness.md"
+  - id: v02-11
+    kind: knowledge
+    title: Closing promotion
+    upstream:
+      source_id: video-shapes-layout
+      selector: L208–212, 06:34–07:03 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Reference only.. No implementation instruction. Evidence: Closing invitation and
+      music. Promotion/entertainment."
+    verification:
+      - No implementation instruction.
+    kept: []
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose, assets and unsupported commercial or causal claims.
+      - No implementation instruction.
+    deferred: []
+    conflicts: []
+    selection: reference-only
+    applicability:
+      - "S: contracts/contribution/contract.ts; contextual source accounting only"
+  - id: v03-01
+    kind: knowledge
+    title: Question intent
+    upstream:
+      source_id: video-futur-great-design
+      selector: L1–16, 00:02–00:37 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt intent; reject prerequisite, B/J.. A narrowly scoped, well-crafted utility
+      remains eligible without additional effects or disciplines. Evidence: Establish intent behind the
+      question before examining “great designers do more.” Dialogue and proposition."
+    verification:
+      - A narrowly scoped, well-crafted utility remains eligible without additional effects or disciplines.
+    kept:
+      - Establish intent behind the question before examining “great designers do more.” Dialogue and
+        proposition.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "B: knowledge/design/audience-derived-identity.md"
+      - "J: knowledge/design/design-worthiness.md"
+  - id: v03-02
+    kind: knowledge
+    title: Outside interests
+    upstream:
+      source_id: video-futur-great-design
+      selector: L17–28, 00:36–01:01 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt optional exploration, D.. An outside analogy needs a useful role and
+      bounded cost. Unrelated complexity is rejected. Evidence: Ming suggests outside interests and
+      willingness to fail may feed creativity. Participant heuristic."
+    verification:
+      - An outside analogy needs a useful role and bounded cost. Unrelated complexity is rejected.
+    kept:
+      - Ming suggests outside interests and willingness to fail may feed creativity. Participant heuristic.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "D: knowledge/design/design-visual-system.md"
+  - id: v03-03
+    kind: knowledge
+    title: Universal-rule counterexample
+    upstream:
+      source_id: video-futur-great-design
+      selector: L29–45, 01:00–01:35 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt, J/S.. Challenge universal rules before encoding them. Do not turn
+      rhetorical practice-hour counts into thresholds. Evidence: A great designer who only designs disproves
+      the universal claim; craft mastery matters. Logical counterexample and personal practice."
+    verification:
+      - Challenge universal rules before encoding them. Do not turn rhetorical practice-hour counts into
+        thresholds.
+    kept:
+      - A great designer who only designs disproves the universal claim; craft mastery matters. Logical
+        counterexample and personal practice.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "J: knowledge/design/design-worthiness.md"
+      - "S: contracts/contribution/contract.ts"
+  - id: v03-04
+    kind: knowledge
+    title: Humble craft anecdotes
+    upstream:
+      source_id: video-futur-great-design
+      selector: L46–66, 01:34–02:16 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Reference only.. No cultural generalization, work-hour requirement or clip
+      import. Evidence: Skilled mundane work and travel anecdotes illustrate doing humble work well. Anecdote
+      and values."
+    verification:
+      - No cultural generalization, work-hour requirement or clip import.
+    kept: []
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose, assets and unsupported commercial or causal claims.
+      - No cultural generalization, work-hour requirement or clip import.
+    deferred: []
+    conflicts: []
+    selection: reference-only
+    applicability:
+      - "S: contracts/contribution/contract.ts; contextual source accounting only"
+  - id: v03-05
+    kind: knowledge
+    title: Focused craft before expansion
+    upstream:
+      source_id: video-futur-great-design
+      selector: L67–96, 02:15–03:11 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt focus, N/J.. Fix the largest defect within scope. Do not use restraint to
+      evade a selected demanding interaction. Reject the percentage and health-causality claims. Evidence: Do
+      less better, then expand when appropriate; success narratives are criticized with an explicitly
+      unscientific percentage. Heuristic and unsupported causal claims."
+    verification:
+      - Fix the largest defect within scope. Do not use restraint to evade a selected demanding interaction.
+        Reject the percentage and health-causality claims.
+    kept:
+      - Do less better, then expand when appropriate; success narratives are criticized with an explicitly
+        unscientific percentage. Heuristic and unsupported causal claims.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "N: knowledge/design/mobile-flow-craft.md"
+      - "J: knowledge/design/design-worthiness.md"
+  - id: v03-06
+    kind: knowledge
+    title: Concrete defect anchors
+    upstream:
+      source_id: video-futur-great-design
+      selector: L97–110, 03:10–03:38 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt, J.. Use concrete defect anchors and record disagreement. No universal
+      score or assumed reviewer agreement. Evidence: Bad-versus-great examples are easier to discuss than fine
+      judgments between good and great. Judgment heuristic."
+    verification:
+      - Use concrete defect anchors and record disagreement. No universal score or assumed reviewer agreement.
+    kept:
+      - Bad-versus-great examples are easier to discuss than fine judgments between good and great. Judgment
+        heuristic.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "J: knowledge/design/design-worthiness.md"
+  - id: v03-07
+    kind: knowledge
+    title: Undefined aesthetic adjective
+    upstream:
+      source_id: video-futur-great-design
+      selector: L111–130, 03:37–04:19 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt, B/D.. Translate important adjectives into observable relationships.
+      Sparse-versus-dense interpretations of “clean” form a useful fixture. Evidence: A student exposes that
+      “elegant” has no shared definition. Teaching anecdote and procedure."
+    verification:
+      - Translate important adjectives into observable relationships. Sparse-versus-dense interpretations of
+        “clean” form a useful fixture.
+    kept:
+      - A student exposes that “elegant” has no shared definition. Teaching anecdote and procedure.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "B: knowledge/design/audience-derived-identity.md"
+      - "D: knowledge/design/design-visual-system.md"
+  - id: v03-08
+    kind: knowledge
+    title: Contrast endpoints and competition
+    upstream:
+      source_id: video-futur-great-design
+      selector: L131–158, 04:18–05:14 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt operationalization; reject maximization, J.. Separate contrast
+      accessibility from composition. A screen where everything shouts must prompt reduced competition.
+      Evidence: Contrast is explored through low/high endpoints; more is called better in that exercise.
+      Teaching example and oversimplification."
+    verification:
+      - Separate contrast accessibility from composition. A screen where everything shouts must prompt reduced
+        competition.
+    kept:
+      - Contrast is explored through low/high endpoints; more is called better in that exercise. Teaching
+        example and oversimplification.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "J: knowledge/design/design-worthiness.md"
+  - id: v03-09
+    kind: knowledge
+    title: Independent knowledge transfer
+    upstream:
+      source_id: video-futur-great-design
+      selector: L159–192, 05:13–06:15 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt central evaluation, J.. Fresh reviewer diagnoses held-out work and repairs
+      it. Exactly five rubric rows and vocabulary completion are not requirements. Evidence: Students should
+      make comparable decisions without the teacher; explicit criteria and sliders help. Attributed teaching
+      practice."
+    verification:
+      - Fresh reviewer diagnoses held-out work and repairs it. Exactly five rubric rows and vocabulary
+        completion are not requirements.
+    kept:
+      - Students should make comparable decisions without the teacher; explicit criteria and sliders help.
+        Attributed teaching practice.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "J: knowledge/design/design-worthiness.md"
+  - id: v03-10
+    kind: knowledge
+    title: Operationalize ambiguous briefs
+    upstream:
+      source_id: video-futur-great-design
+      selector: L193–225, 06:14–07:20 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt clarity, B.. Reuse evidence and ask only consequential questions. Reject a
+      mandatory grueling questionnaire or retrospective rationale for a template. Evidence: Vague “epic,”
+      “clean,” “modern,” and “organic” briefs create false agreement; clarification develops articulation.
+      Personal practice."
+    verification:
+      - Reuse evidence and ask only consequential questions. Reject a mandatory grueling questionnaire or
+        retrospective rationale for a template.
+    kept:
+      - Vague “epic,” “clean,” “modern,” and “organic” briefs create false agreement; clarification develops
+        articulation. Personal practice.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "B: knowledge/design/audience-derived-identity.md"
+  - id: v03-11
+    kind: knowledge
+    title: Terminal caption artifact
+    upstream:
+      source_id: video-futur-great-design
+      selector: L226, 07:19–07:22 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Reference only.. Preserve bytes; invent no closing lesson. Evidence: Terminal
+      “foreign” caption. Caption artifact."
+    verification:
+      - Preserve bytes; invent no closing lesson.
+    kept: []
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose, assets and unsupported commercial or causal claims.
+      - Preserve bytes; invent no closing lesson.
+    deferred: []
+    conflicts: []
+    selection: reference-only
+    applicability:
+      - "S: contracts/contribution/contract.ts; contextual source accounting only"
+  - id: v04-01
+    kind: knowledge
+    title: Opening career promotion
+    upstream:
+      source_id: video-satori-think-like
+      selector: L1–7, 00:00–00:18 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Reference only.. No status or career acceptance criterion. Evidence: Promises
+      career benefits from three mindsets. Promotion."
+    verification:
+      - No status or career acceptance criterion.
+    kept: []
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose, assets and unsupported commercial or causal claims.
+      - No status or career acceptance criterion.
+    deferred: []
+    conflicts: []
+    selection: reference-only
+    applicability:
+      - "S: contracts/contribution/contract.ts; contextual source accounting only"
+  - id: v04-02
+    kind: knowledge
+    title: Identity and belonging
+    upstream:
+      source_id: video-satori-think-like
+      selector: L8–50, 00:13–02:21 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt framing, B/D.. Diagnose the actual problem. Do not require multi-symbol
+      logos or treat inferred historical intent as verified. Evidence: **Problem-solving:** vague requests
+      conceal communication problems; Airbnb’s mark is interpreted through belonging and combined symbols.
+      Heuristic and partly speculative case history."
+    verification:
+      - Diagnose the actual problem. Do not require multi-symbol logos or treat inferred historical intent as
+        verified.
+    kept:
+      - "**Problem-solving:** vague requests conceal communication problems; Airbnb’s mark is interpreted
+        through belonging and combined symbols. Heuristic and partly speculative case history."
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "B: knowledge/design/audience-derived-identity.md"
+      - "D: knowledge/design/design-visual-system.md"
+  - id: v04-03
+    kind: knowledge
+    title: Small-scale identity critique
+    upstream:
+      source_id: video-satori-think-like
+      selector: L51–82, 02:20–04:02 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt, D/N.. Link alternatives to diagnosed failures and test required sizes.
+      Monochrome wordmarks are example-specific and can themselves fail tiny contexts. Evidence: Uber critique
+      links small-scale detail, identity and broader applications to simplification. Described critique and
+      interpreted history."
+    verification:
+      - Link alternatives to diagnosed failures and test required sizes. Monochrome wordmarks are
+        example-specific and can themselves fail tiny contexts.
+    kept:
+      - Uber critique links small-scale detail, identity and broader applications to simplification. Described
+        critique and interpreted history.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "D: knowledge/design/design-visual-system.md"
+      - "N: knowledge/design/mobile-flow-craft.md"
+  - id: v04-04
+    kind: knowledge
+    title: Sponsored tool demonstration
+    upstream:
+      source_id: video-satori-think-like
+      selector: L83–109, 04:01–05:29 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Reference/reject mandate.. No Framer dependency, template default, perpetual CTA
+      animation or predicted uplift. Selected motion needs independent evidence. Evidence: Framer templates,
+      hover and looping CTA effects are promoted with click claims. Promotion and described tool demo."
+    verification:
+      - No Framer dependency, template default, perpetual CTA animation or predicted uplift. Selected motion
+        needs independent evidence.
+    kept: []
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose, assets and unsupported commercial or causal claims.
+      - No Framer dependency, template default, perpetual CTA animation or predicted uplift. Selected motion
+        needs independent evidence.
+    deferred: []
+    conflicts: []
+    selection: reference-only
+    applicability:
+      - "S: contracts/contribution/contract.ts; contextual source accounting only"
+  - id: v04-05
+    kind: knowledge
+    title: Coordinated visual tone
+    upstream:
+      source_id: video-satori-think-like
+      selector: L110–131, 05:21–06:33 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt, B/E/D.. Coordinate dimensions around a stated hypothesis. No universal
+      happiness response or borrowed brand expression. Evidence: **Visual storytelling:** Coca-Cola’s type,
+      color and imagery are interpreted as a coordinated emotional package. Interpretation."
+    verification:
+      - Coordinate dimensions around a stated hypothesis. No universal happiness response or borrowed brand
+        expression.
+    kept:
+      - "**Visual storytelling:** Coca-Cola’s type, color and imagery are interpreted as a coordinated
+        emotional package. Interpretation."
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "B: knowledge/design/audience-derived-identity.md"
+      - "E: knowledge/experience/emotional-design-system.md"
+      - "D: knowledge/design/design-visual-system.md"
+  - id: v04-06
+    kind: knowledge
+    title: Genre associations
+    upstream:
+      source_id: video-satori-think-like
+      selector: L132–155, 06:27–07:49 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Covered/adapt, E.. Treat cultural associations as hypotheses. A “warm” palette
+      that weakens urgent recovery is a counterexample. Evidence: Horror and romance examples illustrate
+      reinforcing tone through type, color and images. Genre heuristic."
+    verification:
+      - Treat cultural associations as hypotheses. A “warm” palette that weakens urgent recovery is a
+        counterexample.
+    kept:
+      - Horror and romance examples illustrate reinforcing tone through type, color and images. Genre
+        heuristic.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "E: knowledge/experience/emotional-design-system.md"
+  - id: v04-07
+    kind: knowledge
+    title: Reasons for form
+    upstream:
+      source_id: video-satori-think-like
+      selector: L156–184, 07:42–09:19 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Duplicate/adapt, D.. Record meaningful reasons, not per-pixel essays.
+      Interpretation is not verified designer intent. Evidence: **Intentional choices:** avoid mechanical
+      font/color additions; Nike’s curve is interpreted as speed and victory. Heuristic and logo
+      interpretation."
+    verification:
+      - Record meaningful reasons, not per-pixel essays. Interpretation is not verified designer intent.
+    kept:
+      - "**Intentional choices:** avoid mechanical font/color additions; Nike’s curve is interpreted as speed
+        and victory. Heuristic and logo interpretation."
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "D: knowledge/design/design-visual-system.md"
+  - id: v04-08
+    kind: knowledge
+    title: Color and shape questions
+    upstream:
+      source_id: video-satori-think-like
+      selector: L185–204, 09:18–10:19 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt questions; reject category rule, B/D.. A sensory-sensitive or
+      parent-focused product may need another treatment. Actual audience context decides. Evidence: Ask what
+      color, shape and type contribute; bright toy colors are offered as an example. Procedure and
+      stereotype."
+    verification:
+      - A sensory-sensitive or parent-focused product may need another treatment. Actual audience context
+        decides.
+    kept:
+      - Ask what color, shape and type contribute; bright toy colors are offered as an example. Procedure and
+        stereotype.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "B: knowledge/design/audience-derived-identity.md"
+      - "D: knowledge/design/design-visual-system.md"
+  - id: v04-09
+    kind: knowledge
+    title: Audience over category
+    upstream:
+      source_id: video-satori-think-like
+      selector: L205–211, 10:18–10:39 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Covered, B/J.. Explain conflicts between founder taste and audience needs without
+      erasing legitimate constraints. Unsupported audience assumptions fail. Evidence: Design addresses the
+      client’s audience through coordinated elements. Heuristic."
+    verification:
+      - Explain conflicts between founder taste and audience needs without erasing legitimate constraints.
+        Unsupported audience assumptions fail.
+    kept:
+      - Design addresses the client’s audience through coordinated elements. Heuristic.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "B: knowledge/design/audience-derived-identity.md"
+      - "J: knowledge/design/design-worthiness.md"
+  - id: v04-10
+    kind: knowledge
+    title: Promotion
+    upstream:
+      source_id: video-satori-think-like
+      selector: L212–224, 10:33–11:21 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Duplicate/reference.. Doctrine adoption does not establish top-agency quality.
+      Evidence: Career-superiority recap and further-video promotion. Promotion."
+    verification:
+      - Doctrine adoption does not establish top-agency quality.
+    kept: []
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose, assets and unsupported commercial or causal claims.
+      - Doctrine adoption does not establish top-agency quality.
+    deferred: []
+    conflicts: []
+    selection: reference-only
+    applicability:
+      - "S: contracts/contribution/contract.ts; contextual source accounting only"
+  - id: v05-01
+    kind: knowledge
+    title: Premium revenue promises
+    upstream:
+      source_id: video-omar-premium-branding
+      selector: L1–44, 00:02–01:29 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Reference/reject guarantees, S/J.. No 10× price promise or inferred efficacy.
+      Evidence: Premium psychology is linked to higher prices, store counts and revenue. Promotion and
+      unsupported commercial claims."
+    verification:
+      - No 10× price promise or inferred efficacy.
+    kept: []
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose, assets and unsupported commercial or causal claims.
+      - No 10× price promise or inferred efficacy.
+    deferred: []
+    conflicts: []
+    selection: reference-only
+    applicability:
+      - "S: contracts/contribution/contract.ts"
+      - "J: knowledge/design/design-worthiness.md"
+  - id: v05-02
+    kind: knowledge
+    title: Meaning beyond scarcity
+    upstream:
+      source_id: video-omar-premium-branding
+      selector: L45–67, 01:28–02:16 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt conditionally, B.. Require genuine attributes and segment evidence. A
+      practical utility defaults to usefulness, not prestige. Evidence: **Exclusivity** concerns narrative,
+      ownership and meaning beyond function; explicitly distinguished from scarcity. Heuristic."
+    verification:
+      - Require genuine attributes and segment evidence. A practical utility defaults to usefulness, not
+        prestige.
+    kept:
+      - "**Exclusivity** concerns narrative, ownership and meaning beyond function; explicitly distinguished
+        from scarcity. Heuristic."
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "B: knowledge/design/audience-derived-identity.md"
+  - id: v05-03
+    kind: knowledge
+    title: Narrow positioning anecdote
+    upstream:
+      source_id: video-omar-premium-branding
+      selector: L68–101, 02:15–03:28 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Reference/adapt principle, B.. Name a defensible difference; do not repeat
+      historical success as established causality. Evidence: Packard illustrates narrow clientele,
+      craftsmanship and distinctive positioning. Historical anecdote."
+    verification:
+      - Name a defensible difference; do not repeat historical success as established causality.
+    kept:
+      - Packard illustrates narrow clientele, craftsmanship and distinctive positioning. Historical anecdote.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "B: knowledge/design/audience-derived-identity.md"
+  - id: v05-04
+    kind: knowledge
+    title: Fictional reframing example
+    upstream:
+      source_id: video-omar-premium-branding
+      selector: L102–115, 03:27–03:58 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Reference only.. It is not an experiment or permission to distract from
+      consequential limitations. Claims review catches that misuse. Evidence: *Mad Men*’s “toasted” example
+      illustrates reframing. Fictional dramatization."
+    verification:
+      - It is not an experiment or permission to distract from consequential limitations. Claims review
+        catches that misuse.
+    kept: []
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose, assets and unsupported commercial or causal claims.
+      - It is not an experiment or permission to distract from consequential limitations. Claims review
+        catches that misuse.
+    deferred: []
+    conflicts: []
+    selection: reference-only
+    applicability:
+      - "S: contracts/contribution/contract.ts; contextual source accounting only"
+  - id: v05-05
+    kind: knowledge
+    title: Aspirational identification
+    upstream:
+      source_id: video-omar-premium-branding
+      selector: L116–141, 03:57–04:48 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt, B/E.. Use expressed motivations, not inferred vulnerabilities. Unsupported
+      prestige assumptions return to research. Evidence: **Identification** links product to aspirations,
+      values and self-conception. Psychological heuristic."
+    verification:
+      - Use expressed motivations, not inferred vulnerabilities. Unsupported prestige assumptions return to
+        research.
+    kept:
+      - "**Identification** links product to aspirations, values and self-conception. Psychological heuristic."
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "B: knowledge/design/audience-derived-identity.md"
+      - "E: knowledge/experience/emotional-design-system.md"
+  - id: v05-06
+    kind: knowledge
+    title: Cultural luxury associations
+    upstream:
+      source_id: video-omar-premium-branding
+      selector: L142–186, 04:47–06:20 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Reference, B.. Do not universalize gender/class associations or copy brand codes.
+      Same-category audiences may choose different meanings. Evidence: Chanel is interpreted through
+      confidence, sophistication and an aspirational self. Historical/cultural interpretation."
+    verification:
+      - Do not universalize gender/class associations or copy brand codes. Same-category audiences may choose
+        different meanings.
+    kept: []
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose, assets and unsupported commercial or causal claims.
+      - Do not universalize gender/class associations or copy brand codes. Same-category audiences may choose
+        different meanings.
+    deferred: []
+    conflicts: []
+    selection: reference-only
+    applicability:
+      - "B: knowledge/design/audience-derived-identity.md"
+  - id: v05-07
+    kind: knowledge
+    title: Story and product role
+    upstream:
+      source_id: video-omar-premium-branding
+      selector: L187–225, 06:19–07:44 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt, E/A.. State product role and takeaway. Narrative alone proves neither
+      memory nor commercial scale. Evidence: **Storytelling** links product and consumer life through meaning
+      and experience. Heuristic and memory/scale claims."
+    verification:
+      - State product role and takeaway. Narrative alone proves neither memory nor commercial scale.
+    kept:
+      - "**Storytelling** links product and consumer life through meaning and experience. Heuristic and
+        memory/scale claims."
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "E: knowledge/experience/emotional-design-system.md"
+      - "A: knowledge/design/remotion-content-assets.md"
+  - id: v05-08
+    kind: knowledge
+    title: Casting and setting
+    upstream:
+      source_id: video-omar-premium-branding
+      selector: L226–278, 07:43–09:38 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Reference/adapt fit, A.. Explain casting and scene roles. No borrowed
+      endorsement, slogan or celebrity asset. Evidence: Nespresso/Clooney expresses a lifestyle through
+      casting, language and setting. Case interpretation."
+    verification:
+      - Explain casting and scene roles. No borrowed endorsement, slogan or celebrity asset.
+    kept:
+      - Nespresso/Clooney expresses a lifestyle through casting, language and setting. Case interpretation.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; source-specific claims and aesthetics remain excluded.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "A: knowledge/design/remotion-content-assets.md"
+  - id: v05-09
+    kind: knowledge
+    title: Authentic participation
+    upstream:
+      source_id: video-omar-premium-branding
+      selector: L279–314, 09:37–10:55 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt, A.. Ground stories in authentic use. Stock aspiration and unverified
+      practitioner identities cannot establish product truth. Evidence: Lululemon illustrates participation,
+      practitioners and routine-based stories. Case interpretation."
+    verification:
+      - Ground stories in authentic use. Stock aspiration and unverified practitioner identities cannot
+        establish product truth.
+    kept:
+      - Lululemon illustrates participation, practitioners and routine-based stories. Case interpretation.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "A: knowledge/design/remotion-content-assets.md"
+  - id: v05-10
+    kind: knowledge
+    title: Drops and coherent world
+    upstream:
+      source_id: video-omar-premium-branding
+      selector: L315–355, 10:54–12:24 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt coherence; reject universal scarcity, B/A.. Retain the tension with earlier
+      “not scarcity.” Actual scarcity can be stated truthfully; fake app countdowns fail. Evidence: Represent
+      illustrates drops, founder involvement and documentary stories; a coherent brand world is emphasized.
+      Case interpretation."
+    verification:
+      - Retain the tension with earlier “not scarcity.” Actual scarcity can be stated truthfully; fake app
+        countdowns fail.
+    kept:
+      - Represent illustrates drops, founder involvement and documentary stories; a coherent brand world is
+        emphasized. Case interpretation.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "B: knowledge/design/audience-derived-identity.md"
+      - "A: knowledge/design/remotion-content-assets.md"
+  - id: v05-11
+    kind: knowledge
+    title: Segment research
+    upstream:
+      source_id: video-omar-premium-branding
+      selector: L356–390, 12:23–13:32 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt, B.. Record evidence, motivations and uncertainties by segment.
+      Same-category comparison tests whether priorities change meaningfully. Evidence: **Research/psychology
+      mapping:** segments differ in what attributes mean and in awareness. Procedure."
+    verification:
+      - Record evidence, motivations and uncertainties by segment. Same-category comparison tests whether
+        priorities change meaningfully.
+    kept:
+      - "**Research/psychology mapping:** segments differ in what attributes mean and in awareness. Procedure."
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "B: knowledge/design/audience-derived-identity.md"
+  - id: v05-12
+    kind: knowledge
+    title: Stable direction with variation
+    upstream:
+      source_id: video-omar-premium-branding
+      selector: L391–434, 13:31–15:03 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Covered/adapt, B/A.. Use existing invariants and experiment owners. No second
+      vector store; discount effects are conditional and pricing authority remains separate. Evidence:
+      **Marketing vector:** maintain direction while allowing a spectrum of creative variants; discounting is
+      a cautionary example. Procedure and heuristic."
+    verification:
+      - Use existing invariants and experiment owners. No second vector store; discount effects are
+        conditional and pricing authority remains separate.
+    kept:
+      - "**Marketing vector:** maintain direction while allowing a spectrum of creative variants; discounting
+        is a cautionary example. Procedure and heuristic."
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "B: knowledge/design/audience-derived-identity.md"
+      - "A: knowledge/design/remotion-content-assets.md"
+  - id: v05-13
+    kind: knowledge
+    title: Behavioral measurement
+    upstream:
+      source_id: video-omar-premium-branding
+      selector: L435–464, 15:02–15:57 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt, M.. Define denominator, exposure, window and attribution. Retention is a
+      signal, not proof that storytelling caused it. Evidence: **Performance optimization:** hook/hold,
+      clicks, cohorts and repeat behavior complement purchases. Procedure."
+    verification:
+      - Define denominator, exposure, window and attribution. Retention is a signal, not proof that
+        storytelling caused it.
+    kept:
+      - "**Performance optimization:** hook/hold, clicks, cohorts and repeat behavior complement purchases.
+        Procedure."
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "M: knowledge/experience/emotional-experience-measurement.md"
+  - id: v05-14
+    kind: knowledge
+    title: Agency promotion
+    upstream:
+      source_id: video-omar-premium-branding
+      selector: L465–513, 15:56–17:34 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Reference/duplicate, S/B.. Preserve the question of why a customer cares; exclude
+      revenue promises and booking instructions. Evidence: Slate Swim revenue anecdote, agency CTA, recap and
+      audience-value question. Promotion and closing heuristic."
+    verification:
+      - Preserve the question of why a customer cares; exclude revenue promises and booking instructions.
+    kept: []
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose, assets and unsupported commercial or causal claims.
+      - Preserve the question of why a customer cares; exclude revenue promises and booking instructions.
+    deferred: []
+    conflicts: []
+    selection: reference-only
+    applicability:
+      - "S: contracts/contribution/contract.ts"
+      - "B: knowledge/design/audience-derived-identity.md"
+  - id: v06-01
+    kind: knowledge
+    title: Observe everyday lettering
+    upstream:
+      source_id: video-netflix-paula-scher
+      selector: L1–25, 00:13–01:27 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt observation; reference praise, R/D.. Investigate product-world visual
+      material. Relevance must exceed fame or attractiveness. Evidence: Street lettering and typography as
+      painting with words; colleagues praise recognizable work. Personal practice/testimonial."
+    verification:
+      - Investigate product-world visual material. Relevance must exceed fame or attractiveness.
+    kept:
+      - Street lettering and typography as painting with words; colleagues praise recognizable work. Personal
+        practice/testimonial.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "R: knowledge/design/design-evidence-stack.md"
+      - "D: knowledge/design/design-visual-system.md"
+  - id: v06-02
+    kind: knowledge
+    title: Concrete team critique
+    upstream:
+      source_id: video-netflix-paula-scher
+      selector: L26–95, 02:20–04:30 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt, D/J.. Compare variables cheaply. “Make premium” without a concrete
+      relationship is insufficient. No mandatory distraction. Evidence: Scraps, movement and team critique
+      expose alternatives; critique names weights and intersections. Personal/described procedure."
+    verification:
+      - Compare variables cheaply. “Make premium” without a concrete relationship is insufficient. No
+        mandatory distraction.
+    kept:
+      - Scraps, movement and team critique expose alternatives; critique names weights and intersections.
+        Personal/described procedure.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "D: knowledge/design/design-visual-system.md"
+      - "J: knowledge/design/design-worthiness.md"
+  - id: v06-03
+    kind: knowledge
+    title: Institutional hierarchy
+    upstream:
+      source_id: video-netflix-paula-scher
+      selector: L96–127, 04:30–05:29 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt, B.. Resolve product, feature and campaign hierarchy before styling. A
+      connected launch must read as one product. Evidence: Public Theater’s multiple identities needed to
+      become one institution. Case problem."
+    verification:
+      - Resolve product, feature and campaign hierarchy before styling. A connected launch must read as one
+        product.
+    kept:
+      - Public Theater’s multiple identities needed to become one institution. Case problem.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "B: knowledge/design/audience-derived-identity.md"
+  - id: v06-04
+    kind: knowledge
+    title: Recombinable type language
+    upstream:
+      source_id: video-netflix-paula-scher
+      selector: L128–150, 05:29–06:39 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt method, D.. Derive formal vocabulary from context. Do not adopt wood type
+      as a house style. Logo-removed surfaces should remain coherent. Evidence: Wood-type widths/weights
+      express a populous New York institution through a recombinable language. Personal rationale/testimony."
+    verification:
+      - Derive formal vocabulary from context. Do not adopt wood type as a house style. Logo-removed surfaces
+        should remain coherent.
+    kept:
+      - Wood-type widths/weights express a populous New York institution through a recombinable language.
+        Personal rationale/testimony.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "D: knowledge/design/design-visual-system.md"
+  - id: v06-05
+    kind: knowledge
+    title: Letter proportions
+    upstream:
+      source_id: video-netflix-paula-scher
+      selector: L151–176, 06:40–07:37 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt, T/J.. Compare actual faces with product copy. Historical and emotional
+      associations remain contextual hypotheses. Evidence: Letter weight, height and proportions alter
+      perceived character before verbal meaning is read. Heuristic and described manipulation."
+    verification:
+      - Compare actual faces with product copy. Historical and emotional associations remain contextual
+        hypotheses.
+    kept:
+      - Letter weight, height and proportions alter perceived character before verbal meaning is read.
+        Heuristic and described manipulation.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "T: tooling/lib/design-md.ts"
+      - "J: knowledge/design/design-worthiness.md"
+  - id: v06-06
+    kind: knowledge
+    title: Compress context into a mark
+    upstream:
+      source_id: video-netflix-paula-scher
+      selector: L177–186, 07:40–08:03 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt conceptual compression, D.. Product-world structure may inform a mark.
+      Forced metaphor or copied H geometry fails. Evidence: High Line’s H derives from tracks and industrial
+      form. Personal rationale."
+    verification:
+      - Product-world structure may inform a mark. Forced metaphor or copied H geometry fails.
+    kept:
+      - High Line’s H derives from tracks and industrial form. Personal rationale.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "D: knowledge/design/design-visual-system.md"
+  - id: v06-07
+    kind: knowledge
+    title: Expressive maps
+    upstream:
+      source_id: video-netflix-paula-scher
+      selector: L187–215, 08:20–09:30 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Reference/adapt exploration.. Artistic distortion is not permitted in product
+      analytics, location, availability or evidence. Evidence: Map painting restores physical making; maps are
+      explicitly emotional rather than factual. Personal practice."
+    verification:
+      - Artistic distortion is not permitted in product analytics, location, availability or evidence.
+    kept:
+      - Map painting restores physical making; maps are explicitly emotional rather than factual. Personal
+        practice.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "S: contracts/contribution/contract.ts; contextual source accounting only"
+  - id: v06-08
+    kind: knowledge
+    title: Rhetorical density
+    upstream:
+      source_id: video-netflix-paula-scher
+      selector: L216–247, 09:30–10:52 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Reference selected editorial work, D.. Density cannot imply factual credibility
+      or conceal essential values. Evidence: Dense maps and satirical charts use information rhetorically.
+      Artistic practice."
+    verification:
+      - Density cannot imply factual credibility or conceal essential values.
+    kept:
+      - Dense maps and satirical charts use information rhetorically. Artistic practice.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; source-specific claims and aesthetics remain excluded.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "D: knowledge/design/design-visual-system.md"
+  - id: v06-09
+    kind: knowledge
+    title: Synthesis and biography
+    upstream:
+      source_id: video-netflix-paula-scher
+      selector: L248–297, 10:53–12:30 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt synthesis; reference biography, R/D.. Explain how selected fragments serve
+      the product. IQ and biography are not effectiveness evidence. Evidence: Small information fragments form
+      larger concepts; childhood explains interests. Practice/biography."
+    verification:
+      - Explain how selected fragments serve the product. IQ and biography are not effectiveness evidence.
+    kept:
+      - Small information fragments form larger concepts; childhood explains interests. Practice/biography.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "R: knowledge/design/design-evidence-stack.md"
+      - "D: knowledge/design/design-visual-system.md"
+  - id: v06-10
+    kind: knowledge
+    title: Type and image counterpoint
+    upstream:
+      source_id: video-netflix-paula-scher
+      selector: L298–343, 12:36–14:13 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt, D.. Compare support versus counterpoint and scale. Each relationship needs
+      a purpose and readable essential content. Evidence: Record covers pair or contrast type and
+      illustration; enlarged objects become compositional devices. Personal procedure."
+    verification:
+      - Compare support versus counterpoint and scale. Each relationship needs a purpose and readable
+        essential content.
+    kept:
+      - Record covers pair or contrast type and illustration; enlarged objects become compositional devices.
+        Personal procedure.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "D: knowledge/design/design-visual-system.md"
+  - id: v06-11
+    kind: knowledge
+    title: Taste versus popularity
+    upstream:
+      source_id: video-netflix-paula-scher
+      selector: L344–371, 14:12–15:16 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Reference, J.. Keep preference, usability and business outcome separate. Import
+      no music, lyrics or artwork. Evidence: Boston cover story separates sales/popularity from Scher’s own
+      taste. Anecdote, sales claim and subjective judgment."
+    verification:
+      - Keep preference, usability and business outcome separate. Import no music, lyrics or artwork.
+    kept: []
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose, assets and unsupported commercial or causal claims.
+      - Keep preference, usability and business outcome separate. Import no music, lyrics or artwork.
+    deferred: []
+    conflicts: []
+    selection: reference-only
+    applicability:
+      - "J: knowledge/design/design-worthiness.md"
+  - id: v06-12
+    kind: knowledge
+    title: Type-led exploration
+    upstream:
+      source_id: video-netflix-paula-scher
+      selector: L372–397, 15:16–16:26 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt exploration, D/T.. Type may lead when content warrants it; no universal
+      type-led app requirement. Evidence: Lower-pressure projects allow a type-led voice to develop. Personal
+      retrospective."
+    verification:
+      - Type may lead when content warrants it; no universal type-led app requirement.
+    kept:
+      - Lower-pressure projects allow a type-led voice to develop. Personal retrospective.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "D: knowledge/design/design-visual-system.md"
+      - "T: tooling/lib/design-md.ts"
+  - id: v06-13
+    kind: knowledge
+    title: Bounded play
+    upstream:
+      source_id: video-netflix-paula-scher
+      selector: L398–413, 16:28–17:18 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt bounded divergence, D.. Meaningful alternatives must survive brief-based
+      selection. Randomization is not differentiation. Evidence: Free association and play help ideas; small
+      adjustments are discussed. Personal practice."
+    verification:
+      - Meaningful alternatives must survive brief-based selection. Randomization is not differentiation.
+    kept:
+      - Free association and play help ideas; small adjustments are discussed. Personal practice.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "D: knowledge/design/design-visual-system.md"
+  - id: v06-14
+    kind: knowledge
+    title: Abstract physical structure
+    upstream:
+      source_id: video-netflix-paula-scher
+      selector: L414–438, 17:17–18:06 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt, D.. Record originating feature, study and abstraction. Generic chrome
+      without a product relationship fails. Exact visual fidelity remains uninspected. Evidence: Pier 55 moves
+      from physical pillars/amphitheater/water into abstract forms. Personal procedure."
+    verification:
+      - Record originating feature, study and abstraction. Generic chrome without a product relationship
+        fails. Exact visual fidelity remains uninspected.
+    kept:
+      - Pier 55 moves from physical pillars/amphitheater/water into abstract forms. Personal procedure.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred:
+      - Visual judgment remains unavailable for described demonstrations.
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "D: knowledge/design/design-visual-system.md"
+  - id: v06-15
+    kind: knowledge
+    title: Identity evolution
+    upstream:
+      source_id: video-netflix-paula-scher
+      selector: L439–458, 18:07–19:06 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Covered/adapt, B/D.. Invariants plus versioned evolution. Small correction should
+      not force rebranding; material change refreshes downstream work. Evidence: Identity works across forms
+      and changes over time, sometimes subtly. Personal practice."
+    verification:
+      - Invariants plus versioned evolution. Small correction should not force rebranding; material change
+        refreshes downstream work.
+    kept:
+      - Identity works across forms and changes over time, sometimes subtly. Personal practice.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "B: knowledge/design/audience-derived-identity.md"
+      - "D: knowledge/design/design-visual-system.md"
+  - id: v06-16
+    kind: knowledge
+    title: Purposeful typographic density
+    upstream:
+      source_id: video-netflix-paula-scher
+      selector: L459–485, 19:07–20:18 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt selectable rhythm/density, D.. Dense expression must serve actual
+      experience and target readability. Evidence: *Noise/Funk* translates performance energy into crowded,
+      aggressive, elegant typography. Case interpretation."
+    verification:
+      - Dense expression must serve actual experience and target readability.
+    kept:
+      - "*Noise/Funk* translates performance energy into crowded, aggressive, elegant typography. Case
+        interpretation."
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "D: knowledge/design/design-visual-system.md"
+  - id: v06-17
+    kind: knowledge
+    title: Style convergence
+    upstream:
+      source_id: video-netflix-paula-scher
+      selector: L486–510, 20:20–21:09 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt comparison, J.. Similarity triggers inquiry, not automatic inversion,
+      rebranding or infringement claims. Evidence: Imitation makes a once-distinct language commonplace; Scher
+      changes direction. Anecdote."
+    verification:
+      - Similarity triggers inquiry, not automatic inversion, rebranding or infringement claims.
+    kept:
+      - Imitation makes a once-distinct language commonplace; Scher changes direction. Anecdote.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "J: knowledge/design/design-worthiness.md"
+  - id: v06-18
+    kind: knowledge
+    title: Personal influences
+    upstream:
+      source_id: video-netflix-paula-scher
+      selector: L511–601, 21:11–24:19 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Reference; duplicate expressive possibility.. Neither “clean” nor colorful type
+      is inherently superior. No relationship anecdote becomes process. Evidence: Domestic biography and Push
+      Pin influence show type as witty and communicative. Biography/influence."
+    verification:
+      - Neither “clean” nor colorful type is inherently superior. No relationship anecdote becomes process.
+    kept: []
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose, assets and unsupported commercial or causal claims.
+      - Neither “clean” nor colorful type is inherently superior. No relationship anecdote becomes process.
+    deferred: []
+    conflicts: []
+    selection: reference-only
+    applicability:
+      - "S: contracts/contribution/contract.ts; contextual source accounting only"
+  - id: v06-19
+    kind: knowledge
+    title: Environmental orientation
+    upstream:
+      source_id: video-netflix-paula-scher
+      selector: L602–614, 24:19–24:59 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt, N/D.. Verify the actual use context, not only a desktop view. Evidence:
+      Environmental lettering provides place and orientation. Personal practice."
+    verification:
+      - Verify the actual use context, not only a desktop view.
+    kept:
+      - Environmental lettering provides place and orientation. Personal practice.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "N: knowledge/design/mobile-flow-craft.md"
+      - "D: knowledge/design/design-visual-system.md"
+  - id: v06-20
+    kind: knowledge
+    title: Orientation and belonging
+    upstream:
+      source_id: video-netflix-paula-scher
+      selector: L615–652, 25:01–26:25 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt dual objective, B/E/N.. Test finding the right place separately from
+      reported belonging. Emotional benefit remains attributed. Evidence: Rockaway photos/signs support
+      orientation and emotional reconnection after Sandy. Case anecdote."
+    verification:
+      - Test finding the right place separately from reported belonging. Emotional benefit remains attributed.
+    kept:
+      - Rockaway photos/signs support orientation and emotional reconnection after Sandy. Case anecdote.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "B: knowledge/design/audience-derived-identity.md"
+      - "E: knowledge/experience/emotional-design-system.md"
+      - "N: knowledge/design/mobile-flow-craft.md"
+  - id: v06-21
+    kind: knowledge
+    title: Consequential choice mapping
+    upstream:
+      source_id: video-netflix-paula-scher
+      selector: L653–704, 26:26–28:11 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt mapping; reject causal shortcut, N/J.. Consequential choices must align
+      visible, semantic and activation order. Preserve the caption’s “2001” as uncertain, not a rule.
+      Evidence: Butterfly ballot has readable type but confusing name-to-hole mapping; uncertainty precedes a
+      sweeping election-causality statement. Case interpretation."
+    verification:
+      - Consequential choices must align visible, semantic and activation order. Preserve the caption’s “2001”
+        as uncertain, not a rule.
+    kept:
+      - Butterfly ballot has readable type but confusing name-to-hole mapping; uncertainty precedes a sweeping
+        election-causality statement. Case interpretation.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "N: knowledge/design/mobile-flow-craft.md"
+      - "J: knowledge/design/design-worthiness.md"
+  - id: v06-22
+    kind: knowledge
+    title: Biographical reflection
+    upstream:
+      source_id: video-netflix-paula-scher
+      selector: L705–773, 28:20–31:45 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Reference only.. No compulsory intense work hours or invented process
+      requirement. Evidence: Painting, films, father’s accuracy and gender/age experiences provide context.
+      Biography/reflection."
+    verification:
+      - No compulsory intense work hours or invented process requirement.
+    kept: []
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose, assets and unsupported commercial or causal claims.
+      - No compulsory intense work hours or invented process requirement.
+    deferred: []
+    conflicts: []
+    selection: reference-only
+    applicability:
+      - "S: contracts/contribution/contract.ts; contextual source accounting only"
+  - id: v06-23
+    kind: knowledge
+    title: Organization and campaign
+    upstream:
+      source_id: video-netflix-paula-scher
+      selector: L774–811, 31:47–33:10 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt, B.. Resolve institution/product/campaign priorities and existing equity.
+      Color changes do not solve unclear hierarchy. Evidence: Discovery separates institution from show and
+      asks why the organization looks as it does. Procedure/philosophy."
+    verification:
+      - Resolve institution/product/campaign priorities and existing equity. Color changes do not solve
+        unclear hierarchy.
+    kept:
+      - Discovery separates institution from show and asks why the organization looks as it does.
+        Procedure/philosophy.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "B: knowledge/design/audience-derived-identity.md"
+  - id: v06-24
+    kind: knowledge
+    title: Applications beyond the mark
+    upstream:
+      source_id: video-netflix-paula-scher
+      selector: L812–853, 33:09–34:25 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt handoff, A/N.. A logo or hero cannot establish coherent paywalls, store
+      assets and recovery states. Evidence: Citi’s initial mark comes quickly; applications and organizational
+      adoption take longer. Personal case."
+    verification:
+      - A logo or hero cannot establish coherent paywalls, store assets and recovery states.
+    kept:
+      - Citi’s initial mark comes quickly; applications and organizational adoption take longer. Personal case.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "A: knowledge/design/remotion-content-assets.md"
+      - "N: knowledge/design/mobile-flow-craft.md"
+  - id: v06-25
+    kind: knowledge
+    title: Bounded concrete review
+    upstream:
+      source_id: video-netflix-paula-scher
+      selector: L854–919, 34:33–36:47 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt bounded review, J.. Prioritize blockers and retain checkpoints. Do not stop
+      review to evade substantive objections. Evidence: Meeting humor describes dilution through concessions;
+      critique names contrast, direction, scale and production color. Practice/dramatized heuristic."
+    verification:
+      - Prioritize blockers and retain checkpoints. Do not stop review to evade substantive objections.
+    kept:
+      - Meeting humor describes dilution through concessions; critique names contrast, direction, scale and
+        production color. Practice/dramatized heuristic.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "J: knowledge/design/design-worthiness.md"
+  - id: v06-26
+    kind: knowledge
+    title: Persuasion versus proof
+    upstream:
+      source_id: video-netflix-paula-scher
+      selector: L920–942, 36:47–37:24 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Reference, J.. Does not waive runtime, user or functional evidence. Separate
+      rationale from observation. Evidence: “There isn’t proof” concerns persuading people about a new
+      identity; client recognizes the Public’s voice. Interpretation/testimonial."
+    verification:
+      - Does not waive runtime, user or functional evidence. Separate rationale from observation.
+    kept: []
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose, assets and unsupported commercial or causal claims.
+      - Does not waive runtime, user or functional evidence. Separate rationale from observation.
+    deferred: []
+    conflicts: []
+    selection: reference-only
+    applicability:
+      - "J: knowledge/design/design-worthiness.md"
+  - id: v06-27
+    kind: knowledge
+    title: Closing reflection
+    upstream:
+      source_id: video-netflix-paula-scher
+      selector: L943–972, 37:33–39:46 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.audience-derived-identity
+      path: knowledge/design/audience-derived-identity.md
+      owner: catalog/knowledge/design/design-audience-derived-identity.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Reference only.. Motivation is not empirical efficacy or acceptance evidence.
+      Evidence: Making, satisfaction, family response and future ambition close the film. Reflection."
+    verification:
+      - Motivation is not empirical efficacy or acceptance evidence.
+    kept: []
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose, assets and unsupported commercial or causal claims.
+      - Motivation is not empirical efficacy or acceptance evidence.
+    deferred: []
+    conflicts: []
+    selection: reference-only
+    applicability:
+      - "S: contracts/contribution/contract.ts; contextual source accounting only"
+  - id: v07-01
+    kind: knowledge
+    title: Content and type role
+    upstream:
+      source_id: video-designspo-typography
+      selector: L1–37, 00:02–01:06 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.design-visual-system
+      path: knowledge/design/design-visual-system.md
+      owner: catalog/knowledge/design/design-design-visual-system.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt, T/B.. Evaluate actual content, language and role. “Premium font” is not an
+      adequate rationale; typeface/font terminology is simplified. Evidence: Typography arranges text for
+      legibility and tone; project character informs selection. Technical introduction/heuristic."
+    verification:
+      - Evaluate actual content, language and role. “Premium font” is not an adequate rationale; typeface/font
+        terminology is simplified.
+    kept:
+      - Typography arranges text for legibility and tone; project character informs selection. Technical
+        introduction/heuristic.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "T: tooling/lib/design-md.ts"
+      - "B: knowledge/design/audience-derived-identity.md"
+  - id: v07-02
+    kind: knowledge
+    title: Serif associations
+    upstream:
+      source_id: video-designspo-typography
+      selector: L38–74, 01:05–02:16 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.design-visual-system
+      path: knowledge/design/design-visual-system.md
+      owner: catalog/knowledge/design/design-design-visual-system.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Reference associations; reject ban, T.. A contemporary playful serif is a valid
+      counterexample. History is not independently established here. Evidence: Serif is linked to
+      tradition/stability and discouraged for modern/playful work. History/heuristic."
+    verification:
+      - A contemporary playful serif is a valid counterexample. History is not independently established here.
+    kept: []
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose, assets and unsupported commercial or causal claims.
+      - A contemporary playful serif is a valid counterexample. History is not independently established here.
+    deferred: []
+    conflicts: []
+    selection: reference-only
+    applicability:
+      - "T: tooling/lib/design-md.ts"
+  - id: v07-03
+    kind: knowledge
+    title: Sans and convergence
+    upstream:
+      source_id: video-designspo-typography
+      selector: L75–122, 02:15–03:49 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.design-visual-system
+      path: knowledge/design/design-visual-system.md
+      owner: catalog/knowledge/design/design-design-visual-system.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt convergence warning.. Actual font capabilities decide. Reject
+      limited-serif-weight, universal-legibility and prevalence claims. Evidence: Sans is described as modern
+      and versatile; fashion-brand convergence can erase distinction. Mixed technical/empirical claims."
+    verification:
+      - Actual font capabilities decide. Reject limited-serif-weight, universal-legibility and prevalence
+        claims.
+    kept:
+      - Sans is described as modern and versatile; fashion-brand convergence can erase distinction. Mixed
+        technical/empirical claims.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "S: contracts/contribution/contract.ts; contextual source accounting only"
+  - id: v07-04
+    kind: knowledge
+    title: Display role limits
+    upstream:
+      source_id: video-designspo-typography
+      selector: L123–133, 03:48–04:11 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.design-visual-system
+      path: knowledge/design/design-visual-system.md
+      owner: catalog/knowledge/design/design-design-visual-system.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt, T.. Any small-control use requires real testing. Display choice cannot
+      silently propagate into settings and error labels. Evidence: Display faces suit distinctive short text
+      and may fail paragraphs/controls. Role heuristic."
+    verification:
+      - Any small-control use requires real testing. Display choice cannot silently propagate into settings
+        and error labels.
+    kept:
+      - Display faces suit distinctive short text and may fail paragraphs/controls. Role heuristic.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "T: tooling/lib/design-md.ts"
+  - id: v07-05
+    kind: knowledge
+    title: Script and handwriting
+    upstream:
+      source_id: video-designspo-typography
+      selector: L134–147, 04:10–04:37 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.design-visual-system
+      path: knowledge/design/design-visual-system.md
+      owner: catalog/knowledge/design/design-design-visual-system.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt options, T.. Check cultural fit, legibility and glyph support. No automatic
+      emotional mapping. Evidence: Script suggests refinement; handwriting suggests playfulness. Heuristic."
+    verification:
+      - Check cultural fit, legibility and glyph support. No automatic emotional mapping.
+    kept:
+      - Script suggests refinement; handwriting suggests playfulness. Heuristic.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "T: tooling/lib/design-md.ts"
+  - id: v07-06
+    kind: knowledge
+    title: Monospace and numerals
+    upstream:
+      source_id: video-designspo-typography
+      selector: L148–160, 04:36–05:01 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.design-visual-system
+      path: knowledge/design/design-visual-system.md
+      owner: catalog/knowledge/design/design-design-visual-system.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt applicability, T.. Distinguish whole-family monospace from tabular
+      numerals. Technical products do not universally require it. Evidence: Monospace uses equal advances and
+      supports aligned code. Technical description."
+    verification:
+      - Distinguish whole-family monospace from tabular numerals. Technical products do not universally
+        require it.
+    kept:
+      - Monospace uses equal advances and supports aligned code. Technical description.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "T: tooling/lib/design-md.ts"
+  - id: v07-07
+    kind: knowledge
+    title: Incorrect unit conversions
+    upstream:
+      source_id: video-designspo-typography
+      selector: L161–188, 05:00–05:55 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.design-visual-system
+      path: knowledge/design/design-visual-system.md
+      owner: catalog/knowledge/design/design-design-visual-system.yaml
+    disposition: reject
+    status: rejected
+    rationale: "Method decision: Reject conversions, S/T.. Preserve source bytes; enforce independently checked
+      CSS rules. A faulty conversion must not reach tokens or validators. Evidence: Point/inch/pixel
+      conversions are inconsistent in captions. Faulty or uncertain technical claims."
+    verification:
+      - Preserve source bytes; enforce independently checked CSS rules. A faulty conversion must not reach
+        tokens or validators.
+    kept: []
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: reference-only
+    applicability:
+      - "S: contracts/contribution/contract.ts"
+      - "T: tooling/lib/design-md.ts"
+  - id: v07-08
+    kind: knowledge
+    title: Relative sizing context
+    upstream:
+      source_id: video-designspo-typography
+      selector: L189–221, 05:54–07:02 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.design-visual-system
+      path: knowledge/design/design-visual-system.md
+      owner: catalog/knowledge/design/design-design-visual-system.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt with correction, T/N.. Record actual element/root context. Relative units
+      alone do not establish accessibility; nested/root-change clipping is a fixture. Evidence: em/rem and
+      relative sizing are described with fixed-default and prevalence assumptions. Mixed technical
+      claim/speculation."
+    verification:
+      - Record actual element/root context. Relative units alone do not establish accessibility;
+        nested/root-change clipping is a fixture.
+    kept:
+      - em/rem and relative sizing are described with fixed-default and prevalence assumptions. Mixed
+        technical claim/speculation.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "T: tooling/lib/design-md.ts"
+      - "N: knowledge/design/mobile-flow-craft.md"
+  - id: v07-09
+    kind: knowledge
+    title: Weight at actual size
+    upstream:
+      source_id: video-designspo-typography
+      selector: L222–248, 07:01–07:52 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.design-visual-system
+      path: knowledge/design/design-visual-system.md
+      owner: catalog/knowledge/design/design-design-visual-system.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt roles; reject thin-small-text rule.. Test actual supported weight, size and
+      background. Evidence: Weight establishes roles, but thin small text and limited face weights are broadly
+      recommended. Heuristic/generalization."
+    verification:
+      - Test actual supported weight, size and background.
+    kept:
+      - Weight establishes roles, but thin small text and limited face weights are broadly recommended.
+        Heuristic/generalization.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "S: contracts/contribution/contract.ts; contextual source accounting only"
+  - id: v07-10
+    kind: knowledge
+    title: Apparent metrics
+    upstream:
+      source_id: video-designspo-typography
+      selector: L249–278, 07:51–08:44 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.design-visual-system
+      path: knowledge/design/design-visual-system.md
+      owner: catalog/knowledge/design/design-design-visual-system.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt metrics; reference luxury claim, T.. Same nominal size can wrap or appear
+      differently. Test ascenders, descenders and diacritics. Evidence: Baseline, cap height and x-height
+      affect apparent type; cap height is associated with luxury. Technical description/association."
+    verification:
+      - Same nominal size can wrap or appear differently. Test ascenders, descenders and diacritics.
+    kept:
+      - Baseline, cap height and x-height affect apparent type; cap height is associated with luxury.
+        Technical description/association.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "T: tooling/lib/design-md.ts"
+  - id: v07-11
+    kind: knowledge
+    title: Leading
+    upstream:
+      source_id: video-designspo-typography
+      selector: L279–305, 08:43–09:30 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.design-visual-system
+      path: knowledge/design/design-visual-system.md
+      owner: catalog/knowledge/design/design-design-visual-system.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt, T.. Preserve qualifications. No universal 100/125/150% defaults. Test real
+      multiline content and user settings. Evidence: Leading is baseline spacing; tighter headings and looser
+      body are qualified heuristics. Technical description/heuristic."
+    verification:
+      - Preserve qualifications. No universal 100/125/150% defaults. Test real multiline content and user
+        settings.
+    kept:
+      - Leading is baseline spacing; tighter headings and looser body are qualified heuristics. Technical
+        description/heuristic.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "T: tooling/lib/design-md.ts"
+  - id: v07-12
+    kind: knowledge
+    title: Tracking
+    upstream:
+      source_id: video-designspo-typography
+      selector: L306–325, 09:29–10:05 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.design-visual-system
+      path: knowledge/design/design-visual-system.md
+      owner: catalog/knowledge/design/design-design-visual-system.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt optical review, T.. Reject universal negative-pixel spacing. Check shaping,
+      ligatures and control labels. Evidence: Tracking can tighten large type or open small type. Heuristic."
+    verification:
+      - Reject universal negative-pixel spacing. Check shaping, ligatures and control labels.
+    kept:
+      - Tracking can tighten large type or open small type. Heuristic.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "T: tooling/lib/design-md.ts"
+  - id: v07-13
+    kind: knowledge
+    title: Optical pair refinement
+    upstream:
+      source_id: video-designspo-typography
+      selector: L326–344, 10:04–10:39 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.design-visual-system
+      path: knowledge/design/design-visual-system.md
+      owner: catalog/knowledge/design/design-design-visual-system.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt, T/J.. Inspect actual prominent strings. No fixed W/A correction; the cited
+      visual result remains uninspected. Evidence: Kerning adjusts pairs; Southern Living illustrates subtle
+      identity-preserving refinement. Technical description/case."
+    verification:
+      - Inspect actual prominent strings. No fixed W/A correction; the cited visual result remains uninspected.
+    kept:
+      - Kerning adjusts pairs; Southern Living illustrates subtle identity-preserving refinement. Technical
+        description/case.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred:
+      - Visual judgment remains unavailable for described demonstrations.
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "T: tooling/lib/design-md.ts"
+      - "J: knowledge/design/design-worthiness.md"
+  - id: v07-14
+    kind: knowledge
+    title: Contrast context
+    upstream:
+      source_id: video-designspo-typography
+      selector: L345–365, 10:38–11:19 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.design-visual-system
+      path: knowledge/design/design-visual-system.md
+      owner: catalog/knowledge/design/design-design-visual-system.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt concern; correct standard, T/N.. Use role/state-specific requirements.
+      Contrast ratio alone is not total accessibility. Evidence: Text contrast matters; 7:1 is presented
+      without full conformance context. Simplified technical claim."
+    verification:
+      - Use role/state-specific requirements. Contrast ratio alone is not total accessibility.
+    kept:
+      - Text contrast matters; 7:1 is presented without full conformance context. Simplified technical claim.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "T: tooling/lib/design-md.ts"
+      - "N: knowledge/design/mobile-flow-craft.md"
+  - id: v07-15
+    kind: knowledge
+    title: Role system
+    upstream:
+      source_id: video-designspo-typography
+      selector: L366–392, 11:18–12:09 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.design-visual-system
+      path: knowledge/design/design-visual-system.md
+      owner: catalog/knowledge/design/design-design-visual-system.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Covered/extend, T.. Add missing portable properties to existing tokens. Semantic
+      headings must match content, independently of visual scale. Evidence: A typography system combines
+      roles, size, weight, leading and tracking. Procedure."
+    verification:
+      - Add missing portable properties to existing tokens. Semantic headings must match content,
+        independently of visual scale.
+    kept:
+      - A typography system combines roles, size, weight, leading and tracking. Procedure.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "T: tooling/lib/design-md.ts"
+  - id: v07-16
+    kind: knowledge
+    title: Controls and labels
+    upstream:
+      source_id: video-designspo-typography
+      selector: L393–408, 12:08–12:37 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.design-visual-system
+      path: knowledge/design/design-visual-system.md
+      owner: catalog/knowledge/design/design-design-visual-system.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt, T/N.. Secondary hierarchy cannot make essential instructions unreadable.
+      Test validation and long button strings. Evidence: Body, button and label roles differ; labels are
+      smaller and quieter. Heuristic."
+    verification:
+      - Secondary hierarchy cannot make essential instructions unreadable. Test validation and long button
+        strings.
+    kept:
+      - Body, button and label roles differ; labels are smaller and quieter. Heuristic.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "T: tooling/lib/design-md.ts"
+      - "N: knowledge/design/mobile-flow-craft.md"
+  - id: v07-17
+    kind: knowledge
+    title: Text measure and grids
+    upstream:
+      source_id: video-designspo-typography
+      selector: L409–430, 12:36–13:17 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.design-visual-system
+      path: knowledge/design/design-visual-system.md
+      owner: catalog/knowledge/design/design-design-visual-system.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Adapt organization; reject universal count, D/T.. Native utility may use one
+      column; desktop divisions must recompose on mobile. Evidence: Grids organize text measure; twelve web
+      columns and print conventions are suggested. Heuristic."
+    verification:
+      - Native utility may use one column; desktop divisions must recompose on mobile.
+    kept:
+      - Grids organize text measure; twelve web columns and print conventions are suggested. Heuristic.
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose and assets; all explicit exclusions in the method decision.
+    deferred: []
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - "D: knowledge/design/design-visual-system.md"
+      - "T: tooling/lib/design-md.ts"
+  - id: v07-18
+    kind: knowledge
+    title: Promotion
+    upstream:
+      source_id: video-designspo-typography
+      selector: L431–438, 13:16–13:32 (time rounded)
+    target:
+      kind: existing-reference
+      id: reference.design.design-visual-system
+      path: knowledge/design/design-visual-system.md
+      owner: catalog/knowledge/design/design-design-visual-system.yaml
+    disposition: reference
+    status: accepted
+    rationale: "Method decision: Reference only.. No mandatory four-pixel system or engagement instruction
+      follows. Evidence: Spacing-video and engagement promotion. Promotion."
+    verification:
+      - No mandatory four-pixel system or engagement instruction follows.
+    kept: []
+    changed:
+      - Original synthesis retains this unit’s stated method decision, limitations and evidence class.
+    omitted:
+      - Source prose, assets and unsupported commercial or causal claims.
+      - No mandatory four-pixel system or engagement instruction follows.
+    deferred: []
+    conflicts: []
+    selection: reference-only
+    applicability:
+      - "S: contracts/contribution/contract.ts; contextual source accounting only"
+  - id: amir-brand-system
+    kind: knowledge
+    title: Provider-neutral brand kit and reference roles
+    upstream:
+      source_id: amir-brand-system-builder
+      selector: SKILL.md, README.md, LICENSE
+    target:
+      kind: existing-reference
+      id: reference.design.design-visual-system
+      path: knowledge/design/design-visual-system.md
+      owner: catalog/knowledge/design/design-design-visual-system.yaml
+    disposition: adapt
+    status: accepted
+    rationale: Reauthor the selected method into existing design authority; preserve conditional selection and
+      original attribution.
+    verification:
+      - Contribution check and preview
+      - Independent review of actual product outputs
+    kept:
+      - Provider-neutral brand kit and reference roles
+    changed:
+      - Existing DESIGN.md authority and provider-neutral execution
+    omitted:
+      - No mandatory Google Fonts, Lovart, per-generation approvals or benchmark score
+      - Source prompt text and assets
+    deferred:
+      - Empirical product benefit
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - Technique selection must serve the current brief
+  - id: amir-cinematic-scroll
+    kind: knowledge
+    title: Conditional layer planning and forward/reverse checkpoints
+    upstream:
+      source_id: amir-cinematic-scroll-prompt-kit
+      selector: PROMPT.txt, examples/PROJECT_BRIEF.example.md, examples/assets.example.json, LICENSE
+    target:
+      kind: existing-reference
+      id: reference.design.editorial-scrollytelling
+      path: knowledge/design/editorial-scrollytelling.md
+      owner: catalog/knowledge/design/design-editorial-scrollytelling.yaml
+    disposition: adapt
+    status: accepted
+    rationale: Reauthor the selected method into existing design authority; preserve conditional selection and
+      original attribution.
+    verification:
+      - Contribution check and preview
+      - Independent review of actual product outputs
+    kept:
+      - Conditional layer planning and forward/reverse checkpoints
+    changed:
+      - Existing DESIGN.md authority and provider-neutral execution
+    omitted:
+      - No fixed serif, portal, sticky stage, card rail or scroll length
+      - Source prompt text and assets
+    deferred:
+      - Empirical product benefit
+    conflicts: []
+    selection: selected-method
+    applicability:
+      - Technique selection must serve the current brief
+derivations:
+  - target: reference.design.design-visual-system
+    source_ids:
+      - amir-brand-system-builder
+    relationship: adapted
+    baseline: 30f6084ddf6adf4173cf882fce266015f8872c17
+    selectors: &a1
+      - SKILL.md
+      - README.md
+      - LICENSE
+    rationale: Selected methods reauthored into the existing design and production authorities. Source text,
+      assets, universal aesthetics, provider mandates and approval loops are excluded.
+    omissions:
+      - No mandatory Google Fonts, Lovart, per-generation approvals or benchmark score. Identity stays in
+        DESIGN.md and existing controller owns narrative state.
+    reviewer: b2c-maintainers
+    reviewed_at: 2026-09-07
+    evaluation: brand-drift-counterexample
+    notice: notices/amir-brand-system.txt
+  - target: reference.design.remotion-content-assets
+    source_ids:
+      - amir-brand-system-builder
+    relationship: adapted
+    baseline: 30f6084ddf6adf4173cf882fce266015f8872c17
+    selectors: *a1
+    rationale: Selected methods reauthored into the existing design and production authorities. Source text,
+      assets, universal aesthetics, provider mandates and approval loops are excluded.
+    omissions:
+      - No mandatory Google Fonts, Lovart, per-generation approvals or benchmark score. Identity stays in
+        DESIGN.md and existing controller owns narrative state.
+    reviewer: b2c-maintainers
+    reviewed_at: 2026-09-07
+    evaluation: brand-drift-counterexample
+    notice: notices/amir-brand-system.txt
+  - target: reference.design.editorial-scrollytelling
+    source_ids:
+      - amir-cinematic-scroll-prompt-kit
+    relationship: adapted
+    baseline: 39ac222e385061c1eeab7f063b869950ee7cca1b
+    selectors: &a2
+      - PROMPT.txt
+      - examples/PROJECT_BRIEF.example.md
+      - examples/assets.example.json
+      - LICENSE
+    rationale: Selected methods reauthored into the existing design and production authorities. Source text,
+      assets, universal aesthetics, provider mandates and approval loops are excluded.
+    omissions:
+      - No fixed serif, portal, sticky stage, card rail or scroll length. Identity stays in DESIGN.md and
+        existing controller owns narrative state.
+    reviewer: b2c-maintainers
+    reviewed_at: 2026-09-07
+    evaluation: cinematic-applicability-counterexample
+    notice: notices/amir-cinematic-scroll.txt
+  - target: reference.design.remotion-content-assets
+    source_ids:
+      - amir-cinematic-scroll-prompt-kit
+    relationship: adapted
+    baseline: 39ac222e385061c1eeab7f063b869950ee7cca1b
+    selectors: *a2
+    rationale: Selected methods reauthored into the existing design and production authorities. Source text,
+      assets, universal aesthetics, provider mandates and approval loops are excluded.
+    omissions:
+      - No fixed serif, portal, sticky stage, card rail or scroll length. Identity stays in DESIGN.md and
+        existing controller owns narrative state.
+    reviewer: b2c-maintainers
+    reviewed_at: 2026-09-07
+    evaluation: cinematic-applicability-counterexample
+    notice: notices/amir-cinematic-scroll.txt
+evaluations:
+  - id: brand-drift-counterexample
+    unit_id: amir-brand-system
+    kind: counterexample
+    description: Distinguish permitted scene variation from identity and claim drift.
+    must_fail:
+      - A campaign keeps the logo but replaces the approved type roles and adds an unsupported certification.
+    must_pass:
+      - A new setting preserves the accepted identity and claim evidence.
+  - id: cinematic-applicability-counterexample
+    unit_id: amir-cinematic-scroll
+    kind: counterexample
+    description: Select depth by communication need and retain complete semantic fallback.
+    must_fail:
+      - A fixed portal scroll hides the price and has no usable reduced-motion reading sequence.
+    must_pass:
+      - A quiet static utility rejects cinematic treatment with a task-based reason.
+      - A selected layered story keeps anchors, real text and correct forward/reverse states.
+affected_outputs:
+  - knowledge/design/audience-derived-identity.md
+  - knowledge/design/design-visual-system.md
+  - knowledge/design/editorial-scrollytelling.md
+  - knowledge/design/remotion-content-assets.md
+required_checks:
+  - b2c contribute check
+  - b2c contribute preview
+  - Independent source and doctrine review
+uncertainties:
+  - All video demonstrations remain visually uninspected
+  - Comparative product evaluation is separate from contribution validation
+missing_core_mechanism:
+  present: false
+notices:
+  - source_id: amir-brand-system-builder
+    spdx: CC-BY-4.0
+    copyright: Created by Amir Mushich. Licensed under CC BY 4.0; attribution required.
+    notice_path: notices/amir-brand-system.txt
+    covers:
+      - amir-brand-system
+      - reference.design.design-visual-system
+      - knowledge/design/design-visual-system.md
+      - knowledge/design/remotion-content-assets.md
+  - source_id: amir-cinematic-scroll-prompt-kit
+    spdx: MIT
+    copyright: Copyright (c) 2026 Amir Mushich
+    notice_path: notices/amir-cinematic-scroll.txt
+    covers:
+      - amir-cinematic-scroll
+      - reference.design.editorial-scrollytelling
+      - knowledge/design/editorial-scrollytelling.md
+      - knowledge/design/remotion-content-assets.md

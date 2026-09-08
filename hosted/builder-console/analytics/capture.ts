@@ -148,8 +148,8 @@ const DEDUPE_TTL_SECONDS = 172_800;
  * objected, so we do not capture. A suppression that lapses during an outage is a broken promise;
  * a gap in analytics is a gap in analytics.
  *
- * Opting a subject out is an operator action against the same namespace:
- *   wrangler kv key put --binding OAUTH_KV "analytics:optout:<subject>" 1
+ * Opting a console account out is an operator action against FLAGS_KV:
+ *   wrangler kv key put --binding FLAGS_KV "analytics:optout:<account_id>" 1 --config hosted/builder-console/wrangler.jsonc
  * Reversing it is `wrangler kv key delete` with the same key. No expiry: an objection stands
  * until it is withdrawn.
  */

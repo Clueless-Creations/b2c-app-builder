@@ -170,8 +170,10 @@ check it against:
 | `account_created`        | Yes               | Yes                                                                                                                                                                                                                                     |
 | `api_key_created`        | Yes               | Yes                                                                                                                                                                                                                                     |
 | `api_key_revoked`        | Yes               | Yes                                                                                                                                                                                                                                     |
-| `interest_submitted`     | Yes               | Not applicable — excluded from the objection-record scope by `LEGITIMATE_INTERESTS_ASSESSMENT.md`'s "Scope" section, which gives this event its own basis analysis rather than folding it into the one that scopes the objection record |
+| `interest_submitted`     | Yes               | Yes for an authenticated submission — the session account id is passed as `objectionSubject` and checked in `FLAGS_KV`. Anonymous submissions have no account subject and receive the geography check only |
 | `upgrade_intent_clicked` | Yes               | Yes — the account is already signed in (`requireConsoleSession`), so `console/checkout.ts` always has an `account_id` to pass as `objectionSubject`, the same as `account_created` and the two API-key events                           |
+
+Interest storage precedes analytics: an objection, missing objection store, or objection-store failure suppresses authenticated capture without undoing the saved interest row. This describes the technical gate; it does not revise the separate lawful-basis assessment.
 
 `landing_viewed` is browser-only (see the table in "Server-side and browser, not one or the other"
 in `README.md`); it runs inside the client SDK on the marketing surface, governed by `snippet.ts`'s

@@ -1,11 +1,11 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.218.16",
+  "version": "0.218.17",
   "updatedAt": "2026-09-07",
   "sourcePath": ".",
   "releaseNotes": [
-    "Register knowledge/design/mobile-flow-craft.md in the generated catalog, routing index, and hosted bundle after PR #34 shipped the authored YAML without re-rendering.",
-    "Move the Appllama MIT notice onto catalog/upstreams/notices, add the appllama-skills identity, and delete the unapproved top-level third_party/ directory so Audit (fast) can go green.",
-    "Refresh kernel/schema/evidence-schema-version.json so the catalog digest pin matches the rendered graph."
+    "Scope check:repository-boundary's top-level allowlist to git-tracked files and untracked files git would absorb, so ignored local files no longer fail the audit.",
+    "Keep the same allowlist and still fail on an untracked unignored root file or directory, including fixtures that model .gitignore and .git/info/exclude.",
+    "Refresh kernel/schema/evidence-schema-version.json so the catalog digest pin matches 0.218.17."
   ]
 }

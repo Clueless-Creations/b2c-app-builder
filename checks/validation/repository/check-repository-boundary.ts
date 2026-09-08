@@ -8,11 +8,13 @@
  * npm script: check:repository-boundary
  * Usage: tsx checks/validation/repository/check-repository-boundary.ts --repo-root /path/to/B2C App Builder
  */
-import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { existsSync, readFileSync, readdirSync, realpathSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { parse } from "@babel/parser";
 import { parse as parseYaml } from "yaml";
+import { findGitRoot } from "../../../tooling/lib/git-root.js";
 import { flagString, issue, parseFlags, reportAndExit, type Issue } from "../../../tooling/lib/launch-state.js";
 
 interface SourceEntry {
@@ -74,26 +76,73 @@ const allowedTopLevelFiles = new Set([
   "skill-version.json",
   "tsconfig.json",
 ]);
-for (const entry of readdirSync(repoRoot, { withFileTypes: true })) {
-  if (!entry.isDirectory()) {
-    if (entry.isFile() && allowedTopLevelFiles.has(entry.name)) continue;
-    issues.push(
-      issue(
-        "error",
-        "repository_boundary.cloud_ui_source",
-        `The top-level ${entry.name} file is not an approved B2C App Builder entry point. Add it to the repository boundary only with an architecture update.`,
-        entry.name,
-      ),
-    );
-    continue;
+
+function realPath(value: string): string {
+  try {
+    return realpathSync(value);
+  } catch {
+    return path.resolve(value);
   }
-  if (allowedTopLevelDirectories.has(entry.name)) continue;
+}
+
+function gitNulPaths(root: string, argv: string[]): string[] | undefined {
+  const result = spawnSync("git", ["-C", root, ...argv], { encoding: "utf8" });
+  if (result.status !== 0) return undefined;
+  return (result.stdout ?? "").split("\0").filter(Boolean);
+}
+
+/**
+ * When --repo-root is the git toplevel, the allowlist applies to tracked files and to
+ * untracked files git would absorb (`git add -A`). Ignored local files, including
+ * `.git/info/exclude`, are not repository contents. Fixture roots are not git
+ * repositories, so they keep the working-tree walk.
+ */
+function topLevelEntries(root: string): { files: Set<string>; directories: Set<string> } {
+  const gitRoot = findGitRoot(root);
+  if (gitRoot && realPath(gitRoot) === realPath(root)) {
+    const tracked = gitNulPaths(root, ["ls-files", "-z"]);
+    const others = gitNulPaths(root, ["ls-files", "--others", "--exclude-standard", "-z"]);
+    if (tracked && others) {
+      const files = new Set<string>();
+      const directories = new Set<string>();
+      for (const relative of [...tracked, ...others]) {
+        const normalized = relative.replaceAll("\\", "/");
+        const slash = normalized.indexOf("/");
+        if (slash === -1) files.add(normalized);
+        else directories.add(normalized.slice(0, slash));
+      }
+      return { files, directories };
+    }
+  }
+  const files = new Set<string>();
+  const directories = new Set<string>();
+  for (const entry of readdirSync(root, { withFileTypes: true })) {
+    if (entry.isDirectory()) directories.add(entry.name);
+    else files.add(entry.name);
+  }
+  return { files, directories };
+}
+
+const topLevel = topLevelEntries(repoRoot);
+for (const name of topLevel.files) {
+  if (allowedTopLevelFiles.has(name)) continue;
   issues.push(
     issue(
       "error",
       "repository_boundary.cloud_ui_source",
-      `The top-level ${entry.name}/ directory is not an approved B2C App Builder source layer. Add it to the repository boundary only with an architecture update.`,
-      `${entry.name}/`,
+      `The top-level ${name} file is not an approved B2C App Builder entry point. Add it to the repository boundary only with an architecture update.`,
+      name,
+    ),
+  );
+}
+for (const name of topLevel.directories) {
+  if (allowedTopLevelDirectories.has(name)) continue;
+  issues.push(
+    issue(
+      "error",
+      "repository_boundary.cloud_ui_source",
+      `The top-level ${name}/ directory is not an approved B2C App Builder source layer. Add it to the repository boundary only with an architecture update.`,
+      `${name}/`,
     ),
   );
 }

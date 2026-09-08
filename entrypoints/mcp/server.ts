@@ -47,6 +47,7 @@ import { KNOWLEDGE_TOOL_DEFINITIONS, registerKnowledgeTools, toCallToolResult } 
 import type { HostedKnowledgeBundle, KnowledgeService } from "../../kernel/knowledge-service/types.js";
 import { routeUtterance } from "../../kernel/session/route-utterance.js";
 import { withOnboardingStepper } from "../../kernel/session/stepper.js";
+import { appendDoctorHostBlock } from "../../kernel/session/doctor-host.js";
 import { readWorkspaceStatus, renderWorkspaceStatus, resolveCwdWorkspaceState } from "../../kernel/session/status.js";
 
 const skillRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -378,7 +379,7 @@ server.registerTool(
     if (workspace !== undefined) {
       const resolved = workspaceOr(workspace);
       if (!resolved.ok) return resolved.result;
-      return { content: [{ type: "text", text: renderWorkspaceStatus(readWorkspaceStatus(resolved.path)) }] };
+      return { content: [{ type: "text", text: appendDoctorHostBlock(renderWorkspaceStatus(readWorkspaceStatus(resolved.path))) }] };
     }
     if (cwd === undefined) {
       return refusal(

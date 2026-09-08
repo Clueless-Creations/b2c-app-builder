@@ -15,6 +15,7 @@ import path from "node:path";
 
 import { resolveRegisteredWorkspace } from "../../adapters/registry.js";
 import { isMainModule, parseArgs, resolveCallerPath } from "../lib/cli.js";
+import { appendDoctorHostBlock } from "./doctor-host.js";
 import { buildSoftQuestion, type FounderAction } from "./founder-gate.js";
 import { inspectWorkspace, type InspectorPhase, type ProductKind } from "./inspect.js";
 import { readWorkspaceStepper, type StepperProjection } from "./stepper.js";
@@ -327,7 +328,7 @@ export function resolveCwdWorkspaceState(cwd: string): ResolveCwdWorkspaceStateR
   if (registration.kind === "registered") {
     const status = readWorkspaceStatus(inspection.cwd);
     const stepperResult = readWorkspaceStepper(inspection.cwd);
-    const text = renderWorkspaceStatus(status) + (stepperResult.ok ? `\n${renderStepperBlock(stepperResult.stepper)}` : "");
+    const text = appendDoctorHostBlock(renderWorkspaceStatus(status) + (stepperResult.ok ? `\n${renderStepperBlock(stepperResult.stepper)}` : ""));
     return {
       ok: true,
       state: { text, content: { kind: "registered", workspaceId: registration.id, status, ...(stepperResult.ok ? { stepper: stepperResult.stepper } : {}) } },
@@ -338,7 +339,7 @@ export function resolveCwdWorkspaceState(cwd: string): ResolveCwdWorkspaceStateR
     if ("refused" in containing) return { ok: false, refusalMessage: containing.message };
     const status = readWorkspaceStatus(containing.path);
     const stepperResult = readWorkspaceStepper(containing.path);
-    const text = renderInsideRegisteredStatus(registration.id, status) + (stepperResult.ok ? `\n${renderStepperBlock(stepperResult.stepper)}` : "");
+    const text = appendDoctorHostBlock(renderInsideRegisteredStatus(registration.id, status) + (stepperResult.ok ? `\n${renderStepperBlock(stepperResult.stepper)}` : ""));
     return {
       ok: true,
       state: {
@@ -349,7 +350,7 @@ export function resolveCwdWorkspaceState(cwd: string): ResolveCwdWorkspaceStateR
   }
   if (registration.kind === "registry-stale") {
     const status = readWorkspaceStatus(registration.registeredPath);
-    return { ok: true, state: { text: renderWorkspaceStatus(status), content: { kind: "missing", workspaceId: registration.id, status } } };
+    return { ok: true, state: { text: appendDoctorHostBlock(renderWorkspaceStatus(status)), content: { kind: "missing", workspaceId: registration.id, status } } };
   }
   const degraded = buildDegradedWorkspaceStatus({
     cwd: inspection.cwd,
@@ -357,7 +358,7 @@ export function resolveCwdWorkspaceState(cwd: string): ResolveCwdWorkspaceStateR
     productKind: inspection.productKind,
     suggestedFix: registration.suggestedFix,
   });
-  return { ok: true, state: { text: renderDegradedWorkspaceStatus(degraded), content: degraded } };
+  return { ok: true, state: { text: appendDoctorHostBlock(renderDegradedWorkspaceStatus(degraded)), content: degraded } };
 }
 
 export function resolveCliWorkspace(reference: string): { ok: true; path: string } | { ok: false; message: string } {
@@ -387,7 +388,7 @@ export function main(argv = process.argv.slice(2)): number {
     return 1;
   }
   const status = readWorkspaceStatus(resolved.path);
-  console.log(args.json === "true" ? JSON.stringify(status, null, 2) : renderWorkspaceStatus(status));
+  console.log(args.json === "true" ? JSON.stringify(status, null, 2) : appendDoctorHostBlock(renderWorkspaceStatus(status)));
   return 0;
 }
 

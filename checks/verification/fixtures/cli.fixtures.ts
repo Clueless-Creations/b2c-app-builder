@@ -480,6 +480,7 @@ export function register(harness: Harness): void {
     for (const code of ["doctor.node", "doctor.tsx", "doctor.catalog", "doctor.registry"]) {
       assert(doctor.output.includes(code), `doctor must report ${code}: ${doctor.output.slice(-400)}`);
     }
+    assert(doctor.output.includes("doctor.asc"), `doctor must report a doctor.asc* finding: ${doctor.output.slice(-400)}`);
     assert(!doctor.output.includes("ERROR"), `a healthy repo checkout must produce no doctor errors: ${doctor.output.slice(-400)}`);
   });
 

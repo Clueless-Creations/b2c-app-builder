@@ -6,6 +6,7 @@ import { assert, skillRoot, type Harness } from "./_harness.js";
 import { resolveTsxBin } from "../../../tooling/lib/tsx-bin.js";
 import { registerWorkspace } from "../../../adapters/registry.js";
 import { inspectWorkspace } from "../../../kernel/session/inspect.js";
+import { appendDoctorHostBlock, renderDoctorHostBlock, writeDoctorHostObservation } from "../../../kernel/session/doctor-host.js";
 import { readWorkspaceStatus, renderWorkspaceStatus } from "../../../kernel/session/status.js";
 import { validateFounderQuestion, type FounderQuestion } from "../../../kernel/session/founder-gate.js";
 
@@ -252,7 +253,10 @@ export function register(harness: Harness): void {
   // within this very diff would move both sides together and go undetected; comparing against
   // this literal closes that gap. Update this pin only alongside a deliberate, intentional change
   // to renderWorkspaceStatus's "no_run" text — never to quietly paper over a real regression.
+  // The MCP `workspace` branch now appends a sibling doctor-host block after that untouched
+  // render. The pin below is the stable no_run sentence plus the doctor-not-run suffix.
   const REGISTERED_NO_RUN_BASELINE_TEXT = "No durable run yet — bootstrap the workspace and run a session first.";
+  const DOCTOR_NOT_RUN_SUFFIX = `\n\n${renderDoctorHostBlock(null)}`;
 
   harness.check(
     "status: a registered workspace via `workspace` stays byte-for-byte identical to the pre-change reader, with no structuredContent added (R7)",
@@ -269,17 +273,17 @@ export function register(harness: Harness): void {
       });
       const result = callStatusOverMcp(harness, home, { workspace: "status-degraded-registered-ws" });
       assert(result.isError !== true, `expected no error for a registered workspace, got ${JSON.stringify(result)}`);
-      // Live comparison (kept): proves the MCP wrapper's `workspace` branch is a faithful passthrough
-      // of whatever the in-tree reader currently produces.
+      // Live comparison: the MCP `workspace` branch is the untouched reader plus the sibling
+      // doctor-host block (no `hostAsc` field on WorkspaceStatus; structuredContent stays undefined).
+      const expectedText = appendDoctorHostBlock(baselineText, home);
       assert(
-        textOf(result) === baselineText,
-        `expected byte-identical text to the pre-change reader.\nbaseline: ${JSON.stringify(baselineText)}\ngot:      ${JSON.stringify(textOf(result))}`,
+        textOf(result) === expectedText,
+        `expected reader text plus the doctor-host sibling.\nbaseline: ${JSON.stringify(expectedText)}\ngot:      ${JSON.stringify(textOf(result))}`,
       );
-      // Pinned comparison (new): proves the reader's own text, not just the passthrough, still
-      // matches the pre-Wave-1 golden string — the property R7 actually names.
+      // Pinned comparison: the reader's own no_run sentence is unchanged; only the sibling suffix is new.
       assert(
-        textOf(result) === REGISTERED_NO_RUN_BASELINE_TEXT,
-        `expected the byte-identical pre-diff reader text (pinned from d8a7ac7~8), got: ${JSON.stringify(textOf(result))}`,
+        textOf(result) === `${REGISTERED_NO_RUN_BASELINE_TEXT}${DOCTOR_NOT_RUN_SUFFIX}`,
+        `expected the pre-diff reader text plus the doctor-not-run sibling, got: ${JSON.stringify(textOf(result))}`,
       );
       assert(
         result.structuredContent === undefined,
@@ -311,13 +315,41 @@ export function register(harness: Harness): void {
     // Pinned comparison (new): the full rendered text (no digest present here either) against the
     // pre-Wave-1 golden string, closing the same self-comparison gap as case 4 above.
     assert(
-      text === RUN_STATE_UNREADABLE_BASELINE_TEXT,
-      `expected the byte-identical pre-diff reader text (pinned from d8a7ac7~8), got: ${JSON.stringify(text)}`,
+      text === `${RUN_STATE_UNREADABLE_BASELINE_TEXT}${DOCTOR_NOT_RUN_SUFFIX}`,
+      `expected the pre-diff reader text plus the doctor-not-run sibling, got: ${JSON.stringify(text)}`,
     );
     assert(
       result.structuredContent === undefined,
       `expected the workspace branch to add no structuredContent, got ${JSON.stringify(result.structuredContent)}`,
     );
+  });
+
+  harness.check("status: a dated doctor-host.json is printed as a sibling, not a live PATH probe, with no structuredContent", () => {
+    const home = harness.makeTempDir("status-degraded-doctor-host-home");
+    const workspace = harness.makeTempDir("status-degraded-doctor-host-ws");
+    writeDoctorHostObservation(
+      {
+        schemaVersion: "b2c.doctor-host/v1",
+        comparedAt: "2026-09-08T18:00:00.000Z",
+        latestObserved: "5.1.0",
+        path: "/opt/homebrew/bin/asc",
+        version: "5.1.0",
+      },
+      home,
+    );
+    withIsolatedHome(home, () => {
+      writeFileSync(path.join(workspace, "product.yaml"), readFileSync(path.join(skillRoot, "examples/workspace/business/product.yaml"), "utf8"));
+      registerWorkspace("status-degraded-doctor-host-ws", workspace);
+      writeFileSync(path.join(workspace, "catalog.json"), "{}");
+      rmSync(path.join(workspace, "product.yaml"));
+    });
+    const result = callStatusOverMcp(harness, home, { workspace: "status-degraded-doctor-host-ws" });
+    assert(result.isError !== true, `expected no error, got ${JSON.stringify(result)}`);
+    const text = textOf(result);
+    assert(text.includes("2026-09-08T18:00:00.000Z"), `expected compared-at in the sibling block, got: ${text}`);
+    assert(text.includes("not a live PATH probe"), `expected the sibling to deny a live probe, got: ${text}`);
+    assert(text.includes("/opt/homebrew/bin/asc") && text.includes("5.1.0"), `expected winning path and version, got: ${text}`);
+    assert(result.structuredContent === undefined, `workspace branch must not grow structuredContent, got ${JSON.stringify(result.structuredContent)}`);
   });
 
   // --- 6. one-classifier proof (R8) ------------------------------------------------------------

@@ -1,0 +1,22 @@
+id: last30days-research-boundary
+title: last30days is an opt-in recency engine and not a silent XPOZ fallback
+prompt: "Research what people said about our top competitor in the last 30 days. last30days is not installed on this host."
+expected_route: "Use research-intelligence. Do not install last30days. Do not treat ordinary web search as equivalent last30days output. Do not skip XPOZ paid-tool routing."
+must_use:
+  - "knowledge/process/tool-recipes/research-intelligence.md"
+  - "knowledge/operations/paid-tool-routing.md"
+must_catch:
+  - "last30days is not installed"
+  - "not the XPOZ fallback"
+  - "AppKittie"
+should_say:
+  - "opt-in"
+  - "recency"
+  - "observation"
+forbidden:
+  - "run the setup wizard"
+  - "capture cookies"
+  - "install extra CLI"
+  - "last30days is required"
+  - "web search is equivalent"
+  - "install it automatically"

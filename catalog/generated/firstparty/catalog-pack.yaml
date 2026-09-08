@@ -1,8 +1,8 @@
 id: business-pack.consumer-business
 title: Consumer business
 kind: business-pack
-version: 0.219.3
-revision: 0.219.3
+version: 0.219.4
+revision: 0.219.4
 depends_on: []
 creates_provider_spend: false
 domains:
@@ -6295,9 +6295,9 @@ references:
     title: Recommended Agent Skills
     domain_id: domain.engineering
     path: knowledge/engineering/recommended-agent-skills.md
-    load_when: before Expo or SwiftUI implementation when choosing recommended external agent skill packs for craft, motion, store work, or optional design-research provider guidance without vendor lock-in
+    load_when: before Expo or SwiftUI implementation when choosing recommended external agent skill packs for craft, motion, store work, optional recency research, or optional design-research provider guidance without vendor lock-in
     lifecycle: active
-    applicability_notes: Pin expo/skills and emilkowalski animate-expo/review-animations as recommended Expo installs. Appllama's app-design skill is an opt-in stack-specific companion; appllama-usage is loaded only when the user's Appllama MCP is independently connected and authorized. Keep paid/vendor MCPs off the default surface.
+    applicability_notes: Pin expo/skills and emilkowalski animate-expo/review-animations as recommended Expo installs. Appllama's app-design skill is an opt-in stack-specific companion; appllama-usage is loaded only when the user's Appllama MCP is independently connected and authorized. last30days is an opt-in host engine for scored recency briefs; it is not a default and does not replace AppKittie, XPOZ, or Firecrawl. Keep paid/vendor MCPs off the default surface.
     sources:
       - id: github-appllama-skills
         name: Appllama agent skills
@@ -6321,6 +6321,27 @@ references:
           - skills/appllama-app-design-skill/SKILL.md
           - skills/appllama-usage/SKILL.md
         upstream_id: appllama-skills
+      - id: github-mvanhorn-last30days-skill
+        name: last30days agent skill
+        source_type: agent_skill_pack
+        url: https://github.com/mvanhorn/last30days-skill
+        review_cadence_days: 30
+        claim_scope: MIT-licensed recency research skill. Install syntax and the skill name are taken from the upstream README. Host engine execution, setup, and secrets remain separately authorized.
+        last_review_date: 2026-09-08
+        reviewer: b2c-maintainers
+        publisher: Matt Van Horn
+        revision: 310f0b405db2d84adb4993bbf140cef9584057d2
+        rights:
+          status: verified
+          spdx: MIT
+          evidence: catalog/upstreams/notices/last30days-skill.txt
+          evidence_sha256: 31803213a789825dc419de43542381e1d570b4408cf2bcf2e8a9947a6d3fd2ab
+          notes: Skill name and install syntax only; no SKILL.md is copied into the builder.
+        selectors:
+          - README.md
+          - LICENSE
+          - skills/last30days/SKILL.md
+        upstream_id: last30days-skill
     replacement_ids: []
   - id: reference.engineering.technical-documentation-ste100
     title: Technical Documentation In ASD-STE100
@@ -8563,7 +8584,7 @@ references:
     title: Research Intelligence
     domain_id: domain.process
     path: knowledge/process/tool-recipes/research-intelligence.md
-    load_when: delegating AppKittie store intelligence, XPOZ social-language, Firecrawl web intelligence, Refero UX pattern research, or name/keyword collision checks — routed from tool-recipes.md; complements the Market research rows
+    load_when: delegating AppKittie store intelligence, XPOZ social-language, last30days recency briefs, Firecrawl web intelligence, Refero UX pattern research, or name/keyword collision checks — routed from tool-recipes.md; complements the Market research rows
     lifecycle: active
     sources:
       - id: api-refero-design-mcp
@@ -8582,6 +8603,27 @@ references:
         claim_scope: Auto-discovered from recently added repository content.
         last_review_date: 2026-08-17
         reviewer: b2c-maintainers
+      - id: github-mvanhorn-last30days-skill
+        name: last30days agent skill
+        source_type: agent_skill_pack
+        url: https://github.com/mvanhorn/last30days-skill
+        review_cadence_days: 30
+        claim_scope: MIT-licensed recency research skill. Selected methods are adapted into this reference. Host skill installation, setup wizard, cookie capture, extra CLIs, and live engine runs remain separately authorized.
+        last_review_date: 2026-09-08
+        reviewer: b2c-maintainers
+        publisher: Matt Van Horn
+        revision: 310f0b405db2d84adb4993bbf140cef9584057d2
+        rights:
+          status: verified
+          spdx: MIT
+          evidence: catalog/upstreams/notices/last30days-skill.txt
+          evidence_sha256: 31803213a789825dc419de43542381e1d570b4408cf2bcf2e8a9947a6d3fd2ab
+          notes: Methods only; no SKILL.md, engine, or host install is copied into the builder.
+        selectors:
+          - README.md
+          - LICENSE
+          - skills/last30days/SKILL.md
+        upstream_id: last30days-skill
     replacement_ids: []
   - id: reference.process.tool-recipes.revenue-email-analytics
     title: Revenue Email Analytics

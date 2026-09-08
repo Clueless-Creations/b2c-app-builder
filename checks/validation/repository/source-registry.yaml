@@ -2456,3 +2456,40 @@ sources:
     locations:
       - catalog/upstreams/amir-cinematic-scroll.yaml
     notes: Immutable license evidence retained for the reviewed upstream commit. This is not live executable or output verification.
+
+  - id: github-mvanhorn-last30days-skill
+    name: last30days agent skill
+    source_type: github
+    url: https://github.com/mvanhorn/last30days-skill
+    refresh_cadence_days: 30
+    owner: source-freshness
+    locations:
+      - catalog/upstreams/last30days-skill.yaml
+      - knowledge/engineering/recommended-agent-skills.md
+      - knowledge/process/tool-recipes/research-intelligence.md
+      - catalog/knowledge/engineering/engineering-recommended-agent-skills.yaml
+      - catalog/knowledge/process/process-tool-recipes-research-intelligence.yaml
+    notes: Reviewed source and opt-in skill-pack routing. Immutable reviewed source selectors and rights remain in
+      the upstream manifest.
+  - id: last30days-skill-file
+    name: last30days SKILL.md
+    source_type: github
+    url: https://github.com/mvanhorn/last30days-skill/blob/310f0b405db2d84adb4993bbf140cef9584057d2/skills/last30days/SKILL.md
+    refresh_cadence_days: 30
+    owner: source-freshness
+    locations:
+      - catalog/upstreams/last30days-skill.yaml
+      - knowledge/process/tool-recipes/research-intelligence.md
+      - catalog/knowledge/process/process-tool-recipes-research-intelligence.yaml
+    notes: Skill-file reference retained from existing guidance. Immutable reviewed source selectors and rights
+      remain in the upstream manifest.
+  - id: last30days-skill-license
+    name: last30days reviewed license
+    source_type: github
+    url: https://github.com/mvanhorn/last30days-skill/blob/310f0b405db2d84adb4993bbf140cef9584057d2/LICENSE
+    refresh_cadence_days: 365
+    owner: b2c-maintainers
+    locations:
+      - catalog/upstreams/last30days-skill.yaml
+    notes: Immutable license evidence reviewed with the selected upstream commit. A new adoption must review and
+      retain its own license; this entry is not live executable verification.

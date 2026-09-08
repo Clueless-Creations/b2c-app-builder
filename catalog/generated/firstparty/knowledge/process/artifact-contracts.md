@@ -599,6 +599,7 @@ Must include:
 - the verdict mirror in `lanes.research.go_pivot_kill_decision`
 - AppKittie findings: category economics, competitors, downloads/revenue estimates, IAP/pricing, screenshots, ad presence, creator partnerships, contact/social links, review themes, and keyword results
 - XPOZ findings: platform, query, creator/subreddit/handle, post/comment evidence, user language, emotional register, objections, and ad/organic content formats
+- last30days findings, when a last30days brief was authorized and the host engine ran: topic, recency window, run date, sources that returned evidence versus sources that failed or were skipped, engagement-backed quotes with resolvable references, and what the brief changed. Do not invent this section when the engine did not run.
 - Firecrawl/web findings: competitor pages crawled, pricing, plans, claims, CTAs, FAQ/help/policy pages, SEO/GEO patterns, and source URLs
 - decision log: what each evidence cluster changed in the spec, brand, ASO, pricing, funnel, or roadmap
 - trace IDs or `state/LAUNCH_TRACE.md` pointers for every major decision that moves forward

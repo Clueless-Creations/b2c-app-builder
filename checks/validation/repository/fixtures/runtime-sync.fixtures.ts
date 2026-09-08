@@ -1,7 +1,7 @@
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { type Harness } from "./_harness.js";
+import { skillRoot, type Harness } from "./_harness.js";
 
 /**
  * Fixtures for the ownership-tracked installed-runtime sync. Conflicts block,
@@ -28,6 +28,56 @@ function writeSourceTree(root: string): string {
 }
 
 export function register(harness: Harness): void {
+  // Real verified sync: npm installs a local Prettier package, then the actual
+  // audit runner executes its genuine formatting validator and excludes the
+  // repository-only boundary check. The selected plan avoids recursive audits.
+  {
+    const root = harness.makeEmptyFixture("runtime-sync-verified-audit");
+    const source = writeSourceTree(root);
+    const runtime = path.join(root, "runtime");
+    for (const relative of ["tooling/run-audit.ts", "tooling/lib/audit-plan.ts", "tooling/lib/runtime-sync-lib.ts"]) {
+      mkdirSync(path.dirname(path.join(source, relative)), { recursive: true });
+      copyFileSync(path.join(skillRoot, relative), path.join(source, relative));
+    }
+    mkdirSync(path.join(source, ".github"));
+    writeFileSync(path.join(source, ".github", "fixture.yml"), "name: fixture\n");
+    writeFileSync(path.join(source, "payload.json"), '{ "fixture": true }\n');
+    const original = JSON.parse(readFileSync(path.join(skillRoot, "package.json"), "utf8"));
+    const boundaryScript = original.scripts["check:repository-boundary"].replace("tsx ", `tsx ${skillRoot}/`);
+    writeFileSync(
+      path.join(source, "package.json"),
+      JSON.stringify(
+        {
+          name: "verified-runtime-fixture",
+          version: "0.0.1",
+          type: "module",
+          private: true,
+          devDependencies: { prettier: `file:${path.join(skillRoot, "node_modules/prettier")}` },
+          scripts: {
+            audit: `node ${JSON.stringify(path.join(skillRoot, "node_modules/tsx/dist/cli.mjs"))} tooling/run-audit.ts --only lint:format --only check:repository-boundary`,
+            "lint:format": "prettier --check payload.json",
+            "check:repository-boundary": boundaryScript,
+          },
+        },
+        null,
+        2,
+      ) + "\n",
+    );
+    git(source, ["add", "-A"]);
+    git(source, ["commit", "-qm", "verified audit fixture"]);
+    const args = ["sync", "--source", source, "--installed", runtime, "--runtimes-root", path.join(root, "clients")];
+    harness.runScriptArgs("verified runtime sync succeeds despite copied github metadata", "runtime-sync.ts", args, 0, "Maintainer audit (skill layout");
+    const success = harness.results.at(-1)!.output;
+    if (!success.includes("lint:format — ok") || success.includes("[2/2] check:repository-boundary"))
+      throw new Error("Verified sync did not run its real formatter with repository gates excluded.");
+    writeFileSync(path.join(source, "payload.json"), '{"fixture":true}');
+    git(source, ["add", "payload.json"]);
+    git(source, ["commit", "-qm", "invalid format fixture"]);
+    harness.runScriptArgs("verified runtime sync propagates an actual installed formatting failure", "runtime-sync.ts", args, 1, "lint:format — FAILED");
+    const failed = harness.results.at(-1)!.output;
+    if (!failed.includes("Runtime audit failed") || failed.includes("Runtime now at source version"))
+      throw new Error("Failed installed validator did not fail sync before success reporting.");
+  }
   const tool = "runtime-sync.ts";
   const run = (label: string, args: string[], expectedCode: number, expectedText?: string): void => {
     const isolatedArgs = args.includes("--runtimes-root") ? args : [...args, "--runtimes-root", path.join(harness.tempRoot, "isolated-client-roots")];
@@ -42,6 +92,30 @@ export function register(harness: Harness): void {
     "--no-verify",
     ...extra,
   ];
+
+  {
+    const root = harness.makeEmptyFixture("runtime-sync-invalid-manifest");
+    const source = writeSourceTree(root);
+    const runtime = path.join(root, "runtime");
+    mkdirSync(runtime);
+    const marker = path.join(runtime, ".runtime-sync-manifest.json");
+    writeFileSync(path.join(runtime, "a.txt"), "preserve runtime edit\n");
+    const valid = { schemaVersion: 1, sourceVersion: "unknown", syncedAt: "2026-09-08T00:00:00Z", files: {} };
+    for (const value of [
+      "{",
+      "null",
+      "[]",
+      JSON.stringify({ ...valid, files: null }),
+      JSON.stringify({ ...valid, files: [] }),
+      JSON.stringify({ ...valid, files: { "../escape": "a".repeat(64) } }),
+      JSON.stringify({ ...valid, files: { "a.txt": 7 } }),
+    ]) {
+      writeFileSync(marker, value);
+      run("invalid ownership manifest cannot grant adopt or force authority", syncArgs(source, runtime, "--adopt", "--force"), 1);
+      if (readFileSync(marker, "utf8") !== value || readFileSync(path.join(runtime, "a.txt"), "utf8") !== "preserve runtime edit\n")
+        throw new Error("Invalid manifest rejection mutated runtime.");
+    }
+  }
 
   {
     const root = harness.makeEmptyFixture("runtime-sync-flow");

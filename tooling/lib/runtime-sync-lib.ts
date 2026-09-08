@@ -31,6 +31,33 @@ export interface SyncManifest {
   files: Record<string, string>;
 }
 
+/** Shared ownership validation for the sync reader and audit layout detection. */
+export function isSyncManifest(value: unknown): value is SyncManifest {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const manifest = value as Record<string, unknown>;
+  if (
+    manifest.schemaVersion !== 1 ||
+    typeof manifest.sourceVersion !== "string" ||
+    !manifest.sourceVersion.trim() ||
+    typeof manifest.syncedAt !== "string" ||
+    !Number.isFinite(Date.parse(manifest.syncedAt)) ||
+    !manifest.files ||
+    typeof manifest.files !== "object" ||
+    Array.isArray(manifest.files)
+  )
+    return false;
+  return Object.entries(manifest.files).every(
+    ([relative, hash]) =>
+      relative.length > 0 &&
+      !relative.startsWith("/") &&
+      !relative.includes("\\") &&
+      !/^[A-Za-z]:/.test(relative) &&
+      relative.split("/").every((part) => part !== ".." && part !== "." && part.length > 0) &&
+      typeof hash === "string" &&
+      /^[a-f0-9]{64}$/i.test(hash),
+  );
+}
+
 export interface SyncPlanInput {
   /** Relative posix path -> sha256 for every git-tracked source file. */
   sourceFiles: Record<string, string>;

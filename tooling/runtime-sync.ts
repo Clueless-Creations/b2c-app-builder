@@ -35,7 +35,7 @@ import { homedir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { inspectRuntimePins, defaultRuntimeInstallRoots, type RuntimePinRelation } from "../adapters/providers/runtime-pin.js";
-import { computeSyncPlan, isIgnoredRuntimePath, nextManifest, planIsClean, type SyncManifest, type SyncPlan } from "./lib/runtime-sync-lib.js";
+import { isSyncManifest, computeSyncPlan, isIgnoredRuntimePath, nextManifest, planIsClean, type SyncManifest, type SyncPlan } from "./lib/runtime-sync-lib.js";
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const defaultSourceRoot = path.resolve(scriptDir, "..");
@@ -147,12 +147,14 @@ function hashRuntimeFiles(installedRoot: string): { hashes: Record<string, strin
 
 function readManifest(installedRoot: string): SyncManifest | undefined {
   const manifestPath = path.join(installedRoot, MANIFEST_NAME);
-  if (!existsSync(manifestPath)) return undefined;
+  const stat = lstatSync(manifestPath, { throwIfNoEntry: false });
+  if (!stat) return undefined;
+  if (!stat.isFile()) throw new Error(`${manifestPath} must be a regular sync manifest file.`);
   const parsed: unknown = JSON.parse(readFileSync(manifestPath, "utf8"));
-  if (typeof parsed !== "object" || parsed === null || (parsed as SyncManifest).schemaVersion !== 1 || typeof (parsed as SyncManifest).files !== "object") {
-    throw new Error(`${manifestPath} is not a schemaVersion 1 sync manifest. Delete it to re-bootstrap with --adopt.`);
+  if (!isSyncManifest(parsed)) {
+    throw new Error(`${manifestPath} is not a schemaVersion 1 sync manifest. Restore valid ownership evidence before syncing; no runtime files were changed.`);
   }
-  return parsed as SyncManifest;
+  return parsed;
 }
 
 function sourceVersion(sourceRoot: string): string {

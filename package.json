@@ -1,6 +1,6 @@
 {
   "name": "b2c-app-builder",
-  "version": "0.219.1",
+  "version": "0.219.2",
   "description": "Consumer-business primitives for AI agents: capabilities, providers, recipes, and evidence through a CLI, MCP, and skill.",
   "keywords": [
     "mcp",
@@ -97,8 +97,8 @@
     "check:continuity-contract": "tsx checks/validation/business/orchestration/check-continuity-contract.ts --skill-root .",
     "check:credits": "tsx tooling/render-credits.ts --check",
     "check:design-acceptance": "tsx checks/validation/business/design/check-design-acceptance.ts",
-    "check:design-md": "tsx checks/validation/business/design/check-design-md.ts",
     "check:design-foundation": "tsx checks/validation/business/design/check-design-md.ts --require-foundation",
+    "check:design-md": "tsx checks/validation/business/design/check-design-md.ts",
     "check:design-room": "tsx checks/validation/business/design/check-design-room-contract.ts --root examples/workspace/business",
     "check:design-worthiness": "tsx checks/validation/business/design/check-design-worthiness.ts",
     "check:design-worthiness-mechanical": "tsx checks/validation/business/design/check-design-worthiness.ts --mechanical-only",
@@ -231,6 +231,7 @@
     "session:bootstrap": "tsx kernel/session/bootstrap.ts",
     "setup": "npm link && node entrypoints/cli/b2c.mjs setup",
     "test:boundaries": "tsx checks/verification/boundaries/run.ts",
+    "test:browser-proof-chrome": "tsx checks/verification/fixtures/browser-proof.chrome-smoke.ts",
     "test:fixtures": "tsx checks/verification/fixtures/run.ts",
     "test:parity": "tsx checks/verification/parity/run.ts",
     "test:public-api": "tsx tooling/test-public-api.ts",

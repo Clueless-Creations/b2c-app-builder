@@ -1,10 +1,11 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.1",
+  "version": "0.219.2",
   "updatedAt": "2026-09-08",
   "sourcePath": ".",
   "releaseNotes": [
-    "Refresh the shipped Design Room, token exports and evidence catalog fingerprint for the design foundation contracts.",
-    "Document the strict design and content foundation gates in the complete validator map; preserve the renderer bytes used by token validation."
+    "Execute configured captures and typed interactions through the actual Chrome browser-proof adapter.",
+    "Bind replay responses to retained resource bytes and reject changed content, status, dependencies and navigation before recording evidence.",
+    "Provide an optional installed-Chrome smoke test while preserving strict engine-issued acceptance requirements."
   ]
 }

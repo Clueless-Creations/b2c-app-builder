@@ -655,7 +655,20 @@ class CdpConnection {
   send(method: string, params: Record<string, unknown> = {}, sessionId?: string): Promise<Record<string, unknown>> {
     const id = ++this.nextId;
     return new Promise((resolve, reject) => {
-      this.pending.set(id, { resolve, reject });
+      const timer = setTimeout(() => {
+        this.pending.delete(id);
+        reject(new Error(`Chrome DevTools command ${method} timed out`));
+      }, 20_000);
+      this.pending.set(id, {
+        resolve: (value) => {
+          clearTimeout(timer);
+          resolve(value);
+        },
+        reject: (error) => {
+          clearTimeout(timer);
+          reject(error);
+        },
+      });
       this.socket.send(JSON.stringify({ id, method, params, ...(sessionId ? { sessionId } : {}) }));
     });
   }
@@ -667,16 +680,25 @@ class CdpConnection {
 
   async waitFor(method: string, sessionId: string, timeoutMs: number): Promise<CdpResponse> {
     return new Promise((resolve, reject) => {
-      const timer = setTimeout(() => {
+      const cleanup = () => {
+        clearTimeout(timer);
         remove();
+        this.socket.removeEventListener("close", closed);
+      };
+      const closed = () => {
+        cleanup();
+        reject(new Error("Chrome DevTools connection closed"));
+      };
+      const timer = setTimeout(() => {
+        cleanup();
         reject(new Error(`Chrome DevTools event ${method} timed out`));
       }, timeoutMs);
       const remove = this.on((event) => {
         if (event.method !== method || event.sessionId !== sessionId) return;
-        clearTimeout(timer);
-        remove();
+        cleanup();
         resolve(event);
       });
+      this.socket.addEventListener("close", closed, { once: true });
     });
   }
 
@@ -723,12 +745,234 @@ function asString(value: unknown, label: string): string {
   return value;
 }
 
+/** Execute only the typed plan vocabulary; configuration never supplies JavaScript. */
+async function executeChromeEvidence(
+  connection: CdpConnection,
+  sessionId: string,
+  browserContextId: string,
+  input: Parameters<BrowserProofObserver>[0],
+  verifyResources: () => Promise<unknown>,
+  replayFailureSignal: Promise<never>,
+): Promise<Pick<BrowserProofObservation, "captures" | "interactions">> {
+  const send = (method: string, params: Record<string, unknown> = {}) => connection.send(method, params, sessionId);
+  const evaluate = async (expression: string): Promise<unknown> => {
+    const response = await send("Runtime.evaluate", { expression, returnByValue: true, awaitPromise: true });
+    if (response.exceptionDetails) throw new Error("Chrome proof DOM operation failed");
+    return (response.result as Record<string, unknown> | undefined)?.value;
+  };
+  // Selectors and values are serialized as data, never concatenated as executable source.
+  const element = async (selector: string, operation: string): Promise<unknown> =>
+    evaluate(
+      `(() => { const nodes = document.querySelectorAll(${JSON.stringify(selector)}); if (nodes.length !== 1) throw new Error('Expected exactly one element'); const el = nodes[0]; ${operation} })()`,
+    );
+  const navigate = async () => {
+    const loaded = connection.waitFor("Page.loadEventFired", sessionId, 20_000);
+    // Attach the rejection handler before sending a command that can fail first.
+    loaded.catch(() => undefined);
+    const result = await send("Page.navigate", { url: input.url });
+    if (result.errorText) {
+      await verifyResources();
+      throw new Error(`Chrome navigation failed: ${result.errorText}`);
+    }
+    await Promise.race([loaded, replayFailureSignal]);
+    await verifyResources();
+    return result;
+  };
+  const prepare = async (spec: BrowserProofConfig["captures"][number]) => {
+    if (spec.settings.screenReader || spec.settings.largeText)
+      throw new Error(`capture ${spec.id} cannot claim a browser screen reader or OS large-text setting from Chrome DevTools`);
+    await send("Network.emulateNetworkConditions", { offline: false, latency: 0, downloadThroughput: -1, uploadThroughput: -1 });
+    await send("Emulation.setDeviceMetricsOverride", { ...spec.viewport, deviceScaleFactor: spec.scale, mobile: false });
+    await send("Emulation.setEmulatedMedia", {
+      features: [{ name: "prefers-reduced-motion", value: spec.settings.reducedMotion ? "reduce" : "no-preference" }],
+    });
+    await send("Emulation.setScriptExecutionDisabled", { value: !spec.settings.javascript });
+    await send("Emulation.setLocaleOverride", { locale: spec.locale });
+    await send("Network.setUserAgentOverride", { userAgent: String(await evaluate("navigator.userAgent")), acceptLanguage: spec.locale });
+    const navigation = await navigate();
+    const observed = (await evaluate(
+      "({width:innerWidth,height:innerHeight,scale:devicePixelRatio,reducedMotion:matchMedia('(prefers-reduced-motion: reduce)').matches,locale:navigator.language})",
+    )) as Record<string, unknown>;
+    if (
+      observed.width !== spec.viewport.width ||
+      observed.height !== spec.viewport.height ||
+      observed.scale !== spec.scale ||
+      observed.reducedMotion !== spec.settings.reducedMotion
+    )
+      throw new Error(`Chrome did not apply capture ${spec.id} viewport or media settings`);
+    return { navigation, configured: { viewport: spec.viewport, scale: spec.scale, settings: spec.settings, locale: spec.locale }, observed };
+  };
+  const steps = async (plan: readonly BrowserProofStep[]) => {
+    const transcript: unknown[] = [];
+    for (const step of plan) {
+      const startedAt = timestamp();
+      let observed: unknown;
+      switch (step.action) {
+        case "click": {
+          const position = (await element(
+            step.selector,
+            "el.scrollIntoView({block:'center'}); const r=el.getBoundingClientRect(); if (!r.width || !r.height || el.disabled) throw new Error('Element not actionable'); const x=r.x+r.width/2,y=r.y+r.height/2; if (!el.contains(document.elementFromPoint(x,y))) throw new Error('Element obscured'); return {x,y};",
+          )) as { x: number; y: number };
+          await send("Input.dispatchMouseEvent", { type: "mousePressed", ...position, button: "left", clickCount: 1 });
+          observed = await send("Input.dispatchMouseEvent", { type: "mouseReleased", ...position, button: "left", clickCount: 1 });
+          break;
+        }
+        case "fill":
+          await element(
+            step.selector,
+            "if (!(el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) || el.disabled || el.readOnly) throw new Error('Element not editable'); el.focus(); el.select(); return true;",
+          );
+          observed = await send("Input.insertText", { text: step.value });
+          break;
+        case "press": {
+          await element(step.selector, "el.focus(); if(document.activeElement!==el) throw new Error('Element not focusable'); return true;");
+          const codes = { Enter: 13, Space: 32, Escape: 27, Tab: 9, ArrowUp: 38, ArrowDown: 40, ArrowLeft: 37, ArrowRight: 39 };
+          const key = step.key === "Space" ? " " : step.key;
+          const params = {
+            key,
+            code: step.key,
+            windowsVirtualKeyCode: codes[step.key],
+            ...(step.key === "Enter" ? { text: "\r" } : step.key === "Space" ? { text: " " } : {}),
+          };
+          await send("Input.dispatchKeyEvent", { type: "keyDown", ...params });
+          observed = await send("Input.dispatchKeyEvent", { type: "keyUp", ...params });
+          break;
+        }
+        case "wait-for": {
+          const deadline = Date.now() + step.timeoutMs;
+          do {
+            observed = await evaluate(`Boolean(document.querySelector(${JSON.stringify(step.selector)}))`);
+            if (observed) break;
+            await new Promise<void>((resolve) => setTimeout(resolve, 25));
+          } while (Date.now() < deadline);
+          if (!observed) throw new Error(`Chrome wait-for timed out: ${step.selector}`);
+          break;
+        }
+        case "wait":
+          await new Promise<void>((resolve) => setTimeout(resolve, step.durationMs));
+          break;
+        case "reload": {
+          const loaded = connection.waitFor("Page.loadEventFired", sessionId, 20_000);
+          loaded.catch(() => undefined);
+          observed = await send("Page.reload");
+          await Promise.race([loaded, replayFailureSignal]);
+          await verifyResources();
+          break;
+        }
+        case "set-offline":
+          observed = await send("Network.emulateNetworkConditions", { offline: step.offline, latency: 0, downloadThroughput: -1, uploadThroughput: -1 });
+          break;
+        case "scroll":
+          observed = await evaluate(`(() => { scrollTo(${step.x},${step.y}); return {x:scrollX,y:scrollY}; })()`);
+          break;
+      }
+      transcript.push({ step, startedAt, finishedAt: timestamp(), observed });
+    }
+    return transcript;
+  };
+  const assertions = async (plan: readonly BrowserProofAssertion[]) => {
+    const transcript: unknown[] = [];
+    for (const assertion of plan) {
+      let actual: unknown;
+      let passed: boolean;
+      switch (assertion.kind) {
+        case "url-equals":
+          actual = await evaluate("location.href");
+          passed = actual === assertion.value;
+          break;
+        case "selector-exists":
+          actual = await evaluate(`Boolean(document.querySelector(${JSON.stringify(assertion.selector)}))`);
+          passed = actual === true;
+          break;
+        case "selector-text-includes":
+          actual = await element(assertion.selector, "return el.textContent;");
+          passed = typeof actual === "string" && actual.includes(assertion.value);
+          break;
+        case "selector-value-equals":
+          actual = await element(assertion.selector, "return el.value;");
+          passed = actual === assertion.value;
+          break;
+        case "selector-checked-equals":
+          actual = await element(assertion.selector, "return el.checked;");
+          passed = actual === assertion.value;
+          break;
+        case "selector-attribute-equals":
+          actual = await element(assertion.selector, `return el.getAttribute(${JSON.stringify(assertion.name)});`);
+          passed = actual === assertion.value;
+          break;
+      }
+      if (!passed) throw new Error(`Chrome assertion failed: ${JSON.stringify(assertion)}`);
+      transcript.push({ assertion, actual, passed, observedAt: timestamp() });
+    }
+    return transcript;
+  };
+  const captures: BrowserProofObservation["captures"][number][] = [];
+  const interactions: BrowserProofObservation["interactions"][number][] = [];
+  for (const spec of input.captures) {
+    const settings = await prepare(spec);
+    const executedSteps = await steps(spec.steps);
+    await verifyResources();
+    const observedAssertions = await assertions(spec.assertions);
+    const result = await send("Page.captureScreenshot", { format: "png", captureBeyondViewport: false, fromSurface: true });
+    const screenshot = Buffer.from(asString(result.data, "screenshot"), "base64");
+    const resourceBinding = await verifyResources();
+    const capturedAt = timestamp();
+    captures.push({
+      id: spec.id,
+      capturedAt,
+      screenshot,
+      transcript: {
+        schemaVersion: 1,
+        kind: "chrome-capture",
+        browserContextId,
+        evidenceId: spec.id,
+        settings,
+        resourceBinding,
+        steps: executedSteps,
+        assertions: observedAssertions,
+        capturedAt,
+      },
+    });
+  }
+  // Interactions have no separate viewport/settings fields. Replay from the served
+  // route using the first cited capture, retaining that exact setup in the transcript.
+  for (const spec of input.interactions) {
+    const capture = input.captures.find((entry) => entry.id === spec.captureIds[0]);
+    if (!capture) throw new Error(`interaction ${spec.id} has no configured capture settings`);
+    const settings = await prepare(capture);
+    const executedSteps = await steps(spec.steps);
+    await verifyResources();
+    const observedAssertions = await assertions(spec.assertions);
+    const resourceBinding = await verifyResources();
+    const executedAt = timestamp();
+    interactions.push({
+      id: spec.id,
+      executedAt,
+      observation: `${spec.steps.length} browser actions executed; ${spec.assertions.length} assertions passed.`,
+      transcript: {
+        schemaVersion: 1,
+        kind: "chrome-interaction",
+        browserContextId,
+        evidenceId: spec.id,
+        settings,
+        resourceBinding,
+        steps: executedSteps,
+        assertions: observedAssertions,
+        executedAt,
+      },
+    });
+  }
+  return { captures, interactions };
+}
+
 /** Real producer: one new Chrome process, one incognito context, one exact navigation. */
 export async function observeWithChrome(input: {
   readonly origin: string;
   readonly url: string;
   readonly resourceUrls: readonly string[];
   readonly executable?: string;
+  readonly captures: BrowserProofConfig["captures"];
+  readonly interactions: BrowserProofConfig["interactions"];
 }): Promise<BrowserProofObservation> {
   const executable = chromeExecutable(input.executable);
   const versionProbe = spawnSync(executable, ["--version"], { encoding: "utf8", timeout: 5_000 });
@@ -765,10 +1009,16 @@ export async function observeWithChrome(input: {
     const target = await connection.send("Target.createTarget", { url: "about:blank", browserContextId: contextId });
     const attached = await connection.send("Target.attachToTarget", { targetId: asString(target.targetId, "target id"), flatten: true });
     const targetSessionId = asString(attached.sessionId, "target session id");
-    await connection.send("Network.enable", {}, targetSessionId);
+    await connection.send(
+      "Network.enable",
+      { maxResourceBufferSize: MAX_BROWSER_RETAINED_RESOURCE_BYTES, maxTotalBufferSize: MAX_BROWSER_PROOF_EVIDENCE_BYTES },
+      targetSessionId,
+    );
     await connection.send("Page.enable", {}, targetSessionId);
     const launchFinishedAt = timestamp();
 
+    const completedRequests = new Set<string>();
+    const failedRequests = new Set<string>();
     const responses: Array<{
       requestId: string;
       url: string;
@@ -778,7 +1028,10 @@ export async function observeWithChrome(input: {
       encodedDataLength?: number;
     }> = [];
     const removeListener = connection.on((event) => {
-      if (event.sessionId !== targetSessionId || event.method !== "Network.responseReceived") return;
+      if (event.sessionId !== targetSessionId) return;
+      if (event.method === "Network.loadingFinished") completedRequests.add(String(event.params?.requestId));
+      if (event.method === "Network.loadingFailed") failedRequests.add(String(event.params?.requestId));
+      if (event.method !== "Network.responseReceived") return;
       const response = event.params?.response;
       if (!response || typeof response !== "object") return;
       const row = response as Record<string, unknown>;
@@ -795,11 +1048,11 @@ export async function observeWithChrome(input: {
     });
     const navigationStartedAt = timestamp();
     const loaded = connection.waitFor("Page.loadEventFired", targetSessionId, 20_000);
+    loaded.catch(() => undefined);
     const navigation = await connection.send("Page.navigate", { url: input.url }, targetSessionId);
     if (typeof navigation.errorText === "string" && navigation.errorText) throw new Error(`Chrome navigation failed: ${navigation.errorText}`);
     await loaded;
     const navigationFinishedAt = timestamp();
-    removeListener();
     const history = await connection.send("Page.getNavigationHistory", {}, targetSessionId);
     const entries = Array.isArray(history.entries) ? (history.entries as Array<Record<string, unknown>>) : [];
     const currentIndex = typeof history.currentIndex === "number" ? history.currentIndex : -1;
@@ -809,16 +1062,91 @@ export async function observeWithChrome(input: {
 
     const retained: BrowserObservedResource[] = [];
     for (const expectedUrl of input.resourceUrls) {
-      const response = responses.filter((candidate) => candidate.url === expectedUrl).at(-1);
-      if (!response) throw new Error(`Chrome did not observe configured resource ${expectedUrl}`);
+      const deadline = Date.now() + 10_000;
+      let response = responses.filter((candidate) => candidate.url === expectedUrl).at(-1);
+      while ((!response || !completedRequests.has(response.requestId)) && Date.now() < deadline) {
+        if (response && failedRequests.has(response.requestId)) throw new Error(`Chrome failed to load configured resource ${expectedUrl}`);
+        await new Promise<void>((resolve) => setTimeout(resolve, 25));
+        response = responses.filter((candidate) => candidate.url === expectedUrl).at(-1);
+      }
+      if (!response || !completedRequests.has(response.requestId)) throw new Error(`Chrome did not finish configured resource ${expectedUrl}`);
       const bodyResult = await connection.send("Network.getResponseBody", { requestId: response.requestId }, targetSessionId);
-      const bodyText = asString(bodyResult.body, `response body for ${expectedUrl}`);
+      if (typeof bodyResult.body !== "string") throw new Error(`Chrome omitted response body for ${expectedUrl}`);
+      const bodyText = bodyResult.body;
       retained.push({
         url: response.url,
         statusCode: response.statusCode,
         mimeType: response.mimeType,
         body: Buffer.from(bodyText, bodyResult.base64Encoded === true ? "base64" : "utf8"),
       });
+    }
+    removeListener();
+    // Check each replay response before the browser can consume its bytes. This
+    // includes resources requested by steps; settings such as no-JS need not
+    // request every configured resource again.
+    const expectedResources = new Map(retained.map((resource) => [resource.url, resource]));
+    const replayBindings: unknown[] = [];
+    const pendingResponses = new Set<Promise<void>>();
+    let replayFailure: Error | undefined;
+    let rejectReplay: (error: Error) => void = () => undefined;
+    const replayFailureSignal = new Promise<never>((_resolve, reject) => {
+      rejectReplay = reject;
+    });
+    replayFailureSignal.catch(() => undefined);
+    const replayConnection = connection;
+    const removeReplayListener = connection.on((event) => {
+      if (event.sessionId !== targetSessionId || event.method !== "Fetch.requestPaused") return;
+      const params = event.params ?? {};
+      const requestId = String(params.requestId);
+      const request = params.request as Record<string, unknown>;
+      const url = String(request.url);
+      const work = (async () => {
+        try {
+          const expected = expectedResources.get(url);
+          if (!expected) throw new Error(`Chrome replay requested unconfigured resource ${url}`);
+          if (params.responseErrorReason || params.responseStatusCode !== expected.statusCode) throw new Error(`Chrome replay changed resource status: ${url}`);
+          const result = await replayConnection.send("Fetch.getResponseBody", { requestId }, targetSessionId);
+          if (typeof result.body !== "string") throw new Error(`Chrome replay omitted resource body: ${url}`);
+          const body = Buffer.from(result.body, result.base64Encoded === true ? "base64" : "utf8");
+          if (!body.equals(expected.body)) throw new Error(`Chrome replay changed resource bytes: ${url}`);
+          const headers = params.responseHeaders as Array<{ name: string; value: string }> | undefined;
+          const mime = headers
+            ?.find((header) => header.name.toLowerCase() === "content-type")
+            ?.value.split(";", 1)[0]
+            ?.trim()
+            .toLowerCase();
+          if (mime && mime !== expected.mimeType.toLowerCase()) throw new Error(`Chrome replay changed resource MIME type: ${url}`);
+          replayBindings.push({ url, statusCode: params.responseStatusCode, sha256: sha256(body), observedAt: timestamp() });
+          await replayConnection.send("Fetch.continueRequest", { requestId }, targetSessionId);
+        } catch (error) {
+          replayFailure ??= error instanceof Error ? error : new Error(String(error));
+          rejectReplay(replayFailure);
+          await replayConnection.send("Fetch.failRequest", { requestId, errorReason: "Aborted" }, targetSessionId).catch(() => undefined);
+        }
+      })();
+      pendingResponses.add(work);
+      void work.finally(() => pendingResponses.delete(work));
+    });
+    const verifyResources = async () => {
+      // A stable event boundary drains response checks already started. Future
+      // requests remain intercepted and are checked before consumption too.
+      await new Promise<void>((resolve) => setTimeout(resolve, 25));
+      while (pendingResponses.size) await Promise.all([...pendingResponses]);
+      if (replayFailure) throw replayFailure;
+      const history = await replayConnection.send("Page.getNavigationHistory", {}, targetSessionId);
+      const entries = history.entries as Array<{ url: string }>;
+      const replayUrl = entries[Number(history.currentIndex)]?.url;
+      if (replayUrl !== input.url) throw new Error(`Chrome replay changed final URL: ${replayUrl}`);
+      return { finalUrl: replayUrl, responses: [...replayBindings] };
+    };
+    await connection.send("Network.setCacheDisabled", { cacheDisabled: true }, targetSessionId);
+    await connection.send("Fetch.enable", { patterns: [{ urlPattern: "*", requestStage: "Response" }] }, targetSessionId);
+    let evidence: Pick<BrowserProofObservation, "captures" | "interactions">;
+    try {
+      evidence = await executeChromeEvidence(connection, targetSessionId, contextId, input, verifyResources, replayFailureSignal);
+      await verifyResources();
+    } finally {
+      removeReplayListener();
     }
     const launchTranscript = {
       schemaVersion: 1,
@@ -860,17 +1188,25 @@ export async function observeWithChrome(input: {
         transcript: navigationTranscript,
       },
       resources: retained,
-      // The current Chrome adapter proves navigation and retained resource bytes. It does
-      // not yet execute the configured capture and interaction plans, so the producer below
-      // fails closed instead of publishing incomplete acceptance evidence.
-      captures: [],
-      interactions: [],
+      ...evidence,
     };
   } finally {
     if (connection && contextId) await connection.send("Target.disposeBrowserContext", { browserContextId: contextId }).catch(() => undefined);
     connection?.close();
-    if (child.exitCode === null) child.kill("SIGTERM");
-    rmSync(userDataDir, { recursive: true, force: true });
+    if (child.exitCode === null && child.signalCode === null) {
+      await new Promise<void>((resolve) => {
+        const timer = setTimeout(() => {
+          child.kill("SIGKILL");
+          resolve();
+        }, 3_000);
+        child.once("exit", () => {
+          clearTimeout(timer);
+          resolve();
+        });
+        child.kill("SIGTERM");
+      });
+    }
+    rmSync(userDataDir, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 });
     if (child.exitCode !== null && child.exitCode !== 0 && stderr.trim()) {
       // Retain no Chrome stderr: it can contain local paths. The exit is represented by the thrown error.
     }

@@ -19,7 +19,9 @@
  * `rubricVersion`. That is the whole mechanism — no second, hand-maintained version scheme.
  *
  * SCOPE. Every dimension below traces to a named row: the ten codes in vibecoded-tells.md's
- * "Mechanical Detection" table, and the ten numbered rules in design-worthiness.md. Only the
+ * "Mechanical Detection" table, and the twelve numbered rules in design-worthiness.md — except
+ * the two named in KNOWN_UNMAPPED_WORTHINESS_RULES, which carry no dimension yet and say so out
+ * loud rather than leaving the gap for a reader to discover. Only the
  * dimensions marked `automatedByGrader: true` are ones tooling/grade-design-surface.ts can
  * compute itself today, from the pure libraries this Wave extracted
  * (checks/validation/business/design/lib/vibecode-tells.ts and lib/worthiness-mechanical.ts). The
@@ -55,7 +57,30 @@ export interface PinnedKnowledgeReference {
 }
 
 /** Bump only on a deliberate, reviewed change to the dimension list below or a knowingly-accepted knowledge-doc edit. */
-export const DESIGN_TASTE_RUBRIC_VERSION = "1.1.1";
+export const DESIGN_TASTE_RUBRIC_VERSION = "1.1.2";
+
+/**
+ * design-worthiness.md rule numbers this rubric maps to at least one dimension below.
+ * The taste gate is rule 12: PR #34 inserted rules 10 and 11 and pushed it down from 10.
+ */
+export const MAPPED_WORTHINESS_RULES: readonly number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 12];
+
+/**
+ * Rules PR #34 added that this rubric does NOT map yet: 10 "Native flow semantics are explicit"
+ * and 11 "Mechanical anti-generic consistency".
+ *
+ * They are declared here rather than left as a silent hole. A dimension needs a tier AND, for
+ * every tier except "taste", a severity ceiling — and the document supplies neither. Rule 11's
+ * own tier line is conditional ("Mechanical where the repository can derive the fact from
+ * authored tokens/contracts; otherwise Attested until a shared validator owns the field"), so
+ * resolving it is a judgment about which validators exist today, not a transcription. That
+ * judgment belongs to the founder, not to whoever re-pinned the hash.
+ *
+ * design-taste-rubric.fixtures.ts asserts this list plus MAPPED_WORTHINESS_RULES accounts for
+ * every rule heading in the document, so adding rule 13 — or finally mapping 10 and 11 — fails
+ * loudly here instead of widening the gap in silence.
+ */
+export const KNOWN_UNMAPPED_WORTHINESS_RULES: readonly number[] = [10, 11];
 
 export const PINNED_KNOWLEDGE_REFERENCES: readonly PinnedKnowledgeReference[] = [
   {
@@ -66,7 +91,7 @@ export const PINNED_KNOWLEDGE_REFERENCES: readonly PinnedKnowledgeReference[] = 
   {
     referenceId: "reference.design.design-worthiness",
     documentPath: "knowledge/design/design-worthiness.md",
-    sourceSha256: "41cccf1e3745cb1a9198e11772ca81ba28c625602c8c4afca30cf80a9cba6a98",
+    sourceSha256: "3748ff32713ffc83589a8603f8b352663cda13d5cd00d8f63c19b1617ad03717",
   },
 ];
 
@@ -251,7 +276,7 @@ export const DESIGN_TASTE_DIMENSIONS: readonly RubricDimension[] = [
     severity: "warning",
     sourceReferenceId: "reference.design.design-worthiness",
     description:
-      "Rule 10's process floor: DESIGN_SYSTEM_REVIEW.md always records current independent Findings with a recognized none/minor/major/high/high-severity/blocker marker, the exact engine-bound candidate input fingerprint, and frozen rubric path/version. Taste authority comes from either a direct founder/owner Taste Gate row in DESIGN.md plus a reducer-audited receipt for those exact bytes, or a structured delegated decision in DESIGN_SYSTEM_REVIEW.md under a current-run reducer-audited design-taste delegation. Delegated authority and reviewer identity come only from run-state and its audit evidence; the reviewer must differ from the Design Room producer. Presence, shape, provenance, rubric binding, failure precedence, and producer exclusion are enforced by check:design-worthiness.",
+      "Rule 12's process floor: DESIGN_SYSTEM_REVIEW.md always records current independent Findings with a recognized none/minor/major/high/high-severity/blocker marker, the exact engine-bound candidate input fingerprint, and frozen rubric path/version. Taste authority comes from either a direct founder/owner Taste Gate row in DESIGN.md plus a reducer-audited receipt for those exact bytes, or a structured delegated decision in DESIGN_SYSTEM_REVIEW.md under a current-run reducer-audited design-taste delegation. Delegated authority and reviewer identity come only from run-state and its audit evidence; the reviewer must differ from the Design Room producer. Presence, shape, provenance, rubric binding, failure precedence, and producer exclusion are enforced by check:design-worthiness.",
     automatedByGrader: false,
   },
   {
@@ -259,7 +284,7 @@ export const DESIGN_TASTE_DIMENSIONS: readonly RubricDimension[] = [
     tier: "taste",
     sourceReferenceId: "reference.design.design-worthiness",
     description:
-      "Rule 10, question 1: would a stranger recognize this as one product? The founder or owner may decide directly; an independent fresh-context reviewer may decide under the recorded Founder opening mandate.",
+      "Rule 12, question 1: would a stranger recognize this as one product? The founder or owner may decide directly; an independent fresh-context reviewer may decide under the recorded Founder opening mandate.",
     automatedByGrader: false,
   },
   {
@@ -267,7 +292,7 @@ export const DESIGN_TASTE_DIMENSIONS: readonly RubricDimension[] = [
     tier: "taste",
     sourceReferenceId: "reference.design.design-worthiness",
     description:
-      "Rule 10, question 2: would we rather competitors copy this version? The founder or owner may decide directly; an independent fresh-context reviewer may decide under the recorded Founder opening mandate.",
+      "Rule 12, question 2: would we rather competitors copy this version? The founder or owner may decide directly; an independent fresh-context reviewer may decide under the recorded Founder opening mandate.",
     automatedByGrader: false,
   },
 ];
@@ -291,6 +316,16 @@ export function findRubricDimension(key: string): RubricDimension | undefined {
  * provenance.sourceSha256 are provably the same kind of value, not two invented hashes that
  * happen to share a name.
  */
+/**
+ * The rule numbers design-worthiness.md actually declares, read from its own "### N. " headings.
+ * The fixture compares this against MAPPED_WORTHINESS_RULES + KNOWN_UNMAPPED_WORTHINESS_RULES, so
+ * the rubric can never quietly cover fewer rules than the document it claims to map.
+ */
+export function worthinessRuleNumbers(skillRoot: string): number[] {
+  const document = readFileSync(path.resolve(skillRoot, "knowledge/design/design-worthiness.md"), "utf8");
+  return [...document.matchAll(/^### (\d+)\. /gm)].map((match) => Number(match[1])).sort((left, right) => left - right);
+}
+
 export function knowledgeSourceSha256(skillRoot: string, documentPath: string): string {
   const absolute = path.resolve(skillRoot, documentPath);
   return createHash("sha256").update(readFileSync(absolute)).digest("hex");

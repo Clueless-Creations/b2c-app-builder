@@ -1,11 +1,12 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.218.20",
+  "version": "0.218.21",
   "updatedAt": "2026-09-07",
   "sourcePath": ".",
   "releaseNotes": [
-    "Give the craft-audit routing fixture the frozen rubric its locked DESIGN.md declared, so a missing acceptance report is the only gate failure and stays on the audit's own retry budget instead of reopening product producers.",
-    "Build the canonical product and its offer evidence in the monetization conformance fixture, which check-revenue reads before any provider branch whenever the revenue lane is active.",
-    "Share one offer-evidence document between the monetization and porchwatch fixtures instead of keeping two copies that can drift."
+    "Stop the shipped mobile-flow-craft knowledge text pointing hosted workers at THIRD_PARTY_NOTICES.md, a repository file no worker can open; the Appllama MIT attribution stays and travels with the package notices.",
+    "Re-pin design-worthiness.md after PR #34 grew it from ten rules to twelve, move the taste-gate dimensions' citations from rule 10 to rule 12, and declare rules 10 and 11 unmapped instead of leaving a silent hole.",
+    "Assert every design-worthiness rule is either mapped to a dimension or declared unmapped, so the next rule added to the document fails loudly rather than widening the gap.",
+    "Correct the firstparty reference count to 142 after mobile-flow-craft joined the generated catalog."
   ]
 }

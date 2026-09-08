@@ -5,10 +5,13 @@ import { skillRoot, type Harness } from "./_harness.js";
 import {
   DESIGN_TASTE_DIMENSIONS,
   DESIGN_TASTE_RUBRIC,
+  KNOWN_UNMAPPED_WORTHINESS_RULES,
+  MAPPED_WORTHINESS_RULES,
   PINNED_KNOWLEDGE_REFERENCES,
   findRubricDimension,
   findRubricPinDrift,
   knowledgeSourceSha256,
+  worthinessRuleNumbers,
 } from "../../../../tooling/lib/design-taste-rubric.js";
 
 /**
@@ -85,6 +88,25 @@ export function register(harness: Harness): void {
       assert.equal(findRubricDimension(dimension.key)?.key, dimension.key);
     }
     assert.equal(findRubricDimension("worthiness.not_a_real_dimension"), undefined);
+  });
+
+  // PR #34 grew design-worthiness.md from ten rules to twelve without touching this rubric, and the
+  // content-hash pin was the only thing that noticed. A hash says "these bytes changed"; it cannot say
+  // "and two of the rules they added are still unmapped". This check says that part out loud, so the
+  // gap cannot widen the next time the document grows.
+  check("every design-worthiness rule is either mapped or declared unmapped", () => {
+    const declared = worthinessRuleNumbers(skillRoot);
+    assert.ok(declared.length > 0, "design-worthiness.md must declare numbered rules for this check to mean anything");
+    const accounted = [...MAPPED_WORTHINESS_RULES, ...KNOWN_UNMAPPED_WORTHINESS_RULES].sort((left, right) => left - right);
+    assert.deepEqual(
+      declared,
+      accounted,
+      `design-worthiness.md declares rules ${JSON.stringify(declared)}, but the rubric accounts for ${JSON.stringify(accounted)}. ` +
+        "Map the new rule to a dimension, or add it to KNOWN_UNMAPPED_WORTHINESS_RULES with the reason.",
+    );
+    for (const rule of KNOWN_UNMAPPED_WORTHINESS_RULES) {
+      assert.ok(!MAPPED_WORTHINESS_RULES.includes(rule), `rule ${rule} cannot be both mapped and declared unmapped`);
+    }
   });
 
   check("the exported rubric composes the same version, references, and dimensions", () => {

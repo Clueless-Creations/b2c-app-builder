@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.0",
+  "version": "0.219.1",
   "updatedAt": "2026-09-08",
   "sourcePath": ".",
   "releaseNotes": [
-    "Add communication, identity, typography and vendor-neutral asset foundations to existing design workflows, with explicit technique selection and independent defect diagnosis.",
-    "Bind local design resources to candidate acceptance, verify notices at output boundaries, and preserve legacy validation through explicit new-work profiles."
+    "Refresh the shipped Design Room, token exports and evidence catalog fingerprint for the design foundation contracts.",
+    "Document the strict design and content foundation gates in the complete validator map; preserve the renderer bytes used by token validation."
   ]
 }

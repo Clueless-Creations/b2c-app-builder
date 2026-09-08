@@ -1,8 +1,8 @@
-import { chmodSync, mkdirSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { registerWorkspace } from "../../../adapters/registry.js";
 import { inspectWorkspace, EVIDENCE_EXCERPT_CAP, MARKER_BYTE_CAP } from "../../../kernel/session/inspect.js";
-import { assert, type Harness } from "./_harness.js";
+import { assert, skillRoot, type Harness } from "./_harness.js";
 
 /**
  * U1 fixtures: the pre-registration workspace inspector (KTD4). Every scenario below owns its own
@@ -132,10 +132,7 @@ export function register(harness: Harness): void {
     const subdir = path.join(workspace, "nested", "deeper");
     mkdirSync(subdir, { recursive: true });
     withIsolatedHome(home, () => {
-      writeFileSync(
-        path.join(workspace, "product.yaml"),
-        "schema_version: 1\nmeta: {name: Fixture, status: hypothesis}\ncopy: {promise_user_problem: Fixture}\ninstances: []\n",
-      );
+      writeFileSync(path.join(workspace, "product.yaml"), readFileSync(path.join(skillRoot, "examples/workspace/business/product.yaml"), "utf8"));
       registerWorkspace("inspect-inside-fixture-ws", workspace);
       rmSync(path.join(workspace, "product.yaml"));
       const result = inspectWorkspace(subdir);
@@ -154,10 +151,7 @@ export function register(harness: Harness): void {
     const home = harness.makeTempDir("inspect-stale-home");
     const workspace = harness.makeTempDir("inspect-stale-workspace");
     withIsolatedHome(home, () => {
-      writeFileSync(
-        path.join(workspace, "product.yaml"),
-        "schema_version: 1\nmeta: {name: Fixture, status: hypothesis}\ncopy: {promise_user_problem: Fixture}\ninstances: []\n",
-      );
+      writeFileSync(path.join(workspace, "product.yaml"), readFileSync(path.join(skillRoot, "examples/workspace/business/product.yaml"), "utf8"));
       registerWorkspace("inspect-stale-fixture-ws", workspace);
       rmSync(path.join(workspace, "product.yaml"));
       rmSync(workspace, { recursive: true, force: true });

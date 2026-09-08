@@ -12,7 +12,7 @@
  *   - Only the files named in MARKER_ALLOWLIST are ever read. Nothing else in the folder —
  *     no directory listing, no recursive walk — is touched.
  *   - A symlinked marker is refused (`lstat`-checked before any read) — never followed.
- *   - Scaffold identity uses the shared bounded registry reader (4 MiB per known marker).
+ *   - Scaffold identity uses the shared bounded registry reader (16 MiB for catalog, 4 MiB for other known markers).
  *   - Each evidence marker is capped at MARKER_BYTE_CAP bytes; a file over the cap is treated as absent
  *     rather than partially read.
  *   - Every excerpt returned to a caller is capped at EVIDENCE_EXCERPT_CAP characters — far below
@@ -250,7 +250,7 @@ export function registerCommand(target: string, platform: NodeJS.Platform = proc
 
 // --- entry point -------------------------------------------------------------------------------
 
-/** Read-only classification of `cwd` against the registry and the fixed marker allowlist. Never writes, never follows a symlinked marker, never reads past MARKER_BYTE_CAP. */
+/** Read-only classification using the fixed marker allowlist, bounded scaffold validation, and MARKER_BYTE_CAP evidence reads. Never writes or follows a symlinked marker. */
 export function inspectWorkspace(cwd: string): InspectResult {
   const absoluteCwd = path.resolve(cwd);
   const exact = resolveRegisteredWorkspace(absoluteCwd);

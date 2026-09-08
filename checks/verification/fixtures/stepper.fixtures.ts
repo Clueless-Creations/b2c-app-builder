@@ -557,9 +557,9 @@ export function register(harness: Harness): void {
     const workspace = harness.makeTempDir("stepper-run-state-corrupt-ws");
     writeFileSync(path.join(workspace, "catalog.json"), JSON.stringify(catalogInput));
     mkdirSync(path.join(workspace, "run"), { recursive: true });
-    writeFileSync(path.join(workspace, "run", "run-state.json"), "{ this is not valid json");
     withIsolatedHome(home, () => {
       registerWorkspace("stepper-run-state-corrupt-fixture-ws", workspace);
+      writeFileSync(path.join(workspace, "run", "run-state.json"), "{ this is not valid json");
       const onboardingPrimary = { kind: "primary" as const, workflowId: onb00, rationale: "x", doNotLoad: [], nextAgentAction: "x" };
       assert(
         !("stepper" in withOnboardingStepper(onboardingPrimary, workspace)),

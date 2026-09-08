@@ -78,7 +78,7 @@ right workflow.
 For a new business, create and register its planning workspace in one command:
 
 ```bash
-b2c business-create --workspace my-app --directory /absolute/path/to/my-app --name "My App" --hypothesis "The consumer problem to research" --json
+b2c business-create --workspace my-app --directory /absolute/path/to/my-app --name "My App" --hypothesis "The consumer problem to research" --mandate "Research a consumer problem in this market. Define a differentiated product. Design and build its native app and web funnel. Establish the evidence we need to improve it. Review, repair, and prove it is ready." --json
 b2c business-status --workspace my-app --json
 b2c business-plan --workspace my-app --json
 ```
@@ -88,8 +88,7 @@ use `b2c workspaces register` to adopt it, then resume through status and plan.
 Creation records a hypothesis; research and an explicit product decision precede
 initialization.
 
-
-Then give the agent a mandate:
+Continue with the mandate saved in `operations/LAUNCH_PROGRAM.md`:
 
 > Research a consumer problem in this market. Define a differentiated product.
 > Design and build its native app and web funnel. Establish the evidence we

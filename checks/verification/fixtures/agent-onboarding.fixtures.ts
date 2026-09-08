@@ -1,3 +1,10 @@
+import fs from "node:fs";
+import { syncBuiltinESMExports } from "node:module";
+import { initializeProductFixture } from "./product-fixture.js";
+import YAML from "yaml";
+import { composeCatalog } from "../../../catalog/index.js";
+import { toCatalogInput } from "../../../catalog/bridge.js";
+import { validateExecutableCatalog } from "../../../kernel/session/catalog-contract.js";
 import { existsSync, mkdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
@@ -83,7 +90,10 @@ export function register(h: Harness): void {
     const linked = h.makeTempDir("onboarding-linked");
     isolated(h.makeTempDir("onboarding-runtime-home"), () => {
       mkdirSync(path.join(runtime, "state"));
-      writeFileSync(path.join(runtime, "state/business-state.json"), JSON.stringify({ schemaVersion: "2.0.0", project: {}, lanes: {}, founderGates: {} }));
+      writeFileSync(
+        path.join(runtime, "state/business-state.json"),
+        readFileSync(path.join(skillRoot, "examples/workspace/business/state/business-state.json"), "utf8"),
+      );
       registerWorkspace("runtime", runtime);
       symlinkSync(path.join(runtime, "state"), path.join(linked, "state"));
       let refused = false;
@@ -119,6 +129,119 @@ export function register(h: Harness): void {
       assert(refused && loadRegistry().workspaces.length === 0, "unrelated directory was registered");
       writeFileSync(path.join(root, "product.yaml"), "x".repeat(WORKSPACE_SCAFFOLD_BYTE_CAP + 1));
       assert(!hasWorkspaceScaffold(root), "oversized marker accepted");
+    });
+  });
+
+  h.check("onboarding: canonical validation rejects near-valid and mixed invalid documents before registration", () => {
+    const product = YAML.parse(readFileSync(path.join(skillRoot, "examples/workspace/business/product.yaml"), "utf8"));
+    const invalidProduct = structuredClone(product);
+    invalidProduct.instances = [{ id: "fake", class_id: "not-an-ontology-class", slots: {} }];
+    const incompleteProduct = { schema_version: 1, meta: { name: "Almost", status: "hypothesis" }, copy: { promise_user_problem: "Almost" }, instances: [] };
+    const invalidCatalog = { version: "x", artifacts: [], workflows: [{ id: "workflow.fake" }] };
+    for (const [index, docs] of [
+      { "catalog.json": invalidCatalog },
+      { "product.yaml": incompleteProduct },
+      { "product.yaml": invalidProduct },
+      { "product.yaml": product, "catalog.json": invalidCatalog },
+      { "product.yaml": product, "state/business-state.json": { schemaVersion: "2.0.0", project: {}, lanes: {}, founderGates: {} } },
+      { "product.yaml": product, "run/run-state.json": { schemaVersion: "1.0.0", runId: "run.fake", planId: "plan.fake", nodes: {} } },
+    ].entries()) {
+      const root = h.makeTempDir(`onboarding-invalid-${index}`);
+      isolated(h.makeTempDir(`onboarding-invalid-home-${index}`), () => {
+        for (const [relative, value] of Object.entries(docs)) {
+          mkdirSync(path.dirname(path.join(root, relative)), { recursive: true });
+          writeFileSync(path.join(root, relative), relative.endsWith(".yaml") ? YAML.stringify(value) : JSON.stringify(value));
+        }
+        assert(!hasWorkspaceScaffold(root), `invalid document combination ${index} accepted`);
+        let refused = false;
+        try {
+          registerWorkspace("invalid", root);
+        } catch {
+          refused = true;
+        }
+        assert(refused && loadRegistry().workspaces.length === 0, `invalid combination ${index} changed registry`);
+      });
+    }
+  });
+
+  h.check("onboarding: structurally valid draft products retain ontology-readiness checks for later", () => {
+    const root = h.makeTempDir("onboarding-draft-semantics");
+    const product = YAML.parse(readFileSync(path.join(skillRoot, "examples/workspace/business/product.yaml"), "utf8"));
+    product.meta.status = "hypothesis";
+    product.instances[0].class_id = "class.unresolved-draft-concept";
+    writeFileSync(path.join(root, "product.yaml"), YAML.stringify(product));
+    isolated(h.makeTempDir("onboarding-draft-semantics-home"), () => {
+      registerWorkspace("draft", root);
+      assert(loadRegistry().workspaces[0]?.id === "draft", "adoption imposed extra ontology readiness beyond the canonical loader");
+    });
+  });
+
+  h.check("onboarding: a real compiled catalog alone is adoptable under the same execution validator", () => {
+    const root = h.makeTempDir("onboarding-catalog-only");
+    const catalog = toCatalogInput(composeCatalog(skillRoot));
+    assert(validateExecutableCatalog(catalog) === undefined, "fixture is not a valid executable catalog");
+    writeFileSync(path.join(root, "catalog.json"), JSON.stringify(catalog));
+    isolated(h.makeTempDir("onboarding-catalog-only-home"), () => {
+      registerWorkspace("catalog-only", root);
+      assert(loadRegistry().workspaces[0]?.id === "catalog-only", "canonical catalog-only adoption failed");
+    });
+  });
+
+  h.check("onboarding: real initialized catalog adoption and inspection preserve package read boundaries", () => {
+    const root = h.makeTempDir("onboarding-initialized");
+    isolated(h.makeTempDir("onboarding-initialized-home"), () => {
+      initializeProductFixture(root, "Initialized adoption");
+      const catalog = JSON.parse(readFileSync(path.join(root, "catalog.json"), "utf8"));
+      registerWorkspace("initialized", root);
+      assert(loadRegistry().workspaces[0]?.id === "initialized", "actual emitted initialized catalog could not be adopted");
+      removeWorkspace("initialized");
+      const workflow = catalog.workflows.find((entry: { selectedOperation?: unknown }) => entry.selectedOperation);
+      assert(workflow, "initialized fixture did not contain a selected operation");
+      const outside = h.makeTempDir("onboarding-outside-snapshot");
+      writeFileSync(path.join(outside, "snapshot.json"), "{}");
+      workflow.dependencies = [];
+      workflow.selectedOperation.recipeSelection.packageDirectory = outside;
+      catalog.workflows = [workflow];
+      writeFileSync(path.join(root, "catalog.json"), JSON.stringify(catalog));
+      const oldOpen = fs.openSync,
+        oldRead = fs.readFileSync;
+      let outsideReads = 0;
+      const realOutside = fs.realpathSync(outside);
+      const observe = (file: unknown) => {
+        if (typeof file !== "string" && !Buffer.isBuffer(file) && !(file instanceof URL)) return;
+        try {
+          if (fs.realpathSync(file).startsWith(realOutside + path.sep)) outsideReads += 1;
+        } catch {
+          /* Missing files cannot expose snapshot bytes. */
+        }
+      };
+      fs.openSync = ((...args: Parameters<typeof fs.openSync>) => {
+        observe(args[0]);
+        return oldOpen(...args);
+      }) as typeof fs.openSync;
+      fs.readFileSync = ((...args: Parameters<typeof fs.readFileSync>) => {
+        observe(args[0]);
+        return oldRead(...args);
+      }) as typeof fs.readFileSync;
+      syncBuiltinESMExports();
+      try {
+        assert(hasWorkspaceScaffold(root), "pure marker shape inspection should recognize the catalog contract");
+        const inspected = inspectWorkspace(root);
+        assert(inspected.ok && inspected.registration.kind === "unregistered", "inspection changed registration classification");
+        assert(outsideReads === 0, "read-only inspection followed selected package references");
+        let refused = false;
+        try {
+          registerWorkspace("unsafe-selection", root);
+        } catch {
+          refused = true;
+        }
+        assert(refused && loadRegistry().workspaces.length === 0, "explicit adoption skipped executable validation");
+        assert(outsideReads > 0, "outside-read trap was not armed for explicit selected package validation");
+      } finally {
+        fs.openSync = oldOpen;
+        fs.readFileSync = oldRead;
+        syncBuiltinESMExports();
+      }
     });
   });
 

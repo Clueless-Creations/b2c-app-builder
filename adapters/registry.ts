@@ -1,3 +1,6 @@
+import { parseProductInstanceDocument } from "../catalog/ontology/instance-load.js";
+import { validateExecutableCatalog, validateExecutableCatalogShape } from "../kernel/session/catalog-contract.js";
+import { validateBusinessState, validateRunState } from "../kernel/schema/index.js";
 import YAML from "yaml";
 import { boundedFileBytes } from "../kernel/lib/bounded-file.js";
 import { existsSync, lstatSync, mkdirSync, readFileSync, realpathSync, renameSync, writeFileSync } from "node:fs";
@@ -64,52 +67,53 @@ function writeRegistry(registry: WorkspaceRegistry): void {
 export const WORKSPACE_SCAFFOLD_MARKERS = ["product.yaml", "catalog.json", "state/business-state.json", "run/run-state.json"] as const;
 
 export const WORKSPACE_SCAFFOLD_BYTE_CAP = 4 * 1024 * 1024;
+export const WORKSPACE_CATALOG_BYTE_CAP = 16 * 1024 * 1024;
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function recognizableScaffold(relative: string, value: unknown): boolean {
-  if (!isRecord(value)) return false;
+function validScaffoldDocument(relative: string, value: unknown, validateExecution: boolean): boolean {
   if (relative === "product.yaml") {
-    return (
-      value.schema_version === 1 &&
-      isRecord(value.meta) &&
-      typeof value.meta.name === "string" &&
-      typeof value.meta.status === "string" &&
-      isRecord(value.copy) &&
-      typeof value.copy.promise_user_problem === "string" &&
-      Array.isArray(value.instances)
-    );
+    parseProductInstanceDocument(value);
+    return true;
   }
-  if (relative === "catalog.json") {
-    return (
-      typeof value.version === "string" &&
-      Array.isArray(value.artifacts) &&
-      Array.isArray(value.workflows) &&
-      value.workflows.some((workflow: unknown) => isRecord(workflow) && typeof workflow.id === "string" && workflow.id.startsWith("workflow."))
-    );
-  }
-  if (relative === "state/business-state.json") {
-    return value.schemaVersion === "2.0.0" && isRecord(value.project) && isRecord(value.lanes) && isRecord(value.founderGates);
-  }
-  return value.schemaVersion === "1.0.0" && typeof value.runId === "string" && typeof value.planId === "string" && isRecord(value.nodes);
+  if (relative === "catalog.json") return (validateExecution ? validateExecutableCatalog(value) : validateExecutableCatalogShape(value)) === undefined;
+  if (relative === "state/business-state.json") return validateBusinessState(value).valid;
+  return validateRunState(value).valid;
 }
 
-export function hasWorkspaceScaffold(root: string): boolean {
-  return WORKSPACE_SCAFFOLD_MARKERS.some((relative) => {
+/** Inspection validates bounded marker content only. Explicit adoption may also verify selected package references. */
+export function hasWorkspaceScaffold(root: string, options: { validateExecution?: boolean } = {}): boolean {
+  let recognized = false;
+  for (const relative of WORKSPACE_SCAFFOLD_MARKERS) {
     let target = root;
     try {
+      let missing = false;
       for (const segment of relative.split("/")) {
         target = path.join(target, segment);
-        if (lstatSync(target).isSymbolicLink()) return false;
+        try {
+          if (lstatSync(target).isSymbolicLink()) return false;
+        } catch (error) {
+          if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+            missing = true;
+            break;
+          }
+          throw error;
+        }
       }
-      const bytes = boundedFileBytes(target, WORKSPACE_SCAFFOLD_BYTE_CAP).toString("utf8");
-      return recognizableScaffold(relative, relative === "product.yaml" ? YAML.parse(bytes, { maxAliasCount: 20 }) : JSON.parse(bytes));
+      if (missing) continue;
+      const bytes = boundedFileBytes(target, relative === "catalog.json" ? WORKSPACE_CATALOG_BYTE_CAP : WORKSPACE_SCAFFOLD_BYTE_CAP).toString("utf8");
+      if (
+        !validScaffoldDocument(
+          relative,
+          relative === "product.yaml" ? YAML.parse(bytes, { maxAliasCount: 20 }) : JSON.parse(bytes),
+          options.validateExecution === true,
+        )
+      )
+        return false;
+      recognized = true;
     } catch {
       return false;
     }
-  });
+  }
+  return recognized;
 }
 
 export function registerWorkspace(id: string, workspacePath: string, now = new Date().toISOString()): WorkspaceRegistry {
@@ -121,7 +125,7 @@ export function registerWorkspace(id: string, workspacePath: string, now = new D
   if (existing && path.resolve(existing.path) !== absolute) {
     throw new Error(`registry.id_taken: "${id}" already points at ${existing.path} — remove it first if the move is intentional`);
   }
-  if (!existing && !hasWorkspaceScaffold(absolute)) {
+  if (!existing && !hasWorkspaceScaffold(absolute, { validateExecution: true })) {
     throw new Error(
       `registry.scaffold_missing: ${absolute} has no planning or runtime workspace scaffold. ` +
         'Start a new business with b2c business-create --workspace <id> --directory <empty-directory> --name "<name>" --hypothesis "<hypothesis>". ' +

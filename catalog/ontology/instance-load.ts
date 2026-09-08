@@ -73,7 +73,11 @@ export function productYamlPath(workspaceRoot: string, fileName = "product.yaml"
 
 export function loadProductInstanceDocument(filePath: string): ProductInstanceDocument {
   if (!existsSync(filePath)) throw new Error(`product instance document is missing at ${filePath}`);
-  const parsed: unknown = YAML.parse(readFileSync(filePath, "utf8"));
+  return parseProductInstanceDocument(YAML.parse(readFileSync(filePath, "utf8")));
+}
+
+/** Validate already-read authored input through the same schema and ontology rules. */
+export function parseProductInstanceDocument(parsed: unknown): ProductInstanceDocument {
   const schema = JSON.parse(readFileSync(schemaPath, "utf8")) as AnySchema;
   const ajv = new Ajv2020({ allErrors: true, strict: false });
   const validate = ajv.compile(schema);

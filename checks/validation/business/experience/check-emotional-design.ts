@@ -44,6 +44,7 @@ import {
 } from "../../../../tooling/lib/launch-state.js";
 import { existsSync, readdirSync } from "node:fs";
 import path from "node:path";
+import { parse as parseYaml } from "yaml";
 
 const args = parseCliArgs(process.argv.slice(2));
 const loaded = loadProjectState(args);
@@ -131,6 +132,38 @@ function extractCardBlocks(filePath: string, text: string): CardBlock[] {
   }
   finish();
   return blocks;
+}
+
+/** Explicit zero-card decision in the existing artifact, never a lane-skip grant.
+ * Parse actual YAML with duplicate-key rejection; explanatory prose alone is not a decision. */
+function hasNoCardDecision(text: string): boolean {
+  const decisions: unknown[] = [];
+  // Hidden draft decisions cannot establish a visible applicability record.
+  // An unclosed comment hides the remainder of the document as well.
+  const visibleText = text.replace(/<!--[\s\S]*?(?:-->|$)/g, "");
+  for (const match of visibleText.matchAll(/```ya?ml\s*\n([\s\S]*?)```/g)) {
+    if (!/^experience_card_selection:/m.test(match[1] ?? "")) continue;
+    try {
+      const parsed: unknown = parseYaml(match[1] ?? "");
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return false;
+      const record = parsed as Record<string, unknown>;
+      if (Object.keys(record).length !== 1) return false;
+      decisions.push(record.experience_card_selection);
+    } catch {
+      return false;
+    }
+  }
+  if (decisions.length !== 1) return false;
+  const value = decisions[0];
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const decision = value as Record<string, unknown>;
+  const keys = ["status", "user_job", "rationale", "alternative"];
+  if (Object.keys(decision).length !== keys.length || keys.some((key) => !(key in decision))) return false;
+  if (decision.status !== "not_applicable") return false;
+  return ["user_job", "rationale", "alternative"].every((key) => {
+    const value = decision[key];
+    return typeof value === "string" && value.trim().length >= 30 && !/\b(todo|tbd|placeholder|pending|unknown)\b|\[fill|^n\/?a$/i.test(value);
+  });
 }
 
 function parseBlock(filePath: string, lines: string[]): CardBlock {
@@ -614,28 +647,26 @@ if (design) {
   }
 
   const blocks = designBlocks;
-  if (blocks.length === 0) {
+  const noCardDecision = hasNoCardDecision(design.text);
+  if (blocks.length === 0 && !noCardDecision) {
     issues.push(
       issue(
         "error",
         "emotional_design.no_card_blocks",
-        "EMOTIONAL_DESIGN.md has no experience_card: attestation blocks. Each applied card needs a machine-checkable block under Ethics Attestation.",
+        "Select applicable experience_card: blocks or record one substantive experience_card_selection YAML decision with status not_applicable, user_job, rationale and alternative.",
         design.relativePath,
       ),
     );
   }
-  const mechanisms = new Set(blocks.map((b) => field(b, "mechanism")));
-  for (const required of ["commitment", "variable_reward", "perceived_effort_delay", "intent_mirroring"]) {
-    if (!mechanisms.has(required)) {
-      issues.push(
-        issue(
-          "warning",
-          `emotional_design.card_${required}_not_applied`,
-          `EMOTIONAL_DESIGN.md applies no "${required}" card. The four named cards are the default deck; mark a deferral with a founder-approved rationale if one is intentionally out of scope.`,
-          design.relativePath,
-        ),
-      );
-    }
+  if (blocks.length > 0 && noCardDecision) {
+    issues.push(
+      issue(
+        "error",
+        "emotional_design.selection_conflict",
+        "A not_applicable card selection cannot coexist with applied experience_card: blocks. Correct the selection; all existing card ethics still apply.",
+        design.relativePath,
+      ),
+    );
   }
   for (const block of blocks) {
     checkCardBlock(block);
@@ -693,14 +724,27 @@ if (audit) {
     }
   }
   const auditBlocks = auditCardBlocks;
-  const namedCards = ["Commitment Card", "Variable Reward Card", "Perceived Effort Delay Card", "Intent Mirroring Card"];
-  const allNamed = namedCards.every((c) => audit.text.includes(c));
-  if (auditBlocks.length === 0 && !allNamed) {
+  const selectedMechanisms = [...new Set(designBlocks.map((block) => field(block, "mechanism")).filter(Boolean))];
+  const mapsSelected =
+    selectedMechanisms.length > 0 && selectedMechanisms.every((mechanism) => includesPhrase(audit.text, `${mechanism.replace(/_/g, " ")} Card`));
+  const auditNoCards = hasNoCardDecision(audit.text);
+  const validNoCards = designBlocks.length === 0 && !!design && hasNoCardDecision(design.text) && auditNoCards;
+  if (auditBlocks.length === 0 && !mapsSelected && !validNoCards) {
     issues.push(
       issue(
         "error",
         "emotional_audit.no_card_mapping",
-        "EMOTIONAL_AUDIT.md must map findings to cards: include at least one experience_card: block or reference all four named cards (Commitment Card, Variable Reward Card, Perceived Effort Delay Card, Intent Mirroring Card). Prose-only findings are rejected.",
+        "EMOTIONAL_AUDIT.md must map findings to the selected cards, include experience_card: blocks, or independently record a substantive not_applicable selection agreeing with the zero-card design decision.",
+        audit.relativePath,
+      ),
+    );
+  }
+  if (auditNoCards && (auditBlocks.length > 0 || designBlocks.length > 0)) {
+    issues.push(
+      issue(
+        "error",
+        "emotional_audit.selection_conflict",
+        "The audit cannot declare cards not_applicable while the design or audit contains applied cards. Review their ethics and correct the selection.",
         audit.relativePath,
       ),
     );

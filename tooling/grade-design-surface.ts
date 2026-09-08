@@ -162,7 +162,7 @@ function emitTaskTemplate(report: GradingReport): string {
   lines.push("");
   lines.push(`Rubric ${report.rubricVersion}, pinned to ${report.pinnedReferences.map((reference) => reference.referenceId).join(" and ")}.`);
   lines.push(
-    `The GradingReport printed above already covers every Mechanical-tier dimension this grader can compute (${report.findings.length} finding(s)) — do not re-score those; grade only the dimensions below.`,
+    `The GradingReport printed above already covers every Mechanical-tier dimension this grader can compute (${report.findings.length} finding(s)) — do not repeat their detection. Inspect warning-level visual cues in context; a detected pattern is not a proven defect. Grade the dimensions below.`,
   );
   lines.push("");
   lines.push("## Surfaces to Grade — Attested tier");

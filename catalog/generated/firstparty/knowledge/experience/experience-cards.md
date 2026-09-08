@@ -4,6 +4,12 @@ Use this when designing, auditing, or implementing emotionally charged moments i
 app. These cards are the canonical deck for the B2C App Builder skill. Each card
 names a psychological mechanism, draws a bright/dark line, and gives you a deterministic
 checklist for audit and ship.
+## Applicability And Evidence Boundary
+
+Card selection is conditional; the discipline of making and reviewing that selection is core. Calm, predictable feedback and immediate completion can be the right emotional experience. Evaluate the actual user need before selecting novelty, anticipation, a commitment, or a reveal. Do not manufacture a behavioral loop to fill a card checklist.
+
+Psychological theories and examples below motivate hypotheses. They do not establish a universal effect size, a guaranteed star-level improvement, or a measured benefit in this product. Keep observed user response separate from intended tone. Every applied card retains its ethics, truthful progress, accessibility and measurement obligations; marking another card non-applicable waives none of them.
+
 
 **This file is the index.** Each file under [`experience-cards/`](./experience-cards/commitment-card.md)
 is a compact routing stub — title, one-liner, risk tier, bright/dark lines, and a
@@ -53,6 +59,17 @@ content here:
 - `knowledge/experience/ethics-guardrail.md` — Guardrail Contract, regulatory landscape, risk table
 
 ---
+
+When no card applies, record the following fenced YAML inside the existing `EMOTIONAL_DESIGN.md`. Each text field must explain the actual product decision (at least 30 characters, no placeholders). The audit independently records its decision in `EMOTIONAL_AUDIT.md`; an empty map alone is insufficient. This selects zero cards, not a skipped ethics review. A selection cannot coexist with applied card blocks.
+
+```yaml
+experience_card_selection:
+  status: not_applicable
+  user_job: Locate the household document and read its renewal date.
+  rationale: Predictable retrieval needs no commitment, reward, wait or intent mirror.
+  alternative: Show the requested record immediately with clear status and recovery.
+```
+
 
 ## Card Routing
 

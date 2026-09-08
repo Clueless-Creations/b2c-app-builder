@@ -1,10 +1,16 @@
 # Consumer Product Design Agency
 
 Use this reference when building or auditing the emotional and behavioral layer of a B2C mobile app. It translates five academic design tiers into operational decisions, artifacts, and failure modes for this skill. It is a peer reference to [`eleven-star-experience.md`](eleven-star-experience.md), `quality-lens.md`, `onboarding-conversion.md`, `analytics-attribution.md`, `design-visual-system.md`, and `failure-cards.md`. Do not duplicate those; cross-reference them.
+## Applicability And Evidence Boundary
+
+Card selection is conditional; the discipline of making and reviewing that selection is core. Calm, predictable feedback and immediate completion can be the right emotional experience. Evaluate the actual user need before selecting novelty, anticipation, a commitment, or a reveal. Do not manufacture a behavioral loop to fill a card checklist.
+
+Psychological theories and examples below motivate hypotheses. They do not establish a universal effect size, a guaranteed star-level improvement, or a measured benefit in this product. Keep observed user response separate from intended tone. Every applied card retains its ethics, truthful progress, accessibility and measurement obligations; marking another card non-applicable waives none of them.
+
 
 ## Contents
 
-- Four Required Experience Cards
+- Four Experience Card Options
 - Tier 1 Human-Centered Design
 - Tier 2 Emotional Design
 - Tier 3 Behavioral Science
@@ -16,9 +22,9 @@ Use this reference when building or auditing the emotional and behavioral layer 
 
 ---
 
-## Four Required Experience Cards
+## Four Experience Card Options
 
-Every B2C mobile launch produced by this skill must implement four named cards. These cards are the minimum behavioral layer. Omitting any one card produces a measurably weaker conversion, retention, or word-of-mouth outcome.
+Evaluate whether these four patterns serve the actual user job. Select applicable cards and record why the others do not apply. A quiet, direct utility may use none. There is no established universal conversion, retention or word-of-mouth penalty for omitting a card.
 
 ### Commitment Card
 
@@ -56,13 +62,13 @@ Every B2C mobile launch produced by this skill must implement four named cards. 
 
 **Mechanism.** Ryan Buell and Michael Norton's labor illusion / operational transparency research shows that users value a result more when they can see effort being expended on their behalf, even when that effort is invisible or instantaneous. Norton, Mochon, and Ariely's IKEA effect extends this: users overvalue outcomes they participated in creating. Kahneman and Tversky's prospect theory adds that loss aversion makes a result feel more valuable when the user perceives they invested something to get it.
 
-**What it looks like in a mobile app.** When the app performs a computation, personalization pass, or AI generation, it shows a brief deliberate progress experience — not a spinner, but a labeled, staged, meaningful wait. Each stage names what the app is doing for the user specifically ("Analyzing your writing style…", "Building your plan…"). The delay is 1.5–4 seconds regardless of actual computation time, but never artificial if the true computation is longer.
+**What it looks like in a mobile app.** When the app performs a computation, personalization pass, or AI generation, it shows a brief deliberate progress experience — not a spinner, but a labeled, staged, meaningful wait. Each stage names what the app is doing for the user specifically ("Analyzing your writing style…", "Building your plan…"). Show accurate progress while real work is pending; make the result available as soon as it is ready. Do not add a minimum wait to signal effort.
 
 **Bright line.** The staged wait reflects real steps the app is performing (or did perform). Each stage label is accurate. The delay is proportional: a 3-second personalization pass, not a 12-second fake loader for a cached result.
 
 **Dark line.** The delay is purely artificial with fabricated stage labels. The effort display implies AI sophistication that does not exist. A fake progress bar resets near 100% to extend time. This is a compliance veto.
 
-**Deterministic guardrail.** Each stage label in the progress experience must map to an actual backend or on-device computation step documented in `engineering/TECH_SPEC.md`. If the computation is truly instant (cached), the delay must be omitted or kept to ≤800ms with a single honest label. No stage may claim a specific data source the app does not actually access.
+**Deterministic guardrail.** Each stage label in the progress experience must map to an actual backend or on-device computation step documented in `engineering/TECH_SPEC.md`. If the computation is truly instant (cached), omit the delay and show the ready result. No stage may claim a specific data source the app does not actually access.
 
 **Artifact.** Define the perceived effort sequence in `product/ONBOARDING.md` and in the relevant feature section of `PRODUCT.md`. Include stage count, label copy, duration per stage, motion spec (tokens), and true computation mapping. Add `onboarding_effort_reveal_complete` (or the feature-specific equivalent) to `analytics/ANALYTICS.md`.
 
@@ -74,7 +80,7 @@ Every B2C mobile launch produced by this skill must implement four named cards. 
 
 **What it looks like in a mobile app.** At a deliberate, calm moment in the session — often after a first result, before a paywall, or at session end — the app pauses and reflects the user's stated goal or action back to them. Not a push notification. Not a modal that demands a tap. A contextual screen, card, or inline moment that names what the user came to do and what they just accomplished or are about to accomplish. It turns a tap into a moment.
 
-**Bright line.** The mirror uses the user's own words (from Commitment Card input or last session action). The pause is brief (2–4 seconds before the next action becomes available, or can be skipped). The user feels seen, not trapped.
+**Bright line.** The mirror uses the user's own words (from Commitment Card input or last session action). The pause is brief (non-blocking and immediately dismissible). The user feels seen, not trapped.
 
 **Dark line.** The mirror is deployed to create guilt ("You said you'd practice every day…"), to manufacture urgency before a paywall, or to delay a user who wants to leave. This is a compliance veto.
 
@@ -146,7 +152,7 @@ The app is functionally correct but emotionally neutral. It sits at 5-star (expe
 
 ### Artifact This Tier Produces
 
-The Four Required Experience Cards above (Commitment Card, Variable Reward Card, Perceived Effort Delay Card, Intent Mirroring Card) are the primary artifacts for Tier 3. Additionally:
+The Four Experience Card Options above (Commitment Card, Variable Reward Card, Perceived Effort Delay Card, Intent Mirroring Card) are the primary artifacts for Tier 3. Additionally:
 
 - In `product/ONBOARDING.md`: a B=MAP audit row for the onboarding sequence: Motivation score (high/medium/low and why), Ability score, Prompt placement.
 - In `analytics/ANALYTICS.md`: a peak-end event pair — one event for the emotional peak (variable reward reveal) and one for session close (intent mirror or last core action). These two events feed the north-star retention dashboard.
@@ -228,7 +234,7 @@ These apply to all five tiers and all four cards. Any implementation that crosse
 
 Every emotional moment must be measurable. These events are required in `analytics/ANALYTICS.md` before any Experience Card is shipped.
 
-The four required Experience Cards' PostHog event names and properties (`commitment_made`, `variable_reward_revealed`, `perceived_effort_completed`, `intent_mirror_shown`, `intent_mirror_dismissed`) are defined once, canonically, in [`emotional-experience-measurement.md`](./emotional-experience-measurement.md) §§4-7 — load that section rather than restate the property list here; a second copy is how the schema drifts.
+The four foundational Experience Cards' PostHog event names and properties (`commitment_made`, `variable_reward_revealed`, `perceived_effort_completed`, `intent_mirror_shown`, `intent_mirror_dismissed`) are defined once, canonically, in [`emotional-experience-measurement.md`](./emotional-experience-measurement.md) §§4-7 — load that section rather than restate the property list here; a second copy is how the schema drifts.
 
 Events unique to this tier's AI-agency work, not owned by the card measurement file:
 
@@ -245,7 +251,7 @@ All events must follow the naming rules in `analytics/ANALYTICS.md`. Add these t
 
 Before calling the emotional/behavioral layer build-ready:
 
-- [ ] All four Experience Cards are specified in `product/ONBOARDING.md` and `PRODUCT.md` with copy, data source, PostHog event, and star-level mapping.
+- [ ] All selected Experience Cards are specified in `product/ONBOARDING.md` and `PRODUCT.md` with copy, data source, PostHog event, and star-level mapping.
 - [ ] Each card's bright-line guardrail is met (see table above).
 - [ ] Dark-line tests pass: no guilt-trigger on churn, no artificial withholding, no fabricated AI stages, no intent mirror that blocks navigation.
 - [ ] Perceived Effort Delay stage labels all trace to a step in `engineering/TECH_SPEC.md`.
@@ -259,4 +265,4 @@ Before calling the emotional/behavioral layer build-ready:
 - [ ] B=MAP audit row is in `product/ONBOARDING.md`.
 - [ ] Journey-map row in `state/LAUNCH_TRACE.md` covers trigger → word-of-mouth arc.
 - [ ] Day-7 retention unlock threshold recorded as hard stop/scale rule in `PAID_UA.md`.
-- [ ] All four cards are mapped to a star level in `11_STAR_EXPERIENCE.md`.
+- [ ] All selected cards are mapped to a star level in `11_STAR_EXPERIENCE.md`.

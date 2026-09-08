@@ -686,7 +686,7 @@ _Before DESIGN.md mutation, generated visuals, native animation, or landing moti
 
 ### Design Room
 
-_Any design/visual-system/cross-surface/store-creative/landing/onboarding/paywall work. Founder phrasing: design how every screen looks and feels._
+_New or substantively revised design systems, concepts, or cross-surface direction. Founder phrasing: design how every screen looks and feels. A bounded correction to an accepted legacy contract uses the direct focused-maintenance procedure in quality-lens, not full Design Room execution._
 
 - **Role:** Design guru
 - **Phases:** 2
@@ -694,8 +694,8 @@ _Any design/visual-system/cross-surface/store-creative/landing/onboarding/paywal
 - **Reads:** `PRODUCT.md`, `DESIGN.md`, `state/LAUNCH_TRACE.md`, `strategy/RESEARCH.md`, `design/reference-packs/`, `product/onboarding/graph/ONB-15-architecture-decision.md`
 - **Consults:** `studio/seed/business.json`
 - **Produces:** `DESIGN.md`, `studio/seed/business.json`, `design/design-room.html`
-- **Gates:** `validate:design-state`, `check:design-md`, `render:design-room`, `check:design-room`, `check:design-worthiness-mechanical`
-- **Knowledge:** [Audience-Derived Identity](../../knowledge/design/audience-derived-identity.md), [Design Evidence Stack](../../knowledge/design/design-evidence-stack.md), [Design Room](../../knowledge/design/design-room.md), [Design Worthiness](../../knowledge/design/design-worthiness.md), [Evidence-Led Editorial Scrollytelling](../../knowledge/design/editorial-scrollytelling.md), [Landing Motion Craft](../../knowledge/design/landing-motion-craft.md), [Mobile Flow Craft](../../knowledge/design/mobile-flow-craft.md), [Quality Lens](../../knowledge/design/quality-lens.md), [Surfaces B2C](../../knowledge/design/surfaces-b2c.md), [Vibecoded Tells](../../knowledge/design/vibecoded-tells.md), [Artifact Contracts](../../knowledge/process/artifact-contracts.md)
+- **Gates:** `validate:design-state`, `check:design-foundation`, `render:design-room`, `check:design-room`, `check:design-worthiness-mechanical`
+- **Knowledge:** [Audience-Derived Identity](../../knowledge/design/audience-derived-identity.md), [Design Evidence Stack](../../knowledge/design/design-evidence-stack.md), [Design Room](../../knowledge/design/design-room.md), [Design Visual System](../../knowledge/design/design-visual-system.md), [Design Worthiness](../../knowledge/design/design-worthiness.md), [Evidence-Led Editorial Scrollytelling](../../knowledge/design/editorial-scrollytelling.md), [Landing Motion Craft](../../knowledge/design/landing-motion-craft.md), [Mobile Flow Craft](../../knowledge/design/mobile-flow-craft.md), [Quality Lens](../../knowledge/design/quality-lens.md), [Surfaces B2C](../../knowledge/design/surfaces-b2c.md), [Vibecoded Tells](../../knowledge/design/vibecoded-tells.md), [Artifact Contracts](../../knowledge/process/artifact-contracts.md)
 
 ### Design system audit (isolated)
 
@@ -721,7 +721,7 @@ _The native app and landing page run and their required behavior has evidence, b
 - **Consults:** —
 - **Produces:** `design/proofs/design-acceptance.json`, `design/reviews/IMPLEMENTATION_REVIEW.md`
 - **Gates:** `check:design-acceptance`
-- **Knowledge:** [Consumer Craft Benchmarks](../../knowledge/design/consumer-craft-benchmarks.md), [Design Acceptance Evidence](../../knowledge/design/design-acceptance.md), [Design Visual System](../../knowledge/design/design-visual-system.md), [Mobile Flow Craft](../../knowledge/design/mobile-flow-craft.md)
+- **Knowledge:** [Consumer Craft Benchmarks](../../knowledge/design/consumer-craft-benchmarks.md), [Design Acceptance Evidence](../../knowledge/design/design-acceptance.md), [Design Visual System](../../knowledge/design/design-visual-system.md), [Mobile Flow Craft](../../knowledge/design/mobile-flow-craft.md), [Quality Lens](../../knowledge/design/quality-lens.md)
 
 ### Token promotion
 
@@ -772,8 +772,8 @@ _Before rendered videos/stills, app previews, ad/social variants. Founder phrasi
 - **Reads:** `DESIGN.md`, `design/reference-packs/`
 - **Consults:** —
 - **Produces:** `growth/content-assets/CONTENT_ASSETS.md`, `growth/content-assets/content-assets.html`
-- **Gates:** `check:content-assets`
-- **Knowledge:** [Design Evidence Stack](../../knowledge/design/design-evidence-stack.md), [Design Visual System](../../knowledge/design/design-visual-system.md), [Remotion Content Assets](../../knowledge/design/remotion-content-assets.md), [Visual And Motion Production](../../knowledge/process/tool-recipes/visual-and-motion-production.md)
+- **Gates:** `check:content-assets-foundation`
+- **Knowledge:** [Design Evidence Stack](../../knowledge/design/design-evidence-stack.md), [Design Visual System](../../knowledge/design/design-visual-system.md), [Content Asset Production](../../knowledge/design/remotion-content-assets.md), [Visual And Motion Production](../../knowledge/process/tool-recipes/visual-and-motion-production.md)
 
 ## Every Word A User Reads
 

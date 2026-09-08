@@ -85,6 +85,12 @@ export function register(harness: Harness): void {
     assert.equal(selectRecommendedNextEdit(findings), "worthiness.taste_stranger_test: worthiness.taste_stranger_test observation");
   });
 
+  check("mechanical style warnings request inspection without claiming all checks are clean", () => {
+    const warning = mechanicalFinding({ code: "vibecode.default_icon_pack", severity: "warning", file: "controls.tsx" });
+    assert.match(selectRecommendedNextEdit([warning]), /^Inspect in context; no automatic restyle:/);
+    assert.notEqual(selectRecommendedNextEdit([warning]), NO_FURTHER_EDIT_MESSAGE);
+  });
+
   check("no findings at all recommends the fixed clean message, never a fabricated edit", () => {
     assert.equal(selectRecommendedNextEdit([]), NO_FURTHER_EDIT_MESSAGE);
   });
@@ -116,28 +122,28 @@ export function register(harness: Harness): void {
 
   const iconPackRoot = makeFixture("grade-design-icon-pack");
   writeIconPackTell(iconPackRoot);
-  runFixture("a Lucide import is reported as a mechanical error finding", iconPackRoot, SCRIPT, 0, '"code": "vibecode.default_icon_pack"');
+  runFixture("a Lucide import is reported as a contextual warning finding", iconPackRoot, SCRIPT, 0, '"code": "vibecode.default_icon_pack"');
   runFixture("the icon-pack finding is tagged tier mechanical with its dimension key", iconPackRoot, SCRIPT, 0, '"tier": "mechanical"', [
     "--scan-roots",
     "growth/landing",
   ]);
   runFixture("the icon-pack finding names dimensionKey vibecode.default_icon_pack", iconPackRoot, SCRIPT, 0, '"dimensionKey": "vibecode.default_icon_pack"');
   runFixture(
-    "the icon-pack mechanical error becomes the single recommended next edit",
+    "an icon-pack warning requests contextual inspection",
     iconPackRoot,
     SCRIPT,
     0,
-    '"recommendedNextEdit": "vibecode.default_icon_pack',
+    '"recommendedNextEdit": "Inspect in context; no automatic restyle: vibecode.default_icon_pack',
   );
   runFixture(
-    "a mechanical error blocks the taste task template and points at fixing it first",
+    "a contextual icon warning preserves independent review",
     iconPackRoot,
     SCRIPT,
     0,
-    "Mechanical errors found. Fix these first",
+    "Surfaces to Grade",
     [],
     undefined,
-    "Surfaces to Grade",
+    "Mechanical errors found. Fix these first",
   );
 
   // -------------------------------------------------------------------------------------

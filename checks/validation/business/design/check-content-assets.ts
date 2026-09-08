@@ -2,6 +2,7 @@
 import { existsSync, readFileSync, realpathSync } from "node:fs";
 import { createHash } from "node:crypto";
 import path from "node:path";
+import { CONTENT_ASSETS_VERSION, validateContentAssetsV2 } from "../../../../tooling/lib/content-assets.js";
 import {
   asArray,
   asString,
@@ -112,6 +113,32 @@ const skip = contentStatus === "not_needed" || contentStatus === "deferred";
 const markdown = firstExistingText(["CONTENT_ASSETS.md", "growth/content-assets/CONTENT_ASSETS.md"]);
 const htmlPath = existsAny(["content-assets.html", "growth/content-assets/content-assets.html"]);
 const manifestText = firstExistingText(["growth/content-assets/manifest.json", "manifest.json"]);
+const parsedManifest = manifestText ? parseManifest(manifestText.relativePath, manifestText.text) : undefined;
+const strongManifest = isRecord(parsedManifest) && parsedManifest.schema_version === CONTENT_ASSETS_VERSION;
+if (process.argv.includes("--require-foundation") && (!skip || manifestAssets(parsedManifest).length > 0) && !strongManifest) {
+  issues.push(
+    issue(
+      "error",
+      "content_assets.foundation_required",
+      "New content production requires manifest schema_version 2 and structured foundation briefs. Direct legacy validation remains available for focused existing work.",
+      manifestText?.relativePath ?? "growth/content-assets/manifest.json",
+    ),
+  );
+}
+if (
+  isRecord(parsedManifest) &&
+  parsedManifest.schema_version !== undefined &&
+  !["1", CONTENT_ASSETS_VERSION].includes(parsedManifest.schema_version as string)
+) {
+  issues.push(
+    issue(
+      "error",
+      "content_assets.manifest.version.unsupported",
+      "Supported manifest versions are 1 (legacy) and 2 (structured brief).",
+      manifestText?.relativePath,
+    ),
+  );
+}
 
 if (!skip && !markdown) {
   issues.push(
@@ -127,8 +154,7 @@ if (!skip && !markdown) {
 if (markdown) {
   const requiredPhrases = [
     "Route Matrix",
-    "Higgsfield",
-    "Remotion",
+    ...(strongManifest ? [] : ["Higgsfield", "Remotion"]),
     "Founder approval",
     "License status",
     "Source Inputs",
@@ -200,7 +226,8 @@ if (!skip && !manifestText) {
 }
 
 if (manifestText) {
-  const parsed = parseManifest(manifestText.relativePath, manifestText.text);
+  const parsed = parsedManifest;
+  issues.push(...validateContentAssetsV2(args.root, parsed, manifestText.relativePath));
   const assets = manifestAssets(parsed);
   if (isRecord(parsed) && "assets" in parsed && !Array.isArray(parsed.assets)) {
     issues.push(issue("error", "content_assets.manifest.assets.invalid", "manifest.assets must be an array.", manifestText.relativePath));
@@ -236,7 +263,7 @@ if (manifestText) {
     for (const input of asArray(asset.inputs)
       .map(asString)
       .filter((value): value is string => Boolean(value?.trim()))) {
-      if (!digestRequired) continue;
+      if (!digestRequired || strongManifest) continue;
       if (/^[a-z][a-z0-9+.-]*:/i.test(input) || input.startsWith("#")) continue;
       const absoluteInput = path.join(args.root, input);
       if (!existsSync(absoluteInput)) {
@@ -274,7 +301,7 @@ if (manifestText) {
     }
 
     const route = asString(asset.route)?.toLowerCase();
-    if (route === "remotion") {
+    if (route === "remotion" && !strongManifest) {
       requireStringField(asset, "composition_id", index, manifestText.relativePath);
       requireStringField(asset, "dimensions", index, manifestText.relativePath);
       requireStringField(asset, "render_proof", index, manifestText.relativePath);
@@ -312,14 +339,15 @@ if (manifestText) {
     // classify itself via asset_kind. Silence is not a classification.
     const renderProofText = asString(asset.render_proof) ?? "";
     const assetKind = asString(asset.asset_kind)?.trim().toLowerCase() ?? "";
-    const looksUgc = /\bugc(?:_how_to|_unboxing)?\b|\bproduct_review\b/i.test([route, asString(asset.mode) ?? "", renderProofText, assetKind].join(" "));
+    const looksUgc =
+      !strongManifest && /\bugc(?:_how_to|_unboxing)?\b|\bproduct_review\b/i.test([route, asString(asset.mode) ?? "", renderProofText, assetKind].join(" "));
     const KNOWN_VIDEO_ASSET_KINDS = ["ugc", "product_ad", "b_roll", "demo", "app_preview"];
-    const isGeneratedVideo = /\bseedance|marketing_studio|cinema_studio|\bveo\b/i.test(`${route} ${renderProofText}`);
+    const isGeneratedVideo = !strongManifest && /\bseedance|marketing_studio|cinema_studio|\bveo\b/i.test(`${route} ${renderProofText}`);
 
     // The brief requirement keys on generation, not on one provider's name: a
     // bare seedance_2_5 route generates just as much UI-bearing video as a
     // higgsfield_* route does.
-    if ((route && (route.includes("higgsfield") || route.includes("marketing_studio"))) || isGeneratedVideo) {
+    if (!strongManifest && ((route && (route.includes("higgsfield") || route.includes("marketing_studio"))) || isGeneratedVideo)) {
       const promptBrief = asString(asset.prompt_brief) ?? "";
       if (!promptBrief.trim()) {
         issues.push(

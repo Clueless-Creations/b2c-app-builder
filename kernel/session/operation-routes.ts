@@ -1,3 +1,4 @@
+import { assertRedistributable, noticesForResources, renderThirdPartyNotices } from "../composition/notices.js";
 import { assertWorkerContext } from "../composition/worker-context.js";
 import { boundedFileBytes } from "../lib/bounded-file.js";
 import { loadRunState } from "../engine/runstate.js";
@@ -7,7 +8,7 @@ import path from "node:path";
 import { Ajv2020, type AnySchema } from "ajv/dist/2020.js";
 import { validateSourceAccess } from "../../contracts/source-access.js";
 import { loadSelectedKnowledge, verifySelectedEffect, verifySelectedOperation } from "../composition/compile-bindings.js";
-import { readSnapshotResource, readStoredSnapshot } from "../composition/resources.js";
+import { createSnapshotReader, readSnapshotResource, readStoredSnapshot } from "../composition/resources.js";
 import { workflowContractFingerprint } from "../engine/review-evidence.js";
 import { outputFingerprintPath } from "../engine/artifact-fingerprint.js";
 import type { CatalogWorkflowNode, CompiledRunNode } from "../engine/compile.js";
@@ -28,6 +29,10 @@ export interface OperationRoute {
   resultArtifactId: string;
   receiptArtifactId: string;
   binaryArtifactIds?: readonly string[];
+  /** Host-owned declarations of actual incorporation, never inferred from loading knowledge. */
+  incorporatedResources?: readonly { resourceId: string; packageDigest: string }[];
+  /** Reserved declared output; callbacks cannot supply these generated notice bytes. */
+  noticeArtifactId?: string;
   input(context: NodeExecutionContext): unknown;
   execute(request: OperationRouteRequest): Promise<{ output: unknown; evidence: unknown; artifacts?: Array<{ artifactId: string; bytes: Buffer }> }>;
   /** Independent readback. A schema-valid assertion alone never proves the declared result. */
@@ -57,6 +62,7 @@ interface Receipt {
   executionCycle: string;
   outputDigest: string;
   artifactDigests?: Record<string, string>;
+  incorporationDigest?: string;
   recordedAt: string;
   evidence: unknown;
   providerProof: "not_observed";
@@ -129,6 +135,7 @@ function validateReceipt(node: CompiledRunNode, route: OperationRoute, receipt: 
     receipt.contractFingerprint !== workflowContractFingerprint(node) ||
     receipt.inputDigest !== digest(receipt.input) ||
     receipt.outputDigest !== digest(output) ||
+    receipt.incorporationDigest !== incorporationDigest(route) ||
     receipt.providerProof !== "not_observed" ||
     typeof receipt.executionCycle !== "string"
   )
@@ -144,8 +151,52 @@ function validateReceipt(node: CompiledRunNode, route: OperationRoute, receipt: 
   schemaValidator(node, "evidenceSchema")(receipt.evidence);
 }
 
+function incorporationDigest(route: OperationRoute): string | undefined {
+  return route.noticeArtifactId ? digest({ artifactId: route.noticeArtifactId, resources: route.incorporatedResources }) : undefined;
+}
+
+function binaryOutputIds(route: OperationRoute): string[] {
+  return [...(route.binaryArtifactIds ?? []), ...(route.noticeArtifactId ? [route.noticeArtifactId] : [])];
+}
+
+function operationNoticeBytes(node: CompiledRunNode, route: OperationRoute): Buffer | undefined {
+  if (!route.noticeArtifactId) return undefined;
+  const selected = node.selectedOperation!;
+  // Visibility starts at selected recipe/contract/implementation exports. A selected resource's
+  // owner is provenance only: importing one knowledge resource must not expose its siblings.
+  const identities = [selected.recipeSelection, selected.contract, selected.implementation];
+  const packages = [...new Map(identities.map((identity) => [identity.packageDigest, identity])).values()].map((identity) => ({
+    directory: identity.packageDirectory,
+    snapshot: readStoredSnapshot(identity.packageDirectory, identity.packageDigest),
+  }));
+  const entries = (route.incorporatedResources ?? []).flatMap((reference) => {
+    const reader = createSnapshotReader();
+    const visible = packages.find((entry) => {
+      try {
+        return reader.identity(entry.directory, entry.snapshot, reference.resourceId).packageDigest === reference.packageDigest;
+      } catch {
+        return false;
+      }
+    });
+    if (!visible) throw new Error(`binding.incorporated_resource_unselected:${reference.resourceId}`);
+    // The verified snapshot import resolver fixes the owner digest and sibling store location.
+    const directory = path.join(path.dirname(visible.directory), reference.packageDigest.slice(7));
+    const owner = { directory, snapshot: reader.load(directory, reference.packageDigest) };
+    assertRedistributable([owner], [reference.resourceId]);
+    return noticesForResources([owner], [reference.resourceId]);
+  });
+  const unique = [...new Map(entries.map((entry) => [`${entry.packageDigest}:${entry.id}`, entry])).values()];
+  return Buffer.from(renderThirdPartyNotices(unique), "utf8");
+}
+
+function verifyNoticeBytes(node: CompiledRunNode, route: OperationRoute, paths: Record<string, string>): void {
+  const expected = operationNoticeBytes(node, route);
+  if (expected && (!paths[route.noticeArtifactId!] || !boundedFileBytes(paths[route.noticeArtifactId!]!, 32 * 1024 * 1024).equals(expected)))
+    throw new Error("binding.notice_output_mismatch");
+}
+
 function verifyBinaryArtifacts(route: OperationRoute, receipt: Receipt, paths: Record<string, string>): void {
-  const ids = route.binaryArtifactIds ?? [];
+  const ids = binaryOutputIds(route);
   if (
     Object.keys(receipt.artifactDigests ?? {}).length !== ids.length ||
     ids.some((id) => !paths[id] || bytesDigest(boundedFileBytes(paths[id]!, 32 * 1024 * 1024)) !== receipt.artifactDigests?.[id])
@@ -272,11 +323,21 @@ export class OperationRouteRegistry {
           (route.resultArtifactId === route.receiptArtifactId || !Number.isFinite(route.maxReceiptAgeMs) || route.maxReceiptAgeMs <= 0))
       )
         throw new Error("binding.invalid_or_duplicate_host_route");
+      if (
+        route.kind !== "worker-artifacts" &&
+        (Boolean(route.noticeArtifactId) !== Boolean(route.incorporatedResources?.length) ||
+          (route.incorporatedResources &&
+            new Set(route.incorporatedResources.map((entry) => `${entry.packageDigest}:${entry.resourceId}`)).size !== route.incorporatedResources.length))
+      )
+        throw new Error("binding.invalid_incorporation_declaration");
       this.#routes.set(
         key,
         Object.freeze({
           ...route,
           ...(route.kind !== "worker-artifacts" && route.binaryArtifactIds ? { binaryArtifactIds: Object.freeze([...route.binaryArtifactIds]) } : {}),
+          ...(route.kind !== "worker-artifacts" && route.incorporatedResources
+            ? { incorporatedResources: Object.freeze(route.incorporatedResources.map((entry) => Object.freeze({ ...entry }))) }
+            : {}),
         }),
       );
     }
@@ -297,7 +358,7 @@ export class OperationRouteRegistry {
       return route;
     }
     if (selected.implementation.mode === "worker-artifact") throw Error("binding.worker_route_required");
-    const declaredIds = [route.resultArtifactId, route.receiptArtifactId, ...(route.binaryArtifactIds ?? [])];
+    const declaredIds = [route.resultArtifactId, route.receiptArtifactId, ...binaryOutputIds(route)];
     if (
       new Set(declaredIds).size !== declaredIds.length ||
       node.outputs.length !== declaredIds.length ||
@@ -356,6 +417,7 @@ export class OperationRouteRegistry {
         schemaValidator(node, "evidenceSchema")({ workflowId: node.workflowId, evidence: result.evidence });
         return result;
       }
+      const noticeBytes = operationNoticeBytes(node, route);
       const resultPath = context.artifactPaths[route.resultArtifactId];
       const receiptPath = context.artifactPaths[route.receiptArtifactId];
       if (!resultPath || !receiptPath || resultPath === receiptPath || !node.outputPaths.includes(resultPath) || !node.outputPaths.includes(receiptPath))
@@ -379,7 +441,7 @@ export class OperationRouteRegistry {
       const cycle = executionCycle(node, context);
       const idempotencyKey = digest([context.runId, node.workflowId, contractFingerprint, inputDigest, acceptedInputFingerprint, cycle]);
       const binaryPaths = Object.fromEntries(
-        (route.binaryArtifactIds ?? []).map((id) => {
+        binaryOutputIds(route).map((id) => {
           const relative = context.artifactPaths[id];
           if (!relative || !node.outputPaths.includes(relative)) throw new Error("binding.binary_output_path_missing");
           return [id, inside(context.workspaceDir, relative)];
@@ -395,6 +457,7 @@ export class OperationRouteRegistry {
           const priorOutput = JSON.parse(boundedFileBytes(resultFile, 1024 * 1024).toString("utf8"));
           validateReceipt(node, route, prior, priorOutput, prior.recordedAt);
           verifyBinaryArtifacts(route, prior, binaryPaths);
+          verifyNoticeBytes(node, route, binaryPaths);
           allowCompletedCycleRollover(node, context, prior, cycle, context.artifactPaths);
           rollover = true;
           replay = false;
@@ -451,6 +514,7 @@ export class OperationRouteRegistry {
           receipt = JSON.parse(boundedFileBytes(receiptFile, 1024 * 1024).toString("utf8")) as Receipt;
           validateReceipt(node, route, receipt, output, context.now);
           verifyBinaryArtifacts(route, receipt, binaryPaths);
+          verifyNoticeBytes(node, route, binaryPaths);
           if (receipt.idempotencyKey !== idempotencyKey || receipt.runId !== context.runId) throw new Error("binding.prior_result_identity_mismatch");
         } else {
           const response = await route.execute({ input, idempotencyKey, knowledge: loadSelectedKnowledge(node.selectedOperation!) });
@@ -471,6 +535,7 @@ export class OperationRouteRegistry {
           )
             throw new Error("binding.binary_output_coverage_mismatch");
           binaries = returned.map((entry) => ({ artifactId: entry.artifactId, bytes: Buffer.from(entry.bytes) }));
+          if (noticeBytes) binaries.push({ artifactId: route.noticeArtifactId!, bytes: noticeBytes });
           receipt = {
             schemaVersion: "b2c.operation-receipt/v1",
             operation: route.operation,
@@ -484,6 +549,7 @@ export class OperationRouteRegistry {
             acceptedInputFingerprint,
             executionCycle: cycle,
             outputDigest: digest(output),
+            ...(route.noticeArtifactId ? { incorporationDigest: incorporationDigest(route) } : {}),
             ...(binaries.length ? { artifactDigests: Object.fromEntries(binaries.map((entry) => [entry.artifactId, bytesDigest(entry.bytes)])) } : {}),
             recordedAt: context.now,
             evidence: response.evidence,
@@ -511,7 +577,7 @@ export class OperationRouteRegistry {
       }
       return {
         status: "succeeded",
-        outputs: [route.resultArtifactId, route.receiptArtifactId, ...(route.binaryArtifactIds ?? [])].map((artifactId) => ({
+        outputs: [route.resultArtifactId, route.receiptArtifactId, ...binaryOutputIds(route)].map((artifactId) => ({
           artifactId,
           path: context.artifactPaths[artifactId]!,
           fingerprint: outputFingerprintPath(inside(context.workspaceDir, context.artifactPaths[artifactId]!)),
@@ -568,9 +634,20 @@ export class OperationRouteRegistry {
         route,
         receipt,
         Object.fromEntries(
-          (route.binaryArtifactIds ?? []).map((id) => {
+          binaryOutputIds(route).map((id) => {
             const ref = context.outputs.find((entry) => entry.artifactId === id);
             if (!ref || !node.outputPaths.includes(ref.path)) throw new Error("binding.binary_verification_path_missing");
+            return [id, inside(context.workspaceDir, ref.path)];
+          }),
+        ),
+      );
+      verifyNoticeBytes(
+        node,
+        route,
+        Object.fromEntries(
+          binaryOutputIds(route).map((id) => {
+            const ref = context.outputs.find((entry) => entry.artifactId === id);
+            if (!ref) throw new Error("binding.binary_verification_path_missing");
             return [id, inside(context.workspaceDir, ref.path)];
           }),
         ),

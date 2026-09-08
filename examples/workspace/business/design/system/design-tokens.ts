@@ -1,4 +1,4 @@
-// source: DESIGN.md; design-token-hash: 4c86cf0df4992ecd
+// source: DESIGN.md; design-token-hash: 158d186692209d33
 export const designTokens = {
   "color": {
     "background": "#f7f3ec",
@@ -15,12 +15,30 @@ export const designTokens = {
   },
   "font": {
     "display": {
-      "family": "Fraunces, Georgia, serif",
-      "weight": "700"
+      "family": "Georgia",
+      "weight": "700",
+      "size": "2rem",
+      "lineHeight": 1.2,
+      "letterSpacing": "0px",
+      "fallbacks": [
+        "serif"
+      ],
+      "resourceId": "system-display",
+      "nativeSize": 32,
+      "nativeTracking": 0
     },
     "body": {
-      "family": "Source Sans 3, Avenir Next, sans-serif",
-      "weight": "400"
+      "family": "system-ui",
+      "weight": "400",
+      "size": "1rem",
+      "lineHeight": 1.5,
+      "letterSpacing": "0px",
+      "fallbacks": [
+        "sans-serif"
+      ],
+      "resourceId": "system-body",
+      "nativeSize": 16,
+      "nativeTracking": 0
     }
   },
   "radius": {

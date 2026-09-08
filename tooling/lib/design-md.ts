@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, lstatSync, realpathSync, statSync } from "node:fs";
 import path from "node:path";
+import { boundedFileBytes } from "../../kernel/lib/bounded-file.js";
 import { lint } from "@google/design.md/linter";
 import { parse as parseYaml } from "yaml";
 import { asString, isRecord, issue, type Issue } from "./launch-state.js";
@@ -10,12 +11,24 @@ export interface DesignMdSources {
   businessPath: string;
 }
 
+export interface PortableTypography {
+  family: string;
+  weight: string | number;
+  size?: string;
+  lineHeight?: number;
+  letterSpacing?: string;
+  fallbacks?: string[];
+  resourceId?: string;
+  nativeSize?: number;
+  nativeTracking?: number;
+}
+
 export interface PortableDesignTokens {
   schemaVersion: "1.0.0";
   source: "DESIGN.md";
   tokens: {
     color: Record<string, string>;
-    font: Record<string, { family: string; weight: string | number }>;
+    font: Record<string, PortableTypography>;
     radius: Record<string, string>;
     space: Record<string, string | number>;
     motion: Record<string, string>;
@@ -63,9 +76,16 @@ export function loadDesignSystem(root: string): LoadedDesignSystem {
     return { markdown: "", issues, sources };
   }
 
-  const markdown = readFileSync(sources.designPath, "utf8");
+  let markdown: string;
+  try {
+    markdown = boundedDesignBytes(sources.designPath, 1024 * 1024, "DESIGN.md").toString("utf8");
+  } catch (error) {
+    issues.push(issue("error", "design_md.read_limit", error instanceof Error ? error.message : String(error), "DESIGN.md"));
+    return { markdown: "", issues, sources };
+  }
   const parsed = parseFrontmatter(markdown, issues);
   const tokens = parsed ? normalizeTokens(markdown, parsed, issues) : undefined;
+  if (parsed) validateTypographyFiles(root, parsed, issues);
   return {
     markdown,
     frontmatter: parsed,
@@ -100,6 +120,13 @@ export function validateDesignMd(markdown: string): Issue[] {
   try {
     for (const finding of lint(markdown).findings) {
       if (finding.severity === "info") continue;
+      // These additive fields are validated above; do not suppress other upstream findings.
+      if (
+        finding.severity === "warning" &&
+        /^typography\.[^.]+\.(nativeSize|nativeTracking|fallbacks|resourceId)$/.test(finding.path ?? "") &&
+        finding.message.includes("not a recognized typography property")
+      )
+        continue;
       issues.push(
         issue(
           finding.severity === "warning" ? "warning" : "error",
@@ -121,7 +148,7 @@ export function hashDesignTokens(tokens: PortableDesignTokens): string {
   return createHash("sha256").update(JSON.stringify(tokens.tokens)).digest("hex").slice(0, 16);
 }
 
-function parseFrontmatter(markdown: string, issues: Issue[]): Record<string, unknown> | undefined {
+export function parseFrontmatter(markdown: string, issues: Issue[]): Record<string, unknown> | undefined {
   const match = markdown.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
   if (!match) {
     issues.push(issue("error", "design_md.frontmatter_missing", "DESIGN.md must start with fenced YAML frontmatter.", "DESIGN.md"));
@@ -152,7 +179,7 @@ function normalizeTokens(markdown: string, frontmatter: Record<string, unknown>,
   const rounded = stringRecord(frontmatter.rounded, "rounded", issues);
   const spacing = dimensionRecord(frontmatter.spacing, "spacing", issues);
   const typographyRoot = isRecord(frontmatter.typography) ? frontmatter.typography : {};
-  const font: Record<string, { family: string; weight: string | number }> = {};
+  const font: Record<string, PortableTypography> = {};
   for (const [name, raw] of Object.entries(typographyRoot)) {
     if (!isRecord(raw)) {
       issues.push(issue("error", "design_md.typography_invalid", `Typography token ${name} must be a map.`, "DESIGN.md"));
@@ -165,6 +192,45 @@ function normalizeTokens(markdown: string, frontmatter: Record<string, unknown>,
       continue;
     }
     font[name] = { family, weight };
+  }
+  validateFoundation(frontmatter, issues);
+  for (const [name, raw] of Object.entries(typographyRoot)) {
+    if (!isRecord(raw) || !font[name]) continue;
+    const enhanced = frontmatter.foundation !== undefined;
+    if (!enhanced) continue;
+    const fail = (message: string) => issues.push(issue("error", "design_md.typography_contract", `Typography ${name}: ${message}`, "DESIGN.md"));
+    const dimension = (value: unknown, positive: boolean) =>
+      typeof value === "string" && /^-?\d+(?:\.\d+)?(?:px|rem)$/.test(value) && (!positive || Number.parseFloat(value) > 0);
+    if (!dimension(raw.fontSize, true)) fail("fontSize must be positive px or rem.");
+    if (typeof raw.lineHeight !== "number" || !Number.isFinite(raw.lineHeight) || raw.lineHeight <= 0)
+      fail("lineHeight must be a positive unitless multiplier.");
+    if (!dimension(raw.letterSpacing, false)) fail("letterSpacing must use px or rem, including zero.");
+    if (!Array.isArray(raw.fallbacks) || raw.fallbacks.length === 0 || raw.fallbacks.some((v) => typeof v !== "string" || !v.trim()))
+      fail("fallbacks must list font families.");
+    if (typeof raw.resourceId !== "string" || !raw.resourceId.trim()) fail("resourceId must identify a declared typography resource.");
+    for (const key of ["nativeSize", "nativeTracking"] as const) {
+      if (typeof raw[key] !== "number" || !Number.isFinite(raw[key]) || (key === "nativeSize" && raw[key] <= 0))
+        fail(`${key} must explicitly declare the native logical value; CSS pixels and rem are not native units.`);
+    }
+    const weight = Number(raw.fontWeight);
+    if (!Number.isFinite(weight) || weight < 1 || weight > 1000) fail("fontWeight must be numeric in the range 1–1000.");
+    const foundation = isRecord(frontmatter.foundation) ? frontmatter.foundation : {};
+    const resources = Array.isArray(foundation.typographyResources) ? foundation.typographyResources : [];
+    if (
+      frontmatter.foundation !== undefined &&
+      !resources.some((resource) => isRecord(resource) && resource.id === raw.resourceId && resource.family === raw.fontFamily)
+    )
+      fail("resourceId and fontFamily must match the same typography resource.");
+    font[name] = {
+      ...font[name]!,
+      size: raw.fontSize as string,
+      lineHeight: raw.lineHeight as number,
+      letterSpacing: raw.letterSpacing as string,
+      fallbacks: raw.fallbacks as string[],
+      resourceId: raw.resourceId as string,
+      nativeSize: raw.nativeSize as number,
+      nativeTracking: raw.nativeTracking as number,
+    };
   }
   const motion = parseMotionTokens(markdown, issues);
   if (!colors || !rounded || !spacing || Object.keys(font).length === 0 || !motion) return undefined;
@@ -245,4 +311,132 @@ function dedupeIssues(issues: Issue[]): Issue[] {
     seen.add(key);
     return true;
   });
+}
+
+/** Additive authoring contract. Missing foundation preserves legacy designs; new templates opt in. */
+export function validateFoundation(frontmatter: Record<string, unknown>, issues: Issue[]): void {
+  if (frontmatter.foundation === undefined) return;
+  const fail = (message: string) => issues.push(issue("error", "design_md.foundation", message, "DESIGN.md"));
+  const raw = frontmatter.foundation;
+  if (!isRecord(raw)) {
+    fail("foundation must be a versioned map.");
+    return;
+  }
+  const allowed = ["version", "communicationPriorities", "rationale", "identityInvariants", "referenceInfluences", "typographyResources"];
+  for (const key of Object.keys(raw)) if (!allowed.includes(key)) fail(`Unknown foundation field: ${key}.`);
+  if (raw.version !== 1) fail("foundation.version must be 1.");
+  const text = (value: unknown) => typeof value === "string" && value.trim().length > 0;
+  const texts = (value: unknown) => Array.isArray(value) && value.length > 0 && value.every(text);
+  for (const key of ["communicationPriorities", "identityInvariants"]) if (!texts(raw[key])) fail(`foundation.${key} must be a nonempty list of decisions.`);
+  const rows = (key: string, keys: string[], required = true): Record<string, unknown>[] => {
+    const value = raw[key];
+    if (!Array.isArray(value) || (required && value.length === 0)) {
+      fail(`foundation.${key} must be ${required ? "a nonempty" : "an"} array.`);
+      return [];
+    }
+    return value.flatMap((row) => {
+      if (!isRecord(row)) {
+        fail(`foundation.${key} entries must be maps.`);
+        return [];
+      }
+      for (const key of Object.keys(row)) if (!keys.includes(key)) fail(`Unknown foundation.${key} entry field.`);
+      return [row];
+    });
+  };
+  for (const row of rows("rationale", ["decision", "kind", "reason", "evidence"])) {
+    if (!text(row.decision) || !text(row.reason)) fail("Each rationale needs a decision and reason.");
+    if (!["evidence", "hypothesis", "legibility", "medium-constraint"].includes(String(row.kind)))
+      fail("Rationale kind must distinguish evidence, hypothesis, legibility, or medium-constraint.");
+    if (row.kind === "evidence" && !text(row.evidence)) fail("Evidence rationale needs a source locator; a declared locator is not verification.");
+  }
+  for (const row of rows("referenceInfluences", ["source", "adopt", "avoid"], false)) {
+    if (![row.source, row.adopt, row.avoid].every(text)) fail("Reference influences need source, adopt, and avoid.");
+  }
+  const resources = rows("typographyResources", [
+    "id",
+    "family",
+    "mode",
+    "source",
+    "license",
+    "scripts",
+    "fallbacks",
+    "expansionTest",
+    "path",
+    "sha256",
+    "licensePath",
+  ]);
+  const ids = resources.map((row) => row.id);
+  if (new Set(ids).size !== ids.length) fail("Typography resource ids must be unique.");
+  for (const row of resources) {
+    if (!["system", "local", "remote"].includes(String(row.mode))) fail("Typography resource mode must be system, local, or remote.");
+    if (row.mode === "local" && (!text(row.path) || !text(row.licensePath) || typeof row.sha256 !== "string" || !/^[a-f0-9]{64}$/.test(row.sha256)))
+      fail("Local typography resources require a workspace-relative path, licensePath, and sha256 of the actual font bytes.");
+    if (row.mode !== "local" && (row.path !== undefined || row.sha256 !== undefined || row.licensePath !== undefined))
+      fail("Only local typography resources carry path and sha256; remote source metadata is not loading proof.");
+    if (![row.id, row.family, row.source, row.license, row.expansionTest].every(text) || !texts(row.scripts) || !texts(row.fallbacks))
+      fail("Typography resources need id, family, source, license, scripts, fallbacks, and a representative expansion test plan or evidence locator.");
+  }
+}
+
+function validateTypographyFiles(root: string, frontmatter: Record<string, unknown>, issues: Issue[]): void {
+  const foundation = isRecord(frontmatter.foundation) ? frontmatter.foundation : {};
+  const resources = Array.isArray(foundation.typographyResources) ? foundation.typographyResources : [];
+  for (const resource of resources) {
+    if (!isRecord(resource) || resource.mode !== "local" || typeof resource.path !== "string") continue;
+    try {
+      const base = realpathSync(root);
+      const candidate = path.resolve(base, resource.path);
+      if (path.isAbsolute(resource.path) || !candidate.startsWith(`${base}${path.sep}`)) throw new Error("path must remain within the workspace");
+      const actual = realpathSync(candidate);
+      if (!actual.startsWith(`${base}${path.sep}`) || !statSync(actual).isFile())
+        throw new Error("font must be a file within the workspace, including after resolving symlinks");
+      if (typeof resource.licensePath !== "string" || path.isAbsolute(resource.licensePath)) throw new Error("licensePath must be workspace-relative");
+      const licensePath = realpathSync(path.resolve(base, resource.licensePath));
+      if (
+        !licensePath.startsWith(`${base}${path.sep}`) ||
+        !statSync(licensePath).isFile() ||
+        !boundedDesignBytes(licensePath, 1024 * 1024, "font notice")
+          .toString("utf8")
+          .trim()
+      )
+        throw new Error("licensePath must resolve to a nonempty notice file within the workspace");
+      if (
+        createHash("sha256")
+          .update(boundedDesignBytes(actual, 128 * 1024 * 1024, "font resource"))
+          .digest("hex") !== resource.sha256
+      )
+        throw new Error("font bytes do not match sha256");
+    } catch (error) {
+      issues.push(
+        issue(
+          "error",
+          "design_md.typography_resource",
+          `Typography resource ${String(resource.id)}: ${error instanceof Error ? error.message : String(error)}`,
+          "DESIGN.md",
+        ),
+      );
+    }
+  }
+}
+
+/** Referenced local bytes remain dependencies of the one DESIGN.md authority. */
+export function typographyDependencyPaths(frontmatter: Record<string, unknown> | undefined): string[] {
+  const foundation = isRecord(frontmatter?.foundation) ? frontmatter.foundation : {};
+  const resources = Array.isArray(foundation.typographyResources) ? foundation.typographyResources : [];
+  return [
+    ...new Set(
+      resources.flatMap((resource) =>
+        isRecord(resource) && resource.mode === "local"
+          ? [resource.path, resource.licensePath].filter((value): value is string => typeof value === "string")
+          : [],
+      ),
+    ),
+  ];
+}
+
+/** Preflight before allocation, then recheck inode/type/size while reading at most the observed bytes. */
+function boundedDesignBytes(file: string, maximum: number, label: string): Buffer {
+  const stat = lstatSync(file);
+  if (!stat.isFile() || stat.isSymbolicLink() || stat.size > maximum) throw new Error(`${label} must be a regular file no larger than ${maximum} bytes.`);
+  return boundedFileBytes(file, stat.size);
 }

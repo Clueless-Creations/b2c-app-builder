@@ -1,12 +1,18 @@
 # Emotional Experience Design
 
 Use this reference before any product, onboarding, paywall, or core-loop work where the goal is to make interactions feel charged with meaning — not merely functional. Apps that anticipate, solve, and reward action retain users because they create emotional memory, not just utility.
+## Applicability And Evidence Boundary
+
+Card selection is conditional; the discipline of making and reviewing that selection is core. Calm, predictable feedback and immediate completion can be the right emotional experience. Evaluate the actual user need before selecting novelty, anticipation, a commitment, or a reveal. Do not manufacture a behavioral loop to fill a card checklist.
+
+Psychological theories and examples below motivate hypotheses. They do not establish a universal effect size, a guaranteed star-level improvement, or a measured benefit in this product. Keep observed user response separate from intended tone. Every applied card retains its ethics, truthful progress, accessibility and measurement obligations; marking another card non-applicable waives none of them.
+
 
 Load [`eleven-star-experience.md`](eleven-star-experience.md) first. The star ladder defines the target emotional state; this reference defines the mechanics and verification to reach it. Load `analytics-attribution.md` before implementation: every emotional moment named here must emit a named PostHog event or it is unmeasurable.
 
 ## Contents
 
-- The Four Required Experience Cards
+- The Four Experience Card Options
 - Six-Lens Design Review Framework
 - Emotional Curve Artifact
 - Analytics Events For Emotional Moments
@@ -17,11 +23,11 @@ Load [`eleven-star-experience.md`](eleven-star-experience.md) first. The star la
 
 ---
 
-## The Four Required Experience Cards
+## The Four Experience Card Options
 
-Every B2C mobile app built with this skill must implement all four Experience Cards. They are not optional polish — they are the mechanics that separate a 6-star ("better than expected") product from a 5-star commodity.
+Choose cards according to the user job and current flow. Evaluate the four patterns and record a reason for non-applicability. No card is mandatory merely because the product is a consumer app; a quiet utility may use none.
 
-For each card: implement the pattern, emit the named PostHog event, verify the bright line, and record evidence in `engineering/PRODUCTION_READINESS.md`.
+For each selected card: implement the pattern, emit the named PostHog event, verify the bright line, and record evidence in `engineering/PRODUCTION_READINESS.md`.
 
 ---
 
@@ -59,7 +65,7 @@ For each card: implement the pattern, emit the named PostHog event, verify the b
 - Bright side: the variation reflects real personalization, discovery, or learning — the user genuinely does not know which insight or result they will see, and every possible result serves their goal.
 - Dark side: simulated variation (randomized label on identical outcomes), artificial delay on a pre-computed result with no real variance, or loot-box mechanics where paid money buys uncertain outcomes. Gambling-adjacent mechanics in apps rated 4+ are a platform policy violation and a skill-level compliance veto.
 
-**Guardrail (deterministic).** The result must be genuinely variable in content, not only in cosmetic framing. If the same user action always produces an identical backend result, the animation is deceptive. Implementation must pass a test where two consecutive completions of the same action produce observably different content outputs at least 30% of the time, OR the product can demonstrate that variation is real but unlikely to occur on consecutive attempts due to personalization convergence. Record the proof method in `engineering/PRODUCTION_READINESS.md`.
+**Guardrail (deterministic).** The result must be genuinely variable in content, not only in cosmetic framing. Document the actual source of variation and test representative controlled inputs. A deterministic confirmation is valid and should use ordinary feedback. No fixed variation percentage establishes honesty or user value. Record the proof method in `engineering/PRODUCTION_READINESS.md`.
 
 **PostHog events.** Defined once, canonically, in [`emotional-experience-measurement.md`](./emotional-experience-measurement.md) §5 (Variable Reward Card Measurement) — do not restate the event names or properties here.
 
@@ -71,16 +77,16 @@ For each card: implement the pattern, emit the named PostHog event, verify the b
 
 **Psychological basis.** Labor illusion / operational transparency: customers who can see effort being done on their behalf are more satisfied with the outcome and willing to pay more, even when the actual processing time is identical (Ryan Buell & Michael Norton, _Management Science_, 2011). IKEA effect: users value outcomes more when they participated in producing them (Norton, Mochon & Ariely, _Journal of Consumer Psychology_, 2012). Peak-end rule: the emotional peak of an experience and its end dominate the overall memory of it (Kahneman & Fredrickson, _Psychological Science_, 1993).
 
-**What it is.** A deliberate, honest display of processing, assembly, or effort that makes the user perceive the output as crafted for them — not instantly auto-generated. The product shows its work: scanning steps, building a plan, analyzing data, assembling pieces. The actual time is tuned to feel earned, not slow. The delay can be real (slow computation) or designed (real processing re-paced with visible stepwise progress). It is honest if the displayed steps correspond to real operations; it is deceptive if the steps are cosmetic progress bars over pre-computed results.
+**What it is.** A deliberate, honest display of processing, assembly, or effort that makes the user perceive the output as crafted for them — not instantly auto-generated. The product shows its work: scanning steps, building a plan, analyzing data, assembling pieces. The actual time is tuned to feel earned, not slow. Only pending work justifies a wait. Completed steps may be summarized without delaying the ready result. It is honest if the displayed steps correspond to real operations; it is deceptive if the steps are cosmetic progress bars over pre-computed results.
 
 **When to trigger.** Plan generation, personalized report creation, first AI analysis, match scoring, or any high-stakes first result where the user has invested several onboarding steps. Do not apply to routine CRUD operations or paywall interactions.
 
 **Bright line.**
 
-- Bright side: the displayed steps correspond to real computational steps (even if re-paced), and the final output is genuinely assembled from the user's inputs. The delay creates appreciation.
+- Bright side: the displayed steps correspond to real computational steps without invented steps or delayed access, and the final output is genuinely assembled from the user's inputs. Whether the presentation helps understanding requires evaluation.
 - Dark side: a purely cosmetic spinner on a pre-rendered result with zero relationship between the displayed steps and the actual computation. If the product team can ship a result in 50ms but adds a 4s spinner with fake steps, that is a deceptive dark pattern even if the result is accurate.
 
-**Guardrail (deterministic).** At least 50% of the displayed processing steps must correspond to a real computational operation (data fetch, model inference, sorting, filtering, formatting, or rendering). The product spec must document the step-to-operation map in `engineering/TECH_SPEC.md`. If this cannot be verified, use a simpler loading state instead.
+**Guardrail (deterministic).** Every displayed processing step must correspond to a real computational operation (data fetch, model inference, sorting, filtering, formatting, or rendering). The product spec must document the step-to-operation map in `engineering/TECH_SPEC.md`. If this cannot be verified, use a simpler loading state instead.
 
 **PostHog events.** Defined once, canonically, in [`emotional-experience-measurement.md`](./emotional-experience-measurement.md) §6 (Perceived Effort Delay Card Measurement) — do not restate the event names or properties here.
 
@@ -111,7 +117,7 @@ For each card: implement the pattern, emit the named PostHog event, verify the b
 
 ## Six-Lens Design Review Framework
 
-Run this review per feature or per journey before build handoff. Each lens has an exact question, evidence to capture on a real device, and a sub-score (0–2). Total score: 0–12. **Score ≥9 = build-ready. Score 7–8 = proceed with named blockers tracked as failure cards. Score <7 = redesign before build.**
+Run this review per feature or per journey before build handoff. Each lens has an exact question, evidence to capture on a real device, and a sub-score (0–2). Total score: 0–12. The total is a discussion aid. It cannot establish readiness or override a material defect.
 
 These bands are canonical in [`emotional-design-system.md`](./emotional-design-system.md) §Emotional Review Framework. This file must not restate them differently.
 
@@ -240,7 +246,7 @@ with itself across two files is worse than one that lives in a single place.
 
 ## Analytics Events For Emotional Moments
 
-The four required Experience Cards' events and properties are defined once, canonically, in
+The four foundational Experience Cards' events and properties are defined once, canonically, in
 [`emotional-experience-measurement.md`](./emotional-experience-measurement.md) §§4-7 — load that
 section rather than a second copy here, for the same reason the Emotional Curve spec above lives
 in one place. This file adds only the event below, which the measurement file does not own:
@@ -291,8 +297,8 @@ status: "open"
 evidence:
   - "engineering/TECH_SPEC.md"
   - "engineering/PRODUCTION_READINESS.md"
-impact: "App is missing one or more required Experience Cards. Emotional engagement below 6-star threshold."
-next_action: "Implement all four Experience Cards (Commitment, Variable Reward, Perceived Effort Delay, Intent Mirroring). Emit named PostHog events for each. Record bright-line compliance in engineering/PRODUCTION_READINESS.md."
+impact: "App is missing a selected Experience Card required by its accepted user-job rationale."
+next_action: "Implement the selected cards or correct an unsupported applicability decision. Emit named PostHog events for each. Record bright-line compliance in engineering/PRODUCTION_READINESS.md."
 validator: "npm run check:emotional-design -- --root ."
 ```
 

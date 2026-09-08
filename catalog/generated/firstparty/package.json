@@ -1,6 +1,6 @@
 {
   "name": "b2c-app-builder",
-  "version": "0.218.33",
+  "version": "0.219.3",
   "description": "Consumer-business primitives for AI agents: capabilities, providers, recipes, and evidence through a CLI, MCP, and skill.",
   "keywords": [
     "mcp",
@@ -237,7 +237,10 @@
     "validate:design-state": "tsx checks/validation/business/design/validate-state.ts",
     "validate:launch-state": "tsx checks/validation/business/orchestration/validate-project-state.ts",
     "validate:skill": "f=\"$HOME/.codex/skills/.system/skill-creator/scripts/quick_validate.py\"; if [ -f \"$f\" ]; then uv run --with pyyaml python \"$f\" .; else echo 'skill-creator quick_validate not installed; skipping maintainer-only skill lint (expected outside the author machine)'; fi",
-    "verify:node": "tsx kernel/session/verify.ts"
+    "verify:node": "tsx kernel/session/verify.ts",
+    "check:design-foundation": "tsx checks/validation/business/design/check-design-md.ts --require-foundation",
+    "check:content-assets-foundation": "tsx checks/validation/business/design/check-content-assets.ts --require-foundation",
+    "test:browser-proof-chrome": "tsx checks/verification/fixtures/browser-proof.chrome-smoke.ts"
   },
   "dependencies": {
     "@babel/parser": "8.0.4",

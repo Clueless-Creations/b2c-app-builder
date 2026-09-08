@@ -1,5 +1,7 @@
+import fs from "node:fs";
+import { syncBuiltinESMExports } from "node:module";
 import { createHash } from "node:crypto";
-import { mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { openSync, closeSync, ftruncateSync, mkdirSync, readFileSync, rmSync, renameSync, symlinkSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { deflateSync } from "node:zlib";
 import { parse as parseYaml, stringify as yaml } from "yaml";
@@ -1151,6 +1153,96 @@ function addAndroidCoverage(fixture: AcceptanceFixture, keepIos: boolean): void 
 }
 
 export function register(harness: Harness): void {
+  harness.check("design-acceptance: oversized declared font is refused by inventory without eager resource validation", () => {
+    const fixture = example(harness);
+    mkdirSync(path.join(fixture.root, "design/fonts"), { recursive: true });
+    const font = "design/fonts/oversized.woff2";
+    const fd = openSync(path.join(fixture.root, font), "w");
+    try {
+      ftruncateSync(fd, 300 * 1024 * 1024);
+    } finally {
+      closeSync(fd);
+    }
+    writeFileSync(path.join(fixture.root, "design/fonts/NOTICE.txt"), "Synthetic notice");
+    const file = path.join(fixture.root, "DESIGN.md");
+    const text = readFileSync(file, "utf8");
+    const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---/)!;
+    const frontmatter = parseYaml(match[1]!);
+    frontmatter.foundation = { version: 1, typographyResources: [{ id: "oversized", mode: "local", path: font, licensePath: "design/fonts/NOTICE.txt" }] };
+    writeFileSync(file, text.replace(match[0], `---\n${yaml(frontmatter)}---`));
+    let message = "",
+      eagerRead = false;
+    const originalRead = fs.readFileSync;
+    fs.readFileSync = ((...args: unknown[]) => {
+      if (args[0] === path.join(fixture.root, font)) {
+        eagerRead = true;
+        throw new Error("oversized resource was read before inventory");
+      }
+      return Reflect.apply(originalRead, fs, args);
+    }) as typeof fs.readFileSync;
+    syncBuiltinESMExports();
+    try {
+      designCandidateFingerprint(fixture.root, fixture.scope);
+    } catch (error) {
+      message = String(error);
+    } finally {
+      fs.readFileSync = originalRead;
+      syncBuiltinESMExports();
+    }
+    assert(!eagerRead, "candidate must not eagerly validate referenced font bytes");
+    assert(message.includes("exceeds 5000 files or 256 MiB"), "candidate inventory must refuse oversized bytes before hashing resources");
+  });
+  harness.check("design-acceptance: font and license bytes omitted from implementation roots still invalidate candidate", () => {
+    const fixture = example(harness);
+    const fontPath = "design/fonts/fixture.woff2",
+      licensePath = "design/fonts/NOTICE.txt";
+    mkdirSync(path.join(fixture.root, "design/fonts"), { recursive: true });
+    writeFileSync(path.join(fixture.root, fontPath), "synthetic font bytes; no rendering claim");
+    writeFileSync(path.join(fixture.root, licensePath), "Synthetic fixture notice");
+    const designPath = path.join(fixture.root, "DESIGN.md");
+    const design = readFileSync(designPath, "utf8");
+    const match = design.match(/^---\r?\n([\s\S]*?)\r?\n---/)!;
+    const frontmatter = parseYaml(match[1]!);
+    frontmatter.foundation = { version: 1, typographyResources: [{ id: "fixture-font", mode: "local", path: fontPath, licensePath }] };
+    writeFileSync(designPath, design.replace(match[0], `---\n${yaml(frontmatter)}---`));
+    const before = designCandidateFingerprint(fixture.root, fixture.scope);
+    writeFileSync(path.join(fixture.root, fontPath), "changed synthetic font bytes");
+    const fontChanged = designCandidateFingerprint(fixture.root, fixture.scope);
+    assert(before !== fontChanged, "omitted font must affect candidate identity");
+    writeFileSync(path.join(fixture.root, licensePath), "Changed synthetic notice");
+    assert(fontChanged !== designCandidateFingerprint(fixture.root, fixture.scope), "notice bytes must affect candidate identity");
+  });
+  harness.check("design-acceptance: asset brief dependencies are bound without manually listing their directory", () => {
+    const fixture = example(harness);
+    mkdirSync(path.join(fixture.root, "growth/content-assets"), { recursive: true });
+    mkdirSync(path.join(fixture.root, "design/kit"), { recursive: true });
+    const asset = "design/kit/mark.svg";
+    writeFileSync(path.join(fixture.root, asset), "<svg>synthetic first mark</svg>");
+    writeFileSync(
+      path.join(fixture.root, "growth/content-assets/manifest.json"),
+      JSON.stringify({ schema_version: "2", assets: [{ brief: { kit: { path: "DESIGN.md", assets: [{ path: asset }] } } }] }),
+    );
+    const before = designCandidateFingerprint(fixture.root, fixture.scope);
+    writeFileSync(path.join(fixture.root, asset), "<svg>synthetic changed mark</svg>");
+    assert(before !== designCandidateFingerprint(fixture.root, fixture.scope), "kit file must affect candidate identity");
+    const primaryBefore = designCandidateFingerprint(fixture.root, fixture.scope);
+    writeFileSync(path.join(fixture.root, "manifest.json"), "unrelated malformed root manifest");
+    assert(primaryBefore === designCandidateFingerprint(fixture.root, fixture.scope), "shadowed root manifest must follow validator precedence");
+    rmSync(path.join(fixture.root, "manifest.json"));
+    renameSync(path.join(fixture.root, "growth/content-assets/manifest.json"), path.join(fixture.root, "manifest.json"));
+    const fallbackBefore = designCandidateFingerprint(fixture.root, fixture.scope);
+    writeFileSync(path.join(fixture.root, asset), "<svg>root manifest resource changed</svg>");
+    assert(fallbackBefore !== designCandidateFingerprint(fixture.root, fixture.scope), "supported root manifest fallback must bind dependencies too");
+    rmSync(path.join(fixture.root, asset));
+    let rejected = false;
+    try {
+      designCandidateFingerprint(fixture.root, fixture.scope);
+    } catch {
+      rejected = true;
+    }
+    assert(rejected, "missing declared kit dependency must fail closed");
+  });
+
   harness.check("Porchwatch F8: expired design evidence selects only compatible observed alternatives", () => {
     const resolution = { status: "resolved" as const, observedAt: "2026-01-01T00:00:00Z", provider: "synthetic", sourceId: "source" };
     const result = selectDesignReference(

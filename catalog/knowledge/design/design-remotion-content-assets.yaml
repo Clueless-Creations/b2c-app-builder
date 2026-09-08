@@ -1,10 +1,11 @@
 schema_version: 1.0.0
 id: reference.design.remotion-content-assets
-title: Remotion Content Assets
+title: Content Asset Production
 domain_id: domain.design
 document_path: knowledge/design/remotion-content-assets.md
-load_when: replacing Higgsfield with Remotion; scaffolding a Remotion project; code-rendered videos/stills; app-preview
-  clips; social/ad/content variants; any "local rendered assets are ready" claim
+load_when: planning or producing generated, composed, captured or licensed assets; binding a versioned
+  asset brief to the current brand kit; selecting compositing or interactive media; Remotion implementation;
+  app-preview clips; social/ad/content variants; any rendered assets readiness claim
 lifecycle: active
 bindings:
   workflow_ids:
@@ -17,8 +18,36 @@ sources:
     url: https://github.com/amirmushichge/brand-system-skill
     review_cadence_days: 30
     claim_scope: Adapted brand consistency process under CC BY 4.0; selected provider and existing DESIGN.md remain authoritative.
-    last_review_date: 2026-09-05
+    last_review_date: '2026-09-07'
     reviewer: b2c-maintainers
+    publisher: Amir Mushich
+    revision: 30f6084ddf6adf4173cf882fce266015f8872c17
+    upstream_id: amir-brand-system
+    rights:
+      status: verified
+      spdx: CC-BY-4.0
+      evidence: https://github.com/amirmushichge/brand-system-skill/blob/30f6084ddf6adf4173cf882fce266015f8872c17/LICENSE
+      evidence_sha256: f5b745ef98087f531e719ee8ca6a96809444573ecc7173c6fa68eaad39b3cc3f
+      notes: Selected method adaptation only; third-party assets excluded.
+    selectors: [SKILL.md, README.md, LICENSE]
+  - id: amir-cinematic-scroll-prompt-kit
+    name: Amir Mushich cinematic-scroll-prompt-kit
+    source_type: github
+    url: https://github.com/amirmushichge/cinematic-scroll-prompt-kit
+    review_cadence_days: 30
+    claim_scope: Conditional compositing layer requirements and reversible sequence inspection; no fixed visual style or renderer selection.
+    last_review_date: '2026-09-07'
+    reviewer: b2c-maintainers
+    publisher: Amir Mushich
+    revision: 39ac222e385061c1eeab7f063b869950ee7cca1b
+    upstream_id: amir-cinematic-scroll
+    rights:
+      status: verified
+      spdx: MIT
+      evidence: https://github.com/amirmushichge/cinematic-scroll-prompt-kit/blob/39ac222e385061c1eeab7f063b869950ee7cca1b/LICENSE
+      evidence_sha256: 8ee01d7b14659f2cb90cd33f3f259e039269b384d3970eed41805912c5a0a525
+      notes: Selected method adaptation only; third-party assets excluded.
+    selectors: [PROMPT.txt, examples/PROJECT_BRIEF.example.md, examples/assets.example.json, LICENSE]
   - id: amir-motion-brief
     name: Amir Mushich Motion Brief
     source_type: github
@@ -27,3 +56,26 @@ sources:
     claim_scope: Optional video creative brief guidance, not an executable provider or evidence of rendered quality.
     last_review_date: 2026-09-05
     reviewer: b2c-maintainers
+derivations:
+  - source_ids: [amir-brand-system-builder]
+    relationship: adapted
+    baseline: 30f6084ddf6adf4173cf882fce266015f8872c17
+    selectors: [SKILL.md, README.md, LICENSE]
+    rationale: Brand-kit and reference-role method reauthored into the existing provider-neutral asset owner with byte-bound briefs.
+    omissions:
+      - No mandatory provider, presentation format or per-generation approval ceremony.
+      - No source artwork, fonts, prompt expression or third-party trademarks imported.
+    reviewer: b2c-maintainers
+    reviewed_at: '2026-09-07'
+    notice: catalog/upstreams/notices/amir-brand-system.txt
+  - source_ids: [amir-cinematic-scroll-prompt-kit]
+    relationship: adapted
+    baseline: 39ac222e385061c1eeab7f063b869950ee7cca1b
+    selectors: [PROMPT.txt, examples/PROJECT_BRIEF.example.md, examples/assets.example.json, LICENSE]
+    rationale: Layer roles, alignment and responsive sequence checks adapted as conditional compositing fields.
+    omissions:
+      - No required cinematic technique, scroll distance, typeface or scene order.
+      - No source media or prompt expression imported.
+    reviewer: b2c-maintainers
+    reviewed_at: '2026-09-07'
+    notice: catalog/upstreams/notices/amir-cinematic-scroll.txt

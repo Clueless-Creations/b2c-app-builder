@@ -122,6 +122,174 @@ const WRONG_FOUNDER_FIXTURE_KEY = trustedFounderKeyFromBase64Url(WRONG_FOUNDER_F
 export function register(h: Harness): void {
   const { makeFixture, makeEmptyFixture, runFixture, results } = h;
 
+  const zeroCardDecision = `
+\`\`\`yaml
+experience_card_selection:
+  status: not_applicable
+  user_job: Locate the household document and read its renewal date.
+  rationale: Predictable retrieval needs no commitment, reward, wait or intent mirror.
+  alternative: Show the requested record immediately with clear status and recovery.
+\`\`\`
+`;
+  const zeroCardPacket = (name: string, decision = zeroCardDecision) => {
+    const root = makeFixture(name);
+    const directory = path.join(root, "product/experience/emotional-design");
+    writeFileSync(
+      path.join(directory, "EMOTIONAL_DESIGN.md"),
+      [
+        "# Emotional North Star",
+        "Clear predictable document retrieval.",
+        "## Target Emotional Journey",
+        "## Card Application Map",
+        "## Ethics Attestation",
+        "## Measurement Plan",
+        "## Integration",
+        "## Acceptance Checklist",
+        "11_STAR_EXPERIENCE.md analytics/ANALYTICS.md DESIGN.md product/ONBOARDING.md",
+        decision,
+      ].join("\n"),
+    );
+    writeFileSync(
+      path.join(directory, "EMOTIONAL_AUDIT.md"),
+      ["# Journey Discovery", "## Six-Lens Review", "## Card Application", "## Counter-Metric", "## Star Level", "## Pathway to Better State", decision].join(
+        "\n",
+      ),
+    );
+    return root;
+  };
+  const zeroCards = zeroCardPacket("emotional-explicit-zero-cards");
+  runFixture(
+    "explicit substantive zero-card design and independent audit pass",
+    zeroCards,
+    "check-emotional-design.ts",
+    0,
+    undefined,
+    [],
+    undefined,
+    "card_commitment_not_applied",
+  );
+  for (const [name, decision] of [
+    ["absent", ""],
+    ["commented-out", `<!--${zeroCardDecision}-->`],
+    ["unclosed-comment", `<!--${zeroCardDecision}`],
+    [
+      "placeholder",
+      zeroCardDecision.replace(
+        "Predictable retrieval needs no commitment, reward, wait or intent mirror.",
+        "TODO write a substantive product-specific rationale after review.",
+      ),
+    ],
+    ["short", zeroCardDecision.replace("Predictable retrieval needs no commitment, reward, wait or intent mirror.", "Not needed.")],
+    ["duplicate", zeroCardDecision + zeroCardDecision],
+    ["unknown-key", zeroCardDecision.replace("  status:", "  bypass: true\n  status:")],
+  ]) {
+    runFixture(
+      `zero-card ${name} decision fails`,
+      zeroCardPacket(`emotional-zero-${name}`, decision),
+      "check-emotional-design.ts",
+      1,
+      "emotional_design.no_card_blocks",
+    );
+  }
+  const singleCard = zeroCardPacket(
+    "emotional-one-selected-card",
+    `
+experience_card:
+  card_id: document-reminder-preference
+  mechanism: commitment
+  bright_line: The reminder follows the date and cadence chosen by the user.
+  dark_line: Never use the preference to pressure a subscription purchase.
+  guardrail: The user can edit or delete the reminder at any time in settings.
+  posthog_event: reminder_preference_saved
+  reduced_motion: OS reduce-motion shows the saved preference immediately without animation.
+`,
+  );
+  {
+    const file = path.join(singleCard, "product/experience/emotional-design/EMOTIONAL_AUDIT.md");
+    writeFileSync(
+      file,
+      [
+        "# Journey Discovery",
+        "## Six-Lens Review",
+        "## Card Application",
+        "Commitment Card: the preference remains editable in settings.",
+        "## Counter-Metric",
+        "## Star Level",
+        "## Pathway to Better State",
+      ].join("\n"),
+    );
+  }
+  runFixture(
+    "audit maps only the selected card without inventing other cards",
+    singleCard,
+    "check-emotional-design.ts",
+    0,
+    undefined,
+    [],
+    undefined,
+    "card_variable_reward_not_applied",
+  );
+  const hiddenAuditDecision = zeroCardPacket("emotional-zero-hidden-audit-decision");
+  {
+    const file = path.join(hiddenAuditDecision, "product/experience/emotional-design/EMOTIONAL_AUDIT.md");
+    writeFileSync(file, readFileSync(file, "utf8").replace(zeroCardDecision, `<!--${zeroCardDecision}-->`));
+  }
+  runFixture(
+    "visible zero-card design cannot bless a hidden audit decision",
+    hiddenAuditDecision,
+    "check-emotional-design.ts",
+    1,
+    "emotional_audit.no_card_mapping",
+  );
+  const visibleWithHiddenDraft = zeroCardPacket("emotional-zero-visible-with-hidden-draft", `<!--${zeroCardDecision}-->${zeroCardDecision}`);
+  runFixture("visible zero-card decision ignores a hidden draft duplicate", visibleWithHiddenDraft, "check-emotional-design.ts", 0);
+  const zeroAuditMissing = zeroCardPacket("emotional-zero-audit-missing-decision");
+  {
+    const file = path.join(zeroAuditMissing, "product/experience/emotional-design/EMOTIONAL_AUDIT.md");
+    writeFileSync(file, readFileSync(file, "utf8").replace(zeroCardDecision, "No selected cards."));
+  }
+  runFixture("zero-card audit must independently record applicability", zeroAuditMissing, "check-emotional-design.ts", 1, "emotional_audit.no_card_mapping");
+  const zeroCardLiveLie = zeroCardPacket("emotional-zero-live-lie");
+  writeFileSync(path.join(zeroCardLiveLie, "product/ONBOARDING.md"), "Join 999 users who already started today.");
+  runFixture(
+    "zero-card decision never excuses fabricated live social proof",
+    zeroCardLiveLie,
+    "check-emotional-design.ts",
+    1,
+    "emotional_design.fake_social_proof_phrase",
+  );
+  const selectedDespiteSkip = zeroCardPacket("emotional-selected-despite-skip");
+  {
+    const state = readState(selectedDespiteSkip);
+    const lane = getLane(state, "emotional_design");
+    lane.status = "not_needed";
+    lane.reason = "The document retrieval task uses ordinary predictable feedback.";
+    writeState(selectedDespiteSkip, state);
+    const file = path.join(selectedDespiteSkip, "product/experience/emotional-design/EMOTIONAL_DESIGN.md");
+    writeFileSync(
+      file,
+      readFileSync(file, "utf8") +
+        `
+experience_card:
+  card_id: undeclared-reward
+  mechanism: variable_reward
+  trigger_moment: record lookup completion
+  bright_line: Display only truthful document data from the selected record.
+  dark_line: Never hide an existing document to induce another attempt.
+  guardrail: Return the available result immediately after lookup completes.
+  posthog_event: document_opened
+`,
+    );
+  }
+  runFixture(
+    "skipped lane and zero-card claim cannot bypass applied reward ethics",
+    selectedDespiteSkip,
+    "check-emotional-design.ts",
+    1,
+    "emotional_design.variable_reward_missing_user_control_escape_hatch",
+  );
+  runFixture("zero-card claim conflicts with an applied card", selectedDespiteSkip, "check-emotional-design.ts", 1, "emotional_design.selection_conflict");
+
   const emotionalDesignMissing = makeFixture("emotional-design-missing");
   rmSync(path.join(emotionalDesignMissing, "product", "experience", "emotional-design"), { recursive: true, force: true });
   runFixture("missing emotional design contract fails", emotionalDesignMissing, "check-emotional-design.ts", 1, "emotional_design.contract_missing");
@@ -1032,7 +1200,7 @@ experience_card:
     'import { Sparkles } from "lucide-react";\nexport function IconBar() {\n  return <Sparkles />;\n}\n',
     "utf8",
   );
-  runFixture("default icon pack import fails the gate", vibecodeIconPack, "check-vibecoded-tells.ts", 1, "vibecode.default_icon_pack");
+  runFixture("conventional icon import warns without failing the gate", vibecodeIconPack, "check-vibecoded-tells.ts", 0, "vibecode.default_icon_pack");
 
   // A site-shaped landing (index.html present) owes the Tier 1 legal links.
   const vibecodeNoLegal = makeFixture("vibecode-no-legal");
@@ -2609,7 +2777,7 @@ experience_card:
   const vibecodeWebApp = makeEmptyFixture("vibecode-webapp-scan-roots");
   mkdirSync(path.join(vibecodeWebApp, "src"), { recursive: true });
   writeFileSync(path.join(vibecodeWebApp, "src", "App.tsx"), 'import { Star } from "lucide-react";\nexport function App() {\n  return <Star />;\n}\n', "utf8");
-  runFixture("--scan-roots scans a plain web-app src/ layout", vibecodeWebApp, "check-vibecoded-tells.ts", 1, "vibecode.default_icon_pack", [
+  runFixture("--scan-roots scans a plain web-app src/ layout", vibecodeWebApp, "check-vibecoded-tells.ts", 0, "vibecode.default_icon_pack", [
     "--scan-roots",
     "src",
   ]);
@@ -2618,7 +2786,7 @@ experience_card:
     const componentRoot = makeEmptyFixture(`vibecode-webapp-${extension}`);
     mkdirSync(path.join(componentRoot, "src"), { recursive: true });
     writeFileSync(path.join(componentRoot, "src", `App.${extension}`), 'import { Star } from "lucide-react";\n<Star />\n', "utf8");
-    runFixture(`--scan-roots scans .${extension} web-surface source`, componentRoot, "check-vibecoded-tells.ts", 1, "vibecode.default_icon_pack", [
+    runFixture(`--scan-roots scans .${extension} web-surface source`, componentRoot, "check-vibecoded-tells.ts", 0, "vibecode.default_icon_pack", [
       "--scan-roots",
       "src",
     ]);
@@ -2862,7 +3030,7 @@ experience_card:
     "a directory audited through an ignored tree is still scanned when reached as source",
     vibecodeIgnoredThenSource,
     "check-vibecoded-tells.ts",
-    1,
+    0,
     "vibecode.default_icon_pack",
     ["--scan-roots", "src"],
   );
@@ -2933,7 +3101,7 @@ experience_card:
     "--scan-roots follows a nested symlink that stays inside the web-app root",
     vibecodeNestedSymlinkInside,
     "check-vibecoded-tells.ts",
-    1,
+    0,
     "vibecode.default_icon_pack",
     ["--scan-roots", "src"],
   );
@@ -2952,7 +3120,7 @@ experience_card:
     "--scan-roots preserves the supported extension of a contained file-link alias",
     vibecodeLinkedFileAlias,
     "check-vibecoded-tells.ts",
-    1,
+    0,
     "vibecode.default_icon_pack",
     ["--scan-roots", "src"],
   );

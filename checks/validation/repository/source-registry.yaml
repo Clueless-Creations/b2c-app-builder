@@ -2326,3 +2326,133 @@ sources:
       - catalog/upstreams/appllama-skills.yaml
     notes: Immutable license evidence reviewed with the selected upstream commit. A new adoption must review and
       retain its own license; this entry is not live executable verification.
+
+  - id: video-satori-survive
+    name: How A Graphic Designer MUST Think in 2026 To Survive!
+    source_type: video
+    url: https://www.youtube.com/watch?v=WFkGbyH24AY
+    refresh_cadence_days: 90
+    owner: design
+    locations:
+    - catalog/knowledge/design/design-audience-derived-identity.yaml
+    notes: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source
+      expression imported.
+  - id: video-shapes-layout
+    name: 5 laws of design layout & composition golden rules
+    source_type: video
+    url: https://www.youtube.com/watch?v=eEWRbpDu6CU
+    refresh_cadence_days: 90
+    owner: design
+    locations:
+    - catalog/knowledge/design/design-audience-derived-identity.yaml
+    notes: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source
+      expression imported.
+  - id: video-futur-great-design
+    name: The Secret To Great Design Is Simpler Than You Think
+    source_type: video
+    url: https://www.youtube.com/watch?v=SdCzIDmfDAA
+    refresh_cadence_days: 90
+    owner: design
+    locations:
+    - catalog/knowledge/design/design-audience-derived-identity.yaml
+    notes: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source
+      expression imported.
+  - id: video-satori-think-like
+    name: How To Actually Think Like A Graphic Designer!
+    source_type: video
+    url: https://www.youtube.com/watch?v=2zr9vXdsN94
+    refresh_cadence_days: 90
+    owner: design
+    locations:
+    - catalog/knowledge/design/design-audience-derived-identity.yaml
+    notes: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source
+      expression imported.
+  - id: video-omar-premium-branding
+    name: The Psychology of Premium Branding
+    source_type: video
+    url: https://www.youtube.com/watch?v=1kcxUhjuW_0
+    refresh_cadence_days: 90
+    owner: design
+    locations:
+    - catalog/knowledge/design/design-audience-derived-identity.yaml
+    notes: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source
+      expression imported.
+  - id: video-netflix-paula-scher
+    name: 'Abstract: The Art of Design, Paula Scher: Graphic Design'
+    source_type: video
+    url: https://www.youtube.com/watch?v=LCfBYE97rFk
+    refresh_cadence_days: 90
+    owner: design
+    locations:
+    - catalog/knowledge/design/design-audience-derived-identity.yaml
+    notes: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source
+      expression imported.
+  - id: video-designspo-typography
+    name: The ULTIMATE Guide To Typography For Beginners
+    source_type: video
+    url: https://www.youtube.com/watch?v=AXpxZMRM1EY
+    refresh_cadence_days: 90
+    owner: design
+    locations:
+    - catalog/knowledge/design/design-design-visual-system.yaml
+    notes: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source
+      expression imported.
+  - id: amir-cinematic-scroll-prompt-kit
+    name: Amir Mushich Cinematic Scroll Prompt Kit
+    source_type: github
+    url: https://github.com/amirmushichge/cinematic-scroll-prompt-kit
+    refresh_cadence_days: 30
+    owner: design
+    locations:
+    - catalog/knowledge/design/design-editorial-scrollytelling.yaml
+    notes: MIT selected layer-planning and checkpoint method; no source prompt or assets copied.
+  - id: w3c-css-values-4
+    name: W3C CSS Values and Units Level 4
+    source_type: standard
+    url: https://www.w3.org/TR/css-values-4/#absolute-lengths
+    refresh_cadence_days: 180
+    owner: design
+    locations:
+      - knowledge/design/design-visual-system.md
+      - knowledge/design/design-worthiness.md
+    notes: CSS absolute and relative units; no physical display-size guarantee.
+  - id: w3c-wcag22-text-contrast
+    name: W3C WCAG 2.2 text contrast
+    source_type: standard
+    url: https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html
+    refresh_cadence_days: 180
+    owner: design
+    locations:
+      - knowledge/design/design-visual-system.md
+      - knowledge/design/design-worthiness.md
+    notes: Text contrast thresholds and exceptions; no universal7:1 rule.
+  - id: w3c-wcag22-non-text-contrast
+    name: W3C WCAG 2.2 non-text contrast
+    source_type: standard
+    url: https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html
+    refresh_cadence_days: 180
+    owner: design
+    locations:
+      - knowledge/design/design-visual-system.md
+      - knowledge/design/design-worthiness.md
+    notes: Essential graphical object and control contrast with applicable exceptions.
+
+  - id: amir-brand-system-license
+    name: Amir brand-system reviewed license
+    source_type: github
+    url: https://github.com/amirmushichge/brand-system-skill/blob/30f6084ddf6adf4173cf882fce266015f8872c17/LICENSE
+    refresh_cadence_days: 365
+    owner: b2c-maintainers
+    locations:
+      - catalog/upstreams/amir-brand-system.yaml
+    notes: Immutable license evidence retained for the reviewed upstream commit. This is not live executable or output verification.
+
+  - id: amir-cinematic-scroll-license
+    name: Amir cinematic-scroll reviewed license
+    source_type: github
+    url: https://github.com/amirmushichge/cinematic-scroll-prompt-kit/blob/39ac222e385061c1eeab7f063b869950ee7cca1b/LICENSE
+    refresh_cadence_days: 365
+    owner: b2c-maintainers
+    locations:
+      - catalog/upstreams/amir-cinematic-scroll.yaml
+    notes: Immutable license evidence retained for the reviewed upstream commit. This is not live executable or output verification.

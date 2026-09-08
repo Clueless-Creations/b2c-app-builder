@@ -11,11 +11,53 @@ colors:
   border: "#d2d2d7"
 typography:
   display:
-    fontFamily: system-ui, sans-serif
+    fontFamily: Georgia
     fontWeight: "700"
+    fontSize: 2rem
+    lineHeight: 1.2
+    letterSpacing: 0px
+    nativeSize: 32
+    nativeTracking: 0
+    fallbacks: [serif]
+    resourceId: system-display
   body:
-    fontFamily: system-ui, sans-serif
+    fontFamily: system-ui
     fontWeight: "400"
+    fontSize: 1rem
+    lineHeight: 1.5
+    letterSpacing: 0px
+    nativeSize: 16
+    nativeTracking: 0
+    fallbacks: [sans-serif]
+    resourceId: system-body
+foundation:
+  version: 1
+  communicationPriorities:
+    - The next action and its consequence come before decorative explanation.
+  identityInvariants:
+    - Preserve the selected Anchor Brand Kit roles across app and acquisition surfaces.
+  rationale:
+    - decision: Begin with readable system resources until the product direction is selected.
+      kind: legibility
+      reason: A working fallback allows content and layout review without a font download.
+  referenceInfluences: []
+  typographyResources:
+    - id: system-display
+      family: Georgia
+      mode: system
+      source: Platform font availability; verify on selected targets.
+      license: Platform supplied; no font bytes redistributed.
+      scripts: [Latin]
+      fallbacks: [serif]
+      expansionTest: Pending implementation; inspect long headings, target scripts, and largest supported text setting.
+    - id: system-body
+      family: system-ui
+      mode: system
+      source: Platform default font; adapter resolves the native family.
+      license: Platform supplied; no font bytes redistributed.
+      scripts: [Latin]
+      fallbacks: [sans-serif]
+      expansionTest: Pending implementation; inspect localized body text and controls at largest supported text setting.
 rounded:
   sm: 4px
   md: 8px

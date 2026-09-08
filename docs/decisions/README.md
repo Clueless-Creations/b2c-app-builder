@@ -25,6 +25,7 @@ roadmap's decision text in place.
 | [0007](0007-upstream-lifecycle-and-agent-scopes.md)           | Upstream lifecycle handoff, relationship kinds, and agent scopes   | accepted | ADR-0005; ARCH-06, 07, 09                       |
 
 | [0008](0008-agent-onboarding-entry-path.md) | Distinguish business creation from workspace adoption | accepted | ARCH-07, 09, 11; U25 |
+| [0009](0009-bespoke-design-foundations.md) | Bespoke design foundations in existing authorities | accepted | ARCH-03–09, ARCH-11–15; U9, U13, U18, U19 |
 
 ## Write a record
 

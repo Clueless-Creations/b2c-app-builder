@@ -52,7 +52,7 @@ const designRoomState = loaded.state && isRecord(loaded.state) && isRecord(loade
 const acceptance = design.frontmatter && isRecord(design.frontmatter.acceptance) ? design.frontmatter.acceptance : {};
 const explorationRequired = asString(designRoomState.status) === "rendered" || asString(acceptance.status) === "accepted";
 const parsedExploration = parseDesignExploration(design.frontmatter, explorationRequired);
-const renderIssues = [...loaded.issues, ...parsedExploration.issues];
+const renderIssues = [...loaded.issues, ...design.issues, ...parsedExploration.issues];
 
 if (!loaded.state || !loaded.tokens || !loaded.stateHash) {
   reportAndExit("Design Room render", renderIssues);
@@ -305,6 +305,11 @@ function renderStaticHtml(state: unknown, tokens: unknown, stateHash: string, li
   </header>
   <main>
     <section>
+      <p class="eyebrow">Authored foundation</p>
+      <h2>Communication and identity decisions</h2>
+      ${renderFoundation(design.frontmatter)}
+    </section>
+    <section>
       <p class="eyebrow">Direction exploration</p>
       <h2>Distinct concepts and the recorded choice</h2>
       <div class="grid">${explorationCards}</div>
@@ -477,4 +482,25 @@ function loadDesignLibrary(root: string): DesignLibraryView {
   }
 
   return { components, adapters };
+}
+
+function renderFoundation(frontmatter: Record<string, unknown> | undefined): string {
+  const foundation = isRecord(frontmatter?.foundation) ? frontmatter.foundation : undefined;
+  if (!foundation) return '<p class="empty">This legacy design has no structured foundation. Preserve its accepted direction during a focused edit.</p>';
+  const list = (value: unknown) =>
+    `<ul>${strings(value)
+      .map((item) => `<li>${escapeHtml(item)}</li>`)
+      .join("")}</ul>`;
+  const rationale = asArray(foundation.rationale)
+    .filter(isRecord)
+    .map(
+      (row) =>
+        `<li><strong>${escapeHtml(row.decision)}</strong> (${escapeHtml(row.kind)}): ${escapeHtml(row.reason)}${row.evidence ? ` — source: ${escapeHtml(row.evidence)}` : ""}</li>`,
+    )
+    .join("");
+  const resources = asArray(foundation.typographyResources)
+    .filter(isRecord)
+    .map((row) => `<li>${escapeHtml(row.family)} (${escapeHtml(row.mode)}): ${escapeHtml(row.expansionTest)}</li>`)
+    .join("");
+  return `<h3>Communication priorities</h3>${list(foundation.communicationPriorities)}<h3>Anchor Brand Kit constraints</h3>${list(foundation.identityInvariants)}<h3>Decision rationale</h3><ul>${rationale}</ul><h3>Typography verification plans and locators</h3><ul>${resources}</ul><p class="muted">These declarations do not establish font loading, visual quality, or runtime acceptance. Inspect the produced surfaces and their evidence.</p>`;
 }

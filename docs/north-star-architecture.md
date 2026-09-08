@@ -381,6 +381,8 @@ for novel product behavior. Avoid a universal app DSL, mandatory visual template
 or lowest-common-denominator cross-platform UI. A starter is a starting point;
 unimplemented behavior stays visible as incomplete.
 
+[ADR-0009](decisions/0009-bespoke-design-foundations.md) refines design reuse: the existing DESIGN authority records communication, rationale, identity invariants and typography; expressive methods remain conditional. Product outcomes and independent review establish suitability. Aesthetic pattern counts cannot replace that evidence.
+
 ### ARCH-14: Portfolio scale follows complete businesses
 
 Keep independent app workspaces and provider/environment isolation. The initial

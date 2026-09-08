@@ -1,6 +1,12 @@
 # Emotional Experience System
 
-Use this when building, auditing, or reviewing the emotional and behavioral layer of a B2C mobile app. Apps charged with emotions feel different: they anticipate, solve, and reward action. This file is the methodology. The canonical 12-card deck lives in `knowledge/experience/experience-cards.md`; producer recipes for the four required cards are in `knowledge/experience/emotional-experience-design.md`, and measurement contracts in `knowledge/experience/emotional-experience-measurement.md`. Read both before implementation.
+Use this when building, auditing, or reviewing the emotional and behavioral layer of a B2C mobile app. Apps charged with emotions feel different: they anticipate, solve, and reward action. This file is the methodology. The canonical 12-card deck lives in `knowledge/experience/experience-cards.md`; producer recipes for the four foundational cards are in `knowledge/experience/emotional-experience-design.md`, and measurement contracts in `knowledge/experience/emotional-experience-measurement.md`. Read both before implementation.
+## Applicability And Evidence Boundary
+
+Card selection is conditional; the discipline of making and reviewing that selection is core. Calm, predictable feedback and immediate completion can be the right emotional experience. Evaluate the actual user need before selecting novelty, anticipation, a commitment, or a reveal. Do not manufacture a behavioral loop to fill a card checklist.
+
+Psychological theories and examples below motivate hypotheses. They do not establish a universal effect size, a guaranteed star-level improvement, or a measured benefit in this product. Keep observed user response separate from intended tone. Every applied card retains its ethics, truthful progress, accessibility and measurement obligations; marking another card non-applicable waives none of them.
+
 
 Cross-references (do NOT duplicate; integrate):
 
@@ -12,6 +18,17 @@ Cross-references (do NOT duplicate; integrate):
 - `knowledge/process/failure-cards.md` — dark-pattern violations and missing card attestations become failure cards.
 - `knowledge/experience/ethics-guardrail.md` — the Guardrail Contract and per-mechanism prohibitions are the compliance boundary for every card applied by this system.
 - `knowledge/experience/consumer-product-design-agency.md` — the five-tier academic source synthesis; this file operationalizes it.
+
+When no card applies, record the following fenced YAML inside the existing `EMOTIONAL_DESIGN.md`. Each text field must explain the actual product decision (at least 30 characters, no placeholders). The audit independently records its decision in `EMOTIONAL_AUDIT.md`; an empty map alone is insufficient. This selects zero cards, not a skipped ethics review. A selection cannot coexist with applied card blocks.
+
+```yaml
+experience_card_selection:
+  status: not_applicable
+  user_job: Locate the household document and read its renewal date.
+  rationale: Predictable retrieval needs no commitment, reward, wait or intent mirror.
+  alternative: Show the requested record immediately with clear status and recovery.
+```
+
 
 ## Contents
 
@@ -70,7 +87,7 @@ Researcher attribution for every claim used in card design is required. Where a 
 
 ## Experience Card Deck
 
-Twelve cards cover the full behavioral arc from first session through churn recovery. The four named cards are required. The eight additional cards fill temporal, memorial, social, identity, pre-conversion, and failure-state gaps that the named four leave open.
+Twelve cards cover the full behavioral arc from first session through churn recovery. Each card is selected only when the user job supports it. The eight additional cards fill temporal, memorial, social, identity, pre-conversion, and failure-state gaps that the named four leave open.
 
 Use this table as a navigation surface. The files under `knowledge/experience/experience-cards/` (e.g. `knowledge/experience/experience-cards/commitment-card.md`), routed by the index at `knowledge/experience/experience-cards.md`, are frozen free-layer stubs — title, one-liner, risk tier, bright/dark lines, and a served-by-MCP pointer. The full card specs — psychological basis, trigger timing, motion spec, guardrail detail, PostHog events, and dark-pattern tests — are served per card by the Retention Mechanics MCP (`retention_get_mechanic`). Load only the cards in scope; the index carries the card shape, summary table, and Ethics Ladder.
 
@@ -83,7 +100,7 @@ bright-line guardrail per card. That index and the twelve card files under
 twelve rows here is the duplication docs/architecture.md names, and it drifts silently because
 nothing compares the two tables.
 
-**Deck coverage rationale.** The four required cards (Commitment, Variable Reward, Perceived Effort Delay, Intent Mirroring) are strongest at 6-star and 7-star and operate primarily within a single session or the onboarding funnel. The eight additional cards fill five gaps: temporal momentum and return-visit drive (Endowed Progress, Streak and Loss Aversion, Fresh Start); memory and word-of-mouth b2c (Peak-End); intrinsic and social motivation (Mastery and Status); identity anchoring (Identity and Self-Expression); and pre-conversion motivation and failure resilience (Reciprocity, Recovery and Trust Repair). No card in the deck duplicates another's mechanism.
+**Deck coverage rationale.** The four foundational cards (Commitment, Variable Reward, Perceived Effort Delay, Intent Mirroring) are strongest at 6-star and 7-star and operate primarily within a single session or the onboarding funnel. The eight additional cards fill five gaps: temporal momentum and return-visit drive (Endowed Progress, Streak and Loss Aversion, Fresh Start); memory and word-of-mouth b2c (Peak-End); intrinsic and social motivation (Mastery and Status); identity anchoring (Identity and Self-Expression); and pre-conversion motivation and failure resilience (Reciprocity, Recovery and Trust Repair). No card in the deck duplicates another's mechanism.
 
 ---
 
@@ -91,7 +108,7 @@ nothing compares the two tables.
 
 Use this framework on any feature, screen, or user journey before committing to build. Run it on the running app when auditing an existing app: the in-app iOS Simulator (rung 0) pre-walks a journey quickly, while the audit of record needs a real device via MobAI, because haptics, thermals, and real-network latency drive the emotional read. Run it on rendered HTML proofs when auditing a spec in progress.
 
-Score each lens 0–2 (0 = absent or harmful, 1 = present but weak, 2 = deliberate and strong). Total out of 12. Score ≥9 = build-ready. Score <7 = redesign before build. Score 7–8 = proceed with named blockers tracked as failure cards.
+Score each lens 0–2 (0 = absent or harmful, 1 = present but weak, 2 = deliberate and strong). Total out of 12. The total is a discussion aid, not acceptance authority. Resolve material defects and inspect the actual flow regardless of the total.
 
 ### Lens 1 — Human Goal And JTBD
 
@@ -163,9 +180,9 @@ This protocol produces `EMOTIONAL_DESIGN.md` updates, card applications, measure
 
 2. **Name the JTBD.** Write one JTBD sentence for the feature being charged. If it does not exist in `PRODUCT.md`, add it before proceeding.
 
-3. **Run the Emotional Review Framework.** Score all six lenses for the current state of the feature. Record the score in `EMOTIONAL_DESIGN.md §Review Scores`. A score ≥9 means the feature is already charged; audit and document rather than redesign.
+3. **Run the Emotional Review Framework.** Score all six lenses for the current state of the feature. Record the score in `EMOTIONAL_DESIGN.md §Review Scores`. Use actual findings to decide whether a repair is needed; the score alone establishes no outcome.
 
-4. **Select cards.** From the twelve-card deck, identify which cards apply to this feature and at which moments. The four required cards (Commitment, Variable Reward, Perceived Effort Delay, Intent Mirroring) are always evaluated — mark them not-applicable with a reason if genuinely inapplicable. Justify each selected additional card with a JTBD-level reason, not a "would be cool" reason.
+4. **Select cards.** From the twelve-card deck, identify which cards apply to this feature and at which moments. Evaluate the four foundational cards (Commitment, Variable Reward, Perceived Effort Delay, Intent Mirroring) at applicability depth; mark them not-applicable with a user-job reason when unsuitable. Justify each selected additional card with a JTBD-level reason, not a "would be cool" reason.
 
 5. **Design the Emotional Curve.** Map the entry state, build, peak, resolve, and exit state for the flow. Verify the peak falls before the paywall. Render the curve in `emotional-design.html`.
 
@@ -211,9 +228,9 @@ This protocol runs against the live app, scores each screen against the Emotiona
 
 5. **Write findings.** Each finding follows the Audit Output Contract (see below). Do not write findings as narrative prose.
 
-6. **Generate pathways to better state.** For each finding rated score 0 or 1 on any lens, write a specific recommendation that applies one or more cards from the deck. Include the card name, the trigger moment, the copy sketch, and the PostHog event that would measure the change.
+6. **Generate pathways to better state.** For each material finding, write a specific repair. Select a card only when it addresses the diagnosed need; ordinary feedback, clearer content or removing a delay may be the appropriate repair. Include the card name, the trigger moment, the copy sketch, and the PostHog event that would measure the change.
 
-7. **Open failure cards.** For any finding where a dark-pattern flag is YES, open a failure card in `operations/FAILURE_CARDS.md` using the shape from `failure-cards.md`. For any finding where a required card is missing on a key screen, open a failure card with severity `high`.
+7. **Open failure cards.** For any finding where a dark-pattern flag is YES, open a failure card in `operations/FAILURE_CARDS.md` using the shape from `failure-cards.md`. For a missing selected card, judge severity from the unmet user need. A documented non-applicable card is not a failure.
 
 8. **Update `state/business-state.json`.** Add the audit result to `lanes.emotional_design.evidence` with a path to `EMOTIONAL_AUDIT.md` and the overall score (total / 12 per screen, median across the primary journey).
 
@@ -322,7 +339,7 @@ Card-level failure shapes to open when violations are found:
      emotional-experience-design.md §Failure Cards. This table is a routing surface. The IDs
      must match that file exactly. -->
 
-| `experience-card-not-implemented` | A required card (Commitment, Variable Reward, Perceived Effort Delay, Intent Mirroring) is absent on a screen that would benefit from it according to the JTBD and star-level target | Apply the card per the Producer Protocol; add PostHog event to `analytics/ANALYTICS.md`; run `check:emotional-design` |
+| `experience-card-not-implemented` | A selected card is absent where its accepted user-job rationale requires it | Apply the card per the Producer Protocol; add PostHog event to `analytics/ANALYTICS.md`; run `check:emotional-design` |
 | `experience-card-dark-pattern` | Any applied card fails the three-question bright-line test or uses a prohibited pattern from `ethics-guardrail.md §Non-Negotiable Prohibitions` | Stop implementation; remove or redesign the mechanism; run `check:emotional-design`; open as severity critical |
 | `emotional-curve-peak-after-paywall` | The Emotional Curve plot in `EMOTIONAL_DESIGN.md` or `emotional-design.html` shows the emotional peak occurring after the paywall marker | Redesign the flow so the peak occurs before the paywall; re-render `emotional-design.html` |
 | `experience-card-event-missing` | A card is applied in `EMOTIONAL_DESIGN.md` but no corresponding event exists in `analytics/ANALYTICS.md` | Add the event to `analytics/ANALYTICS.md` before implementation; verify with `check:attribution` |

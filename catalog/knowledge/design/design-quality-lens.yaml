@@ -13,8 +13,17 @@ bindings:
     - workflow.store.store-screenshots-production
     - workflow.engineering.engineering-orchestration-ce-production-readiness
     - workflow.design.design-system-audit
+    - workflow.design.implementation-craft-audit
     - workflow.growth.landing-funnel-audit
   context_pack_ids:
     - context.design
 sources: []
 source_exemption: This package contains internal operating guidance or has no external factual claims.
+
+specifies:
+  - artifact: design/reviews/DESIGN_SYSTEM_REVIEW.md
+    heading: Defect diagnosis
+  - artifact: design/reviews/IMPLEMENTATION_REVIEW.md
+    heading: Defect diagnosis
+  - artifact: DESIGN.md
+    heading: Focused review

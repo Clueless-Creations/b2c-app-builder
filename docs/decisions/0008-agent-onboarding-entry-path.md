@@ -27,6 +27,12 @@ Recommend `workspaces register` only when adopting an existing planning or
 runtime scaffold. Refuse registration of an unscaffolded directory before
 writing the registry, and give an actionable creation command.
 
+Adoption requires canonical product or runtime-state identity. A catalog alone
+does not identify a workspace. Validate every present core marker, reject an
+empty workflow catalog, and apply the planning reader's product-size limit.
+Preserve existing registrations and valid partial runtime state for diagnosis;
+registration does not establish executable readiness.
+
 Keep supported `new` and `bootstrap` operations. A workspace created through
 those operations can be adopted and resumed; it does not need to be recreated.
 Keep existing registration and occupied-target refusals. Explain how to inspect
@@ -46,7 +52,7 @@ Generate public CLI flag mappings and recovery guidance from the contract owner.
 ## Compatibility and verification
 
 Public operation names, schema fields, and CLI flags retain their meanings.
-Registration now rejects directories that cannot be resumed as workspaces.
+Registration now rejects directories without canonical workspace identity.
 Existing scaffold adoption remains supported. The refusal does not modify the
 registry or target.
 

@@ -1,3 +1,4 @@
+import { PLANNING_ARTIFACT_BYTE_CAP } from "../kernel/session/planning-limits.js";
 import { parseProductInstanceDocument } from "../catalog/ontology/instance-load.js";
 import { validateExecutableCatalog, validateExecutableCatalogShape } from "../kernel/session/catalog-contract.js";
 import { validateBusinessState, validateRunState } from "../kernel/schema/index.js";
@@ -74,7 +75,11 @@ function validScaffoldDocument(relative: string, value: unknown, validateExecuti
     parseProductInstanceDocument(value);
     return true;
   }
-  if (relative === "catalog.json") return (validateExecution ? validateExecutableCatalog(value) : validateExecutableCatalogShape(value)) === undefined;
+  if (relative === "catalog.json") {
+    const refusal = validateExecution ? validateExecutableCatalog(value) : validateExecutableCatalogShape(value);
+    // An empty executable graph is useful to the engine, but no creation path emits it as a workspace scaffold.
+    return refusal === undefined && (value as { workflows: unknown[] }).workflows.length > 0;
+  }
   if (relative === "state/business-state.json") return validateBusinessState(value).valid;
   return validateRunState(value).valid;
 }
@@ -99,7 +104,9 @@ export function hasWorkspaceScaffold(root: string, options: { validateExecution?
         }
       }
       if (missing) continue;
-      const bytes = boundedFileBytes(target, relative === "catalog.json" ? WORKSPACE_CATALOG_BYTE_CAP : WORKSPACE_SCAFFOLD_BYTE_CAP).toString("utf8");
+      const cap =
+        relative === "catalog.json" ? WORKSPACE_CATALOG_BYTE_CAP : relative === "product.yaml" ? PLANNING_ARTIFACT_BYTE_CAP : WORKSPACE_SCAFFOLD_BYTE_CAP;
+      const bytes = boundedFileBytes(target, cap).toString("utf8");
       if (
         !validScaffoldDocument(
           relative,
@@ -108,7 +115,9 @@ export function hasWorkspaceScaffold(root: string, options: { validateExecution?
         )
       )
         return false;
-      recognized = true;
+      // Catalogs describe available work, not a business identity. Planning products and
+      // reducer-owned business/run documents identify the workspace being adopted.
+      if (relative !== "catalog.json") recognized = true;
     } catch {
       return false;
     }

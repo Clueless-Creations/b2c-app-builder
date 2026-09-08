@@ -12,7 +12,7 @@
  *   - Only the files named in MARKER_ALLOWLIST are ever read. Nothing else in the folder —
  *     no directory listing, no recursive walk — is touched.
  *   - A symlinked marker is refused (`lstat`-checked before any read) — never followed.
- *   - Scaffold identity uses the shared bounded registry reader (16 MiB for catalog, 4 MiB for other known markers).
+ *   - Scaffold identity uses the shared bounded registry reader (16 MiB for catalog, 1 MiB for product, 4 MiB for state/run).
  *   - Each evidence marker is capped at MARKER_BYTE_CAP bytes; a file over the cap is treated as absent
  *     rather than partially read.
  *   - Every excerpt returned to a caller is capped at EVIDENCE_EXCERPT_CAP characters — far below

@@ -1,3 +1,5 @@
+import { PLANNING_ARTIFACT_BYTE_CAP } from "../../../kernel/session/planning-limits.js";
+import { parseProductInstanceDocument } from "../../../catalog/ontology/instance-load.js";
 import fs from "node:fs";
 import { syncBuiltinESMExports } from "node:module";
 import { initializeProductFixture } from "./product-fixture.js";
@@ -132,6 +134,22 @@ export function register(h: Harness): void {
     });
   });
 
+  h.check("onboarding: product adoption obeys the same byte bound as planning resume", () => {
+    const root = h.makeTempDir("onboarding-product-limit");
+    const product = readFileSync(path.join(skillRoot, "examples/workspace/business/product.yaml"), "utf8") + "\n# " + "x".repeat(PLANNING_ARTIFACT_BYTE_CAP);
+    parseProductInstanceDocument(YAML.parse(product));
+    writeFileSync(path.join(root, "product.yaml"), product);
+    isolated(h.makeTempDir("onboarding-product-limit-home"), () => {
+      let refused = false;
+      try {
+        registerWorkspace("oversized-product", root);
+      } catch {
+        refused = true;
+      }
+      assert(refused && loadRegistry().workspaces.length === 0, "schema-valid product exceeded the planning reader limit after adoption");
+    });
+  });
+
   h.check("onboarding: canonical validation rejects near-valid and mixed invalid documents before registration", () => {
     const product = YAML.parse(readFileSync(path.join(skillRoot, "examples/workspace/business/product.yaml"), "utf8"));
     const invalidProduct = structuredClone(product);
@@ -140,6 +158,8 @@ export function register(h: Harness): void {
     const invalidCatalog = { version: "x", artifacts: [], workflows: [{ id: "workflow.fake" }] };
     for (const [index, docs] of [
       { "catalog.json": invalidCatalog },
+      { "catalog.json": { version: "x", artifacts: [], workflows: [] } },
+      { "product.yaml": product, "catalog.json": { version: "x", artifacts: [], workflows: [] } },
       { "product.yaml": incompleteProduct },
       { "product.yaml": invalidProduct },
       { "product.yaml": product, "catalog.json": invalidCatalog },
@@ -176,14 +196,31 @@ export function register(h: Harness): void {
     });
   });
 
-  h.check("onboarding: a real compiled catalog alone is adoptable under the same execution validator", () => {
+  h.check("onboarding: a coherent catalog needs workspace identity before adoption", () => {
     const root = h.makeTempDir("onboarding-catalog-only");
     const catalog = toCatalogInput(composeCatalog(skillRoot));
     assert(validateExecutableCatalog(catalog) === undefined, "fixture is not a valid executable catalog");
     writeFileSync(path.join(root, "catalog.json"), JSON.stringify(catalog));
     isolated(h.makeTempDir("onboarding-catalog-only-home"), () => {
-      registerWorkspace("catalog-only", root);
-      assert(loadRegistry().workspaces[0]?.id === "catalog-only", "canonical catalog-only adoption failed");
+      let refused = false;
+      try {
+        registerWorkspace("catalog-only", root);
+      } catch {
+        refused = true;
+      }
+      assert(refused && loadRegistry().workspaces.length === 0, "work catalog alone was treated as a business identity");
+      const inspected = inspectWorkspace(root);
+      assert(
+        inspected.ok && inspected.registration.kind === "unregistered" && !inspected.registration.suggestedFix.includes("workspaces register"),
+        "catalog-only inspection suggested adoption",
+      );
+      mkdirSync(path.join(root, "state"));
+      writeFileSync(
+        path.join(root, "state/business-state.json"),
+        readFileSync(path.join(skillRoot, "examples/workspace/business/state/business-state.json"), "utf8"),
+      );
+      registerWorkspace("legacy-business", root);
+      assert(loadRegistry().workspaces[0]?.id === "legacy-business", "coherent catalog and legacy business identity were not adoptable");
     });
   });
 

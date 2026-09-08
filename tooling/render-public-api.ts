@@ -71,6 +71,8 @@ emit(
     "- `business.registration_conflict`: the requested ID or directory already belongs to a registry entry. Inspect `b2c workspaces list`. Resume a valid existing workspace with `b2c business-plan --workspace <registered-id> --json`. If inspection confirms a stale registration from a failed attempt, remove only that registration with `b2c workspaces remove <id>`; this leaves workspace files intact. Retry creation only when the intended ID is free and the target is absent or empty. Preserve other businesses and their registrations.",
     "- `business.target_occupied`: the destination contains files. Inspect and preserve them. Resume an existing registered scaffold, or register an existing unregistered scaffold with `b2c workspaces register <id> <path>`. For a new business, choose an absent or empty destination. Do not delete unfamiliar files or retry creation over an existing app.",
     "",
+    "- `registry.scaffold_missing`: adoption requires a canonical product document or runtime state. A catalog alone is not workspace identity, and an empty catalog is not executable. Every present core marker must validate; product files share the planning reader's 1 MiB limit. Inspect and preserve invalid or partial files before repairing them. For a new business, choose an absent or empty target and use creation. Existing registrations remain available for diagnosis.",
+    "",
     "Registration makes an existing scaffold visible to local MCP; it does not create a planning workspace. The legacy `b2c new` and `b2c bootstrap` commands remain supported for explicit scaffold and runtime maintenance. Public business creation and initialization remain CLI-only.",
     "",
     "## Composition",

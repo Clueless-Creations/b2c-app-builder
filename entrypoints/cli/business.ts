@@ -7,13 +7,34 @@ import { compose, callPublicOperation, failure } from "../../kernel/services/bus
 
 const [command, ...argv] = process.argv.slice(2);
 const operation = PUBLIC_OPERATIONS.find((item) => item.cli === command);
+// CLI aliases name the same fields used by the request projection below.
+const inputFieldForFlag: Readonly<Record<string, string>> = {
+  workspace: "workspaceId",
+  revision: "expectedRevision",
+  request: "requestId",
+  concurrency: "maxConcurrency",
+  seconds: "wallClockSeconds",
+  workflow: "workflowId",
+  source: "sourcePath",
+  dependencies: "dependencyDigests",
+  packages: "packageDigests",
+  preview: "previewDigest",
+  experiment: "experimentId",
+  "max-age": "maxAgeSeconds",
+};
+function usageFlag(flag: string): string {
+  const schema = z.toJSONSchema(operation!.inputSchema, { io: "input" });
+  const required = new Set(Array.isArray(schema.required) ? schema.required : []);
+  const spelling = `--${flag} <value>`;
+  return required.has(inputFieldForFlag[flag] ?? flag) ? spelling : `[${spelling}]`;
+}
 const usage = () =>
   [
     operation?.description,
     operation && !["business-status", "catalog", "compose"].includes(command ?? "")
       ? `Usage: b2c ${command} ${operation.flags
           .filter((flag) => flag !== "json")
-          .map((flag) => `--${flag} <value>`)
+          .map(usageFlag)
           .join(" ")} [--json]`
       : command === "business-status"
         ? "Usage: b2c business-status --workspace <registered-id> [--json]"

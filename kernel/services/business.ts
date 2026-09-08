@@ -55,6 +55,18 @@ function respond<T>(compute: () => T): Result<T> {
         "The request does not match the public schema.",
         error.issues.map((issue) => issue.path.join(".")),
       );
+    if (error instanceof Error) {
+      const reason = error.message.split(":")[0]!;
+      const creationRecovery: Record<string, string> = {
+        "business.registration_conflict":
+          "Inspect b2c workspaces list. Resume an existing business with b2c business-status --workspace <registered-id>, or choose an unused ID and a new empty directory for business-create. If registration was a mistake, verify the exact ID and path before explicitly using b2c workspaces remove <id>; this removes only its registry entry. Retry creation only in an empty directory. No files or registrations were changed by this refusal.",
+        "business.target_occupied":
+          "Choose a new empty directory for b2c business-create. To adopt an existing B2C scaffold, use b2c workspaces register <id> <path> and then b2c business-status --workspace <id>. Preserve existing files; do not delete them to make creation pass.",
+        "registry.scaffold_missing":
+          'Use b2c business-create --workspace <id> --directory <empty-directory> --name "<name>" --hypothesis "<hypothesis>". Registration only adopts a planning or runtime scaffold. No registry entry was added.',
+      };
+      if (creationRecovery[reason]) return failure("LOCAL_OPERATION_REFUSED", reason, [], creationRecovery[reason]);
+    }
     if (error instanceof Error && /^(composition|market|erasure|business)\.[a-z_]+(?::|$)/.test(error.message)) {
       const reason = error.message.split(":")[0]!;
       const code = reason.includes("workspace_unregistered")

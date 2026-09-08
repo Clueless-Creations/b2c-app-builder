@@ -6,7 +6,7 @@ import { loadKnowledgePackages } from "../../catalog/knowledge-packages.js";
 import type { CatalogKnowledgePackage } from "../../catalog/types.js";
 import type { ContributionUnit, EvaluationCase } from "../../contracts/contribution/contract.js";
 import { resolveScriptPath } from "../../tooling/lib/script-paths.js";
-import { resolveTsxBin } from "../../tooling/lib/tsx-bin.js";
+import { resolveTsxCommand } from "../../tooling/lib/tsx-bin.js";
 import { readContributionManifest, readTextIfExists, truncate } from "./manifest-io.js";
 import type { EvaluateCaseResult, EvaluateData } from "./types.js";
 
@@ -208,7 +208,7 @@ function planCommand(command: string, targetRoot: string, skillRoot: string): Co
     if (!file.endsWith(".ts")) return { kind: "invalid", detail: `${scriptPath} is not a TypeScript script` };
     if (!existsSync(file)) return { kind: "invalid", detail: `script ${scriptPath} does not exist under the skill root` };
     const label = `npx tsx ${path.relative(skillRoot, file)}${args.length ? ` ${args.join(" ")}` : ""}`;
-    return { kind: "run", executable: resolveTsxBin(skillRoot), args: [file, ...args], cwd: skillRoot, label, where: "the skill root" };
+    return { kind: "run", ...resolveTsxCommand(skillRoot, [file, ...args]), cwd: skillRoot, label, where: "the skill root" };
   }
   if (argv.length === 1 && /\.ya?ml$/u.test(first)) {
     const file = insideSkillRoot(skillRoot, first);

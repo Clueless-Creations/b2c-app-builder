@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.218.24",
+  "version": "0.218.33",
   "updatedAt": "2026-09-08",
   "sourcePath": ".",
   "releaseNotes": [
-    "Recognize verified managed runtime copies during installation audits while keeping Git checkouts and worktrees under repository protections.",
-    "Share ownership-manifest validation and test verified installation success, check failures, invalid manifests and existing ownership protections."
+    "Keep new-business creation, existing-workspace adoption and safe conflict recovery consistent across CLI, MCP, skill and launch guidance.",
+    "Resolve packaged runtime dependencies without global tooling, make setup help read-only, and honor existing authorization for local workspace registration."
   ]
 }

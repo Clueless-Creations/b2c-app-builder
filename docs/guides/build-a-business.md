@@ -82,30 +82,42 @@ explicit path. Registration gives a workspace a stable ID and makes it visible t
 
 ## Create a planning workspace
 
-```bash
-b2c new my-app --dir ~/businesses/my-app --idea "A short product hypothesis"
-```
-
-The command creates only the files that research, product, design, and later
-runtime setup need. It does not copy generated pages, app code, store packets, or
-future workflow artifacts.
-
-After the product direction is accepted, record acceptance in `product.yaml`,
-render `PRODUCT.md`, then add the durable runtime:
+For a new complete business, create and register the planning workspace together:
 
 ```bash
-b2c render-product --workspace ~/businesses/my-app
-b2c bootstrap --workspace ~/businesses/my-app --apply --answers answers.json
-b2c workspaces register my-app ~/businesses/my-app
-b2c plan --workspace my-app
+b2c business-create --workspace my-app --directory ./my-app --name "Working name" --hypothesis "A short product hypothesis" --mandate "The full user request" --json
+b2c business-plan --workspace my-app --json
 ```
 
-An overhaul uses the same bootstrap command once its accepted `PRODUCT.md` and
-`DESIGN.md` describe the target. Focused changes do not need it. The answers file
-records work authority. Omit it to install a parked runtime.
+The target must be absent or empty. Do not register it or add agent instructions
+before creation. The command creates the planning scaffold and records the mandate
+in `operations/LAUNCH_PROGRAM.md`. The CLI uses `--workspace`; the JSON schema
+calls that field `workspaceId`.
 
-Every `--workspace` option accepts a registered workspace ID or a path. Grant or
-change work authority later with `b2c onboard --workspace <id-or-path> --answers answers.json`.
+Research the hypothesis. After explicit product acceptance, record it in
+`product.yaml`, render `PRODUCT.md`, and read a fresh revision before initialization:
+
+```bash
+b2c render-product --workspace my-app
+b2c business-plan --workspace my-app --json
+b2c business-initialize --workspace my-app --revision <revision-from-plan> --json
+```
+
+Initialization grants no work authority. Use
+`b2c onboard --workspace my-app --answers answers.json`
+to record approved authority, then inspect `business-plan`
+again before a bounded `business-run`.
+
+For an existing registered workspace, resume with `business-plan`. For an existing
+unregistered scaffold, use `b2c workspaces register <id> <path>`; registration does
+not create its product or runtime files. Inspect an existing app before installing
+workspace files and preserve its implementation. Focused changes need no runtime.
+
+The supported legacy `b2c new` and `b2c bootstrap` commands remain available for
+explicit scaffold and runtime maintenance. Use `business-create` for a new complete
+business. See [creation recovery](../../contracts/public-api/REFERENCE.md#creation-recovery)
+when an older attempt left a registration or occupied target.
+
 The answers file names the business slug, a founder contact email, and a grant
 level (`review-first`, `run-with-guardrails`, or `full`) per business unit
 (`Product`, `Design`, `Engineering`, `Growth`, `Analytics`, `Revenue`, `Store`,

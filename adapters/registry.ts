@@ -1,4 +1,10 @@
-import { existsSync, mkdirSync, readFileSync, realpathSync, renameSync, writeFileSync } from "node:fs";
+import { PLANNING_ARTIFACT_BYTE_CAP } from "../kernel/session/planning-limits.js";
+import { parseProductInstanceDocument } from "../catalog/ontology/instance-load.js";
+import { validateExecutableCatalog, validateExecutableCatalogShape } from "../kernel/session/catalog-contract.js";
+import { validateBusinessState, validateRunState } from "../kernel/schema/index.js";
+import YAML from "yaml";
+import { boundedFileBytes } from "../kernel/lib/bounded-file.js";
+import { existsSync, lstatSync, mkdirSync, readFileSync, realpathSync, renameSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
@@ -58,6 +64,67 @@ function writeRegistry(registry: WorkspaceRegistry): void {
   renameSync(tmp, file);
 }
 
+/** Recognize B2C identity without treating a partial contract as proof of readiness. */
+export const WORKSPACE_SCAFFOLD_MARKERS = ["product.yaml", "catalog.json", "state/business-state.json", "run/run-state.json"] as const;
+
+export const WORKSPACE_SCAFFOLD_BYTE_CAP = 4 * 1024 * 1024;
+export const WORKSPACE_CATALOG_BYTE_CAP = 16 * 1024 * 1024;
+
+function validScaffoldDocument(relative: string, value: unknown, validateExecution: boolean): boolean {
+  if (relative === "product.yaml") {
+    parseProductInstanceDocument(value);
+    return true;
+  }
+  if (relative === "catalog.json") {
+    const refusal = validateExecution ? validateExecutableCatalog(value) : validateExecutableCatalogShape(value);
+    // An empty executable graph is useful to the engine, but no creation path emits it as a workspace scaffold.
+    return refusal === undefined && (value as { workflows: unknown[] }).workflows.length > 0;
+  }
+  if (relative === "state/business-state.json") return validateBusinessState(value).valid;
+  return validateRunState(value).valid;
+}
+
+/** Inspection validates bounded marker content only. Explicit adoption may also verify selected package references. */
+export function hasWorkspaceScaffold(root: string, options: { validateExecution?: boolean } = {}): boolean {
+  let recognized = false;
+  for (const relative of WORKSPACE_SCAFFOLD_MARKERS) {
+    let target = root;
+    try {
+      let missing = false;
+      for (const segment of relative.split("/")) {
+        target = path.join(target, segment);
+        try {
+          if (lstatSync(target).isSymbolicLink()) return false;
+        } catch (error) {
+          if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+            missing = true;
+            break;
+          }
+          throw error;
+        }
+      }
+      if (missing) continue;
+      const cap =
+        relative === "catalog.json" ? WORKSPACE_CATALOG_BYTE_CAP : relative === "product.yaml" ? PLANNING_ARTIFACT_BYTE_CAP : WORKSPACE_SCAFFOLD_BYTE_CAP;
+      const bytes = boundedFileBytes(target, cap).toString("utf8");
+      if (
+        !validScaffoldDocument(
+          relative,
+          relative === "product.yaml" ? YAML.parse(bytes, { maxAliasCount: 20 }) : JSON.parse(bytes),
+          options.validateExecution === true,
+        )
+      )
+        return false;
+      // Catalogs describe available work, not a business identity. Planning products and
+      // reducer-owned business/run documents identify the workspace being adopted.
+      if (relative !== "catalog.json") recognized = true;
+    } catch {
+      return false;
+    }
+  }
+  return recognized;
+}
+
 export function registerWorkspace(id: string, workspacePath: string, now = new Date().toISOString()): WorkspaceRegistry {
   if (!WORKSPACE_ID.test(id)) throw new Error(`registry.invalid_id: "${id}" — ids are lowercase letters, digits, and hyphens`);
   const absolute = path.resolve(workspacePath);
@@ -66,6 +133,13 @@ export function registerWorkspace(id: string, workspacePath: string, now = new D
   const existing = registry.workspaces.find((entry) => entry.id === id);
   if (existing && path.resolve(existing.path) !== absolute) {
     throw new Error(`registry.id_taken: "${id}" already points at ${existing.path} — remove it first if the move is intentional`);
+  }
+  if (!existing && !hasWorkspaceScaffold(absolute, { validateExecution: true })) {
+    throw new Error(
+      `registry.scaffold_missing: ${absolute} has no planning or runtime workspace scaffold. ` +
+        'Start a new business with b2c business-create --workspace <id> --directory <empty-directory> --name "<name>" --hypothesis "<hypothesis>". ' +
+        "Registration adopts an existing scaffold; it does not create one. No registry entry was added.",
+    );
   }
   const next: WorkspaceRegistry = {
     schemaVersion: "1.0.0",
@@ -103,7 +177,7 @@ export function resolveRegisteredWorkspace(reference: string): { path: string } 
   return {
     refused: true,
     message:
-      `"${reference}" is not a registered workspace. Register it first: b2c workspaces register <id> <path> — ` +
+      `"${reference}" is not a registered workspace. For a new business use b2c business-create --help. To adopt an existing scaffold: b2c workspaces register <id> <path> — ` +
       (registry.workspaces.length > 0 ? `registered ids: ${registry.workspaces.map((entry) => entry.id).join(", ")}` : "nothing is registered yet"),
   };
 }

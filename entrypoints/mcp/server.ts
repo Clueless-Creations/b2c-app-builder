@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { resolveTsxCli } from "../../tooling/lib/tsx-launcher.mjs";
 /**
  * b2c-app-builder-mcp — the engine as a Model Context Protocol server (stdio).
  *
@@ -33,7 +34,7 @@
 import { registerPublicTools } from "./business.js";
 import { contributorToolsEnabled, registerContributorTools } from "./contribute.js";
 import { runProcess } from "./run-process.js";
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -58,11 +59,6 @@ function skillVersion(): string {
   }
 }
 
-function resolveTsx(): string {
-  const local = path.join(skillRoot, "node_modules", ".bin", process.platform === "win32" ? "tsx.cmd" : "tsx");
-  return existsSync(local) ? local : "tsx";
-}
-
 type ToolResult = { content: Array<{ type: "text"; text: string }>; isError?: boolean };
 
 function refusal(text: string): ToolResult {
@@ -70,7 +66,7 @@ function refusal(text: string): ToolResult {
 }
 
 async function runCli(script: string, args: string[]): Promise<ToolResult> {
-  const result = await runProcess(resolveTsx(), [path.join(skillRoot, script), ...args], {
+  const result = await runProcess(process.execPath, [resolveTsxCli(skillRoot), path.join(skillRoot, script), ...args], {
     cwd: skillRoot,
     timeoutMs: 3_600_000,
   });
@@ -97,7 +93,11 @@ function workspaceOr(reference: string): { ok: true; path: string } | { ok: fals
 const flag = (name: string, value: string | boolean | number | undefined): string[] =>
   value === undefined || value === false ? [] : value === true ? [`--${name}`] : [`--${name}`, String(value)];
 
-const WORKSPACE_ARG = z.string().describe("A REGISTERED workspace id (or its exact registered path). Register with: b2c workspaces register <id> <path>");
+const WORKSPACE_ARG = z
+  .string()
+  .describe(
+    "A REGISTERED workspace id (or its exact registered path). For a new business, use CLI business-create with --workspace, --directory, --name and --hypothesis; it creates and registers an absent or empty target. Use workspaces register only for an existing scaffold.",
+  );
 
 const readOnly = process.env.B2C_APP_BUILDER_MCP_WRITE !== "1" || process.env.B2C_APP_BUILDER_MCP_READONLY === "1";
 const server = new McpServer({ name: "b2c-app-builder", version: skillVersion() });
@@ -313,8 +313,8 @@ server.registerTool(
   {
     description:
       "Read-only workspace status. Provide exactly one of workspace or cwd — supplying both, or neither, is a typed error. " +
-      "workspace: a REGISTERED workspace id (or its exact registered path). Returns the durable run's node-status counts and the latest founder digest. An unregistered reference is refused with the registration command. " +
-      "cwd: an absolute folder path not yet resolved through the registry. Classified by the shared workspace inspector (the same one b2c_plan's routing mode uses, so the two tools cannot disagree) into a degraded first-session answer: unregistered carries an inferred phase and the exact `b2c workspaces register <id> <path>` command as nextAgentAction (never the register suggestion when productKind is a mismatch — the mismatch is surfaced instead), inside-registered names the containing workspace and returns its normal status, and registry-stale reuses the normal missing-path status. Never errors on an empty folder. registered and inside-registered additionally carry a stepper (onboarding-graph position: totalCount/completedCount/activeNodeIds/blockedNodeIds/anomalies/done) when the workspace's catalog compiles, both in structuredContent and as a trailing text block. " +
+      "workspace: a REGISTERED workspace id (or its exact registered path). Returns the durable run's node-status counts and the latest founder digest. An unregistered reference is refused; use cwd mode to inspect its start path. " +
+      "cwd: an absolute folder path not yet resolved through the registry. Classified by the shared workspace inspector (the same one b2c_plan's routing mode uses, so the two tools cannot disagree) into a degraded first-session answer: unregistered carries an inferred phase and nextAgentAction: create a new business with CLI business-create in an absent or empty target, or register an existing scaffold with `b2c workspaces register <id> <path>`. Inspect and preserve occupied app folders. A productKind mismatch is surfaced instead of recommending creation or registration, inside-registered names the containing workspace and returns its normal status, and registry-stale reuses the normal missing-path status. Never errors on an empty folder. registered and inside-registered additionally carry a stepper (onboarding-graph position: totalCount/completedCount/activeNodeIds/blockedNodeIds/anomalies/done) when the workspace's catalog compiles, both in structuredContent and as a trailing text block. " +
       'check: run one named gate (a check:* npm script from the skill package, e.g. "product-md") against workspace instead of returning run status — requires workspace, refused together with cwd. Same verdict as `b2c check <name> --workspace <dir> --json`: structuredContent carries kind:"check" plus {check, command, pass, failures[{severity, rule, message, path?, location?, fixHint?}]}. isError mirrors the gate\'s own exit code, same as every other CLI-backed tool here — a failing check is real structured content, not a broken call, so read structuredContent.pass for the verdict, not isError. ' +
       "Reads files; runs nothing.",
     inputSchema: {

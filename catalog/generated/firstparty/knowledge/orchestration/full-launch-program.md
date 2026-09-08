@@ -52,7 +52,7 @@ Workspace-specific identities belong here and in reducer-owned state, never in c
 
 ## Start Path
 
-1. Register the workspace at its current path when the founder approves. Use the exact command `b2c_status` returns. Never create a second workspace. Never re-scaffold an existing one.
+1. For a new business, create and register the planning workspace together: `b2c business-create --workspace my-app --directory ./my-app --name "Working name" --hypothesis "A short product hypothesis" --mandate "The full founder request" --json`. Select an absent or empty directory; do not add files or register it first. The command records the mandate. For an existing registered workspace, resume it. For an existing unregistered scaffold, use `b2c workspaces register <id> <path>`. Inspect an existing app before installing a scaffold; preserve its files. Never create a second workspace or re-scaffold an existing one.
 2. Run `workflow.orchestration.session-continuity-resume`. Read the durable artifacts before new work. Chat memory is not state.
 3. Run `workflow.orchestration.orient-scaffold-and-state-cockpit-upkeep`. Write `operations/ORCHESTRATION.md` with the `## Review Ledger` section before any broad dispatch.
 4. Run the paid-tool check for every preferred tool in `reference.operations.paid-tool-routing`. Stop and ask when a required design-evidence or generation tool is missing. Do not substitute a generic fallback and call it equivalent.
@@ -159,7 +159,9 @@ A store-ready binary with a generic landing, a carousel onboarding, unaudited co
 
 Use the founder-zero contract: two or three choices, one recommendation, consequences, a defer path, and a revisit trigger, in plain language.
 
-Pause for: workspace registration, paid-tool access or spend, Go/Pivot/Kill, brand and taste, pricing, legal identity, Apple enrollment and agreements, the TestFlight versus submit envelope, and the live domain deploy.
+The user's authorization to create or adopt a local workspace covers its registration. Pause when that authorization does not cover the target or registration, or when it would affect a different existing business.
+
+Pause for: paid-tool access or spend, Go/Pivot/Kill, brand and taste, pricing, legal identity, Apple enrollment and agreements, the TestFlight versus submit envelope, and the live domain deploy.
 
 The agent never submits for review, releases to production, enrolls or rotates certificates, sets prices, spends without a ceiling, publishes legal text as final, or copies another app's secrets.
 

@@ -45,6 +45,10 @@ export function register(harness: Harness): void {
       symlinkSync(path.join(skillRoot, "contracts", "contribution"), path.join(temp, "contracts", "contribution"), "junction");
       symlinkSync(path.join(skillRoot, "kernel", "contribution"), path.join(temp, "kernel", "contribution"), "junction");
       symlinkSync(path.join(skillRoot, "adapters"), path.join(temp, "adapters"), "junction");
+      // The server uses the shared TypeScript launcher before registering any tools.
+      // Share its library while leaving the isolated knowledge bundle unavailable.
+      mkdirSync(path.join(temp, "tooling"), { recursive: true });
+      symlinkSync(path.join(skillRoot, "tooling/lib"), path.join(temp, "tooling/lib"), "junction");
       mkdirSync(path.join(temp, "kernel/session"));
       symlinkSync(path.join(skillRoot, "kernel/session/status.ts"), path.join(temp, "kernel/session/status.ts"));
       symlinkSync(path.join(skillRoot, "kernel/session/inspect.ts"), path.join(temp, "kernel/session/inspect.ts"));

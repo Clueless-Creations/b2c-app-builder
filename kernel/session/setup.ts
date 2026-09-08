@@ -20,6 +20,22 @@ import { isMainModule } from "../lib/cli.js";
 const skillRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 
 function main(): number {
+  if (process.argv.slice(2).some((arg) => arg === "--help" || arg === "-h")) {
+    console.log(
+      [
+        "Usage: b2c setup [--help|-h]",
+        "",
+        "Prepare this machine for B2C App Builder.",
+        "Without flags, create the builder home and an empty workspace registry when absent,",
+        "run doctor health checks, and print MCP registration and business creation commands.",
+        "Existing workspace registrations are preserved. Setup does not install software or create a business.",
+        "",
+        "--help, -h  Show this help without creating files or running health checks.",
+        "Run b2c doctor for a read-only health report.",
+      ].join("\n"),
+    );
+    return 0;
+  }
   const home = b2cAppBuilderHome();
   if (!existsSync(home)) {
     mkdirSync(home, { recursive: true });
@@ -46,12 +62,16 @@ function main(): number {
       "Next steps:",
       "  Public v1: b2c catalog --json; b2c compose --config b2c.yaml --json",
       "  Mobile app operation: b2c catalog --id b2c/mobile-app-operation --json (native-first selection; preview only)",
-      "  Composition preview is supported. Apply and public provider execution are not yet available.",
-      "  Existing business-building runtime:",
-      `  1. Create a planning workspace:  b2c new <slug> --dir <where> [--idea "<hypothesis>"]`,
-      `  2. Research it. Accept or reject the direction in product.yaml, then run b2c render-product --workspace <dir>.`,
-      `  3. Add the runtime when needed:  b2c bootstrap --workspace <where> --apply`,
-      `  4. Register it:                  b2c workspaces register <slug> <where>`,
+      "  compose previews declarations only. Use composition-plan and composition-activate for installed-package activation.",
+      "  Start a complete consumer business:",
+      `  1. Create and register: b2c business-create --workspace <slug> --directory <empty-or-absent-path> --name "<working name>" --hypothesis "<hypothesis>" --mandate "<full request>" --json`,
+      "     Do not register or add files to the target first. The CLI flag is --workspace, not --workspace-id.",
+      `  2. Research it. After explicit acceptance in product.yaml, run b2c render-product --workspace <slug>.`,
+      `  3. Read the revision: b2c business-plan --workspace <slug> --json`,
+      `  4. Initialize: b2c business-initialize --workspace <slug> --revision <revision-from-plan> --json`,
+      "     Initialization grants no work authority. Record approved authority with b2c onboard before business-run.",
+      "  Existing registered workspace: resume with business-plan. Existing unregistered scaffold: b2c workspaces register <slug> <path>.",
+      "  Legacy b2c new and b2c bootstrap remain supported for explicit scaffold and runtime maintenance.",
       "",
       ...(fromCheckout
         ? [`Global \`b2c\` command (optional): run \`npm link\` from ${skillRoot}`, `Without linking, the command is: ${node} ${cli}`]

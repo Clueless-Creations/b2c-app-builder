@@ -9,10 +9,11 @@
  * this one classifier, so they cannot disagree about the same folder).
  *
  * Bounds, by construction (R2, R20):
- *   - Only the five files named in MARKER_ALLOWLIST are ever read. Nothing else in the folder —
+ *   - Only the files named in MARKER_ALLOWLIST are ever read. Nothing else in the folder —
  *     no directory listing, no recursive walk — is touched.
  *   - A symlinked marker is refused (`lstat`-checked before any read) — never followed.
- *   - Each marker is capped at MARKER_BYTE_CAP bytes; a file over the cap is treated as absent
+ *   - Scaffold identity uses the shared bounded registry reader (16 MiB for catalog, 1 MiB for product, 4 MiB for state/run).
+ *   - Each evidence marker is capped at MARKER_BYTE_CAP bytes; a file over the cap is treated as absent
  *     rather than partially read.
  *   - Every excerpt returned to a caller is capped at EVIDENCE_EXCERPT_CAP characters — far below
  *     MARKER_BYTE_CAP — so evidence is bounded independently of the read cap, never a raw dump.
@@ -27,12 +28,20 @@
  */
 import { existsSync, lstatSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { findContainingWorkspace, loadRegistry, resolveRegisteredWorkspace } from "../../adapters/registry.js";
+import { findContainingWorkspace, hasWorkspaceScaffold, loadRegistry, resolveRegisteredWorkspace } from "../../adapters/registry.js";
 
 // --- marker allowlist (KTD4 step 3) -----------------------------------------------------------
 
 /** Fixed allowlist: the inspector never reads any file outside this list. */
-export const MARKER_ALLOWLIST = ["package.json", "PRODUCT.md", "README.md", "state/business-state.json", "run/run-state.json"] as const;
+export const MARKER_ALLOWLIST = [
+  "package.json",
+  "PRODUCT.md",
+  "README.md",
+  "product.yaml",
+  "catalog.json",
+  "state/business-state.json",
+  "run/run-state.json",
+] as const;
 export type MarkerName = (typeof MARKER_ALLOWLIST)[number];
 
 /** Per-file read cap in bytes. An oversized marker is treated as absent — never partially read. */
@@ -227,17 +236,21 @@ function inferPhase(projectState: MarkerRead, runState: MarkerRead): InspectorPh
 
 // --- registration probe (KTD4 step 2) ----------------------------------------------------------
 
-function registerCommand(target: string): string {
-  // Same literal command shape used across the CLI/MCP surface (`adapters/registry.ts`'s
-  // refusal message, `kernel/session/workspaces.ts`'s usage banner, `entrypoints/mcp/server.ts`'s tool
-  // description): "b2c workspaces register <id> <path>". The id is left as a placeholder — only
-  // the founder can choose it — but the path is concrete, since the inspector already knows it.
-  return `b2c workspaces register <id> ${target}`;
+export function registerCommand(target: string, platform: NodeJS.Platform = process.platform): string {
+  // Windows cmd.exe treats single quotes as path characters. Double quotes preserve spaces
+  // and apostrophes; double a trailing backslash so it cannot escape the closing quote.
+  if (platform === "win32") {
+    // cmd expands these even inside quotes. Keep exceptional paths out of shell text.
+    if (/[%!"\r\n]/.test(target))
+      return "b2c workspaces register <id> <path> (pass the workspace path as one literal process argument; it contains shell expansion characters)";
+    return `b2c workspaces register <id> "${target.replace(/\\+$/, (slashes) => slashes + slashes)}"`;
+  }
+  return `b2c workspaces register <id> '${target.replace(/'/g, "'\\''")}'`;
 }
 
 // --- entry point -------------------------------------------------------------------------------
 
-/** Read-only classification of `cwd` against the registry and the fixed marker allowlist. Never writes, never follows a symlinked marker, never reads past MARKER_BYTE_CAP. */
+/** Read-only classification using the fixed marker allowlist, bounded scaffold validation, and MARKER_BYTE_CAP evidence reads. Never writes or follows a symlinked marker. */
 export function inspectWorkspace(cwd: string): InspectResult {
   const absoluteCwd = path.resolve(cwd);
   const exact = resolveRegisteredWorkspace(absoluteCwd);
@@ -260,7 +273,14 @@ export function inspectWorkspace(cwd: string): InspectResult {
     return { ok: false, code: "cwd_not_found", message: `inspect.cwd_not_found: "${absoluteCwd}" does not exist` };
   } else {
     const containing = findContainingWorkspace(absoluteCwd);
-    registration = containing ? { kind: "inside-registered", id: containing.id } : { kind: "unregistered", suggestedFix: registerCommand(absoluteCwd) };
+    registration = containing
+      ? { kind: "inside-registered", id: containing.id }
+      : {
+          kind: "unregistered",
+          suggestedFix: hasWorkspaceScaffold(absoluteCwd)
+            ? registerCommand(absoluteCwd)
+            : 'b2c business-create --workspace <id> --directory <empty-directory> --name "<name>" --hypothesis "<hypothesis>"',
+        };
   }
 
   // From here the folder either exists, or it is a stale registered path that was removed —

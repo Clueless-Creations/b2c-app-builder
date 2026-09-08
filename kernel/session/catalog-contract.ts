@@ -170,12 +170,18 @@ function isCatalog(value: unknown): value is CatalogInput {
   );
 }
 
+/** Validate the complete persisted shape without following selected package references. */
+export function validateExecutableCatalogShape(value: unknown): CatalogRefusal | undefined {
+  return isCatalog(value) ? undefined : missingCatalog();
+}
+
 export function validateExecutableCatalog(value: unknown): CatalogRefusal | undefined {
-  if (!isCatalog(value)) return missingCatalog();
+  const shapeRefusal = validateExecutableCatalogShape(value);
+  if (shapeRefusal) return shapeRefusal;
   try {
     // Shape-valid pins can still be non-executable. Compile in memory so an unknown
     // dependency or ambiguous output writer cannot reach a workspace mutation.
-    compilePlan(value);
+    compilePlan(value as CatalogInput);
   } catch {
     return missingCatalog();
   }

@@ -1,3 +1,4 @@
+import { PLANNING_ARTIFACT_BYTE_CAP } from "./planning-limits.js";
 import { readResearchObservations } from "./research-observations.js";
 import { createHash } from "node:crypto";
 import { existsSync, lstatSync } from "node:fs";
@@ -39,7 +40,7 @@ export function readPlanningArtifact(root: string, relative: string): Buffer | u
     file = path.join(file, part);
     if (existsSync(file) && lstatSync(file).isSymbolicLink()) throw new Error("business.unsafe_planning_artifact");
   }
-  return existsSync(file) ? boundedFileBytes(file, 1024 * 1024) : undefined;
+  return existsSync(file) ? boundedFileBytes(file, PLANNING_ARTIFACT_BYTE_CAP) : undefined;
 }
 
 /** References existing authored evidence; file presence never means accepted work. No provider calls. */

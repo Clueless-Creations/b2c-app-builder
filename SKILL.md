@@ -30,8 +30,17 @@ Discover capabilities, providers, and recipes with `b2c_discover` or `b2c catalo
 
 ## Build a business
 
-Use `business-create` for a registered planning workspace. Preserve the full request
-with `--mandate` in `operations/LAUNCH_PROGRAM.md`. A provisional workspace ID is
+For a new business, create and register its planning workspace in one command:
+
+```sh
+b2c business-create --workspace my-app --directory ./my-app --name "Working name" --hypothesis "A short product hypothesis" --mandate "The full user request" --json
+```
+
+Choose an absent or empty target directory. Do not add files or register it first.
+The CLI flag is `--workspace`; `workspaceId` is the JSON field. Resume an existing
+registered workspace with `business-plan`. Register an existing scaffold only
+with `b2c workspaces register <id> <path>`. The create command preserves the full
+request from `--mandate` in `operations/LAUNCH_PROGRAM.md`. A provisional workspace ID is
 not the final product name. Do not hand-author runtime state during planning. Research and author
 `product.yaml`, then render `PRODUCT.md` with `b2c render-product --workspace ID`.
 After explicit product acceptance,
@@ -51,7 +60,9 @@ For app exploration, flow walks, functional or design checks, screenshots, and r
 
 ## Route
 
-Classify the start before catalog search:
+Classify the start before catalog search. A complete-business request takes
+precedence over the idea-supplied and no-idea routes: load the full launch program
+first, then research within it.
 
 - **Existing app, focused change:** inspect the repository instructions and the affected surface. Load one workflow for that goal. Do not install the full operating graph.
 - **Existing app, overhaul:** resume current state and inventory what works. Define the target in `product.yaml` and `DESIGN.md`, then render `PRODUCT.md`. Carry the accepted scope through implementation, independent review, and repair.

@@ -250,6 +250,9 @@ retired occurrences; a new occurrence needs a new explicit scheduling decision.
 CLI and MCP project one versioned operation registry and shared application
 services. Define names and types from business semantics. Remove obsolete names and duplicate adapters. Each operation has one public meaning.
 Reject unsupported contract versions explicitly.
+For a new business, route to the shared creation operation. Reserve workspace
+registration for adoption of an existing scaffold, and expose actionable recovery
+without automatic removal of files or registrations. See [ADR-0008](decisions/0008-agent-onboarding-entry-path.md).
 Public contracts must not expose raw internal runtime, provider SDK, or authority
 objects. Generate schemas and reference documentation from the same owner. Read-only MCP returns declarations, resolved
 plans, stored observations, limitations, and next actions. It does not directly

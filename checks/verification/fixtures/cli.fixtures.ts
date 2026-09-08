@@ -367,10 +367,13 @@ export function register(harness: Harness): void {
     assert(badId.code === 1, `a non-slug id must be refused, got exit ${badId.code}`);
     const listed = runBin(["workspaces", "list"], { env });
     assert(listed.code === 0 && listed.output.includes("fixture-business"), `list must show the registered id: ${listed.output.slice(-300)}`);
-    const unstarted = runBin(["status", "--workspace", "fixture-business"], { env });
+    const planning = runBin(["status", "--workspace", "fixture-business"], { env });
     assert(
-      unstarted.code === 0 && unstarted.output.includes("No durable run yet"),
-      `status must resolve a registered id and report an unstarted workspace: ${unstarted.output.slice(-300)}`,
+      planning.code === 0 &&
+        planning.output.includes("Planning workspace") &&
+        planning.output.includes("research and review the hypothesis before business-initialize") &&
+        planning.output.includes("strategy/RESEARCH.md: missing"),
+      `status must resolve a registered planning workspace and report its research next step: ${planning.output.slice(-300)}`,
     );
 
     mkdirSync(path.join(workspace, "run"), { recursive: true });

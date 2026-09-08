@@ -20,7 +20,9 @@ import { readWorkspaceStatus, renderWorkspaceStatusSummary } from "./status.js";
 function list(): number {
   const registry = loadRegistry();
   if (registry.workspaces.length === 0) {
-    console.log(`No workspaces registered yet (${registryPath()}). Register one: b2c workspaces register <id> <path>`);
+    console.log(
+      `No workspaces registered yet (${registryPath()}). Start a new business: b2c business-create --help. Adopt an existing scaffold: b2c workspaces register <id> <path>`,
+    );
     return 0;
   }
   for (const entry of registry.workspaces) {

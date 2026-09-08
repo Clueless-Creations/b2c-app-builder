@@ -1,6 +1,6 @@
 {
   "schemaVersion": "2.0.0",
-  "skillVersion": "0.218.24",
+  "skillVersion": "0.218.33",
   "areas": [
     {
       "id": "area.operating-system",
@@ -6126,7 +6126,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/orchestration/full-launch-program.md",
-        "sha256": "sha256:7a2e11080dd4eea43914f637e57b9d20c372f6f99ff65e51be3ea35c5aea81dd",
+        "sha256": "sha256:877bc5c3b15a39114acaf256483a6e947f284393a6dc3a911058f055a3580e79",
         "origin": "skill"
       }
     },
@@ -17912,14 +17912,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "8c1422b62265297863961f45efe1d16d68fdca793fae03dffe41f1aa358e309e",
+    "fingerprint": "d84a90082d43ad23832a07fbb9b625ff8eaf905eae361fcf259b61c70971a39e",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
-        "version": "0.218.24",
-        "revision": "0.218.24",
-        "contentDigest": "5f427f165a6cbb59b945d8ea0c4ba87eeb50b12364e6438b05d8849dae9dfd7f"
+        "version": "0.218.33",
+        "revision": "0.218.33",
+        "contentDigest": "b16f3803ff865bb563302506b9283efbc7972383204a1920be11626d9cab87f8"
       }
     ],
     "base": {

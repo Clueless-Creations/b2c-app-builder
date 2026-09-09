@@ -32,9 +32,14 @@ import type { NodeBrief } from "../../../kernel/engine/node-brief.js";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 /** Built by concatenation so this file does not carry a raw-secret-shaped literal. */
 function fabricatedSecretLikeShapes() {
+  const pemBegin = ["-----BEGIN RSA", "PRIVATE KEY-----"].join(" ");
+  const pemEnd = ["-----END RSA", "PRIVATE KEY-----"].join(" ");
+  const pemBody = ["MIIEvQIBADANFAKEPEM", "BODYTOKEN0001"].join("");
   return {
     webhook: ["whsec", "abcdefghijkl1234567890"].join("_"),
-    pem: ["-----BEGIN RSA", "PRIVATE KEY-----"].join(" "),
+    pem: pemBegin,
+    pemBody,
+    pemBlock: [pemBegin, pemBody, pemEnd].join("\n"),
     cloud: ["AKIA", "EXAMPLEKEY000000"].join(""),
   };
 }
@@ -363,7 +368,7 @@ test("public plan projects distinct hold kinds, ready briefs, and a revision-bou
       ttlSeconds: 300,
       inputFingerprint: `sha256:${"0".repeat(64)}`,
       evidence: [],
-      error: `worker exited 1: api_key=fixture-not-a-live-token password=hunter2 Bearer fabricated-bearer-token-value-99 webhook=${secretLike.webhook} ${secretLike.pem} cloud=${secretLike.cloud} operator@example.com /Users/someone/secret.env \u0007`,
+      error: `worker exited 1: api_key=fixture-not-a-live-token password=hunter2 Bearer fabricated-bearer-token-value-99 webhook=${secretLike.webhook}\n${secretLike.pemBlock}\ncloud=${secretLike.cloud} operator@example.com /Users/someone/secret.env \u0007`,
       readbackRequired: false,
     });
     mkdirSync(path.dirname(paths.runState), { recursive: true });
@@ -380,6 +385,7 @@ test("public plan projects distinct hold kinds, ready briefs, and a revision-bou
     assert(!encoded.includes("hunter2"));
     assert(!encoded.includes(secretLike.webhook), encoded);
     assert(!encoded.includes(secretLike.pem), encoded);
+    assert(!encoded.includes(secretLike.pemBody), encoded);
     assert(!encoded.includes(secretLike.cloud), encoded);
     assert(!encoded.includes("operator@example.com"));
     assert(!encoded.includes("/Users/someone/secret.env"));
@@ -431,7 +437,7 @@ test("public plan schema stays additive and bounds unsafe planner text", () => {
     reason: "autonomy",
     detail: `${"n".repeat(500)} api_key=fixture-not-a-live-token`,
     lastFailure: "worker exited 1: summarized",
-    lastFailureRaw: `worker exited 1: password=hunter2 /Users/someone/secret.env webhook=${secretLike.webhook} ${secretLike.pem} ${secretLike.cloud}`,
+    lastFailureRaw: `worker exited 1: password=hunter2 /Users/someone/secret.env webhook=${secretLike.webhook}\n${secretLike.pemBlock}\n${secretLike.cloud}`,
     lastFailureCode: "worker.exited",
   };
   const projected = projectHeldWork(dirty);
@@ -446,11 +452,14 @@ test("public plan schema stays additive and bounds unsafe planner text", () => {
   assert(!projected.lastFailure?.summary.includes("/Users/someone"));
   assert(!projected.lastFailure?.summary.includes(secretLike.webhook));
   assert(!projected.lastFailure?.summary.includes(secretLike.pem));
+  assert(!projected.lastFailure?.summary.includes(secretLike.pemBody));
   assert(!projected.lastFailure?.summary.includes(secretLike.cloud));
   const encodedHeld = JSON.stringify(projected);
   assert(!encodedHeld.includes(secretLike.webhook));
   assert(!encodedHeld.includes(secretLike.pem));
+  assert(!encodedHeld.includes(secretLike.pemBody), encodedHeld);
   assert(!encodedHeld.includes(secretLike.cloud));
+  assert(!("lastFailureRaw" in projected));
   const unobserved = projectHeldWork({
     nodeId: "run.fixture.unobserved",
     workflowId: "workflow.fixture.unobserved",

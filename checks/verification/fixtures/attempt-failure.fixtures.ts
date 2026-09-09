@@ -36,9 +36,14 @@ export function register(harness: Harness): void {
     assert(!redacted.includes("sk-abcdefghijklmnop1234") && !redacted.includes("abc123secret"), `secrets must be redacted: ${redacted}`);
     assert(summarizeAttemptFailure(undefined) === "The attempt failed without a recorded error.", "an absent error has a fixed summary");
     const webhook = ["whsec", "abcdefghijkl1234567890"].join("_");
-    const pem = ["-----BEGIN RSA", "PRIVATE KEY-----"].join(" ");
+    const pemBegin = ["-----BEGIN RSA", "PRIVATE KEY-----"].join(" ");
+    const pemEnd = ["-----END RSA", "PRIVATE KEY-----"].join(" ");
+    const pemBody = ["MIIEvQIBADANFAKEPEM", "BODYTOKEN0001"].join("");
     const cloud = ["AKIA", "EXAMPLEKEY000000"].join("");
-    const redactedShapes = redactSensitiveText(`worker exited 1: ${webhook} ${pem} ${cloud}`);
-    assert(!redactedShapes.includes(webhook) && !redactedShapes.includes(pem) && !redactedShapes.includes(cloud), `secret-like shapes must be redacted: ${redactedShapes}`);
+    const redactedShapes = redactSensitiveText(`worker exited 1: ${webhook}\n${pemBegin}\n${pemBody}\n${pemEnd}\n${cloud}`);
+    assert(
+      !redactedShapes.includes(webhook) && !redactedShapes.includes(pemBegin) && !redactedShapes.includes(pemBody) && !redactedShapes.includes(cloud),
+      `secret-like shapes and PEM body must be redacted: ${redactedShapes}`,
+    );
   });
 }

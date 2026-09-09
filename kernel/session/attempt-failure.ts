@@ -53,7 +53,9 @@ function redact(text: string): string {
   let out = text;
   for (const pattern of SECRET_PATTERNS) {
     pattern.lastIndex = 0;
-    out = out.replace(pattern, (match, separator?: string) => (separator ? `${match.slice(0, match.indexOf(separator))}${separator}[redacted]` : "[redacted]"));
+    out = out.replace(pattern, (match, separator: unknown) =>
+      typeof separator === "string" ? `${match.slice(0, match.indexOf(separator))}${separator}[redacted]` : "[redacted]",
+    );
     pattern.lastIndex = 0;
   }
   const home = process.env.HOME?.trim();

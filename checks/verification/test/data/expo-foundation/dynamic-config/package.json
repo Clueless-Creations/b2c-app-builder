@@ -1,0 +1,10 @@
+{
+  "name": "synthetic-expo-dynamic-config",
+  "private": true,
+  "version": "0.0.0",
+  "dependencies": {
+    "expo": "57.0.17",
+    "react": "19.2.0",
+    "react-native": "0.86.3"
+  }
+}

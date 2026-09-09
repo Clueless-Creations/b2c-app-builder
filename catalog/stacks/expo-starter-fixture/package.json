@@ -1,0 +1,11 @@
+{
+  "name": "b2c-expo-consumer-starter-fixture",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Isolated Expo TypeScript starter fixture. No lockfile. Not accepted delivery.",
+  "dependencies": {
+    "expo": "57.0.17",
+    "react": "19.2.0",
+    "react-native": "0.86.3"
+  }
+}

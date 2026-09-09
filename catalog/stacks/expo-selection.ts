@@ -195,7 +195,7 @@ export const EXPO_QUEUED_OWNERS: readonly ExpoQueuedOwner[] = [
   {
     issue: 82,
     owns: "Expo starter, Router/native UI, CNG, custom Swift/Kotlin module path",
-    consume: "catalog/stacks/expo-selection.ts runtime slug and version facts",
+    consume: "This mapping’s runtime slug and version facts; starter and native-ownership modules import it",
     doNot: "Relabel the Next.js habit-tracker starter, or replace product.yaml / DESIGN.md ownership",
   },
   {
@@ -347,9 +347,10 @@ function operationSupport(): ExpoOperationSupport[] {
       title: "Expo TypeScript starter",
       selection: "app-framework",
       platforms: ["ios", "android", "web"],
-      evidenceTier: "blocked",
+      evidenceTier: "fixture-tested",
       queuedIssue: 82,
-      notes: "No Expo starter in this checkout. Habit-tracker starter is Next.js.",
+      notes:
+        "Isolated TypeScript starter fixture and empty/dirty target policy are fixture-tested. No lockfile, development client, or packaged install yet. Habit-tracker starter remains Next.js.",
     },
     {
       id: "router-native-ui",
@@ -367,7 +368,8 @@ function operationSupport(): ExpoOperationSupport[] {
       platforms: ["ios", "android"],
       evidenceTier: "blocked",
       queuedIssue: 82,
-      notes: "Blocked until #82. Do not run prebuild or treat changelog notes as an executable #81 route.",
+      notes:
+        "Blocked until Expo CLI prebuild is executed in a disposable workspace. Ownership classification in expo-native-ownership.ts is fixture-tested; that is not CNG generation.",
     },
     {
       id: "custom-native-module",

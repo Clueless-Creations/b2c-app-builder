@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "Expo Consumer Fixture",
+    "slug": "expo-consumer-fixture",
+    "scheme": "expoconsumerfixture",
+    "version": "0.0.0",
+    "platforms": ["ios", "android", "web"],
+    "ios": {
+      "bundleIdentifier": "app.example.expoconsumerfixture"
+    },
+    "android": {
+      "package": "app.example.expoconsumerfixture"
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "extra": {
+      "b2cNativeDirectoryOwnership": "generated-cng"
+    }
+  }
+}

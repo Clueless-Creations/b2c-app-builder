@@ -257,6 +257,43 @@ export function register(harness: Harness): void {
     assert(issues.length === 0, JSON.stringify(issues));
   });
 
+  harness.check("page-gates: static_document_invented_scrollytelling fails when a privacy page invents scrollytelling", () => {
+    const root = harness.makeTempDir("page-gates-invented-scrolly");
+    mkdirSync(path.join(root, "studio/seed"), { recursive: true });
+    mkdirSync(path.join(root, "growth/landing"), { recursive: true });
+    writeFileSync(
+      path.join(root, "studio/seed/business.json"),
+      JSON.stringify(studioDoc({ landingPages: [{ id: "privacy", interaction: "static-document" }] }), null, 2),
+      "utf8",
+    );
+    writeFileSync(
+      path.join(root, "growth/landing/privacy.html"),
+      "<!doctype html><html lang=\"en\"><body><h1>Privacy</h1><p>Static disclosures. No scene hooks.</p></body></html>\n",
+      "utf8",
+    );
+    writeFileSync(
+      path.join(root, "growth/landing/surface-contract.json"),
+      JSON.stringify(
+        {
+          analytics_events: ["page_viewed"],
+          scrollytelling: { applicable: true, evidence: "Invented 60fps scrollytelling on a static privacy page." },
+        },
+        null,
+        2,
+      ),
+      "utf8",
+    );
+    const projected = loadDesignSurfaceApplicability(root);
+    assert(projected.surfaces[0]?.interaction === "static-document", `privacy ${projected.surfaces[0]?.interaction}`);
+    assert(projected.surfaces[0]?.scrollytelling === "not_required", "privacy must not select scrollytelling from studio interaction");
+    assert(!projected.implementedScrollytelling, "the static privacy page must not implement scene hooks");
+    const issues = validateFrozenPageTechniqueGates(root, "page_gates");
+    assert(
+      issues.some((entry) => entry.code === "page_gates.static_document_invented_scrollytelling"),
+      JSON.stringify(issues),
+    );
+  });
+
   harness.check("page-gates: conversion landing without CRO evidence fails", () => {
     const root = harness.makeTempDir("page-gates-conversion");
     mkdirSync(path.join(root, "studio/seed"), { recursive: true });

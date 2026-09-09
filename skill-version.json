@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.19",
+  "version": "0.219.20",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Re-score Quiet Receipt mixed-surface pages against rubric v1 after the waitlist and scroll repair.",
-    "Pin the mixed-surface finding harness to Verdict pass."
+    "Commit a static-document invented-scrollytelling page-gate fixture.",
+    "Compile live ONB-08 and reopen an accepted packet when studio interaction changes."
   ]
 }

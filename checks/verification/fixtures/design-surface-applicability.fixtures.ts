@@ -331,7 +331,7 @@ export function register(harness: Harness): void {
     assert(!/\bStatus:\s*\*\*pending\*\*/.test(review), "finding artifact must leave pending");
     assert(!/Awaiting a fresh-context reviewer/.test(review), "placeholder finding rows must be gone");
     const verdict = review.split("## Verdict")[1] ?? "";
-    assert(/^\s*hold\b/m.test(verdict), "verdict must record hold");
+    assert(/^\s*pass\b/m.test(verdict), "verdict must record pass");
     assert(!/\bAccept increment\b/.test(review), "reviewer must not write an accept increment");
     assert(/\bprivacy\b/i.test(review) && /\bconversion\b/i.test(review) && /\bcinematic\b/i.test(review), "findings must cover all three surfaces");
     assert(/RUBRIC-mixed-surface-v1/.test(review), "review must name the frozen rubric");

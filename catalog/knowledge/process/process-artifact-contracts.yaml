@@ -29,3 +29,5 @@ specifies:
     heading: PRODUCT.md
   - artifact: DESIGN.md
     heading: DESIGN.md
+  - artifact: run/app-store-portfolio.json
+    heading: run/app-store-portfolio.json

@@ -16,6 +16,9 @@ import { validateCatalog } from "../../../catalog/validate.js";
 import { domainBusinessUnit } from "../../../kernel/autonomy/budget.js";
 import { evaluateGrantCeiling } from "../../../kernel/autonomy/grants.js";
 import { compilePlan } from "../../../kernel/engine/compile.js";
+import { allowAllAutonomyEvaluator, computeFrontier } from "../../../kernel/engine/frontier.js";
+import { seedRunState } from "../../../kernel/engine/runstate.js";
+import type { BusinessStateV2 } from "../../../kernel/schema/types.js";
 import { repositoryProfileIds, type Grant, type GrantsMap } from "../../../kernel/schema/types.js";
 
 // skillRoot is the repository root (ADR-0002); the ledger lives at docs/plans/attachments/.
@@ -796,7 +799,7 @@ export function register(harness: Harness): void {
     );
     const firstparty = composition!.deltas["business-pack.consumer-business"]!;
     assert(firstparty.domains === 15, `expected 15 firstparty domains, got ${firstparty.domains}`);
-    assert(firstparty.workflows === 111, `expected 111 firstparty workflows, got ${firstparty.workflows}`);
+    assert(firstparty.workflows === 112, `expected 112 firstparty workflows, got ${firstparty.workflows}`);
     assert(firstparty.references === 142, `expected 142 firstparty references, got ${firstparty.references}`);
     const deltaWorkflows = Object.values(composition!.deltas).reduce((sum, delta) => sum + delta.workflows, 0);
     const deltaDomains = Object.values(composition!.deltas).reduce((sum, delta) => sum + delta.domains, 0);
@@ -974,6 +977,37 @@ export function register(harness: Harness): void {
       appleSigning!.verification.kind === "deterministic" && appleSigning!.verification.gateIds.includes("check:apple-release-readiness"),
       "Apple signing execution must carry check:apple-release-readiness as a deterministic gate",
     );
+    const research = plan.nodes.find((node) => node.workflowId === "workflow.research.research-backed-spec");
+    const localization = plan.nodes.find((node) => node.workflowId === "workflow.research.localization-market-research");
+    assert(Boolean(research), "compiled plan should include research-backed-spec");
+    assert(
+      research!.dependencies.includes("run.operations.live-app-store-portfolio") &&
+        research!.dependencies.includes("run.operations.paid-tool-routing-and-fallback"),
+      "compiled research-backed-spec must wait for the portfolio observe and paid-tool routing nodes",
+    );
+    assert(
+      localization!.dependencies.includes("run.research.research-backed-spec"),
+      "compiled localization-market-research must wait for research-backed-spec",
+    );
+    const businessState = JSON.parse(
+      readFileSync(path.join(skillRoot, "examples/workspace/business/state/business-state.json"), "utf8"),
+    ) as BusinessStateV2;
+    const run = seedRunState(plan, businessState, {
+      ownerSessionId: "session.frontier-portfolio-hold",
+      ttlSeconds: 3600,
+      wallClockCapSeconds: 3600,
+      now: "2026-09-08T00:00:00.000Z",
+      runId: "run.frontier-portfolio-hold",
+    });
+    assert(
+      run.nodes["run.operations.live-app-store-portfolio"]?.status !== "succeeded",
+      "example workspace must not seed a succeeded portfolio observe",
+    );
+    const frontier = computeFrontier(plan, run, businessState, allowAllAutonomyEvaluator);
+    assert(
+      !frontier.ready.includes("run.research.research-backed-spec"),
+      "research-backed-spec must not enter the ready set while the portfolio observe has not succeeded",
+    );
     assert(
       appleSigning!.dependencies.includes("run.store.apple-app-store-requirements-privacy-manifest") &&
         appleSigning!.inputs.includes("artifact.store-apple-app-store-requirements-md"),
@@ -993,6 +1027,20 @@ export function register(harness: Harness): void {
       "the app-quality starter must state that the optional beta worksheet is not completion proof",
     );
     assert(!/^\|\s*BETA-\d+/im.test(appQualityTemplate), "the optional beta worksheet must not ship prefilled tester rows that look like declared evidence");
+  });
+
+  harness.check("intake: full-launch research graph lists AppKittie and XPOZ; a secrets start does not", () => {
+    const catalog = composeCatalog(skillRoot);
+    const researchTools = deriveWorkflowIntakeTools(catalog, "workflow.research.research-backed-spec");
+    assert(researchTools.includes("AppKittie"), `research-backed-spec intake must include AppKittie, got ${researchTools.join(", ")}`);
+    assert(researchTools.includes("XPOZ"), `research-backed-spec intake must include XPOZ, got ${researchTools.join(", ")}`);
+    assert(researchTools.includes("Firecrawl"), `research-backed-spec intake must include Firecrawl, got ${researchTools.join(", ")}`);
+    assert(researchTools.includes("App Store Connect"), "complete-business research intake always adds App Store Connect");
+    assert(researchTools.includes("live-app-store-portfolio"), "complete-business research intake always adds the live portfolio");
+    const secretsTools = deriveWorkflowIntakeTools(catalog, "workflow.operations.secrets-baseline-and-routing");
+    assert(!secretsTools.includes("XPOZ"), `a secrets-only start must not ask for XPOZ, got ${secretsTools.join(", ")}`);
+    assert(!secretsTools.includes("AppKittie"), `a secrets-only start must not ask for AppKittie, got ${secretsTools.join(", ")}`);
+    assert(!secretsTools.includes("App Store Connect"), "a focused secrets start omits ASC unless that graph names it");
   });
 
   harness.check("bridge: a business workflow retains its executable process dependency", () => {
@@ -1048,6 +1096,7 @@ export function register(harness: Harness): void {
     const readinessBootstrap = new Set([
       readiness.id,
       "workflow.operations.paid-tool-routing-and-fallback",
+      "workflow.operations.live-app-store-portfolio",
       "workflow.operations.secrets-baseline-and-routing",
     ]);
     const unguardedProviderWork = catalog.workflows.filter(
@@ -1438,6 +1487,61 @@ function foodGrant(): Grant {
     grantedViaUnit: "Operations",
     updatedAt: "2026-08-05T00:00:00.000Z",
   };
+}
+
+const PAID_TOOL_INTAKE_NEEDLES = [
+  { id: "AppKittie", needles: ["AppKittie", "mcp__appkittie__"] },
+  { id: "XPOZ", needles: ["XPOZ", "mcp__claude_ai_XPOZ__"] },
+  { id: "Firecrawl", needles: ["Firecrawl"] },
+  { id: "Higgsfield", needles: ["Higgsfield", "mcp__claude_ai_Higgsfield__"] },
+  { id: "MobAI", needles: ["MobAI", "mcp__mobai__"] },
+  { id: "Refero", needles: ["Refero", "refero_search"] },
+] as const;
+
+function workflowClosure(catalog: Catalog, startId: string): CatalogWorkflowDef[] {
+  const byId = new Map(catalog.workflows.map((workflow) => [workflow.id, workflow]));
+  const seen = new Set<string>();
+  const ordered: CatalogWorkflowDef[] = [];
+  const stack = [startId];
+  while (stack.length > 0) {
+    const id = stack.pop()!;
+    if (seen.has(id)) continue;
+    seen.add(id);
+    const workflow = byId.get(id);
+    if (!workflow) continue;
+    ordered.push(workflow);
+    for (const dependency of workflow.dependencies) stack.push(dependency);
+  }
+  return ordered;
+}
+
+function deriveWorkflowIntakeTools(catalog: Catalog, startId: string): string[] {
+  const nodes = workflowClosure(catalog, startId);
+  const texts: string[] = [];
+  const referencesById = new Map(catalog.references.map((reference) => [reference.id, reference]));
+  for (const workflow of nodes) {
+    texts.push(workflow.instructions, workflow.trigger, ...workflow.consults, ...workflow.reads);
+    for (const referenceId of workflow.referenceIds) {
+      const reference = referencesById.get(referenceId);
+      if (!reference) continue;
+      texts.push(reference.path, reference.title, reference.loadWhen);
+      const absolute = path.join(skillRoot, reference.path);
+      if (existsSync(absolute) && /\.(md|ya?ml)$/.test(reference.path)) {
+        texts.push(readFileSync(absolute, "utf8"));
+      }
+    }
+  }
+  const blob = texts.join("\n");
+  const matched = PAID_TOOL_INTAKE_NEEDLES.filter((tool) => tool.needles.some((needle) => blob.includes(needle))).map((tool) => tool.id);
+  const includesResearchHold = nodes.some(
+    (workflow) =>
+      workflow.id === "workflow.research.research-backed-spec" || workflow.id === "workflow.operations.live-app-store-portfolio",
+  );
+  if (includesResearchHold) {
+    if (!matched.includes("App Store Connect")) matched.push("App Store Connect");
+    if (!matched.includes("live-app-store-portfolio")) matched.push("live-app-store-portfolio");
+  }
+  return matched;
 }
 
 // --- Port ledger parsing helpers --------------------------------------------------------

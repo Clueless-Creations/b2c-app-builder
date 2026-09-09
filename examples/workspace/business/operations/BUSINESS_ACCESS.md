@@ -14,8 +14,8 @@ not manage a checklist.
 **Right now I need one thing from you.** Choose the recommended step-away setup or an assisted setup.
 
 The step-away setup covers autonomy, budget, accounts, tools, website deployment, asset creation,
-store material, and test-build uploads. I will identify any unavoidable ownership authentication
-in one handoff.
+store material, and test-build uploads. Name the account-gated tools this start needs in this
+same question. I will identify any unavoidable ownership authentication in one handoff.
 
 Choose whether the agent should prepare the business for unattended work.
 
@@ -31,9 +31,9 @@ Choose whether the agent should prepare the business for unattended work.
 
 ### If you are not ready
 
-Say so and nothing breaks. Local and reversible work can continue without standing external authority. Continue research, design, local builds, drafts, and readiness discovery. I will raise it again: Before the first provider mutation, website deployment, asset spend, or store upload.
+Say so and nothing breaks. Local and reversible work can continue without standing external authority. Continue reversible local prep, design drafts, local builds, and readiness discovery. I will raise it again: Before the first provider mutation, website deployment, asset spend, or store upload.
 
-While I wait: Continue research, design, local builds, drafts, and read-only capability discovery; do not infer consent.
+While I wait: Continue reversible local prep, design drafts, local builds, and read-only capability discovery; do not infer consent.
 
 ### Definitions
 

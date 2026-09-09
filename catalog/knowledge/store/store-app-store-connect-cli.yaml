@@ -8,6 +8,7 @@ load_when: before automating App Store Connect with the Rork asc CLI or CLI skil
 lifecycle: active
 bindings:
   workflow_ids:
+    - workflow.operations.live-app-store-portfolio
     - workflow.store.apple-signing-and-release-readiness
     - workflow.store.store-console-workflow
     - workflow.store.asc-cli-automation

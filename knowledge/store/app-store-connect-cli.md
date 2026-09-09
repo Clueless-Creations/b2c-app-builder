@@ -209,6 +209,7 @@ Run non-mutating checks first:
 asc auth status --validate --output json
 asc auth doctor
 asc apps list --output json --pretty
+asc certificates list --output json --pretty
 security find-identity -v -p codesigning
 xcodebuild -showBuildSettings -scheme MyApp -configuration Release | rg 'PRODUCT_BUNDLE_IDENTIFIER|DEVELOPMENT_TEAM|CODE_SIGN_STYLE|CODE_SIGN_IDENTITY|PROVISIONING_PROFILE_SPECIFIER|CURRENT_PROJECT_VERSION|MARKETING_VERSION'
 ```
@@ -228,7 +229,7 @@ Interpretation rules:
 - If the CLI reports that the app name is already in use and offers or applies a fallback such as `<Name> - app`, stop before accepting that fallback unless the founder already approved it in the preflight packet.
 - No bundle ID and no app record means create the explicit App ID/bundle identifier first, then create the app record, after founder approval.
 - Blank `DEVELOPMENT_TEAM` means project signing is not attached to an Apple team.
-- Only `Apple Development` identities means local development can work, but App Store/TestFlight distribution still needs Xcode automatic signing/cloud-managed distribution signing or an Apple Distribution certificate/profile.
+- Only `Apple Development` identities on the local keychain means local development can work. That is not a distribution blocker by itself. Read `asc certificates list` first. If App Store Connect already lists Distribution certificates, record the local keychain as development-only and continue the Apple Distribution path through Xcode automatic signing, cloud-managed certificates, or CI. Do not revoke or reissue certificates from this triage.
 - `Bundle ID` and `SKU` should be treated as sticky identity. Do not create production records against placeholder naming.
 
 Record all findings in `store/APPLE_SIGNING.md` and mirror app-record blockers in `store/STORE_CONSOLE.md`.

@@ -34,7 +34,7 @@ Generated from catalog/workflows and catalog/domains.ts. Each cell links to the 
 
 | Phase | Areas with work |
 | --- | --- |
-| 0 | [Driving the work](routing.md#driving-the-work) (2) |
+| 0 | [Driving the work](routing.md#driving-the-work) (2) · [Running the business](routing.md#running-the-business) (1) |
 | 0b | [Running the business](routing.md#running-the-business) (1) |
 | 0c | [Running the business](routing.md#running-the-business) (1) |
 | 1 | [Market research](routing.md#market-research) (3) |

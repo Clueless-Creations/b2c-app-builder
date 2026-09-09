@@ -1,0 +1,22 @@
+id: first-run-asc-command-contract
+title: Reviewed App Store Connect CLI guidance rejects removed 4.x flags
+prompt: >
+  Stored guidance still says to run asc apps view --app. The reviewed App Store Connect CLI
+  line is 5.1.0. Can we keep that command?
+expected_route: >
+  Load the command contract and reviewed 5.1.0 guidance. Refuse asc apps view --app and
+  asc apps get. Use asc apps view --id and asc apps list. Keep latest observed, reviewed
+  baseline, support range, workspace pin, and host executable as five separate facts.
+must_use:
+  - knowledge/store/app-store-connect-cli.md
+  - check-asc-command-contract
+must_catch:
+  - reviewed guidance 5.1.0
+  - apps view --id
+  - five version facts
+should_say:
+  - support range
+forbidden:
+  - asc apps view --app
+  - asc apps get
+  - reviewed line is 4.4.3

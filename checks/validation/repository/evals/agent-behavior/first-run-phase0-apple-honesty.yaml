@@ -1,0 +1,28 @@
+id: first-run-phase0-apple-honesty
+behavioral: true
+title: Phase 0 keeps API-key health, web session, and signing proofs apart
+prompt: >
+  We are in Phase 0. The API key validates. There is no Apple web session. The local keychain
+  has no Apple Distribution identity. App Store Connect lists Distribution certificates.
+  The winning asc is 5.0.0. Tell me if Apple is ready and whether we should web-login.
+expected_route: >
+  Load launch-phases and apple-signing-release. Record API-key health and web-session health as
+  two proofs. Do not claim ASC is connected. Do not write a signing blocker until certificates
+  list has been read; do not revoke or reissue. Refuse an asc web auth login handoff unless the
+  winning binary is 5.1.0 or newer. API reads on 5.0.0 may continue with a warn.
+must_use:
+  - knowledge/process/launch-phases.md
+  - knowledge/store/apple-signing-release.md
+  - knowledge/store/app-store-connect-cli.md
+must_catch:
+  - API key is not a web session
+  - certificates list before a signing blocker
+  - web-login handoff refused below 5.1.0
+should_say:
+  - two proofs
+  - Distribution certificates
+forbidden:
+  - ASC is connected
+  - revoke the certificate
+  - reissue the certificate
+  - local Development identity blocks distribution

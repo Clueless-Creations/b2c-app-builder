@@ -1,10 +1,11 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.4",
+  "version": "0.219.5",
   "updatedAt": "2026-09-08",
   "sourcePath": ".",
   "releaseNotes": [
-    "Adapt last30days recency, engagement ranking, entity resolution, and honest source-coverage into research-intelligence without vendoring the engine or adding a capability.",
-    "Route last30days as an opt-in host skill and add a boundary eval so it is not treated as an XPOZ, AppKittie, or Firecrawl fallback."
+    "Report the winning App Store Connect CLI from doctor and prefer the latest observed release without installing or upgrading the host.",
+    "Hold research-backed-spec until a live App Store apps-list receipt exists, and ask once for the account-gated tools that start needs.",
+    "Record deferred research-intelligence tools as labeled fallback, and keep App Store Connect CLI 5.1.0 as the reviewed line."
   ]
 }

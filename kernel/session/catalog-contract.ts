@@ -206,6 +206,7 @@ function hasPriorWorkspaceMarker(workspace: string): boolean {
     "run/run-state.json",
     "run/checkpoint.json",
     "run/app-review.json",
+    "run/app-store-portfolio.json",
     "run/app-review-webhooks",
     "digests",
   ];

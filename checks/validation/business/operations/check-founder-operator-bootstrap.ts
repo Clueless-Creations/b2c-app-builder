@@ -110,10 +110,11 @@ function validateSemantics(value: Record<string, unknown>): void {
     youtube: "social",
   };
   const ids = accounts.map((entry) => asString(entry.id) ?? "");
-  if (value.schemaVersion !== "2.0.0") {
-    issues.push(issue("error", "founder_operator.gate_contract_unsupported", "Business access must use schema 2.0.0.", ledgerRelative));
+  if (value.schemaVersion !== "2.1.0") {
+    issues.push(issue("error", "founder_operator.gate_contract_unsupported", "Business access must use schema 2.1.0.", ledgerRelative));
     return;
   }
+  validateForbiddenProjects(value);
 
   if (new Set(ids).size !== ids.length) {
     issues.push(issue("error", "founder_operator.account_id_duplicate", "Business access account IDs must be unique.", ledgerRelative));
@@ -558,6 +559,40 @@ function validateAccount(account: Record<string, unknown>, index: number): void 
   }
 }
 
+function validateForbiddenProjects(value: Record<string, unknown>): void {
+  const entries = asArray(value.forbiddenProviderProjects);
+  if (value.forbiddenProviderProjects !== undefined && !Array.isArray(value.forbiddenProviderProjects)) {
+    issues.push(
+      issue(
+        "error",
+        "founder_operator.forbidden_projects_invalid",
+        "forbiddenProviderProjects must be an array of sanitized project names. Mandate tables may mirror names only.",
+        ledgerRelative,
+      ),
+    );
+    return;
+  }
+  for (const [index, entry] of entries.entries()) {
+    if (!isRecord(entry)) {
+      issues.push(
+        issue("error", "founder_operator.forbidden_project_invalid", `forbiddenProviderProjects[${index}] must be an object.`, ledgerRelative),
+      );
+      continue;
+    }
+    const evidenceCommand = asString(entry.evidenceCommand) ?? "";
+    if (/--|[/~=]/.test(evidenceCommand)) {
+      issues.push(
+        issue(
+          "error",
+          "founder_operator.forbidden_project_command",
+          `forbiddenProviderProjects[${index}] evidenceCommand must be a command name only — no flags, paths, or assignments.`,
+          ledgerRelative,
+        ),
+      );
+    }
+  }
+}
+
 function validateState(
   value: Record<string, unknown>,
   founder: Record<string, unknown>,
@@ -575,9 +610,9 @@ function validateState(
   const bypass = isRecord(activeGate.bypassPolicy) ? activeGate.bypassPolicy : {};
   const definitions = asArray(activeGate.definitions).filter(isRecord);
   const humanGateValues = [agentAction, nextBusinessOperation];
-  if (value.schemaVersion === "2.0.0") humanGateValues.push(asString(phase.label) ?? "", asString(phase.outcome) ?? "");
+  if (value.schemaVersion === "2.1.0") humanGateValues.push(asString(phase.label) ?? "", asString(phase.outcome) ?? "");
   if (hasActiveGate) humanGateValues.push(founderAction, ...["whatThisIs", "whyNow", "successProof"].map((key) => asString(activeGate[key]) ?? ""));
-  if (value.schemaVersion === "2.0.0") {
+  if (value.schemaVersion === "2.1.0") {
     if (hasActiveGate) {
       humanGateValues.push(
         ...definitions.flatMap((entry) => [asString(entry.term) ?? "", asString(entry.meaning) ?? ""]),
@@ -605,7 +640,7 @@ function validateState(
   }
   const humanOneNextAction = human?.split("## One Next Action")[1]?.split("\n## ")[0] ?? "";
   if (
-    value.schemaVersion === "2.0.0" &&
+    value.schemaVersion === "2.1.0" &&
     !hasActiveGate &&
     (!humanOneNextAction.includes("No founder decision is pending") || /Recommended choice:|Question mode:/.test(humanOneNextAction))
   ) {

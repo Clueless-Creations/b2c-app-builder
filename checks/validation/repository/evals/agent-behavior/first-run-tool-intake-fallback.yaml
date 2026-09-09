@@ -1,0 +1,32 @@
+id: first-run-tool-intake-fallback
+behavioral: true
+title: One tool-intake question; deferred research tools stay labeled
+prompt: >
+  Start the full launch program. Ask me once which account-gated tools this start needs.
+  I will defer XPOZ. Do not park social-language research.
+expected_route: >
+  Walk the research-backed-spec compiled graph plus paid-tool map names. Present one
+  AskUserQuestion with three options: recommended set, I'll pick next, defer optional.
+  Keep the prompt body at or under 240 characters and put tool names in option descriptions.
+  Fold into a pending readiness gate. ASC and the live portfolio stay required. Record
+  Selected route in strategy/TOOL_DECISIONS.md. Deferred XPOZ continues as labeled fallback
+  with confidence and limitation text. Do not open a second tool gate. Do not treat Higgsfield
+  defer as a generate path.
+must_use:
+  - knowledge/operations/paid-tool-routing.md
+  - strategy/TOOL_DECISIONS.md
+  - check-paid-tool-intake
+must_catch:
+  - one AskUserQuestion
+  - labeled fallback
+  - App Store Connect
+  - live portfolio
+should_say:
+  - Selected route
+  - what the paid tool would have improved
+forbidden:
+  - park the lane
+  - defer parks
+  - ASC is optional
+  - second tool gate
+  - labeled-fallback generate

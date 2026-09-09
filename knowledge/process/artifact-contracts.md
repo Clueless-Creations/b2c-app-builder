@@ -98,7 +98,7 @@ agents/                   # simple role prompts/configs: orchestrator, marketing
 
 `operations/AGENT_OPERATIONS.md` and its JSON ledger are required before browser, account/provider, social, or native-device operations are claimed ready. Use `frontier-agent-operations.md`; access is not authorization, and completed external mutations need exact-target preflight, a scoped approval envelope, sanitized before/after read-back proof, rollback/recovery, and canonical state reconciliation. Gate with `check:agent-operations`.
 
-`operations/BUSINESS_ACCESS.md` and `operations/business-access.json` are required at broad-launch orient. Use `founder-zero-operator.md`: assume beginner founder knowledge, let the agent drive setup, keep the current phase visible, and use at most one versioned active gate with plain-language definitions, two or three AskUserQuestion-compatible choices, consequences, safe fallback/defer behavior, lifecycle, and next actions. Use `null` while the agent can continue without a founder decision; never invent a gate to fill the slot. Route accounts through founder-owned, scoped, revocable access with sanitized proof. Business access uses schema 2.0.0; unsupported schemas fail validation. Gate with `check:founder-operator`.
+`operations/BUSINESS_ACCESS.md` and `operations/business-access.json` are required at broad-launch orient. Use `founder-zero-operator.md`: assume beginner founder knowledge, let the agent drive setup, keep the current phase visible, and use at most one versioned active gate with plain-language definitions, two or three AskUserQuestion-compatible choices, consequences, safe fallback/defer behavior, lifecycle, and next actions. Use `null` while the agent can continue without a founder decision; never invent a gate to fill the slot. Route accounts through founder-owned, scoped, revocable access with sanitized proof. Business access uses schema 2.1.0, including `forbiddenProviderProjects[]`. Mandate tables may mirror those names only. Unsupported schemas fail validation. Gate with `check:founder-operator`.
 
 When handing to Rork or another generated-app builder, duplicate the needed subset into:
 
@@ -280,20 +280,25 @@ Use when paid or account-gated tools affect research, visuals, testing, store op
 
 Must include:
 
+- a `## Workflow intake` section with `Selected route: recommended-set`, `pick-next`, `defer-optional`, or an explicit `no optional tools` row before paid-tool routing succeeds
+- required tools that stay in force (App Store Connect CLI and the live portfolio when that graph applies)
 - tool and lane
 - intended paid/account-gated workflow
 - runtime access status
 - founder confirmation or blocker
-- selected route: paid, user export, free fallback, blocked, deferred
+- selected route: paid, export, fallback, blocked, deferred
 - fallback limitation and confidence impact
 - downstream artifacts affected
 - date checked
 
+Research-intelligence defer (AppKittie, XPOZ, Firecrawl, paid ASO) records `fallback` and continues the evidence lane labeled. Spend-gated defer records `deferred` and authorizes no generate path.
+
 Acceptance:
 
 - No fallback work is mistaken for the intended paid-tool workflow.
-- A future agent can tell whether AppKittie, XPOZ, Firecrawl, Higgsfield, MobAI, Fastlane, paid ASO/MMP tools, creator marketplaces, RevenueCat, Stripe, PostHog, Resend, App Store Connect, or Google Play access was used, blocked, or intentionally bypassed.
+- A future agent can tell whether AppKittie, XPOZ, Firecrawl, Higgsfield, MobAI, Fastlane, paid ASO/MMP tools, creator marketplaces, RevenueCat, Stripe, PostHog, Resend, App Store Connect, or Google Play access was used, blocked, deferred as no-spend, or continued as labeled fallback.
 - Founder-only spend, account, credential, posting, and submission decisions are explicit.
+- Workflow start asked once; tools named at intake were not asked again.
 
 ## `SECRETS.md`
 
@@ -920,6 +925,31 @@ Acceptance:
 - A ready packet has an actual `PrivacyInfo.xcprivacy` in the app source tree.
 - App Privacy answers are not copied from policy prose alone; they reconcile app code, SDKs, vendors, analytics, revenue, privacy policy, Xcode privacy report, and App Store Connect labels.
 - Upload readiness is blocked by unresolved privacy manifest, required reason API, third-party SDK, purpose string, ATT, review-note, account-deletion, or ASC delivery-warning gaps.
+
+## run/app-store-portfolio.json
+
+Use this when the live App Store Connect portfolio must be observed before `workflow.research.research-backed-spec` is admissible.
+
+Must include:
+
+- schema `1.0.0`
+- command exactly `asc apps list`
+- `authFamily` `api`
+- winning `asc` version
+- `observedAt` from the live command
+- `appCount` and `apps[]` of sanitized `{name}` plus optional `{bundleId}`
+- `empty: true` only when the live command returned no apps
+
+Acceptance:
+
+- Failed or missing API auth produces no receipt.
+- A web session never satisfies the hold.
+- Do not invent an empty portfolio from memory.
+- Do not store Apple numeric ids, SKU, raw stdout, session, or env.
+- A receipt older than seven days, or older than a later Apple-account `checkedAt`, is hold-equivalent.
+- Compare names and bundle ids against `operations/business-access.json` `forbiddenProviderProjects[]`.
+- Register the path as reducer-protected observe state. MCP and status may read it. They must not treat it as an authored operations file.
+- Gate with `check:app-store-portfolio`. The workflow uses `check:app-store-portfolio-required`.
 
 ## `store/APP_REVIEW.md`
 

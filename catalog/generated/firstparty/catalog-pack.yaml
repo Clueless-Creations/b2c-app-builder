@@ -1,8 +1,8 @@
 id: business-pack.consumer-business
 title: Consumer business
 kind: business-pack
-version: 0.219.4
-revision: 0.219.4
+version: 0.219.5
+revision: 0.219.5
 depends_on: []
 creates_provider_spend: false
 domains:
@@ -251,7 +251,7 @@ workflows:
       - get this business running from scratch
       - pull the overall progress across every workstream
       - something changed and the tracked state needs to catch up
-    instructions: Run `b2c status` and `b2c plan` to orient from reducer-owned `state/business-state.json`. Do not edit that file or author a second state document. Submit lane, evidence, and blocker changes through the runtime reducer. A succeeded lane needs evidence or live proof, and a lane cannot succeed while a required upstream lane is running or blocked. Choose the smallest orchestration strategy that fits the ready work, then report what changed, what happens next, and what needs the human. Do not wait for later operational or readiness artifacts during orientation.
+    instructions: Run `b2c status` and `b2c plan` to orient from reducer-owned `state/business-state.json`. Do not edit that file or author a second state document. Submit lane, evidence, and blocker changes through the runtime reducer. A succeeded lane needs evidence or live proof, and a lane cannot succeed while a required upstream lane is running or blocked. Record App Store Connect API-key health and Apple web-session health as two proofs; a healthy API key is not ASC connected. Do not write a signing blocker until `asc certificates list` has been read, and do not treat a local Development keychain as a distribution blocker when App Store Connect already lists Distribution certificates. Do not dispatch research-backed-spec until the live App Store portfolio observe has succeeded. Choose the smallest orchestration strategy that fits the ready work, then report what changed, what happens next, and what needs the human. Do not wait for later operational or readiness artifacts during orientation.
     reads:
       - state/business-state.json
     consults:
@@ -291,7 +291,7 @@ workflows:
       - take this all the way to submit-for-review ready
       - ship the app, the website, and the store packet as one program
       - every surface gets a fresh-context review before it counts as done
-    instructions: "Open the program. Write `operations/LAUNCH_PROGRAM.md` from the mandate record in `reference.orchestration.full-launch-program`: outcome, stop line, launch scope, start classification, workspace facts, craft references, spend ceiling, autonomy mode, founder-only actions, and the review policy. Record `project.launchScope: full` through the reducer with a dated founder reason when it changes an existing scope; never edit `state/business-state.json` by hand. Confirm the `## Review Ledger` section exists in `operations/ORCHESTRATION.md` before any broad dispatch. Run the paid-tool check for every preferred design-evidence and generation tool and stop when a required one is missing. Classify the start: a brownfield overhaul runs research in audit-and-gap-fill mode with keep, refresh, or redo per artifact. Then let `b2c plan` sequence the existing nodes; this node adds the mandate, the isolated-review edges, the reference-pack edge, and the closeout gates, not a second graph. Hand off with the smallest founder-only ask."
+    instructions: "Open the program. Write `operations/LAUNCH_PROGRAM.md` from the mandate record in `reference.orchestration.full-launch-program`: outcome, stop line, launch scope, start classification, workspace facts, craft references, spend ceiling, autonomy mode, founder-only actions, and the review policy. Record `project.launchScope: full` through the reducer with a dated founder reason when it changes an existing scope; never edit `state/business-state.json` by hand. Confirm the `## Review Ledger` section exists in `operations/ORCHESTRATION.md` before any broad dispatch. Present one start-of-workflow tool-intake AskUserQuestion for the account-gated tools on the research-backed-spec compiled graph; fold it into a pending readiness gate; do not open a second tool gate. Name App Store Connect API auth and the live apps-list receipt as required even when optional research tools are deferred. Record API-key health and web-session health as two proofs. Classify the start: a brownfield overhaul runs research in audit-and-gap-fill mode with keep, refresh, or redo per artifact. Do not dispatch research-backed-spec until live-app-store-portfolio has succeeded. Then let `b2c plan` sequence the existing nodes; this node adds the mandate, the isolated-review edges, the reference-pack edge, and the closeout gates, not a second graph. Hand off with the smallest founder-only ask."
     reads:
       - state/business-state.json
     consults:
@@ -584,7 +584,7 @@ workflows:
       - check if we already have access before paying for a tool
       - route around a tool that needs an account we don't have
       - find the free fallback instead of a paid service
-    instructions: Before using, skipping, or replacing any paid/account-gated tool (AppKittie, XPOZ, Firecrawl, Higgsfield, MobAI, Retention Mechanics), run ToolSearch for the tool's `mcp__<TOOLNAME>__` prefix and check for founder-supplied exports before concluding it is unavailable — a missing connector is not proof the founder lacks the tool. Present the three-choice Confirmation Prompt (use/provision, export/fallback, defer) through AskUserQuestion rather than a free-text blocker, and record the decision in `strategy/TOOL_DECISIONS.md` with tool, lane, access status, selected route, and fallback limitation. Treat MobAI's free tier (single device, Testing Mode) as needing no spend gate at all — only an upgrade or trial does. Never present a fallback artifact as equivalent to the paid-tool output; label it with confidence and the limitation, and route any credit/subscription spend through a separate protected ceiling, never inferred from the fallback choice.
+    instructions: At workflow start, walk the compiled start node plus its dependency closure — full-launch and complete-business walk `workflow.research.research-backed-spec` and its dependencies, including this node and `workflow.operations.live-app-store-portfolio` — and collect Tool Map names and MCP prefixes from instructions, consults, reads, and bound knowledge. Always add App Store Connect CLI and the live portfolio when that graph includes research-backed-spec or live-app-store-portfolio; a focused start lists only tools that graph actually names. Present one AskUserQuestion with multiSelect unset, a prompt body at or under 240 characters, and three options (recommended set, I'll pick next, defer optional) whose descriptions hold the names and jobs. Fold this into an already-pending readiness gate; do not open a second activeFounderGate. ASC and the live apps-list receipt stay required. I'll pick next records unnamed optionals as labeled fallback in the same turn. Deferred AppKittie, XPOZ, Firecrawl, or paid ASO continue as labeled fallback; deferred Higgsfield or MobAI upgrades mean no spend and no labeled-fallback generate. Tools named at intake get no second confirmation. Credit spend still uses a separate amount gate. Run ToolSearch for each tool's `mcp__<TOOLNAME>__` prefix before concluding it is unavailable. Record `Selected route:` in `strategy/TOOL_DECISIONS.md` plus per-tool rows with limitation text. Treat MobAI Free as needing no spend gate. Never present fallback output as equivalent to the paid-tool artifact.
     reads:
       - state/business-state.json
     consults:
@@ -599,12 +599,47 @@ workflows:
     dependencies: []
     output_paths:
       - strategy/TOOL_DECISIONS.md
-    gate_commands: []
+    gate_commands:
+      - check:paid-tool-intake-required
     provider_ids:
       - provider.doppler
     founder_only_actions:
       - approve a paid or constrained fallback
     action_class: mutate
+    idempotent: true
+    applicability:
+      mode: always
+  - id: workflow.operations.live-app-store-portfolio
+    title: Live App Store portfolio observe
+    domain_id: domain.operations
+    area_ids:
+      - area.business-operations-trust
+    trigger: Before research-backed-spec on a complete-business or full-launch start; whenever Apple team or API auth changes
+    founder_phrasings:
+      - list the apps already on this App Store account before we research
+      - check live App Store Connect apps before we pick a product
+      - do we already have an app on this Apple team
+    instructions: "Read the live App Store Connect portfolio with API auth only. Confirm `asc auth status --validate` on the winning binary, then run `asc apps list` and write `run/app-store-portfolio.json` with schema 1.0.0, command `asc apps list`, authFamily `api`, winnerVersion, observedAt, appCount, apps[] of sanitized `{name}` plus optional `{bundleId}`, and `empty: true` only when the live command returned no apps. Failed or missing API auth produces no receipt. A web session never satisfies this hold. Do not invent an empty portfolio. Do not store Apple numeric ids, SKU, raw stdout, session, or env. Compare names and bundle ids against `operations/business-access.json` `forbiddenProviderProjects[]` and refuse research that would target a match. A receipt older than seven days, or older than a later Apple-account checkedAt, is stale — re-run apps list. This node may remain held while reversible local prep continues; it blocks `workflow.research.research-backed-spec`."
+    reads:
+      - operations/business-access.json
+    consults:
+      - operations/BUSINESS_ACCESS.md
+    reference_ids:
+      - reference.process.artifact-contracts
+      - reference.store.app-store-connect-cli
+    role_id: role.operator-readiness
+    lane_ids:
+      - store_console
+    phase_ids:
+      - phase.0-orient
+    dependencies: []
+    output_paths:
+      - run/app-store-portfolio.json
+    gate_commands:
+      - check:app-store-portfolio-required
+    provider_ids: []
+    founder_only_actions: []
+    action_class: observe
     idempotent: true
     applicability:
       mode: always
@@ -980,7 +1015,7 @@ workflows:
       - set up my accounts and recovery options before we go further
       - decide how much autonomy the agent should have
       - get the business identity and two-factor recovery squared away
-    instructions: When the durable runtime starts, offer one optional step-away setup. Settle autonomy and budget, confirm business identity and founder-owned recovery/2FA, inventory only the accounts required by accepted near-term work, and record exact external authority in operations/business-access.json. This setup may remain held while research, product definition, design, local implementation, and local tests continue. Complete it before authenticated provider work, standing schedules, spend, public actions, testing-track uploads, or releases. Keep one structured `activeFounderGate`, set it to `null` while work can continue, and combine missing tools or roles into one handoff. Never request secrets in chat. Consume matching standing envelopes without asking twice. Pause only for missing or expired scope, ceiling overruns, protected identity, legal, pricing, or credential changes, destruction, or an unapproved public release.
+    instructions: When the durable runtime starts, offer one optional step-away setup. Settle autonomy and budget, confirm business identity and founder-owned recovery/2FA, inventory only the accounts required by accepted near-term work, and record exact external authority in operations/business-access.json. If this gate is already pending, fold the start-of-workflow recommended tool set into the same AskUserQuestion rather than opening a second tool gate. This setup may remain held while reversible local prep, product definition drafts, design drafts, local implementation, and local tests continue. It does not authorize dispatch of `workflow.research.research-backed-spec`; that node stays frontier-blocked until `workflow.operations.live-app-store-portfolio` succeeds. Complete the setup before authenticated provider work, standing schedules, spend, public actions, testing-track uploads, or releases. Keep one structured `activeFounderGate`, set it to `null` while work can continue, and combine missing tools or roles into one handoff. Never request secrets in chat. Consume matching standing envelopes without asking twice. Pause only for missing or expired scope, ceiling overruns, protected identity, legal, pricing, or credential changes, destruction, or an unapproved public release.
     reads:
       - state/business-state.json
     consults:
@@ -1188,7 +1223,7 @@ workflows:
       - is this idea even worth pursuing
       - pick a business idea for me and just run with it
       - research the market before we commit to building
-    instructions: "When no idea exists, compare three safe, feasible consumer-app opportunities before committing an app identity or build. Judge economics, recurring pain, reachable distribution, transformation clarity, complete-product feasibility, and sensitivity risk. If the opening request delegates product selection, choose the strongest candidate that clears the evidence bar and record `Founder opening mandate` as the decision authority. Otherwise, recommend one candidate for Go, Pivot, or Kill. Return no candidate instead of forcing a weak idea. Before a paid research request, use research-lookup with its provider/version, connection, operation and non-secret arguments under an explicit freshness limit. Reuse saved current results. In a registered planning workspace, checkpoint pending through research-record before dispatch, then checkpoint the actual observed, failed or uncertain result immediately; read back uncertain requests before replay. Use the bound research references to write dated source evidence, category economics, demand, wedge, distribution, offer response, transformation demo, paying niche, signal provenance, conflicts, and the decision into strategy/RESEARCH.md, strategy/SIGNAL_CORPUS.md, and strategy/OFFER_TEST.md. Use the default category bar only when the work has not set a better one: top-ten gross of at least $5M per year with two apps above $1M each. Author accepted product facts in product.yaml, then render PRODUCT.md. Do not hand-edit PRODUCT.md. Before the product is accepted, define its core loop, Complete product scope, moat path, and beat moment. Run check:research-workflow-output. Do not harden a direction that fails it."
+    instructions: "When no idea exists, compare three safe, feasible consumer-app opportunities before committing an app identity or build. Judge economics, recurring pain, reachable distribution, transformation clarity, complete-product feasibility, and sensitivity risk. If the opening request delegates product selection, choose the strongest candidate that clears the evidence bar and record `Founder opening mandate` as the decision authority. Otherwise, recommend one candidate for Go, Pivot, or Kill. Return no candidate instead of forcing a weak idea. Before a paid research request, use research-lookup with its provider/version, connection, operation and non-secret arguments under an explicit freshness limit. Reuse saved current results. In a registered planning workspace, checkpoint pending through research-record before dispatch, then checkpoint the actual observed, failed or uncertain result immediately; read back uncertain requests before replay. Use AppKittie, XPOZ, and Firecrawl from the bound research-intelligence recipe when those names appear; if intake deferred them, continue the evidence lane as labeled fallback rather than parking it. Use the bound research references to write dated source evidence, category economics, demand, wedge, distribution, offer response, transformation demo, paying niche, signal provenance, conflicts, and the decision into strategy/RESEARCH.md, strategy/SIGNAL_CORPUS.md, and strategy/OFFER_TEST.md. Use the default category bar only when the work has not set a better one: top-ten gross of at least $5M per year with two apps above $1M each. Author accepted product facts in product.yaml, then render PRODUCT.md. Do not hand-edit PRODUCT.md. Before the product is accepted, define its core loop, Complete product scope, moat path, and beat moment. Run check:research-workflow-output. Do not harden a direction that fails it."
     reads:
       - product.yaml
     consults: []
@@ -1210,7 +1245,9 @@ workflows:
       - research
     phase_ids:
       - phase.1
-    dependencies: []
+    dependencies:
+      - workflow.operations.live-app-store-portfolio
+      - workflow.operations.paid-tool-routing-and-fallback
     output_paths:
       - strategy/RESEARCH.md
       - strategy/SIGNAL_CORPUS.md
@@ -1291,6 +1328,7 @@ workflows:
     phase_ids:
       - phase.1
     dependencies:
+      - workflow.research.research-backed-spec
       - workflow.operations.agent-operations-ledger
     output_paths:
       - strategy/localization-market-research/LOCALIZATION_MARKET_RESEARCH.md
@@ -7608,7 +7646,7 @@ references:
     title: Paid Tool Routing
     domain_id: domain.operations
     path: knowledge/operations/paid-tool-routing.md
-    load_when: before using or replacing any paid/account-gated tool, before running a free fallback, or when a service is missing from the runtime
+    load_when: at workflow start for the one tool-intake question, before using or replacing any paid/account-gated tool, before running a free fallback, or when a service is missing from the runtime
     lifecycle: active
     sources:
       - id: experience-card-deck
@@ -8217,6 +8255,8 @@ references:
         heading: PRODUCT.md
       - artifact: DESIGN.md
         heading: DESIGN.md
+      - artifact: run/app-store-portfolio.json
+        heading: run/app-store-portfolio.json
     replacement_ids: []
   - id: reference.process.cascade-edges
     title: Cascade Edges
@@ -8986,11 +9026,11 @@ references:
         url: https://github.com/rorkai/App-Store-Connect-CLI
         review_cadence_days: 7
         claim_scope: Command families, auth ladder, safe automation boundaries, telemetry disclosure, and the verified command cookbook are adapted from the CLI README, local --help output, and release notes.
-        last_review_date: 2026-08-18
+        last_review_date: 2026-09-08
         reviewer: b2c-maintainers
         publisher: Rudrank Riyam (author); Rork (maintainer)
-        revision: 4.11.0 latest stable observed 2026-09-05; reviewed baseline 4.4.3 (2026-08-17) and 4.9.0 notes (2026-08-24)
-        retrieved_at: 2026-09-05
+        revision: 5.1.0 latest stable and reviewed guidance 2026-09-08
+        retrieved_at: 2026-09-08
         rights:
           status: verified
           spdx: MIT
@@ -9008,7 +9048,7 @@ references:
         url: https://github.com/rorkai/app-store-connect-cli-skills
         review_cadence_days: 7
         claim_scope: The routed skill names and their purposes; no SKILL.md text is copied.
-        last_review_date: 2026-08-18
+        last_review_date: 2026-09-08
         reviewer: b2c-maintainers
         publisher: Rudrank Riyam (author); Rork (maintainer)
         revision: main@f52c4f04323bb2dfb21ca8be82e6494e9cd0b4d8 observed 2026-09-05; reviewed routing 2026-08-18 without a recorded commit
@@ -9030,8 +9070,8 @@ references:
         relationship: adapted
         rationale: Command procedures and boundaries are reauthored in the builder's vocabulary with founder gates, refusals, and evidence rules the upstream does not define.
         reviewer: b2c-maintainers
-        reviewed_at: 2026-09-05
-        baseline: 4.4.3 help (2026-08-17); 4.9.0 release notes (2026-08-24)
+        reviewed_at: 2026-09-08
+        baseline: 5.1.0 help and release notes (2026-09-08)
         selectors:
           - README.md
           - asc --help
@@ -9039,7 +9079,7 @@ references:
           - asc install-skills without founder approval
           - asc web agreements accept
           - asc webhooks serve as production ingress
-          - asc apps get and asc validate app-store-version (invalid forms)
+          - asc apps get, asc apps view --app, and asc validate app-store-version (invalid forms)
         evaluation: check:asc-command-contract; LaunchBench asc-flag-drift-runtime and asc-stale-command-guidance
     replacement_ids: []
   - id: reference.store.app-store-listing-prep
@@ -10608,6 +10648,7 @@ roles:
     output_path_prefixes:
       - operations/
       - strategy/TOOL_DECISIONS.md
+      - run/app-store-portfolio.json
   - id: role.research-strategist
     name: Research strategist
     prompt_path: agents/research-strategist.md
@@ -11258,6 +11299,18 @@ gates:
     script_path: checks/validation/business/store/check-app-review-contract.ts
     owner_domain_id: domain.process
     audit: required
+  - id: gate.check-app-store-portfolio
+    command: check:app-store-portfolio
+    command_manifest_path: package.json
+    script_path: checks/validation/business/store/check-app-store-portfolio.ts
+    owner_domain_id: domain.process
+    audit: required
+  - id: gate.check-app-store-portfolio-required
+    command: check:app-store-portfolio-required
+    command_manifest_path: package.json
+    script_path: checks/validation/business/store/check-app-store-portfolio.ts
+    owner_domain_id: domain.process
+    audit: excluded
   - id: gate.check-apple-release-readiness
     command: check:apple-release-readiness
     command_manifest_path: package.json
@@ -11768,6 +11821,18 @@ gates:
     script_path: checks/validation/repository/check-package-parity.ts
     owner_domain_id: domain.machine
     audit: required
+  - id: gate.check-paid-tool-intake
+    command: check:paid-tool-intake
+    command_manifest_path: package.json
+    script_path: checks/validation/business/operations/check-paid-tool-intake.ts
+    owner_domain_id: domain.process
+    audit: required
+  - id: gate.check-paid-tool-intake-required
+    command: check:paid-tool-intake-required
+    command_manifest_path: package.json
+    script_path: checks/validation/business/operations/check-paid-tool-intake.ts
+    owner_domain_id: domain.process
+    audit: excluded
   - id: gate.check-paid-ua
     command: check:paid-ua
     command_manifest_path: package.json

@@ -16,7 +16,7 @@ Generated from catalog/upstreams for maintainers. It states what the builder sup
 | posthog-wizard | PostHog wizard | adapted-method | 41c12328636f46a517777b17359dd8f5b3d14d96@2026-09-06 | 41c12328636f46a517777b17359dd8f5b3d14d96@2026-09-06 | `41c12328636f46a517777b17359dd8f5b3d14d96` untested | v2.73.0 (published 2026-09-04) | 2026-09-06 | not observed | current; last 2026-09-06; due 2026-09-13 | 1 | 1 |
 | revenuecat-ai-toolkit | RevenueCat AI Toolkit | adapted-method | b9b77b12da33213c9c2e750b06cd6270c1d8ed65@2026-09-06 | b9b77b12da33213c9c2e750b06cd6270c1d8ed65@2026-09-06 | `b9b77b12da33213c9c2e750b06cd6270c1d8ed65` untested | v2.2.0 (published 2026-08-28) | 2026-09-06 | not observed | current; last 2026-09-06; due 2026-09-13 | 1 | 1 |
 | revenuecat-cli | RevenueCat CLI | adapted-method | 1a3d2820b3166dd6d4cc4775902e43eeeab5f004@2026-09-06 | 1a3d2820b3166dd6d4cc4775902e43eeeab5f004@2026-09-06 | `1a3d2820b3166dd6d4cc4775902e43eeeab5f004` untested | v0.1.1 (published 2026-08-27) | 2026-09-06 | not observed | current; last 2026-09-06; due 2026-09-13 | 1 | 1 |
-| rork-app-store-connect-cli | App Store Connect CLI (asc) | external-executable, adapted-method | 4.4.3@2026-08-17 | 4.9.0@2026-08-24 | `4.4.3` supported; `>=4.5.0 <5.0.0` untested; `<4.0.0` unsupported | 4.11.0 (published 2026-08-29) | 2026-09-05 | ~/.local/bin/asc 4.11.0 | current; last 2026-09-05; due 2026-09-12 | 10 | 4 |
+| rork-app-store-connect-cli | App Store Connect CLI (asc) | external-executable, adapted-method | 5.1.0@2026-09-08 | 5.1.0@2026-09-08 | `>=5.0.0 <6.0.0` supported; `<5.0.0` unsupported | 5.1.0 (published 2026-09-08) | 2026-09-08 | ~/.local/bin/asc 5.1.0 | current; last 2026-09-08; due 2026-09-15 | 10 | 4 |
 | rork-app-store-connect-cli-skills | App Store Connect CLI skills (asc skill pack) | selected-skill-guidance | unknown | unrecorded@2026-08-18 | `main (unpinned by the builder)` untested | unknown (no observation) | none | not observed | current; last 2026-09-05; due 2026-09-12 | 2 | 1 |
 | sentry-snapshotpreviews | SnapshotPreviews | adapted-method | 856a1c1585e31d4113c019050d6d0712cf6ddadc@2026-09-06 | 856a1c1585e31d4113c019050d6d0712cf6ddadc@2026-09-06 | `856a1c1585e31d4113c019050d6d0712cf6ddadc` untested | v0.18.0 (published 2026-07-07) | 2026-09-06 | not observed | current; last 2026-09-06; due 2026-09-13 | 2 | 1 |
 | sentry-xcodebuildmcp | XcodeBuildMCP | adapted-method | e6ef59b49b44012c824f0a0de261c96142e37390@2026-09-06 | e6ef59b49b44012c824f0a0de261c96142e37390@2026-09-06 | `e6ef59b49b44012c824f0a0de261c96142e37390` untested | v2.7.0 (published 2026-07-23) | 2026-09-06 | not observed | current; last 2026-09-06; due 2026-09-13 | 2 | 1 |
@@ -272,23 +272,26 @@ Unsupported operations:
 - asc.web.agreements.accept: Account Holder action. Never run from an App Review observe mandate; interactive founder confirmation and provider readback are required.
 - asc.webhooks.serve: Fixture-only. Production ingress goes through `b2c app-review-ingress`; --allow-remote and --exec on a public bind are refused.
 - asc.apps.get: Known-invalid command form. check:asc-command-contract fails closed when it appears in stored guidance.
+- asc.apps.view.app: Known-invalid 5.x form. Use `asc apps view --id`. check:asc-command-contract fails closed when `asc apps view --app` appears in stored guidance.
 - asc.validate.app-store-version: Known-invalid subcommand form. Use --version or --version-id with --app.
 
 Intentional adaptations:
 
-- forbidden-command-forms: Stored guidance must not contain `asc apps get` or `asc validate app-store-version`; the contract check fails closed when either appears. (owner: checks/validation/business/store/check-asc-command-contract.ts)
+- forbidden-command-forms: Stored guidance must not contain `asc apps get`, `asc apps view --app`, or `asc validate app-store-version`; the contract check fails closed when any appear. (owner: checks/validation/business/store/check-asc-command-contract.ts)
+- session-from-env-flag-only: The --session-from-env flag may appear as a flag name. Session cookie or env values are never stored in knowledge, observations, receipts, or evals. (owner: knowledge/store/app-store-connect-cli.md)
 - observe-mandate-refusals: The App Review observe mandate refuses submit, cancel, agreement acceptance, and webhook serving regardless of what the CLI allows. (owner: adapters/app-review/mandate.ts)
 - confirm-plus-founder-gate: Mutating commands need both the CLI `--confirm` flag and explicit founder approval; omitting `--confirm` is an error, not a dry run. (owner: knowledge/store/app-store-connect-cli.md)
 - never-source-credential-env: Credential env files are never sourced; profiles or extracted single values are used instead. (owner: knowledge/store/app-store-connect-cli.md)
 - telemetry-disclosure: The `asc telemetry status` output is recorded as evidence because the CLI sends pseudonymous usage telemetry by default. (owner: knowledge/store/app-store-connect-cli.md)
 - skill-pack-subordinate: Skill pack guidance is subordinate reference material routed by name; no upstream SKILL.md becomes a top-level builder skill. (owner: knowledge/store/app-store-connect-cli.md)
 
-Unknowns (observation 2026-09-05, method manual):
+Unknowns (observation 2026-09-08, method manual):
 
-- The Homebrew keg checksum was not computed; only its `brew list --versions` output was observed.
+- Reviewed guidance is 5.1.0, so there are no stable releases after the baseline.
+- The two PATH entries share one digest and do not match the GitHub macOS arm64 5.1.0 release asset digest; they match each other and the Homebrew-linked 5.1.0 bottle.
 - Windows and Linux release assets were not exercised.
-- Releases 4.9.1 through 4.11.0 are observed, not reviewed; their impact on stored guidance is unclassified.
-- Assembled by a maintainer from GitHub API responses retrieved with curl on 2026-09-05; not written by upstream-check --write. Re-run upstream-check --fetch --observe-host --write to replace it.
+- --session-from-env is a flag name only; no session, cookie, or env value was recorded.
+- Assembled by a maintainer from GitHub API responses and a local host-observe on 2026-09-08; not written by upstream-check --write. Re-run upstream-check --fetch --observe-host --write to replace it.
 
 ## rork-app-store-connect-cli-skills
 

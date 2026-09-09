@@ -1,6 +1,6 @@
 # Consumer-business primitives: north-star architecture
 
-Revision: 5 · Established: 2026-09-04 · Role: normative target architecture
+Revision: 6 · Established: 2026-09-04 · Role: normative target architecture
 
 This is the architecture against which new work and refactoring are reviewed. It
 defines the intended system; it does **not** claim that every boundary exists in
@@ -205,7 +205,9 @@ none of the others until a maintainer reviews it. ADR-0007 records this rule.
 | Global experience and design decisions                                      | Workspace `DESIGN.md`                                                                        | Linked flows, screens, component and platform contracts; generated Design Room |
 | Proposed recipe, package selections and operation bindings                  | Proposed workspace `b2c.yaml`                                                                | Preview only until explicit apply                                              |
 | Active composition and installed package digests                            | Existing generated runtime installation manifest and catalog pin                             | Status and compiled contracts                                                  |
-| Provider account/project/app/environment and secret references              | Existing `operations/business-access.json` contract                                          | Bindings reference connection IDs; no copied credentials                       |
+| Provider account/project/app/environment, secret references, and forbidden provider-project exclusions | Existing `operations/business-access.json` contract (schema 2.1.0 `forbiddenProviderProjects[]`) | Bindings reference connection IDs; mandate tables may mirror names only; no copied credentials |
+| Machine-local host executable snapshot (PATH winner, parsed version, latest-tag comparison) | Sanitized file under engine home, written only by CLI `doctor`/`setup` | MCP/`b2c_status` may read the stored file; they never spawn upstream executables or sync this into `catalog/upstreams/observations/` |
+| Live App Store portfolio apps-list receipt | Reducer-protected workspace `run/app-store-portfolio.json` (same owner class as `run/app-review.json`) | Frontier hold plus receipt validator; MCP/status may read the stored receipt |
 | Metric definitions and interpretation                                       | Proposed workspace `operations/metric-contracts.json`, aligned with the earlier cockpit plan | Product links, recipe requirements, and versioned reducer metric records       |
 | Attempts, accepted proof, observations, pending work, authority and history | Existing reducer-owned workspace state                                                       | CLI/MCP status, cockpit, portfolio read models                                 |
 | Workspace identity and address                                              | Existing local registry                                                                      | Cross-workspace references                                                     |
@@ -255,9 +257,11 @@ registration for adoption of an existing scaffold, and expose actionable recover
 without automatic removal of files or registrations. See [ADR-0008](decisions/0008-agent-onboarding-entry-path.md).
 Public contracts must not expose raw internal runtime, provider SDK, or authority
 objects. Generate schemas and reference documentation from the same owner. Read-only MCP returns declarations, resolved
-plans, stored observations, limitations, and next actions. It does not directly
-pull provider data or mutate providers. Approved workers, connected tools, or
-CLI adapters perform the scoped provider work and record receipts.
+plans, stored observations, limitations, and next actions. It may return
+CLI-written engine-home host snapshots and reducer-stored provider observe
+receipts. It must not spawn upstream executables or perform scoped provider
+reads. Approved workers, connected tools, or CLI adapters perform the scoped
+provider work and record receipts. See [ADR-0010](decisions/0010-first-run-honesty-owners.md).
 
 Existing explicitly enabled MCP writes retain their current gates. New bindings
 do not widen the MCP write surface. Selected capability and provider knowledge

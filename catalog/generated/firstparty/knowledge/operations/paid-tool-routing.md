@@ -1,12 +1,13 @@
 # Paid Tool Routing And Free Fallbacks
 
-Use this before using, skipping, or replacing any paid third-party tool or paid tier of a freemium tool in the launch workflow.
+Use this before using, skipping, or replacing any paid third-party tool or paid tier of a freemium tool in the launch workflow, and at the start of every workflow to collect the account-gated tools that start might need.
 
-The rule is simple: tool access missing from the current runtime does not mean the founder lacks the tool, refuses to pay for it, or wants a weaker free fallback. Ask before spending tokens on a fallback path.
+The rule is simple: tool access missing from the current runtime does not mean the founder lacks the tool, refuses to pay for it, or wants a weaker free fallback. Ask once at workflow start. Do not park a research-intelligence lane in silence.
 
 ## Contents
 
 - Decision Protocol
+- Workflow Intake
 - Confirmation Prompt
 - Tool Map
 - Artifact Requirements
@@ -15,8 +16,9 @@ The rule is simple: tool access missing from the current runtime does not mean t
 
 ## Decision Protocol
 
-1. Identify the preferred tool/tier and why it is useful for the lane. If a free tier exists, separate what it covers from the paid capability the lane actually needs.
-2. Check for the MCP path first. Before concluding a paid tool is unavailable, use `ToolSearch` to search for `mcp__<TOOLNAME>__*` tools in the current runtime. For each primary tool, the exact prefix to search is:
+1. At workflow start, derive the tool list from Workflow Intake below. Present one AskUserQuestion. Do not open a second tool gate in the same turn.
+2. Identify each preferred tool/tier and why it is useful for the lane. If a free tier exists, separate what it covers from the paid capability the lane actually needs.
+3. Check for the MCP path first. Before concluding a paid tool is unavailable, use `ToolSearch` to search for `mcp__<TOOLNAME>__*` tools in the current runtime. For each primary tool, the exact prefix to search is:
    - AppKittie: `mcp__appkittie__`
    - XPOZ: `mcp__claude_ai_XPOZ__`
    - Higgsfield: `mcp__claude_ai_Higgsfield__`
@@ -24,17 +26,45 @@ The rule is simple: tool access missing from the current runtime does not mean t
    - MobAI: `mcp__mobai__`
    - Retention Mechanics: `mcp__retention-mechanics__` (also plain `retention_` tool names)
      If the MCP tools are present and callable, use them. A tool that "did not show up as an available connector" is not the same as a tool absent from the runtime — verify via ToolSearch before concluding unavailable.
-3. Check whether the user already supplied access, exports, screenshots, CSVs, PDFs, API keys, or prior results that satisfy the lane.
-4. If the tool is genuinely unavailable, expired, unauthenticated, or blocked after the MCP check, stop before running the free fallback.
-5. Ask the founder whether to use/provision the paid tool, provide access or exports, or continue with the fallback.
-6. Continue only after the user confirms the paid path or the free fallback.
-7. Record the decision in `strategy/TOOL_DECISIONS.md` or in the relevant ops doc when the launch is small.
+4. Check whether the user already supplied access, exports, screenshots, CSVs, PDFs, API keys, or prior results that satisfy the lane.
+5. Tools named at intake do not get a second paid-tool confirmation. Credit or subscription spend still uses a separate spend gate with an amount.
+6. If a tool that was not on the intake list becomes necessary mid-flight, use the Confirmation Prompt once for that tool.
+7. Record the start-of-workflow route and each per-tool row in `strategy/TOOL_DECISIONS.md`.
 
 Do not present a fallback artifact as equivalent to the paid-tool artifact. Label fallback outputs with confidence, limitations, and what the paid tool would have improved.
 
+## Workflow Intake
+
+Present one start-of-workflow question for the account-gated tools that workflow might need. Do not create a second tool registry. A catalog `provider` id is not required.
+
+**Derive the list**
+
+1. Choose the walk root. Complete-business or full-launch: `workflow.research.research-backed-spec` plus its compiled dependencies (portfolio observe and paid-tool routing are already on that graph). Focused start: that workflow plus its dependency closure.
+2. For each node, scan compiled instructions, consults, reads, and bound knowledge documents for Tool Map names and MCP prefixes.
+3. Always add App Store Connect CLI and `workflow.operations.live-app-store-portfolio` when the start is complete-business, full-launch, or the compiled graph includes `research-backed-spec` or `live-app-store-portfolio`. Focused starts omit tools whose names do not appear in that graph.
+4. ASC and the live apps-list receipt stay required on any start that includes those nodes. Deferring optional research tools does not skip the portfolio hold.
+
+**Ask once**
+
+Use AskUserQuestion with `multiSelect` unset (false). The prompt body is the choice frame only and must stay at or under 240 characters. Put recommended-set names and jobs in the option descriptions, using Per-Tool Question Inputs.
+
+```text
+Phase: <phase>. Outcome: start this workflow with the accounts it needs. Choose the recommended set, name optionals, or defer optionals. App Store Connect and the live portfolio stay required.
+```
+
+Three mutually exclusive options:
+
+1. **Recommended set** — connect every listed optional tool plus required ASC and the live portfolio.
+2. **I'll pick next** — the founder names which optional tools to connect in that same turn. Unnamed optionals are recorded as labeled fallback in that same turn. Do not open a second tool gate.
+3. **Defer optional** — ASC and the live portfolio remain required. Optional research-intelligence tools (AppKittie, XPOZ, Firecrawl, paid ASO) continue as labeled fallback. Optional spend-gated tools (Higgsfield, MobAI upgrades, and similar) mean no spend and no labeled-fallback generate path.
+
+If a readiness `activeFounderGate` is already pending, fold this recommended tool set into that same AskUserQuestion. Do not add a second founder gate. If no gate is pending, this intake is the gate. Founder-zero still allows at most one `activeFounderGate`.
+
+I'll pick next with no names still writes `strategy/TOOL_DECISIONS.md` (`Selected route: pick-next` plus fallback rows for the unnamed optionals) and can succeed paid-tool routing.
+
 ## Confirmation Prompt
 
-Use the Founder Question Contract, not a free-text access blocker. Name the phase/outcome and define the tool's job. If this is only a provider-route decision, offer these three shapes through AskUserQuestion when available:
+Use this only for a tool that intake did not already decide. Use the Founder Question Contract, not a free-text access blocker. Name the phase/outcome and define the tool's job. If this is only a provider-route decision, offer these three shapes through AskUserQuestion when available:
 
 ```text
 Phase: <plain-language phase>. Outcome: <what this unlocks>.
@@ -42,7 +72,7 @@ I use <paid tool> for <plain-language job>, but usable access is not available r
 
 1. Use or provision <paid tool> (Recommended when its evidence is launch-critical) - the founder handles only the minimum access/spend gate; the agent continues the intended route.
 2. Use an export or approved <fallback> - the agent continues now and labels the lower confidence and limitations.
-3. Defer this lane - the agent continues unrelated safe work; revisit before <specific milestone>.
+3. Defer this optional tool - research-intelligence continues as labeled fallback; spend-gated defer means no spend. Do not park a research lane in silence.
 ```
 
 If credits, a trial, subscription, or other spend is involved, separate that into a protected `spend` gate with an exact amount/ceiling and a defer choice; the fallback is a separate explicit route, never inferred authorization. If the founder says they have the tool, ask only for the minimum access/export needed. If the founder selects the free path, proceed and record the limitation.
@@ -69,18 +99,27 @@ If credits, a trial, subscription, or other spend is involved, separate that int
 
 Create `strategy/TOOL_DECISIONS.md` when more than one paid or account-gated tool affects the launch.
 
-Include:
+The `## Workflow intake` section must record the start-of-workflow choice before paid-tool routing can succeed:
+
+- `Selected route: recommended-set`, `pick-next`, `defer-optional`, or an explicit `no optional tools` row
+- required tools that stay in force (ASC and the live portfolio when that graph applies)
+- optional tools connected in this turn
+- optional tools on labeled fallback, each with limitation text
+
+Per-tool rows still include:
 
 - tool
 - lane
 - ideal paid workflow
 - access status
 - founder confirmation
-- selected route: paid, export, free fallback, blocked, deferred
+- selected route: paid, export, fallback, blocked, deferred
 - fallback limitation
 - license or rights status when a fallback uses Remotion, open-source media, public-domain assets, or founder-owned content
 - downstream artifacts affected
 - date checked
+
+Research-intelligence defer (AppKittie, XPOZ, Firecrawl, paid ASO) records `selected route: fallback` with confidence, the limitation, and what the paid tool would have improved. The evidence lane continues. Spend-gated defer (Higgsfield, MobAI upgrades, and similar) records `selected route: deferred` and authorizes no generate path.
 
 Small launches can add a "Tool decisions" section to `strategy/RESEARCH.md`, `engineering/ENGINEERING_PLAN.md`, `store/STORE_CONSOLE.md`, `SCREENSHOTS.md`, `growth/FASTLANE_OPS.md`, or `engineering/PRODUCTION_READINESS.md`.
 
@@ -97,7 +136,7 @@ Always ask before:
 - publishing, submitting, scheduling, or posting
 - entering credentials, API keys, or account sessions not already available
 
-If the founder approves a fallback, do not keep re-asking for the same lane unless the fallback limitations change.
+If the founder approves a fallback, do not keep re-asking for the same lane unless the fallback limitations change. Tools already named at workflow intake do not get a second confirmation. Keep at most one `activeFounderGate`.
 
 ## Per-Tool Question Inputs
 
@@ -128,3 +167,6 @@ Higgsfield credit use is a separate protected spend gate. Call `mcp__claude_ai_H
 - Treating Remotion as universally free for commercial work without checking the current Remotion license and recording eligibility or founder approval.
 - Creating a store-console or ASO packet from public pages alone when App Store Connect or Google Play Console access was available but not requested.
 - Presenting fallback outputs without a confidence label, limitation note, and strategy/TOOL_DECISIONS.md entry — every fallback decision must be recorded even when small.
+- Opening a second sequential tool gate after intake, or asking again for a tool the founder already named.
+- Treating "defer optional" as parking a research-intelligence lane. AppKittie, XPOZ, Firecrawl, and paid ASO continue with labeled fallback.
+- Treating Higgsfield or MobAI-upgrade defer as authorization to generate on a labeled-fallback path. Defer there means no spend.

@@ -140,8 +140,21 @@ _Before using or replacing any paid/account-gated tool, or before a free fallbac
 - **Reads:** `state/business-state.json`
 - **Consults:** `strategy/TOOL_DECISIONS.md`
 - **Produces:** `strategy/TOOL_DECISIONS.md`
-- **Gates:** —
+- **Gates:** `check:paid-tool-intake-required`
 - **Knowledge:** [Paid Tool Routing](../../knowledge/operations/paid-tool-routing.md)
+
+### Live App Store portfolio observe
+
+_Before research-backed-spec on a complete-business or full-launch start; whenever Apple team or API auth changes_
+
+- **Role:** Operator readiness
+- **Phases:** 0
+- **Providers:** —
+- **Reads:** `operations/business-access.json`
+- **Consults:** `operations/BUSINESS_ACCESS.md`
+- **Produces:** `run/app-store-portfolio.json`
+- **Gates:** `check:app-store-portfolio-required`
+- **Knowledge:** [Artifact Contracts](../../knowledge/process/artifact-contracts.md), [App Store Connect CLI](../../knowledge/store/app-store-connect-cli.md)
 
 ### Secrets baseline & routing
 

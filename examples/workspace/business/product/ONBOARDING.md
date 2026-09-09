@@ -90,9 +90,11 @@ Refresh the complete relevant RevenueCat and billing surface, including SDKs, pr
 
 Resolve applicability from studio/seed/business.json `interaction`, implemented scroll-linked hooks on an active landing, and `growth/landing/surface-contract.json` when present. Empty inventory means 60fps is not selected. A listed surface without `interaction` stays unresolved. Use the 60fps MCP with `search_shots`, `get_shot`, `get_motion_breakdown`, and `get_related_shots` only when bespoke-motion or scroll-linked is selected and that MCP is recorded ready; a fallback is not equivalent. Translate principles into original product behavior and the target framework.
 
-| ID        | Target and problem | Reference          | Adopted principle | Implementation, haptic, and interruption | Reduced motion |
-| --------- | ------------------ | ------------------ | ----------------- | ---------------------------------------- | -------------- |
-| `MOT-001` | Record             | Record the shot ID | Record            | Record                                   | Record         |
+Do not add a Motion Research row or invent a shot ID until a surface selects bespoke-motion or scroll-linked.
+
+| ID  | Target and problem                                              | Reference              | Adopted principle | Implementation, haptic, and interruption | Reduced motion |
+| --- | --------------------------------------------------------------- | ---------------------- | ----------------- | ---------------------------------------- | -------------- |
+| —   | Leave empty until scroll-linked or bespoke-motion is selected   | Do not invent a shot ID | —                 | —                                        | —              |
 
 ## Evidence Decision And Complaint Traceability
 

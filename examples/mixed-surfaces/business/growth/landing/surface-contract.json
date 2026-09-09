@@ -1,0 +1,69 @@
+{
+  "contract_version": "1.1",
+  "example_notice": "Synthetic fixture. Scrollytelling is applicable only because studio lists cinematic as scroll-linked. QA rows stay pending until a real browser run.",
+  "sources": [],
+  "analytics_events": ["landing_viewed", "landing_cta_clicked", "waitlist_submitted"],
+  "locales": [
+    {
+      "locale": "en-US",
+      "evidence": "growth/landing/conversion.html"
+    }
+  ],
+  "pricing": {
+    "applicable": false,
+    "evidence": ""
+  },
+  "onboarding": {
+    "applicable": false,
+    "evidence": ""
+  },
+  "screenshots": [],
+  "scrollytelling": {
+    "applicable": true,
+    "evidence": "growth/landing/cinematic.html",
+    "locales": ["en-US"],
+    "scenes": [
+      {
+        "id": "filed-slip",
+        "narrative_roles": ["situation", "mechanism", "outcome", "proof"],
+        "states": ["unowned", "captured", "filed", "found"],
+        "visual_job": "Show an unowned paper slip becoming a filed receipt the owner can find.",
+        "source_kind": "html",
+        "localizations": [
+          {
+            "locale": "en-US",
+            "beats": [
+              {
+                "state_id": "unowned",
+                "text": "The slip sits in a bag with no date, merchant, or owner.",
+                "copy_key": "cinematic.filed-slip.unowned.en-US"
+              },
+              {
+                "state_id": "captured",
+                "text": "One photograph records the merchant, date, and amount.",
+                "copy_key": "cinematic.filed-slip.captured.en-US"
+              },
+              {
+                "state_id": "filed",
+                "text": "The receipt is stored under that merchant and week.",
+                "copy_key": "cinematic.filed-slip.filed.en-US"
+              },
+              {
+                "state_id": "found",
+                "text": "A later search returns the same receipt, not a look-alike.",
+                "copy_key": "cinematic.filed-slip.found.en-US"
+              }
+            ],
+            "caption": {
+              "text": "A paper slip moves from unowned to captured, filed, and found."
+            },
+            "accessible_description": {
+              "text": "Four states show a paper slip with no owner, a photograph of its fields, a filed record, and a later search result."
+            }
+          }
+        ]
+      }
+    ],
+    "qa": []
+  }
+}

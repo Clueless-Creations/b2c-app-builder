@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Waitlist — Quiet Receipt</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #1b1916;
+        --muted: #5c564d;
+        --paper: #f6f1e8;
+        --rule: #d7cfc2;
+        --accent: #0c7c59;
+      }
+      body {
+        margin: 0 auto;
+        max-width: 40rem;
+        padding: 1.5rem 1.25rem 3rem;
+        font: 1rem/1.55 system-ui, sans-serif;
+        color: var(--ink);
+        background: var(--paper);
+      }
+      h1 {
+        font-size: 1.6rem;
+        line-height: 1.25;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.35rem;
+      }
+      input[type="email"] {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 0.65rem 0.7rem;
+        border: 1px solid var(--rule);
+        border-radius: 0.35rem;
+        font: inherit;
+      }
+      button {
+        margin-top: 0.85rem;
+        padding: 0.65rem 1rem;
+        border: 0;
+        border-radius: 0.35rem;
+        background: var(--accent);
+        color: #fff;
+        font: inherit;
+        font-weight: 600;
+      }
+      nav a + a {
+        margin-left: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <p>Quiet Receipt</p>
+      <nav aria-label="Fixture pages">
+        <a href="./privacy.html">Privacy</a>
+        <a href="./conversion.html">Waitlist</a>
+        <a href="./cinematic.html">How a slip is filed</a>
+      </nav>
+      <h1>Find last month’s receipt without emptying the drawer.</h1>
+      <p>
+        Photograph a paper slip once. Quiet Receipt files the merchant, date,
+        and amount so you can search later.
+      </p>
+    </header>
+    <main>
+      <p class="muted">
+        This waitlist is a fixture. Submitting does not join a real list.
+      </p>
+      <form action="#" method="get">
+        <label for="email">Email for the iOS waitlist</label>
+        <input id="email" name="email" type="email" autocomplete="email" required />
+        <button type="submit">Join the waitlist</button>
+      </form>
+      <p>
+        Read what would be stored on the <a href="./privacy.html">privacy page</a>.
+        This page has no scroll-linked choreography.
+      </p>
+    </main>
+  </body>
+</html>

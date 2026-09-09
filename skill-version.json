@@ -1,11 +1,11 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.15",
+  "version": "0.219.16",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Reopen an accepted ONB-08 packet when a consulted studio surface or a read TOOL_DECISIONS artifact later changes, without un-accepting unrelated outputs.",
-    "Add frozen per-page CRO and motion gates so a conversion landing is scored for conversion evidence and a static legal page is not forced to invent experiments or motion.",
-    "Keep consults out of frontier readiness; do not restore universal scrollytelling or 60fps on static pages."
+    "Prepare the Quiet Receipt mixed-surface fixture and a pending second-context finding artifact so a later reviewer can judge fit and usability.",
+    "Stop offering distilled motion recipes as the disconnected 60fps procedure, and follow editorial-scrollytelling.md only on selected or implemented scroll-linked pages.",
+    "Remove the example ONBOARDING shot-ID placeholder so empty inventory does not invent a 60fps row."
   ]
 }

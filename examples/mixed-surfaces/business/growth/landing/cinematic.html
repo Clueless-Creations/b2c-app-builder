@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>How a slip is filed — Quiet Receipt</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #1b1916;
+        --muted: #5c564d;
+        --paper: #f6f1e8;
+        --rule: #d7cfc2;
+        --scene-p: 1;
+      }
+      body {
+        margin: 0 auto;
+        max-width: 42rem;
+        padding: 1.5rem 1.25rem 3rem;
+        font: 1rem/1.55 system-ui, sans-serif;
+        color: var(--ink);
+        background: var(--paper);
+      }
+      h1,
+      h2 {
+        line-height: 1.25;
+      }
+      h1 {
+        font-size: 1.6rem;
+      }
+      h2 {
+        font-size: 1.1rem;
+      }
+      ol {
+        padding-left: 1.2rem;
+      }
+      .stage {
+        border: 1px solid var(--rule);
+        padding: 1rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      nav a + a {
+        margin-left: 1rem;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        [data-scene-track] {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <p>Quiet Receipt</p>
+      <nav aria-label="Fixture pages">
+        <a href="./privacy.html">Privacy</a>
+        <a href="./conversion.html">Waitlist</a>
+        <a href="./cinematic.html">How a slip is filed</a>
+      </nav>
+      <h1>How a slip is filed</h1>
+      <p>
+        The reading sequence is the complete explanation. Motion only marks
+        which state is under discussion. JavaScript off still shows every
+        state.
+      </p>
+    </header>
+    <main
+      id="filed-slip"
+      data-scene-track
+      data-scene-id="filed-slip"
+      data-scene-step="found"
+      aria-labelledby="filed-slip-heading"
+    >
+      <h2 id="filed-slip-heading">From an unowned slip to a found receipt</h2>
+      <p class="muted" id="filed-slip-description">
+        Four states show a paper slip with no owner, a photograph of its
+        fields, a filed record, and a later search result.
+      </p>
+      <div class="stage" role="img" aria-describedby="filed-slip-description">
+        <p data-scene-step-state="unowned">Unowned: the slip sits in a bag.</p>
+        <p data-scene-step-state="captured">Captured: one photograph records merchant, date, and amount.</p>
+        <p data-scene-step-state="filed">Filed: the receipt lives under that merchant and week.</p>
+        <p data-scene-step-state="found">Found: a later search returns the same receipt.</p>
+      </div>
+      <ol>
+        <li data-scene-step="unowned">
+          <strong>Situation.</strong> The slip sits in a bag with no date,
+          merchant, or owner.
+        </li>
+        <li data-scene-step="captured">
+          <strong>Mechanism.</strong> One photograph records the merchant,
+          date, and amount.
+        </li>
+        <li data-scene-step="filed">
+          <strong>Outcome.</strong> The receipt is stored under that merchant
+          and week.
+        </li>
+        <li data-scene-step="found">
+          <strong>Proof.</strong> A later search returns the same receipt, not
+          a look-alike.
+        </li>
+      </ol>
+      <p>
+        Join the <a href="./conversion.html">waitlist</a> if you want the iOS
+        app. This page is the scroll-linked surface; the privacy page is not.
+      </p>
+    </main>
+  </body>
+</html>

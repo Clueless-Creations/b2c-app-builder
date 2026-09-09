@@ -299,4 +299,65 @@ export function register(harness: Harness): void {
     const issues = validateFrozenPageTechniqueGates(root, "page_gates");
     assert(issues.length === 0, JSON.stringify(issues));
   });
+
+  const mixedFixtureRoot = path.join(skillRoot, "examples/mixed-surfaces/business");
+
+  harness.check("design-surface-applicability: mixed live fixture keeps per-page techniques distinct", () => {
+    const projected = loadDesignSurfaceApplicability(mixedFixtureRoot);
+    const byId = Object.fromEntries(projected.surfaces.map((surface) => [surface.id, surface]));
+    assert(projected.inventory === "present", `inventory ${projected.inventory}`);
+    assert(byId.privacy?.interaction === "static-document", `privacy ${byId.privacy?.interaction}`);
+    assert(byId.privacy?.scrollytelling === "not_required", `privacy scrolly ${byId.privacy?.scrollytelling}`);
+    assert(byId.privacy?.conversionExperiments === "not_required", `privacy conversion ${byId.privacy?.conversionExperiments}`);
+    assert(byId.conversion?.interaction === "conversion", `conversion ${byId.conversion?.interaction}`);
+    assert(byId.conversion?.scrollytelling === "not_required", `conversion scrolly ${byId.conversion?.scrollytelling}`);
+    assert(byId.conversion?.conversionExperiments === "selected", `conversion experiments ${byId.conversion?.conversionExperiments}`);
+    assert(byId.cinematic?.interaction === "scroll-linked", `cinematic ${byId.cinematic?.interaction}`);
+    assert(byId.cinematic?.scrollytelling === "selected", `cinematic scrolly ${byId.cinematic?.scrollytelling}`);
+    assert(projected.scrollytelling === "selected", `rollup scrolly ${projected.scrollytelling}`);
+    assert(projected.conversionExperiments === "selected", `rollup conversion ${projected.conversionExperiments}`);
+    assert(projected.sixtyFpsRegister === "selected", `60fps ${projected.sixtyFpsRegister}`);
+    assert(projected.implementedScrollytelling, "cinematic page must implement scene hooks");
+  });
+
+  harness.check("page-gates: mixed live fixture stays honest", () => {
+    const issues = validateFrozenPageTechniqueGates(mixedFixtureRoot, "page_gates");
+    assert(issues.length === 0, JSON.stringify(issues));
+  });
+
+  harness.check("mixed live fixture leaves the second-context finding artifact pending", () => {
+    const review = readFileSync(path.join(mixedFixtureRoot, "design/reviews/MIXED_SURFACE_INDEPENDENT_REVIEW.md"), "utf8");
+    assert(/\bStatus:\s*\*\*pending\*\*/.test(review), "finding artifact must stay pending");
+    assert(/\bVerdict\n\npending\b/.test(review), "verdict cell must stay pending");
+    assert(!/\bAccept increment\b/.test(review), "producer must not write an accept verdict");
+    assert(!/\b(pass|fail|accepted)\b/i.test(review.split("## Verdict")[1] ?? ""), "producer must not fill a pass or fail");
+    const privacy = readFileSync(path.join(mixedFixtureRoot, "growth/landing/privacy.html"), "utf8");
+    const conversion = readFileSync(path.join(mixedFixtureRoot, "growth/landing/conversion.html"), "utf8");
+    const cinematic = readFileSync(path.join(mixedFixtureRoot, "growth/landing/cinematic.html"), "utf8");
+    assert(!/data-scene-(?:id|track|step)|--scene-p/.test(privacy), "privacy must stay a static document");
+    assert(!/data-scene-(?:id|track|step)|--scene-p/.test(conversion), "conversion must not invent scroll-linked hooks");
+    assert(/data-scene-track/.test(cinematic), "cinematic must implement scroll-linked hooks");
+  });
+
+  harness.check("residual guidance does not restore universal 60fps or scrollytelling procedure", () => {
+    const evidenceStack = readFileSync(path.join(skillRoot, "knowledge/design/design-evidence-stack.md"), "utf8");
+    assert(
+      !/If it is not connected, use the public catalog and the distilled recipes/.test(evidenceStack),
+      "design-evidence-stack must not offer distilled recipes as the disconnected procedure",
+    );
+    assert(/not the disconnected procedure/.test(evidenceStack), "design-evidence-stack must refuse the recipe fallback");
+    const landingProducer = readFileSync(path.join(skillRoot, "catalog/workflows/growth-revenue.ts"), "utf8");
+    const landingNode = landingProducer.split('id: "workflow.growth.pre-launch-funnel-landing-waitlist"')[1] ?? "";
+    assert(
+      /When that selected or implemented scroll-linked surface is in scope, follow editorial-scrollytelling\.md/.test(landingNode),
+      "landing producer must gate editorial-scrollytelling.md on selected or implemented scroll-linked",
+    );
+    assert(
+      /Do not follow editorial-scrollytelling\.md on static-document or conversion pages/.test(landingNode),
+      "landing producer must refuse editorial-scrollytelling.md on static and conversion pages",
+    );
+    const onboarding = readFileSync(path.join(skillRoot, "examples/workspace/business/product/ONBOARDING.md"), "utf8");
+    assert(!/Record the shot ID/.test(onboarding), "example ONBOARDING must not restore a shot-ID placeholder row");
+    assert(/Do not invent a shot ID/.test(onboarding), "example ONBOARDING must refuse invented shot IDs");
+  });
 }

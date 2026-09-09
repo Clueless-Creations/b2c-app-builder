@@ -45,6 +45,25 @@ export const EXPO_PACKAGE_MANAGER = "npm";
 export const METRO_NATIVE_ENTRY = "src/index.ts";
 export const METRO_WEB_ENTRY = "src/index.web.ts";
 export const WEB_MAIN_FIELDS = ["browser", "module", "main"] as const;
+export const NATIVE_MAIN_FIELDS = ["react-native", "main"] as const;
+
+export interface MetroPackageEntries {
+  main?: string;
+  browser?: string;
+  reactNative?: string;
+}
+
+export function resolveMetroPackageEntry(
+  platform: "ios" | "android" | "web",
+  entries: MetroPackageEntries,
+): { field: "browser" | "react-native" | "main"; path: string } | undefined {
+  if (platform === "web") {
+    if (entries.browser) return { field: "browser", path: entries.browser };
+    return entries.main ? { field: "main", path: entries.main } : undefined;
+  }
+  if (entries.reactNative) return { field: "react-native", path: entries.reactNative };
+  return entries.main ? { field: "main", path: entries.main } : undefined;
+}
 
 export type CustomModuleLayoutStatus = "boundary-ready" | "incomplete" | "web-false-parity";
 export type CustomModuleAction = "boundary-ready" | "unsupported-on-web" | "rebuild-required" | "refuse";
@@ -72,6 +91,7 @@ export interface CustomModuleLayoutReport {
   configOmitsWeb: boolean;
   metroWebEntry: string | undefined;
   metroNativeEntry: string | undefined;
+  metroReactNativeEntry: string | undefined;
   requireNativeModulePresent: boolean;
   lifecyclePresent: boolean;
   eventsPresent: boolean;
@@ -141,7 +161,7 @@ function webPathIsUnsupported(webText: string | undefined, capabilityText: strin
   );
 }
 
-function modulePackageEntries(packageJsonText: string | undefined): { main?: string; browser?: string; reactNative?: string } {
+function modulePackageEntries(packageJsonText: string | undefined): MetroPackageEntries {
   if (!packageJsonText) return {};
   try {
     const parsed: unknown = JSON.parse(packageJsonText);
@@ -195,11 +215,12 @@ export function inspectExpoCustomModule(target: string): CustomModuleLayoutRepor
   const requireNativeModulePresent = Boolean(
     nativeEntryText?.includes("requireNativeModule") && nativeEntryText.includes(EXPO_CUSTOM_MODULE_NAME),
   );
-  const metroSelectsWeb = entries.browser === METRO_WEB_ENTRY && entries.main === METRO_NATIVE_ENTRY;
+  const metroSelectsNative = entries.main === METRO_NATIVE_ENTRY && entries.reactNative === METRO_NATIVE_ENTRY;
+  const metroSelectsWeb = entries.browser === METRO_WEB_ENTRY && metroSelectsNative;
   const webUnsupported = webPathIsUnsupported(webText, capabilityText) && metroSelectsWeb;
   const omitsWeb = configOmitsWeb(configText);
   let status: CustomModuleLayoutStatus = "boundary-ready";
-  if (!webUnsupported || !omitsWeb || !metroSelectsWeb) status = "web-false-parity";
+  if (!webUnsupported || !omitsWeb || !metroSelectsWeb || !metroSelectsNative) status = "web-false-parity";
   else if (missingFiles.length > 0 || !iosSourcePresent || !androidSourcePresent || !requireNativeModulePresent) status = "incomplete";
   return {
     filesPresent,
@@ -211,6 +232,7 @@ export function inspectExpoCustomModule(target: string): CustomModuleLayoutRepor
     configOmitsWeb: omitsWeb,
     metroWebEntry: entries.browser,
     metroNativeEntry: entries.main,
+    metroReactNativeEntry: entries.reactNative,
     requireNativeModulePresent,
     lifecyclePresent: sourceDeclaresLifecycleAndEvents(iosText) && sourceDeclaresLifecycleAndEvents(androidText),
     eventsPresent: Boolean(iosText?.includes("Events") && androidText?.includes("Events")),
@@ -222,6 +244,7 @@ export function inspectExpoCustomModule(target: string): CustomModuleLayoutRepor
 }
 
 export interface PackagedExpoStarterReport {
+  kind: "pack-file-list";
   packageManager: typeof EXPO_PACKAGE_MANAGER;
   lockfileInFixture: boolean;
   packed: readonly string[];
@@ -243,6 +266,7 @@ export function inspectPackagedExpoStarter(skillRoot: string): PackagedExpoStart
     }
   }
   return {
+    kind: "pack-file-list",
     packageManager: EXPO_PACKAGE_MANAGER,
     lockfileInFixture,
     packed,

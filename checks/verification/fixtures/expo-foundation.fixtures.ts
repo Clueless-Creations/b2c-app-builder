@@ -19,13 +19,16 @@ import {
   writeNativeGenerationFingerprint,
 } from "../../../catalog/stacks/expo-native-ownership.js";
 import {
+  EXPO_CUSTOM_MODULE_DIR,
   EXPO_CUSTOM_MODULE_FILES,
   EXPO_PACKAGE_MANAGER,
   METRO_NATIVE_ENTRY,
   METRO_WEB_ENTRY,
   decideExpoCustomModule,
+  inspectExpoCustomModule,
   inspectPackagedExpoStarter,
   isolatedStarterCustomModule,
+  resolveMetroPackageEntry,
 } from "../../../catalog/stacks/expo-custom-module.js";
 import {
   EXPO_ROUTER_ROUTE_FILES,
@@ -214,6 +217,25 @@ export function register(harness: Harness): void {
     assert(layout.webUnsupported && layout.configOmitsWeb, "web must be omitted and explicitly unsupported");
     assert(layout.metroWebEntry === METRO_WEB_ENTRY, "Metro web must select browser → index.web.ts, not main");
     assert(layout.metroNativeEntry === METRO_NATIVE_ENTRY, "native main must stay src/index.ts");
+    assert(layout.metroReactNativeEntry === METRO_NATIVE_ENTRY, "react-native field must stay src/index.ts, not the web file");
+    const iosEntry = resolveMetroPackageEntry("ios", {
+      main: layout.metroNativeEntry,
+      browser: layout.metroWebEntry,
+      reactNative: layout.metroReactNativeEntry,
+    });
+    const webResolved = resolveMetroPackageEntry("web", {
+      main: layout.metroNativeEntry,
+      browser: layout.metroWebEntry,
+      reactNative: layout.metroReactNativeEntry,
+    });
+    const androidEntry = resolveMetroPackageEntry("android", {
+      main: layout.metroNativeEntry,
+      browser: layout.metroWebEntry,
+      reactNative: layout.metroReactNativeEntry,
+    });
+    assert(iosEntry?.field === "react-native" && iosEntry.path === METRO_NATIVE_ENTRY, "iOS must resolve react-native → src/index.ts");
+    assert(androidEntry?.field === "react-native" && androidEntry.path === METRO_NATIVE_ENTRY, "Android must resolve react-native → src/index.ts");
+    assert(webResolved?.field === "browser" && webResolved.path === METRO_WEB_ENTRY, "web must resolve browser → src/index.web.ts");
     assert(layout.requireNativeModulePresent, "native entry must call requireNativeModule");
     assert(layout.lifecyclePresent && layout.eventsPresent, "native sources must declare lifecycle and error events");
     assert(layout.fabricatedModulesCorePin === false, "must not invent expo-modules-core latest");
@@ -288,9 +310,31 @@ export function register(harness: Harness): void {
     assert(nativeEntry.includes('from "expo"') && nativeEntry.includes("requireNativeModule"), "native entry must use requireNativeModule from expo");
     assert(!nativeEntry.includes("unsupported-on-web"), "native main must not be the web unsupported path");
     const packed = inspectPackagedExpoStarter(skillRoot);
+    assert(packed.kind === "pack-file-list", "npm pack --dry-run is a builder file-list check, not a packaged-consumer install");
     assert(packed.packageManager === EXPO_PACKAGE_MANAGER, "one package-manager path is npm");
     assert(packed.lockfileInFixture === false, "must not fabricate a starter lockfile");
     assert(packed.missing.length === 0, `builder npm pack must include the module sources, missing ${packed.missing.join(", ")}`);
+    const diverted = harness.makeTempDir("expo-custom-module-rn-field");
+    materializeExpoStarterFixture({
+      target: diverted,
+      skillRoot,
+      compositionTarget: iosExpo(),
+      platforms: ["ios"],
+      authorized: true,
+    });
+    const modulePkgPath = path.join(diverted, EXPO_CUSTOM_MODULE_DIR, "package.json");
+    const modulePkg = JSON.parse(readFileSync(modulePkgPath, "utf8")) as { main: string; browser: string; "react-native"?: string };
+    modulePkg["react-native"] = METRO_WEB_ENTRY;
+    writeFileSync(modulePkgPath, `${JSON.stringify(modulePkg, null, 2)}\n`);
+    const divertedLayout = inspectExpoCustomModule(diverted);
+    assert(divertedLayout.status === "web-false-parity", "pointing react-native at the web entry is false parity");
+    assert(divertedLayout.metroReactNativeEntry === METRO_WEB_ENTRY, "inspect must read the diverted react-native field");
+    const divertedDecision = decideExpoCustomModule({
+      target: diverted,
+      skillRoot,
+      compositionTarget: iosExpo(),
+    });
+    assert(divertedDecision.action === "refuse" && divertedDecision.code === "web-false-parity", divertedDecision.reason);
   });
 
   harness.check("expo foundation: empty authorized target scaffolds only the selected platform and preserves product.yaml", () => {

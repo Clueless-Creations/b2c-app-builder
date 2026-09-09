@@ -13,6 +13,13 @@ planner and responsive web experience with shared original illustrations.
 The gallery includes real browser and simulator captures. Each example keeps
 its product scope and verification limits beside its source.
 
+## Mixed-surface fixture
+
+[Quiet Receipt](mixed-surfaces/README.md) is a small synthetic fixture with a
+plain privacy page, a non-scrollytelling conversion page, and a deliberately
+animated surface. It prepares a later independent review of fit and usability.
+It is not a launched business.
+
 ## Workspace reference
 
 [Workspace artifacts](workspace/) illustrate the business documents and

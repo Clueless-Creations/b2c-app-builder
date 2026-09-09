@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "1.0.0",
+  "updatedAt": "2026-09-09",
+  "business": {
+    "name": "Quiet Receipt",
+    "slug": "quiet-receipt",
+    "stage": "design",
+    "positioning": "Photograph a paper receipt once and find the filed copy later.",
+    "targetAudience": "People who keep paper slips and later need the date, merchant, and amount."
+  },
+  "theme": {
+    "status": "draft"
+  },
+  "designRoom": {
+    "status": "rendered",
+    "contractPath": "DESIGN.md",
+    "renderPath": "design/design-room.html"
+  },
+  "surfaces": {
+    "webFunnels": [],
+    "landingPages": [
+      {
+        "id": "privacy",
+        "name": "Privacy",
+        "status": "ready",
+        "purpose": "Disclose what Quiet Receipt stores and how a person deletes it.",
+        "interaction": "static-document",
+        "decisions": [],
+        "tokenReferences": []
+      },
+      {
+        "id": "conversion",
+        "name": "Waitlist",
+        "status": "ready",
+        "purpose": "Collect one waitlist email for the iOS app.",
+        "interaction": "conversion",
+        "decisions": [],
+        "tokenReferences": []
+      },
+      {
+        "id": "cinematic",
+        "name": "How a slip is filed",
+        "status": "ready",
+        "purpose": "Show how an unowned paper slip becomes a filed receipt.",
+        "interaction": "scroll-linked",
+        "decisions": [],
+        "tokenReferences": []
+      }
+    ],
+    "marketingAssets": [],
+    "mobileApp": {
+      "stack": "unselected",
+      "platforms": ["ios"],
+      "screens": [],
+      "flows": []
+    },
+    "appStore": {
+      "defaultProductPage": {
+        "status": "not_started",
+        "positioning": "",
+        "screenshotCount": 0,
+        "appPreviewCount": 0,
+        "promotionalText": "",
+        "keywords": []
+      },
+      "customProductPages": [],
+      "productPageOptimizationTests": [],
+      "inAppEvents": []
+    }
+  }
+}

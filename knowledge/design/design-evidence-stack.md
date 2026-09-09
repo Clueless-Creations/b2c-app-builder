@@ -58,7 +58,7 @@ This method is adapted in part from Appllama's MIT-licensed research skill. It i
 
 When the Appllama MCP is connected and authorized for the acting member, load the upstream `appllama-usage` skill rather than duplicating its tool map here. The B2C workflow owns the research question, scope, adoption decision, and evidence contract. Appllama owns its provider-specific search syntax, pagination, credits, media behavior, and catalog semantics. If it is unavailable, choose a declared compatible source lane; do not imply Appllama was inspected.
 
-When the 60fps MCP is connected, use `60fps_search_shots`, `60fps_get_shot`, `60fps_get_motion_breakdown`, and `60fps_get_related_shots`. If it is not connected, use the public catalog and the distilled recipes in `motion-craft-benchmarks.md`. A distilled recipe is not equivalent to a selected 60fps register: when bespoke-motion or scroll-linked is selected and the MCP is unavailable, hold rather than claiming the fallback is the same proof.
+When the 60fps MCP is connected, use `60fps_search_shots`, `60fps_get_shot`, `60fps_get_motion_breakdown`, and `60fps_get_related_shots`. When bespoke-motion or scroll-linked is selected and that MCP is not connected, hold. Distilled recipes in `motion-craft-benchmarks.md` are not the disconnected procedure for a selected 60fps register and are not equivalent proof.
 
 ## Task Routing
 

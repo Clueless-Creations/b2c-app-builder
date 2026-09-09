@@ -4,7 +4,7 @@
  * collector. Does not impersonate the REST probe or native purchase proof.
  */
 
-import { CLI_PROOF_COLLECTOR, getRevenueCatCliOperation, type RevenueCatChartName } from "./cli-operations.js";
+import { CLI_PROOF_COLLECTOR, getRevenueCatCliOperation, isMutationEffect, type RevenueCatChartName } from "./cli-operations.js";
 import {
   extractEntitlementIds,
   extractResourceIds,
@@ -17,6 +17,8 @@ import {
 import type { RevenueCatCliDiscovery } from "./cli-discovery.js";
 import type { RevenueCatCliHoldCode, RevenueCatCliPreflight, RevenueCatCliTarget } from "./cli-preflight.js";
 import type { CliProcessRunner } from "./cli-process.js";
+import type { CliEffectProgress, CliNextAction, RevenueCatCliLedger } from "./cli-ledger.js";
+import { revenueCatCliLedgerPath } from "./cli-ledger.js";
 
 export const CATALOG_INTENTS = [
   "inspect-project-app",
@@ -76,6 +78,10 @@ export interface CatalogSessionRequest {
     readonly lookupKey: string;
     readonly displayName: string;
   };
+  readonly idempotencyKey?: string;
+  readonly ledger?: RevenueCatCliLedger;
+  readonly ledgerPath?: string;
+  readonly persistLedger?: () => void;
 }
 
 export interface RevenueCatCliCatalogEvidence {
@@ -136,6 +142,8 @@ export interface CatalogSessionResult {
   readonly invoked: readonly RevenueCatCliRunResult[];
   readonly evidence: RevenueCatCliCatalogEvidence;
   readonly replaySafe: boolean;
+  readonly nextAction?: CliNextAction;
+  readonly effectProgress?: CliEffectProgress;
 }
 
 export function assessStorePlanApplyAuthorization(
@@ -245,6 +253,10 @@ function runStep(
     run: request.run,
     target: request.target,
     discovery: request.discovery,
+    idempotencyKey: request.idempotencyKey,
+    ledger: request.ledger,
+    ledgerPath: request.ledgerPath,
+    persistLedger: request.persistLedger,
     ...extra,
   });
 }
@@ -256,13 +268,23 @@ function worstPagination(states: readonly ("complete" | "partial" | "unknown")[]
   return "unknown";
 }
 
+function mutationTouched(invoked: readonly RevenueCatCliRunResult[], hold?: RevenueCatCliPreflight): boolean {
+  if (hold?.code === "request-identity-conflict" || hold?.code === "mutation-uncertain") return true;
+  return invoked.some(
+    (step) => isMutationEffect(step.operation.effectClass) && (step.invoked || step.resumed === true || step.uncertainMutation),
+  );
+}
+
 function refused(request: CatalogSessionRequest, hold: RevenueCatCliPreflight, invoked: readonly RevenueCatCliRunResult[] = []): CatalogSessionResult {
+  const replaySafe = !mutationTouched(invoked, hold);
   return {
     disposition: "refused",
     hold,
     invoked,
     evidence: emptyEvidence(request),
-    replaySafe: true,
+    replaySafe,
+    nextAction: replaySafe ? "none" : "hold-uncertain",
+    effectProgress: replaySafe ? "no-effect" : "dispatched-unconfirmed",
   };
 }
 
@@ -329,6 +351,26 @@ function inspectProjectApp(request: CatalogSessionRequest): CatalogSessionResult
   return { disposition: "complete", invoked, evidence: next, replaySafe: true };
 }
 
+function priorAppliedWrite(request: CatalogSessionRequest): { readonly remoteId?: string; readonly state: "applied-unverified" | "verified" } | undefined {
+  if (!request.ledger || !request.idempotencyKey) return undefined;
+  const entry = request.ledger.get(request.idempotencyKey);
+  if (!entry) return undefined;
+  if (entry.state === "applied-unverified" || entry.state === "verified") {
+    return { remoteId: entry.remoteId, state: entry.state };
+  }
+  return undefined;
+}
+
+function preservedCreateEvidence(request: CatalogSessionRequest, remoteId: string | undefined): RevenueCatCliCatalogEvidence {
+  const evidence = emptyEvidence(request);
+  const offeringIds = remoteId && !evidence.catalog.offering_ids.includes(remoteId) ? [...evidence.catalog.offering_ids, remoteId] : evidence.catalog.offering_ids;
+  return {
+    ...evidence,
+    catalog: { ...evidence.catalog, offering_ids: offeringIds, created: true },
+    created: true,
+  };
+}
+
 function reconcileCatalog(request: CatalogSessionRequest): CatalogSessionResult {
   const products = runStep(request, "rc.products.list");
   const entitlements = runStep(request, "rc.entitlements.list");
@@ -337,7 +379,20 @@ function reconcileCatalog(request: CatalogSessionRequest): CatalogSessionResult 
   for (const step of invoked) {
     if (!step.invoked) return refused(request, step.preflight, invoked);
     if (step.uncertainMutation) return { disposition: "uncertain", invoked, evidence: emptyEvidence(request), replaySafe: false };
-    if (!step.json?.ok) return { disposition: "incomplete", invoked, evidence: emptyEvidence(request), replaySafe: true };
+    if (!step.json?.ok) {
+      const prior = priorAppliedWrite(request);
+      if (prior) {
+        return {
+          disposition: "incomplete",
+          invoked,
+          evidence: preservedCreateEvidence(request, prior.remoteId),
+          replaySafe: false,
+          nextAction: "observe",
+          effectProgress: prior.state,
+        };
+      }
+      return { disposition: "incomplete", invoked, evidence: emptyEvidence(request), replaySafe: true };
+    }
   }
   const productIds = extractResourceIds(products.json && products.json.ok ? products.json.data : undefined);
   const entitlementIds = extractResourceIds(entitlements.json && entitlements.json.ok ? entitlements.json.data : undefined);
@@ -347,7 +402,20 @@ function reconcileCatalog(request: CatalogSessionRequest): CatalogSessionResult 
     const packages = runStep(request, "rc.offerings.packages", { offeringId: request.expected.offeringId });
     invoked.push(packages);
     if (!packages.invoked) return refused(request, packages.preflight, invoked);
-    if (!packages.json?.ok) return { disposition: "incomplete", invoked, evidence: emptyEvidence(request), replaySafe: true };
+    if (!packages.json?.ok) {
+      const prior = priorAppliedWrite(request);
+      if (prior) {
+        return {
+          disposition: "incomplete",
+          invoked,
+          evidence: preservedCreateEvidence(request, prior.remoteId),
+          replaySafe: false,
+          nextAction: "observe",
+          effectProgress: prior.state,
+        };
+      }
+      return { disposition: "incomplete", invoked, evidence: emptyEvidence(request), replaySafe: true };
+    }
     packageIds = extractResourceIds(packages.json.data);
   }
   const pagination = worstPagination([productIds.pagination, entitlementIds.pagination, offeringIds.pagination, request.expected.offeringId ? packageIds.pagination : "complete"]);
@@ -395,18 +463,37 @@ function reconcileCatalog(request: CatalogSessionRequest): CatalogSessionResult 
     displayName: request.offeringCreate?.displayName,
   });
   invoked.push(create);
-  if (!create.invoked) return refused(request, create.preflight, invoked);
+  if (!create.invoked && create.resumed !== true) return refused(request, create.preflight, invoked);
   if (create.uncertainMutation) {
     return {
       disposition: "uncertain",
       invoked,
       evidence: { ...evidence, catalog: { ...catalog, created: true }, created: true, pagination },
       replaySafe: false,
+      nextAction: "hold-uncertain",
+      effectProgress: "dispatched-unconfirmed",
     };
   }
   if (!create.json?.ok) {
-    return { disposition: "incomplete", invoked, evidence: { ...evidence, catalog, pagination }, replaySafe: true };
+    return {
+      disposition: "uncertain",
+      invoked,
+      evidence: { ...evidence, catalog, pagination },
+      replaySafe: false,
+      nextAction: "hold-uncertain",
+      effectProgress: "dispatched-unconfirmed",
+    };
   }
+  const createdId =
+    create.remoteId ??
+    (create.json.data && typeof create.json.data === "object" && typeof (create.json.data as { id?: unknown }).id === "string"
+      ? (create.json.data as { id: string }).id
+      : request.expected.offeringId);
+  const createdCatalog = {
+    ...catalog,
+    created: true,
+    offering_ids: createdId && !catalog.offering_ids.includes(createdId) ? [...catalog.offering_ids, createdId] : catalog.offering_ids,
+  };
   const productsAfter = runStep(request, "rc.products.list");
   const entitlementsAfter = runStep(request, "rc.entitlements.list");
   const offeringsAfter = runStep(request, "rc.offerings.list");
@@ -414,10 +501,24 @@ function reconcileCatalog(request: CatalogSessionRequest): CatalogSessionResult 
   for (const step of [productsAfter, entitlementsAfter, offeringsAfter]) {
     if (!step.invoked) return refused(request, step.preflight, invoked);
     if (step.uncertainMutation) {
-      return { disposition: "uncertain", invoked, evidence: { ...evidence, catalog: { ...catalog, created: true }, created: true, pagination }, replaySafe: false };
+      return {
+        disposition: "uncertain",
+        invoked,
+        evidence: { ...evidence, catalog: createdCatalog, created: true, pagination },
+        replaySafe: false,
+        nextAction: "hold-uncertain",
+        effectProgress: "applied-unverified",
+      };
     }
     if (!step.json?.ok) {
-      return { disposition: "incomplete", invoked, evidence: { ...evidence, catalog: { ...catalog, created: true }, created: true, pagination }, replaySafe: true };
+      return {
+        disposition: "incomplete",
+        invoked,
+        evidence: { ...evidence, catalog: createdCatalog, created: true, pagination },
+        replaySafe: false,
+        nextAction: "observe",
+        effectProgress: "applied-unverified",
+      };
     }
   }
   const productIdsAfter = extractResourceIds(productsAfter.json && productsAfter.json.ok ? productsAfter.json.data : undefined);
@@ -429,7 +530,14 @@ function reconcileCatalog(request: CatalogSessionRequest): CatalogSessionResult 
     invoked.push(packagesAfter);
     if (!packagesAfter.invoked) return refused(request, packagesAfter.preflight, invoked);
     if (!packagesAfter.json?.ok) {
-      return { disposition: "incomplete", invoked, evidence: { ...evidence, catalog: { ...catalog, created: true }, created: true, pagination }, replaySafe: true };
+      return {
+        disposition: "incomplete",
+        invoked,
+        evidence: { ...evidence, catalog: { ...createdCatalog, created: true }, created: true, pagination },
+        replaySafe: false,
+        nextAction: "observe",
+        effectProgress: "applied-unverified",
+      };
     }
     packageIdsAfter = extractResourceIds(packagesAfter.json.data);
   }
@@ -464,7 +572,9 @@ function reconcileCatalog(request: CatalogSessionRequest): CatalogSessionResult 
       created: true,
       pagination: afterPagination,
     },
-    replaySafe: true,
+    replaySafe: false,
+    nextAction: reconciled ? "complete" : "observe",
+    effectProgress: reconciled ? "verified" : "applied-unverified",
   };
 }
 
@@ -547,36 +657,33 @@ function testStorePurchase(request: CatalogSessionRequest): CatalogSessionResult
     productId: request.productId,
     appUserId: request.appUserId,
   });
-  if (!purchase.invoked) return refused(request, purchase.preflight, [purchase]);
+  if (!purchase.invoked && purchase.resumed !== true) return refused(request, purchase.preflight, [purchase]);
   if (purchase.uncertainMutation) {
-    return { disposition: "uncertain", invoked: [purchase], evidence: emptyEvidence(request), replaySafe: false };
+    return {
+      disposition: "uncertain",
+      invoked: [purchase],
+      evidence: emptyEvidence(request),
+      replaySafe: false,
+      nextAction: "hold-uncertain",
+      effectProgress: "dispatched-unconfirmed",
+    };
   }
   if (!purchase.json?.ok) {
-    return { disposition: "incomplete", invoked: [purchase], evidence: emptyEvidence(request), replaySafe: true };
+    return {
+      disposition: "uncertain",
+      invoked: [purchase],
+      evidence: emptyEvidence(request),
+      replaySafe: false,
+      nextAction: "hold-uncertain",
+      effectProgress: "dispatched-unconfirmed",
+    };
   }
   const customerId = request.customerId ?? request.appUserId;
-  const readback = runStep(request, "rc.customers.show", { customerId });
-  const invoked = [purchase, readback];
-  if (!readback.invoked) return refused(request, readback.preflight, invoked);
-  if (!readback.json?.ok) {
-    return { disposition: "incomplete", invoked, evidence: emptyEvidence(request), replaySafe: true };
-  }
-  const entitlementIds = extractEntitlementIds(readback.json.data);
   const observedProductId = observedSimulatePurchaseProductId(purchase.json && purchase.json.ok ? purchase.json.data : undefined);
-  const expectedEntitlements = request.expected.entitlementIds ?? [];
-  const expectedProducts = request.expected.productIds ?? [];
   const requestedProduct = request.productId;
-  const productMatches =
-    typeof requestedProduct === "string" &&
-    requestedProduct.length > 0 &&
-    expectedProducts.includes(requestedProduct) &&
-    (observedProductId === null || observedProductId === requestedProduct);
-  const entitlementsMatch = expectedEntitlements.length > 0 && expectedEntitlements.every((id) => entitlementIds.includes(id));
-  const evidence = emptyEvidence(request);
-  return {
-    disposition: productMatches && entitlementsMatch ? "complete" : "incomplete",
-    invoked,
-    evidence: {
+  const appliedEvidence = (entitlementIds: readonly string[]): RevenueCatCliCatalogEvidence => {
+    const evidence = emptyEvidence(request);
+    return {
       ...evidence,
       test_store: {
         executed: true,
@@ -586,8 +693,50 @@ function testStorePurchase(request: CatalogSessionRequest): CatalogSessionResult
         not_in_app_ui_proof: true,
         not_app_store_or_play_proof: true,
       },
-    },
-    replaySafe: true,
+    };
+  };
+  const readback = runStep(request, "rc.customers.show", { customerId });
+  const invoked = [purchase, readback];
+  if (!readback.invoked) return refused(request, readback.preflight, invoked);
+  if (!readback.json?.ok) {
+    return {
+      disposition: "incomplete",
+      invoked,
+      evidence: appliedEvidence([]),
+      replaySafe: false,
+      nextAction: "observe",
+      effectProgress: "applied-unverified",
+    };
+  }
+  const entitlementIds = extractEntitlementIds(readback.json.data);
+  const expectedEntitlements = request.expected.entitlementIds ?? [];
+  const expectedProducts = request.expected.productIds ?? [];
+  const productMatches =
+    typeof requestedProduct === "string" &&
+    requestedProduct.length > 0 &&
+    expectedProducts.includes(requestedProduct) &&
+    (observedProductId === null || observedProductId === requestedProduct);
+  const entitlementsMatch = expectedEntitlements.length > 0 && expectedEntitlements.every((id) => entitlementIds.includes(id));
+  const complete = productMatches && entitlementsMatch;
+  if (complete && request.ledger && request.idempotencyKey) {
+    const binding = request.ledger.get(request.idempotencyKey)?.binding;
+    if (binding) {
+      request.ledger.record(request.idempotencyKey, binding, {
+        state: "verified",
+        remoteId: purchase.remoteId,
+      });
+      if (request.persistLedger) request.persistLedger();
+      else if (request.ledgerPath) request.ledger.save(request.ledgerPath);
+      else request.ledger.save(revenueCatCliLedgerPath(request.cwd));
+    }
+  }
+  return {
+    disposition: complete ? "complete" : "incomplete",
+    invoked,
+    evidence: appliedEvidence(entitlementIds),
+    replaySafe: false,
+    nextAction: complete ? "complete" : "observe",
+    effectProgress: complete ? "verified" : "applied-unverified",
   };
 }
 

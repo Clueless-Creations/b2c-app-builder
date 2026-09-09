@@ -22,6 +22,7 @@ export type RevenueCatCliHoldCode =
   | "nested-orchestration-refused"
   | "profile-default-refused"
   | "mutation-uncertain"
+  | "request-identity-conflict"
   | "request-project-mismatch"
   | "request-app-mismatch"
   | "unscoped-observation"
@@ -203,4 +204,42 @@ export function isolatedConfigHome(root: string, workspaceKey: string): string {
 
 export function mutationTimeoutIsUncertain(effectClass: CliEffectClass, timedOut: boolean): boolean {
   return timedOut && isMutationEffect(effectClass);
+}
+
+/**
+ * After a mutation process has been dispatched, timeout is not the only unknown.
+ * Cancellation, truncation, a generic runner error, a missing exit status, or
+ * undecodable output leave the remote effect unknown. Pre-spawn refusals stay
+ * no-effect. Only positive evidence (ok JSON after spawn) establishes applied.
+ */
+export function mutationDispatchIsUncertain(
+  effectClass: CliEffectClass,
+  process: {
+    readonly timedOut: boolean;
+    readonly cancelled: boolean;
+    readonly truncated: boolean;
+    readonly status: number | null;
+    readonly error?: string;
+  },
+  jsonOk: boolean,
+): boolean {
+  if (!isMutationEffect(effectClass)) return false;
+  if (process.timedOut || process.cancelled || process.truncated) return true;
+  if (process.error) return true;
+  if (process.status === null) return true;
+  return !jsonOk;
+}
+
+export function classifyMutationFailureKind(process: {
+  readonly timedOut: boolean;
+  readonly cancelled: boolean;
+  readonly truncated: boolean;
+  readonly status: number | null;
+  readonly error?: string;
+}): "timeout" | "cancelled" | "truncated" | "invalid-output" | "error" | undefined {
+  if (process.timedOut) return "timeout";
+  if (process.cancelled) return "cancelled";
+  if (process.truncated) return "truncated";
+  if (process.error || process.status === null) return "error";
+  return "invalid-output";
 }

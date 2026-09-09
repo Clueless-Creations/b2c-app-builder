@@ -11,13 +11,7 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import {
-  EXPO_IS_DEFAULT_STACK,
-  isExpoAppTarget,
-  shippingSatisfiesRequirement,
-  type CompositionTarget,
-  type ShippingPlatform,
-} from "./expo-selection.js";
+import { EXPO_IS_DEFAULT_STACK, isExpoAppTarget, shippingSatisfiesRequirement, type CompositionTarget, type ShippingPlatform } from "./expo-selection.js";
 import {
   BUILDER_PACKAGE_NAME,
   NATIVE_COMPILE_STATUS,
@@ -213,9 +207,7 @@ export function inspectExpoCustomModule(target: string): CustomModuleLayoutRepor
   const entries = modulePackageEntries(modulePkg);
   const iosSourcePresent = Boolean(iosText?.includes(EXPO_CUSTOM_MODULE_NAME));
   const androidSourcePresent = Boolean(androidText?.includes(EXPO_CUSTOM_MODULE_NAME));
-  const requireNativeModulePresent = Boolean(
-    nativeEntryText?.includes("requireNativeModule") && nativeEntryText.includes(EXPO_CUSTOM_MODULE_NAME),
-  );
+  const requireNativeModulePresent = Boolean(nativeEntryText?.includes("requireNativeModule") && nativeEntryText.includes(EXPO_CUSTOM_MODULE_NAME));
   const metroSelectsNative = entries.main === METRO_NATIVE_ENTRY && entries.reactNative === METRO_NATIVE_ENTRY;
   const metroSelectsWeb = entries.browser === METRO_WEB_ENTRY && metroSelectsNative;
   const webUnsupported = webPathIsUnsupported(webText, capabilityText) && metroSelectsWeb;
@@ -300,23 +292,18 @@ function packTarballFilename(stdout: string): string | undefined {
   } catch {
     // npm pack --json may print extra lines; fall through to the last .tgz token
   }
-  const match = stdout.trim().split(/\s+/).find((token) => token.endsWith(".tgz"));
+  const match = stdout
+    .trim()
+    .split(/\s+/)
+    .find((token) => token.endsWith(".tgz"));
   return match;
 }
 
-export function installPackagedExpoConsumer(input: {
-  skillRoot: string;
-  packDir: string;
-  consumerDir: string;
-}): PackagedExpoConsumerInstall {
+export function installPackagedExpoConsumer(input: { skillRoot: string; packDir: string; consumerDir: string }): PackagedExpoConsumerInstall {
   const fixtureRoot = path.join(input.skillRoot, "catalog/stacks/expo-starter-fixture");
   const lockfileInFixture = Boolean(lstatIfPresent(path.join(fixtureRoot, "package-lock.json")));
   const required = requiredConsumerStarterFiles();
-  const failed = (
-    status: "pack-failed" | "install-failed",
-    reason: string,
-    extra: Partial<PackagedExpoConsumerInstall> = {},
-  ): PackagedExpoConsumerInstall => ({
+  const failed = (status: "pack-failed" | "install-failed", reason: string, extra: Partial<PackagedExpoConsumerInstall> = {}): PackagedExpoConsumerInstall => ({
     kind: "packaged-consumer-install",
     packageManager: EXPO_PACKAGE_MANAGER,
     status,

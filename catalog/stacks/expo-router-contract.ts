@@ -18,12 +18,7 @@ import {
   type CompositionTarget,
   type ShippingPlatform,
 } from "./expo-selection.js";
-import {
-  BUILDER_PACKAGE_NAME,
-  STATIC_JSON_BYTE_CAP,
-  isBuilderCheckoutPath,
-  packageJsonHasExactDependency,
-} from "./expo-native-ownership.js";
+import { BUILDER_PACKAGE_NAME, STATIC_JSON_BYTE_CAP, isBuilderCheckoutPath, packageJsonHasExactDependency } from "./expo-native-ownership.js";
 import { EXPO_STARTER_FIXTURE_DIR, MARKETING_OR_BACKEND_DEPENDENCIES } from "./expo-starter.js";
 
 /** Exact pins that satisfy published expo@57.0.17 bundledNativeModules.json. */
@@ -233,9 +228,7 @@ export function inspectExpoRouterLayout(target: string, skillRoot: string): Expo
     const text = readOptionalText(path.join(target, relative));
     return !text || !routeIsThin(text);
   });
-  const texts = [...routeFilesPresent, ...srcFilesPresent]
-    .map((relative) => readOptionalText(path.join(target, relative)) ?? "")
-    .join("\n");
+  const texts = [...routeFilesPresent, ...srcFilesPresent].map((relative) => readOptionalText(path.join(target, relative)) ?? "").join("\n");
   const hardcodedProduct = PRODUCT_HARDCODE_PATTERN.test(texts);
   const jsxRoutes = inspectJsxRoutes(target, routeFilesPresent);
   const pinStatus = inspectExpoRouterPin(readOptionalText(path.join(target, "package.json")));
@@ -322,10 +315,7 @@ export function planExpoRouterDelivery(input: {
     return refuse("data-reexport-routes", "Route files must be Expo Router JSX (Stack/Tabs), not data-object re-exports.");
   }
   if (layout.pinStatus === "unpinned") {
-    return refuse(
-      "unpinned-expo-router",
-      "JSX file layout is present. expo-router stays unpinned until a workspace pin exists. Not runtime-verified.",
-    );
+    return refuse("unpinned-expo-router", "JSX file layout is present. expo-router stays unpinned until a workspace pin exists. Not runtime-verified.");
   }
   return {
     action: "layout-ready",

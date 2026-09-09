@@ -366,10 +366,9 @@ export function installExpoStarterConsumer(input: PlanExpoStarterScaffoldInput):
   const expoLocal = existsSync(path.join(input.target, "node_modules", "expo", "package.json"));
   const localModuleInstalled = existsSync(path.join(input.target, "node_modules", "b2c-native-capability", "package.json"));
   const expoRouterLocal = existsSync(path.join(input.target, "node_modules", "expo-router", "package.json"));
-  const noticesPresent = [
-    path.join("node_modules", "expo", "LICENSE"),
-    path.join("node_modules", "b2c-native-capability", "NOTICE"),
-  ].filter((relative) => existsSync(path.join(input.target, relative)));
+  const noticesPresent = [path.join("node_modules", "expo", "LICENSE"), path.join("node_modules", "b2c-native-capability", "NOTICE")].filter((relative) =>
+    existsSync(path.join(input.target, relative)),
+  );
   return {
     kind: "expo-starter-consumer-install",
     status: "installed",

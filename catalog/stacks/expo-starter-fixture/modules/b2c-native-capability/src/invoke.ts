@@ -1,9 +1,4 @@
-import {
-  missingNativeModuleInBinary,
-  unsupportedOnWeb,
-  type CapabilityHost,
-  type NativeCapabilityResult,
-} from "./capability.js";
+import { missingNativeModuleInBinary, unsupportedOnWeb, type CapabilityHost, type NativeCapabilityResult } from "./capability.js";
 
 export function invokeNativeCapability(host: CapabilityHost, nativeModulePresentInBinary: boolean): NativeCapabilityResult {
   if (host === "web") return unsupportedOnWeb();

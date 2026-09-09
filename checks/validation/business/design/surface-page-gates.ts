@@ -19,10 +19,8 @@ import { asString, isRecord, issue, type Issue } from "../../../../tooling/lib/l
 
 export const CRO_AUDIT_PATHS = ["growth/CRO_AUDIT.md", "CRO_AUDIT.md"] as const;
 const CONVERSION_EVENT_NAMES = ["landing_cta_clicked", "waitlist_submitted"] as const;
-const CONVERSION_GOAL_PATTERN =
-  /\b(waitlist|sign[- ]?up|purchase|cta|convert|conversion goal|primary action|email capture|app store redirect)\b/i;
-const INVENTED_CONVERSION_PATTERN =
-  /\b(conversion experiment|conversion goal|waitlist|primary cta|a\/b test|cro hypothesis|cro test)\b/i;
+const CONVERSION_GOAL_PATTERN = /\b(waitlist|sign[- ]?up|purchase|cta|convert|conversion goal|primary action|email capture|app store redirect)\b/i;
+const INVENTED_CONVERSION_PATTERN = /\b(conversion experiment|conversion goal|waitlist|primary cta|a\/b test|cro hypothesis|cro test)\b/i;
 const WAIVES_CONVERSION_PATTERN = /\b(no conversion job|not a conversion|static document|legal page|no cro)\b/i;
 
 function readOptional(root: string, relativePath: string): string | undefined {
@@ -82,11 +80,7 @@ function publicWebSurfaces(applicability: DesignSurfaceApplicability): SurfaceAp
   return applicability.surfaces.filter((surface) => surface.family === "landing" || surface.family === "web-funnel");
 }
 
-export function surfaceRequiresMotionInteractionEvidence(
-  surfaceId: string,
-  surfaceKind: string,
-  applicability: DesignSurfaceApplicability,
-): boolean {
+export function surfaceRequiresMotionInteractionEvidence(surfaceId: string, surfaceKind: string, applicability: DesignSurfaceApplicability): boolean {
   const row = applicability.surfaces.find((surface) => surface.id === surfaceId);
   if (row?.motionReference === "selected" || row?.scrollytelling === "selected") return true;
   return surfaceKind === "landing" && applicability.implementedScrollytelling;

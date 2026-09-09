@@ -350,7 +350,7 @@ function operationSupport(): ExpoOperationSupport[] {
       evidenceTier: "fixture-tested",
       queuedIssue: 82,
       notes:
-        "Isolated TypeScript starter fixture and empty/dirty target policy are fixture-tested. No lockfile, development client, or packaged install yet. Habit-tracker starter remains Next.js.",
+        "Isolated TypeScript starter fixture and empty/dirty target policy are fixture-tested. A disposable Expo-starter consumer can generate a lockfile with local npm install; the fixture tree still ships none. Not a development client. Habit-tracker starter remains Next.js.",
     },
     {
       id: "router-native-ui",

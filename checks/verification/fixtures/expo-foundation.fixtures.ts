@@ -46,6 +46,7 @@ import {
   BUILDER_AUTHORITY_FILES,
   EXPO_STARTER_FIXTURE_DIR,
   habitTrackerStarterIsNextNotExpo,
+  installExpoStarterConsumer,
   isolatedExpoStarterPaths,
   materializeExpoStarterFixture,
   planExpoStarterScaffold,
@@ -352,6 +353,34 @@ export function register(harness: Harness): void {
     assert(installed.missing.length === 0, `installed builder is missing ${installed.missing.join(", ")}`);
     assert(installed.installedRoot !== undefined && existsSync(installed.installedRoot), "consumer must have node_modules/b2c-app-builder");
     assert(!existsSync(path.join(installed.installedRoot!, "catalog/stacks/expo-starter-fixture/package-lock.json")), "install must not invent a starter lockfile");
+  });
+
+  harness.check("expo foundation: disposable Expo-starter consumer generates a local lockfile", () => {
+    const target = harness.makeTempDir("expo-starter-consumer");
+    const installed = installExpoStarterConsumer({
+      target,
+      skillRoot,
+      compositionTarget: iosExpo(),
+      platforms: ["ios"],
+      authorized: true,
+    });
+    assert(installed.kind === "expo-starter-consumer-install", "the consumer is the Expo starter, not the builder tarball");
+    assert(installed.status === "installed", installed.reason ?? "Expo starter consumer install failed");
+    assert(installed.lockfileGenerated, "local npm install must generate package-lock.json");
+    assert(existsSync(path.join(target, "package-lock.json")), "lockfile must exist on the Expo starter consumer");
+    assert(!existsSync(path.join(EXPO_STARTER_FIXTURE_DIR, "package-lock.json")), "the fixture tree still ships no lockfile");
+    assert(installed.expoLocal, "expo must install into the starter's node_modules");
+    assert(installed.expoInstalledGlobally === false, "must not install Expo globally");
+    assert(installed.localModuleInstalled, "file: b2c-native-capability must install into the starter consumer");
+    assert(installed.noticesPresent.includes(path.join("node_modules", "expo", "LICENSE")), "Expo LICENSE must arrive with the install");
+    assert(installed.noticesPresent.includes(path.join("node_modules", "b2c-native-capability", "NOTICE")), "local module NOTICE must arrive with the install");
+    assert(installed.peerResolution === "npm-default", "reviewed pins must install without --legacy-peer-deps or a global Expo");
+    assert(installed.nativeCompileStatus === NATIVE_COMPILE_STATUS, "starter consumer install is not a native compile");
+    const lock = JSON.parse(readFileSync(path.join(target, "package-lock.json"), "utf8")) as { packages?: Record<string, { version?: string }> };
+    const expoLock = lock.packages?.["node_modules/expo"]?.version;
+    const reactLock = lock.packages?.["node_modules/react"]?.version;
+    assert(typeof expoLock === "string" && expoLock.startsWith("57."), `lockfile expo pin must stay on SDK 57, got ${expoLock}`);
+    assert(reactLock === "19.2.3", `lockfile react must be the RN 0.86.3 peer patch, got ${reactLock}`);
   });
 
   harness.check("expo foundation: empty authorized target scaffolds only the selected platform and preserves product.yaml", () => {

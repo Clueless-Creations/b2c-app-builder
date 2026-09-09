@@ -9,6 +9,7 @@ This tree is a disposable TypeScript Expo app skeleton for issue 82. It is not a
 - `expo-router` is not pinned. The reviewed fact is bundled with SDK 57, not a workspace version. Do not invent one.
 - No Expo UI adapter manifest. SwiftUI remains the only implemented adapter.
 - Loading, error, empty, and retry are state contracts in `src/`, not runtime-verified screens.
-- `modules/b2c-native-capability` is a TypeScript/Swift/Kotlin boundary. Native `main` calls `requireNativeModule`. Web is `browser` → `src/index.web.ts`. Autolinking and native compile are not-run.
+- Fixture `react` is `19.2.3` so `react-native@0.86.3`'s published peer (`^19.2.3`) can install with default npm. The reviewed React fact remains `19.2`, not a new #81 pin.
+- `modules/b2c-native-capability` is a TypeScript/Swift/Kotlin boundary. Native `main` calls `requireNativeModule`. Web is `browser` → `src/index.web.ts`. Autolinking and native compile are not-run. A local `NOTICE` ships with the module; that is not a compiled native proof.
 
-Copy this fixture only into an authorized empty workspace outside the builder checkout.
+Copy this fixture only into an authorized empty workspace outside the builder checkout. A disposable Expo-starter consumer may generate `package-lock.json` with local `npm install`. That lockfile is not shipped in this fixture tree.

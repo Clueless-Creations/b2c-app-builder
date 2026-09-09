@@ -30,6 +30,7 @@ import { EXPO_STARTER_FIXTURE_DIR, MARKETING_OR_BACKEND_DEPENDENCIES } from "./e
 export const EXPO_CUSTOM_MODULE_DIR = "modules/b2c-native-capability";
 export const EXPO_CUSTOM_MODULE_FILES = [
   `${EXPO_CUSTOM_MODULE_DIR}/package.json`,
+  `${EXPO_CUSTOM_MODULE_DIR}/NOTICE`,
   `${EXPO_CUSTOM_MODULE_DIR}/expo-module.config.json`,
   `${EXPO_CUSTOM_MODULE_DIR}/src/index.ts`,
   `${EXPO_CUSTOM_MODULE_DIR}/src/index.web.ts`,

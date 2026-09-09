@@ -8,7 +8,8 @@
  * Consumes `catalog/stacks/expo-selection.ts`. Scaffold writes only into authorized destinations
  * outside the builder checkout.
  */
-import { cpSync, lstatSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { cpSync, existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -23,6 +24,7 @@ import {
   BUILDER_PACKAGE_NAME,
   DYNAMIC_CONFIG_BASENAMES,
   STATIC_APP_CONFIG_BASENAME,
+  NATIVE_COMPILE_STATUS,
   STATIC_JSON_BYTE_CAP,
   isBuilderCheckoutPath,
   packageJsonHasExactDependency,
@@ -320,6 +322,62 @@ export function materializeExpoStarterFixture(input: PlanExpoStarterScaffoldInpu
     }
   }
   return plan;
+}
+
+export interface ExpoStarterConsumerInstall {
+  kind: "expo-starter-consumer-install";
+  status: "installed" | "scaffold-refused" | "install-failed";
+  lockfileGenerated: boolean;
+  expoLocal: boolean;
+  expoInstalledGlobally: false;
+  localModuleInstalled: boolean;
+  noticesPresent: readonly string[];
+  peerResolution: "npm-default";
+  nativeCompileStatus: typeof NATIVE_COMPILE_STATUS;
+  reason?: string;
+}
+
+export function installExpoStarterConsumer(input: PlanExpoStarterScaffoldInput): ExpoStarterConsumerInstall {
+  const plan = materializeExpoStarterFixture(input);
+  const failed = (status: "scaffold-refused" | "install-failed", reason: string): ExpoStarterConsumerInstall => ({
+    kind: "expo-starter-consumer-install",
+    status,
+    lockfileGenerated: false,
+    expoLocal: false,
+    expoInstalledGlobally: false,
+    localModuleInstalled: false,
+    noticesPresent: [],
+    peerResolution: "npm-default",
+    nativeCompileStatus: NATIVE_COMPILE_STATUS,
+    reason,
+  });
+  if (plan.action !== "scaffold") return failed("scaffold-refused", plan.reason);
+  const install = spawnSync("npm", ["install", "--ignore-scripts", "--no-audit", "--no-fund"], {
+    cwd: input.target,
+    encoding: "utf8",
+    timeout: 300_000,
+  });
+  if (install.status !== 0) {
+    return failed("install-failed", (install.stderr || install.stdout || "npm install failed").trim().slice(-400));
+  }
+  const lockfileGenerated = existsSync(path.join(input.target, "package-lock.json"));
+  const expoLocal = existsSync(path.join(input.target, "node_modules", "expo", "package.json"));
+  const localModuleInstalled = existsSync(path.join(input.target, "node_modules", "b2c-native-capability", "package.json"));
+  const noticesPresent = [
+    path.join("node_modules", "expo", "LICENSE"),
+    path.join("node_modules", "b2c-native-capability", "NOTICE"),
+  ].filter((relative) => existsSync(path.join(input.target, relative)));
+  return {
+    kind: "expo-starter-consumer-install",
+    status: "installed",
+    lockfileGenerated,
+    expoLocal,
+    expoInstalledGlobally: false,
+    localModuleInstalled,
+    noticesPresent,
+    peerResolution: "npm-default",
+    nativeCompileStatus: NATIVE_COMPILE_STATUS,
+  };
 }
 
 export function assertExpoIsNotDefault(): void {

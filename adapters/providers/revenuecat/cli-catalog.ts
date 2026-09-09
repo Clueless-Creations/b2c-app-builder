@@ -98,9 +98,13 @@ export interface RevenueCatCliCatalogEvidence {
     readonly missing_ids: readonly string[];
     readonly created: boolean;
   };
-  readonly offering_verify?: { readonly complete: boolean; readonly issues: unknown };
+  readonly offering_verify?: { readonly complete: boolean; readonly protocol_valid?: boolean; readonly issues: unknown };
   readonly preview?: {
     readonly offering_id: string | null;
+    readonly offering_lookup_key?: string | null;
+    readonly offering_remote_id?: string | null;
+    readonly mapping?: "resolved" | "unresolved" | "ambiguous" | "mismatch" | "not-applicable";
+    readonly protocol_valid?: boolean;
     readonly fallback_only: boolean;
     readonly published_paywall: boolean;
     readonly wrong_app: boolean;
@@ -338,7 +342,7 @@ function reconcileCatalog(request: CatalogSessionRequest): CatalogSessionResult 
   const productIds = extractResourceIds(products.json && products.json.ok ? products.json.data : undefined);
   const entitlementIds = extractResourceIds(entitlements.json && entitlements.json.ok ? entitlements.json.data : undefined);
   const offeringIds = extractResourceIds(offerings.json && offerings.json.ok ? offerings.json.data : undefined);
-  let packageIds: ReturnType<typeof extractResourceIds> = { ids: [], pagination: "unknown" };
+  let packageIds: ReturnType<typeof extractResourceIds> = { ids: [], lookupKeys: [], pagination: "unknown", itemsPresent: false };
   if (request.expected.offeringId) {
     const packages = runStep(request, "rc.offerings.packages", { offeringId: request.expected.offeringId });
     invoked.push(packages);
@@ -419,7 +423,7 @@ function reconcileCatalog(request: CatalogSessionRequest): CatalogSessionResult 
   const productIdsAfter = extractResourceIds(productsAfter.json && productsAfter.json.ok ? productsAfter.json.data : undefined);
   const entitlementIdsAfter = extractResourceIds(entitlementsAfter.json && entitlementsAfter.json.ok ? entitlementsAfter.json.data : undefined);
   const offeringIdsAfter = extractResourceIds(offeringsAfter.json && offeringsAfter.json.ok ? offeringsAfter.json.data : undefined);
-  let packageIdsAfter: ReturnType<typeof extractResourceIds> = { ids: [], pagination: "unknown" };
+  let packageIdsAfter: ReturnType<typeof extractResourceIds> = { ids: [], lookupKeys: [], pagination: "unknown", itemsPresent: false };
   if (request.expected.offeringId) {
     const packagesAfter = runStep(request, "rc.offerings.packages", { offeringId: request.expected.offeringId });
     invoked.push(packagesAfter);
@@ -475,7 +479,7 @@ function verifyOffering(request: CatalogSessionRequest): CatalogSessionResult {
   return {
     disposition: verdict.complete ? "complete" : "incomplete",
     invoked: [verify],
-    evidence: { ...evidence, offering_verify: { complete: verdict.complete, issues: verdict.issues } },
+    evidence: { ...evidence, offering_verify: { complete: verdict.complete, protocol_valid: verdict.protocolValid, issues: verdict.issues } },
     replaySafe: true,
   };
 }
@@ -489,12 +493,16 @@ function previewSdk(request: CatalogSessionRequest): CatalogSessionResult {
   const interpreted = interpretOfferingPreview(preview.json.data, { appId: request.expected.appId, offeringId: request.expected.offeringId });
   const evidence = emptyEvidence(request);
   return {
-    disposition: interpreted.wrongApp ? "incomplete" : interpreted.complete ? "complete" : "incomplete",
+    disposition: interpreted.wrongApp || interpreted.wrongCurrentOffering ? "incomplete" : interpreted.complete ? "complete" : "incomplete",
     invoked: [preview],
     evidence: {
       ...evidence,
       preview: {
-        offering_id: interpreted.offeringId,
+        offering_id: interpreted.offeringLookupKey,
+        offering_lookup_key: interpreted.offeringLookupKey,
+        offering_remote_id: interpreted.offeringRemoteId,
+        mapping: interpreted.mapping,
+        protocol_valid: interpreted.protocolValid,
         fallback_only: interpreted.fallbackOnly,
         published_paywall: interpreted.publishedPaywall,
         wrong_app: interpreted.wrongApp,
@@ -585,9 +593,14 @@ function testStorePurchase(request: CatalogSessionRequest): CatalogSessionResult
 
 function observedSimulatePurchaseProductId(data: unknown): string | null {
   if (!data || typeof data !== "object") return null;
-  const record = data as { product_id?: unknown; productId?: unknown };
+  const record = data as { product_id?: unknown; productId?: unknown; product?: unknown };
   if (typeof record.product_id === "string") return record.product_id;
   if (typeof record.productId === "string") return record.productId;
+  if (record.product && typeof record.product === "object") {
+    const product = record.product as { id?: unknown; store_identifier?: unknown };
+    if (typeof product.id === "string") return product.id;
+    if (typeof product.store_identifier === "string") return product.store_identifier;
+  }
   return null;
 }
 

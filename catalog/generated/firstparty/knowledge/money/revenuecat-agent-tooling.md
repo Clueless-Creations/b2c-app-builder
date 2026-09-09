@@ -100,6 +100,24 @@ before retrying. Do not invent upstream idempotency.
 CLI proof uses collector `revenuecat-cli@1`. It is not the REST probe marker
 `revenuecat@1`.
 
+### Response decoding (v0.1.1)
+
+Pinned executable: GitHub **v0.1.1** (`448a9998bd2107c274b9eb1cf55ad5d5d81f6377`), npm
+`@revenuecat/cli@0.1.1`. `--json` wraps management results as
+`{ "data": ..., "schema_version": 1 }` (integer `1`). Preview still uses that
+envelope; the inner `data` is the SDK offerings payload, not a verify graph.
+
+| Command | Native shape | What decode records | Not proved |
+| --- | --- | --- | --- |
+| `offerings preview` | `current_offering_id` + `offerings[].identifier` (SDK lookup keys). `paywall_components: null` is fallback. No `issues` field. | Protocol-valid preview, lookup key, fallback vs published components | Billing readiness, dashboard paywall publication, management `ofrng_*` id unless a `lookup_key` map is supplied |
+| `offerings verify` | `{ offering, packages, paywalls, entitlements, issues }` where `issues` is a string array | Graph presence, nested `price_error`, REST id vs `lookup_key` | Desired-state repair. `{ "issues": [] }` without the graph is not complete |
+| list/show/create | v2 `{ object, items, next_page }` or resource `{ id, lookup_key, object }` | Opaque remote ids, lookup keys, pagination `complete` / `partial` / `unknown` | An unread page is not an empty catalog |
+| `customers simulate-purchase` | `{ app_id, app_user_id, product, fetch_token, customer_info, active_entitlements }` | Product id and store identifier, SDK entitlement identifiers, `TEST_` fetch token | Native IAP, in-app UI, App Store/Play |
+
+Sample coverage in `checks/verification/fixtures/revenuecat-cli-decode.fixtures.ts` is the pinned preview test payload, the documented SDK packages example, the verify HTTP-mock graph, v2 list pages, and the simulate-purchase Render map. Unknown `schema_version`, invalid JSON, and feeding verify JSON to the preview decoder fail closed. Live CLI output was not captured on this host.
+
+Protocol validity is not business completeness. Catalog repair planning is a later step. Custom presentation must not be rewritten as a forced dashboard paywall.
+
 ### Command-to-operation matrix (v0.1.1)
 
 | Builder operation | CLI argv (v0.1.1) | Effect | Status |

@@ -541,7 +541,9 @@ async function prove(): Promise<void> {
     const before = digest(readFileSync(manifestFile));
     const plan = upgradePlan(realDeps(), { upstreamId: RORK });
     assert(
-      plan.candidate?.revision === recordedObservation.latestStable?.tag && plan.candidate.digests.length === 6,
+      plan.candidate != null &&
+        plan.candidate.revision === recordedObservation.latestStable?.tag &&
+        plan.candidate.digests.length === 6,
       `candidate ${JSON.stringify(plan.candidate)}`,
     );
     assert(

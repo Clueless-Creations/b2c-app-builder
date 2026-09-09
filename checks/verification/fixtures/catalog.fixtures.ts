@@ -1498,11 +1498,11 @@ const PAID_TOOL_INTAKE_NEEDLES = [
   { id: "Refero", needles: ["Refero", "refero_search"] },
 ] as const;
 
-function workflowClosure(catalog: Catalog, startId: string): CatalogWorkflowDef[] {
+function workflowClosure(catalog: Catalog, startId: CatalogWorkflowDef["id"]): CatalogWorkflowDef[] {
   const byId = new Map(catalog.workflows.map((workflow) => [workflow.id, workflow]));
   const seen = new Set<string>();
   const ordered: CatalogWorkflowDef[] = [];
-  const stack = [startId];
+  const stack: CatalogWorkflowDef["id"][] = [startId];
   while (stack.length > 0) {
     const id = stack.pop()!;
     if (seen.has(id)) continue;
@@ -1515,7 +1515,7 @@ function workflowClosure(catalog: Catalog, startId: string): CatalogWorkflowDef[
   return ordered;
 }
 
-function deriveWorkflowIntakeTools(catalog: Catalog, startId: string): string[] {
+function deriveWorkflowIntakeTools(catalog: Catalog, startId: CatalogWorkflowDef["id"]): string[] {
   const nodes = workflowClosure(catalog, startId);
   const texts: string[] = [];
   const referencesById = new Map(catalog.references.map((reference) => [reference.id, reference]));
@@ -1532,7 +1532,9 @@ function deriveWorkflowIntakeTools(catalog: Catalog, startId: string): string[] 
     }
   }
   const blob = texts.join("\n");
-  const matched = PAID_TOOL_INTAKE_NEEDLES.filter((tool) => tool.needles.some((needle) => blob.includes(needle))).map((tool) => tool.id);
+  const matched: string[] = PAID_TOOL_INTAKE_NEEDLES.filter((tool) => tool.needles.some((needle) => blob.includes(needle))).map(
+    (tool) => tool.id,
+  );
   const includesResearchHold = nodes.some(
     (workflow) =>
       workflow.id === "workflow.research.research-backed-spec" || workflow.id === "workflow.operations.live-app-store-portfolio",

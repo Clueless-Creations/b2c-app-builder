@@ -9,7 +9,7 @@
  * Consumes `catalog/stacks/expo-selection.ts`.
  */
 import { spawnSync } from "node:child_process";
-import { lstatSync, readFileSync } from "node:fs";
+import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import {
   EXPO_IS_DEFAULT_STACK,
@@ -271,6 +271,101 @@ export function inspectPackagedExpoStarter(skillRoot: string): PackagedExpoStart
     lockfileInFixture,
     packed,
     missing: required.filter((relative) => !packed.includes(relative)),
+  };
+}
+
+export interface PackagedExpoConsumerInstall {
+  kind: "packaged-consumer-install";
+  packageManager: typeof EXPO_PACKAGE_MANAGER;
+  status: "installed" | "pack-failed" | "install-failed";
+  tarball?: string;
+  installedRoot?: string;
+  present: readonly string[];
+  missing: readonly string[];
+  lockfileInFixture: boolean;
+  expoInstalledGlobally: false;
+  nativeCompileStatus: typeof NATIVE_COMPILE_STATUS;
+  reason?: string;
+}
+
+function requiredConsumerStarterFiles(): string[] {
+  return EXPO_CUSTOM_MODULE_FILES.map((relative) => `catalog/stacks/expo-starter-fixture/${relative}`);
+}
+
+function packTarballFilename(stdout: string): string | undefined {
+  try {
+    const parsed = JSON.parse(stdout) as Array<{ filename?: string }>;
+    if (typeof parsed[0]?.filename === "string") return parsed[0].filename;
+  } catch {
+    // npm pack --json may print extra lines; fall through to the last .tgz token
+  }
+  const match = stdout.trim().split(/\s+/).find((token) => token.endsWith(".tgz"));
+  return match;
+}
+
+export function installPackagedExpoConsumer(input: {
+  skillRoot: string;
+  packDir: string;
+  consumerDir: string;
+}): PackagedExpoConsumerInstall {
+  const fixtureRoot = path.join(input.skillRoot, "catalog/stacks/expo-starter-fixture");
+  const lockfileInFixture = Boolean(lstatIfPresent(path.join(fixtureRoot, "package-lock.json")));
+  const required = requiredConsumerStarterFiles();
+  const failed = (
+    status: "pack-failed" | "install-failed",
+    reason: string,
+    extra: Partial<PackagedExpoConsumerInstall> = {},
+  ): PackagedExpoConsumerInstall => ({
+    kind: "packaged-consumer-install",
+    packageManager: EXPO_PACKAGE_MANAGER,
+    status,
+    present: [],
+    missing: required,
+    lockfileInFixture,
+    expoInstalledGlobally: false,
+    nativeCompileStatus: NATIVE_COMPILE_STATUS,
+    reason,
+    ...extra,
+  });
+  mkdirSync(input.packDir, { recursive: true });
+  mkdirSync(input.consumerDir, { recursive: true });
+  const pack = spawnSync("npm", ["pack", "--pack-destination", input.packDir, "--json"], {
+    cwd: input.skillRoot,
+    encoding: "utf8",
+    timeout: 120_000,
+  });
+  if (pack.status !== 0) {
+    return failed("pack-failed", (pack.stderr || pack.stdout || "npm pack failed").trim().slice(-400));
+  }
+  const filename = packTarballFilename(pack.stdout) ?? readdirSync(input.packDir).find((name) => name.endsWith(".tgz"));
+  if (!filename) return failed("pack-failed", "npm pack wrote no tarball");
+  const tarball = path.join(input.packDir, path.basename(filename));
+  if (!existsSync(tarball)) return failed("pack-failed", `tarball missing at ${tarball}`);
+  writeFileSync(
+    path.join(input.consumerDir, "package.json"),
+    `${JSON.stringify({ name: "b2c-expo-foundation-consumer", private: true, version: "0.0.0" }, null, 2)}\n`,
+  );
+  const install = spawnSync(
+    "npm",
+    ["install", tarball, "--omit=dev", "--ignore-scripts", "--no-audit", "--no-fund", "--package-lock=false", "--prefer-offline"],
+    { cwd: input.consumerDir, encoding: "utf8", timeout: 180_000 },
+  );
+  if (install.status !== 0) {
+    return failed("install-failed", (install.stderr || install.stdout || "npm install failed").trim().slice(-400), { tarball });
+  }
+  const installedRoot = path.join(input.consumerDir, "node_modules", BUILDER_PACKAGE_NAME);
+  const present = required.filter((relative) => existsSync(path.join(installedRoot, relative)));
+  return {
+    kind: "packaged-consumer-install",
+    packageManager: EXPO_PACKAGE_MANAGER,
+    status: "installed",
+    tarball,
+    installedRoot,
+    present,
+    missing: required.filter((relative) => !present.includes(relative)),
+    lockfileInFixture,
+    expoInstalledGlobally: false,
+    nativeCompileStatus: NATIVE_COMPILE_STATUS,
   };
 }
 

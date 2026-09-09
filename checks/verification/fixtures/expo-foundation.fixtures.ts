@@ -27,6 +27,7 @@ import {
   decideExpoCustomModule,
   inspectExpoCustomModule,
   inspectPackagedExpoStarter,
+  installPackagedExpoConsumer,
   isolatedStarterCustomModule,
   resolveMetroPackageEntry,
 } from "../../../catalog/stacks/expo-custom-module.js";
@@ -335,6 +336,22 @@ export function register(harness: Harness): void {
       compositionTarget: iosExpo(),
     });
     assert(divertedDecision.action === "refuse" && divertedDecision.code === "web-false-parity", divertedDecision.reason);
+  });
+
+  harness.check("expo foundation: packaged-consumer install ships the Expo module sources", () => {
+    const installed = installPackagedExpoConsumer({
+      skillRoot,
+      packDir: harness.makeTempDir("expo-consumer-pack"),
+      consumerDir: harness.makeTempDir("expo-consumer-install"),
+    });
+    assert(installed.kind === "packaged-consumer-install", "this is an install, not a dry-run file list");
+    assert(installed.status === "installed", installed.reason ?? "packaged-consumer install failed");
+    assert(installed.expoInstalledGlobally === false, "must not install Expo globally");
+    assert(installed.nativeCompileStatus === NATIVE_COMPILE_STATUS, "consumer install is not a native compile");
+    assert(installed.lockfileInFixture === false, "the isolated starter still has no lockfile");
+    assert(installed.missing.length === 0, `installed builder is missing ${installed.missing.join(", ")}`);
+    assert(installed.installedRoot !== undefined && existsSync(installed.installedRoot), "consumer must have node_modules/b2c-app-builder");
+    assert(!existsSync(path.join(installed.installedRoot!, "catalog/stacks/expo-starter-fixture/package-lock.json")), "install must not invent a starter lockfile");
   });
 
   harness.check("expo foundation: empty authorized target scaffolds only the selected platform and preserves product.yaml", () => {

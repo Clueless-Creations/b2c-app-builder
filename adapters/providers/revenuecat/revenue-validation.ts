@@ -44,6 +44,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { asString, getPath, issue, loadProjectState, parseCliArgs, readText, type Issue } from "../../../tooling/lib/launch-state.js";
 import { unmigratedBreakingSummaries } from "../evaluate.js";
+import { classifyRevenueCatProofDocument } from "./cli-proof.js";
 
 export function validateRevenueCatRevenue(
   args: ReturnType<typeof parseCliArgs>,
@@ -339,6 +340,17 @@ export function validateRevenueCatRevenue(
     // Acknowledged: this is a raised bar, not cryptographically unforgeable.
     // The fingerprint prefix check allows future minor versions (e.g. "revenuecat@2").
     const probeValue = typeof obj.probe === "string" ? obj.probe : "";
+    const proofIdentity = classifyRevenueCatProofDocument(obj);
+    if (proofIdentity.refusal === "cli-stamped-as-rest" || proofIdentity.refusal === "rest-stamped-as-cli") {
+      issues.push(
+        issue(
+          "error",
+          "revenue.proof_json.collector_mismatch",
+          proofIdentity.message ?? "RevenueCat CLI collector identity cannot replace the REST probe marker.",
+          proofJsonRelPath,
+        ),
+      );
+    }
     if (!probeValue.startsWith("revenuecat@")) {
       issues.push(
         issue(

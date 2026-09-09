@@ -38,6 +38,8 @@
  *
  * The output artifact is gated by a "probe":"revenuecat@1" fingerprint so the
  * validator can distinguish real probe output from hand-typed JSON.
+ * This REST collector is distinct from CLI proof collector "revenuecat-cli@1".
+ * Do not stamp CLI stdout with this REST probe marker.
  * This is a raised bar, not an unforgeable cryptographic proof — founder
  * approval (explicit sign-off) remains the ultimate backstop.
  */

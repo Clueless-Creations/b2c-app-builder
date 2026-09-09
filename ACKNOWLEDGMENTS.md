@@ -107,9 +107,10 @@ B2C App Builder is built on open-source work and adapts published methods. This 
 - Original author: RevenueCat, publishing organization and copyright holder per root LICENSE
 - License: MIT (verified)
 - Canonical URL: https://github.com/RevenueCat/cli
-- Contributes: Selected procedures inform knowledge/money/revenuecat-agent-tooling.md. Original notices are retained; no whole-project integration or live support is claimed.
+- Contributes: Selected procedures inform knowledge/money/revenuecat-agent-tooling.md. A typed process adapter wraps a trusted host rc/revenuecat binary for reviewed operations. Original notices are retained; live host execution remains unproven.
 - How we consume it:
   - adapted-method: Adapt selected setup and verification procedures as subordinate guidance; no upstream scripts, SDK binaries, or top-level skills are installed.
+  - external-executable: The host `rc` or `revenuecat` binary, when it identifies as RevenueCat CLI 0.1.1, runs selected typed operations through adapters/providers/revenuecat. The builder does not vendor the Go application or fetch an unpinned latest package at runtime.
 
 **App Store Connect CLI skills (asc skill pack)**
 

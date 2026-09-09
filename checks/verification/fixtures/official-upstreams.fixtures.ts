@@ -208,5 +208,21 @@ export function register(h: Harness): void {
     const rc = readFileSync(path.join(skillRoot, "knowledge/money/revenuecat-agent-tooling.md"), "utf8");
     assert(posthog.includes("source upload") && posthog.includes("consent"), "setup disclosure guidance absent");
     assert(rc.includes("conditional") && rc.includes("logIn"), "upstream identity conflict not resolved");
+    assert(rc.includes("v0.1.1") && rc.includes("revenuecat-cli@1"), "executable mapping absent from selected-provider guidance");
+  });
+  h.check("official upstreams: revenuecat-cli executable relationship extends the same identity", () => {
+    const row = loadUpstreams(skillRoot).upstreams.find((entry) => entry.manifest.id === "revenuecat-cli")!;
+    const kinds = row.manifest.relationships.map((relationship) => relationship.kind);
+    assert(kinds.includes("adapted-method") && kinds.includes("external-executable"), `kinds ${kinds.join(",")}`);
+    assert(row.manifest.hostProbe?.command === "rc" && row.manifest.hostProbe.args.includes("--version"), "host probe must remain a version-only rc probe");
+    assert(
+      row.manifest.baselines.reviewedSource?.revision === "448a9998bd2107c274b9eb1cf55ad5d5d81f6377",
+      "executable candidate must be the v0.1.1 commit",
+    );
+    assert(
+      row.manifest.baselines.reviewedGuidance?.revision === "1a3d2820b3166dd6d4cc4775902e43eeeab5f004",
+      "historical guidance baseline must remain",
+    );
+    assert(row.observation?.host === null, "historical observation must not invent a host executable");
   });
 }

@@ -24,47 +24,108 @@ relationships:
     local_owners: [knowledge/money/revenuecat-agent-tooling.md]
     tests: [checks/verification/fixtures/official-upstreams.fixtures.ts]
     upstream_paths: [README.md]
-    pin_authority: Reviewed commit below and the builder package content digest identify the authored guidance; host executables and remotely downloaded skills remain separate compatibility dependencies.
+    pin_authority: Reviewed guidance commit below identifies the authored procedures; host executables remain a separate fact.
+  - kind: external-executable
+    consumption: The host `rc` or `revenuecat` binary, when it identifies as RevenueCat CLI 0.1.1, runs selected typed operations through adapters/providers/revenuecat. The builder does not vendor the Go application or fetch an unpinned latest package at runtime.
+    local_owners:
+      - adapters/providers/revenuecat/cli-discovery.ts
+      - adapters/providers/revenuecat/cli-process.ts
+      - adapters/providers/revenuecat/cli-operations.ts
+      - adapters/providers/revenuecat/cli-preflight.ts
+      - adapters/providers/revenuecat/cli-execute.ts
+      - adapters/providers/revenuecat/cli-proof.ts
+    tests:
+      - checks/verification/fixtures/revenuecat-cli.fixtures.ts
+      - checks/verification/fixtures/official-upstreams.fixtures.ts
+    upstream_paths:
+      - README.md
+      - docs/command-surface.md
+      - AGENTS.md
+      - LICENSE
+    pin_authority: PATH lookup of a trusted absolute rc or revenuecat binary at execution time; recorded as a host observation, never as a lock or npm @latest pin.
 baselines:
   reviewed_source:
-    revision: 1a3d2820b3166dd6d4cc4775902e43eeeab5f004
-    observed_at: "2026-09-06"
-    by: b2c-contributor source review
-    note: Read-only archive inspected; branch head rechecked via GitHub. This is source review, not a binary execution test.
+    revision: 448a9998bd2107c274b9eb1cf55ad5d5d81f6377
+    observed_at: "2026-09-08"
+    by: b2c-maintainers
+    note: GitHub release v0.1.1 (published 2026-08-27). npm @revenuecat/cli 0.1.1 ships the same native binaries. This is the executable candidate. It is not a host-install proof.
   reviewed_guidance:
     revision: 1a3d2820b3166dd6d4cc4775902e43eeeab5f004
     observed_at: "2026-09-06"
     by: b2c-contributor source review
-    note: Adapted selected procedures; intentional deviations are recorded locally.
+    note: Adapted selected procedures from the later source review. Branch head f4e77d6c6b128a390d46e9ed5aef9c4cf79f62e2 is newer than v0.1.1 and is not treated as the installed release.
 support:
-  policy: Reviewed source guidance only. No upstream executable or live provider integration was exercised. SDK and tool compatibility must be verified against the selected app and host before execution.
+  policy: Executable operations are qualified against release v0.1.1 only. Discovery, version/schema checks, and fake-process tests exist; no host binary was installed or authenticated in this change. Native SDK version, AI Toolkit revision, CLI version, and the observed host executable stay distinct. A profile named staging is not a Test Store.
   versions:
+    - range: "0.1.1"
+      status: untested
+      evidence:
+        - "GitHub release v0.1.1 at 448a9998bd2107c274b9eb1cf55ad5d5d81f6377; npm @revenuecat/cli 0.1.1."
+        - "Fixture-backed discovery and process adapter in adapters/providers/revenuecat; no live binary was exercised."
     - range: 1a3d2820b3166dd6d4cc4775902e43eeeab5f004
       status: untested
-      evidence: ["Source inspection only; no live execution or broad SDK-version support claim."]
+      evidence: ["Source inspection only for adapted guidance; not an executable support claim."]
   operations:
     - id: revenuecat-command-discovery
       title: CLI schema discovery and setup boundary guidance
       keywords: [commands, schema, setup, paywalls, telemetry]
-      owners: [knowledge/money/revenuecat-agent-tooling.md]
+      owners: [knowledge/money/revenuecat-agent-tooling.md, adapters/providers/revenuecat/cli-discovery.ts]
+    - id: rc.version
+      title: Local executable identity and version
+      keywords: [version, rc, revenuecat]
+      owners: [adapters/providers/revenuecat/cli-discovery.ts]
+    - id: rc.offerings.verify
+      title: offerings verify (authenticated read)
+      keywords: [offerings, verify]
+      owners: [adapters/providers/revenuecat/cli-operations.ts]
+    - id: rc.offerings.preview
+      title: offerings preview (authenticated read with user)
+      keywords: [offerings, preview]
+      owners: [adapters/providers/revenuecat/cli-operations.ts]
+    - id: rc.customers.simulate-purchase
+      title: Test Store simulate-purchase after verified target and host authority
+      keywords: [test-store, simulate-purchase]
+      owners: [adapters/providers/revenuecat/cli-operations.ts, adapters/providers/revenuecat/cli-preflight.ts]
   unsupported_operations:
     - id: automatic-setup
       reason: Installing, authenticating, disclosing source, changing credentials or remote configuration require explicit scoped authority.
     - id: unreviewed-upstream-features
       reason: New upstream features require a reviewed integration change and tests, not an automatic tool grant.
-  platforms: []
+    - id: rc.api
+      reason: Raw API passthrough is refused. Typed operations only.
+    - id: rc.setup
+      reason: Nested setup/rico/skills must not bypass builder orchestration.
+    - id: rc.products.store.plan
+      reason: Remote store plans are experimental and persist server-side; a command named plan is not assumed effect-free.
+  platforms: [darwin, linux, windows]
 adaptations:
   - id: builder-contracts-win
     description: Keep product, identity, consent, measurement, evidence, and execution authority with the existing builder owners. Upstream agents never become acceptance authorities.
     owner: knowledge/money/revenuecat-agent-tooling.md
     intentional: true
+  - id: confirmation-is-not-permission
+    description: --no-input and --yes do not grant host authority. Mutations are refused before spawn without an explicit grant.
+    owner: adapters/providers/revenuecat/cli-preflight.ts
+    intentional: true
+  - id: exact-project-flag
+    description: Project-scoped operations require an explicit validated --project-id. Profile defaults and ambient RC_PROJECT_ID are not used to select a workspace.
+    owner: adapters/providers/revenuecat/cli-operations.ts
+    intentional: true
+  - id: collector-identity-distinct
+    description: CLI results use collector revenuecat-cli@1. They must not reuse the REST probe marker revenuecat@1.
+    owner: adapters/providers/revenuecat/cli-proof.ts
+    intentional: true
+host_probe:
+  command: rc
+  args: ["--version"]
+  version_pattern: "(\\d+\\.\\d+\\.\\d+)"
 review:
   owner: b2c-maintainers
   cadence_days: 7
-  last_review: "2026-09-06"
+  last_review: "2026-09-08"
   status: current
 credits:
   acknowledge: true
   use: adapted
-  summary: Selected procedures inform knowledge/money/revenuecat-agent-tooling.md. Original notices are retained; no whole-project integration or live support is claimed.
+  summary: Selected procedures inform knowledge/money/revenuecat-agent-tooling.md. A typed process adapter wraps a trusted host rc/revenuecat binary for reviewed operations. Original notices are retained; live host execution remains unproven.
 copyright: Copyright (c) 2024-2026 RevenueCat

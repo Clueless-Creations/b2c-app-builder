@@ -4,7 +4,7 @@ export const REVENUECAT_PROVISIONING: ProvisioningProvider = {
   providerId: "provider.revenuecat",
   capability: "subscription-entitlements",
   // Secret-key probe and entitlement checks are API; offerings/entitlements exist in the dashboard.
-  accessRoutes: ["api", "browser"],
+  accessRoutes: ["api", "cli", "browser"],
   unlocks: "Lets the app sell subscriptions/IAP and lets the agent prove a real purchase actually grants access, not just that a paywall renders.",
   requirements: [
     {
@@ -47,7 +47,7 @@ export const REVENUECAT_PROVISIONING: ProvisioningProvider = {
     {
       kind: "external",
       name: "A sandbox/Test Store purchase actually completes and is confirmed to grant entitlement in-app, in RevenueCat, and in any backend projection",
-      why: "Configuration proof is not purchase-to-access proof.",
+      why: "Configuration proof is not purchase-to-access proof. A CLI Test Store transaction is not Apple/Play purchase or in-app UI proof.",
       verifiable: true,
     },
   ],

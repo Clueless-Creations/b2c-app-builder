@@ -46,9 +46,10 @@ sources:
     source_type: github
     url: https://github.com/RevenueCat/cli
     review_cadence_days: 7
-    claim_scope: Selected procedures and limitations; no installed or live-provider support claim.
-    last_review_date: 2026-09-06
-    reviewer: b2c-contributor source review
+    claim_scope: Selected v0.1.1 procedures, typed executable mapping, and limitations; no live-host
+      execution or unpinned latest-binary claim.
+    last_review_date: 2026-09-08
+    reviewer: b2c-maintainers
     publisher: RevenueCat
     revision: 1a3d2820b3166dd6d4cc4775902e43eeeab5f004
     retrieved_at: 2026-09-06T13:59:35.856259Z
@@ -96,10 +97,12 @@ derivations:
     selectors:
       - README.md
     rationale: Retain relevant official procedures while preserving existing artifact ownership, scoped authority and
-      independently verified acceptance.
+      independently verified acceptance. Executable mapping is qualified against release v0.1.1, not this later
+      guidance commit.
     omissions:
-      - Automatic installation, broad agent workflows, unreviewed remotely fetched skills and implicit acceptance.
-    reviewer: b2c-contributor source review
-    reviewed_at: 2026-09-06
+      - Automatic installation, unpinned latest binaries, raw API passthrough, nested setup/rico/skills, and implicit
+        acceptance.
+    reviewer: b2c-maintainers
+    reviewed_at: 2026-09-08
     notice: catalog/upstreams/notices/revenuecat-cli.txt
     evaluation: npm run test:fixtures -- official-upstreams

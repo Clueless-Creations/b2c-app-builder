@@ -1,11 +1,11 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.10",
+  "version": "0.219.11",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Add an Expo/EAS command-effect matrix and injectable process layer so cloud credits, auto-submit, OTA, hosting, and hooks cannot hide inside a build-looking command.",
-    "Fixture-test selected Expo/EAS process holds without unblocking CNG, official Expo skills, or live EAS.",
-    "Hold unread EAS job ids as mutation-uncertain instead of inventing a paid replay."
+    "Wire selected RevenueCat CLI catalog sessions through the existing runner as fixture-only Increment B.",
+    "Refuse incomplete offering, product, entitlement, and mismatched Test Store create paths as complete.",
+    "Keep the executable candidate at GitHub release v0.1.1 without installing the host binary or claiming native purchase proof."
   ]
 }

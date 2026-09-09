@@ -1,6 +1,6 @@
 {
   "schemaVersion": "2.0.0",
-  "skillVersion": "0.219.10",
+  "skillVersion": "0.219.11",
   "areas": [
     {
       "id": "area.operating-system",
@@ -5914,7 +5914,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/money/revenuecat-agent-tooling.md",
-        "sha256": "sha256:620358e8a7f09ef1d5c0e11b1c1ffe16254d17111796d8099f9310ee57b52d14",
+        "sha256": "sha256:b8172cc85bd817707adc44c4d174b5afef6dcd6cc2891ea58a615d5f6e2903aa",
         "origin": "skill"
       }
     },
@@ -18597,14 +18597,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "6fccd66979f0b4cca1ad78d558eddf2446e9c56848d4a7a5d853248a87ac49c8",
+    "fingerprint": "afa15e4b0acd4557d188e36a25cdabfa33d2cb877fb4bcc58c91476a43890846",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
-        "version": "0.219.10",
-        "revision": "0.219.10",
-        "contentDigest": "426d6e6e9505c34cb0177bc467d7341dd60c030c3aa4e829d7869e5ec80073b9"
+        "version": "0.219.11",
+        "revision": "0.219.11",
+        "contentDigest": "0db8250827d17ee9f57539fe40f4f85272745bca4a00cfe965374ee4d2616ba7"
       }
     ],
     "base": {

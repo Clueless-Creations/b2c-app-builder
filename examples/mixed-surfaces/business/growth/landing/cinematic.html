@@ -12,11 +12,14 @@
         --paper: #f6f1e8;
         --rule: #d7cfc2;
         --scene-p: 1;
+        --beat-t: 1;
+        --beat-index: 3;
+        --beat-count: 4;
       }
       body {
         margin: 0 auto;
-        max-width: 42rem;
-        padding: 1.5rem 1.25rem 3rem;
+        max-width: 56rem;
+        padding: 1.5rem 1.25rem 4rem;
         font: 1rem/1.55 system-ui, sans-serif;
         color: var(--ink);
         background: var(--paper);
@@ -31,23 +34,138 @@
       h2 {
         font-size: 1.1rem;
       }
-      ol {
-        padding-left: 1.2rem;
-      }
-      .stage {
-        border: 1px solid var(--rule);
-        padding: 1rem;
-        margin: 1rem 0 1.5rem;
-      }
       .muted {
         color: var(--muted);
       }
       nav a + a {
         margin-left: 1rem;
       }
+      .layout {
+        display: grid;
+        gap: 1.25rem;
+      }
+      .pin {
+        margin: 0;
+        position: sticky;
+        top: 0.4rem;
+        z-index: 1;
+        background: var(--paper);
+      }
+      .stage {
+        border: 1px solid var(--rule);
+        padding: 0.85rem;
+        background: #fff;
+      }
+      .meter {
+        height: 0.35rem;
+        margin: 0 0 0.75rem;
+        background: var(--rule);
+      }
+      .meter > i {
+        display: block;
+        height: 100%;
+        width: calc(var(--scene-p) * 100%);
+        background: var(--ink);
+      }
+      .now {
+        display: none;
+        margin: 0 0 0.75rem;
+        font-weight: 650;
+      }
+      [data-scene-lifecycle="active"] .now {
+        display: block;
+      }
+      [data-scene-visual] {
+        border: 1px solid var(--rule);
+        padding: 0.6rem 0.7rem;
+        margin: 0.4rem 0 0;
+      }
+      [data-scene-visual] svg {
+        display: block;
+        width: 100%;
+        max-width: 16rem;
+        height: auto;
+      }
+      .steps {
+        margin: 0;
+        padding-left: 1.2rem;
+      }
+      .steps li {
+        min-height: 70vh;
+        padding: 0.5rem 0 2rem;
+      }
+      .steps li.is-current-step {
+        outline: 2px solid var(--ink);
+        outline-offset: 0.4rem;
+      }
+      @media (max-width: 799px) {
+        html {
+          scroll-padding-top: 9.5rem;
+        }
+        [data-scene-lifecycle="active"] .stage {
+          min-height: 8.5rem;
+        }
+        [data-scene-lifecycle="active"] [data-scene-visual] {
+          top: 4.1rem;
+        }
+        [data-scene-lifecycle="active"] [data-scene-visual] svg {
+          max-width: 9rem;
+        }
+        [data-scene-lifecycle="active"] [data-scene-visual] p {
+          display: none;
+        }
+      }
+      @media (min-width: 800px) {
+        .layout {
+          grid-template-columns: minmax(14rem, 18rem) minmax(0, 1fr);
+          align-items: start;
+        }
+        .pin {
+          top: 1rem;
+        }
+        .steps li {
+          min-height: 80vh;
+        }
+      }
+      [data-scene-lifecycle="active"] .stage {
+        position: relative;
+        min-height: 13.5rem;
+      }
+      [data-scene-lifecycle="active"] [data-scene-visual] {
+        position: absolute;
+        left: 0.85rem;
+        right: 0.85rem;
+        top: 4.6rem;
+        margin: 0;
+        opacity: 0;
+        visibility: hidden;
+      }
+      [data-scene-lifecycle="active"] [data-scene-visual][data-scene-visual-active="true"] {
+        opacity: 1;
+        visibility: visible;
+      }
       @media (prefers-reduced-motion: reduce) {
-        [data-scene-track] {
-          scroll-behavior: auto;
+        .pin {
+          position: static;
+        }
+        .steps li {
+          min-height: 0;
+          padding: 0.35rem 0 1rem;
+        }
+        [data-scene-lifecycle="active"] .stage {
+          min-height: 0;
+        }
+        [data-scene-lifecycle="active"] [data-scene-visual] {
+          position: static;
+          left: auto;
+          right: auto;
+          top: auto;
+          margin: 0.4rem 0 0;
+          opacity: 1;
+          visibility: visible;
+        }
+        .now {
+          display: none;
         }
       }
     </style>
@@ -62,51 +180,305 @@
       </nav>
       <h1>How a slip is filed</h1>
       <p>
-        The reading sequence is the complete explanation. Motion only marks
-        which state is under discussion. JavaScript off still shows every
-        state.
+        Scroll through the four states. The stage follows the reading line.
+        JavaScript off, or reduced motion, still shows every state in the list.
       </p>
     </header>
-    <main
-      id="filed-slip"
-      data-scene-track
-      data-scene-id="filed-slip"
-      data-scene-step="found"
-      aria-labelledby="filed-slip-heading"
-    >
-      <h2 id="filed-slip-heading">From an unowned slip to a found receipt</h2>
-      <p class="muted" id="filed-slip-description">
-        Four states show a paper slip with no owner, a photograph of its
-        fields, a filed record, and a later search result.
-      </p>
-      <div class="stage" role="img" aria-describedby="filed-slip-description">
-        <p data-scene-step-state="unowned">Unowned: the slip sits in a bag.</p>
-        <p data-scene-step-state="captured">Captured: one photograph records merchant, date, and amount.</p>
-        <p data-scene-step-state="filed">Filed: the receipt lives under that merchant and week.</p>
-        <p data-scene-step-state="found">Found: a later search returns the same receipt.</p>
-      </div>
-      <ol>
-        <li data-scene-step="unowned">
-          <strong>Situation.</strong> The slip sits in a bag with no date,
-          merchant, or owner.
-        </li>
-        <li data-scene-step="captured">
-          <strong>Mechanism.</strong> One photograph records the merchant,
-          date, and amount.
-        </li>
-        <li data-scene-step="filed">
-          <strong>Outcome.</strong> The receipt is stored under that merchant
-          and week.
-        </li>
-        <li data-scene-step="found">
-          <strong>Proof.</strong> A later search returns the same receipt, not
-          a look-alike.
-        </li>
-      </ol>
-      <p>
-        Join the <a href="./conversion.html">waitlist</a> if you want the iOS
-        app. This page is the scroll-linked surface; the privacy page is not.
-      </p>
+    <main>
+      <section
+        id="filed-slip"
+        class="scene"
+        aria-labelledby="filed-slip-heading"
+        data-scene-track
+        data-scene-id="filed-slip"
+        data-scene-state="found"
+        data-scene-beat="found"
+        data-scene-final="found"
+        data-scene-direction="forward"
+        data-scene-guide="0.5"
+        data-scene-mobile-guide="0.72"
+        data-scene-short-mobile-guide="0.82"
+        data-scene-motion="static"
+        data-scene-lifecycle="static"
+        style="--scene-p: 1; --beat-t: 1; --beat-index: 3; --beat-count: 4"
+      >
+        <h2 id="filed-slip-heading">From an unowned slip to a found receipt</h2>
+        <p class="muted" id="filed-slip-description">
+          Four states show a paper slip with no owner, a photograph of its
+          fields, a filed record, and a later search result.
+        </p>
+        <div class="layout">
+          <figure class="pin">
+            <div class="stage">
+              <div class="meter" aria-hidden="true"><i></i></div>
+              <p class="now">
+                Now under discussion:
+                <span data-scene-now>Found</span>
+              </p>
+              <div
+                data-scene-visual
+                data-scene-visual-state="unowned"
+                data-scene-source-kind="svg"
+                data-scene-visual-active="false"
+                aria-hidden="true"
+              >
+                <svg viewBox="0 0 200 120" focusable="false">
+                  <rect x="36" y="28" width="128" height="72" fill="none" stroke="currentColor" />
+                  <path d="M52 20h96l12 8v8H40v-8z" fill="none" stroke="currentColor" />
+                </svg>
+                <p>Unowned</p>
+              </div>
+              <div
+                data-scene-visual
+                data-scene-visual-state="captured"
+                data-scene-source-kind="svg"
+                data-scene-visual-active="false"
+                aria-hidden="true"
+              >
+                <svg viewBox="0 0 200 120" focusable="false">
+                  <rect x="44" y="18" width="112" height="84" fill="none" stroke="currentColor" />
+                  <path d="M60 42h80M60 62h56M60 82h68" fill="none" stroke="currentColor" />
+                </svg>
+                <p>Captured</p>
+              </div>
+              <div
+                data-scene-visual
+                data-scene-visual-state="filed"
+                data-scene-source-kind="svg"
+                data-scene-visual-active="false"
+                aria-hidden="true"
+              >
+                <svg viewBox="0 0 200 120" focusable="false">
+                  <path d="M28 38h60l12 10h72v54H28z" fill="none" stroke="currentColor" />
+                  <rect x="52" y="28" width="96" height="70" fill="none" stroke="currentColor" />
+                </svg>
+                <p>Filed</p>
+              </div>
+              <div
+                data-scene-visual
+                data-scene-visual-state="found"
+                data-scene-source-kind="svg"
+                data-scene-visual-active="true"
+                aria-hidden="true"
+              >
+                <svg viewBox="0 0 200 120" focusable="false">
+                  <rect x="36" y="22" width="90" height="76" fill="none" stroke="currentColor" />
+                  <circle cx="148" cy="70" r="22" fill="none" stroke="currentColor" />
+                  <path d="m164 86 18 18" fill="none" stroke="currentColor" />
+                </svg>
+                <p>Found</p>
+              </div>
+            </div>
+            <figcaption class="muted">
+              The list is the full explanation. The plates only mark the state
+              under the reading line.
+            </figcaption>
+          </figure>
+          <ol class="steps">
+            <li data-scene-step data-scene-step-state="unowned">
+              <strong>Situation.</strong> The slip sits in a bag with no date,
+              merchant, or owner.
+            </li>
+            <li data-scene-step data-scene-step-state="captured">
+              <strong>Mechanism.</strong> One photograph records the merchant,
+              date, and amount.
+            </li>
+            <li data-scene-step data-scene-step-state="filed">
+              <strong>Outcome.</strong> The receipt is stored under that merchant
+              and week.
+            </li>
+            <li class="is-current-step" data-scene-step data-scene-step-state="found" aria-current="step">
+              <strong>Proof.</strong> A later search returns the same receipt, not
+              a look-alike.
+            </li>
+          </ol>
+        </div>
+        <p>
+          Join the <a href="./conversion.html">waitlist</a> if you want the iOS
+          app. This page is the scroll-linked surface; the privacy page is not.
+        </p>
+      </section>
     </main>
+    <script>
+      (function () {
+        var scene = document.querySelector("[data-scene-track]");
+        if (!scene) return;
+
+        var steps = Array.prototype.slice.call(scene.querySelectorAll("[data-scene-step]"));
+        var visuals = Array.prototype.slice.call(scene.querySelectorAll("[data-scene-visual]"));
+        var now = scene.querySelector("[data-scene-now]");
+        var labels = {
+          unowned: "Unowned",
+          captured: "Captured",
+          filed: "Filed",
+          found: "Found",
+        };
+        var motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+        var mobileQuery = window.matchMedia("(max-width: 799px)");
+        var shortMobileQuery = window.matchMedia("(max-width: 799px) and (max-height: 620px)");
+        var direction = "forward";
+        var lastGuide = 0;
+        var frameRequest = 0;
+
+        function clampUnit(value) {
+          if (!Number.isFinite(value)) return 0;
+          return Math.min(1, Math.max(0, value));
+        }
+
+        function progressBetween(value, start, end) {
+          if (!Number.isFinite(value) || !Number.isFinite(start) || !Number.isFinite(end)) return 0;
+          if (end <= start) return value >= end ? 1 : 0;
+          return clampUnit((value - start) / (end - start));
+        }
+
+        function stateIds() {
+          return steps.map(function (step) {
+            return step.getAttribute("data-scene-step-state");
+          });
+        }
+
+        function visualIds() {
+          return visuals.map(function (visual) {
+            return visual.getAttribute("data-scene-visual-state");
+          });
+        }
+
+        function pairValid() {
+          var stepSet = stateIds();
+          var visualSet = visualIds();
+          if (stepSet.length === 0 || visualSet.length !== stepSet.length) return false;
+          for (var i = 0; i < stepSet.length; i += 1) {
+            if (!stepSet[i] || visualSet.indexOf(stepSet[i]) === -1) return false;
+            if (stepSet.indexOf(stepSet[i]) !== i) return false;
+          }
+          return true;
+        }
+
+        function guideRatio() {
+          if (shortMobileQuery.matches) return 0.82;
+          if (mobileQuery.matches) return 0.72;
+          return 0.5;
+        }
+
+        function guidePosition() {
+          var viewport = window.visualViewport;
+          var height = viewport ? viewport.height : window.innerHeight;
+          var offsetTop = viewport ? viewport.offsetTop : 0;
+          return window.scrollY + offsetTop + height * guideRatio();
+        }
+
+        function measureCenters() {
+          var scrollY = window.scrollY;
+          return steps.map(function (step) {
+            var rect = step.getBoundingClientRect();
+            return scrollY + rect.top + rect.height / 2;
+          });
+        }
+
+        function resolveFrame(centers, sceneStart, sceneEnd, guide, nextDirection) {
+          var beatIndex = 0;
+          var i;
+          for (i = 1; i < centers.length; i += 1) {
+            if (guide < centers[i]) break;
+            beatIndex = i;
+          }
+          var firstCenter = centers[0];
+          var lastCenter = centers[centers.length - 1];
+          var sceneProgress =
+            centers.length === 1
+              ? progressBetween(guide, sceneStart, sceneEnd)
+              : progressBetween(guide, firstCenter, lastCenter);
+          var beatStart = centers[beatIndex];
+          var following = centers[beatIndex + 1];
+          var beatEnd = following === undefined ? Math.max(beatStart, sceneEnd) : following;
+          return {
+            beatIndex: beatIndex,
+            sceneProgress: sceneProgress,
+            beatProgress: progressBetween(guide, beatStart, beatEnd),
+            direction: nextDirection,
+          };
+        }
+
+        function writeFrame(frame, ids) {
+          var beatIndex = Math.min(ids.length - 1, Math.max(0, frame.beatIndex));
+          var stateId = ids[beatIndex];
+          if (!stateId) return;
+          scene.setAttribute("data-scene-state", stateId);
+          scene.setAttribute("data-scene-beat", stateId);
+          scene.setAttribute("data-scene-direction", frame.direction);
+          scene.style.setProperty("--scene-p", String(Math.round(frame.sceneProgress * 10000) / 10000));
+          scene.style.setProperty("--beat-t", String(Math.round(frame.beatProgress * 10000) / 10000));
+          scene.style.setProperty("--beat-index", String(beatIndex));
+          steps.forEach(function (step, index) {
+            var current = index === beatIndex;
+            step.classList.toggle("is-current-step", current);
+            if (current) step.setAttribute("aria-current", "step");
+            else step.removeAttribute("aria-current");
+          });
+          visuals.forEach(function (visual) {
+            var active = visual.getAttribute("data-scene-visual-state") === stateId;
+            visual.setAttribute("data-scene-visual-active", active ? "true" : "false");
+          });
+          if (now) now.textContent = labels[stateId] || stateId;
+        }
+
+        function applyFinalState() {
+          var ids = stateIds();
+          writeFrame(
+            { beatIndex: ids.length - 1, sceneProgress: 1, beatProgress: 1, direction: "forward" },
+            ids,
+          );
+          scene.setAttribute("data-scene-motion", "static");
+          scene.setAttribute("data-scene-lifecycle", "static");
+        }
+
+        function update() {
+          if (!pairValid()) return;
+          if (motionQuery.matches) {
+            applyFinalState();
+            return;
+          }
+          var scrollY = window.scrollY;
+          var sceneRect = scene.getBoundingClientRect();
+          var centers = measureCenters();
+          var nextGuide = guidePosition();
+          if (nextGuide > lastGuide) direction = "forward";
+          else if (nextGuide < lastGuide) direction = "reverse";
+          lastGuide = nextGuide;
+          scene.setAttribute("data-scene-motion", "scroll");
+          scene.setAttribute("data-scene-lifecycle", "active");
+          writeFrame(
+            resolveFrame(centers, scrollY + sceneRect.top, scrollY + sceneRect.bottom, nextGuide, direction),
+            stateIds(),
+          );
+        }
+
+        function schedule() {
+          if (frameRequest) return;
+          frameRequest = window.requestAnimationFrame(function () {
+            frameRequest = 0;
+            update();
+          });
+        }
+
+        if (!pairValid()) {
+          console.warn("[Quiet Receipt] Scene enhancement skipped: step and visual state IDs do not pair.");
+          return;
+        }
+
+        lastGuide = guidePosition();
+        update();
+        window.addEventListener("scroll", schedule, { passive: true });
+        window.addEventListener("resize", schedule, { passive: true });
+        window.addEventListener("orientationchange", schedule, { passive: true });
+        if (window.visualViewport) {
+          window.visualViewport.addEventListener("resize", schedule, { passive: true });
+          window.visualViewport.addEventListener("scroll", schedule, { passive: true });
+        }
+        motionQuery.addEventListener("change", schedule);
+        mobileQuery.addEventListener("change", schedule);
+        shortMobileQuery.addEventListener("change", schedule);
+      })();
+    </script>
   </body>
 </html>

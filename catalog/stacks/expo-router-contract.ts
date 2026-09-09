@@ -3,7 +3,8 @@
  *
  * Inspects JSX `app/` routes and `src/` screens without executing expo-router,
  * Metro, or a native UI adapter. The reviewed #81 fact remains bundled-with-sdk-57.
- * The fixture workspace pin is the SDK 57 bundled package 57.0.9, not /latest/.
+ * The fixture workspace pin is expo@57.0.17 bundledNativeModules.json, not /latest/
+ * and not the older expo@57.0.9 table.
  *
  * Consumes `catalog/stacks/expo-selection.ts`.
  */
@@ -25,7 +26,28 @@ import {
 } from "./expo-native-ownership.js";
 import { EXPO_STARTER_FIXTURE_DIR, MARKETING_OR_BACKEND_DEPENDENCIES } from "./expo-starter.js";
 
-export const EXPO_ROUTER_WORKSPACE_PIN = "57.0.9";
+/** Exact pins that satisfy published expo@57.0.17 bundledNativeModules.json. */
+export const EXPO_ROUTER_COMPANION_PINS = {
+  "expo-router": "57.0.17",
+  "expo-linking": "57.0.8",
+  "expo-constants": "57.0.17",
+  "expo-status-bar": "57.0.1",
+  "react-native-screens": "4.26.0",
+  "react-native-safe-area-context": "5.7.0",
+} as const;
+
+/** Bundled ranges from https://unpkg.com/expo@57.0.17/bundledNativeModules.json */
+export const EXPO_BUNDLED_COMPANION_RANGES = {
+  "expo-router": "~57.0.17",
+  "expo-linking": "~57.0.8",
+  "expo-constants": "~57.0.15",
+  "expo-status-bar": "~57.0.1",
+  "react-native-screens": "~4.26.0",
+  "react-native-safe-area-context": "~5.7.0",
+} as const;
+
+export const EXPO_ROUTER_WORKSPACE_PIN = EXPO_ROUTER_COMPANION_PINS["expo-router"];
+export const EXPO_BUNDLED_NATIVE_MODULES_SOURCE = "https://unpkg.com/expo@57.0.17/bundledNativeModules.json";
 export const EXPO_ROUTER_ROUTE_FILES = [
   "app/_layout.tsx",
   "app/(tabs)/_layout.tsx",
@@ -158,8 +180,32 @@ export function inspectExpoRouterPin(packageJsonText: string | undefined): ExpoR
   if (!packageJsonText || !packageJsonHasExactDependency(packageJsonText, "expo-router")) return "unpinned";
   const version = dependencyVersion(packageJsonText, "expo-router");
   if (!version || version === "latest" || version === "*" || version === reviewedExpoRouterFact()) return "fabricated-latest";
-  if (!/^57\.\d+\.\d+$/.test(version)) return "fabricated-latest";
+  if (version !== EXPO_ROUTER_WORKSPACE_PIN) return "fabricated-latest";
   return "workspace-pin";
+}
+
+export function satisfiesBundledTildeRange(pin: string, range: string): boolean {
+  const rangeParts = /^~(\d+)\.(\d+)\.(\d+)$/.exec(range);
+  const pinParts = /^(\d+)\.(\d+)\.(\d+)$/.exec(pin);
+  if (!rangeParts || !pinParts) return false;
+  return pinParts[1] === rangeParts[1] && pinParts[2] === rangeParts[2] && Number(pinParts[3]) >= Number(rangeParts[3]);
+}
+
+export function inspectExpoCompanionPins(dependencies: Record<string, string> | undefined): {
+  mismatched: readonly string[];
+  rangeFailures: readonly string[];
+} {
+  const mismatched: string[] = [];
+  const rangeFailures: string[] = [];
+  for (const name of Object.keys(EXPO_ROUTER_COMPANION_PINS) as (keyof typeof EXPO_ROUTER_COMPANION_PINS)[]) {
+    const expected = EXPO_ROUTER_COMPANION_PINS[name];
+    const actual = dependencies?.[name];
+    if (actual !== expected) mismatched.push(`${name}=${actual ?? "missing"}`);
+    if (!satisfiesBundledTildeRange(expected, EXPO_BUNDLED_COMPANION_RANGES[name])) {
+      rangeFailures.push(`${name}@${expected} ! ${EXPO_BUNDLED_COMPANION_RANGES[name]}`);
+    }
+  }
+  return { mismatched, rangeFailures };
 }
 
 export function expoAdapterManifestExists(skillRoot: string): boolean {

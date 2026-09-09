@@ -6,7 +6,7 @@ This tree is a disposable TypeScript Expo app skeleton for issue 82. It is not a
 - Builder `AGENTS.md`, `product.yaml`, and `DESIGN.md` are not in this tree and must not be replaced.
 - Native `ios/` and `android/` directories are absent so Continuous Native Generation stays a later, classified step.
 - `app/` holds Expo Router JSX (`Stack` / `Tabs` / `Link`). Application screens stay in `src/`.
-- Fixture `expo-router` is `57.0.9`, the SDK 57 bundled package. The reviewed #81 fact remains `bundled-with-sdk-57`. Do not take `/latest/` docs as the pin. Navigation graph journeys are fixture-tested; Expo Router runtime was not executed.
+- Fixture `expo-router` is `57.0.17`, from published `expo@57.0.17` `bundledNativeModules.json`. The reviewed #81 fact remains `bundled-with-sdk-57`. Do not take `/latest/` docs or the older expo@57.0.9 table as the pin. Navigation graph journeys are fixture-tested; Expo Router runtime was not executed.
 - No Expo UI adapter manifest. SwiftUI remains the only implemented adapter.
 - Loading, error, empty, and retry are state contracts in `src/`, not runtime-verified screens.
 - Fixture `react` is `19.2.3` so `react-native@0.86.3`'s published peer (`^19.2.3`) can install with default npm. The reviewed React fact remains `19.2`, not a new #81 pin.

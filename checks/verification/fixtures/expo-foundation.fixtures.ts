@@ -32,9 +32,11 @@ import {
   resolveMetroPackageEntry,
 } from "../../../catalog/stacks/expo-custom-module.js";
 import {
+  EXPO_ROUTER_COMPANION_PINS,
   EXPO_ROUTER_ROUTE_FILES,
   EXPO_ROUTER_SRC_FILES,
   EXPO_ROUTER_WORKSPACE_PIN,
+  inspectExpoCompanionPins,
   isolatedStarterRouterLayout,
   planExpoRouterDelivery,
   reviewedExpoRouterFact,
@@ -146,6 +148,9 @@ export function register(harness: Harness): void {
     assert(compatibility.sdk === "match" && compatibility.reactNative === "match", compatibility.actionable);
     assert(compatibility.autoUpgradeAttempted === false, "fixture pins must not trigger auto-upgrade");
     assert(pkg.dependencies?.["expo-router"] === EXPO_ROUTER_WORKSPACE_PIN, `fixture expo-router pin must be ${EXPO_ROUTER_WORKSPACE_PIN}`);
+    const companions = inspectExpoCompanionPins(pkg.dependencies);
+    assert(companions.rangeFailures.length === 0, `companion pins must satisfy expo@57.0.17 bundled ranges: ${companions.rangeFailures.join(", ")}`);
+    assert(companions.mismatched.length === 0, `companion pins must match the expo@57.0.17 bundled set: ${companions.mismatched.join(", ")}`);
     assert(pkg.dependencies?.["expo-modules-core"] === undefined, "must not invent an expo-modules-core pin");
     assert(reviewedExpoRouterFact() === "bundled-with-sdk-57", "reviewed Router fact is not a package version");
   });
@@ -417,10 +422,12 @@ export function register(harness: Harness): void {
     const lock = JSON.parse(readFileSync(path.join(target, "package-lock.json"), "utf8")) as { packages?: Record<string, { version?: string }> };
     const expoLock = lock.packages?.["node_modules/expo"]?.version;
     const reactLock = lock.packages?.["node_modules/react"]?.version;
-    const routerLock = lock.packages?.["node_modules/expo-router"]?.version;
     assert(typeof expoLock === "string" && expoLock.startsWith("57."), `lockfile expo pin must stay on SDK 57, got ${expoLock}`);
     assert(reactLock === "19.2.3", `lockfile react must be the RN 0.86.3 peer patch, got ${reactLock}`);
-    assert(routerLock === EXPO_ROUTER_WORKSPACE_PIN, `lockfile expo-router must be ${EXPO_ROUTER_WORKSPACE_PIN}, got ${routerLock}`);
+    for (const [name, pin] of Object.entries(EXPO_ROUTER_COMPANION_PINS)) {
+      const locked = lock.packages?.[`node_modules/${name}`]?.version;
+      assert(locked === pin, `lockfile ${name} must be ${pin}, got ${locked}`);
+    }
   });
 
   harness.check("expo foundation: empty authorized target scaffolds only the selected platform and preserves product.yaml", () => {

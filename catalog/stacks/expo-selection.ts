@@ -360,7 +360,7 @@ function operationSupport(): ExpoOperationSupport[] {
       evidenceTier: "blocked",
       queuedIssue: 82,
       notes:
-        "JSX Stack/Tabs routes and expo-router@57.0.9 exist. Navigation graph journeys are fixture-tested. Operation stays blocked: Expo Router runtime was not executed, and SwiftUI remains the only UI adapter.",
+        "JSX Stack/Tabs routes and expo-router@57.0.17 (expo@57.0.17 bundled set) exist. Navigation graph journeys are fixture-tested. Operation stays blocked: Expo Router runtime was not executed, and SwiftUI remains the only UI adapter.",
     },
     {
       id: "cng-prebuild",

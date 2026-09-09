@@ -1,6 +1,6 @@
 {
   "schemaVersion": "2.0.0",
-  "skillVersion": "0.219.14",
+  "skillVersion": "0.219.15",
   "areas": [
     {
       "id": "area.operating-system",
@@ -5282,7 +5282,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/growth/cro-landing.md",
-        "sha256": "sha256:3f74a1265266f57872ad6ba646d2c9c53ec24ddc3d02e10f9782790b906416fc",
+        "sha256": "sha256:1840bbea8e38965853243a70768939d02a00ea3fca50b91f7ede9e38d271babb",
         "origin": "skill"
       }
     },
@@ -18604,14 +18604,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "7ce0cbddd22e4b487b865829b39f60aa2f874c33714965d0649508464286be4c",
+    "fingerprint": "27a4833ff9764d1a2f2b808d1403056e09df62402c2151eba8ca1cbfda16f305",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
-        "version": "0.219.14",
-        "revision": "0.219.14",
-        "contentDigest": "f80d63bddf4a5a630f06048b7a18429599a8cf662db15c3aa28fc4790de214c2"
+        "version": "0.219.15",
+        "revision": "0.219.15",
+        "contentDigest": "fb9b5f34dc8d81a8c7ebbebc078611282ab4dc4824f6704e4e7518b470c90daf"
       }
     ],
     "base": {

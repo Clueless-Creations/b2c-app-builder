@@ -13,7 +13,7 @@ import type {
   RunStateDocument,
   Status,
 } from "../schema/types.js";
-import { sha256, type CompiledPlan, type CompiledRunNode, type RunNodeId } from "./compile.js";
+import { consultedArtifactIds, sha256, type CompiledPlan, type CompiledRunNode, type RunNodeId } from "./compile.js";
 import {
   invalidateOccurrenceContract,
   exhaustOccurrence,
@@ -946,7 +946,8 @@ export function invalidateDescendants(
       if (preservedNodeIds.has(node.id)) continue;
       const state = run.nodes[node.id];
       if (!state || state.status === "stale" || visited.has(node.id)) continue;
-      if (node.inputs.some((artifactId) => changed.has(artifactId))) {
+      const consultInputs = consultedArtifactIds(node, plan.artifactBindings);
+      if (node.inputs.some((artifactId) => changed.has(artifactId)) || consultInputs.some((artifactId) => changed.has(artifactId))) {
         visited.add(node.id);
         const priorExternalAttempt = state.attempts.length > 0 && requiresReadbackBeforeRepeat(node);
         state.status = priorExternalAttempt ? "needs_readback" : "stale";

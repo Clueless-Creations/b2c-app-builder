@@ -1,7 +1,7 @@
 apiVersion: b2c.extension/v1
 hostApiVersion: b2c/v1
 id: b2c/consumer-business
-version: 0.219.14
+version: 0.219.15
 title: Consumer business
 dependencies: []
 imports: []
@@ -6239,7 +6239,7 @@ implementations:
       workflowId: workflow.words.writing-quality-no-slop
       instructions: "Before any founder-facing or marketing copy ships, identify which voice you are protecting — this skill's own direct/no-filler voice for founder-facing surfaces, or the launched business's strategy/BRAND.md voice and the tone 11_STAR_EXPERIENCE.md set for marketing copy — and make the minimum effective edit: strip filler, hedging, importance-inflation, and interpretive asides without flattening a brand's playful or clinical register into generic 'clean' English. Apply the portability test to each generic sentence: if it can move unchanged to another person, company, country, or product, replace it with a specific fact, mechanism, consequence, or judgment. Author every user-facing string as a keyed row in product/copy/COPY_DECK.md (with product/copy/COPY_BRIEF.md as the brief that precedes it) before any builder consumes it — builders read deck keys, they do not invent strings from the spec. Run the banned-words/patterns self-check and channel-specific limits (store character counts, push/email subject limits) before handoff; check:app-copy is the gate that fails a placeholder-shaped or missing deck row."
       providerIds: []
-      contextFingerprint: sha256:da0d7fef262cee4d921c46d2b4f1bffb57842450be456f974c103842569173a6
+      contextFingerprint: sha256:a38fd606980bac829166d112cea10cd5cbcf0162641a63b79cdb3bfa74eb552e
   - id: b2c/worker.words.copy-review-audit
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -6290,7 +6290,7 @@ implementations:
       workflowId: workflow.words.copy-review-audit
       instructions: "Review product/copy/COPY_BRIEF.md and product/copy/COPY_DECK.md in a fresh context that never saw the producer's transcript, per surface (app strings, paywall and offer, store fields, lifecycle email, launch posts). Score against the frozen voice benchmarks and phrase bank in the brief, not a moving one. Run no-ai-slop in detect mode and quote every pattern; do not rewrite. Check every quantified, comparative, health, or urgency claim against the claims ledger and mark unsubstantiated claims for removal. Check paywall and offer copy against reference.experience.ethics-guardrail: no guilt, urgency, or fake timers. Check store fields against the field limits. Write findings only, versioned against the rubric, into product/copy/COPY_REVIEW.md, one section per surface with severity. Producers fix; the auditor never edits the deck. check:app-copy is the mechanical gate; a passing gate does not replace this review. The string freeze is dated in the review only when every surface has passed."
       providerIds: []
-      contextFingerprint: sha256:1a7ca4581f8900eb77713baecd78ca2d3d925bf1669227507657bf69f6621288
+      contextFingerprint: sha256:edcbf7e85fd13e81ff53c64051f47d17a07f97914ee3d49c23e970018ab69ab7
   - id: b2c/worker.store.aso-and-store-ops
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -6340,7 +6340,7 @@ implementations:
       workflowId: workflow.store.aso-and-store-ops
       instructions: Build app-marketing-context (app name, category, target country, top competitors, primary/secondary/long-tail keyword candidates, current listing state, and public support/privacy URLs) before locking a single metadata field, then run keyword and name-collision checks in the target country and separate brand language from search language. Route any localization call through the demand-first priority tiers in LOCALIZATION_MARKET_RESEARCH.md rather than translating on inference, and route Apple Search Ads storefront targeting from the same tiers. Draft final metadata fields plus rejected alternatives with rationale into STORE_OPS.md, and run every metadata/keyword string through the no-slop-writing.md self-check before calling it locked. For the recurring post-launch loop, track keyword rank deltas, ASA search-term mining, and localization opportunities weekly rather than treating ASO as a one-time pass. Prefer `asc optimize keywords rank` first without Apple Ads credentials; record storefront, platform, locale, query set, CLI version, source availability, raw inputs, rank-window limitation, and collection time in STORE_OPS.md; keep `unavailable` as `unavailable`; do not auto-apply metadata.
       providerIds: []
-      contextFingerprint: sha256:018014fdf1c8050f83aeccabfe8c185b978c4e00a3ec2b70e21e711126fe218b
+      contextFingerprint: sha256:e180b65b01a797a34d5fef356632bca82b2af9039490cea511e654857ede4ed5
   - id: b2c/worker.store.app-store-listing-prep-packet
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -6389,7 +6389,7 @@ implementations:
       workflowId: workflow.store.app-store-listing-prep-packet
       instructions: "Build APP_STORE_LISTING.md as the bridge document: default listing fields, App Privacy answers derived from the actual data inventory and SDK/vendor behavior (never from policy prose alone), and pricing/subscription mapping reconciled against revenue/REVENUE_OPS.md's RevenueCat/Stripe/web-funnel state. Anchor screenshot, App Preview, custom-product-page, and In-App Event concepts to the real complete product experience in 11_STAR_EXPERIENCE.md so the listing never invents a promise the app cannot keep. Run the finished description/keyword/promotional-text copy through the no-slop-writing.md self-check, then confirm `npm run check:store-console -- --root .` passes before calling the packet ready. Founder approval gates any live product creation, price change, or submission — draft the packet, do not publish it."
       providerIds: []
-      contextFingerprint: sha256:5c071c2e98f2ee0f81244bc312c2bd59a1bf5774218542ddde1078579ad26f57
+      contextFingerprint: sha256:db819c68fd11f3e6c2a8fef451ef0a4ecf200038fa1f660bde057a2dd49ad678
   - id: b2c/worker.store.apple-signing-and-release-readiness
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -6556,7 +6556,7 @@ implementations:
       providerIds:
         - provider.app-store-connect
         - provider.google-play
-      contextFingerprint: sha256:272b70600caca7ae50dfeda5841b5cd4be7c5518bdf8cab1fdcea932e0583ef1
+      contextFingerprint: sha256:0e25dea3b1cfe05ee813154417520f7b511105f0c4c2d4216dae4d37286358fb
   - id: b2c/worker.store.asc-cli-automation
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -6961,7 +6961,7 @@ implementations:
       instructions: Apply only the approved Google Play listing text, localized metadata, custom store listings, and promotional content covered by the exact current standing envelope. Verify account, package, track-neutral resource IDs, locales, payload digest, and capability immediately before mutation. Capture before-state and read back every locale. Write store/proof/google-play-metadata-apply.json with approval ID, request digest, before state, provider operation IDs, readback state, and timestamps. Do not upload media, change products, submit a release, or widen the envelope.
       providerIds:
         - provider.google-play
-      contextFingerprint: sha256:956d29d57d0f179bc89f5440394f332466e4ecb060f96dca4828b873c987aef5
+      contextFingerprint: sha256:21fecb52268add3b056c19385b071ceea5a7dfd34c42f54bdaad8944b22d8b46
   - id: b2c/worker.store.google-play-media-standing-envelope
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -7009,7 +7009,7 @@ implementations:
       instructions: Upload only the locale, device-family, custom-store-listing, screenshot, feature-graphic, and promo-video assets covered by the exact current standing envelope. Verify every file digest and Play resource ID immediately before upload. Capture before-state and read back the resulting media set. Write store/proof/google-play-media-apply.json with approval ID, per-file digest, locale, device family, product-page/listing ID, provider operation IDs, readback state, and timestamps. Do not apply text metadata, products, testing tracks, or release state.
       providerIds:
         - provider.google-play
-      contextFingerprint: sha256:22ea978c4aa79a887a26f2270c599d3d3f30a94a143197e05916021e321fbe32
+      contextFingerprint: sha256:d8cce29c247b529881757181a3a6b14349f42211c96c06c011fca60b0301f8ab
   - id: b2c/worker.store.google-play-testing-track-standing-envelope
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -7714,7 +7714,7 @@ implementations:
         - provider.paid-ad-channels
         - provider.posthog
         - provider.revenuecat
-      contextFingerprint: sha256:f21a5e31a1bf7ef91c7bfefe6e2db0a133e9d5f2c936e5ede800b7714f64b62b
+      contextFingerprint: sha256:23391588ba9b467b24edc6c898a5e351e2a2b3869d5ceac85d0e189f5a42a480
   - id: b2c/worker.growth.viral-growth-loop
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -7765,7 +7765,7 @@ implementations:
       workflowId: workflow.growth.viral-growth-loop
       instructions: "Write growth/VIRAL_GROWTH.md: record the fit-gate decision, the product-specific growth thesis (audience/platform, visible result, emotional trigger, product loop, content loop, conversion moment), and the full Product Loop Contract (trigger, reward, recipient value, share artifact, surface, fallback, abuse controls, policy constraints). Sequence monetization timing so the paywall catches demand after emotional investment forms, not before, per onboarding-conversion.md and revenue-monetization.md. Compute the loop's real economics weekly in the Loop Economics section — viral coefficient k = (invites/shares per active user) x (recipient conversion rate to install/activation), plus cycle time — since k below 0.15 means the loop is decoration, not a growth engine, and share/view counts alone never justify calling the lane done. Any referral/share/unlock mechanic carrying streak, scarcity, or social-proof pressure gets an ethics-guardrail pass before it ships."
       providerIds: []
-      contextFingerprint: sha256:bbff5e205901bd07dfb119f6a8a5223b67f8959fa4320e3359576f501a61c57f
+      contextFingerprint: sha256:263f5e15341677af9e1aec084564c03a3e5f919e922fa6004572a60227590be7
   - id: b2c/worker.growth.launch-narrative-and-cadence
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -7816,7 +7816,7 @@ implementations:
       workflowId: workflow.growth.launch-narrative-and-cadence
       instructions: "Write growth/LAUNCH_NARRATIVE.md covering the Fit Gate, feeling-first Launch Thesis, the Two Launch Types (rare tentpole vs. weekly feature-launch heartbeat), the Launch-Day Run-of-Show, and all post copy in fenced code blocks. Build the content direction from strategy/SIGNAL_CORPUS.md and the distribution evidence in strategy/RESEARCH.md. Keep a structured content-intelligence table with source, account baseline, audience fit, hook, structure, emotion, format, sales intent, and downstream result. Normalize outliers against the source account's normal result, and extract patterns without copying words, identity, assets, or exact composition. Judge audience quality through owned contacts, activation, and revenue when those values exist. Every post shapes a feeling before naming the feature and clears the 2026 DO-NOT-DO list: no hashtags, no emojis carrying the message, no link in the root post (first self-reply only), no seeded 'congrats!' replies, plus the no-slop-writing.md self-check. Public claims are limited to what is true and attributable — never launder the launch agency's own aggregate stats as this app's results — and any rage-bait line clears an ethics-guardrail review before it ships. Public posting, account connections, and paid amplification spend are founder-only gates that must be confirmed before launch goes live."
       providerIds: []
-      contextFingerprint: sha256:3b1b02c872e1e99cbc2ab9d4e5c39204714fc82f3c70313c1fe0097116698e1d
+      contextFingerprint: sha256:939c34d2d7319bbc9d0092f7f8abb594e93e098a074a5f94fef9cbef05523046
   - id: b2c/worker.growth.geo-seo-public-visibility
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -7864,7 +7864,7 @@ implementations:
       workflowId: workflow.growth.geo-seo-public-visibility
       instructions: Write GEO_SEO.md before an agent edits a landing, policy, or blog file. Run the Copy Compliance Pre-Edit Scan. Reject false claims, unshipped-feature promises, implied-authority claims, and price promises that conflict with revenue/REVENUE_OPS.md. Define the title, description, canonical URL, social cards, robots.txt, sitemap.xml, llms.txt, and JSON-LD contract. Localize only for Tier 1 markets in LOCALIZATION_MARKET_RESEARCH.md. This node prepares the local contract. It does not publish the site. The public-deploy node runs the live HTTP and JSON-LD checks after founder approval.
       providerIds: []
-      contextFingerprint: sha256:fe1589427cfd1713dc8643816fda5f5dfd2fa6789aa0bcf7b612c530c935e187
+      contextFingerprint: sha256:062e1d7f63ca19842278f27c89bb684f81a3b94b4cffaa46bcbab4bc8c726547
   - id: b2c/worker.growth.pre-launch-funnel-landing-waitlist
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -7910,7 +7910,7 @@ implementations:
       workflowId: workflow.growth.pre-launch-funnel-landing-waitlist
       instructions: "Build a runnable local landing site in growth/landing/ after the landing-specific Design Room refresh. Use the approved promise, one conversion goal, current copy keys, a mobile CTA, truthful proof, responsive behavior, and a local build check. Add onboarding, localization, pricing, or screenshot material only when the accepted product makes it applicable. Write growth/landing/surface-contract.json with canonical input digests, applicability decisions, and local proof. Apply scrollytelling only when studio/seed/business.json records interaction scroll-linked or landing source already implements scroll-linked hooks; static-document and conversion surfaces must not invent a scroll choreography because another recipe uses one. Follow editorial-scrollytelling.md: move from situation to mechanism to outcome to proof; record stable scene states, copy hashes, accessible descriptions, save-data and reduced-motion behavior, forward/reverse behavior, and desktop/mobile browser QA. Use live motion exemplars when available, but express them through this product's design system. Author growth/landing/browser-proof.json for the accepted landing surface IDs with the current candidate SHA-256, exact implementation source roots, exact built entrypoint and resource-to-URL mapping, served origin and URL, and Chrome channel. Start the local server, then run `b2c browser-proof --workspace . --session-id <authorization.executionIdentity>` inside this exact engine attempt. The command must open a new browser context and materialize growth/landing/proof/browser-proof.json plus its immutable build, response, launch, navigation, and runtime receipt files. Never author, copy, relabel, or repair those proof files by hand. Run check:design-md, check:design-room, check:design-worthiness, check:vibecoded-tells, check:scrollytelling, and check:browser-runtime-proof. Do not deploy from this node."
       providerIds: []
-      contextFingerprint: sha256:311f07f14659f3fcadf54545c0d69370f8c366499e8f04dd2e4de3d68f6dd7c2
+      contextFingerprint: sha256:e55071b003b91940ce90584b58522539a7e536d1fab721ffc5eb320efc7b0dc3
   - id: b2c/worker.growth.landing-funnel-audit
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -7964,7 +7964,7 @@ implementations:
       workflowId: workflow.growth.landing-funnel-audit
       instructions: "Audit every modeled public page in growth/landing/ in a fresh context that never saw the producer's transcript: landing, waitlist, web-to-app worksheet, support, privacy, terms, deletion, and any referral or purchase page. Resolve each page from studio/seed/business.json `interaction`, implemented scroll-linked hooks, and growth/landing/surface-contract.json when that file exists; do not infer a technique from purpose prose. Score conversion structure with the CRO discipline in reference.growth.cro-landing only when that page has a conversion job (promise, proof, first useful action before email; no invented social proof, no fake processing). Score the story map against reference.design.editorial-scrollytelling only when scroll-linked is selected or implemented: situation to mechanism to outcome to proof, one measured controller, stable scene IDs, no-JS reading sequence, reduced-motion and Save-Data behavior, mobile recomposition. A static legal or support page is scored for semantic content, legibility, accessibility, and working links — not invented scroll choreography or conversion experiments. Selected or implemented scrollytelling still needs the full interaction, interruption, reduced-motion, and performance evidence. Apply the vibecoded tells and the twelve craft-bar conditions to the techniques that page actually uses. Run no-ai-slop in detect mode on every visible string and the Impeccable detector when installed; record the detector JSON path. Re-run the GEO/SEO audit against the local preview and compare it with the dated baseline in GEO_SEO.md. Write findings only, with severity per page and the rubric version, into growth/CRO_AUDIT.md. Do not restyle or edit copy. An unresolved high-severity finding blocks publication."
       providerIds: []
-      contextFingerprint: sha256:7a78738134fbbffb21ee728cdc084ccbef213d6b1028fd9a611f0b28323e6451
+      contextFingerprint: sha256:11b9b11c36499806d14ab30c6c3505657cd09177e9f4722e7e8cb95e06872d6b
   - id: b2c/worker.growth.landing-funnel-publication-and-live-proof
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -8005,7 +8005,7 @@ implementations:
       workflowId: workflow.growth.landing-funnel-publication-and-live-proof
       instructions: Use agents/launch-surface-producer.md in approved-external-apply mode. A matching current standing envelope is sufficient authority; do not ask again. Otherwise park this one action in the consolidated founder handoff. Check the working tree, artifact digest, deployment-tool version, authenticated account, token scope, project, environment, and target domain before deployment. Publish only the accepted growth/landing/ build, then read back the deployment and check live HTTP status, mobile and desktop renders, browser form submission, duplicate submission behavior, analytics events, crawler files, social metadata, and every JSON-LD block. Record the URL and proof in growth/landing/README.md and engineering/PRODUCTION_READINESS.md. Run check:landing-funnel. Do not change product claims, prices, legal text, or store state during this node.
       providerIds: []
-      contextFingerprint: sha256:4c8a6d5d898412eae05a2a00fce3afb11e9b861480cbae5a5bce18c051d3ff78
+      contextFingerprint: sha256:b2fede699d5cfed3f63021fae94c50d7c894bf66c20fa27142275e1985fc2f8f
   - id: b2c/worker.growth.ugc-creator-engine
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -8056,7 +8056,7 @@ implementations:
       workflowId: workflow.growth.ugc-creator-engine
       instructions: "Write growth/UGC_PLAYBOOK.md: record the fit-gate decision, then use strategy/SIGNAL_CORPUS.md and structured content intelligence to select formats. Normalize outliers against each source account's baseline, and extract patterns without copying words, people, assets, or exact compositions. Run the Day 0 format-discovery model — 3-5 creators, founder-written scripts for the first 4-8 weeks, same-day time-coded feedback, and 5-8 reps per format before judging it — and only call a format scale-ready after 2-3 hits from the same structure across 2+ creators plus downstream install, owned-contact, activation, referral, or revenue evidence. Every script in ugc/script-bank.md survives the judge panel (separate reviewer passes with fresh context, one job each — pacing, vocabulary, idea strength, structure — at least one grounded in a real creator's transcript corpus) before it earns filming or generation spend; record script_id and a passed/survived judge_verdict, since check:content-assets blocks any UGC-family generation missing either. Route to influencer-sponsorship-engine.md instead when the plan is paying creators who already have an audience rather than running new niche accounts. Creator payments, paid creator-platform spend, and public posting/scheduling are founder-only gates."
       providerIds: []
-      contextFingerprint: sha256:5cff861863b894f2142ef420f6c80aab34a1d1948868bffb44ab66ee7e9bc603
+      contextFingerprint: sha256:951fc1c55143fa385b97d704d1e58d32ae55f9fd560df378ed5adb5ff01fc905
   - id: b2c/worker.growth.fastlane-growth-ops
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -8106,7 +8106,7 @@ implementations:
       workflowId: workflow.growth.fastlane-growth-ops
       instructions: "Write growth/FASTLANE_OPS.md and the fastlane/ artifact set (campaign-brief.md, prompts.md, angles.json, preferences.json, schedule.json) only after the Launch Readiness Gate is true: live store/TestFlight URL, current brand/onboarding/design docs, and product claims matching store/legal/revenue docs. Run safe API reads (GET /connections, /blitz/preferences, /blitz/angles, /content, /posts) before any mutation, keep format weights summing to 100 and angle weights covering every active angle exactly once, and never write FASTLANE_API_KEY to a committed file. Source real app media through the Route Ladder — in-app iOS Simulator (rung 0) first on a local Mac, MobAI for Android coverage, a repeatable capture cadence, or recorder-polished demo output — before generic generated visuals, and run the weekly Analytics And Iteration loop tying posts back to installs/trials/purchases/attribution rather than vanity engagement. Connecting accounts, first public post, and any scheduling change are founder-only gates; check:post-launch is the pass signal."
       providerIds: []
-      contextFingerprint: sha256:b8b137a45c53cd082ddb4cf37d9d31534c7209e8d624432e7d5750fe5035eff9
+      contextFingerprint: sha256:c934f32aab9f1fda9e9d80f7c2e034d0a47e5abfe49f293c19bd342c811270b0
   - id: b2c/worker.money.revenue-monetization
     version: 1.0.0
     provider: b2c/consumer-business-worker

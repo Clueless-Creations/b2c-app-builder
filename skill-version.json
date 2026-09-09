@@ -1,11 +1,11 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.14",
+  "version": "0.219.15",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Scope ONB-08 motion research, 60fps MCP operations, and Full Launch Program audits to selected or implemented surfaces.",
-    "Add an optional studio surface interaction class and fail closed when a listed surface omits it or a selected 60fps route is unavailable.",
-    "Keep empty studio inventory from selecting 60fps; static legal and conversion pages do not invent shot IDs or scrollytelling."
+    "Reopen an accepted ONB-08 packet when a consulted studio surface or a read TOOL_DECISIONS artifact later changes, without un-accepting unrelated outputs.",
+    "Add frozen per-page CRO and motion gates so a conversion landing is scored for conversion evidence and a static legal page is not forced to invent experiments or motion.",
+    "Keep consults out of frontier readiness; do not restore universal scrollytelling or 60fps on static pages."
   ]
 }

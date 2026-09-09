@@ -254,7 +254,8 @@ export function compilePlan(catalog: CatalogInput, now = "1970-01-01T00:00:00.00
     // the frontier must not offer a node whose read target is still unproduced placeholder
     // content). A read of the node's OWN output is the read-modify-write pattern and gates
     // nothing; reads of durable state files map to no artifact and gate nothing; `consults`
-    // never gates by definition.
+    // never join inputs and never gate the frontier. They still watch those artifacts for
+    // invalidateDescendants so an already-accepted packet reopens when a consulted surface changes.
     const ownOutputs = new Set(outputs);
     const readArtifacts = (workflow.reads ?? [])
       .map((readPath) => artifactsByPath.get(readPath))
@@ -398,4 +399,21 @@ function dedupeClaims(claims: ResourceClaim[]): ResourceClaim[] {
 
 function unique<T>(values: T[]): T[] {
   return [...new Set(values)];
+}
+
+/**
+ * Catalog artifacts named by `consults`, excluding the node's own outputs.
+ * Consults stay out of `inputs` (frontier readiness). Invalidation still watches them.
+ */
+export function consultedArtifactIds(
+  node: Pick<CompiledRunNode, "consults" | "outputs">,
+  artifactBindings: ReadonlyArray<{ path: string; artifactId: string }>,
+): CatalogArtifactId[] {
+  const ownOutputs = new Set(node.outputs);
+  const byPath = new Map(artifactBindings.map((binding) => [binding.path, binding.artifactId]));
+  return unique(
+    (node.consults ?? [])
+      .map((consultPath) => byPath.get(consultPath))
+      .filter((artifactId): artifactId is CatalogArtifactId => Boolean(artifactId) && !ownOutputs.has(artifactId as CatalogArtifactId)),
+  );
 }

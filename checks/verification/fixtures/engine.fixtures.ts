@@ -14,6 +14,7 @@ import {
 } from "../../../kernel/schema/types.js";
 import {
   compilePlan,
+  consultedArtifactIds,
   type CatalogArtifact,
   type CatalogInput,
   type CatalogWorkflowNode,
@@ -2567,6 +2568,107 @@ export function register(harness: Harness): void {
       assert(later.ready.includes(nodeId("engineering-build")), "the node becomes ready once the read artifact is produced and accepted");
     },
   );
+
+  harness.check(
+    "runstate: changing a consulted artifact reopens the accepted consumer and retains unrelated accepted outputs",
+    () => {
+      const catalog = testCatalog();
+      catalog.artifacts.push({ id: "artifact.studio-seed-business-json", path: "studio/seed/business.json" });
+      catalog.workflows.push({
+        id: "workflow.design-room",
+        title: "Design Room",
+        domainId: "domain.design",
+        actionClass: "mutate",
+        consults: ["studio/seed/business.json"],
+        dependencies: [],
+        outputPaths: ["studio/seed/business.json"],
+        providerIds: [],
+        laneIds: ["design"],
+        founderOnlyActions: [],
+        gateCommands: [],
+        idempotent: true,
+      });
+      const growth = catalog.workflows.find((workflow) => workflow.id === "workflow.growth-post")!;
+      growth.consults = ["studio/seed/business.json"];
+      const plan = compilePlan(catalog, now);
+      const studioProducer = plan.nodes.find((node) => node.id === nodeId("design-room"))!;
+      const consultConsumer = plan.nodes.find((node) => node.id === nodeId("growth-post"))!;
+      const unrelated = plan.nodes.find((node) => node.id === nodeId("research-scan"))!;
+      assert(!consultConsumer.inputs.includes("artifact.studio-seed-business-json"), "a consult must never join inputs");
+      assert(
+        consultedArtifactIds(consultConsumer, plan.artifactBindings).includes("artifact.studio-seed-business-json"),
+        "a consult that names another workflow's artifact must be watched for invalidation",
+      );
+      assert(
+        !consultedArtifactIds(studioProducer, plan.artifactBindings).includes("artifact.studio-seed-business-json"),
+        "a producer that consults its own output must not self-watch that artifact",
+      );
+
+      const { run } = seedFor([], plan);
+      for (const [id, artifactId, fingerprint] of [
+        [studioProducer.id, "artifact.studio-seed-business-json", "sha256:studio-v1"],
+        [consultConsumer.id, "artifact.growth-post", "sha256:growth-v1"],
+        [unrelated.id, "artifact.research-brief", "sha256:research-v1"],
+      ] as const) {
+        run.nodes[id]!.status = "succeeded";
+        run.nodes[id]!.acceptedOutputFingerprint = fingerprint;
+        const binding = run.artifactBindings.find((candidate) => candidate.artifactId === artifactId)!;
+        binding.accepted = true;
+        binding.fingerprint = fingerprint;
+        binding.producedBy = id;
+      }
+
+      const invalidated = invalidateDescendants(plan, run, ["artifact.studio-seed-business-json"], plusSeconds(now, 1));
+      assert(invalidated.includes(consultConsumer.id), "an accepted consult consumer must reopen when the consulted artifact changes");
+      assert(run.nodes[consultConsumer.id]!.status === "stale", "the consult consumer must be stale");
+      assert(!run.artifactBindings.find((binding) => binding.artifactId === "artifact.growth-post")!.accepted, "the consumer output must un-accept");
+      assert(run.nodes[unrelated.id]!.status === "succeeded", "unrelated accepted work must stay accepted");
+      assert(run.artifactBindings.find((binding) => binding.artifactId === "artifact.research-brief")!.accepted, "unrelated output proof must remain");
+      assert(run.nodes[studioProducer.id]!.status === "succeeded", "the studio producer must not self-invalidate through its own consult");
+    },
+  );
+
+  harness.check("runstate: a read of a TOOL_DECISIONS-shaped artifact already invalidates the accepted consumer", () => {
+    const catalog = testCatalog();
+    catalog.artifacts.push({ id: "artifact.strategy-tool-decisions-md", path: "strategy/TOOL_DECISIONS.md" });
+    catalog.workflows.push({
+      id: "workflow.paid-tool-routing",
+      title: "Paid tool routing",
+      domainId: "domain.operations",
+      actionClass: "draft",
+      dependencies: [],
+      outputPaths: ["strategy/TOOL_DECISIONS.md"],
+      providerIds: [],
+      laneIds: ["paid_tool_routing"],
+      founderOnlyActions: [],
+      gateCommands: [],
+      idempotent: true,
+    });
+    const onb = catalog.workflows.find((workflow) => workflow.id === "workflow.product-spec")!;
+    onb.reads = [...(onb.reads ?? []), "strategy/TOOL_DECISIONS.md"];
+    const plan = compilePlan(catalog, now);
+    const consumer = plan.nodes.find((node) => node.id === nodeId("product-spec"))!;
+    const unrelated = plan.nodes.find((node) => node.id === nodeId("growth-post"))!;
+    assert(consumer.inputs.includes("artifact.strategy-tool-decisions-md"), "ONB-08-shaped reads of TOOL_DECISIONS must already join inputs");
+
+    const { run } = seedFor(["research"], plan);
+    for (const [id, artifactId, fingerprint] of [
+      [nodeId("paid-tool-routing"), "artifact.strategy-tool-decisions-md", "sha256:tools-v1"],
+      [consumer.id, "artifact.product-spec", "sha256:spec-v1"],
+      [unrelated.id, "artifact.growth-post", "sha256:growth-v1"],
+    ] as const) {
+      run.nodes[id]!.status = "succeeded";
+      run.nodes[id]!.acceptedOutputFingerprint = fingerprint;
+      const binding = run.artifactBindings.find((candidate) => candidate.artifactId === artifactId)!;
+      binding.accepted = true;
+      binding.fingerprint = fingerprint;
+      binding.producedBy = id;
+    }
+
+    const invalidated = invalidateDescendants(plan, run, ["artifact.strategy-tool-decisions-md"], plusSeconds(now, 1));
+    assert(invalidated.includes(consumer.id), "changing TOOL_DECISIONS must reopen the node that reads it");
+    assert(run.nodes[unrelated.id]!.status === "succeeded", "unrelated accepted outputs must remain");
+  });
 
   harness.check(
     "node-brief: composeNodeBrief carries the full authored contract, and an unauthored node degrades to an explicit marker — never a silent title-only brief",

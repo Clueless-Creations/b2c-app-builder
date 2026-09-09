@@ -6,6 +6,7 @@ import {
   projectDesignSurfaceApplicability,
   type InteractionKind,
 } from "../../../catalog/ontology/design-surface-applicability.js";
+import { validateFrozenPageTechniqueGates } from "../../validation/business/design/surface-page-gates.js";
 import { assert, skillRoot, type Harness } from "./_harness.js";
 
 function surfaceRecord(id: string, interaction?: InteractionKind | "omit"): Record<string, unknown> {
@@ -242,5 +243,60 @@ export function register(harness: Harness): void {
     writeFileSync(seedPath, `${JSON.stringify(seed, null, 2)}\n`, "utf8");
     const after = loadDesignSurfaceApplicability(root);
     assert(after.sixtyFpsRegister === "selected", `after ${after.sixtyFpsRegister}`);
+  });
+
+  harness.check("page-gates: static privacy without invented CRO passes", () => {
+    const root = harness.makeTempDir("page-gates-static");
+    mkdirSync(path.join(root, "studio/seed"), { recursive: true });
+    writeFileSync(
+      path.join(root, "studio/seed/business.json"),
+      JSON.stringify(studioDoc({ landingPages: [{ id: "privacy", interaction: "static-document" }] }), null, 2),
+      "utf8",
+    );
+    const issues = validateFrozenPageTechniqueGates(root, "page_gates");
+    assert(issues.length === 0, JSON.stringify(issues));
+  });
+
+  harness.check("page-gates: conversion landing without CRO evidence fails", () => {
+    const root = harness.makeTempDir("page-gates-conversion");
+    mkdirSync(path.join(root, "studio/seed"), { recursive: true });
+    writeFileSync(
+      path.join(root, "studio/seed/business.json"),
+      JSON.stringify(studioDoc({ landingPages: [{ id: "landing", interaction: "conversion" }] }), null, 2),
+      "utf8",
+    );
+    const issues = validateFrozenPageTechniqueGates(root, "page_gates");
+    assert(
+      issues.some((entry) => entry.code === "page_gates.conversion_evidence_missing"),
+      JSON.stringify(issues),
+    );
+  });
+
+  harness.check("page-gates: mixed inventory stays distinct", () => {
+    const root = harness.makeTempDir("page-gates-mixed");
+    mkdirSync(path.join(root, "studio/seed"), { recursive: true });
+    mkdirSync(path.join(root, "growth"), { recursive: true });
+    writeFileSync(
+      path.join(root, "studio/seed/business.json"),
+      JSON.stringify(
+        studioDoc({
+          landingPages: [
+            { id: "privacy", interaction: "static-document" },
+            { id: "landing", interaction: "conversion" },
+            { id: "story", interaction: "scroll-linked" },
+          ],
+        }),
+        null,
+        2,
+      ),
+      "utf8",
+    );
+    writeFileSync(
+      path.join(root, "growth/CRO_AUDIT.md"),
+      "# CRO audit\n\n## landing\n\nConversion goal: waitlist signup.\n\n## privacy\n\nNo conversion job. Static document legal page.\n",
+      "utf8",
+    );
+    const issues = validateFrozenPageTechniqueGates(root, "page_gates");
+    assert(issues.length === 0, JSON.stringify(issues));
   });
 }

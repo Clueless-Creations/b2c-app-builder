@@ -23,6 +23,7 @@ import {
   readText,
   reportAndExit,
 } from "../../../../tooling/lib/launch-state.js";
+import { conversionAnalyticsEventsRequired, validateFrozenPageTechniqueGates } from "../design/surface-page-gates.js";
 
 const args = parseCliArgs(process.argv.slice(2));
 const loaded = loadProjectState(args);
@@ -68,6 +69,10 @@ if (!inScope) {
   reportAndExit("Landing funnel check (skipped — no landing/funnel lane or artifacts in scope)", issues);
   // No argument: honor the exit code reportAndExit set (errors still fail on the skip path).
   process.exit();
+}
+
+if (designAccepted) {
+  issues.push(...validateFrozenPageTechniqueGates(args.root, "landing_funnel.page_gates"));
 }
 
 if (designAccepted && !hasLandingArtifacts) {
@@ -133,11 +138,13 @@ if (designAccepted) {
       }
 
       const events = Array.isArray(contract.analytics_events) ? contract.analytics_events.map(asString) : [];
-      for (const event of ["landing_viewed", "landing_cta_clicked", "waitlist_submitted"]) {
-        if (!events.includes(event)) {
-          issues.push(
-            issue("error", `landing_funnel.surface_contract.event.${event}.missing`, `surface-contract.json must declare ${event}.`, surfaceContractPath),
-          );
+      if (conversionAnalyticsEventsRequired(args.root)) {
+        for (const event of ["landing_viewed", "landing_cta_clicked", "waitlist_submitted"]) {
+          if (!events.includes(event)) {
+            issues.push(
+              issue("error", `landing_funnel.surface_contract.event.${event}.missing`, `surface-contract.json must declare ${event}.`, surfaceContractPath),
+            );
+          }
         }
       }
       const locales = Array.isArray(contract.locales) ? contract.locales : [];

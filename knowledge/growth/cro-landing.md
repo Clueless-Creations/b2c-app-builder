@@ -26,7 +26,7 @@ Load [`conversion-copy.md`](../words/conversion-copy.md) for the words on the pa
 
 ## Required Artifacts
 
-Create or update `CRO_AUDIT.md` when a launch ships a public conversion page. It records the page's conversion structure, the friction removed, and the test queue. The `check:landing-funnel` gates still apply. They cover live deploy and a form smoke test. This artifact adds the _will-it-convert_ layer. That gate does not check this layer.
+Create or update `CRO_AUDIT.md` when a launch ships a public conversion page. It records the page's conversion structure, the friction removed, and the test queue. The `check:landing-funnel` gates still apply. They cover live deploy, a form smoke test, and a frozen per-page CRO hold when a listed studio surface has a conversion job. A static legal or support page must not invent that layer.
 
 `CRO_AUDIT.md` must include:
 

@@ -4747,15 +4747,15 @@
       "path": "knowledge/experience/commitment-funnel.md",
       "domainId": "domain.experience",
       "title": "Commitment Funnel",
-      "loadWhen": "before first-session screen order; when onboarding needs welcome, quiz, micro-commitment, personalized insight, hard paywall, and install-to-trial quality metrics",
+      "loadWhen": "before first-session screen order; when product.yaml records feature.commitment-funnel as required and onboarding needs welcome, quiz, micro-commitment, personalized insight, hard paywall, and install-to-trial quality metrics",
       "lifecycle": "active",
-      "applicabilityNotes": "Extend the ONB graph. Do not replace it. Quality metrics include refund rate, not trial starts alone.",
+      "applicabilityNotes": "Required only when feature.commitment-funnel is required. Excluded or non-goal does not add a quiz or hard paywall to satisfy a gate. Absence holds and is not a free or selected default. Extend the ONB graph. Do not replace it. Quality metrics include refund rate, not trial starts alone. Do not silently select RevenueCat.",
       "sourceExemption": "This package contains internal operating guidance or has no external factual claims.",
       "sources": [],
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/experience/commitment-funnel.md",
-        "sha256": "sha256:4676505c6a21eac785f5ec395629b91f8755f4310aba109331cea4cb296ecd7a",
+        "sha256": "sha256:abe64444f25a9f5f8438a099e087baa50fb7552735cc4abdd93d47cca1aa5227",
         "origin": "skill"
       }
     },
@@ -4883,6 +4883,7 @@
       "title": "Onboarding Conversion",
       "loadWhen": "before onboarding quizzes, welcome/splash screens, personalization, attribution questions, demo videos, App Review popups, paywall timing, closing offers, trials, or first-session activation",
       "lifecycle": "active",
+      "applicabilityNotes": "Commitment Funnel and Paywall Goal Headline tables are required only when the matching product.yaml feature is required. Excluded or non-goal omits those binds. Absence holds. Packet prose cannot override a required feature. Do not silently select a funnel, billing provider, or extra platform.",
       "sources": [
         {
           "id": "developer-android-com-guide-playcore-in-app-review",
@@ -4938,7 +4939,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/experience/onboarding-conversion.md",
-        "sha256": "sha256:16d902faacc287431fc0b258394c586252de96ff4cf0a1473f31cbe06f0062da",
+        "sha256": "sha256:c40f745ff9efcb215f4b954c88680e4af34078b91fc0675424ed70f018efdcac",
         "origin": "skill"
       }
     },
@@ -4989,9 +4990,9 @@
       "path": "knowledge/experience/paywall-goal-headline.md",
       "domainId": "domain.experience",
       "title": "Paywall Goal Headline",
-      "loadWhen": "before paywall copy lock; when onboarding goals must interpolate an honest headline and a skipped-goal fallback",
+      "loadWhen": "before paywall copy lock; when product.yaml records feature.paywall-goal-headline as required and the declared present-paywall owner can bind RevenueCat offering metadata",
       "lifecycle": "active",
-      "applicabilityNotes": "Default starter contract. Interpolate only the selected goal key. A skipped goal uses the fallback template. Do not invent an outcome.",
+      "applicabilityNotes": "Required only when feature.paywall-goal-headline is required and the presenter can bind it. Excluded or non-goal omits the bind. Absence holds. Superwall or another non-RevenueCat presenter with the feature required is unavailable, not a fake RevenueCat pass. Packet prose cannot override a required feature. Interpolate only the selected goal key. A skipped goal uses the fallback template. Do not invent an outcome.",
       "sources": [
         {
           "id": "www-revenuecat-com-docs-tools-offering-metadata",
@@ -5017,7 +5018,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/experience/paywall-goal-headline.md",
-        "sha256": "sha256:f1fefbb3ce142822c154871e7f0bc86e60b88e3b3f3d7b672b6e673be684ffd6",
+        "sha256": "sha256:6d1b15a21fe5104601083ec6022b74632ab3b8466ac349e5e64725cbe20e96da",
         "origin": "skill"
       }
     },
@@ -6795,7 +6796,7 @@
       ],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/process/artifact-contracts.md",
-        "sha256": "sha256:f8497064192c3de902e7cd94f053e314e61914e7ebe5ffe59a0a288b246cff96",
+        "sha256": "sha256:4d93cde1815af17ed570a9110836efbf33e0b8caacde0924b3850e10fa30a707",
         "origin": "skill"
       }
     },
@@ -12775,9 +12776,10 @@
         "draw the full signup journey end to end",
         "converge every acquisition path into one onboarding map"
       ],
-      "instructions": "Draw the acquisition-specific journeys and converge them into one semantic onboarding state graph, marking each step's entry condition, owner/renderer, input/transition, canonical event, back/skip/close/resume behavior, and failure/next-step path — and mark where the acquisition promise, first effort, first value, engagement, account creation, paywall, purchase, activation, review eligibility, normal-product entry, and interruption budget each land on the graph. Record the Commitment Funnel in first-session order: welcome, quiz or goals, micro-commitment with a skip path, personalized insight, then hard paywall. Record Funnel Quality Metrics for onboarding complete, install-to-trial, trial-to-paid, per-step drop-off, and refund rate. Write the graph to product/onboarding/graph/ONB-16-journey-graph.md; check:onboarding-evidence-onb-16 rejects a stub packet.",
+      "instructions": "Draw the acquisition-specific journeys and converge them into one semantic onboarding state graph, marking each step's entry condition, owner/renderer, input/transition, canonical event, back/skip/close/resume behavior, and failure/next-step path — and mark where the acquisition promise, first effort, first value, engagement, account creation, paywall, purchase, activation, review eligibility, normal-product entry, and interruption budget each land on the graph. Resolve applicability from accepted product.yaml feature scopes and declared b2c.yaml monetization bindings when present: not selected, selected but unavailable, and unresolved stay different. Record first value, navigation/recovery, identity, accessibility, and the monetization boundary actually selected. When feature.commitment-funnel is required, record the Commitment Funnel in first-session order (welcome, quiz or goals, micro-commitment with a skip path, personalized insight, hard paywall) and Funnel Quality Metrics; when that feature is excluded or a non-goal, do not add a quiz or hard paywall to satisfy a gate; when the instance is absent, hold rather than treating the funnel as free or as selected. Keep that funnel in its recipe and reference.experience.commitment-funnel; do not silently select RevenueCat. Write the graph to product/onboarding/graph/ONB-16-journey-graph.md; check:onboarding-evidence-onb-16 rejects a stub packet.",
       "reads": [
-        "product/onboarding/graph/ONB-15-architecture-decision.md"
+        "product/onboarding/graph/ONB-15-architecture-decision.md",
+        "product.yaml"
       ],
       "consults": [],
       "referenceIds": [
@@ -12823,10 +12825,11 @@
         "define every control and copy key on each signup screen",
         "write the exact contract for each onboarding screen"
       ],
-      "instructions": "Specify every onboarding screen with a stable ID and exactly one dominant action, pulling on-screen copy by key from product/copy/COPY_DECK.md rather than inventing strings, and define every control's enable/validation rule, state mutation, and exact idempotent provider action; specify the paywall contract across trial/promo/existing-subscriber/offline/pending/canceled/restore states using live RevenueCat offerings, plus failure/recovery and accessibility/localization behavior per screen. Record the Paywall Goal Headline contract: quiz writes paywall_headline_key, templates live in RevenueCat offering metadata, customVariables bind the selected key, and a skipped goal uses the fallback template with no invented outcome. Write the contract to product/onboarding/graph/ONB-17-screen-control-paywall-contract.md; check:onboarding-evidence-onb-17 rejects a stub packet, and ONB-20's adversarial QA runs directly against this contract.",
+      "instructions": "Specify every onboarding screen with a stable ID and exactly one dominant action, pulling on-screen copy by key from product/copy/COPY_DECK.md rather than inventing strings, and define every control's enable/validation rule, state mutation, and exact idempotent provider action, plus failure/recovery and accessibility/localization behavior per screen. Resolve applicability from accepted product.yaml feature scopes and declared b2c.yaml monetization bindings when present; a producer sentence that a bind is not applicable cannot override a required feature. Specify the paywall contract for the selected purchase and presentation owners, including restore, pending, expiry, cancellation, offline, truthful-offer, and entitlement behavior those owners declare — do not invent RevenueCat offerings or customVariables for an unselected presenter. When feature.paywall-goal-headline is required and the presenter can bind it, record the Paywall Goal Headline contract: quiz writes paywall_headline_key, templates live in RevenueCat offering metadata, customVariables bind the selected key, and a skipped goal uses the fallback template with no invented outcome; when that feature is excluded or a non-goal, omit that bind; when the instance is absent, hold. Write the contract to product/onboarding/graph/ONB-17-screen-control-paywall-contract.md; check:onboarding-evidence-onb-17 rejects a stub packet, and ONB-20's adversarial QA runs directly against this contract.",
       "reads": [
         "product/onboarding/graph/ONB-16-journey-graph.md",
-        "product/copy/COPY_DECK.md"
+        "product/copy/COPY_DECK.md",
+        "product.yaml"
       ],
       "consults": [],
       "referenceIds": [
@@ -12845,8 +12848,7 @@
         "phase.2"
       ],
       "dependencies": [
-        "workflow.experience.onboarding-system.onb-16-journey-graph",
-        "workflow.operations.agent-operations-ledger"
+        "workflow.experience.onboarding-system.onb-16-journey-graph"
       ],
       "outputPaths": [
         "product/onboarding/graph/ONB-17-screen-control-paywall-contract.md"
@@ -12854,9 +12856,7 @@
       "gateCommands": [
         "check:onboarding-evidence-onb-17"
       ],
-      "providerIds": [
-        "provider.revenuecat"
-      ],
+      "providerIds": [],
       "founderOnlyActions": [],
       "actionClass": "draft",
       "idempotent": true,
@@ -18418,14 +18418,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "78adc16f805ac14ea654143c2a6b98a2405f9a508414129a16b00ef522325795",
+    "fingerprint": "9d7695e858a00833d26585e00661e131bf334d3979354074875b57cf32e58b23",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
         "version": "0.219.5",
         "revision": "0.219.5",
-        "contentDigest": "b8ccf3286538e283a2b5651c2a7e895658c6e4a89058231dcd561a1daf9a7479"
+        "contentDigest": "54382725ae6e742eee410bb22d4cc7375fa5cf308b4881a1760fce6f0ebd359a"
       }
     ],
     "base": {

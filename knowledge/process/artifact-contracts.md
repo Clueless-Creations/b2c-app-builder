@@ -750,9 +750,13 @@ Must include:
 - demo-video plan, including aha moment, duration, source UI, captions/no-audio fallback, and Higgsfield generation/scoring path or Remotion render path when used
 - App Review popup eligibility earned after real value and engagement, requested through the native platform API outside first-run onboarding at a later natural success, automatic mounted-screen timing, cooldown, analytics, compliance notes, and fallback when the prompt is not shown
 - hard/soft paywall decision, paywall placement, RevenueCat offering/experiment, restore path, and product package matrix
-- Commitment Funnel table in first-session order: welcome, quiz or goals, micro-commitment with a skip path, personalized insight, then hard paywall
-- Funnel Quality Metrics for onboarding complete, install-to-trial, trial-to-paid, per-step drop-off, and refund rate
-- Paywall Goal Headline table: goal key, `paywall_headline_key`, honest headline template, skipped-goal fallback, RevenueCat offering metadata and `customVariables` bind
+- When `product.yaml` records `feature.commitment-funnel` as required: Commitment Funnel table in first-session order (welcome, quiz or goals, micro-commitment with a skip path, personalized insight, then hard paywall) and Funnel Quality Metrics for onboarding complete, install-to-trial, trial-to-paid, per-step drop-off, and refund rate
+- When that feature is excluded or a non-goal: do not add a quiz or hard paywall to satisfy a gate; omit those tables
+- When `feature.commitment-funnel` is absent: hold; absence is not a free or selected default
+- When `product.yaml` records `feature.paywall-goal-headline` as required and the declared present-paywall owner can bind it: Paywall Goal Headline table (goal key, `paywall_headline_key`, honest headline template, skipped-goal fallback, RevenueCat offering metadata and `customVariables`)
+- When that headline feature is excluded or a non-goal: omit the RevenueCat headline bind
+- When `feature.paywall-goal-headline` is absent: hold; packet prose cannot make that decision
+- When the headline feature is required but the present-paywall owner cannot bind RevenueCat metadata: selected-but-unavailable — do not invent a RevenueCat pass
 - closing-offer or reverse-trial behavior after paywall dismissal, if used
 - first-session activation task and Day 0 cancellation prevention notes
 

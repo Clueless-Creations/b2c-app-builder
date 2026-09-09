@@ -585,7 +585,7 @@ _Define acquisition-specific journeys that converge on one semantic onboarding s
 - **Role:** Product leader
 - **Phases:** 2
 - **Providers:** —
-- **Reads:** `product/onboarding/graph/ONB-15-architecture-decision.md`
+- **Reads:** `product/onboarding/graph/ONB-15-architecture-decision.md`, `product.yaml`
 - **Consults:** —
 - **Produces:** `product/onboarding/graph/ONB-16-journey-graph.md`
 - **Gates:** `check:onboarding-evidence-onb-16`
@@ -597,8 +597,8 @@ _Specify every onboarding screen, copy key, control, action, paywall state, fail
 
 - **Role:** Product leader
 - **Phases:** 2
-- **Providers:** `provider.revenuecat` (api, browser)
-- **Reads:** `product/onboarding/graph/ONB-16-journey-graph.md`, `product/copy/COPY_DECK.md`
+- **Providers:** —
+- **Reads:** `product/onboarding/graph/ONB-16-journey-graph.md`, `product/copy/COPY_DECK.md`, `product.yaml`
 - **Consults:** —
 - **Produces:** `product/onboarding/graph/ONB-17-screen-control-paywall-contract.md`
 - **Gates:** `check:onboarding-evidence-onb-17`

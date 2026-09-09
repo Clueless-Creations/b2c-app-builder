@@ -1,8 +1,17 @@
 # Commitment Funnel
 
-Use this before locking the first-session screen sequence.
+Use this before locking the first-session screen sequence, and only when
+`product.yaml` records `feature.commitment-funnel` as required.
+
+Not selected, selected but unavailable, and unresolved stay different:
+
+- required: welcome, quiz or goals, micro-commitment with a skip path, personalized insight, then hard paywall
+- excluded or non-goal: do not add a quiz or hard paywall to satisfy a gate
+- instance absent: hold; do not treat the funnel as free or as selected
+
 The first two minutes dominate trial starts.
 A quiz plus a hard paywall is not a complete funnel.
+Do not silently select RevenueCat.
 
 Load `onboarding-conversion.md` for the ONB graph.
 Load `paywall-pricing-and-experiments.md` for experiment engines.
@@ -19,7 +28,7 @@ Load experience ethics guidance before a pledge, signature, or hold-to-confirm.
 
 ## 1. Required Sequence
 
-Record a Commitment Funnel table in `product/ONBOARDING.md`.
+Record a Commitment Funnel table in `product/ONBOARDING.md` when the feature is required.
 
 The table must name these steps in order:
 
@@ -37,7 +46,7 @@ Hard paywall follows the insight.
 
 Do not skip to a feature tour after the quiz.
 
-`check:onboarding-graph` reads this table.
+`check:onboarding-graph` reads this table when `feature.commitment-funnel` is required.
 
 ## 2. Quality Metrics
 

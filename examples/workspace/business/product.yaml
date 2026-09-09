@@ -76,6 +76,8 @@ instances:
       slot.app.core-loop: core-loop.primary
       slot.app.features:
         - feature.scope-placeholder
+        - feature.commitment-funnel
+        - feature.paywall-goal-headline
       slot.app.requirements:
         - requirement.req-001
   - id: customer.primary
@@ -96,6 +98,14 @@ instances:
     slots:
       slot.feature.scope: required
       slot.feature.problem: problem.primary
+  - id: feature.commitment-funnel
+    class_id: class.feature
+    slots:
+      slot.feature.scope: required
+  - id: feature.paywall-goal-headline
+    class_id: class.feature
+    slots:
+      slot.feature.scope: required
   - id: requirement.req-001
     class_id: class.requirement
     slots: {}

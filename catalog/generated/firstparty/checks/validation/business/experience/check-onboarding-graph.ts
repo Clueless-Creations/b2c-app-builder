@@ -5,6 +5,7 @@
  * This validator does not grade conversion taste. It proves that the canonical artifact carries the graph, evidence joins, first-value and activation distinctions,
  * screen and control contracts, provider and policy research, typed analytics, compliant review timing, visual design requirements, and replacement-mode deletion plan.
  */
+import { loadOnboardingApplicability } from "../../../../catalog/ontology/onboarding-applicability.js";
 import {
   asArray,
   asString,
@@ -162,6 +163,7 @@ if (!skip && artifact) {
   // found and accepted as present.
   const liveText = stripNonRenderedMarkdown(text);
   const relativePath = artifact.relativePath;
+  const applicability = loadOnboardingApplicability(args.root);
   const requiredSections = [
     "Execution Mode",
     "Graph Run",
@@ -181,12 +183,11 @@ if (!skip && artifact) {
     "Canonical State Model",
     "Architecture Decision",
     "Journey Graph",
-    "Commitment Funnel",
-    "Funnel Quality Metrics",
+    ...(applicability.commitmentFunnel === "selected" ? ["Commitment Funnel", "Funnel Quality Metrics"] : []),
     "Screen Inventory",
     "Control And Action Contract",
     "Paywall Contract",
-    "Paywall Goal Headline",
+    ...(applicability.headlineBind === "selected" ? ["Paywall Goal Headline"] : []),
     "Review Request Contract",
     "Analytics Contract",
     "Experimentation",
@@ -201,6 +202,36 @@ if (!skip && artifact) {
     "Target Runtime Cutover",
     "Verification",
   ];
+  if (applicability.commitmentFunnel === "unresolved") {
+    issues.push(
+      issue(
+        "error",
+        "onboarding_graph.commitment_funnel_unresolved",
+        `${relativePath} cannot treat the Commitment Funnel as free, skipped, or selected until product.yaml records feature.commitment-funnel with slot.feature.scope required, excluded, or non-goal.`,
+        "product.yaml",
+      ),
+    );
+  }
+  if (applicability.headlineBind === "unresolved") {
+    issues.push(
+      issue(
+        "error",
+        "onboarding_graph.paywall_goal_headline_unresolved",
+        `${relativePath} cannot treat the Paywall Goal Headline bind as free, skipped, or selected until product.yaml records feature.paywall-goal-headline with slot.feature.scope required, excluded, or non-goal.`,
+        "product.yaml",
+      ),
+    );
+  }
+  if (applicability.headlineBind === "unavailable") {
+    issues.push(
+      issue(
+        "error",
+        "onboarding_graph.paywall_goal_headline_unavailable",
+        `${relativePath} selected feature.paywall-goal-headline, but the declared present-paywall owner cannot bind RevenueCat offering metadata or customVariables. Do not invent that bind for an unselected presenter.`,
+        relativePath,
+      ),
+    );
+  }
 
   for (const section of requiredSections) {
     if (!hasHeading(liveText, section)) {
@@ -352,26 +383,28 @@ if (!skip && artifact) {
     "The artifact must cover purchase, restore, handoff, identity, nonblocking analytics, unsupported-client, and observability behavior.",
   );
 
-  requirePhrases(
-    issues,
-    relativePath,
-    liveText,
-    "onboarding_graph.commitment_funnel",
-    ["welcome", "quiz", "micro-commitment", "personalized insight", "hard paywall", "skip path"],
-    "The Commitment Funnel must name welcome, quiz or goals, micro-commitment, personalized insight, and hard paywall, with a skip path on the commitment step.",
-  );
+  if (applicability.commitmentFunnel === "selected") {
+    requirePhrases(
+      issues,
+      relativePath,
+      liveText,
+      "onboarding_graph.commitment_funnel",
+      ["welcome", "quiz", "micro-commitment", "personalized insight", "hard paywall", "skip path"],
+      "The Commitment Funnel must name welcome, quiz or goals, micro-commitment, personalized insight, and hard paywall, with a skip path on the commitment step.",
+    );
 
-  requirePhrases(
-    issues,
-    relativePath,
-    liveText,
-    "onboarding_graph.funnel_quality",
-    ["onboarding complete", "install-to-trial", "trial-to-paid", "drop-off", "refund rate"],
-    "Funnel Quality Metrics must include onboarding complete, install-to-trial, trial-to-paid, per-step drop-off, and refund rate. Trial starts alone cannot mark the lane done.",
-  );
+    requirePhrases(
+      issues,
+      relativePath,
+      liveText,
+      "onboarding_graph.funnel_quality",
+      ["onboarding complete", "install-to-trial", "trial-to-paid", "drop-off", "refund rate"],
+      "Funnel Quality Metrics must include onboarding complete, install-to-trial, trial-to-paid, per-step drop-off, and refund rate. Trial starts alone cannot mark the lane done.",
+    );
+  }
 
   const paywallGoalHeadline = extractSection(liveText, "Paywall Goal Headline");
-  if (paywallGoalHeadline) {
+  if (paywallGoalHeadline && applicability.headlineBind === "selected") {
     requirePhrases(
       issues,
       relativePath,
@@ -390,19 +423,20 @@ if (!skip && artifact) {
         ),
       );
     }
-    if (
-      /\binvented (goal|outcome) is (ok|fine|allowed)\b/i.test(paywallGoalHeadline) ||
-      /\ballow(?:s|ed)? invented (goals?|outcomes?)\b/i.test(paywallGoalHeadline)
-    ) {
-      issues.push(
-        issue(
-          "error",
-          "onboarding_graph.paywall_goal_headline_invented",
-          `${relativePath} allows an invented goal or outcome on the paywall. Interpolate only the selected key. A skip uses the fallback template.`,
-          relativePath,
-        ),
-      );
-    }
+  }
+  if (
+    paywallGoalHeadline &&
+    (/\binvented (goal|outcome) is (ok|fine|allowed)\b/i.test(paywallGoalHeadline) ||
+      /\ballow(?:s|ed)? invented (goals?|outcomes?)\b/i.test(paywallGoalHeadline))
+  ) {
+    issues.push(
+      issue(
+        "error",
+        "onboarding_graph.paywall_goal_headline_invented",
+        `${relativePath} allows an invented goal or outcome on the paywall. Interpolate only the selected key. A skip uses the fallback template.`,
+        relativePath,
+      ),
+    );
   }
 
   // requireDone forces the strict block below to run unconditionally, independent of

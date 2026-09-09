@@ -11,6 +11,7 @@
  * stub-length, or still-templated packet, closing the "any returned artifact ID is accepted"
  * gap enough to stop a trivially empty or placeholder packet from unlocking ONB-09.
  */
+import { loadOnboardingApplicability } from "../../../../catalog/ontology/onboarding-applicability.js";
 import {
   flagString,
   issue,
@@ -104,17 +105,49 @@ if (!relativePath) {
     }
 
     if (nodeLabel === "ONB-17") {
-      const required = ["paywall_headline_key", "fallback", "offering metadata", "customVariables"];
-      const missing = required.filter((phrase) => !stripped.toLowerCase().includes(phrase.toLowerCase()));
-      if (missing.length > 0) {
-        issues.push(
-          issue(
-            "error",
-            "onboarding_evidence.onb17_paywall_goal_headline",
-            `${relativePath} must record the Paywall Goal Headline contract: quiz writes paywall_headline_key, templates live in offering metadata, customVariables bind the selected key, and a skipped goal uses the fallback. Missing: ${missing.join(", ")}.`,
-            relativePath,
-          ),
-        );
+      const applicability = loadOnboardingApplicability(args.root);
+      switch (applicability.headlineBind) {
+        case "unresolved":
+          issues.push(
+            issue(
+              "error",
+              "onboarding_evidence.onb17_paywall_goal_headline_unresolved",
+              `${relativePath} cannot decide the Paywall Goal Headline bind until product.yaml records feature.paywall-goal-headline with slot.feature.scope required, excluded, or non-goal. Absence is not a free or no-billing default. Packet prose cannot make that decision.`,
+              "product.yaml",
+            ),
+          );
+          break;
+        case "unavailable":
+          issues.push(
+            issue(
+              "error",
+              "onboarding_evidence.onb17_paywall_goal_headline_unavailable",
+              `${relativePath} selected feature.paywall-goal-headline, but the declared present-paywall owner cannot bind RevenueCat offering metadata or customVariables. Do not invent that bind for an unselected presenter. Change the feature scope or the b2c.yaml present-paywall binding.`,
+              relativePath,
+            ),
+          );
+          break;
+        case "not_required":
+          break;
+        case "selected": {
+          const required = ["paywall_headline_key", "fallback", "offering metadata", "customVariables"];
+          const missing = required.filter((phrase) => !stripped.toLowerCase().includes(phrase.toLowerCase()));
+          if (missing.length > 0) {
+            issues.push(
+              issue(
+                "error",
+                "onboarding_evidence.onb17_paywall_goal_headline",
+                `${relativePath} must record the Paywall Goal Headline contract: quiz writes paywall_headline_key, templates live in offering metadata, customVariables bind the selected key, and a skipped goal uses the fallback. Missing: ${missing.join(", ")}. A producer sentence that this bind is not applicable cannot override the required feature.`,
+                relativePath,
+              ),
+            );
+          }
+          break;
+        }
+        default: {
+          const exhaustive: never = applicability.headlineBind;
+          throw new Error(`Unhandled headline bind applicability ${String(exhaustive)}`);
+        }
       }
     }
   }

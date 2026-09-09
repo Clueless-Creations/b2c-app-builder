@@ -20,8 +20,21 @@ import {
   type CliArgvRequest,
 } from "../../../adapters/providers/revenuecat/cli-operations.js";
 import { assessRevenueCatCliPreflight, isolatedConfigHome } from "../../../adapters/providers/revenuecat/cli-preflight.js";
-import { classifyRevenueCatProofDocument } from "../../../adapters/providers/revenuecat/cli-proof.js";
-import { offeringVerifyIsComplete, paginationState, parseRevenueCatCliJson, runRevenueCatCli } from "../../../adapters/providers/revenuecat/cli-execute.js";
+import {
+  extractResourceIds,
+  interpretOfferingPreview,
+  offeringVerifyIsComplete,
+  paginationState,
+  parseRevenueCatCliJson,
+  runRevenueCatCli,
+} from "../../../adapters/providers/revenuecat/cli-execute.js";
+import {
+  assessStorePlanApplyAuthorization,
+  runRevenueCatCatalogSession,
+  type CatalogSessionRequest,
+} from "../../../adapters/providers/revenuecat/cli-catalog.js";
+import { CLI_CATALOG_KIND, classifyRevenueCatCliCatalogEvidence, classifyRevenueCatProofDocument } from "../../../adapters/providers/revenuecat/cli-proof.js";
+import { issuesFromRevenueCatCliCatalogArtifact } from "../../../adapters/providers/revenuecat/revenue-validation.js";
 import { REVENUECAT_PROVISIONING } from "../../../adapters/providers/revenuecat/provisioning.js";
 import { loadUpstreams } from "../../../kernel/contribution/upstreams-load.js";
 
@@ -81,6 +94,42 @@ function selectedTarget(overrides: Partial<Parameters<typeof assessRevenueCatCli
     appStoreKind: "test-store" as const,
     hostAuthorityGranted: false,
     hasCredential: true,
+    ...overrides,
+  };
+}
+
+function envelope(data: unknown): string {
+  return JSON.stringify({ data, schema_version: "1" });
+}
+
+function catalogSession(
+  harness: Harness,
+  name: string,
+  run: CliProcessRunner,
+  overrides: Partial<CatalogSessionRequest> = {},
+): CatalogSessionRequest {
+  const home = isolatedConfigHome(harness.makeTempDir(name), "ws-a");
+  const discovery = discoverTrusted(harness, `${name}-disc`, run);
+  return {
+    intent: "reconcile-catalog",
+    executable: "/opt/fake/bin/rc",
+    cwd: home,
+    isolatedHome: home,
+    pathEnv: "/opt/fake/bin",
+    apiKey: "rc-fixture-key",
+    run,
+    discovery,
+    target: selectedTarget({ hostAuthorityGranted: false }),
+    expected: {
+      projectId: "proj_approved",
+      appId: "app_test",
+      offeringId: "off_default",
+      productIds: ["prod_monthly"],
+      entitlementIds: ["ent_premium"],
+      packageIds: ["pkg_monthly"],
+    },
+    hostAuthorityGranted: false,
+    synthetic: true,
     ...overrides,
   };
 }
@@ -609,6 +658,31 @@ export function register(harness: Harness): void {
     assert(notArray.complete === false, "string issues must not be complete");
   });
 
+  harness.check("revenuecat-cli: products and entitlements create without typed ids do not spawn", () => {
+    const { run, calls } = recordingRunner(trustedDiscoveryHandler());
+    const discovery = discoverTrusted(harness, "rc-create-ids", run);
+    const base = {
+      projectId: "proj_approved" as const,
+      hostAuthorityGranted: true,
+      executable: "/opt/fake/bin/rc",
+      cwd: isolatedConfigHome(harness.makeTempDir("rc-create-ids-cwd"), "ws-a"),
+      isolatedHome: isolatedConfigHome(harness.makeTempDir("rc-create-ids-home"), "ws-a"),
+      pathEnv: "/opt/fake/bin",
+      apiKey: "rc-fixture-key",
+      run,
+      discovery,
+      target: selectedTarget({ hostAuthorityGranted: true }),
+    };
+    const product = runRevenueCatCli({ ...base, operationId: "rc.products.create", createTitle: "Monthly" });
+    const entitlement = runRevenueCatCli({ ...base, operationId: "rc.entitlements.create" });
+    assert(product.invoked === false, "bare products create must not spawn");
+    assert(entitlement.invoked === false, "bare entitlements create must not spawn");
+    assert(
+      calls.every((call) => call.argv[0] === "--version" || call.argv[0] === "commands"),
+      "stub product or entitlement create must not start a process",
+    );
+  });
+
   harness.check("revenuecat-cli: catalog create without a typed offering id does not spawn", () => {
     const { run, calls } = recordingRunner(trustedDiscoveryHandler());
     const discovery = discoverTrusted(harness, "rc-create-stub", run);
@@ -630,5 +704,308 @@ export function register(harness: Harness): void {
       calls.every((call) => call.argv[0] === "--version" || call.argv[0] === "commands"),
       "stub catalog create must not start a process",
     );
+  });
+
+  harness.check("revenuecat-cli: accepted catalog is read back instead of duplicated", () => {
+    const { run, calls } = recordingRunner((request) => {
+      if (request.argv[0] === "--version") return ok("revenuecat-cli 0.1.1\n");
+      if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
+      if (request.argv.includes("products") && request.argv.includes("list")) return ok(envelope({ items: [{ id: "prod_monthly" }], next_page: null }));
+      if (request.argv.includes("entitlements") && request.argv.includes("list")) return ok(envelope({ items: [{ id: "ent_premium" }], next_page: null }));
+      if (request.argv.includes("offerings") && request.argv.includes("list")) return ok(envelope({ items: [{ id: "off_default" }], next_page: null }));
+      if (request.argv.includes("packages")) return ok(envelope({ items: [{ id: "pkg_monthly" }], next_page: null }));
+      return ok(envelope({}));
+    });
+    const result = runRevenueCatCatalogSession(catalogSession(harness, "rc-reconcile-exists", run, { createIfMissing: true, hostAuthorityGranted: true, target: selectedTarget({ hostAuthorityGranted: true }) }));
+    assert(result.disposition === "complete", `disposition ${result.disposition}`);
+    assert(result.evidence.catalog.reconciled === true, "existing catalog must reconcile");
+    assert(result.evidence.created === false, "must not create when ids already exist");
+    assert(
+      calls.every((call) => !call.argv.includes("create")),
+      "duplicate create must not spawn",
+    );
+  });
+
+  harness.check("revenuecat-cli: offering create without products and entitlements is not reconciled", () => {
+    let createdOffering = false;
+    const { run, calls } = recordingRunner((request) => {
+      if (request.argv[0] === "--version") return ok("revenuecat-cli 0.1.1\n");
+      if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
+      if (request.argv.includes("offerings") && request.argv.includes("create")) {
+        createdOffering = true;
+        return ok(envelope({ id: "off_default" }));
+      }
+      if (request.argv.includes("offerings") && request.argv.includes("list")) {
+        return ok(envelope({ items: createdOffering ? [{ id: "off_default" }] : [], next_page: null }));
+      }
+      if (request.argv.includes("list") || request.argv.includes("packages")) return ok(envelope({ items: [], next_page: null }));
+      return ok(envelope({}));
+    });
+    const result = runRevenueCatCatalogSession(
+      catalogSession(harness, "rc-reconcile-offering-only", run, {
+        createIfMissing: true,
+        hostAuthorityGranted: true,
+        target: selectedTarget({ hostAuthorityGranted: true }),
+      }),
+    );
+    assert(result.disposition === "incomplete", `disposition ${result.disposition}`);
+    assert(result.evidence.catalog.reconciled === false, "creating one offering is not catalog reconciliation");
+    assert(result.evidence.created === true, "authorized offering create may still run");
+    assert(result.evidence.catalog.missing_ids.includes("prod_monthly"), `missing ${result.evidence.catalog.missing_ids.join(",")}`);
+    assert(result.evidence.catalog.missing_ids.includes("ent_premium"), `missing ${result.evidence.catalog.missing_ids.join(",")}`);
+    assert(result.evidence.catalog.missing_ids.includes("pkg_monthly"), `missing ${result.evidence.catalog.missing_ids.join(",")}`);
+    assert(
+      calls.some((call) => call.argv.includes("offerings") && call.argv.includes("create")),
+      "offering create should spawn when authorized",
+    );
+  });
+
+  harness.check("revenuecat-cli: missing catalog without authority does not create", () => {
+    const { run, calls } = recordingRunner((request) => {
+      if (request.argv[0] === "--version") return ok("revenuecat-cli 0.1.1\n");
+      if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
+      if (request.argv.includes("list") || request.argv.includes("packages")) return ok(envelope({ items: [], next_page: null }));
+      return ok(envelope({}));
+    });
+    const result = runRevenueCatCatalogSession(catalogSession(harness, "rc-reconcile-authz", run, { createIfMissing: true, hostAuthorityGranted: false }));
+    assert(result.disposition === "refused", `disposition ${result.disposition}`);
+    assert(result.hold?.code === "authority-missing", `hold ${result.hold?.code}`);
+    assert(
+      calls.every((call) => !call.argv.includes("create")),
+      "create must not spawn without authority",
+    );
+  });
+
+  harness.check("revenuecat-cli: inspect adopts the existing project and app", () => {
+    const { run } = recordingRunner((request) => {
+      if (request.argv[0] === "--version") return ok("revenuecat-cli 0.1.1\n");
+      if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
+      if (request.argv.includes("projects")) return ok(envelope({ items: [{ id: "proj_approved" }], next_page: null }));
+      if (request.argv.includes("apps") && request.argv.includes("show")) return ok(envelope({ id: "app_test", type: "test_store" }));
+      return ok(envelope({}));
+    });
+    const result = runRevenueCatCatalogSession(catalogSession(harness, "rc-inspect", run, { intent: "inspect-project-app" }));
+    assert(result.disposition === "complete", `disposition ${result.disposition}`);
+    assert(result.evidence.catalog.project_ids.includes("proj_approved"), "approved project must be present");
+    assert(result.evidence.catalog.app_ids.includes("app_test"), "approved app must be present");
+    assert(result.invoked.every((step) => !step.argv.includes("create")), "inspect must not create a project");
+  });
+
+  harness.check("revenuecat-cli: nonempty verify issues are incomplete even on exit zero", () => {
+    const { run } = recordingRunner((request) => {
+      if (request.argv[0] === "--version") return ok("revenuecat-cli 0.1.1\n");
+      if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
+      if (request.argv.includes("verify")) return ok(envelope({ issues: [{ code: "missing_product" }] }));
+      return ok(envelope({}));
+    });
+    const result = runRevenueCatCatalogSession(catalogSession(harness, "rc-verify-issues", run, { intent: "verify-offering" }));
+    assert(result.disposition === "incomplete", `disposition ${result.disposition}`);
+    assert(result.evidence.offering_verify?.complete === false, "issues must block completeness");
+  });
+
+  harness.check("revenuecat-cli: null paywall_components is fallback, not published paywall", () => {
+    const preview = interpretOfferingPreview(
+      { id: "off_default", app_id: "app_test", paywall_components: null, issues: [] },
+      { appId: "app_test", offeringId: "off_default" },
+    );
+    assert(preview.fallbackOnly === true && preview.publishedPaywall === false, JSON.stringify(preview));
+    assert(preview.complete === true && preview.wrongApp === false, "fallback can still be a complete preview");
+    const { run } = recordingRunner((request) => {
+      if (request.argv[0] === "--version") return ok("revenuecat-cli 0.1.1\n");
+      if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
+      if (request.argv.includes("preview")) return ok(envelope({ id: "off_default", app_id: "app_test", paywall_components: null, issues: [] }));
+      return ok(envelope({}));
+    });
+    const result = runRevenueCatCatalogSession(
+      catalogSession(harness, "rc-preview-fallback", run, { intent: "preview-sdk", appUserId: "user_synth" }),
+    );
+    assert(result.evidence.preview?.fallback_only === true, "fallback must be recorded");
+    assert(result.evidence.preview?.published_paywall === false, "null components are not published paywall proof");
+  });
+
+  harness.check("revenuecat-cli: wrong-app preview is incomplete", () => {
+    const { run } = recordingRunner((request) => {
+      if (request.argv[0] === "--version") return ok("revenuecat-cli 0.1.1\n");
+      if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
+      return ok(envelope({ id: "off_other", app_id: "app_other", paywall_components: { pages: [] }, issues: [] }));
+    });
+    const result = runRevenueCatCatalogSession(catalogSession(harness, "rc-preview-wrong", run, { intent: "preview-sdk", appUserId: "user_synth" }));
+    assert(result.disposition === "incomplete", `disposition ${result.disposition}`);
+    assert(result.evidence.preview?.wrong_app === true, "wrong app must be flagged");
+  });
+
+  harness.check("revenuecat-cli: authorized Test Store purchase reads entitlements and is not native proof", () => {
+    const { run } = recordingRunner((request) => {
+      if (request.argv[0] === "--version") return ok("revenuecat-cli 0.1.1\n");
+      if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
+      if (request.argv.includes("simulate-purchase")) return ok(envelope({ app_user_id: "user_synth", product_id: "prod_monthly" }));
+      if (request.argv.includes("customers") && request.argv.includes("show")) {
+        return ok(envelope({ id: "user_synth", active_entitlements: [{ id: "ent_premium" }] }));
+      }
+      return ok(envelope({}));
+    });
+    const result = runRevenueCatCatalogSession(
+      catalogSession(harness, "rc-test-store", run, {
+        intent: "test-store-purchase",
+        hostAuthorityGranted: true,
+        target: selectedTarget({ hostAuthorityGranted: true }),
+        appUserId: "user_synth",
+        productId: "prod_monthly",
+        customerId: "user_synth",
+      }),
+    );
+    assert(result.disposition === "complete", `disposition ${result.disposition}`);
+    assert(result.evidence.test_store?.executed === true, "simulate-purchase must run");
+    assert(result.evidence.test_store?.entitlement_ids.includes("ent_premium"), "entitlement readback required");
+    assert(result.evidence.test_store?.not_native_purchase_proof === true, "must remain non-native");
+    assert(result.evidence.not_rest_probe === true && result.evidence.collector === CLI_PROOF_COLLECTOR, "CLI collector only");
+    const classified = classifyRevenueCatCliCatalogEvidence(result.evidence);
+    assert(classified.ok, JSON.stringify(classified));
+  });
+
+  harness.check("revenuecat-cli: Test Store readback with a different entitlement is incomplete", () => {
+    const { run } = recordingRunner((request) => {
+      if (request.argv[0] === "--version") return ok("revenuecat-cli 0.1.1\n");
+      if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
+      if (request.argv.includes("simulate-purchase")) return ok(envelope({ app_user_id: "user_synth", product_id: "prod_monthly" }));
+      if (request.argv.includes("customers") && request.argv.includes("show")) {
+        return ok(envelope({ id: "user_synth", active_entitlements: [{ id: "ent_other" }] }));
+      }
+      return ok(envelope({}));
+    });
+    const result = runRevenueCatCatalogSession(
+      catalogSession(harness, "rc-test-store-wrong-ent", run, {
+        intent: "test-store-purchase",
+        hostAuthorityGranted: true,
+        target: selectedTarget({ hostAuthorityGranted: true }),
+        appUserId: "user_synth",
+        productId: "prod_monthly",
+        customerId: "user_synth",
+      }),
+    );
+    assert(result.disposition === "incomplete", `disposition ${result.disposition}`);
+    assert(result.evidence.test_store?.executed === true, "simulate-purchase may still run");
+    assert(result.evidence.test_store?.entitlement_ids.includes("ent_other"), "wrong entitlement must be recorded");
+    assert(result.evidence.test_store?.not_native_purchase_proof === true, "must remain non-native");
+  });
+
+  harness.check("revenuecat-cli: paywall inspect does not publish", () => {
+    const { run, calls } = recordingRunner((request) => {
+      if (request.argv[0] === "--version") return ok("revenuecat-cli 0.1.1\n");
+      if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
+      if (request.argv.includes("paywalls") && request.argv.includes("list")) return ok(envelope({ items: [{ id: "pw_draft" }], next_page: null }));
+      if (request.argv.includes("paywalls") && request.argv.includes("show")) return ok(envelope({ id: "pw_draft" }));
+      return ok(envelope({}));
+    });
+    const result = runRevenueCatCatalogSession(
+      catalogSession(harness, "rc-paywalls", run, { intent: "inspect-paywalls", expected: { projectId: "proj_approved", appId: "app_test", paywallIds: ["pw_draft"] } }),
+    );
+    assert(result.disposition === "complete", `disposition ${result.disposition}`);
+    assert(result.evidence.paywalls?.published_claimed === false, "inspect must not claim publish");
+    assert(
+      calls.every((call) => !call.argv.includes("publish") && !call.argv.includes("generate")),
+      "publish/generate must not spawn",
+    );
+    assert(getRevenueCatCliOperation("rc.paywalls.publish")?.support !== "implemented-fixture", "publish stays excluded");
+  });
+
+  harness.check("revenuecat-cli: scoped observations refuse unscoped customer lists", () => {
+    assert(getRevenueCatCliOperation("rc.customers.list")?.support !== "implemented-fixture", "customers list stays excluded");
+    const { run } = recordingRunner(trustedDiscoveryHandler());
+    const unscoped = runRevenueCatCatalogSession(catalogSession(harness, "rc-obs-unscoped", run, { intent: "observe-revenue" }));
+    assert(unscoped.disposition === "refused" && unscoped.hold?.code === "unscoped-observation", JSON.stringify(unscoped.hold));
+    const listed = runRevenueCatCli({
+      operationId: "rc.customers.list",
+      projectId: "proj_approved",
+      hostAuthorityGranted: true,
+      executable: "/opt/fake/bin/rc",
+      cwd: isolatedConfigHome(harness.makeTempDir("rc-cust-list-cwd"), "ws-a"),
+      isolatedHome: isolatedConfigHome(harness.makeTempDir("rc-cust-list-home"), "ws-a"),
+      pathEnv: "/opt/fake/bin",
+      apiKey: "rc-fixture-key",
+      run,
+      discovery: discoverTrusted(harness, "rc-cust-list", run),
+      target: selectedTarget({ hostAuthorityGranted: true }),
+    });
+    assert(listed.invoked === false, "customers list must not spawn");
+    const scoped = runRevenueCatCatalogSession(
+      catalogSession(harness, "rc-obs-customer", run, { intent: "observe-revenue", observationKind: "customer", customerId: "user_synth" }),
+    );
+    assert(scoped.disposition === "complete", `scoped ${scoped.disposition}`);
+    assert(scoped.evidence.observations?.customer_records_exported === false, "must not export customer records");
+  });
+
+  harness.check("revenuecat-cli: audit and charts require scoped typed argv", () => {
+    const audit = buildRevenueCatCliArgv({
+      operationId: "rc.audit",
+      projectId: "proj_approved",
+      hostAuthorityGranted: false,
+      auditLimit: 20,
+    });
+    assert(audit.includes("--limit") && audit.includes("20"), JSON.stringify(audit));
+    let missingLimit = "";
+    try {
+      buildRevenueCatCliArgv({ operationId: "rc.audit", projectId: "proj_approved", hostAuthorityGranted: false });
+    } catch (error) {
+      missingLimit = error instanceof Error ? error.message : String(error);
+    }
+    assert(missingLimit.includes("limit"), missingLimit);
+    let badChart = "";
+    try {
+      buildRevenueCatCliArgv({
+        operationId: "rc.charts.show",
+        projectId: "proj_approved",
+        hostAuthorityGranted: false,
+        chartName: "not_a_chart" as never,
+      });
+    } catch (error) {
+      badChart = error instanceof Error ? error.message : String(error);
+    }
+    assert(badChart.includes("chart"), badChart);
+  });
+
+  harness.check("revenuecat-cli: changed remote store plan cannot use an old approval", () => {
+    const stale = assessStorePlanApplyAuthorization({ planId: "plan_1", digest: "aaa" }, { planId: "plan_1", digest: "bbb" });
+    assert(stale.allowed === false && stale.code === "stale-plan-approval", JSON.stringify(stale));
+    const unchanged = assessStorePlanApplyAuthorization({ planId: "plan_1", digest: "aaa" }, { planId: "plan_1", digest: "aaa" });
+    assert(unchanged.allowed === false && unchanged.code === "unsupported-operation", "apply stays excluded when digest matches");
+    const { run, calls } = recordingRunner(trustedDiscoveryHandler());
+    const result = runRevenueCatCatalogSession(
+      catalogSession(harness, "rc-stale-plan", run, {
+        storePlanApproval: { planId: "plan_1", digest: "aaa" },
+        currentStorePlan: { planId: "plan_1", digest: "bbb" },
+      }),
+    );
+    assert(result.disposition === "refused" && result.hold?.code === "stale-plan-approval", `hold ${result.hold?.code}`);
+    assert(
+      calls.every((call) => call.argv[0] === "--version" || call.argv[0] === "commands"),
+      "store apply must not spawn",
+    );
+    assert(getRevenueCatCliOperation("rc.products.store.apply")?.support !== "implemented-fixture", "apply stays excluded");
+    assert(getRevenueCatCliOperation("rc.webhooks.create")?.support !== "implemented-fixture", "webhooks stay excluded");
+  });
+
+  harness.check("revenuecat-cli: CLI catalog evidence cannot close the REST lane", () => {
+    const okDoc = {
+      collector: CLI_PROOF_COLLECTOR,
+      kind: CLI_CATALOG_KIND,
+      synthetic: true,
+      live: false,
+      not_native_purchase_proof: true,
+      preview: { fallback_only: true, published_paywall: false },
+    };
+    assert(classifyRevenueCatCliCatalogEvidence(okDoc).ok, "valid CLI catalog must pass");
+    const asRest = classifyRevenueCatCliCatalogEvidence({ ...okDoc, probe: REST_PROBE_COLLECTOR });
+    assert(asRest.ok === false && asRest.refusal === "cli-stamped-as-rest", JSON.stringify(asRest));
+    const native = classifyRevenueCatCliCatalogEvidence({ ...okDoc, not_native_purchase_proof: false });
+    assert(native.ok === false && native.refusal === "claims-native-purchase", JSON.stringify(native));
+    const publishedFromNull = classifyRevenueCatCliCatalogEvidence({
+      ...okDoc,
+      preview: { fallback_only: true, published_paywall: true },
+    });
+    assert(publishedFromNull.refusal === "claims-published-paywall-from-fallback", JSON.stringify(publishedFromNull));
+    const issues = issuesFromRevenueCatCliCatalogArtifact(JSON.stringify({ ...okDoc, probe: REST_PROBE_COLLECTOR }), "revenue/revenuecat-cli-catalog.json");
+    assert(issues.some((row) => row.code === "revenue.cli_catalog.collector_mismatch"), JSON.stringify(issues));
+    assert(extractResourceIds({ items: [{ id: "off_default" }], next_page: "https://example/next" }).pagination === "partial", "partial list is not empty");
   });
 }

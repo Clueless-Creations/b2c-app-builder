@@ -44,7 +44,28 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { asString, getPath, issue, loadProjectState, parseCliArgs, readText, type Issue } from "../../../tooling/lib/launch-state.js";
 import { unmigratedBreakingSummaries } from "../evaluate.js";
-import { classifyRevenueCatProofDocument } from "./cli-proof.js";
+import { CLI_CATALOG_KIND, classifyRevenueCatCliCatalogEvidence, classifyRevenueCatProofDocument } from "./cli-proof.js";
+
+export function issuesFromRevenueCatCliCatalogArtifact(content: string, relPath: string): Issue[] {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(content);
+  } catch {
+    return [issue("error", "revenue.cli_catalog.invalid_json", `${relPath} is not valid JSON.`, relPath)];
+  }
+  const classified = classifyRevenueCatCliCatalogEvidence(parsed);
+  if (!classified.ok) {
+    return [
+      issue(
+        "error",
+        classified.refusal === "cli-stamped-as-rest" ? "revenue.cli_catalog.collector_mismatch" : "revenue.cli_catalog.rejected",
+        classified.message ?? "RevenueCat CLI catalog evidence was rejected.",
+        relPath,
+      ),
+    ];
+  }
+  return [];
+}
 
 export function validateRevenueCatRevenue(
   args: ReturnType<typeof parseCliArgs>,
@@ -335,6 +356,17 @@ export function validateRevenueCatRevenue(
     }
 
     const obj = parsed as ProofJson;
+
+    if (obj.kind === CLI_CATALOG_KIND) {
+      issues.push(
+        issue(
+          "error",
+          "revenue.proof_json.cli_catalog_not_rest",
+          "revenue/revenuecat-proof.json cannot be a CLI catalog evidence document. CLI collector revenuecat-cli@1 does not close the REST probe lane.",
+          proofJsonRelPath,
+        ),
+      );
+    }
 
     // Fingerprint check — distinguishes real probe output from hand-typed JSON.
     // Acknowledged: this is a raised bar, not cryptographically unforgeable.
@@ -1180,6 +1212,12 @@ export function validateRevenueCatRevenue(
         );
       }
     }
+  }
+
+  const cliCatalogRelPath = "revenue/revenuecat-cli-catalog.json";
+  const cliCatalogContent = rawContent(cliCatalogRelPath);
+  if (cliCatalogContent) {
+    issues.push(...issuesFromRevenueCatCliCatalogArtifact(cliCatalogContent, cliCatalogRelPath));
   }
 
   return issues;

@@ -110,13 +110,24 @@ CLI proof uses collector `revenuecat-cli@1`. It is not the REST probe marker
 | List/show catalog | `rc --project-id <id> offerings\|apps\|products\|entitlements list\|show --json --no-input --no-color` | authenticated read | argv and preflight tested; live auth not run |
 | Offering verify | `rc --project-id <id> offerings verify <offering-id> --json --no-input --no-color` | authenticated read; inspect `issues` even on exit 0 | argv and result schema tested |
 | Offering preview | `rc --project-id <id> offerings preview <app-id> --app-user-id <id> --json --no-input --no-color` | authenticated read that may touch a user | argv tested; not assumed effect-free |
-| Test Store purchase | `rc --project-id <id> customers simulate-purchase --app-id <test-store-app> --product <id> --app-user-id <id> --yes --json --no-input --no-color` | remote mutation | refused unless app is a verified Test Store and host authority is granted |
-| Catalog create | `rc --project-id <id> offerings create <offering-id> --json --no-input --no-color` | catalog mutation | refused without host authority and a typed offering id; a bare create does not spawn |
-| Raw `api`, `setup`, `rico`, `skills install`, signup, refunds, publish/unpublish, AI generate/edit, store plan/apply/sync, entitlement grant/revoke/transfer, `projects use` / `profiles use` | n/a | excluded | refused; not a generic shell |
+| Test Store purchase | `rc --project-id <id> customers simulate-purchase --app-id <test-store-app> --product <id> --app-user-id <id> --yes --json --no-input --no-color` | remote mutation | refused unless app is a verified Test Store and host authority is granted; complete only when the expected product and entitlements match the readback; not native IAP proof |
+| Catalog create | `rc --project-id <id> offerings create <offering-id> --json --no-input --no-color` | catalog mutation | refused without host authority and a typed offering id; a bare create does not spawn; existing catalog is read back instead of duplicated |
+| Product/entitlement create | `rc --project-id <id> products\|entitlements create <id> --json --no-input --no-color` | catalog mutation | refused without host authority and a typed product or entitlement id; a bare create does not spawn |
+| Project/app inspect | `rc --project-id <id> projects list` and `apps show <app-id>` | authenticated read | fixture-wired; adopt the existing project, do not create a duplicate |
+| Catalog reconcile | `products\|entitlements\|offerings list`, `offerings packages <id>` | authenticated read, then authorized create | existing ids are preserved; create runs only with host authority and a typed offering id; complete and reconciled only when every expected id is present after readback |
+| Paywall inspect | `rc --project-id <id> paywalls list\|show` | authenticated read | inspect only; publish/unpublish/generate/edit stay excluded |
+| Paywall attach | `rc --project-id <id> paywalls attach <paywall-id> <offering-id>` | catalog mutation | refused without host authority |
+| Scoped customer/subscription | `customers show <id>` / `subscriptions show <id>` | authenticated read | one id only; `customers list` is refused |
+| Metrics/charts/audit | `metrics`, `charts show <name>`, `audit --limit <n>` | authenticated read | project-scoped; chart names are a fixed enum; audit requires an explicit limit |
+| Raw `api`, `setup`, `rico`, `skills install`, signup, refunds, publish/unpublish, AI generate/edit, store plan/apply/sync/show, entitlement grant/revoke/transfer, webhooks, `auth login`, `projects use` / `profiles use`, unscoped customer lists | n/a | excluded | refused; a changed remote store plan cannot be applied on an old approval |
 
 Selected families are implemented only through the builder's typed RevenueCat CLI
-adapter. Store credential setup remains experimental upstream. Nested setup must
-not become the builder orchestrator.
+adapter. Catalog, verify, preview, paywall inspect, and authorized Test Store
+routes produce collector `revenuecat-cli@1` evidence. That document is not the
+REST probe, not Apple/Play purchase proof, and not in-app UI proof. Null
+`paywall_components` is a fallback, not a published paywall. Store credential
+setup remains experimental upstream. Nested setup must not become the builder
+orchestrator. Live authenticated execution remains founder-gated.
 
 ## Verify the actual integration
 

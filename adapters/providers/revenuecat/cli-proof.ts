@@ -1,6 +1,9 @@
 import { CLI_PROOF_COLLECTOR, REST_PROBE_COLLECTOR } from "./cli-operations.js";
+import type { RevenueCatCliCatalogEvidence } from "./cli-catalog.js";
 
 export { CLI_PROOF_COLLECTOR, REST_PROBE_COLLECTOR };
+
+export const CLI_CATALOG_KIND = "revenuecat-cli-catalog";
 
 export type RevenueCatProofCollector = typeof CLI_PROOF_COLLECTOR | typeof REST_PROBE_COLLECTOR;
 
@@ -77,6 +80,67 @@ function collectorFrom(probe: string, collectorField: string): RevenueCatProofCo
   if (probe === CLI_PROOF_COLLECTOR || collectorField === CLI_PROOF_COLLECTOR) return CLI_PROOF_COLLECTOR;
   if (probe === REST_PROBE_COLLECTOR || probe.startsWith("revenuecat@")) return REST_PROBE_COLLECTOR;
   return "unknown";
+}
+
+export type RevenueCatCliCatalogRefusal =
+  | "cli-stamped-as-rest"
+  | "synthetic-labeled-live"
+  | "claims-native-purchase"
+  | "claims-published-paywall-from-fallback"
+  | "unknown-collector"
+  | "wrong-shape";
+
+export function classifyRevenueCatCliCatalogEvidence(value: unknown): {
+  readonly ok: boolean;
+  readonly refusal?: RevenueCatCliCatalogRefusal;
+  readonly message?: string;
+  readonly evidence?: RevenueCatCliCatalogEvidence;
+} {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return { ok: false, refusal: "wrong-shape", message: "CLI catalog evidence must be an object." };
+  }
+  const record = value as Record<string, unknown>;
+  const identity = classifyRevenueCatProofDocument(record);
+  if (identity.refusal === "synthetic-labeled-live") {
+    return { ok: false, refusal: "synthetic-labeled-live", message: identity.message };
+  }
+  if (identity.refusal === "cli-stamped-as-rest" || identity.refusal === "rest-stamped-as-cli") {
+    return { ok: false, refusal: "cli-stamped-as-rest", message: identity.message };
+  }
+  if (record.kind !== CLI_CATALOG_KIND || record.collector !== CLI_PROOF_COLLECTOR) {
+    return {
+      ok: false,
+      refusal: "unknown-collector",
+      message: `CLI catalog evidence must use kind ${CLI_CATALOG_KIND} and collector ${CLI_PROOF_COLLECTOR}.`,
+    };
+  }
+  if (record.probe === REST_PROBE_COLLECTOR || (typeof record.probe === "string" && record.probe.startsWith("revenuecat@"))) {
+    return {
+      ok: false,
+      refusal: "cli-stamped-as-rest",
+      message: "CLI catalog evidence cannot carry the REST probe marker.",
+    };
+  }
+  const testStore = record.test_store && typeof record.test_store === "object" ? (record.test_store as Record<string, unknown>) : undefined;
+  if (record.not_native_purchase_proof !== true || (testStore?.executed === true && testStore.not_native_purchase_proof !== true)) {
+    return {
+      ok: false,
+      refusal: "claims-native-purchase",
+      message: "CLI catalog evidence must declare it is not native Apple/Play or in-app purchase proof.",
+    };
+  }
+  if (record.live === true) {
+    return { ok: false, refusal: "synthetic-labeled-live", message: "Fixture CLI catalog evidence cannot be labeled live." };
+  }
+  const preview = record.preview && typeof record.preview === "object" ? (record.preview as Record<string, unknown>) : undefined;
+  if (preview && preview.fallback_only === true && preview.published_paywall === true) {
+    return {
+      ok: false,
+      refusal: "claims-published-paywall-from-fallback",
+      message: "Null or missing paywall_components is fallback, not published paywall proof.",
+    };
+  }
+  return { ok: true, evidence: record as unknown as RevenueCatCliCatalogEvidence };
 }
 
 function parseStoreKind(record: Record<string, unknown>): RevenueCatProofIdentity["storeKind"] {

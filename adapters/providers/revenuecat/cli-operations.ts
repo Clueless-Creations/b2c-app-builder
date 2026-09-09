@@ -245,6 +245,287 @@ export const REVENUECAT_CLI_OPERATIONS: readonly CliOperationSpec[] = [
     experimental: false,
     proofCollector: CLI_PROOF_COLLECTOR,
   },
+  {
+    id: "rc.projects.show",
+    title: "Show one project",
+    command: ["projects", "show"],
+    effectClass: "authenticated-read",
+    support: "implemented-fixture",
+    requiresAuth: true,
+    requiresProject: true,
+    requiresApp: false,
+    requiresHostAuthority: false,
+    allowsYesFlag: false,
+    experimental: false,
+    proofCollector: CLI_PROOF_COLLECTOR,
+  },
+  {
+    id: "rc.products.show",
+    title: "Show one product",
+    command: ["products", "show"],
+    effectClass: "authenticated-read",
+    support: "implemented-fixture",
+    requiresAuth: true,
+    requiresProject: true,
+    requiresApp: false,
+    requiresHostAuthority: false,
+    allowsYesFlag: false,
+    experimental: false,
+    proofCollector: CLI_PROOF_COLLECTOR,
+  },
+  {
+    id: "rc.products.create",
+    title: "Create a product",
+    command: ["products", "create"],
+    effectClass: "catalog-mutation",
+    support: "implemented-fixture",
+    requiresAuth: true,
+    requiresProject: true,
+    requiresApp: false,
+    requiresHostAuthority: true,
+    allowsYesFlag: false,
+    experimental: false,
+    proofCollector: CLI_PROOF_COLLECTOR,
+  },
+  {
+    id: "rc.entitlements.show",
+    title: "Show one entitlement",
+    command: ["entitlements", "show"],
+    effectClass: "authenticated-read",
+    support: "implemented-fixture",
+    requiresAuth: true,
+    requiresProject: true,
+    requiresApp: false,
+    requiresHostAuthority: false,
+    allowsYesFlag: false,
+    experimental: false,
+    proofCollector: CLI_PROOF_COLLECTOR,
+  },
+  {
+    id: "rc.entitlements.create",
+    title: "Create an entitlement",
+    command: ["entitlements", "create"],
+    effectClass: "catalog-mutation",
+    support: "implemented-fixture",
+    requiresAuth: true,
+    requiresProject: true,
+    requiresApp: false,
+    requiresHostAuthority: true,
+    allowsYesFlag: false,
+    experimental: false,
+    proofCollector: CLI_PROOF_COLLECTOR,
+  },
+  {
+    id: "rc.entitlements.attach",
+    title: "Attach products to an entitlement",
+    command: ["entitlements", "attach"],
+    effectClass: "catalog-mutation",
+    support: "implemented-fixture",
+    requiresAuth: true,
+    requiresProject: true,
+    requiresApp: false,
+    requiresHostAuthority: true,
+    allowsYesFlag: false,
+    experimental: false,
+    proofCollector: CLI_PROOF_COLLECTOR,
+  },
+  {
+    id: "rc.offerings.packages",
+    title: "List packages for an offering",
+    command: ["offerings", "packages"],
+    effectClass: "authenticated-read",
+    support: "implemented-fixture",
+    requiresAuth: true,
+    requiresProject: true,
+    requiresApp: false,
+    requiresHostAuthority: false,
+    allowsYesFlag: false,
+    experimental: false,
+    proofCollector: CLI_PROOF_COLLECTOR,
+  },
+  {
+    id: "rc.packages.show",
+    title: "Show one package",
+    command: ["packages", "show"],
+    effectClass: "authenticated-read",
+    support: "implemented-fixture",
+    requiresAuth: true,
+    requiresProject: true,
+    requiresApp: false,
+    requiresHostAuthority: false,
+    allowsYesFlag: false,
+    experimental: false,
+    proofCollector: CLI_PROOF_COLLECTOR,
+  },
+  {
+    id: "rc.packages.create",
+    title: "Create a package on an offering",
+    command: ["packages", "create"],
+    effectClass: "catalog-mutation",
+    support: "implemented-fixture",
+    requiresAuth: true,
+    requiresProject: true,
+    requiresApp: false,
+    requiresHostAuthority: true,
+    allowsYesFlag: false,
+    experimental: false,
+    proofCollector: CLI_PROOF_COLLECTOR,
+  },
+  {
+    id: "rc.packages.attach",
+    title: "Attach products to a package",
+    command: ["packages", "attach"],
+    effectClass: "catalog-mutation",
+    support: "implemented-fixture",
+    requiresAuth: true,
+    requiresProject: true,
+    requiresApp: false,
+    requiresHostAuthority: true,
+    allowsYesFlag: false,
+    experimental: false,
+    proofCollector: CLI_PROOF_COLLECTOR,
+  },
+  {
+    id: "rc.paywalls.list",
+    title: "List paywalls",
+    command: ["paywalls", "list"],
+    effectClass: "authenticated-read",
+    support: "implemented-fixture",
+    requiresAuth: true,
+    requiresProject: true,
+    requiresApp: false,
+    requiresHostAuthority: false,
+    allowsYesFlag: false,
+    experimental: false,
+    proofCollector: CLI_PROOF_COLLECTOR,
+  },
+  {
+    id: "rc.paywalls.show",
+    title: "Show one paywall",
+    command: ["paywalls", "show"],
+    effectClass: "authenticated-read",
+    support: "implemented-fixture",
+    requiresAuth: true,
+    requiresProject: true,
+    requiresApp: false,
+    requiresHostAuthority: false,
+    allowsYesFlag: false,
+    experimental: false,
+    proofCollector: CLI_PROOF_COLLECTOR,
+  },
+  {
+    id: "rc.paywalls.attach",
+    title: "Attach a paywall to an offering",
+    command: ["paywalls", "attach"],
+    effectClass: "catalog-mutation",
+    support: "implemented-fixture",
+    requiresAuth: true,
+    requiresProject: true,
+    requiresApp: false,
+    requiresHostAuthority: true,
+    allowsYesFlag: false,
+    experimental: false,
+    proofCollector: CLI_PROOF_COLLECTOR,
+  },
+  {
+    id: "rc.customers.show",
+    title: "Show one customer",
+    command: ["customers", "show"],
+    effectClass: "authenticated-read",
+    support: "implemented-fixture",
+    requiresAuth: true,
+    requiresProject: true,
+    requiresApp: false,
+    requiresHostAuthority: false,
+    allowsYesFlag: false,
+    experimental: false,
+    proofCollector: CLI_PROOF_COLLECTOR,
+  },
+  {
+    id: "rc.subscriptions.show",
+    title: "Show one subscription",
+    command: ["subscriptions", "show"],
+    effectClass: "authenticated-read",
+    support: "implemented-fixture",
+    requiresAuth: true,
+    requiresProject: true,
+    requiresApp: false,
+    requiresHostAuthority: false,
+    allowsYesFlag: false,
+    experimental: false,
+    proofCollector: CLI_PROOF_COLLECTOR,
+  },
+  {
+    id: "rc.metrics",
+    title: "Project overview metrics",
+    command: ["metrics"],
+    effectClass: "authenticated-read",
+    support: "implemented-fixture",
+    requiresAuth: true,
+    requiresProject: true,
+    requiresApp: false,
+    requiresHostAuthority: false,
+    allowsYesFlag: false,
+    experimental: false,
+    proofCollector: CLI_PROOF_COLLECTOR,
+  },
+  {
+    id: "rc.charts.show",
+    title: "Show one named chart",
+    command: ["charts", "show"],
+    effectClass: "authenticated-read",
+    support: "implemented-fixture",
+    requiresAuth: true,
+    requiresProject: true,
+    requiresApp: false,
+    requiresHostAuthority: false,
+    allowsYesFlag: false,
+    experimental: false,
+    proofCollector: CLI_PROOF_COLLECTOR,
+  },
+  {
+    id: "rc.audit",
+    title: "Scoped audit log",
+    command: ["audit"],
+    effectClass: "authenticated-read",
+    support: "implemented-fixture",
+    requiresAuth: true,
+    requiresProject: true,
+    requiresApp: false,
+    requiresHostAuthority: false,
+    allowsYesFlag: false,
+    experimental: false,
+    proofCollector: CLI_PROOF_COLLECTOR,
+  },
+  excluded({ id: "rc.customers.list", title: "List all customers", command: ["customers", "list"], effectClass: "authenticated-read" }),
+  excluded({ id: "rc.webhooks.list", title: "List webhooks", command: ["webhooks", "list"], effectClass: "authenticated-read" }),
+  excluded({ id: "rc.webhooks.show", title: "Show one webhook", command: ["webhooks", "show"], effectClass: "authenticated-read" }),
+  excluded({ id: "rc.webhooks.create", title: "Create a webhook", command: ["webhooks", "create"], effectClass: "nested-orchestration" }),
+  excluded({ id: "rc.auth.login", title: "Interactive or OAuth login", command: ["auth", "login"], effectClass: "credential-setup" }),
+  excluded({
+    id: "rc.products.store.show",
+    title: "Show a remote store plan",
+    command: ["products", "store", "show"],
+    effectClass: "store-plan",
+    experimental: true,
+    support: "experimental-excluded",
+  }),
+  excluded({
+    id: "rc.products.store.list",
+    title: "List remote store plans",
+    command: ["products", "store", "list"],
+    effectClass: "store-plan",
+    experimental: true,
+    support: "experimental-excluded",
+  }),
+  excluded({
+    id: "rc.products.store.discard",
+    title: "Discard a remote store plan",
+    command: ["products", "store", "discard"],
+    effectClass: "store-apply",
+    experimental: true,
+    support: "experimental-excluded",
+  }),
   excluded({ id: "rc.api", title: "Raw API escape hatch", command: ["api"], effectClass: "raw-api" }),
   excluded({ id: "rc.setup", title: "Nested setup agent", command: ["setup"], effectClass: "nested-orchestration" }),
   excluded({ id: "rc.setup.apple", title: "Apple credential setup", command: ["setup", "apple"], effectClass: "credential-setup", experimental: true, support: "experimental-excluded" }),
@@ -318,6 +599,8 @@ export type ArgvBuildRefusal =
   | "model-authored-flag"
   | "missing-project"
   | "missing-app"
+  | "missing-resource"
+  | "invalid-chart"
   | "yes-without-authority"
   | "ambiguous-target";
 
@@ -337,6 +620,15 @@ export interface CliArgvRequest {
   readonly offeringId?: string;
   readonly productId?: string;
   readonly appUserId?: string;
+  readonly customerId?: string;
+  readonly subscriptionId?: string;
+  readonly paywallId?: string;
+  readonly packageId?: string;
+  readonly entitlementId?: string;
+  readonly chartName?: string;
+  readonly auditLimit?: number;
+  readonly createTitle?: string;
+  readonly attachProductIds?: readonly string[];
   readonly schemaCommand?: CliCommandPath;
   readonly profile?: string;
   readonly hostAuthorityGranted: boolean;
@@ -345,6 +637,36 @@ export interface CliArgvRequest {
 
 const NONINTERACTIVE_FLAGS = ["--json", "--no-input", "--no-color"] as const;
 const RESOURCE_ID_PATTERN = /^[A-Za-z0-9._-]+$/u;
+const SAFE_TITLE_PATTERN = /^[A-Za-z0-9._ -]{1,80}$/u;
+export const REVENUECAT_CHART_NAMES = [
+  "actives",
+  "actives_movement",
+  "actives_new",
+  "arr",
+  "churn",
+  "cohort_explorer",
+  "conversion_to_paying",
+  "customers_active",
+  "customers_new",
+  "ltv_per_customer",
+  "ltv_per_paying_customer",
+  "mrr",
+  "mrr_movement",
+  "prediction_explorer",
+  "refund_rate",
+  "revenue",
+  "subscription_retention",
+  "subscription_status",
+  "trial_conversion_rate",
+  "trials",
+  "trials_movement",
+  "trials_new",
+] as const;
+export type RevenueCatChartName = (typeof REVENUECAT_CHART_NAMES)[number];
+
+export function isSafeRevenueCatResourceId(value: string): boolean {
+  return RESOURCE_ID_PATTERN.test(value);
+}
 
 function assertSafeId(value: string | undefined, label: string): void {
   if (value === undefined) return;
@@ -362,7 +684,24 @@ export function buildRevenueCatCliArgv(request: CliArgvRequest): string[] {
   assertSafeId(request.offeringId, "offering id");
   assertSafeId(request.productId, "product id");
   assertSafeId(request.appUserId, "app user id");
+  assertSafeId(request.customerId, "customer id");
+  assertSafeId(request.subscriptionId, "subscription id");
+  assertSafeId(request.paywallId, "paywall id");
+  assertSafeId(request.packageId, "package id");
+  assertSafeId(request.entitlementId, "entitlement id");
   assertSafeId(request.profile, "profile name");
+  if (request.attachProductIds) {
+    for (const productId of request.attachProductIds) assertSafeId(productId, "attach product id");
+  }
+  if (request.createTitle !== undefined && (!SAFE_TITLE_PATTERN.test(request.createTitle) || request.createTitle.startsWith("-"))) {
+    throw new CliArgvRefusal("ambiguous-target", "create title is not a validated catalog title.");
+  }
+  if (request.chartName !== undefined && !REVENUECAT_CHART_NAMES.includes(request.chartName as RevenueCatChartName)) {
+    throw new CliArgvRefusal("invalid-chart", `${request.chartName} is not a reviewed RevenueCat chart name.`);
+  }
+  if (request.auditLimit !== undefined && (!Number.isInteger(request.auditLimit) || request.auditLimit < 1 || request.auditLimit > 100)) {
+    throw new CliArgvRefusal("missing-resource", "audit --limit must be an integer from 1 to 100.");
+  }
   if (request.extraFlags && request.extraFlags.length > 0) {
     const name = request.extraFlags[0]!.split("=")[0] ?? request.extraFlags[0];
     throw new CliArgvRefusal(
@@ -397,8 +736,45 @@ export function buildRevenueCatCliArgv(request: CliArgvRequest): string[] {
   }
   if (operation.id === "rc.offerings.verify" && request.offeringId) argv.push(request.offeringId);
   if (operation.id === "rc.offerings.show" && request.offeringId) argv.push(request.offeringId);
+  if (operation.id === "rc.offerings.packages") {
+    if (!request.offeringId?.trim()) throw new CliArgvRefusal("missing-resource", "rc.offerings.packages requires an offering id.");
+    argv.push(request.offeringId);
+  }
   if (operation.id === "rc.offerings.preview" && request.appId) argv.push(request.appId);
   if (operation.id === "rc.apps.show" && request.appId) argv.push(request.appId);
+  if (operation.id === "rc.projects.show" && request.projectId) argv.push(request.projectId);
+  if (operation.id === "rc.products.show") {
+    if (!request.productId?.trim()) throw new CliArgvRefusal("missing-resource", "rc.products.show requires a product id.");
+    argv.push(request.productId);
+  }
+  if (operation.id === "rc.entitlements.show") {
+    if (!request.entitlementId?.trim()) throw new CliArgvRefusal("missing-resource", "rc.entitlements.show requires an entitlement id.");
+    argv.push(request.entitlementId);
+  }
+  if (operation.id === "rc.packages.show") {
+    if (!request.packageId?.trim()) throw new CliArgvRefusal("missing-resource", "rc.packages.show requires a package id.");
+    argv.push(request.packageId);
+  }
+  if (operation.id === "rc.paywalls.show") {
+    if (!request.paywallId?.trim()) throw new CliArgvRefusal("missing-resource", "rc.paywalls.show requires a paywall id.");
+    argv.push(request.paywallId);
+  }
+  if (operation.id === "rc.customers.show") {
+    if (!request.customerId?.trim()) throw new CliArgvRefusal("missing-resource", "rc.customers.show requires an explicit customer id. Listing all customers is refused.");
+    argv.push(request.customerId);
+  }
+  if (operation.id === "rc.subscriptions.show") {
+    if (!request.subscriptionId?.trim()) throw new CliArgvRefusal("missing-resource", "rc.subscriptions.show requires a subscription id.");
+    argv.push(request.subscriptionId);
+  }
+  if (operation.id === "rc.charts.show") {
+    if (!request.chartName?.trim()) throw new CliArgvRefusal("missing-resource", "rc.charts.show requires a reviewed chart name.");
+    argv.push(request.chartName);
+  }
+  if (operation.id === "rc.audit") {
+    if (request.auditLimit === undefined) throw new CliArgvRefusal("missing-resource", "rc.audit requires an explicit --limit.");
+    argv.push("--limit", String(request.auditLimit));
+  }
   if (operation.id === "rc.offerings.preview" && request.appUserId) argv.push("--app-user-id", request.appUserId);
   if (operation.id === "rc.customers.simulate-purchase") {
     if (request.appId) argv.push("--app-id", request.appId);
@@ -407,9 +783,44 @@ export function buildRevenueCatCliArgv(request: CliArgvRequest): string[] {
   }
   if (operation.id === "rc.catalog.create") {
     if (!request.offeringId?.trim()) {
-      throw new CliArgvRefusal("missing-project", `${operation.id} requires a typed offering id before spawn. A bare offerings create is not authorized.`);
+      throw new CliArgvRefusal("missing-resource", `${operation.id} requires a typed offering id before spawn. A bare offerings create is not authorized.`);
     }
     argv.push(request.offeringId);
+  }
+  if (operation.id === "rc.products.create") {
+    if (!request.productId?.trim()) {
+      throw new CliArgvRefusal("missing-resource", `${operation.id} requires a typed product id before spawn. A bare products create is not authorized.`);
+    }
+    argv.push(request.productId);
+    if (request.createTitle) argv.push("--title", request.createTitle);
+  }
+  if (operation.id === "rc.entitlements.create") {
+    if (!request.entitlementId?.trim()) {
+      throw new CliArgvRefusal("missing-resource", `${operation.id} requires a typed entitlement id before spawn. A bare entitlements create is not authorized.`);
+    }
+    argv.push(request.entitlementId);
+  }
+  if (operation.id === "rc.packages.create") {
+    if (!request.offeringId?.trim()) throw new CliArgvRefusal("missing-resource", "rc.packages.create requires an offering id.");
+    argv.push(request.offeringId);
+  }
+  if (operation.id === "rc.entitlements.attach") {
+    if (!request.entitlementId?.trim() || !request.attachProductIds?.length) {
+      throw new CliArgvRefusal("missing-resource", "rc.entitlements.attach requires an entitlement id and at least one product id.");
+    }
+    argv.push(request.entitlementId, ...request.attachProductIds);
+  }
+  if (operation.id === "rc.packages.attach") {
+    if (!request.packageId?.trim() || !request.attachProductIds?.length) {
+      throw new CliArgvRefusal("missing-resource", "rc.packages.attach requires a package id and at least one product id.");
+    }
+    argv.push(request.packageId, ...request.attachProductIds);
+  }
+  if (operation.id === "rc.paywalls.attach") {
+    if (!request.paywallId?.trim() || !request.offeringId?.trim()) {
+      throw new CliArgvRefusal("missing-resource", "rc.paywalls.attach requires a paywall id and an offering id.");
+    }
+    argv.push(request.paywallId, request.offeringId);
   }
   argv.push(...NONINTERACTIVE_FLAGS);
   if (operation.allowsYesFlag && request.hostAuthorityGranted) argv.push("--yes");

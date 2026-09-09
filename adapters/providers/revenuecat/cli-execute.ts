@@ -63,6 +63,28 @@ export function parseRevenueCatCliJson(stdout: string, status: number | null): R
   return { ok: true, data, schemaVersion, extraFields };
 }
 
+function argvRefusalHold(error: unknown): RevenueCatCliPreflight["code"] {
+  if (!(error instanceof CliArgvRefusal)) return "unsafe-override";
+  switch (error.code) {
+    case "ambiguous-target":
+      return "ambiguous-project";
+    case "missing-resource":
+    case "invalid-chart":
+      return "unscoped-observation";
+    case "unknown-operation":
+    case "unsupported-operation":
+    case "model-authored-flag":
+    case "missing-project":
+    case "missing-app":
+    case "yes-without-authority":
+      return "unsafe-override";
+    default: {
+      const exhaustive: never = error.code;
+      return exhaustive;
+    }
+  }
+}
+
 export function offeringVerifyIsComplete(data: unknown): { complete: boolean; issues: unknown } {
   if (!data || typeof data !== "object") return { complete: false, issues: "missing-document" };
   const record = data as Record<string, unknown>;
@@ -79,6 +101,83 @@ export function paginationState(data: unknown): "complete" | "partial" | "unknow
   const next = record.next_page ?? record.nextPage ?? record.next_cursor;
   if (next === null || next === undefined || next === "") return "complete";
   return "partial";
+}
+
+export function extractResourceIds(data: unknown): { readonly ids: readonly string[]; readonly pagination: "complete" | "partial" | "unknown" } {
+  const pagination = paginationState(data);
+  if (!data || typeof data !== "object") return { ids: [], pagination: "unknown" };
+  const record = data as Record<string, unknown>;
+  const rawItems = Array.isArray(record.items) ? record.items : Array.isArray(record.data) ? record.data : [];
+  const ids: string[] = [];
+  for (const item of rawItems) {
+    if (!item || typeof item !== "object") continue;
+    const id = (item as { id?: unknown }).id;
+    if (typeof id === "string" && /^[A-Za-z0-9._-]+$/u.test(id)) ids.push(id);
+  }
+  return { ids, pagination };
+}
+
+export function interpretOfferingPreview(
+  data: unknown,
+  expected: { readonly appId: string; readonly offeringId?: string },
+): {
+  readonly complete: boolean;
+  readonly fallbackOnly: boolean;
+  readonly publishedPaywall: boolean;
+  readonly wrongApp: boolean;
+  readonly offeringId: string | null;
+  readonly issues: unknown;
+} {
+  if (!data || typeof data !== "object") {
+    return { complete: false, fallbackOnly: true, publishedPaywall: false, wrongApp: false, offeringId: null, issues: "missing-document" };
+  }
+  const record = data as Record<string, unknown>;
+  const offeringValue = record.current_offering ?? record.offering ?? record;
+  const offering = offeringValue && typeof offeringValue === "object" && !Array.isArray(offeringValue) ? (offeringValue as Record<string, unknown>) : record;
+  const offeringId =
+    typeof offering.id === "string"
+      ? offering.id
+      : typeof offering.identifier === "string"
+        ? offering.identifier
+        : typeof record.offering_id === "string"
+          ? record.offering_id
+          : null;
+  const appId = typeof record.app_id === "string" ? record.app_id : typeof offering.app_id === "string" ? offering.app_id : null;
+  const components = offering.paywall_components ?? record.paywall_components;
+  const fallbackOnly = components === null || components === undefined;
+  const publishedPaywall = !fallbackOnly && typeof components === "object";
+  const issues = record.issues ?? offering.issues;
+  const issuesNonempty = Array.isArray(issues) && issues.length > 0;
+  const issuesKnown = Array.isArray(issues);
+  const wrongApp = (appId !== null && appId !== expected.appId) || (expected.offeringId !== undefined && offeringId !== null && offeringId !== expected.offeringId);
+  return {
+    complete: issuesKnown && !issuesNonempty && !wrongApp && offeringId !== null,
+    fallbackOnly,
+    publishedPaywall,
+    wrongApp,
+    offeringId,
+    issues: issues ?? [],
+  };
+}
+
+export function extractEntitlementIds(data: unknown): readonly string[] {
+  if (!data || typeof data !== "object") return [];
+  const record = data as Record<string, unknown>;
+  const raw = record.active_entitlements ?? record.entitlements ?? record.entitlement_ids;
+  if (Array.isArray(raw)) {
+    return raw.flatMap((entry) => {
+      if (typeof entry === "string" && /^[A-Za-z0-9._-]+$/u.test(entry)) return [entry];
+      if (entry && typeof entry === "object") {
+        const id = (entry as { id?: unknown; entitlement_id?: unknown }).id ?? (entry as { entitlement_id?: unknown }).entitlement_id;
+        return typeof id === "string" && /^[A-Za-z0-9._-]+$/u.test(id) ? [id] : [];
+      }
+      return [];
+    });
+  }
+  if (raw && typeof raw === "object") {
+    return Object.keys(raw).filter((key) => /^[A-Za-z0-9._-]+$/u.test(key));
+  }
+  return [];
 }
 
 export function runRevenueCatCli(input: RevenueCatCliRunRequest): RevenueCatCliRunResult {
@@ -163,7 +262,7 @@ export function runRevenueCatCli(input: RevenueCatCliRunRequest): RevenueCatCliR
     argv = buildRevenueCatCliArgv(input);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    const code = error instanceof CliArgvRefusal && error.code === "ambiguous-target" ? "ambiguous-project" : "unsafe-override";
+    const code = argvRefusalHold(error);
     return {
       invoked: false,
       preflight: { status: "hold", code, message, blocksUnrelatedWork: false },

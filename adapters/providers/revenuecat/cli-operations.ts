@@ -787,7 +787,19 @@ export function buildRevenueCatCliArgv(request: CliArgvRequest): string[] {
     }
     argv.push(request.offeringId);
   }
-  if (operation.id === "rc.products.create" && request.createTitle) argv.push("--title", request.createTitle);
+  if (operation.id === "rc.products.create") {
+    if (!request.productId?.trim()) {
+      throw new CliArgvRefusal("missing-resource", `${operation.id} requires a typed product id before spawn. A bare products create is not authorized.`);
+    }
+    argv.push(request.productId);
+    if (request.createTitle) argv.push("--title", request.createTitle);
+  }
+  if (operation.id === "rc.entitlements.create") {
+    if (!request.entitlementId?.trim()) {
+      throw new CliArgvRefusal("missing-resource", `${operation.id} requires a typed entitlement id before spawn. A bare entitlements create is not authorized.`);
+    }
+    argv.push(request.entitlementId);
+  }
   if (operation.id === "rc.packages.create") {
     if (!request.offeringId?.trim()) throw new CliArgvRefusal("missing-resource", "rc.packages.create requires an offering id.");
     argv.push(request.offeringId);

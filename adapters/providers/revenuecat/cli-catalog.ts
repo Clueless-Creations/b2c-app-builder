@@ -148,6 +148,23 @@ export function assessStorePlanApplyAuthorization(
   };
 }
 
+export function expectedCatalogMissing(
+  expected: ExpectedCatalog,
+  observed: {
+    readonly productIds: readonly string[];
+    readonly entitlementIds: readonly string[];
+    readonly offeringIds: readonly string[];
+    readonly packageIds: readonly string[];
+  },
+): readonly string[] {
+  return [
+    ...reconcileExpectedIds(expected.productIds, observed.productIds).missing,
+    ...reconcileExpectedIds(expected.entitlementIds, observed.entitlementIds).missing,
+    ...reconcileExpectedIds(expected.offeringId ? [expected.offeringId] : undefined, observed.offeringIds).missing,
+    ...reconcileExpectedIds(expected.packageIds, observed.packageIds).missing,
+  ];
+}
+
 export function reconcileExpectedIds(
   expected: readonly string[] | undefined,
   observed: readonly string[],
@@ -321,12 +338,12 @@ function reconcileCatalog(request: CatalogSessionRequest): CatalogSessionResult 
     packageIds = extractResourceIds(packages.json.data);
   }
   const pagination = worstPagination([productIds.pagination, entitlementIds.pagination, offeringIds.pagination, request.expected.offeringId ? packageIds.pagination : "complete"]);
-  const missing = [
-    ...reconcileExpectedIds(request.expected.productIds, productIds.ids).missing,
-    ...reconcileExpectedIds(request.expected.entitlementIds, entitlementIds.ids).missing,
-    ...reconcileExpectedIds(request.expected.offeringId ? [request.expected.offeringId] : undefined, offeringIds.ids).missing,
-    ...reconcileExpectedIds(request.expected.packageIds, packageIds.ids).missing,
-  ];
+  const missing = expectedCatalogMissing(request.expected, {
+    productIds: productIds.ids,
+    entitlementIds: entitlementIds.ids,
+    offeringIds: offeringIds.ids,
+    packageIds: packageIds.ids,
+  });
   const evidence = emptyEvidence(request);
   const catalog = {
     ...evidence.catalog,
@@ -374,23 +391,62 @@ function reconcileCatalog(request: CatalogSessionRequest): CatalogSessionResult 
   if (!create.json?.ok) {
     return { disposition: "incomplete", invoked, evidence: { ...evidence, catalog, pagination }, replaySafe: true };
   }
-  const readback = runStep(request, "rc.offerings.list");
-  invoked.push(readback);
-  const readbackIds = readback.json?.ok ? extractResourceIds(readback.json.data) : { ids: offeringIds.ids, pagination: "unknown" as const };
+  const productsAfter = runStep(request, "rc.products.list");
+  const entitlementsAfter = runStep(request, "rc.entitlements.list");
+  const offeringsAfter = runStep(request, "rc.offerings.list");
+  invoked.push(productsAfter, entitlementsAfter, offeringsAfter);
+  for (const step of [productsAfter, entitlementsAfter, offeringsAfter]) {
+    if (!step.invoked) return refused(request, step.preflight, invoked);
+    if (step.uncertainMutation) {
+      return { disposition: "uncertain", invoked, evidence: { ...evidence, catalog: { ...catalog, created: true }, created: true, pagination }, replaySafe: false };
+    }
+    if (!step.json?.ok) {
+      return { disposition: "incomplete", invoked, evidence: { ...evidence, catalog: { ...catalog, created: true }, created: true, pagination }, replaySafe: true };
+    }
+  }
+  const productIdsAfter = extractResourceIds(productsAfter.json && productsAfter.json.ok ? productsAfter.json.data : undefined);
+  const entitlementIdsAfter = extractResourceIds(entitlementsAfter.json && entitlementsAfter.json.ok ? entitlementsAfter.json.data : undefined);
+  const offeringIdsAfter = extractResourceIds(offeringsAfter.json && offeringsAfter.json.ok ? offeringsAfter.json.data : undefined);
+  let packageIdsAfter: ReturnType<typeof extractResourceIds> = { ids: [], pagination: "unknown" };
+  if (request.expected.offeringId) {
+    const packagesAfter = runStep(request, "rc.offerings.packages", { offeringId: request.expected.offeringId });
+    invoked.push(packagesAfter);
+    if (!packagesAfter.invoked) return refused(request, packagesAfter.preflight, invoked);
+    if (!packagesAfter.json?.ok) {
+      return { disposition: "incomplete", invoked, evidence: { ...evidence, catalog: { ...catalog, created: true }, created: true, pagination }, replaySafe: true };
+    }
+    packageIdsAfter = extractResourceIds(packagesAfter.json.data);
+  }
+  const afterPagination = worstPagination([
+    productIdsAfter.pagination,
+    entitlementIdsAfter.pagination,
+    offeringIdsAfter.pagination,
+    request.expected.offeringId ? packageIdsAfter.pagination : "complete",
+  ]);
+  const missingAfter = expectedCatalogMissing(request.expected, {
+    productIds: productIdsAfter.ids,
+    entitlementIds: entitlementIdsAfter.ids,
+    offeringIds: offeringIdsAfter.ids,
+    packageIds: packageIdsAfter.ids,
+  });
+  const reconciled = missingAfter.length === 0 && afterPagination !== "partial" && afterPagination !== "unknown";
   return {
-    disposition: readbackIds.ids.includes(request.expected.offeringId ?? "") ? "complete" : "incomplete",
+    disposition: reconciled ? "complete" : afterPagination === "partial" ? "partial" : "incomplete",
     invoked,
     evidence: {
       ...evidence,
       catalog: {
         ...catalog,
-        offering_ids: readbackIds.ids,
+        product_ids: productIdsAfter.ids,
+        entitlement_ids: entitlementIdsAfter.ids,
+        offering_ids: offeringIdsAfter.ids,
+        package_ids: packageIdsAfter.ids,
+        missing_ids: missingAfter,
         created: true,
-        reconciled: Boolean(request.expected.offeringId && readbackIds.ids.includes(request.expected.offeringId)),
-        missing_ids: request.expected.offeringId && readbackIds.ids.includes(request.expected.offeringId) ? missing.filter((id) => id !== request.expected.offeringId) : missing,
+        reconciled,
       },
       created: true,
-      pagination: worstPagination([pagination, readbackIds.pagination]),
+      pagination: afterPagination,
     },
     replaySafe: true,
   };
@@ -486,15 +542,25 @@ function testStorePurchase(request: CatalogSessionRequest): CatalogSessionResult
     return { disposition: "incomplete", invoked, evidence: emptyEvidence(request), replaySafe: true };
   }
   const entitlementIds = extractEntitlementIds(readback.json.data);
+  const observedProductId = observedSimulatePurchaseProductId(purchase.json && purchase.json.ok ? purchase.json.data : undefined);
+  const expectedEntitlements = request.expected.entitlementIds ?? [];
+  const expectedProducts = request.expected.productIds ?? [];
+  const requestedProduct = request.productId;
+  const productMatches =
+    typeof requestedProduct === "string" &&
+    requestedProduct.length > 0 &&
+    expectedProducts.includes(requestedProduct) &&
+    (observedProductId === null || observedProductId === requestedProduct);
+  const entitlementsMatch = expectedEntitlements.length > 0 && expectedEntitlements.every((id) => entitlementIds.includes(id));
   const evidence = emptyEvidence(request);
   return {
-    disposition: entitlementIds.length > 0 ? "complete" : "incomplete",
+    disposition: productMatches && entitlementsMatch ? "complete" : "incomplete",
     invoked,
     evidence: {
       ...evidence,
       test_store: {
         executed: true,
-        product_id: request.productId ?? null,
+        product_id: requestedProduct ?? observedProductId,
         entitlement_ids: entitlementIds,
         not_native_purchase_proof: true,
         not_in_app_ui_proof: true,
@@ -503,6 +569,14 @@ function testStorePurchase(request: CatalogSessionRequest): CatalogSessionResult
     },
     replaySafe: true,
   };
+}
+
+function observedSimulatePurchaseProductId(data: unknown): string | null {
+  if (!data || typeof data !== "object") return null;
+  const record = data as { product_id?: unknown; productId?: unknown };
+  if (typeof record.product_id === "string") return record.product_id;
+  if (typeof record.productId === "string") return record.productId;
+  return null;
 }
 
 function observeRevenue(request: CatalogSessionRequest): CatalogSessionResult {

@@ -658,6 +658,31 @@ export function register(harness: Harness): void {
     assert(notArray.complete === false, "string issues must not be complete");
   });
 
+  harness.check("revenuecat-cli: products and entitlements create without typed ids do not spawn", () => {
+    const { run, calls } = recordingRunner(trustedDiscoveryHandler());
+    const discovery = discoverTrusted(harness, "rc-create-ids", run);
+    const base = {
+      projectId: "proj_approved" as const,
+      hostAuthorityGranted: true,
+      executable: "/opt/fake/bin/rc",
+      cwd: isolatedConfigHome(harness.makeTempDir("rc-create-ids-cwd"), "ws-a"),
+      isolatedHome: isolatedConfigHome(harness.makeTempDir("rc-create-ids-home"), "ws-a"),
+      pathEnv: "/opt/fake/bin",
+      apiKey: "rc-fixture-key",
+      run,
+      discovery,
+      target: selectedTarget({ hostAuthorityGranted: true }),
+    };
+    const product = runRevenueCatCli({ ...base, operationId: "rc.products.create", createTitle: "Monthly" });
+    const entitlement = runRevenueCatCli({ ...base, operationId: "rc.entitlements.create" });
+    assert(product.invoked === false, "bare products create must not spawn");
+    assert(entitlement.invoked === false, "bare entitlements create must not spawn");
+    assert(
+      calls.every((call) => call.argv[0] === "--version" || call.argv[0] === "commands"),
+      "stub product or entitlement create must not start a process",
+    );
+  });
+
   harness.check("revenuecat-cli: catalog create without a typed offering id does not spawn", () => {
     const { run, calls } = recordingRunner(trustedDiscoveryHandler());
     const discovery = discoverTrusted(harness, "rc-create-stub", run);
@@ -698,6 +723,40 @@ export function register(harness: Harness): void {
     assert(
       calls.every((call) => !call.argv.includes("create")),
       "duplicate create must not spawn",
+    );
+  });
+
+  harness.check("revenuecat-cli: offering create without products and entitlements is not reconciled", () => {
+    let createdOffering = false;
+    const { run, calls } = recordingRunner((request) => {
+      if (request.argv[0] === "--version") return ok("revenuecat-cli 0.1.1\n");
+      if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
+      if (request.argv.includes("offerings") && request.argv.includes("create")) {
+        createdOffering = true;
+        return ok(envelope({ id: "off_default" }));
+      }
+      if (request.argv.includes("offerings") && request.argv.includes("list")) {
+        return ok(envelope({ items: createdOffering ? [{ id: "off_default" }] : [], next_page: null }));
+      }
+      if (request.argv.includes("list") || request.argv.includes("packages")) return ok(envelope({ items: [], next_page: null }));
+      return ok(envelope({}));
+    });
+    const result = runRevenueCatCatalogSession(
+      catalogSession(harness, "rc-reconcile-offering-only", run, {
+        createIfMissing: true,
+        hostAuthorityGranted: true,
+        target: selectedTarget({ hostAuthorityGranted: true }),
+      }),
+    );
+    assert(result.disposition === "incomplete", `disposition ${result.disposition}`);
+    assert(result.evidence.catalog.reconciled === false, "creating one offering is not catalog reconciliation");
+    assert(result.evidence.created === true, "authorized offering create may still run");
+    assert(result.evidence.catalog.missing_ids.includes("prod_monthly"), `missing ${result.evidence.catalog.missing_ids.join(",")}`);
+    assert(result.evidence.catalog.missing_ids.includes("ent_premium"), `missing ${result.evidence.catalog.missing_ids.join(",")}`);
+    assert(result.evidence.catalog.missing_ids.includes("pkg_monthly"), `missing ${result.evidence.catalog.missing_ids.join(",")}`);
+    assert(
+      calls.some((call) => call.argv.includes("offerings") && call.argv.includes("create")),
+      "offering create should spawn when authorized",
     );
   });
 
@@ -802,6 +861,32 @@ export function register(harness: Harness): void {
     assert(result.evidence.not_rest_probe === true && result.evidence.collector === CLI_PROOF_COLLECTOR, "CLI collector only");
     const classified = classifyRevenueCatCliCatalogEvidence(result.evidence);
     assert(classified.ok, JSON.stringify(classified));
+  });
+
+  harness.check("revenuecat-cli: Test Store readback with a different entitlement is incomplete", () => {
+    const { run } = recordingRunner((request) => {
+      if (request.argv[0] === "--version") return ok("revenuecat-cli 0.1.1\n");
+      if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
+      if (request.argv.includes("simulate-purchase")) return ok(envelope({ app_user_id: "user_synth", product_id: "prod_monthly" }));
+      if (request.argv.includes("customers") && request.argv.includes("show")) {
+        return ok(envelope({ id: "user_synth", active_entitlements: [{ id: "ent_other" }] }));
+      }
+      return ok(envelope({}));
+    });
+    const result = runRevenueCatCatalogSession(
+      catalogSession(harness, "rc-test-store-wrong-ent", run, {
+        intent: "test-store-purchase",
+        hostAuthorityGranted: true,
+        target: selectedTarget({ hostAuthorityGranted: true }),
+        appUserId: "user_synth",
+        productId: "prod_monthly",
+        customerId: "user_synth",
+      }),
+    );
+    assert(result.disposition === "incomplete", `disposition ${result.disposition}`);
+    assert(result.evidence.test_store?.executed === true, "simulate-purchase may still run");
+    assert(result.evidence.test_store?.entitlement_ids.includes("ent_other"), "wrong entitlement must be recorded");
+    assert(result.evidence.test_store?.not_native_purchase_proof === true, "must remain non-native");
   });
 
   harness.check("revenuecat-cli: paywall inspect does not publish", () => {

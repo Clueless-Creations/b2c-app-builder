@@ -15,7 +15,7 @@ _Before marking any provider-backed lane (analytics/revenue/email/store/security
 
 - **Role:** Orchestrator
 - **Phases:** Cross-phase (always-on)
-- **Providers:** `provider.posthog` (api, browser), `provider.revenuecat` (api, browser), `provider.resend` (api, browser), `provider.app-store-connect` (cli, api, browser)
+- **Providers:** `provider.posthog` (api, browser), `provider.revenuecat` (api, cli, browser), `provider.resend` (api, browser), `provider.app-store-connect` (cli, api, browser)
 - **Reads:** `state/business-state.json`
 - **Consults:** `operations/PROVIDER_PROOF.md`
 - **Produces:** `operations/PROVIDER_PROOF.md`
@@ -227,7 +227,7 @@ _App live: the recurring financial pulse; a spend change, refund spike, or runwa
 
 - **Role:** Orchestrator
 - **Phases:** 6b
-- **Providers:** `provider.revenuecat` (api, browser)
+- **Providers:** `provider.revenuecat` (api, cli, browser)
 - **Reads:** `state/business-state.json`
 - **Consults:** `operations/POST_LAUNCH_OPS.md`, `growth/PAID_UA.md`
 - **Produces:** `operations/FINANCE_OPS.md`
@@ -266,7 +266,7 @@ _Before any authenticated browser/API/CLI/native action on a provider, social, o
 
 - **Role:** Operator readiness
 - **Phases:** Cross-phase (always-on)
-- **Providers:** `provider.doppler` (cli, browser), `provider.app-store-connect` (cli, api, browser), `provider.google-play` (api, browser), `provider.posthog` (api, browser), `provider.revenuecat` (api, browser), `provider.stripe` (api, cli, browser), `provider.resend` (api, browser), `provider.app-store-screenshots` (skill_pack), `provider.higgsfield` (mcp), `provider.mobai` (mcp, cli), `provider.in-app-ios-simulator` (native_device), `provider.codex-native-ios` (local tooling — deliberately undeclared, see adapters/provisioning/requirements.ts), `provider.snapshot-previews` (local tooling — deliberately undeclared, see adapters/provisioning/requirements.ts), `provider.serve-sim` (local tooling — deliberately undeclared, see adapters/provisioning/requirements.ts), `provider.aso-skills` (skill_pack), `provider.refero` (api), `provider.security-review` (cli, manual), `provider.sentry` (api, cli, browser), `provider.paid-ad-channels` (manual)
+- **Providers:** `provider.doppler` (cli, browser), `provider.app-store-connect` (cli, api, browser), `provider.google-play` (api, browser), `provider.posthog` (api, browser), `provider.revenuecat` (api, cli, browser), `provider.stripe` (api, cli, browser), `provider.resend` (api, browser), `provider.app-store-screenshots` (skill_pack), `provider.higgsfield` (mcp), `provider.mobai` (mcp, cli), `provider.in-app-ios-simulator` (native_device), `provider.codex-native-ios` (local tooling — deliberately undeclared, see adapters/provisioning/requirements.ts), `provider.snapshot-previews` (local tooling — deliberately undeclared, see adapters/provisioning/requirements.ts), `provider.serve-sim` (local tooling — deliberately undeclared, see adapters/provisioning/requirements.ts), `provider.aso-skills` (skill_pack), `provider.refero` (api), `provider.security-review` (cli, manual), `provider.sentry` (api, cli, browser), `provider.paid-ad-channels` (manual)
 - **Reads:** `state/business-state.json`
 - **Consults:** `operations/AGENT_OPERATIONS.md`, `operations/agent-operations.json`, `operations/PROVIDER_PROOF.md`
 - **Produces:** `operations/AGENT_OPERATIONS.md`, `operations/agent-operations.json`
@@ -467,7 +467,7 @@ _Refresh monetization, identity, analytics, RevenueCat, billing, platform-policy
 
 - **Role:** Product leader
 - **Phases:** 1c
-- **Providers:** `provider.revenuecat` (api, browser), `provider.posthog` (api, browser), `provider.app-store-connect` (cli, api, browser), `provider.google-play` (api, browser)
+- **Providers:** `provider.revenuecat` (api, cli, browser), `provider.posthog` (api, browser), `provider.app-store-connect` (cli, api, browser), `provider.google-play` (api, browser)
 - **Reads:** `product/onboarding/graph/ONB-02-evidence-plan.md`
 - **Consults:** —
 - **Produces:** `product/onboarding/graph/ONB-07-provider-policy-landscape.md`
@@ -532,7 +532,7 @@ _Define canonical journey, profile, identity, entitlement, continuity, and cross
 
 - **Role:** Product leader
 - **Phases:** 1c
-- **Providers:** `provider.revenuecat` (api, browser)
+- **Providers:** `provider.revenuecat` (api, cli, browser)
 - **Reads:** `product/onboarding/graph/ONB-09-evidence-join.md`
 - **Consults:** —
 - **Produces:** `product/onboarding/graph/ONB-12-state-identity-contract.md`
@@ -545,7 +545,7 @@ _Define typed analytics, authoritative emitters, identity stitching, deduplicati
 
 - **Role:** Product leader
 - **Phases:** 1c
-- **Providers:** `provider.posthog` (api, browser), `provider.revenuecat` (api, browser)
+- **Providers:** `provider.posthog` (api, browser), `provider.revenuecat` (api, cli, browser)
 - **Reads:** `product/onboarding/graph/ONB-09-evidence-join.md`, `product/onboarding/graph/ONB-10-first-value-activation.md`, `product/onboarding/graph/ONB-12-state-identity-contract.md`, `product/onboarding/graph/ONB-14-trust-lifecycle-policy.md`, `analytics/ANALYTICS.md`
 - **Consults:** —
 - **Produces:** `product/onboarding/graph/ONB-13-analytics-experiments.md`
@@ -662,7 +662,7 @@ _Implement or finalize the accepted onboarding graph, verify the canonical artif
 
 - **Role:** Product leader
 - **Phases:** 2, 5b
-- **Providers:** `provider.revenuecat` (api, browser), `provider.posthog` (api, browser)
+- **Providers:** `provider.revenuecat` (api, cli, browser), `provider.posthog` (api, browser)
 - **Reads:** `product/onboarding/graph/ONB-00-resume-scope.md`, `product/onboarding/graph/ONB-01-current-state-trace.md`, `product/onboarding/graph/ONB-02-evidence-plan.md`, `product/onboarding/graph/ONB-03-current-guidance.md`, `product/onboarding/graph/ONB-04-competitor-reviews.md`, `product/onboarding/graph/ONB-05-onbo-hub-atlas.md`, `product/onboarding/graph/ONB-06-internal-guidance-audit.md`, `product/onboarding/graph/ONB-07-provider-policy-landscape.md`, `product/onboarding/graph/ONB-08-motion-research.md`, `product/onboarding/graph/ONB-09-evidence-join.md`, `product/onboarding/graph/ONB-10-first-value-activation.md`, `product/onboarding/graph/ONB-11-effort-question-audit.md`, `product/onboarding/graph/ONB-12-state-identity-contract.md`, `product/onboarding/graph/ONB-13-analytics-experiments.md`, `product/onboarding/graph/ONB-14-trust-lifecycle-policy.md`, `product/onboarding/graph/ONB-15-architecture-decision.md`, `product/onboarding/graph/ONB-16-journey-graph.md`, `product/onboarding/graph/ONB-17-screen-control-paywall-contract.md`, `product/onboarding/graph/ONB-18-visual-design-prototype.md`, `product/onboarding/graph/ONB-19-implementation-cutover-contract.md`, `product/onboarding/graph/ONB-20-adversarial-qa.md`, `product/onboarding/graph/ONB-21-compound-engineering-plan.md`, `product/copy/COPY_DECK.md`, `operations/PROVIDER_PROOF.md`
 - **Consults:** —
 - **Produces:** `product/ONBOARDING.md`, `product/onboarding.html`, `product/onboarding/runtime-evidence.json`
@@ -1127,7 +1127,7 @@ _Before RevenueCat/Stripe/web billing, products, paywall, entitlement, webhooks,
 
 - **Role:** Engineering leader
 - **Phases:** 3b
-- **Providers:** `provider.revenuecat` (api, browser), `provider.stripe` (api, cli, browser)
+- **Providers:** `provider.revenuecat` (api, cli, browser), `provider.stripe` (api, cli, browser)
 - **Reads:** `state/LAUNCH_TRACE.md`, `strategy/RESEARCH.md`, `strategy/OFFER_TEST.md`, `state/business-state.json`
 - **Consults:** —
 - **Produces:** `revenue/REVENUE_OPS.md`
@@ -1140,7 +1140,7 @@ _After a live paywall exists, or when the experiment backlog needs a next test_
 
 - **Role:** Engineering leader
 - **Phases:** 6
-- **Providers:** `provider.revenuecat` (api, browser)
+- **Providers:** `provider.revenuecat` (api, cli, browser)
 - **Reads:** `revenue/REVENUE_OPS.md`, `state/business-state.json`
 - **Consults:** —
 - **Produces:** `revenue/PAYWALL_EXPERIMENT_PROGRAM.md`
@@ -1155,7 +1155,7 @@ _Before paid ads, ASA, Meta/TikTok/Google campaigns, or spend-readiness claims_
 
 - **Role:** Marketing guru
 - **Phases:** 1d
-- **Providers:** `provider.paid-ad-channels` (manual), `provider.posthog` (api, browser), `provider.revenuecat` (api, browser)
+- **Providers:** `provider.paid-ad-channels` (manual), `provider.posthog` (api, browser), `provider.revenuecat` (api, cli, browser)
 - **Reads:** `DESIGN.md`, `analytics/ANALYTICS.md`, `strategy/localization-market-research/LOCALIZATION_MARKET_RESEARCH.md`, `state/business-state.json`
 - **Consults:** —
 - **Produces:** `growth/PAID_UA.md`
@@ -1505,7 +1505,7 @@ Generated from adapters/provisioning/requirements.ts. Edit the manifest, not thi
 | `provider.doppler` | secret-storage-and-injection |  |  | ✓ | ✓ |  |  |  |
 | `provider.resend` | founder-digest-email |  | ✓ |  | ✓ |  |  |  |
 | `provider.posthog` | product-analytics-and-attribution |  | ✓ |  | ✓ |  |  |  |
-| `provider.revenuecat` | subscription-entitlements |  | ✓ |  | ✓ |  |  |  |
+| `provider.revenuecat` | subscription-entitlements |  | ✓ | ✓ | ✓ |  |  |  |
 | `provider.stripe` | web-checkout-billing |  | ✓ | ✓ | ✓ |  |  |  |
 | `provider.sentry` | crash-and-error-monitoring |  | ✓ | ✓ | ✓ |  |  |  |
 | `provider.app-store-connect` | ios-distribution-and-testflight |  | ✓ | ✓ | ✓ |  |  |  |

@@ -1,11 +1,11 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.6",
+  "version": "0.219.7",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Apply ONB-16 and ONB-17 quiz, hard-paywall, and Paywall Goal Headline obligations only when those features are selected.",
-    "Hold the Paywall Goal Headline bind when the headline feature is selected and present-paywall is unresolved, instead of silently selecting RevenueCat.",
-    "Require an explicit RevenueCat present-paywall binding before accepting specialized offering-metadata and customVariables evidence."
+    "Discover a trusted host RevenueCat CLI and spawn only through the pinned process adapter.",
+    "Refuse spawn when the request project or app, extra flags, or catalog create operands escape the approved binding.",
+    "Treat offering verify as incomplete unless the CLI returns an issues array, even on exit 0."
   ]
 }

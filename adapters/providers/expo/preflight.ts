@@ -45,6 +45,7 @@ export type ExpoEasHoldCode =
   | "passive-plan"
   | "missing-auth"
   | "mutation-uncertain"
+  | "request-identity-conflict"
   | "latest-refused";
 
 export type ExpoEasPreflightStatus = "hold" | "skip" | "ready";

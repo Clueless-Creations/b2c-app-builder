@@ -3,10 +3,13 @@ export { buildExpoEasArgv, ExpoArgvRefusal } from "./argv.js";
 export { discoverExpoCli } from "./discovery.js";
 export { inspectCommandEffects, inspectProjectCommandEffects } from "./effects.js";
 export { decodeExpoEasResponse, ledgerArtifactUrl } from "./decode.js";
-export { runExpoEasCommand } from "./execute.js";
+export { runExpoEasCommand, expoEasLedgerFile } from "./execute.js";
+export { buildEasJobBinding, fingerprintEasUploadInputs, EAS_UPLOAD_SOURCE_ROOTS } from "./identity.js";
 export {
   EasJobLedger,
+  canonicalEasRequestIdentity,
   createFakeEasJobTransport,
+  easBindingsMatch,
   easJobLedgerPath,
   fingerprintBinding,
   isSuccessfulBuild,

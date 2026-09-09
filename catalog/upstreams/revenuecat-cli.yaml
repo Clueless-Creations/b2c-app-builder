@@ -33,11 +33,13 @@ relationships:
       - adapters/providers/revenuecat/cli-operations.ts
       - adapters/providers/revenuecat/cli-command-schema.ts
       - adapters/providers/revenuecat/cli-preflight.ts
+      - adapters/providers/revenuecat/cli-decode.ts
       - adapters/providers/revenuecat/cli-execute.ts
       - adapters/providers/revenuecat/cli-proof.ts
       - adapters/providers/revenuecat/cli-catalog.ts
     tests:
       - checks/verification/fixtures/revenuecat-cli.fixtures.ts
+      - checks/verification/fixtures/revenuecat-cli-decode.fixtures.ts
       - checks/verification/fixtures/official-upstreams.fixtures.ts
     upstream_paths:
       - README.md

@@ -52,6 +52,7 @@ import { CLI_CATALOG_KIND, classifyRevenueCatCliCatalogEvidence, classifyRevenue
 import { issuesFromRevenueCatCliCatalogArtifact } from "../../../adapters/providers/revenuecat/revenue-validation.js";
 import { REVENUECAT_PROVISIONING } from "../../../adapters/providers/revenuecat/provisioning.js";
 import { loadUpstreams } from "../../../kernel/contribution/upstreams-load.js";
+import { UPSTREAM_SDK_PREVIEW_MINIMAL } from "./revenuecat-cli-decode.samples.js";
 
 const COMMANDS_JSON = JSON.stringify({
   schema_version: "1",
@@ -395,8 +396,8 @@ export function register(harness: Harness): void {
     assert(errorObject.ok === false && errorObject.code === "command-error", JSON.stringify(errorObject));
     const issues = offeringVerifyIsComplete({ issues: [{ code: "missing_product" }] });
     assert(issues.complete === false, "nonempty issues must not be complete");
-    const okVerify = offeringVerifyIsComplete({ issues: [] });
-    assert(okVerify.complete === true, "empty issues can be complete");
+    const emptyIssuesOnly = offeringVerifyIsComplete({ issues: [] });
+    assert(emptyIssuesOnly.complete === false, "empty issues without an offering graph must not be complete");
   });
 
   harness.check("revenuecat-cli: pagination next_page is partial, not an empty catalog", () => {
@@ -823,16 +824,13 @@ export function register(harness: Harness): void {
   });
 
   harness.check("revenuecat-cli: null paywall_components is fallback, not published paywall", () => {
-    const preview = interpretOfferingPreview(
-      { id: "off_default", app_id: "app_test", paywall_components: null, issues: [] },
-      { appId: "app_test", offeringId: "off_default" },
-    );
+    const preview = interpretOfferingPreview(UPSTREAM_SDK_PREVIEW_MINIMAL, { appId: "app_test", offeringLookupKey: "default" });
     assert(preview.fallbackOnly === true && preview.publishedPaywall === false, JSON.stringify(preview));
-    assert(preview.complete === true && preview.wrongApp === false, "fallback can still be a complete preview");
+    assert(preview.protocolValid === true && preview.wrongApp === false, "fallback can still be a valid preview");
     const { run } = recordingRunner((request) => {
       if (request.argv[0] === "--version") return ok("revenuecat-cli 0.1.1\n");
       if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
-      if (request.argv.includes("preview")) return ok(envelope({ id: "off_default", app_id: "app_test", paywall_components: null, issues: [] }));
+      if (request.argv.includes("preview")) return ok(envelope(UPSTREAM_SDK_PREVIEW_MINIMAL));
       return ok(envelope({}));
     });
     const result = runRevenueCatCatalogSession(
@@ -840,13 +838,15 @@ export function register(harness: Harness): void {
     );
     assert(result.evidence.preview?.fallback_only === true, "fallback must be recorded");
     assert(result.evidence.preview?.published_paywall === false, "null components are not published paywall proof");
+    assert(result.evidence.preview?.offering_id === "default", "SDK lookup key must be recorded");
+    assert(result.disposition === "complete", `disposition ${result.disposition}`);
   });
 
   harness.check("revenuecat-cli: wrong-app preview is incomplete", () => {
     const { run } = recordingRunner((request) => {
       if (request.argv[0] === "--version") return ok("revenuecat-cli 0.1.1\n");
       if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
-      return ok(envelope({ id: "off_other", app_id: "app_other", paywall_components: { pages: [] }, issues: [] }));
+      return ok(envelope({ ...UPSTREAM_SDK_PREVIEW_MINIMAL, app_id: "app_other" }));
     });
     const result = runRevenueCatCatalogSession(catalogSession(harness, "rc-preview-wrong", run, { intent: "preview-sdk", appUserId: "user_synth" }));
     assert(result.disposition === "incomplete", `disposition ${result.disposition}`);

@@ -23,10 +23,7 @@ import {
   readText,
   reportAndExit,
 } from "../../../../tooling/lib/launch-state.js";
-import {
-  conversionAnalyticsEventsRequired,
-  validateFrozenPageTechniqueGates,
-} from "../design/surface-page-gates.js";
+import { conversionAnalyticsEventsRequired, validateFrozenPageTechniqueGates } from "../design/surface-page-gates.js";
 
 const args = parseCliArgs(process.argv.slice(2));
 const loaded = loadProjectState(args);

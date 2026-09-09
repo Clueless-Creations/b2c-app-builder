@@ -15585,7 +15585,7 @@
     "checks/validation/repository/check-graph-foundations.ts": "7fcf85053ab148d60b723a38fb14fe93f0680818236fa02c0e354022004ea7a9",
     "tooling/render-hosted-bundle.ts": "96504484c7917076e4cbf8bb21598b73686407529f5e1b6304d8767446fa819d",
     "checks/validation/repository/check-hub-spoke.ts": "a9248a797f3164c415816e09d35a4d89499f7680afba26cc24abe507f711d01b",
-    "checks/validation/business/growth/check-landing-funnel.ts": "828f7efab54e10d42ad8d99620255afc3d9a0cd2f262e1f4d560ddd70d7c9251",
+    "checks/validation/business/growth/check-landing-funnel.ts": "a2813bfb35afcc32f2647f94d0c74d1b21ed2730f5a646436e2ae6a15190adbd",
     "checks/validation/business/process/check-lane-coverage.ts": "25ce2fd700c7dc6569c7e6771db4b7434ff204d35f6c431c47b0a1bae29fe6ac",
     "checks/validation/repository/check-learning-grounding.ts": "92ef32c4103ce98a51c73d3d6b107adea8183074b074f87a4aa7ba1208367c47",
     "checks/validation/business/research/check-localization-research.ts": "b534cebf79667f628dfd3783ba0cdff345d270a70290aaf935cc44b1b37b0127",
@@ -15847,5 +15847,5 @@
     "catalog/upstreams/notices/parth-app-store-screenshots.txt": "a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a"
   },
   "dependencies": [],
-  "digest": "sha256:93bc8c52c9fb1a05459f2374600d9e39cddf6fa97d6bdb11fcc9658bfcdd04f4"
+  "digest": "sha256:6c75c46d4d0ba53511bed01c4d71f2ad493d93fa2860953447cfcef99efc2c82"
 }

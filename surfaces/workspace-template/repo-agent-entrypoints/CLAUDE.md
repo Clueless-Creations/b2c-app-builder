@@ -5,6 +5,7 @@ Read `AGENTS.md` first. It is the canonical operating guide for {{APP_NAME}}. Fo
 Claude-specific notes:
 
 - Run `git status --short --branch` before editing when this is a Git repository.
+- Follow `PRODUCT.md`, `DESIGN.md`, `b2c status`, and `b2c plan` as `AGENTS.md` names them.
 - Use the supported `b2c` CLI/MCP surfaces named by `AGENTS.md` and current plan. Do not infer execution, provider readiness, or authority from tool availability.
 - Load only the references required by the current bounded task.
 - Do not edit reducer-owned files directly.

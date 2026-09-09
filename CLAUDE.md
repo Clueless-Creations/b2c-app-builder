@@ -1,6 +1,6 @@
 # Claude Repository Adapter
 
-Read the nearest applicable `AGENTS.md` first. Root `AGENTS.md` is the canonical repository contract and routes business, contribution, and maintenance work. Do not use this file as a second architecture or lifecycle guide.
+Read `AGENTS.md` first. Nested directories may have a nearer applicable `AGENTS.md`; inherit the root contract. Root `AGENTS.md` is the canonical repository contract and routes business, contribution, and maintenance work. Do not use this file as a second architecture or lifecycle guide.
 
 ## Claude-specific start
 

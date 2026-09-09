@@ -34,6 +34,7 @@ relationships:
       - adapters/providers/revenuecat/cli-preflight.ts
       - adapters/providers/revenuecat/cli-execute.ts
       - adapters/providers/revenuecat/cli-proof.ts
+      - adapters/providers/revenuecat/cli-catalog.ts
     tests:
       - checks/verification/fixtures/revenuecat-cli.fixtures.ts
       - checks/verification/fixtures/official-upstreams.fixtures.ts
@@ -85,7 +86,19 @@ support:
     - id: rc.customers.simulate-purchase
       title: Test Store simulate-purchase after verified target and host authority
       keywords: [test-store, simulate-purchase]
-      owners: [adapters/providers/revenuecat/cli-operations.ts, adapters/providers/revenuecat/cli-preflight.ts]
+      owners: [adapters/providers/revenuecat/cli-operations.ts, adapters/providers/revenuecat/cli-preflight.ts, adapters/providers/revenuecat/cli-catalog.ts]
+    - id: rc.catalog.reconcile
+      title: Authorized catalog inspection and existing-project reconciliation
+      keywords: [catalog, offerings, products, entitlements, packages]
+      owners: [adapters/providers/revenuecat/cli-catalog.ts]
+    - id: rc.paywalls.inspect
+      title: Paywall list/show inspect (not publish)
+      keywords: [paywalls, inspect]
+      owners: [adapters/providers/revenuecat/cli-catalog.ts]
+    - id: rc.observe.revenue
+      title: Scoped customer, subscription, metric, and audit reads
+      keywords: [customers, subscriptions, metrics, charts, audit]
+      owners: [adapters/providers/revenuecat/cli-catalog.ts]
   unsupported_operations:
     - id: automatic-setup
       reason: Installing, authenticating, disclosing source, changing credentials or remote configuration require explicit scoped authority.
@@ -97,6 +110,14 @@ support:
       reason: Nested setup/rico/skills must not bypass builder orchestration.
     - id: rc.products.store.plan
       reason: Remote store plans are experimental and persist server-side; a command named plan is not assumed effect-free.
+    - id: rc.products.store.apply
+      reason: Apply stays excluded. A changed or unverifiable remote plan cannot use an old approval.
+    - id: rc.customers.list
+      reason: Arbitrary customer records are not exported to hosted knowledge. Scoped show of one id only.
+    - id: rc.webhooks
+      reason: Webhook inspect and mutation stay excluded until separately reviewed typed operations exist.
+    - id: rc.paywalls.publish
+      reason: Publishing, unpublishing, and AI generate/edit need separate effect approval and are not inspect.
   platforms: [darwin, linux, windows]
 adaptations:
   - id: builder-contracts-win

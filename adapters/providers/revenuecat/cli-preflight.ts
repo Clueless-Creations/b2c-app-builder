@@ -23,7 +23,9 @@ export type RevenueCatCliHoldCode =
   | "profile-default-refused"
   | "mutation-uncertain"
   | "request-project-mismatch"
-  | "request-app-mismatch";
+  | "request-app-mismatch"
+  | "unscoped-observation"
+  | "stale-plan-approval";
 
 export type RevenueCatCliPreflightStatus = "hold" | "skip" | "ready";
 

@@ -81,10 +81,15 @@ function workflowEffects(workflow: InspectedWorkflow): { vector: ExpoEasEffectVe
       case "deploy":
         vector = withEffect(vector, "serverDeployment");
         nested.push("server-deployment");
+        if (workflow.hasProductionPromotion) {
+          vector = withEffect(vector, "productionPromotion");
+          nested.push("production-promotion");
+        }
         break;
       case "fingerprint":
       case "get-build":
       case "require":
+        break;
       case "unknown":
         break;
       default: {

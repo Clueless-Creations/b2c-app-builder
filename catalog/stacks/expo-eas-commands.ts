@@ -84,6 +84,7 @@ export interface DocumentedFlags {
   readonly local: boolean;
   readonly autoSubmit: boolean;
   readonly wait: boolean;
+  readonly freezeCredentials: boolean;
 }
 
 export interface ExpoEasEffectVector {
@@ -140,6 +141,7 @@ const flags = (partial: Partial<DocumentedFlags> = {}): DocumentedFlags => ({
   local: false,
   autoSubmit: false,
   wait: false,
+  freezeCredentials: false,
   ...partial,
 });
 
@@ -360,9 +362,9 @@ export const EXPO_EAS_COMMANDS: readonly ExpoEasCommandSpec[] = [
     accountRequired: true,
     projectLinkRequired: true,
     requiredAuthority: "spend",
-    documentedFlags: flags({ json: true, nonInteractive: true, local: true, autoSubmit: true, wait: true }),
+    documentedFlags: flags({ json: true, nonInteractive: true, local: true, autoSubmit: true, wait: true, freezeCredentials: true }),
     notes:
-      "Uploads source and may consume credits. --auto-submit is a nested store effect. --non-interactive is not permission. --local is a different operation.",
+      "Uploads source and may consume credits. --auto-submit is a nested store effect. --non-interactive is not permission and may update credentials unless --freeze-credentials is passed. Dispatch freezes credentials. --local is a different operation.",
     docsUrl: EXPO_EAS_COMMAND_SOURCES.easCli,
   }),
   spec({
@@ -379,9 +381,9 @@ export const EXPO_EAS_COMMANDS: readonly ExpoEasCommandSpec[] = [
     accountRequired: true,
     projectLinkRequired: true,
     requiredAuthority: "compile",
-    documentedFlags: flags({ json: true, nonInteractive: true, local: true, autoSubmit: true, wait: true }),
+    documentedFlags: flags({ json: true, nonInteractive: true, local: true, autoSubmit: true, wait: true, freezeCredentials: true }),
     notes:
-      "Documented experimental. Still authenticates and checks the EAS project; may download managed credentials. Not fully offline. Not identical to expo run:*. Platform `all` is disabled locally. iOS local still needs Xcode; Android local still needs an Android SDK. Live host toolchain remains not-run.",
+      "Documented experimental. Still authenticates and checks the EAS project; may download managed credentials. Not fully offline. Not identical to expo run:*. Dispatch passes --freeze-credentials so --non-interactive cannot update signing material. Platform `all` is disabled locally. iOS local still needs Xcode; Android local still needs an Android SDK. Live host toolchain remains not-run.",
     docsUrl: EXPO_EAS_COMMAND_SOURCES.localBuilds,
   }),
   spec({

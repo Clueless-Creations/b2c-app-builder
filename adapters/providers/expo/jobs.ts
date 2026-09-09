@@ -2,7 +2,8 @@
  * Persist EAS remote job identity and reconcile before retry.
  *
  * Upstream EAS is not treated as idempotent. A timeout after the process was accepted is
- * uncertain until build:view / workflow:status / submit:view reads the stored id.
+ * uncertain until build:view / workflow:status / submit:view reads the stored id. A remote
+ * id that cannot be read stays mutation-uncertain. Paid and public effects are never replayed.
  */
 
 import { closeSync, existsSync, fsyncSync, lstatSync, mkdirSync, openSync, readFileSync, renameSync, writeFileSync } from "node:fs";
@@ -40,7 +41,7 @@ export type EasJobReconciliation =
   | { readonly action: "proceed"; readonly reason: "no_prior_request" }
   | { readonly action: "reuse"; readonly entry: EasJobEntry }
   | { readonly action: "reconciled"; readonly entry: EasJobEntry }
-  | { readonly action: "replay"; readonly entry: EasJobEntry };
+  | { readonly action: "uncertain"; readonly entry: EasJobEntry; readonly reason: "remote_id_unread" };
 
 export interface EasJobRead {
   readonly state: EasRemoteJobState;
@@ -202,14 +203,12 @@ export class EasJobLedger {
       this.#entries.set(idempotencyKey, reconciled);
       return { action: "reconciled", entry: reconciled };
     }
-    if (entry.replays >= 1) throw new Error("expo.eas_replay_limit");
-    const allowed: EasJobEntry = {
+    const unread: EasJobEntry = {
       ...entry,
-      replays: entry.replays + 1,
-      history: [...entry.history, { at: this.#now(), event: "replay-allowed", state: entry.state, remoteId: entry.remoteId }],
+      history: [...entry.history, { at: this.#now(), event: "remote-id-unread", state: entry.state, remoteId: entry.remoteId }],
     };
-    this.#entries.set(idempotencyKey, allowed);
-    return { action: "replay", entry: allowed };
+    this.#entries.set(idempotencyKey, unread);
+    return { action: "uncertain", entry: unread, reason: "remote_id_unread" };
   }
 }
 

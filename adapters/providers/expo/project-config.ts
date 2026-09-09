@@ -27,6 +27,8 @@ export interface InspectedWorkflow {
   readonly hasPushTrigger: boolean;
   readonly hasPullRequestTrigger: boolean;
   readonly hasScheduleTrigger: boolean;
+  readonly hasUnknownJobTypes: boolean;
+  readonly hasProductionPromotion: boolean;
 }
 
 export interface InspectedExpoProject {
@@ -72,6 +74,18 @@ function workflowJobType(value: unknown): WorkflowJobType {
   return "unknown";
 }
 
+function paramsRequestProduction(params: Record<string, unknown>): boolean {
+  if (!("prod" in params)) return false;
+  return params.prod !== false && params.prod !== "false" && params.prod !== 0;
+}
+
+function inspectWorkflowJob(job: unknown): { type: WorkflowJobType; productionPromotion: boolean } {
+  if (!isRecord(job)) return { type: "unknown", productionPromotion: false };
+  const type = workflowJobType(job.type);
+  const params = isRecord(job.params) ? job.params : {};
+  return { type, productionPromotion: type === "deploy" && paramsRequestProduction(params) };
+}
+
 function inspectWorkflowFile(root: string, relativePath: string): InspectedWorkflow {
   const absolute = path.join(root, relativePath);
   let parsed: unknown;
@@ -86,11 +100,14 @@ function inspectWorkflowFile(root: string, relativePath: string): InspectedWorkf
       hasPushTrigger: false,
       hasPullRequestTrigger: false,
       hasScheduleTrigger: false,
+      hasUnknownJobTypes: false,
+      hasProductionPromotion: false,
     };
   }
   const record = isRecord(parsed) ? parsed : {};
   const jobs = isRecord(record.jobs) ? record.jobs : {};
-  const jobTypes = Object.values(jobs).map((job) => workflowJobType(isRecord(job) ? job.type : undefined));
+  const inspected = Object.values(jobs).map(inspectWorkflowJob);
+  const jobTypes = inspected.map((job) => job.type);
   const on = isRecord(record.on) ? record.on : typeof record.on === "string" ? { [record.on]: true } : {};
   const triggerKinds = Object.keys(on);
   return {
@@ -101,6 +118,8 @@ function inspectWorkflowFile(root: string, relativePath: string): InspectedWorkf
     hasPushTrigger: "push" in on,
     hasPullRequestTrigger: "pull_request" in on || "pullRequest" in on,
     hasScheduleTrigger: "schedule" in on,
+    hasUnknownJobTypes: jobTypes.includes("unknown"),
+    hasProductionPromotion: inspected.some((job) => job.productionPromotion),
   };
 }
 

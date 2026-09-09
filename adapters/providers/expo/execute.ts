@@ -121,22 +121,43 @@ export function runExpoEasCommand(input: ExpoEasExecuteRequest): ExpoEasExecuteR
   if (isRemotePaidOrPublicEffect(closure.vector)) {
     try {
       const prior = input.ledger.reconcile(input.jobTransport, input.idempotencyKey);
-      if (prior.action === "reuse" || prior.action === "reconciled") {
-        return {
-          ...empty,
-          remoteId: prior.entry.remoteId,
-          jobState: prior.entry.state,
-          uncertainRemote: prior.entry.state === "uncertain",
-          preflight:
-            prior.entry.state === "uncertain"
-              ? {
-                  status: "hold",
-                  code: "mutation-uncertain",
-                  message: "Remote job is still uncertain after reconcile. Not retrying a paid or public effect.",
-                  blocksUnrelatedWork: false,
-                }
-              : preflight,
-        };
+      switch (prior.action) {
+        case "proceed":
+          break;
+        case "reuse":
+        case "reconciled":
+          return {
+            ...empty,
+            remoteId: prior.entry.remoteId,
+            jobState: prior.entry.state,
+            uncertainRemote: prior.entry.state === "uncertain",
+            preflight:
+              prior.entry.state === "uncertain"
+                ? {
+                    status: "hold",
+                    code: "mutation-uncertain",
+                    message: "Remote job is still uncertain after reconcile. Not retrying a paid or public effect.",
+                    blocksUnrelatedWork: false,
+                  }
+                : preflight,
+          };
+        case "uncertain":
+          return {
+            ...empty,
+            remoteId: prior.entry.remoteId,
+            jobState: prior.entry.state,
+            uncertainRemote: true,
+            preflight: {
+              status: "hold",
+              code: "mutation-uncertain",
+              message: "Remote job id exists but readback missed. Holding mutation-uncertain. Paid and public Expo/EAS effects are not replayed.",
+              blocksUnrelatedWork: false,
+            },
+          };
+        default: {
+          const exhaustive: never = prior;
+          throw new Error(`unhandled EAS reconcile action: ${String(exhaustive)}`);
+        }
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);

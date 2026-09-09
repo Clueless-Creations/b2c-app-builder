@@ -180,6 +180,9 @@ export function assessExpoEasPreflight(input: {
   if (input.closure.workflow && !input.closure.workflow.parseOk) {
     return hold("workflow-parse", "Workflow YAML did not parse. Nested effects are unknown; dispatch is refused.");
   }
+  if (input.closure.workflow && input.closure.workflow.hasUnknownJobTypes) {
+    return hold("workflow-parse", "Workflow contains unknown job types. Nested effects are unknown; dispatch is refused.");
+  }
   if (workflowTriggersExceedApproval(input.closure, input.target.allowWorkflowTriggers)) {
     return hold(
       "workflow-trigger-refused",

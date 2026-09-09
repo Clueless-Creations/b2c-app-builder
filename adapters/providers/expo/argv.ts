@@ -136,6 +136,7 @@ export function buildExpoEasArgv(request: ExpoEasArgvRequest): string[] {
       }
       if (operation.documentedFlags.json) argv.push("--json");
       if (operation.documentedFlags.nonInteractive) argv.push("--non-interactive");
+      if (operation.documentedFlags.freezeCredentials) argv.push("--freeze-credentials");
       if (operation.documentedFlags.wait && request.wait !== true) argv.push("--no-wait");
       break;
     }

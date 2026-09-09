@@ -146,6 +146,22 @@ jobs:
     type: deploy
 `;
 
+const PROD_DEPLOY_WORKFLOW = `
+name: promote
+jobs:
+  deploy:
+    type: deploy
+    params:
+      prod: true
+`;
+
+const UNKNOWN_JOB_WORKFLOW = `
+name: e2e
+jobs:
+  e2e:
+    type: maestro
+`;
+
 export function register(harness: Harness): void {
   harness.check("expo-eas: documented whoami has no --json; env:exec and @latest stay excluded", () => {
     const whoami = getExpoEasCommand("eas.whoami");
@@ -159,6 +175,9 @@ export function register(harness: Harness): void {
     assert(update.support === "labeled-unavailable" && update.queuedIssue === 85, "OTA stays #85");
     const deploy = getExpoEasCommand("eas.deploy");
     assert(deploy.support === "labeled-unavailable" && deploy.queuedIssue === 86, "hosting stays #86");
+    const cloud = getExpoEasCommand("eas.build.cloud");
+    assert(cloud.documentedFlags.freezeCredentials, "eas build documents --freeze-credentials");
+    assert(cloud.effects.credentialMutation === false, "frozen dispatch is not a credential mutation");
     assert(EAS_CLI_DOCUMENTED_VERSION === "23.2.0", "documented version is the retrieved page, not /latest/");
     assert(
       EXPO_EAS_COMMANDS.every((command) => command.docsUrl.startsWith("https://docs.expo.dev/")),
@@ -403,6 +422,80 @@ export function register(harness: Harness): void {
     assert(transport.reads.includes("build_paid"), "must read the persisted remote id");
   });
 
+  harness.check("expo-eas: unread remote id after timeout holds and does not spawn twice", () => {
+    const cwd = writeFakeApp(harness.makeTempDir("unread-id-app"));
+    const isolatedHome = isolatedConfigHome(harness.makeTempDir("unread-id-home"), "ws-a");
+    const discovery = trustedDiscovery(harness);
+    const ledger = new EasJobLedger({ now: () => "2026-09-09T00:00:00.000Z" });
+    const transport = createFakeEasJobTransport();
+    const { run, calls } = recordingRunner(() => ({
+      stdout: JSON.stringify({ id: "build_paid", status: "in-queue" }),
+      stderr: "",
+      status: null,
+      timedOut: true,
+      truncated: false,
+      cancelled: false,
+      signal: "SIGTERM",
+    }));
+    const request = {
+      operationId: "eas.build.cloud" as const,
+      executable: "/opt/fake/bin/eas",
+      cwd,
+      isolatedHome,
+      pathEnv: "/opt/fake/bin",
+      expoToken: "secret-token-value",
+      run,
+      discovery,
+      target: selectedTarget(),
+      platform: "ios" as const,
+      profile: "preview",
+      idempotencyKey: "build-unread",
+      ledger,
+      jobTransport: transport,
+    };
+    const first = runExpoEasCommand(request);
+    assert(first.invoked, "first dispatch may spawn");
+    assert(first.remoteId === "build_paid", first.remoteId ?? "");
+    assert(first.uncertainRemote, "timeout after an id is uncertain");
+    const second = runExpoEasCommand(request);
+    assert(second.invoked === false, "unread remote id must not spawn again");
+    assert(second.preflight.code === "mutation-uncertain", second.preflight.code);
+    assert(second.uncertainRemote, "unread remote id stays uncertain");
+    assert(calls.length === 1, `expected one spawn, got ${calls.length}`);
+    assert(transport.reads.includes("build_paid"), "must attempt readback of the persisted remote id");
+  });
+
+  harness.check("expo-eas: workflow prod deploy and unknown jobs refuse instead of failing open", () => {
+    const discovery = trustedDiscovery(harness);
+    const prodProject = inspectExpoProject(writeFakeApp(harness.makeTempDir("prod-workflow"), { workflow: PROD_DEPLOY_WORKFLOW }));
+    const prod = inspectCommandEffects(prodProject, { commandId: "eas.workflow.run", workflowRelativePath: ".eas/workflows/ship.yml" });
+    assert(prod.vector.serverDeployment, "deploy job is a server effect");
+    assert(prod.vector.productionPromotion, "params.prod true is production promotion");
+    assert(prod.nested.includes("production-promotion"), "promotion must be in the nested closure");
+    const prodHold = assessExpoEasPreflight({
+      discovery,
+      commandId: "eas.workflow.run",
+      target: selectedTarget({ grantedAuthority: "publish", allowWorkflowTriggers: true }),
+      project: prodProject,
+      closure: prod,
+    });
+    assert(prod.requiredAuthority === "promote", prod.requiredAuthority);
+    assert(prodHold.status === "hold", prodHold.status);
+    assert(prodHold.code === "authority-missing" || prodHold.code === "nested-effect-ungranted", prodHold.code);
+    const unknownProject = inspectExpoProject(writeFakeApp(harness.makeTempDir("unknown-job"), { workflow: UNKNOWN_JOB_WORKFLOW }));
+    const unknown = inspectCommandEffects(unknownProject, { commandId: "eas.workflow.run", workflowRelativePath: ".eas/workflows/ship.yml" });
+    assert(unknown.workflow?.hasUnknownJobTypes, "maestro is an unknown job type");
+    const unknownHold = assessExpoEasPreflight({
+      discovery,
+      commandId: "eas.workflow.run",
+      target: selectedTarget({ grantedAuthority: "promote", allowWorkflowTriggers: true }),
+      project: unknownProject,
+      closure: unknown,
+    });
+    assert(unknownHold.code === "workflow-parse", unknownHold.code);
+    assert(unknownHold.status === "hold", unknownHold.status);
+  });
+
   harness.check("expo-eas: invalid JSON, expired artifact, and --latest cannot prove success", () => {
     const ledger = new EasJobLedger({ now: () => "2026-09-09T00:00:00.000Z" });
     ledger.record(
@@ -444,6 +537,7 @@ export function register(harness: Harness): void {
     });
     assert(!argv.includes(token), "token is not an argv value");
     assert(argv.includes("--non-interactive"), "documented non-interactive may be added after authority");
+    assert(argv.includes("--freeze-credentials"), "non-interactive build must freeze credentials");
     assert(argv.includes("--no-wait"), "persist the job id instead of blocking");
     const env = buildExpoProcessEnv({ isolatedHome: "/tmp/fake-home-a", pathValue: "/opt/fake/bin", expoToken: token });
     assert(env.EXPO_TOKEN === token, "token lives in isolated env");

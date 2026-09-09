@@ -1,6 +1,6 @@
 {
   "name": "b2c-app-builder",
-  "version": "0.219.4",
+  "version": "0.219.5",
   "description": "Consumer-business primitives for AI agents: capabilities, providers, recipes, and evidence through a CLI, MCP, and skill.",
   "keywords": [
     "mcp",
@@ -75,6 +75,8 @@
     "check:app-archetype": "tsx checks/validation/business/product/check-app-archetype.ts",
     "check:app-copy": "tsx checks/validation/business/words/check-app-copy.ts",
     "check:app-review-contract": "tsx checks/validation/business/store/check-app-review-contract.ts",
+    "check:app-store-portfolio": "tsx checks/validation/business/store/check-app-store-portfolio.ts",
+    "check:app-store-portfolio-required": "tsx checks/validation/business/store/check-app-store-portfolio.ts --require-receipt",
     "check:apple-release-readiness": "tsx checks/validation/business/store/check-apple-app-store-requirements.ts --require-signing-ready",
     "check:apple-requirements": "tsx checks/validation/business/store/check-apple-app-store-requirements.ts",
     "check:archetype-starter": "tsx checks/validation/business/engineering/check-archetype-starter.ts",
@@ -158,6 +160,8 @@
     "check:orchestration": "tsx checks/validation/business/orchestration/check-parallel-orchestration.ts",
     "check:pack-composition": "tsx checks/validation/repository/check-pack-composition.ts --skill-root .",
     "check:package-parity": "tsx checks/validation/repository/check-package-parity.ts --repo-root . --skill-root .",
+    "check:paid-tool-intake": "tsx checks/validation/business/operations/check-paid-tool-intake.ts",
+    "check:paid-tool-intake-required": "tsx checks/validation/business/operations/check-paid-tool-intake.ts --require-intake",
     "check:paid-ua": "tsx checks/validation/business/growth/check-paid-user-acquisition.ts",
     "check:portfolio-registry": "tsx checks/validation/business/operations/check-portfolio-registry.ts",
     "check:post-launch": "tsx checks/validation/business/operations/check-post-launch-ops.ts",

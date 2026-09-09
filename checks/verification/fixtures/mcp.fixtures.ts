@@ -53,6 +53,9 @@ export function register(harness: Harness): void {
       symlinkSync(path.join(skillRoot, "kernel/session/status.ts"), path.join(temp, "kernel/session/status.ts"));
       symlinkSync(path.join(skillRoot, "kernel/session/inspect.ts"), path.join(temp, "kernel/session/inspect.ts"));
       symlinkSync(path.join(skillRoot, "kernel/session/founder-gate.ts"), path.join(temp, "kernel/session/founder-gate.ts"));
+      // Doctor host summary is imported by the copied server at module load. Without this
+      // symlink the isolated server dies before the unavailable-bundle warning can print.
+      symlinkSync(path.join(skillRoot, "kernel/session/doctor-host.ts"), path.join(temp, "kernel/session/doctor-host.ts"));
       // U3: the copied server.ts now imports route-utterance.ts (b2c_plan's routing mode) at
       // module load time, unconditionally -- without this symlink the copied server fails to
       // start at all (ERR_MODULE_NOT_FOUND), well before any of this scenario's own assertions
@@ -434,7 +437,7 @@ async function main() {
   }
   const pinnedFragments = [
     "(catalog 2.0.0+",
-    ": 99 steps, 0 done.",
+    ": 100 steps, 0 done.",
     "This business has no work authority, so every business step below is parked.",
     "Ready now: 3 step(s), in 3 groups. Everything inside a group can run at the same time.",
     "Session continuity / resume  [run.orchestration.session-continuity-resume]",

@@ -3,7 +3,7 @@
 Part of the [ASO And Store Operations](./aso-store-ops.md) hub — it decides which store lane runs and what evidence each lane must leave behind.
 
 Use this before the first keyword lock and each weekly ASO loop.
-Prefer official Apple data from Rork `asc` 4.9.0.
+Prefer official Apple data from Rork `asc` 5.1.0 (`asc optimize keywords rank` / `discover` / `score`).
 Do not start with a paid ASO tool when `asc optimize keywords rank` can run.
 
 Load `app-store-connect-cli.md` before any `asc` command.

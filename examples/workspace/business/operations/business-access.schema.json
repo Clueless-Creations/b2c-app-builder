@@ -4,10 +4,10 @@
   "title": "B2C Mobile Business Founder-Zero Operator Bootstrap",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "updatedAt", "status", "founderModel", "security", "doppler", "accounts"],
+  "required": ["schemaVersion", "updatedAt", "status", "founderModel", "security", "doppler", "accounts", "forbiddenProviderProjects"],
   "properties": {
     "$schema": { "type": "string" },
-    "schemaVersion": { "const": "2.0.0" },
+    "schemaVersion": { "const": "2.1.0" },
     "updatedAt": { "$ref": "#/$defs/optionalDateTime" },
     "status": { "enum": ["not_started", "active", "blocked", "ready"] },
     "founderModel": {
@@ -154,6 +154,10 @@
       "type": "array",
       "minItems": 8,
       "items": { "$ref": "#/$defs/account" }
+    },
+    "forbiddenProviderProjects": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/forbiddenProviderProject" }
     }
   },
   "$defs": {
@@ -215,6 +219,19 @@
             "successProof": { "type": "string" }
           }
         }
+      }
+    },
+    "forbiddenProviderProject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "store", "reason", "recordedAt", "evidenceCommand"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "bundleId": { "type": "string", "minLength": 3 },
+        "store": { "enum": ["app_store", "play", "other"] },
+        "reason": { "type": "string", "minLength": 12 },
+        "recordedAt": { "$ref": "#/$defs/optionalDateTime" },
+        "evidenceCommand": { "type": "string", "minLength": 2, "pattern": "^[A-Za-z0-9._ -]+$" }
       }
     },
     "account": {

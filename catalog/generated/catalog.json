@@ -1,6 +1,6 @@
 {
   "schemaVersion": "2.0.0",
-  "skillVersion": "0.219.4",
+  "skillVersion": "0.219.5",
   "areas": [
     {
       "id": "area.operating-system",
@@ -764,7 +764,8 @@
       ],
       "outputPathPrefixes": [
         "operations/",
-        "strategy/TOOL_DECISIONS.md"
+        "strategy/TOOL_DECISIONS.md",
+        "run/app-store-portfolio.json"
       ]
     },
     {
@@ -5816,7 +5817,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/money/subscription-price-derivation.md",
-        "sha256": "sha256:edbadb941f90fb61e898cb8da5e38c0e5bf95e0241df8b67d67113d4c3327840",
+        "sha256": "sha256:20eb57f3fb50972337a16f469d1302eedc86fb4c83168eb3d388611fbbf66c94",
         "origin": "skill"
       }
     },
@@ -5926,7 +5927,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/operations/founder-zero-operator.md",
-        "sha256": "sha256:81bb7472b41d83d39a7426cc7abbe3d3ebc9db92e0f91c35a97b007c8df92870",
+        "sha256": "sha256:ccaf23b53ffc289c31b2618f208753636ecd4ad49265cb9cdb07d10cc2334d31",
         "origin": "skill"
       }
     },
@@ -5951,7 +5952,7 @@
       "path": "knowledge/operations/paid-tool-routing.md",
       "domainId": "domain.operations",
       "title": "Paid Tool Routing",
-      "loadWhen": "before using or replacing any paid/account-gated tool, before running a free fallback, or when a service is missing from the runtime",
+      "loadWhen": "at workflow start for the one tool-intake question, before using or replacing any paid/account-gated tool, before running a free fallback, or when a service is missing from the runtime",
       "lifecycle": "active",
       "sources": [
         {
@@ -5968,7 +5969,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/operations/paid-tool-routing.md",
-        "sha256": "sha256:bd1e66b5f403499822a142b1c4bd0bc86ac9fec369a4802af940d967fbfc7ee6",
+        "sha256": "sha256:0cfd7a3bf0ea814348c7fd5e8a0e012b6680dbbf95e915ef5903247084937d45",
         "origin": "skill"
       }
     },
@@ -6491,7 +6492,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/orchestration/full-launch-program.md",
-        "sha256": "sha256:877bc5c3b15a39114acaf256483a6e947f284393a6dc3a911058f055a3580e79",
+        "sha256": "sha256:1afa3e5ac2ec91ed4d39c6e5e69b7159bae8263ebbdef6f69679aabcb5960a22",
         "origin": "skill"
       }
     },
@@ -6786,11 +6787,15 @@
         {
           "artifact": "DESIGN.md",
           "heading": "DESIGN.md"
+        },
+        {
+          "artifact": "run/app-store-portfolio.json",
+          "heading": "run/app-store-portfolio.json"
         }
       ],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/process/artifact-contracts.md",
-        "sha256": "sha256:b5d251212fa1c7c7e6a6ecab18497ea1cd80ea577a69b2769cf54e5229296055",
+        "sha256": "sha256:f8497064192c3de902e7cd94f053e314e61914e7ebe5ffe59a0a288b246cff96",
         "origin": "skill"
       }
     },
@@ -6932,7 +6937,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/process/launch-phases.md",
-        "sha256": "sha256:f68e9c32e482aff60423a90d292d916247c22cd6a33ee051480444d742fd06c4",
+        "sha256": "sha256:e3331e3c35f4d71bb154a4ba9e7bc6bc9bf13c37777e03b18d22c9b7c8acefa3",
         "origin": "skill"
       }
     },
@@ -7934,11 +7939,11 @@
           "url": "https://github.com/rorkai/App-Store-Connect-CLI",
           "reviewCadenceDays": 7,
           "claimScope": "Command families, auth ladder, safe automation boundaries, telemetry disclosure, and the verified command cookbook are adapted from the CLI README, local --help output, and release notes.",
-          "lastReviewDate": "2026-08-18",
+          "lastReviewDate": "2026-09-08",
           "reviewer": "b2c-maintainers",
           "publisher": "Rudrank Riyam (author); Rork (maintainer)",
-          "revision": "4.11.0 latest stable observed 2026-09-05; reviewed baseline 4.4.3 (2026-08-17) and 4.9.0 notes (2026-08-24)",
-          "retrievedAt": "2026-09-05",
+          "revision": "5.1.0 latest stable and reviewed guidance 2026-09-08",
+          "retrievedAt": "2026-09-08",
           "rights": {
             "status": "verified",
             "spdx": "MIT",
@@ -7960,7 +7965,7 @@
           "url": "https://github.com/rorkai/app-store-connect-cli-skills",
           "reviewCadenceDays": 7,
           "claimScope": "The routed skill names and their purposes; no SKILL.md text is copied.",
-          "lastReviewDate": "2026-08-18",
+          "lastReviewDate": "2026-09-08",
           "reviewer": "b2c-maintainers",
           "publisher": "Rudrank Riyam (author); Rork (maintainer)",
           "revision": "main@f52c4f04323bb2dfb21ca8be82e6494e9cd0b4d8 observed 2026-09-05; reviewed routing 2026-08-18 without a recorded commit",
@@ -7986,7 +7991,7 @@
             "github-com-rorkai-app-store-connect-cli-skills"
           ],
           "relationship": "adapted",
-          "baseline": "4.4.3 help (2026-08-17); 4.9.0 release notes (2026-08-24)",
+          "baseline": "5.1.0 help and release notes (2026-09-08)",
           "selectors": [
             "README.md",
             "asc --help"
@@ -7996,17 +8001,17 @@
             "asc install-skills without founder approval",
             "asc web agreements accept",
             "asc webhooks serve as production ingress",
-            "asc apps get and asc validate app-store-version (invalid forms)"
+            "asc apps get, asc apps view --app, and asc validate app-store-version (invalid forms)"
           ],
           "reviewer": "b2c-maintainers",
-          "reviewedAt": "2026-09-05",
+          "reviewedAt": "2026-09-08",
           "evaluation": "check:asc-command-contract; LaunchBench asc-flag-drift-runtime and asc-stale-command-guidance"
         }
       ],
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/store/app-store-connect-cli.md",
-        "sha256": "sha256:f3782924039902cf66c509b01d37b4f78366c0f09ff8fde3df4eb95798d9af08",
+        "sha256": "sha256:d2db5dd02053e16263c57e142babf8516caa458f5676c5f74ab586d303454dda",
         "origin": "skill"
       }
     },
@@ -8666,7 +8671,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/store/apple-signing-release.md",
-        "sha256": "sha256:48f8dbec7233f104c5498712bea7972536b380007a1cc337ff9ac6116743d5d7",
+        "sha256": "sha256:34fcc279a145a463e766f844f32f500c16f797110479abd3b450cbc98a7c6de6",
         "origin": "skill"
       }
     },
@@ -8713,7 +8718,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/store/aso-apple-keyword-evidence.md",
-        "sha256": "sha256:24c49f8b3ea43467ee793beb6ffde38511e4ca2fbe8ab1d5e5f84d7e3e2f7fa2",
+        "sha256": "sha256:22419e7872cd6da2a10b058b4c8f54fdd2476cad76162af47790be00809250e2",
         "origin": "skill"
       }
     },
@@ -9990,7 +9995,7 @@
         "pull the overall progress across every workstream",
         "something changed and the tracked state needs to catch up"
       ],
-      "instructions": "Run `b2c status` and `b2c plan` to orient from reducer-owned `state/business-state.json`. Do not edit that file or author a second state document. Submit lane, evidence, and blocker changes through the runtime reducer. A succeeded lane needs evidence or live proof, and a lane cannot succeed while a required upstream lane is running or blocked. Choose the smallest orchestration strategy that fits the ready work, then report what changed, what happens next, and what needs the human. Do not wait for later operational or readiness artifacts during orientation.",
+      "instructions": "Run `b2c status` and `b2c plan` to orient from reducer-owned `state/business-state.json`. Do not edit that file or author a second state document. Submit lane, evidence, and blocker changes through the runtime reducer. A succeeded lane needs evidence or live proof, and a lane cannot succeed while a required upstream lane is running or blocked. Record App Store Connect API-key health and Apple web-session health as two proofs; a healthy API key is not ASC connected. Do not write a signing blocker until `asc certificates list` has been read, and do not treat a local Development keychain as a distribution blocker when App Store Connect already lists Distribution certificates. Do not dispatch research-backed-spec until the live App Store portfolio observe has succeeded. Choose the smallest orchestration strategy that fits the ready work, then report what changed, what happens next, and what needs the human. Do not wait for later operational or readiness artifacts during orientation.",
       "reads": [
         "state/business-state.json"
       ],
@@ -10041,7 +10046,7 @@
         "ship the app, the website, and the store packet as one program",
         "every surface gets a fresh-context review before it counts as done"
       ],
-      "instructions": "Open the program. Write `operations/LAUNCH_PROGRAM.md` from the mandate record in `reference.orchestration.full-launch-program`: outcome, stop line, launch scope, start classification, workspace facts, craft references, spend ceiling, autonomy mode, founder-only actions, and the review policy. Record `project.launchScope: full` through the reducer with a dated founder reason when it changes an existing scope; never edit `state/business-state.json` by hand. Confirm the `## Review Ledger` section exists in `operations/ORCHESTRATION.md` before any broad dispatch. Run the paid-tool check for every preferred design-evidence and generation tool and stop when a required one is missing. Classify the start: a brownfield overhaul runs research in audit-and-gap-fill mode with keep, refresh, or redo per artifact. Then let `b2c plan` sequence the existing nodes; this node adds the mandate, the isolated-review edges, the reference-pack edge, and the closeout gates, not a second graph. Hand off with the smallest founder-only ask.",
+      "instructions": "Open the program. Write `operations/LAUNCH_PROGRAM.md` from the mandate record in `reference.orchestration.full-launch-program`: outcome, stop line, launch scope, start classification, workspace facts, craft references, spend ceiling, autonomy mode, founder-only actions, and the review policy. Record `project.launchScope: full` through the reducer with a dated founder reason when it changes an existing scope; never edit `state/business-state.json` by hand. Confirm the `## Review Ledger` section exists in `operations/ORCHESTRATION.md` before any broad dispatch. Present one start-of-workflow tool-intake AskUserQuestion for the account-gated tools on the research-backed-spec compiled graph; fold it into a pending readiness gate; do not open a second tool gate. Name App Store Connect API auth and the live apps-list receipt as required even when optional research tools are deferred. Record API-key health and web-session health as two proofs. Classify the start: a brownfield overhaul runs research in audit-and-gap-fill mode with keep, refresh, or redo per artifact. Do not dispatch research-backed-spec until live-app-store-portfolio has succeeded. Then let `b2c plan` sequence the existing nodes; this node adds the mandate, the isolated-review edges, the reference-pack edge, and the closeout gates, not a second graph. Hand off with the smallest founder-only ask.",
       "reads": [
         "state/business-state.json"
       ],
@@ -10409,7 +10414,7 @@
         "route around a tool that needs an account we don't have",
         "find the free fallback instead of a paid service"
       ],
-      "instructions": "Before using, skipping, or replacing any paid/account-gated tool (AppKittie, XPOZ, Firecrawl, Higgsfield, MobAI, Retention Mechanics), run ToolSearch for the tool's `mcp__<TOOLNAME>__` prefix and check for founder-supplied exports before concluding it is unavailable — a missing connector is not proof the founder lacks the tool. Present the three-choice Confirmation Prompt (use/provision, export/fallback, defer) through AskUserQuestion rather than a free-text blocker, and record the decision in `strategy/TOOL_DECISIONS.md` with tool, lane, access status, selected route, and fallback limitation. Treat MobAI's free tier (single device, Testing Mode) as needing no spend gate at all — only an upgrade or trial does. Never present a fallback artifact as equivalent to the paid-tool output; label it with confidence and the limitation, and route any credit/subscription spend through a separate protected ceiling, never inferred from the fallback choice.",
+      "instructions": "At workflow start, walk the compiled start node plus its dependency closure — full-launch and complete-business walk `workflow.research.research-backed-spec` and its dependencies, including this node and `workflow.operations.live-app-store-portfolio` — and collect Tool Map names and MCP prefixes from instructions, consults, reads, and bound knowledge. Always add App Store Connect CLI and the live portfolio when that graph includes research-backed-spec or live-app-store-portfolio; a focused start lists only tools that graph actually names. Present one AskUserQuestion with multiSelect unset, a prompt body at or under 240 characters, and three options (recommended set, I'll pick next, defer optional) whose descriptions hold the names and jobs. Fold this into an already-pending readiness gate; do not open a second activeFounderGate. ASC and the live apps-list receipt stay required. I'll pick next records unnamed optionals as labeled fallback in the same turn. Deferred AppKittie, XPOZ, Firecrawl, or paid ASO continue as labeled fallback; deferred Higgsfield or MobAI upgrades mean no spend and no labeled-fallback generate. Tools named at intake get no second confirmation. Credit spend still uses a separate amount gate. Run ToolSearch for each tool's `mcp__<TOOLNAME>__` prefix before concluding it is unavailable. Record `Selected route:` in `strategy/TOOL_DECISIONS.md` plus per-tool rows with limitation text. Treat MobAI Free as needing no spend gate. Never present fallback output as equivalent to the paid-tool artifact.",
       "reads": [
         "state/business-state.json"
       ],
@@ -10430,7 +10435,9 @@
       "outputPaths": [
         "strategy/TOOL_DECISIONS.md"
       ],
-      "gateCommands": [],
+      "gateCommands": [
+        "check:paid-tool-intake-required"
+      ],
       "providerIds": [
         "provider.doppler"
       ],
@@ -10438,6 +10445,52 @@
         "approve a paid or constrained fallback"
       ],
       "actionClass": "mutate",
+      "idempotent": true,
+      "applicability": {
+        "mode": "always"
+      }
+    },
+    {
+      "id": "workflow.operations.live-app-store-portfolio",
+      "title": "Live App Store portfolio observe",
+      "domainId": "domain.operations",
+      "areaIds": [
+        "area.business-operations-trust"
+      ],
+      "trigger": "Before research-backed-spec on a complete-business or full-launch start; whenever Apple team or API auth changes",
+      "founderPhrasings": [
+        "list the apps already on this App Store account before we research",
+        "check live App Store Connect apps before we pick a product",
+        "do we already have an app on this Apple team"
+      ],
+      "instructions": "Read the live App Store Connect portfolio with API auth only. Confirm `asc auth status --validate` on the winning binary, then run `asc apps list` and write `run/app-store-portfolio.json` with schema 1.0.0, command `asc apps list`, authFamily `api`, winnerVersion, observedAt, appCount, apps[] of sanitized `{name}` plus optional `{bundleId}`, and `empty: true` only when the live command returned no apps. Failed or missing API auth produces no receipt. A web session never satisfies this hold. Do not invent an empty portfolio. Do not store Apple numeric ids, SKU, raw stdout, session, or env. Compare names and bundle ids against `operations/business-access.json` `forbiddenProviderProjects[]` and refuse research that would target a match. A receipt older than seven days, or older than a later Apple-account checkedAt, is stale — re-run apps list. This node may remain held while reversible local prep continues; it blocks `workflow.research.research-backed-spec`.",
+      "reads": [
+        "operations/business-access.json"
+      ],
+      "consults": [
+        "operations/BUSINESS_ACCESS.md"
+      ],
+      "referenceIds": [
+        "reference.process.artifact-contracts",
+        "reference.store.app-store-connect-cli"
+      ],
+      "roleId": "role.operator-readiness",
+      "laneIds": [
+        "store_console"
+      ],
+      "phaseIds": [
+        "phase.0-orient"
+      ],
+      "dependencies": [],
+      "outputPaths": [
+        "run/app-store-portfolio.json"
+      ],
+      "gateCommands": [
+        "check:app-store-portfolio-required"
+      ],
+      "providerIds": [],
+      "founderOnlyActions": [],
+      "actionClass": "observe",
       "idempotent": true,
       "applicability": {
         "mode": "always"
@@ -10942,7 +10995,7 @@
         "decide how much autonomy the agent should have",
         "get the business identity and two-factor recovery squared away"
       ],
-      "instructions": "When the durable runtime starts, offer one optional step-away setup. Settle autonomy and budget, confirm business identity and founder-owned recovery/2FA, inventory only the accounts required by accepted near-term work, and record exact external authority in operations/business-access.json. This setup may remain held while research, product definition, design, local implementation, and local tests continue. Complete it before authenticated provider work, standing schedules, spend, public actions, testing-track uploads, or releases. Keep one structured `activeFounderGate`, set it to `null` while work can continue, and combine missing tools or roles into one handoff. Never request secrets in chat. Consume matching standing envelopes without asking twice. Pause only for missing or expired scope, ceiling overruns, protected identity, legal, pricing, or credential changes, destruction, or an unapproved public release.",
+      "instructions": "When the durable runtime starts, offer one optional step-away setup. Settle autonomy and budget, confirm business identity and founder-owned recovery/2FA, inventory only the accounts required by accepted near-term work, and record exact external authority in operations/business-access.json. If this gate is already pending, fold the start-of-workflow recommended tool set into the same AskUserQuestion rather than opening a second tool gate. This setup may remain held while reversible local prep, product definition drafts, design drafts, local implementation, and local tests continue. It does not authorize dispatch of `workflow.research.research-backed-spec`; that node stays frontier-blocked until `workflow.operations.live-app-store-portfolio` succeeds. Complete the setup before authenticated provider work, standing schedules, spend, public actions, testing-track uploads, or releases. Keep one structured `activeFounderGate`, set it to `null` while work can continue, and combine missing tools or roles into one handoff. Never request secrets in chat. Consume matching standing envelopes without asking twice. Pause only for missing or expired scope, ceiling overruns, protected identity, legal, pricing, or credential changes, destruction, or an unapproved public release.",
       "reads": [
         "state/business-state.json"
       ],
@@ -11207,7 +11260,7 @@
         "pick a business idea for me and just run with it",
         "research the market before we commit to building"
       ],
-      "instructions": "When no idea exists, compare three safe, feasible consumer-app opportunities before committing an app identity or build. Judge economics, recurring pain, reachable distribution, transformation clarity, complete-product feasibility, and sensitivity risk. If the opening request delegates product selection, choose the strongest candidate that clears the evidence bar and record `Founder opening mandate` as the decision authority. Otherwise, recommend one candidate for Go, Pivot, or Kill. Return no candidate instead of forcing a weak idea. Before a paid research request, use research-lookup with its provider/version, connection, operation and non-secret arguments under an explicit freshness limit. Reuse saved current results. In a registered planning workspace, checkpoint pending through research-record before dispatch, then checkpoint the actual observed, failed or uncertain result immediately; read back uncertain requests before replay. Use the bound research references to write dated source evidence, category economics, demand, wedge, distribution, offer response, transformation demo, paying niche, signal provenance, conflicts, and the decision into strategy/RESEARCH.md, strategy/SIGNAL_CORPUS.md, and strategy/OFFER_TEST.md. Use the default category bar only when the work has not set a better one: top-ten gross of at least $5M per year with two apps above $1M each. Author accepted product facts in product.yaml, then render PRODUCT.md. Do not hand-edit PRODUCT.md. Before the product is accepted, define its core loop, Complete product scope, moat path, and beat moment. Run check:research-workflow-output. Do not harden a direction that fails it.",
+      "instructions": "When no idea exists, compare three safe, feasible consumer-app opportunities before committing an app identity or build. Judge economics, recurring pain, reachable distribution, transformation clarity, complete-product feasibility, and sensitivity risk. If the opening request delegates product selection, choose the strongest candidate that clears the evidence bar and record `Founder opening mandate` as the decision authority. Otherwise, recommend one candidate for Go, Pivot, or Kill. Return no candidate instead of forcing a weak idea. Before a paid research request, use research-lookup with its provider/version, connection, operation and non-secret arguments under an explicit freshness limit. Reuse saved current results. In a registered planning workspace, checkpoint pending through research-record before dispatch, then checkpoint the actual observed, failed or uncertain result immediately; read back uncertain requests before replay. Use AppKittie, XPOZ, and Firecrawl from the bound research-intelligence recipe when those names appear; if intake deferred them, continue the evidence lane as labeled fallback rather than parking it. Use the bound research references to write dated source evidence, category economics, demand, wedge, distribution, offer response, transformation demo, paying niche, signal provenance, conflicts, and the decision into strategy/RESEARCH.md, strategy/SIGNAL_CORPUS.md, and strategy/OFFER_TEST.md. Use the default category bar only when the work has not set a better one: top-ten gross of at least $5M per year with two apps above $1M each. Author accepted product facts in product.yaml, then render PRODUCT.md. Do not hand-edit PRODUCT.md. Before the product is accepted, define its core loop, Complete product scope, moat path, and beat moment. Run check:research-workflow-output. Do not harden a direction that fails it.",
       "reads": [
         "product.yaml"
       ],
@@ -11233,7 +11286,10 @@
       "phaseIds": [
         "phase.1"
       ],
-      "dependencies": [],
+      "dependencies": [
+        "workflow.operations.live-app-store-portfolio",
+        "workflow.operations.paid-tool-routing-and-fallback"
+      ],
       "outputPaths": [
         "strategy/RESEARCH.md",
         "strategy/SIGNAL_CORPUS.md",
@@ -11337,6 +11393,7 @@
         "phase.1"
       ],
       "dependencies": [
+        "workflow.research.research-backed-spec",
         "workflow.operations.agent-operations-ledger"
       ],
       "outputPaths": [
@@ -16702,6 +16759,15 @@
       "generated": true
     },
     {
+      "id": "artifact.run-app-store-portfolio-json",
+      "path": "run/app-store-portfolio.json",
+      "ownerDomainId": "domain.operations",
+      "laneIds": [
+        "store_console"
+      ],
+      "generated": false
+    },
+    {
       "id": "artifact.skill-version-json",
       "path": "skill-version.json",
       "ownerDomainId": "domain.machine",
@@ -17135,6 +17201,22 @@
       "commandManifestPath": "package.json",
       "ownerDomainId": "domain.process",
       "audit": "required"
+    },
+    {
+      "id": "gate.check-app-store-portfolio",
+      "command": "check:app-store-portfolio",
+      "scriptPath": "checks/validation/business/store/check-app-store-portfolio.ts",
+      "commandManifestPath": "package.json",
+      "ownerDomainId": "domain.process",
+      "audit": "required"
+    },
+    {
+      "id": "gate.check-app-store-portfolio-required",
+      "command": "check:app-store-portfolio-required",
+      "scriptPath": "checks/validation/business/store/check-app-store-portfolio.ts",
+      "commandManifestPath": "package.json",
+      "ownerDomainId": "domain.process",
+      "audit": "excluded"
     },
     {
       "id": "gate.check-apple-release-readiness",
@@ -17817,6 +17899,22 @@
       "audit": "required"
     },
     {
+      "id": "gate.check-paid-tool-intake",
+      "command": "check:paid-tool-intake",
+      "scriptPath": "checks/validation/business/operations/check-paid-tool-intake.ts",
+      "commandManifestPath": "package.json",
+      "ownerDomainId": "domain.process",
+      "audit": "required"
+    },
+    {
+      "id": "gate.check-paid-tool-intake-required",
+      "command": "check:paid-tool-intake-required",
+      "scriptPath": "checks/validation/business/operations/check-paid-tool-intake.ts",
+      "commandManifestPath": "package.json",
+      "ownerDomainId": "domain.process",
+      "audit": "excluded"
+    },
+    {
       "id": "gate.check-paid-ua",
       "command": "check:paid-ua",
       "scriptPath": "checks/validation/business/growth/check-paid-user-acquisition.ts",
@@ -18320,14 +18418,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "be3ca747c378c096fdb190ad4a071e299481d07d733af5809cee5a8ce6c96d00",
+    "fingerprint": "78adc16f805ac14ea654143c2a6b98a2405f9a508414129a16b00ef522325795",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
-        "version": "0.219.4",
-        "revision": "0.219.4",
-        "contentDigest": "ad3053972a0bc2f61c5665ac1f074c94f0168379ca0f5c4707032195d4d75f62"
+        "version": "0.219.5",
+        "revision": "0.219.5",
+        "contentDigest": "b8ccf3286538e283a2b5651c2a7e895658c6e4a89058231dcd561a1daf9a7479"
       }
     ],
     "base": {
@@ -18338,7 +18436,7 @@
     "deltas": {
       "business-pack.consumer-business": {
         "domains": 15,
-        "workflows": 111,
+        "workflows": 112,
         "references": 142
       }
     }

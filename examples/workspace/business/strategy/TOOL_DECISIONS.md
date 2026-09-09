@@ -2,6 +2,10 @@
 
 Record paid, account-gated, and fallback tooling decisions before using or downgrading tools.
 
+## Workflow intake
+
+Workflow intake is not recorded yet. Record the start-of-workflow recommended set, pick-next, or defer-optional choice here, or write an explicit no optional tools row, before paid-tool routing can succeed. Deferred AppKittie, XPOZ, Firecrawl, or paid ASO continue as labeled fallback; deferred Higgsfield or MobAI upgrades mean no spend.
+
 | Tool | Lane | Access status | Founder confirmation | Selected route | Fallback limitation |
 | --- | --- | --- | --- | --- | --- |
 | Compound Engineering | engineering | check current install | required for core engineering work | ce-update, ce-plan, ce-work, ce-code-review, ce-proof | fallback requires a written reason |

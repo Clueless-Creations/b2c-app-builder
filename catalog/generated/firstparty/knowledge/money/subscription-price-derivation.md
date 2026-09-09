@@ -3,7 +3,7 @@
 Part of the [Revenue, Monetization, And Purchase Funnels](./revenue-monetization.md) hub. Honor the **Founder-Only Gates** there before creating live products, changing prices, or submitting for review.
 
 Use this before deriving one subscription's territory prices from another.
-Rork `asc` 4.9.0 adds experimental `asc subscriptions pricing derive`.
+Rork `asc` 5.1.0 keeps `asc subscriptions pricing derive`.
 `--dry-run` is mandatory. A multiplier is not approval.
 
 Load `app-store-connect-cli.md` before any `asc` command.

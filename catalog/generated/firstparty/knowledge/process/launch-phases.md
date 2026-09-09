@@ -60,6 +60,9 @@ Do:
 - Confirm the launch scope (see Launch Scopes above; recommend essentials for a first launch), record `project.launchScope` and `project.kickoffDate` — the pre-build clock starts now — and defer essentials breadth lanes with dated reasons.
 - Report the first verified state, blockers, and next action.
 - Create `operations/BUSINESS_ACCESS.md` and `operations/business-access.json`; present one phase-labeled founder question with selectable choices, consequences, a safe defer route, and the agent action that follows it.
+- Treat App Store Connect API-key health and an Apple web session as two proofs. `asc auth status --validate` and `asc auth doctor` speak only to the API key. `asc web auth status` speaks only to the web session. A healthy API key is not "ASC connected" and does not unlock `asc web *` reads. Refuse an `asc web auth login` handoff unless the winning `asc` binary is `>= 5.1.0`. A 503 while Apple's status page is green is a stale client, not an Apple outage.
+- Do not write a signing blocker until `asc certificates list` has been read under API auth. A local keychain that shows only Apple Development identities is not a distribution blocker when App Store Connect already holds Distribution certificates. Do not revoke or reissue certificates in this phase.
+- Do not dispatch `workflow.research.research-backed-spec` until a live `asc apps list` receipt exists. Missing Apple team or failed API auth holds research. Do not invent an empty portfolio.
 - Create tasks/checkpoints for the engagement; block later phases on the right prior outputs.
 - Decide whether to create one canonical repo bundle, a separate landing repo, or a product-build handoff bundle.
 
@@ -77,6 +80,7 @@ Acceptance:
 
 - A future agent can identify phase, autonomy mode, evidence, blockers, and founder-only gates without reading the entire repo.
 - State and authorization records are current before provider, store, revenue, or legal work begins.
+- API-key status and web-session status are recorded as two lines. The session never claims "ASC is connected" from an API-key proof alone.
 - The founder is not asked to manage a checklist or choose the next lane; one clear action unlocks the agent's recorded next work.
 
 ## Phase 0a: Project State And Autonomy
@@ -111,7 +115,7 @@ Goal: avoid wasting tokens on weak free fallbacks when the founder may have, wan
 Do:
 
 - Load [`paid-tool-routing.md`](../operations/paid-tool-routing.md).
-- List paid/account-gated lanes that affect the launch: AppKittie, XPOZ, Firecrawl, Higgsfield, MobAI Plus/Pro capabilities, Fastlane AI, ASO/MMP/ad tools, Sideshift/creator marketplaces, RevenueCat, Stripe, PostHog, Resend, and App Store/Play accounts. Record when MobAI Free covers the lane and when a fallback narrows cross-platform proof.
+- List paid/account-gated lanes that affect the launch: AppKittie, XPOZ, Firecrawl, Higgsfield, MobAI Plus/Pro capabilities, Fastlane AI, ASO/MMP/ad tools, Sideshift/creator marketplaces, RevenueCat, Stripe, PostHog, Resend, and App Store/Play accounts. Name App Store Connect API auth and the live apps-list receipt as required, not optional. Record when MobAI Free covers the lane and when a fallback narrows cross-platform proof.
 - Check current runtime access, local installs, user-provided exports, screenshots, PDFs, CSVs, API keys, and account sessions.
 - Ask before replacing any paid/account-gated tool with a free fallback.
 - Record selected routes, limitations, and blocked access in `strategy/TOOL_DECISIONS.md` or the relevant ops doc.
@@ -169,6 +173,7 @@ Goal: turn the rough idea into a defensible product spec.
 
 Do:
 
+- Do not start this phase until `workflow.operations.live-app-store-portfolio` has succeeded with a live `asc apps list` receipt. A held step-away setup may continue reversible local prep; it does not authorize this research dispatch.
 - Load `paid-tool-routing.md` before replacing paid AppKittie, XPOZ, Firecrawl, or ASO tools with free public research.
 - Run AppKittie category sweeps across plausible app-store categories by revenue, downloads, growth, ratings, and ads.
 - Use the data to choose the storefront category; do not let internal vocabulary decide the App Store category.

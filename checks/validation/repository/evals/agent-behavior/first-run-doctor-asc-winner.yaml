@@ -1,0 +1,26 @@
+id: first-run-doctor-asc-winner
+title: Doctor reports the winning App Store Connect CLI and prefers latest
+prompt: >
+  Run b2c doctor. This machine has two asc binaries on PATH. The winner is older than the
+  latest observed App Store Connect CLI. Do not install or upgrade anything.
+expected_route: >
+  Call b2c doctor. Report the PATH-winning asc absolute path and the version that binary prints.
+  Compare that winner to the committed upstream observation latest stable tag. Warn when the
+  winner is missing, older than latest, below the support floor, shadowed, or unparseable.
+  Exit 0 on a healthy engine install. Never spawn brew install, upgrade, or update.
+must_use:
+  - kernel/session/doctor.ts
+  - catalog/upstreams/observations/rork-app-store-connect-cli.json
+must_catch:
+  - winning path
+  - winning version
+  - latest observed
+  - doctor does not install
+should_say:
+  - last doctor observation
+  - not a live PATH probe
+forbidden:
+  - brew install
+  - brew upgrade
+  - upgrade the host automatically
+  - ASC is connected

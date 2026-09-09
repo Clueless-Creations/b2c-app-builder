@@ -1,6 +1,6 @@
 {
   "$schema": "./business-access.schema.json",
-  "schemaVersion": "2.0.0",
+  "schemaVersion": "2.1.0",
   "updatedAt": "",
   "status": "not_started",
   "founderModel": {
@@ -39,7 +39,7 @@
             "id": "step_away",
             "label": "Step-away mode",
             "route": "proceed",
-            "description": "Verify the required access and create standing authority for routine launch operations.",
+            "description": "Verify the required access, name the account-gated tools this start needs in this same question, and create standing authority for routine launch operations.",
             "consequence": "The agent can build, deploy the named website, create assets, update store material, and upload test builds without repeat approvals.",
             "agentActionNext": "Run the consolidated readiness preflight, record standing envelopes, and start every ready area.",
             "evidenceEffect": "The ledger shows unattended readiness or one consolidated list of missing items.",
@@ -61,10 +61,10 @@
         "mode": "defer_only",
         "optionId": "assisted",
         "reason": "Local and reversible work can continue without standing external authority.",
-        "fallbackAction": "Continue research, design, local builds, drafts, and readiness discovery.",
+        "fallbackAction": "Continue reversible local prep, design drafts, local builds, and readiness discovery.",
         "revisitTrigger": "Before the first provider mutation, website deployment, asset spend, or store upload."
       },
-      "safeWorkWhileWaiting": "Continue research, design, local builds, drafts, and read-only capability discovery; do not infer consent.",
+      "safeWorkWhileWaiting": "Continue reversible local prep, design drafts, local builds, and read-only capability discovery; do not infer consent.",
       "agentActionNext": "Run the consolidated readiness preflight, record standing envelopes, and start every ready area.",
       "successProof": "The access and operations ledgers show exact capabilities, roles, envelopes, limits, blockers, and next work.",
       "lifecycle": {
@@ -413,5 +413,6 @@
       "nextAgentAction": "Inventory or create the channel and use channel permissions instead of sharing the Google password.",
       "limitations": []
     }
-  ]
+  ],
+  "forbiddenProviderProjects": []
 }

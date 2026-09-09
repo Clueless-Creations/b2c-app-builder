@@ -108,7 +108,7 @@ export const roles: CatalogRole[] = [
       "provider.sentry",
       "provider.paid-ad-channels",
     ],
-    ["operations/", "strategy/TOOL_DECISIONS.md"],
+    ["operations/", "strategy/TOOL_DECISIONS.md", "run/app-store-portfolio.json"],
   ),
   role(
     "role.research-strategist",

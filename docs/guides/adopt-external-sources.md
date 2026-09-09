@@ -198,19 +198,20 @@ head, and the executables found on PATH. The workspace's composition pin lives i
 the workspace, never in the manifest. Upstream latest is not the reviewed
 baseline. The reviewed baseline is not the supported range. The supported range
 is not a workspace upgrade. For the Rork App Store Connect CLI
-(`catalog/upstreams/rork-app-store-connect-cli.yaml`) on 2026-09-05:
+(`catalog/upstreams/rork-app-store-connect-cli.yaml`) on 2026-09-08:
 
-1. Reviewed source baseline: 4.4.3, from local `--help` output on 2026-08-17.
-2. Reviewed guidance baseline: 4.9.0 release notes, reviewed 2026-08-24.
-3. Latest observed stable release: 4.11.0, published 2026-08-29.
-4. Branch head: `main` was ahead of the release on 2026-09-05.
-5. Host executable: 4.11.0 first on PATH at `~/.local/bin/asc`, matching the official macOS arm64 release digest, with a Homebrew keg at 2.8.1 shadowed.
+1. Reviewed source baseline: 5.1.0, from local `--help` output on 2026-09-08.
+2. Reviewed guidance baseline: 5.1.0 release notes, reviewed 2026-09-08.
+3. Latest observed stable release: 5.1.0, published 2026-09-08.
+4. Branch head: `main` at the 5.1.0 tag commit on 2026-09-08.
+5. Host executable: 5.1.0 first on PATH at `~/.local/bin/asc`, with `/opt/homebrew/bin/asc` also at 5.1.0 and the same digest. That digest is the Homebrew bottle, not the GitHub macOS arm64 release asset.
 
 The shipped Rork observation
 (`catalog/upstreams/observations/rork-app-store-connect-cli.json`) was assembled
-by a maintainer from GitHub API responses retrieved on 2026-09-05 and is labeled
+by a maintainer from GitHub API responses retrieved on 2026-09-08 and is labeled
 method `manual`. A fresh `upstream-check --fetch --observe-host --write`
-replaces it.
+replaces it. Reviewed guidance tracking latest stable does not collapse these
+five fields and does not upgrade the host.
 
 Host drift is real. Two executables on one machine can differ, and PATH order
 decides which one runs. A passing probe proves the probed binary only. The Rork

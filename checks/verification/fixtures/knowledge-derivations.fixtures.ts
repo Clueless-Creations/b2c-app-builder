@@ -336,7 +336,14 @@ export function register(harness: Harness): void {
         entry.upstreamId !== undefined && existsSync(path.join(skillRoot, "catalog/upstreams", `${entry.upstreamId}.yaml`)),
         `${entry.id} names no upstream manifest`,
       );
-      assert(entry.revision !== undefined && entry.retrievedAt === "2026-09-05", `${entry.id} lacks a revision or retrieval date`);
+      const retrievedAtBySource: Record<string, string> = {
+        "github-com-rorkai-app-store-connect-cli": "2026-09-08",
+        "github-com-rorkai-app-store-connect-cli-skills": "2026-09-05",
+      };
+      assert(
+        entry.revision !== undefined && entry.retrievedAt === retrievedAtBySource[entry.id],
+        `${entry.id} lacks a revision or retrieval date`,
+      );
       assert(!/auto-discovered/iu.test(entry.claimScope), `${entry.id} still carries the placeholder claim scope`);
     }
     const issues = validateKnowledgePackages([item], skillRoot, domains, workflows, contextPacks, subscribers, loadPinnedKnowledgeFreshnessNow(skillRoot))

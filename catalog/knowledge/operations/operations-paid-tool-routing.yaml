@@ -3,8 +3,8 @@ id: reference.operations.paid-tool-routing
 title: Paid Tool Routing
 domain_id: domain.operations
 document_path: knowledge/operations/paid-tool-routing.md
-load_when: before using or replacing any paid/account-gated tool, before running a free fallback, or when a service is
-  missing from the runtime
+load_when: at workflow start for the one tool-intake question, before using or replacing any paid/account-gated tool,
+  before running a free fallback, or when a service is missing from the runtime
 lifecycle: active
 bindings:
   workflow_ids:

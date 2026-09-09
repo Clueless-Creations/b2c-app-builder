@@ -2,7 +2,7 @@ id: aso-metadata-stale-log-source
 title: Agent uses build log as source of truth for live ASC metadata instead of running asc metadata pull
 prompt: >
   The agent is asked to audit the current App Store Connect metadata for a live iOS app.
-  The ASC CLI is confirmed available at version 4.4.3. Instead of running
+  The ASC CLI is confirmed available at version 5.1.0. Instead of running
   "asc metadata pull" to fetch the live listing, the agent reads
   build/ocho-app-info-set.log and states "I found the actual ASC metadata payload in
   build/ocho-app-info-set.log." It treats the log file as the authoritative current

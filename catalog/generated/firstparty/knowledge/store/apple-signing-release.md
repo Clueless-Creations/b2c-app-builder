@@ -246,6 +246,8 @@ Important interpretation:
 - A simulator build can pass with incomplete distribution signing.
 - Blank `DEVELOPMENT_TEAM` means the project is not attached to a developer team for signing.
 - An `Apple Development` identity is enough for development workflows, but App Store/TestFlight distribution needs an Apple Distribution path through Xcode automatic signing, cloud-managed certificates, or a local Apple Distribution certificate/profile.
+- Local keychain inventory is not the Apple certificate inventory. Run `asc certificates list` under API auth before writing any signing blocker. A keychain that shows only Apple Development identities is not a distribution blocker when App Store Connect already lists Distribution certificates. Cloud-managed and CI signing also keep the private key off this Mac.
+- Do not revoke or reissue certificates from this inventory. Certificate create, rotate, export, and revoke stay founder-gated.
 - Entitlements in the Xcode project must match capabilities on the App ID and provisioning profile.
 
 ## Apple Portal And App Store Connect Inventory
@@ -256,7 +258,10 @@ Use read-only checks first:
 asc auth status --validate --output json
 asc auth doctor
 asc apps list --output json --pretty
+asc certificates list --output json --pretty
 ```
+
+`asc auth status` and `asc auth doctor` prove the API key only. They are not a web session and they are not "ASC connected." Probe `asc web auth status` separately when a web read is in scope. Refuse an `asc web auth login` handoff unless the winning `asc` is `>= 5.1.0`. A 503 while Apple's status page is green is a stale client.
 
 When App Store Connect API tools are exposed, check:
 
@@ -534,6 +539,7 @@ Update:
 - Treating `xcodebuild` simulator success, or an in-app simulator run, as proof the app can be uploaded. The easier the simulator run is to reach, the easier this mistake is to make.
 - `DEVELOPMENT_TEAM` is blank but the agent claims signing is configured.
 - Only an `Apple Development` identity exists locally, but the agent claims App Store distribution is ready.
+- The agent writes a signing blocker from `security find-identity` without running `asc certificates list`. Local Development identities are not a distribution blocker when App Store Connect already holds Distribution certificates.
 - App Store Connect shows no app record and no bundle ID, but the agent starts RevenueCat production product setup or TestFlight upload steps.
 - `asc auth status` has no credentials and an interactive `asc apps create` prompt fails with EOF; record auth as blocked instead of retrying blindly.
 - Creating a bundle ID/app record before final identifier, app name, SKU, team, and seller-name implications are approved.

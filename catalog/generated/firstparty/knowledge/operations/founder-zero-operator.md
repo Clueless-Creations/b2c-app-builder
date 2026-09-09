@@ -36,7 +36,7 @@ Prefer one opening readiness question. Use this question contract when a real ex
 
 1. **Phase and outcome:** say which launch phase is active, what the agent is doing, and what this decision unlocks.
 2. **What and why:** explain the gate in one sentence each; define any unfamiliar role, research, provider, or business term before using it.
-3. **One selectable question:** use AskUserQuestion when available, or the same plain-text prompt otherwise. Offer two or three mutually exclusive choices, put the recommended choice first, and do not require free-text reconstruction when a selection works.
+3. **One selectable question:** use AskUserQuestion when available, or the same plain-text prompt otherwise. Offer two or three mutually exclusive choices, put the recommended choice first, and do not require free-text reconstruction when a selection works. The prompt body stays at or under 240 characters. If a start-of-workflow tool intake is due and a readiness gate is already pending, fold the recommended tool set into that same question; do not open a second `activeFounderGate`.
 4. **Consequences:** for every choice state what happens, what the agent does next, and how readiness/evidence changes.
 5. **Skip, fallback, or defer:** make the safe route explicit and say when the gate returns. Access, money, legal, pricing, public voice, release, and destructive gates can be deferred while safe preparation continues, but never bypassed.
 6. **Lifecycle:** no answer means `pending`, never consent. Move resolved, stale, or superseded gates to `gateHistory`. If a new direct founder instruction changes the task, archive the old gate and re-evaluate it instead of defending an agent-created blocker.
@@ -65,7 +65,7 @@ Create `operations/BUSINESS_ACCESS.md` and `operations/business-access.json` dur
 5. **Create or claim:** use authenticated browser control to create or claim missing business assets when authorized. Explain platform verification, handle/name tradeoffs, and recovery implications before sticky identity changes.
 6. **Delegate:** grant the narrowest revocable operator role or OAuth scope. Avoid shared personal logins.
 7. **Verify:** read back the exact account, business asset, role, permissions, environment, recovery owner, and 2FA owner. Capture sanitized proof.
-8. **Operate:** move into research, content, customer response, store, analytics, and launch work. Access setup is an unlock, not the deliverable.
+8. **Operate:** move into reversible local prep, content drafts, customer-response drafts, and launch sequencing. Access setup is an unlock, not the deliverable. A held step-away gate does not authorize `workflow.research.research-backed-spec`. That node stays frontier-blocked until the live App Store portfolio observe succeeds.
 9. **Stay unattended:** record the matching protected control waiver and exact workflow-scoped standing envelopes, then consume them without asking again. Combine any new missing permissions into one handoff and continue independent work.
 
 ### Plain-Language Research Example
@@ -178,6 +178,7 @@ Flag and repair these immediately:
 - a social account is called ready without exact handle, role, recovery/2FA ownership, sanitized proof, and an operating next step
 - account access is treated as approval to publish, spend, reply, change identity, or delete
 - the founder is interrupted for each account instead of receiving one consolidated readiness request
+- a second sequential tool gate opens after workflow intake, or a deferred research-intelligence tool parks the evidence lane with no labeled fallback
 - a matching standing envelope exists but the agent asks for the same approval again
 - the agent reaches deployment or store upload before checking required tools, roles, signing, and authentication
 - the agent completes access setup but does not begin the next business operation

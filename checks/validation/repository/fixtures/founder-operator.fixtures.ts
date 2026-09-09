@@ -36,6 +36,79 @@ export function register(h: Harness): void {
   writeLedger(unsupportedGateContract, unsupportedLedger);
   runFixture("unsupported gate contracts fail closed", unsupportedGateContract, "check-founder-operator-bootstrap.ts", 1);
 
+  const leftoverSchema = makeFixture("founder-operator-schema-2-0-0");
+  const leftoverLedger = readLedger(leftoverSchema);
+  leftoverLedger.schemaVersion = "2.0.0";
+  writeLedger(leftoverSchema, leftoverLedger);
+  runFixture(
+    "schema 2.0.0 fails closed after the 2.1.0 bump",
+    leftoverSchema,
+    "check-founder-operator-bootstrap.ts",
+    1,
+    "founder_operator.gate_contract_unsupported",
+  );
+
+  const unusedIntake = makeFixture("paid-tool-intake-unused");
+  runFixture("unused tool-intake seed is a no-op for the audit gate", unusedIntake, "check-paid-tool-intake.ts", 0);
+  const unusedIntakeRequired = makeFixture("paid-tool-intake-unused-required");
+  runFixture("unused tool-intake seed fails the workflow gate", unusedIntakeRequired, "check-paid-tool-intake.ts", 1, "paid_tool_intake.not_recorded", [
+    "--require-intake",
+  ]);
+
+  const recordedIntake = makeFixture("paid-tool-intake-recorded");
+  writeFileSync(
+    path.join(recordedIntake, "strategy", "TOOL_DECISIONS.md"),
+    readFileSync(path.join(recordedIntake, "strategy", "TOOL_DECISIONS.md"), "utf8").replace(
+      /## Workflow intake\n\nWorkflow intake is not recorded yet[^\n]*/,
+      "## Workflow intake\n\nSelected route: no optional tools for this start.",
+    ),
+    "utf8",
+  );
+  runFixture("recorded start-of-workflow intake passes the required gate", recordedIntake, "check-paid-tool-intake.ts", 0, undefined, ["--require-intake"]);
+
+  const deferOptionalIntake = makeFixture("paid-tool-intake-defer-optional");
+  writeFileSync(
+    path.join(deferOptionalIntake, "strategy", "TOOL_DECISIONS.md"),
+    readFileSync(path.join(deferOptionalIntake, "strategy", "TOOL_DECISIONS.md"), "utf8").replace(
+      /## Workflow intake\n\nWorkflow intake is not recorded yet[^\n]*/,
+      [
+        "## Workflow intake",
+        "",
+        "Selected route: defer-optional",
+        "Required: App Store Connect CLI, live apps list",
+        "Optional fallback: XPOZ — public web and store reviews only; smaller sample than social-language crawl.",
+      ].join("\n"),
+    ),
+    "utf8",
+  );
+  runFixture("defer-optional intake with labeled research fallback passes the required gate", deferOptionalIntake, "check-paid-tool-intake.ts", 0, undefined, [
+    "--require-intake",
+  ]);
+
+  const pickNextNoNames = makeFixture("paid-tool-intake-pick-next-unnamed");
+  writeFileSync(
+    path.join(pickNextNoNames, "strategy", "TOOL_DECISIONS.md"),
+    readFileSync(path.join(pickNextNoNames, "strategy", "TOOL_DECISIONS.md"), "utf8").replace(
+      /## Workflow intake\n\nWorkflow intake is not recorded yet[^\n]*/,
+      [
+        "## Workflow intake",
+        "",
+        "Selected route: pick-next",
+        "Required: App Store Connect CLI, live apps list",
+        "Optional fallback: AppKittie, XPOZ, Firecrawl — unnamed optionals recorded as labeled fallback in the same turn.",
+      ].join("\n"),
+    ),
+    "utf8",
+  );
+  runFixture(
+    "pick-next with no named optionals still records intake and passes the required gate",
+    pickNextNoNames,
+    "check-paid-tool-intake.ts",
+    0,
+    undefined,
+    ["--require-intake"],
+  );
+
   const noActiveGate = makeFixture("founder-operator-no-active-gate");
   const noActiveGateValue = readLedger(noActiveGate);
   const noActiveFounder = noActiveGateValue.founderModel as Record<string, unknown>;
@@ -543,7 +616,8 @@ function readLedger(root: string): Record<string, unknown> {
 }
 
 function applyFounderGateUxContract(value: Record<string, unknown>): void {
-  value.schemaVersion = "2.0.0";
+  value.schemaVersion = "2.1.0";
+  if (!Array.isArray(value.forbiddenProviderProjects)) value.forbiddenProviderProjects = [];
   const founder = value.founderModel as Record<string, unknown>;
   founder.questionMode = "ask_user_question_when_available";
   founder.gateHistory = [];
@@ -772,7 +846,7 @@ function reconcileFixture(root: string, value: Record<string, unknown>): void {
   const options = (question.options ?? []) as Array<Record<string, unknown>>;
   const definitions = (gate.definitions ?? []) as Array<Record<string, unknown>>;
   const bypass = (gate.bypassPolicy ?? {}) as Record<string, unknown>;
-  if (value.schemaVersion === "2.0.0") {
+  if (value.schemaVersion === "2.1.0") {
     (state.project as Record<string, unknown>).phase = phase.id;
   }
   writeState(root, state);

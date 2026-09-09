@@ -40,6 +40,7 @@ export interface WorkflowSeed {
 const READINESS_WORKFLOW: WorkflowId = "workflow.operations.agent-operations-ledger";
 const READINESS_BOOTSTRAP_WORKFLOWS = new Set<WorkflowId>([
   "workflow.operations.paid-tool-routing-and-fallback",
+  "workflow.operations.live-app-store-portfolio",
   "workflow.operations.secrets-baseline-and-routing",
   "workflow.operations.founder-zero-operator-bootstrap",
   READINESS_WORKFLOW,

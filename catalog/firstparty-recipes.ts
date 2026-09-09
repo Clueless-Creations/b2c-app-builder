@@ -47,6 +47,7 @@ export const FIRSTPARTY_RESPONSIBILITY_GROUPS = [
     description: "Operate support, retention, financial review, and bounded automation.",
     workflows: [
       "workflow.operations.paid-tool-routing-and-fallback",
+      "workflow.operations.live-app-store-portfolio",
       "workflow.operations.secrets-baseline-and-routing",
       "workflow.operations.resend-email-ops",
       "workflow.operations.post-launch-operations",

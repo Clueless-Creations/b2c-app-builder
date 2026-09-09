@@ -5,11 +5,14 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { flagString, issue, parseFlags, reportAndExit, type Issue } from "../../../../tooling/lib/launch-state.js";
 
-const forbiddenCommands = ["asc apps get", "asc validate app-store-version"];
+const forbiddenCommands = ["asc apps get", "asc apps view --app", "asc validate app-store-version"];
 const requiredContractTerms = [
   "asc install-skills",
-  "asc apps view",
+  "asc apps view --id",
   "asc status --app",
+  "asc auth logout --confirm",
+  "--build-id",
+  "--session-from-env",
   "asc review status",
   "asc review doctor",
   "asc review submissions-list",
@@ -74,12 +77,12 @@ const version = spawnSync("asc", ["--version"], { encoding: "utf8" });
 if (!version.error && version.status === 0) {
   const installedMajor = parseMajorVersion(`${version.stdout ?? ""}\n${version.stderr ?? ""}`);
   verifyLiveHelp(["validate", "--help"], ["--version", "--version-id"]);
-  if (installedMajor !== null && installedMajor < 4) {
+  if (installedMajor !== null && installedMajor < 5) {
     issues.push(
       issue(
         "warning",
         "asc_command_contract.live_cli_stale",
-        `Installed asc ${installedMajor}.x predates the stored 4.x contract; update the shadowed CLI before using executable guidance.`,
+        `Installed asc ${installedMajor}.x predates the stored 5.x contract; update the shadowed CLI before using executable guidance.`,
         "knowledge/store/app-store-connect-cli.md",
       ),
     );

@@ -70,7 +70,7 @@ const PROOFS = {
   checkLicenseChanged: "upstreams check: a LICENSE whose digest differs from the manifest evidence is license drift and a risk review",
   classifierAdvisory: "upstreams classifier: advisory and credential wording outranks a dependency-bump or CI prefix",
   upgradePlanReal: "upstreams proof 14: the upgrade plan maps changes to operations and leaves the support contract untouched",
-  hostDrift: "upstreams proof 15: two executables on PATH give an untested installed version and a shadowed second binary",
+  hostDrift: "upstreams proof 15: two executables on PATH give a supported installed version and a shadowed second binary",
   hostProbeFailure: "upstreams proof 15: a failing version probe records a null version and names the executable",
   hostAbsent: "upstreams proof 15: no executable on PATH gives installed unknown and names the command",
   hostRefusesMutatingProbe: "upstreams proof 15: a manifest whose probe names a mutating verb is refused before any process starts",
@@ -251,8 +251,8 @@ async function prove(): Promise<void> {
   await proofCase(PROOFS.inventoryReal, () => {
     const inventory = listUpstreams(realDeps(), {});
     const rork = row(inventory, RORK);
-    assert(rork.reviewedSource === "4.4.3", `reviewedSource ${rork.reviewedSource}`);
-    assert(rork.reviewedGuidance === "4.9.0", `reviewedGuidance ${rork.reviewedGuidance}`);
+    assert(rork.reviewedSource === "5.1.0", `reviewedSource ${rork.reviewedSource}`);
+    assert(rork.reviewedGuidance === "5.1.0", `reviewedGuidance ${rork.reviewedGuidance}`);
     assert(recordedObservation.latestStable, "the recorded observation carries a stable release");
     assert(rork.latestStable !== "unknown", "latestStable must come from the recorded observation");
     assert(
@@ -294,7 +294,7 @@ async function prove(): Promise<void> {
     const rork = row(inventory, RORK);
     assert(rork.installed === "not-observed", `installed ${JSON.stringify(rork.installed)}`);
     assert(rork.latestStable !== "unknown" && rork.latestStable.tag === recordedTag, "latestStable comes from the observation just recorded");
-    assert(rork.reviewedSource === "4.4.3" && rork.reviewedGuidance === "4.9.0", "baselines come from the manifest");
+    assert(rork.reviewedSource === "5.1.0" && rork.reviewedGuidance === "5.1.0", "baselines come from the manifest");
     const skills = row(inventory, SKILLS);
     assert(
       skills.installed === "not-observed" && skills.latestStable === "unknown" && skills.reviewedGuidance === "unrecorded",
@@ -409,16 +409,23 @@ async function prove(): Promise<void> {
       `unknowns say the observation was not refreshed: ${check.unknowns.join(" | ")}`,
     );
     assert(
-      check.changes.length > 0 && check.changes.every((change) => change.confidence === "heuristic" && change.maintainerDecision === "pending"),
-      "classification is heuristic and pending",
+      check.changes.length === 0 || check.changes.every((change) => change.confidence === "heuristic" && change.maintainerDecision === "pending"),
+      "classification is heuristic and pending, or empty when reviewed guidance already tracks latest stable",
     );
     assert(digest(readFileSync(upstreamObservationPath(skillRoot, RORK))) === before, "the recorded observation file is untouched");
   });
 
   await proofCase(PROOFS.checkFetch, async () => {
+    const root = copyUpstreamsRoot(tempDir("check-fetch-lagged-baseline"), [RORK, SKILLS], { observations: true });
+    const copiedManifest = upstreamManifestPath(root, RORK);
+    const lagged = readFileSync(copiedManifest, "utf8")
+      .replace(/reviewed_source:\n    revision: "5\.1\.0"\n    observed_at: "2026-09-08"/u, 'reviewed_source:\n    revision: "4.4.3"\n    observed_at: "2026-08-17"')
+      .replace(/reviewed_guidance:\n    revision: "5\.1\.0"\n    observed_at: "2026-09-08"/u, 'reviewed_guidance:\n    revision: "4.9.0"\n    observed_at: "2026-08-24"');
+    assert(lagged.includes('revision: "4.9.0"'), "classification proof needs a lagged reviewed_guidance against the recorded 4.x notes");
+    writeFileSync(copiedManifest, lagged);
     const { fetchText, requested } = recordedFetch(rorkManifest.canonicalUrl);
     const before = digest(readFileSync(upstreamObservationPath(skillRoot, RORK)));
-    const check = await checkUpstream(realDeps({ fetchText }), { upstreamId: RORK, fetch: true });
+    const check = await checkUpstream({ skillRoot: root, now: () => NOW, fetchText }, { upstreamId: RORK, fetch: true });
     assert(requested.length === 4 && new Set(requested).size === 4, `exactly four documents are read, got ${requested.length}`);
     assert(check.networkUsed === true && check.written === null, "fetch used, nothing written");
     assert(check.observation.method === "github-api", "the observation records its method");
@@ -472,8 +479,8 @@ async function prove(): Promise<void> {
       "relationship owners are affected",
     );
     assert(
-      check.observation.host?.observedAt === recordedObservation.host?.observedAt && check.drift.installedVersusSupported === "untested",
-      "the recorded host block is carried forward, not re-probed, and 4.11.0 is untested",
+      check.observation.host?.observedAt === recordedObservation.host?.observedAt && check.drift.installedVersusSupported === "supported",
+      "the recorded host block is carried forward, not re-probed, and 5.1.0 is inside the supported range",
     );
     assert(digest(readFileSync(upstreamObservationPath(skillRoot, RORK))) === before, "a fetch without --write leaves the recorded observation alone");
   });
@@ -533,10 +540,18 @@ async function prove(): Promise<void> {
     const manifestFile = upstreamManifestPath(skillRoot, RORK);
     const before = digest(readFileSync(manifestFile));
     const plan = upgradePlan(realDeps(), { upstreamId: RORK });
-    assert(plan.candidate?.revision === recordedTag && plan.candidate.digests.length === 6, `candidate ${JSON.stringify(plan.candidate)}`);
-    assert(plan.newFeaturesNotSupported.length > 0, "new upstream features outside the support claim are listed");
     assert(
-      plan.affectedOperations.length > 0 && plan.affectedOperations.every((id) => rorkOperationIds.includes(id)),
+      plan.candidate != null &&
+        plan.candidate.revision === recordedObservation.latestStable?.tag &&
+        plan.candidate.digests.length === 6,
+      `candidate ${JSON.stringify(plan.candidate)}`,
+    );
+    assert(
+      plan.unknowns.some((item) => item.includes("no releases since baseline")),
+      `when reviewed guidance tracks latest stable, the plan must say so: ${plan.unknowns.join(" | ")}`,
+    );
+    assert(
+      plan.affectedOperations.every((id) => rorkOperationIds.includes(id)),
       `affected operations ${plan.affectedOperations.join(", ")}`,
     );
     assert(plan.effectsUnchanged === true, "effects are unchanged");
@@ -548,7 +563,7 @@ async function prove(): Promise<void> {
       `an upgrade plan that edits maintainer-owned owners is maintenance and names them: ${parsed.scope} / ${parsed.routing.reason}`,
     );
     assert(
-      parsed.sources[0]!.publisher === rorkManifest.authors[0]!.name && parsed.sources[0]!.revision === recordedTag,
+      parsed.sources[0]!.publisher === rorkManifest.authors[0]!.name && parsed.sources[0]!.revision === recordedObservation.latestStable?.tag,
       "the source keeps the original author and the candidate revision",
     );
     assert(
@@ -622,19 +637,19 @@ async function prove(): Promise<void> {
   const [first, second] = executables;
 
   await proofCase(PROOFS.hostDrift, async () => {
-    const host = fakeHost({ [first]: { stdout: "4.11.0 (fixture build)\n", status: 0 }, [second]: { stdout: "2.8.1\n", status: 0 } }, [...executables]);
+    const host = fakeHost({ [first]: { stdout: "5.1.0 (fixture build)\n", status: 0 }, [second]: { stdout: "2.8.1\n", status: 0 } }, [...executables]);
     const check = await checkUpstream(realDeps(host), { upstreamId: RORK, observeHost: true });
     assert(check.networkUsed === false, "host observation never fetches");
     assert(check.observation.host?.selected === first, `selected ${check.observation.host?.selected}`);
     const probed = check.observation.host.executables;
-    assert(probed.length === 2 && probed[0]!.version === "4.11.0" && probed[1]!.version === "2.8.1", `versions ${JSON.stringify(probed)}`);
+    assert(probed.length === 2 && probed[0]!.version === "5.1.0" && probed[1]!.version === "2.8.1", `versions ${JSON.stringify(probed)}`);
     assert(probed[0]!.pathOrder === 0 && probed[1]!.pathOrder === 1, "PATH order is recorded");
     assert(probed[1]!.manager === "homebrew" && probed[0]!.manager === undefined, "a Homebrew prefix is labeled from its path alone");
     assert(
       probed.every((executable) => executable.sha256 === digest(`bytes of ${executable.path}`)),
       "digests come from the injected hasher",
     );
-    assert(check.drift.installedVersusSupported === "untested", `installedVersusSupported ${check.drift.installedVersusSupported}`);
+    assert(check.drift.installedVersusSupported === "supported", `installedVersusSupported ${check.drift.installedVersusSupported}`);
     assert(check.drift.installedVersusLatest === "current", `installedVersusLatest ${check.drift.installedVersusLatest}`);
     assert(
       check.drift.shadowedExecutables.length === 1 && check.drift.shadowedExecutables[0] === second,
@@ -643,13 +658,13 @@ async function prove(): Promise<void> {
     const inventory = listUpstreams(realDeps(host), { upstreamId: RORK, observeHost: true });
     const inventoryRow = row(inventory, RORK);
     assert(
-      typeof inventoryRow.installed === "object" && inventoryRow.installed.version === "4.11.0" && inventoryRow.installed.shadowed[0] === second,
+      typeof inventoryRow.installed === "object" && inventoryRow.installed.version === "5.1.0" && inventoryRow.installed.shadowed[0] === second,
       "the inventory reports the same probe",
     );
   });
 
   await proofCase(PROOFS.hostProbeFailure, async () => {
-    const host = fakeHost({ [first]: { stdout: "4.11.0\n", status: 0 }, [second]: { stdout: "", status: 1 } }, [...executables]);
+    const host = fakeHost({ [first]: { stdout: "5.1.0\n", status: 0 }, [second]: { stdout: "", status: 1 } }, [...executables]);
     const check = await checkUpstream(realDeps(host), { upstreamId: RORK, observeHost: true });
     const failed = check.observation.host?.executables.find((executable) => executable.path === second);
     assert(failed && failed.version === null, `failed probe version ${JSON.stringify(failed)}`);
@@ -661,7 +676,7 @@ async function prove(): Promise<void> {
       check.observation.unknowns.some((item) => item.includes(second)),
       "the observation itself records the failed probe",
     );
-    assert(check.drift.installedVersusSupported === "untested", "the selected executable still classifies on its own version");
+    assert(check.drift.installedVersusSupported === "supported", "the selected executable still classifies on its own version");
   });
 
   await proofCase(PROOFS.hostAbsent, async () => {

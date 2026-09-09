@@ -1326,6 +1326,140 @@ function registerAppReviewContract(h: Harness): void {
     1,
     "app_review_contract.verifier_not_independent",
   );
+
+  const missingPortfolio = makeFixture("app-store-portfolio-missing");
+  runFixture("missing portfolio receipt is a no-op for the audit gate", missingPortfolio, "check-app-store-portfolio.ts", 0);
+  runFixture("missing portfolio receipt fails the workflow gate", missingPortfolio, "check-app-store-portfolio.ts", 1, "app_store_portfolio.receipt_missing", [
+    "--require-receipt",
+  ]);
+
+  const nowMs = Date.now();
+  const recentObservedAt = new Date(nowMs - 60 * 60 * 1000).toISOString();
+  const staleObservedAt = new Date(nowMs - 8 * 24 * 60 * 60 * 1000).toISOString();
+  const olderObservedAt = new Date(nowMs - 2 * 60 * 60 * 1000).toISOString();
+  const newerCheckedAt = new Date(nowMs - 30 * 60 * 1000).toISOString();
+
+  const emptyPortfolio = makeFixture("app-store-portfolio-empty-live");
+  writePortfolioReceipt(emptyPortfolio, {
+    appCount: 0,
+    apps: [],
+    empty: true,
+    observedAt: recentObservedAt,
+  });
+  runFixture("live empty portfolio receipt passes", emptyPortfolio, "check-app-store-portfolio.ts", 0, undefined, ["--require-receipt"]);
+
+  const inventedEmpty = makeFixture("app-store-portfolio-invented-empty");
+  writePortfolioReceipt(inventedEmpty, {
+    appCount: 0,
+    apps: [],
+    observedAt: recentObservedAt,
+  });
+  runFixture("prose-only empty portfolio fails", inventedEmpty, "check-app-store-portfolio.ts", 1, "app_store_portfolio.empty_unproven", ["--require-receipt"]);
+
+  const webPortfolio = makeFixture("app-store-portfolio-web");
+  writePortfolioReceipt(webPortfolio, {
+    authFamily: "web",
+    appCount: 0,
+    apps: [],
+    empty: true,
+    observedAt: recentObservedAt,
+  });
+  runFixture("web session never satisfies the portfolio hold", webPortfolio, "check-app-store-portfolio.ts", 1, "app_store_portfolio.auth_family_invalid", [
+    "--require-receipt",
+  ]);
+
+  const stalePortfolio = makeFixture("app-store-portfolio-stale");
+  writePortfolioReceipt(stalePortfolio, {
+    appCount: 0,
+    apps: [],
+    empty: true,
+    observedAt: staleObservedAt,
+  });
+  runFixture("stale portfolio receipt fails closed", stalePortfolio, "check-app-store-portfolio.ts", 1, "app_store_portfolio.receipt_stale", [
+    "--require-receipt",
+  ]);
+
+  const authNewer = makeFixture("app-store-portfolio-auth-newer");
+  writePortfolioReceipt(authNewer, {
+    appCount: 0,
+    apps: [],
+    empty: true,
+    observedAt: olderObservedAt,
+  });
+  const authNewerLedger = JSON.parse(readFileSync(path.join(authNewer, "operations", "business-access.json"), "utf8")) as {
+    accounts: Array<{ id: string; checkedAt: string }>;
+  };
+  const appleAccount = authNewerLedger.accounts.find((entry) => entry.id === "apple");
+  if (appleAccount) appleAccount.checkedAt = newerCheckedAt;
+  writeFileSync(path.join(authNewer, "operations", "business-access.json"), `${JSON.stringify(authNewerLedger, null, 2)}\n`, "utf8");
+  runFixture(
+    "Apple checkedAt newer than the receipt fails closed",
+    authNewer,
+    "check-app-store-portfolio.ts",
+    1,
+    "app_store_portfolio.receipt_stale_after_auth_change",
+    ["--require-receipt"],
+  );
+
+  const forbiddenPortfolio = makeFixture("app-store-portfolio-forbidden");
+  writePortfolioReceipt(forbiddenPortfolio, {
+    appCount: 1,
+    apps: [{ name: "Example Competitor App", bundleId: "com.example.competitor" }],
+    observedAt: recentObservedAt,
+  });
+  const forbiddenLedger = JSON.parse(readFileSync(path.join(forbiddenPortfolio, "operations", "business-access.json"), "utf8")) as {
+    forbiddenProviderProjects: Array<Record<string, string>>;
+  };
+  forbiddenLedger.forbiddenProviderProjects = [
+    {
+      name: "Example Competitor App",
+      bundleId: "com.example.competitor",
+      store: "app_store",
+      reason: "Existing store listing is out of research scope.",
+      recordedAt: "2026-09-08T12:00:00.000Z",
+      evidenceCommand: "asc apps list",
+    },
+  ];
+  writeFileSync(path.join(forbiddenPortfolio, "operations", "business-access.json"), `${JSON.stringify(forbiddenLedger, null, 2)}\n`, "utf8");
+  runFixture(
+    "forbidden provider project in the live list fails closed",
+    forbiddenPortfolio,
+    "check-app-store-portfolio.ts",
+    1,
+    "app_store_portfolio.forbidden_project",
+    ["--require-receipt"],
+  );
+}
+
+function writePortfolioReceipt(
+  root: string,
+  overrides: {
+    authFamily?: string;
+    appCount: number;
+    apps: Array<{ name: string; bundleId?: string }>;
+    empty?: boolean;
+    observedAt: string;
+  },
+): void {
+  mkdirSync(path.join(root, "run"), { recursive: true });
+  writeFileSync(
+    path.join(root, "run", "app-store-portfolio.json"),
+    `${JSON.stringify(
+      {
+        schemaVersion: "1.0.0",
+        command: "asc apps list",
+        authFamily: overrides.authFamily ?? "api",
+        winnerVersion: "5.1.0",
+        observedAt: overrides.observedAt,
+        appCount: overrides.appCount,
+        apps: overrides.apps,
+        ...(overrides.empty === true ? { empty: true } : {}),
+      },
+      null,
+      2,
+    )}\n`,
+    "utf8",
+  );
 }
 
 function watchingPack(): FixtureProviderPack {

@@ -17,7 +17,8 @@ bindings:
 applicability_notes: The program is the loadable replacement for a pasted launch prompt. It adds a mandate record, the
   isolated-review edges, the reference-pack edge, and the closeout gates on top of the existing catalog nodes. It adds
   no second router, catalog, planner, or state store. Workspace identities belong in operations/LAUNCH_PROGRAM.md and
-  reducer-owned state, never in this reference.
+  reducer-owned state, never in this reference. CRO, scrollytelling, and 60fps shot-ID audits apply per selected or
+  implemented surface, not to every public URL.
 sources: []
 source_exemption: This package contains internal operating guidance that sequences existing catalog nodes and gates. It
   makes no factual claim about a third-party product.

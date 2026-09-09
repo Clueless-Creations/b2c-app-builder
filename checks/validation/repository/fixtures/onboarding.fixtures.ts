@@ -38,6 +38,36 @@ export function register(h: Harness): void {
       "utf8",
     );
   };
+  const studioSurface = (id: string, interaction?: string): Record<string, unknown> => ({
+    id,
+    name: id,
+    status: "draft",
+    purpose: "purpose prose must not be parsed as a technique class",
+    decisions: [],
+    tokenReferences: [],
+    ...(interaction === undefined ? {} : { interaction }),
+  });
+  const writeStudioSurfaces = (
+    fixtureRoot: string,
+    landingPages: Array<{ id: string; interaction?: string }> = [],
+    screens: Array<{ id: string; interaction?: string }> = [],
+  ): void => {
+    const file = path.join(fixtureRoot, "studio/seed/business.json");
+    const seed = JSON.parse(readFileSync(file, "utf8")) as {
+      surfaces: { landingPages: unknown[]; mobileApp: { screens: unknown[] } };
+    };
+    seed.surfaces.landingPages = landingPages.map((row) => studioSurface(row.id, row.interaction));
+    seed.surfaces.mobileApp.screens = screens.map((row) => studioSurface(row.id, row.interaction));
+    writeFileSync(file, `${JSON.stringify(seed, null, 2)}\n`, "utf8");
+  };
+  const writeSixtyFpsToolRow = (fixtureRoot: string, access: string, route: string): void => {
+    const file = path.join(fixtureRoot, "strategy/TOOL_DECISIONS.md");
+    const text = readFileSync(file, "utf8");
+    const marker = "\n## Mobile Proof Route Decision";
+    if (!text.includes(marker)) throw new Error("fixture setup: TOOL_DECISIONS intake marker missing");
+    const row = `| 60fps.design MCP | design | ${access} | required before paid/account access | ${route} | distilled recipes are not equivalent |\n`;
+    writeFileSync(file, text.replace(marker, `\n${row}${marker}`), "utf8");
+  };
   const requireHeadlineFeature = (fixtureRoot: string): void => {
     mutateProductYaml(fixtureRoot, (text) => setFeatureScope(text, "feature.paywall-goal-headline", "required"));
   };
@@ -219,6 +249,51 @@ export function register(h: Harness): void {
     "check-onboarding-graph.ts",
     1,
     "onboarding_graph.paywall_goal_headline_unavailable",
+  );
+
+  const motionResearchMissing = makeFixture("onboarding-graph-motion-research-missing");
+  mutateOnboarding(motionResearchMissing, (text) => text.replace("## Motion Research", "## Animation Notes"));
+  runFixture(
+    "onboarding without the Motion Research section fails",
+    motionResearchMissing,
+    "check-onboarding-graph.ts",
+    1,
+    "onboarding_graph.section_motion_research_missing",
+  );
+
+  const motionInteractionUnresolved = makeFixture("onboarding-graph-motion-interaction-unresolved");
+  writeStudioSurfaces(motionInteractionUnresolved, [{ id: "privacy" }]);
+  runFixture(
+    "onboarding holds when a listed studio surface omits interaction",
+    motionInteractionUnresolved,
+    "check-onboarding-graph.ts",
+    1,
+    "onboarding_graph.surface_interaction_unresolved",
+  );
+
+  const motionReferenceUnavailable = makeFixture("onboarding-graph-motion-reference-unavailable");
+  writeStudioSurfaces(motionReferenceUnavailable, [], [{ id: "hero", interaction: "bespoke-motion" }]);
+  writeSixtyFpsToolRow(motionReferenceUnavailable, "blocked", "fallback distilled recipes");
+  runFixture(
+    "onboarding holds when selected 60fps research is recorded as blocked",
+    motionReferenceUnavailable,
+    "check-onboarding-graph.ts",
+    1,
+    "onboarding_graph.motion_reference_unavailable",
+  );
+
+  const motionReferenceSelectedMissingPhrases = makeFixture("onboarding-graph-motion-reference-selected-missing");
+  writeStudioSurfaces(motionReferenceSelectedMissingPhrases, [], [{ id: "hero", interaction: "bespoke-motion" }]);
+  writeSixtyFpsToolRow(motionReferenceSelectedMissingPhrases, "connected", "search_shots route");
+  mutateOnboarding(motionReferenceSelectedMissingPhrases, (text) =>
+    text.replaceAll("60fps MCP", "motion catalog").replaceAll("search_shots", "shot search").replaceAll("get_motion_breakdown", "motion breakdown"),
+  );
+  runFixture(
+    "onboarding requires 60fps MCP operations when that register is selected",
+    motionReferenceSelectedMissingPhrases,
+    "check-onboarding-graph.ts",
+    1,
+    "onboarding_graph.motion_reference",
   );
 
   const paywallGoalHeadlineSuperwallExcluded = makeFixture("onboarding-graph-paywall-goal-headline-superwall-excluded");
@@ -998,8 +1073,8 @@ export function register(h: Harness): void {
       // count-only check would accept this even though a required assertion is now genuinely
       // missing, replaced by a copy of an unrelated one.
       return completed.replace(
-        "- [x] `ONB-00` through `ONB-22` are done, or the lane is not claimed done\n- [x] Evidence, reviews, authorized Onbo Hub, internal guidance, provider, policy, seven-principle, and 60fps research are joined\n",
-        "- [x] Evidence, reviews, authorized Onbo Hub, internal guidance, provider, policy, seven-principle, and 60fps research are joined\n- [x] Evidence, reviews, authorized Onbo Hub, internal guidance, provider, policy, seven-principle, and 60fps research are joined\n",
+        "- [x] `ONB-00` through `ONB-22` are done, or the lane is not claimed done\n- [x] Evidence, reviews, authorized Onbo Hub, internal guidance, provider, policy, seven-principle, and motion research are joined\n",
+        "- [x] Evidence, reviews, authorized Onbo Hub, internal guidance, provider, policy, seven-principle, and motion research are joined\n- [x] Evidence, reviews, authorized Onbo Hub, internal guidance, provider, policy, seven-principle, and motion research are joined\n",
       );
     });
   }
@@ -1025,8 +1100,8 @@ export function register(h: Harness): void {
     mutateOnboarding(verificationFingerprintNotActuallyChecked, (text) => {
       const completed = checkVerificationItems(fillProseDirectiveLines(fillTemplateDirectiveCells(text.replaceAll("not_started", "done"))));
       return completed.replace(
-        "- [x] `ONB-00` through `ONB-22` are done, or the lane is not claimed done\n- [x] Evidence, reviews, authorized Onbo Hub, internal guidance, provider, policy, seven-principle, and 60fps research are joined\n",
-        "Historical note: `ONB-00` through `ONB-22` are done, or the lane is not claimed done -- see the retired checklist archive for detail.\n- [x] Evidence, reviews, authorized Onbo Hub, internal guidance, provider, policy, seven-principle, and 60fps research are joined\n- [x] Evidence, reviews, authorized Onbo Hub, internal guidance, provider, policy, seven-principle, and 60fps research are joined\n",
+        "- [x] `ONB-00` through `ONB-22` are done, or the lane is not claimed done\n- [x] Evidence, reviews, authorized Onbo Hub, internal guidance, provider, policy, seven-principle, and motion research are joined\n",
+        "Historical note: `ONB-00` through `ONB-22` are done, or the lane is not claimed done -- see the retired checklist archive for detail.\n- [x] Evidence, reviews, authorized Onbo Hub, internal guidance, provider, policy, seven-principle, and motion research are joined\n- [x] Evidence, reviews, authorized Onbo Hub, internal guidance, provider, policy, seven-principle, and motion research are joined\n",
       );
     });
   }
@@ -1532,6 +1607,110 @@ export function register(h: Harness): void {
     "--path",
     "product/onboarding/graph/ONB-08-motion-research.md",
   ]);
+
+  const onb08PacketArgs = ["--node", "ONB-08", "--path", "product/onboarding/graph/ONB-08-motion-research.md"] as const;
+  const onb08MotionRegister = `${substantiveResearchProse("applicable motion research translated into the target framework")}
+
+Motion Research uses the 60fps MCP with search_shots and get_motion_breakdown. Reference shot ID shot-fixture-001. Interruption behavior yields to the next gesture. Reduced-motion shows the complete final state without the choreography.
+`;
+  const onb08NotApplicableProse = `${substantiveResearchProse("applicable motion research translated into the target framework")}
+
+The 60fps motion register is not applicable for this product.
+`;
+
+  const onb08PacketStatic = makeFixture("onboarding-evidence-onb08-static-document");
+  writeStudioSurfaces(onb08PacketStatic, [{ id: "privacy", interaction: "static-document" }]);
+  writeEvidencePacket(
+    onb08PacketStatic,
+    "product/onboarding/graph/ONB-08-motion-research.md",
+    substantiveResearchProse("static legal-page motion research with no invented shot IDs"),
+  );
+  runFixture("ONB-08's gate passes a static-document surface without 60fps shot IDs", onb08PacketStatic, evidenceScript, 0, undefined, [...onb08PacketArgs]);
+
+  const onb08PacketSelectedMissing = makeFixture("onboarding-evidence-onb08-selected-missing");
+  writeStudioSurfaces(onb08PacketSelectedMissing, [], [{ id: "hero", interaction: "bespoke-motion" }]);
+  writeSixtyFpsToolRow(onb08PacketSelectedMissing, "connected", "search_shots route");
+  writeEvidencePacket(
+    onb08PacketSelectedMissing,
+    "product/onboarding/graph/ONB-08-motion-research.md",
+    substantiveResearchProse("bespoke motion without recording any reference shot"),
+  );
+  runFixture(
+    "ONB-08's gate fails when selected 60fps research omits shot IDs",
+    onb08PacketSelectedMissing,
+    evidenceScript,
+    1,
+    "onboarding_evidence.onb08_motion_register",
+    [...onb08PacketArgs],
+  );
+
+  const onb08PacketSelectedComplete = makeFixture("onboarding-evidence-onb08-selected-complete");
+  writeStudioSurfaces(onb08PacketSelectedComplete, [], [{ id: "hero", interaction: "bespoke-motion" }]);
+  writeSixtyFpsToolRow(onb08PacketSelectedComplete, "connected", "search_shots route");
+  writeEvidencePacket(onb08PacketSelectedComplete, "product/onboarding/graph/ONB-08-motion-research.md", onb08MotionRegister);
+  runFixture("ONB-08's gate passes selected 60fps research with shot IDs", onb08PacketSelectedComplete, evidenceScript, 0, undefined, [...onb08PacketArgs]);
+
+  const onb08PacketNotApplicableOverride = makeFixture("onboarding-evidence-onb08-not-applicable-override");
+  writeStudioSurfaces(onb08PacketNotApplicableOverride, [], [{ id: "hero", interaction: "bespoke-motion" }]);
+  writeSixtyFpsToolRow(onb08PacketNotApplicableOverride, "connected", "search_shots route");
+  writeEvidencePacket(onb08PacketNotApplicableOverride, "product/onboarding/graph/ONB-08-motion-research.md", onb08NotApplicableProse);
+  runFixture(
+    "ONB-08's gate fails when packet prose claims selected 60fps research is not applicable",
+    onb08PacketNotApplicableOverride,
+    evidenceScript,
+    1,
+    "onboarding_evidence.onb08_motion_register",
+    [...onb08PacketArgs],
+  );
+
+  const onb08PacketUnavailable = makeFixture("onboarding-evidence-onb08-unavailable");
+  writeStudioSurfaces(onb08PacketUnavailable, [], [{ id: "hero", interaction: "bespoke-motion" }]);
+  writeSixtyFpsToolRow(onb08PacketUnavailable, "blocked", "fallback distilled recipes");
+  writeEvidencePacket(onb08PacketUnavailable, "product/onboarding/graph/ONB-08-motion-research.md", onb08MotionRegister);
+  runFixture(
+    "ONB-08's gate does not accept shot IDs when the 60fps MCP is blocked",
+    onb08PacketUnavailable,
+    evidenceScript,
+    1,
+    "onboarding_evidence.onb08_motion_reference_unavailable",
+    [...onb08PacketArgs],
+  );
+
+  const onb08PacketUnresolved = makeFixture("onboarding-evidence-onb08-unresolved");
+  writeStudioSurfaces(onb08PacketUnresolved, [{ id: "privacy" }]);
+  writeEvidencePacket(onb08PacketUnresolved, "product/onboarding/graph/ONB-08-motion-research.md", onb08MotionRegister);
+  runFixture(
+    "ONB-08's gate holds when a listed studio surface omits interaction",
+    onb08PacketUnresolved,
+    evidenceScript,
+    1,
+    "onboarding_evidence.onb08_surface_interaction_unresolved",
+    [...onb08PacketArgs],
+  );
+
+  const onb08PacketImplemented = makeFixture("onboarding-evidence-onb08-implemented-hooks");
+  writeStudioSurfaces(onb08PacketImplemented, [{ id: "home", interaction: "conversion" }]);
+  writeSixtyFpsToolRow(onb08PacketImplemented, "connected", "search_shots route");
+  mkdirSync(path.join(onb08PacketImplemented, "growth/landing"), { recursive: true });
+  writeFileSync(path.join(onb08PacketImplemented, "growth/landing/index.html"), "<main><h1>Landing</h1></main>\n", "utf8");
+  writeFileSync(
+    path.join(onb08PacketImplemented, "growth/landing/Story.tsx"),
+    'export function Story() { return <section data-scrolly-step="need">Need</section>; }\n',
+    "utf8",
+  );
+  writeEvidencePacket(
+    onb08PacketImplemented,
+    "product/onboarding/graph/ONB-08-motion-research.md",
+    substantiveResearchProse("conversion landing that already implements scroll-linked hooks without recording shot IDs"),
+  );
+  runFixture(
+    "ONB-08's gate fails when implemented scroll-linked hooks omit the 60fps register",
+    onb08PacketImplemented,
+    evidenceScript,
+    1,
+    "onboarding_evidence.onb08_motion_register",
+    [...onb08PacketArgs],
+  );
 
   const onb20PacketMissing = makeFixture("onboarding-evidence-onb20-missing");
   runFixture(

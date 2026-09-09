@@ -11,6 +11,7 @@
  * stub-length, or still-templated packet, closing the "any returned artifact ID is accepted"
  * gap enough to stop a trivially empty or placeholder packet from unlocking ONB-09.
  */
+import { loadDesignSurfaceApplicability } from "../../../../catalog/ontology/design-surface-applicability.js";
 import { loadOnboardingApplicability } from "../../../../catalog/ontology/onboarding-applicability.js";
 import {
   flagString,
@@ -147,6 +148,65 @@ if (!relativePath) {
         default: {
           const exhaustive: never = applicability.headlineBind;
           throw new Error(`Unhandled headline bind applicability ${String(exhaustive)}`);
+        }
+      }
+    }
+
+    if (nodeLabel === "ONB-08") {
+      const design = loadDesignSurfaceApplicability(args.root);
+      if (design.interactionUnresolved) {
+        issues.push(
+          issue(
+            "error",
+            "onboarding_evidence.onb08_surface_interaction_unresolved",
+            `${relativePath} cannot decide motion research until every listed studio/seed/business.json surface records interaction as static-document, conversion, scroll-linked, standard-transition, or bespoke-motion. Do not infer the class from purpose prose. Packet prose cannot make that decision.`,
+            "studio/seed/business.json",
+          ),
+        );
+      } else {
+        switch (design.sixtyFpsRegister) {
+          case "unresolved":
+            issues.push(
+              issue(
+                "error",
+                "onboarding_evidence.onb08_motion_reference_unresolved",
+                `${relativePath} cannot decide 60fps motion research until studio interaction (or implemented scroll-linked behavior) is classified and strategy/TOOL_DECISIONS.md records 60fps MCP access. Absence is not a free distilled-recipe default. Packet prose cannot make that decision.`,
+                "strategy/TOOL_DECISIONS.md",
+              ),
+            );
+            break;
+          case "unavailable":
+            issues.push(
+              issue(
+                "error",
+                "onboarding_evidence.onb08_motion_reference_unavailable",
+                `${relativePath} selected bespoke-motion or scroll-linked research, but strategy/TOOL_DECISIONS.md records the 60fps MCP as blocked, unavailable, or fallback. Do not invent shot IDs or claim a distilled recipe is equivalent. Change the studio interaction or the recorded 60fps route.`,
+                relativePath,
+              ),
+            );
+            break;
+          case "not_required":
+            break;
+          case "selected": {
+            const required = ["shot id", "interruption", "search_shots", "get_motion_breakdown"];
+            const missing = required.filter((phrase) => !stripped.toLowerCase().includes(phrase.toLowerCase()));
+            const hasReducedMotion = stripped.toLowerCase().includes("reduced-motion") || stripped.toLowerCase().includes("reduced motion");
+            if (missing.length > 0 || !hasReducedMotion) {
+              issues.push(
+                issue(
+                  "error",
+                  "onboarding_evidence.onb08_motion_register",
+                  `${relativePath} must record Motion Research rows with a reference shot ID, interruption behavior, reduced-motion behavior, and the 60fps MCP operations search_shots and get_motion_breakdown. Missing: ${[...missing, ...(hasReducedMotion ? [] : ["reduced-motion"])].join(", ")}. A producer sentence that this register is not applicable cannot override a selected or implemented rich-motion surface.`,
+                  relativePath,
+                ),
+              );
+            }
+            break;
+          }
+          default: {
+            const exhaustive: never = design.sixtyFpsRegister;
+            throw new Error(`Unhandled 60fps register applicability ${String(exhaustive)}`);
+          }
         }
       }
     }

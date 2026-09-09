@@ -1,11 +1,11 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.13",
+  "version": "0.219.14",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Add an isolated Expo TypeScript starter fixture, expo-router@57.0.17 JSX routes, and disposable consumer install.",
-    "Pin Router companions to published expo@57.0.17 bundledNativeModules.json and assert them so the set cannot drift.",
-    "Keep router-native-ui, custom-native-module, and cng-prebuild blocked; no native compile or device proof."
+    "Scope ONB-08 motion research, 60fps MCP operations, and Full Launch Program audits to selected or implemented surfaces.",
+    "Add an optional studio surface interaction class and fail closed when a listed surface omits it or a selected 60fps route is unavailable.",
+    "Keep empty studio inventory from selecting 60fps; static legal and conversion pages do not invent shot IDs or scrollytelling."
   ]
 }

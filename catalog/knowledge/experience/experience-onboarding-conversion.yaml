@@ -37,7 +37,10 @@ bindings:
 applicability_notes: Commitment Funnel and Paywall Goal Headline tables are required only when the
   matching product.yaml feature is required. Excluded or non-goal omits those binds. Absence holds.
   Packet prose cannot override a required feature. Do not silently select a funnel, billing provider,
-  or extra platform.
+  or extra platform. ONB-08 60fps shot IDs are required only when studio interaction is
+  bespoke-motion or scroll-linked, or an active landing already implements scroll-linked hooks, and
+  the 60fps MCP is recorded ready; blocked or fallback is a hold, not an equivalent recipe. Empty
+  studio inventory does not select 60fps. Listed surfaces that omit interaction stay unresolved.
 sources:
   - id: developer-android-com-guide-playcore-in-app-review
     name: developer.android.com

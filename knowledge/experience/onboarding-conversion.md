@@ -51,7 +51,7 @@ ONB-16 -> [ONB-17, ONB-18, ONB-19]
 | `ONB-05` | Build an authorized Onbo Hub flow atlas without scraping or inferring locked screens                                      |
 | `ONB-06` | Audit applicable B2C App Builder and internal B2C guidance; resolve outdated rules                                        |
 | `ONB-07` | Refresh provider, RevenueCat, billing, identity, analytics, policy, and regional capability facts                         |
-| `ONB-08` | Research interaction and motion using 60fps references and target-framework translation                                   |
+| `ONB-08` | Research applicable interaction and motion; use 60fps operations only on the selected route |
 | `ONB-09` | Join evidence into adopted, test, rejected, and investigate decisions                                                     |
 | `ONB-10` | Define first value rendered, first value engaged, activation, habit, and retention hypotheses                             |
 | `ONB-11` | Audit effort, questions, permissions, interruption budget, and personalization proof                                      |
@@ -199,7 +199,7 @@ Onbo Hub is authorized access only. Revenue estimates remain estimates. Record s
 
 For subscription products, refresh the full relevant RevenueCat surface: SDK, products, packages, offerings, placements, entitlements, identity, paywalls, targeting, experiments, Funnels, Web, Purchases.js, purchase links and buttons, Billing, Stripe, Paddle, Redemption Links, Customer Center, webhooks, analytics, lifecycle, refunds, grace, pending purchases, restore, and newer official capabilities. Separate technically possible, policy permitted, and recommended by platform and region.
 
-Use the 60fps MCP with `search_shots`, `get_shot`, `get_motion_breakdown`, and `get_related_shots`; use motion code only when useful. Translate interaction principles, never another product's brand, assets, copy, exact layout, or implementation.
+Use the 60fps MCP with `search_shots`, `get_shot`, `get_motion_breakdown`, and `get_related_shots` only when studio `interaction` is `bespoke-motion` or `scroll-linked` (or landing source already implements scroll-linked hooks) and `strategy/TOOL_DECISIONS.md` records that MCP as ready. A blocked or fallback route is a hold, not an equivalent distilled recipe. Static legal or conversion surfaces without that selection do not invent shot IDs. Translate interaction principles, never another product's brand, assets, copy, exact layout, or implementation.
 
 Audit the seven-principle heuristic: define activation, show value before disproportionate effort, ask only useful questions, keep one dominant action, use purposeful motion, show visible personalization, and finish with meaningful value in a populated normal product state. Record pass, partial, or fail with evidence, not a fake score.
 

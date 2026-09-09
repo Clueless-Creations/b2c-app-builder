@@ -4215,6 +4215,35 @@ export function Story() {
     "scrollytelling.contract.not_applicable.locales_not_empty",
   );
 
+  const scrollyApplicableFalseWithHooks = makeEmptyFixture("scrolly-applicable-false-with-hooks");
+  mkdirSync(path.join(scrollyApplicableFalseWithHooks, "growth/landing"), { recursive: true });
+  writeFileSync(path.join(scrollyApplicableFalseWithHooks, "growth/landing/index.html"), "<main><h1>Static landing</h1></main>\n", "utf8");
+  writeFileSync(path.join(scrollyApplicableFalseWithHooks, "growth/landing/Story.tsx"), validScrollySource, "utf8");
+  writeFileSync(
+    path.join(scrollyApplicableFalseWithHooks, "growth/landing/surface-contract.json"),
+    `${JSON.stringify(
+      {
+        scrollytelling: {
+          applicable: false,
+          evidence: "The short landing has no sequential evidence that needs a scroll-linked treatment.",
+          locales: [],
+          scenes: [],
+          qa: [],
+        },
+      },
+      null,
+      2,
+    )}\n`,
+    "utf8",
+  );
+  runFixture(
+    "implemented scrollytelling hooks cannot hide behind applicable false",
+    scrollyApplicableFalseWithHooks,
+    "check-scrollytelling-contract.ts",
+    1,
+    "scrollytelling.business.applicability_mismatch",
+  );
+
   const scrollyReducedMotionCss = writeScrollyFixture(
     "scrolly-reduced-motion-shared-css",
     undefined,

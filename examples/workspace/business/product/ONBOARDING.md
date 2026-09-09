@@ -20,7 +20,7 @@ Record `greenfield`, `replacement`, `audit_only`, or founder-scoped `incremental
 | `ONB-05` | not_started | Research and design           | Build the authorized Onbo Hub atlas               |
 | `ONB-06` | not_started | Product                       | Audit internal guidance                           |
 | `ONB-07` | not_started | Money, engineering, and trust | Refresh provider and policy facts                 |
-| `ONB-08` | not_started | Design                        | Build the 60fps motion register                   |
+| `ONB-08` | not_started | Design                        | Research applicable motion                            |
 | `ONB-09` | not_started | Orchestrator                  | Join evidence and dispositions                    |
 | `ONB-10` | not_started | Product and data              | Define first value and activation                 |
 | `ONB-11` | not_started | Product and design            | Audit effort and questions                        |
@@ -86,9 +86,9 @@ Refresh the complete relevant RevenueCat and billing surface, including SDKs, pr
 | ------------------- | -------------------- | ----------------------- | ------------------------------------------- | -------------------- | ----------------- |
 | Record              | Yes or no            | Yes, no, or conditional | Record                                      | Record               | Record            |
 
-## 60fps Motion Register
+## Motion Research
 
-Use the 60fps MCP with `search_shots`, `get_shot`, `get_motion_breakdown`, and `get_related_shots`; use motion code only when helpful. Translate principles into original product behavior and the target framework.
+Resolve applicability from studio/seed/business.json `interaction`, implemented scroll-linked hooks on an active landing, and `growth/landing/surface-contract.json` when present. Empty inventory means 60fps is not selected. A listed surface without `interaction` stays unresolved. Use the 60fps MCP with `search_shots`, `get_shot`, `get_motion_breakdown`, and `get_related_shots` only when bespoke-motion or scroll-linked is selected and that MCP is recorded ready; a fallback is not equivalent. Translate principles into original product behavior and the target framework.
 
 | ID        | Target and problem | Reference          | Adopted principle | Implementation, haptic, and interruption | Reduced motion |
 | --------- | ------------------ | ------------------ | ----------------- | ---------------------------------------- | -------------- |
@@ -292,7 +292,7 @@ Enforce a minimum supported client when old contracts are incompatible. Do not k
 ## Verification
 
 - [ ] `ONB-00` through `ONB-22` are done, or the lane is not claimed done
-- [ ] Evidence, reviews, authorized Onbo Hub, internal guidance, provider, policy, seven-principle, and 60fps research are joined
+- [ ] Evidence, reviews, authorized Onbo Hub, internal guidance, provider, policy, seven-principle, and motion research are joined
 - [ ] First value rendered, First value engaged, Activation, retention, monetization, review eligibility, and completion are distinct
 - [ ] Effort, questions, permissions, personalization proof, and the interruption budget are justified
 - [ ] Canonical state, identity, entitlement, analytics, Experiment, review, permission, and lifecycle owners are explicit

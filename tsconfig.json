@@ -10,7 +10,15 @@
     "noUncheckedIndexedAccess": true,
     "noUnusedLocals": true
   },
-  "exclude": ["catalog/generated/firstparty/**", "hosted/knowledge-mcp/**", "hosted/builder-console/**", "surfaces/**", "examples/**", "node_modules/**"],
+  "exclude": [
+    "catalog/generated/firstparty/**",
+    "catalog/stacks/expo-starter-fixture/modules/b2c-native-capability/src/index.ts",
+    "hosted/knowledge-mcp/**",
+    "hosted/builder-console/**",
+    "surfaces/**",
+    "examples/**",
+    "node_modules/**"
+  ],
   "include": [
     "checks/**/*.ts",
     "tooling/**/*.ts",

@@ -3,10 +3,12 @@
  *
  * Inspects a local Swift/Kotlin module and its TypeScript/web path without importing
  * expo-modules-core, executing plugins, or compiling native code. Autolinking and
- * development-client rebuild stay unverified. Web is an explicit unsupported path.
+ * development-client rebuild stay unverified. Web is selected through package.json
+ * `browser` → `src/index.web.ts`, not `main`.
  *
  * Consumes `catalog/stacks/expo-selection.ts`.
  */
+import { spawnSync } from "node:child_process";
 import { lstatSync, readFileSync } from "node:fs";
 import path from "node:path";
 import {
@@ -30,14 +32,19 @@ export const EXPO_CUSTOM_MODULE_FILES = [
   `${EXPO_CUSTOM_MODULE_DIR}/package.json`,
   `${EXPO_CUSTOM_MODULE_DIR}/expo-module.config.json`,
   `${EXPO_CUSTOM_MODULE_DIR}/src/index.ts`,
+  `${EXPO_CUSTOM_MODULE_DIR}/src/index.web.ts`,
+  `${EXPO_CUSTOM_MODULE_DIR}/src/capability.ts`,
   `${EXPO_CUSTOM_MODULE_DIR}/src/invoke.ts`,
-  `${EXPO_CUSTOM_MODULE_DIR}/src/B2cNativeCapability.web.ts`,
   `${EXPO_CUSTOM_MODULE_DIR}/ios/B2cNativeCapabilityModule.swift`,
   `${EXPO_CUSTOM_MODULE_DIR}/android/src/main/java/app/example/b2cnativecapability/B2cNativeCapabilityModule.kt`,
 ] as const;
 
 export const EXPO_CUSTOM_MODULE_NAME = "B2cNativeCapability";
 export const NATIVE_MODULES_DIR = "./modules";
+export const EXPO_PACKAGE_MANAGER = "npm";
+export const METRO_NATIVE_ENTRY = "src/index.ts";
+export const METRO_WEB_ENTRY = "src/index.web.ts";
+export const WEB_MAIN_FIELDS = ["browser", "module", "main"] as const;
 
 export type CustomModuleLayoutStatus = "boundary-ready" | "incomplete" | "web-false-parity";
 export type CustomModuleAction = "boundary-ready" | "unsupported-on-web" | "rebuild-required" | "refuse";
@@ -63,6 +70,9 @@ export interface CustomModuleLayoutReport {
   webSourcePresent: boolean;
   webUnsupported: boolean;
   configOmitsWeb: boolean;
+  metroWebEntry: string | undefined;
+  metroNativeEntry: string | undefined;
+  requireNativeModulePresent: boolean;
   lifecyclePresent: boolean;
   eventsPresent: boolean;
   fabricatedModulesCorePin: boolean;
@@ -121,9 +131,29 @@ function configOmitsWeb(configText: string | undefined): boolean {
   }
 }
 
-function webPathIsUnsupported(webText: string | undefined, indexText: string | undefined): boolean {
-  if (!webText || !indexText) return false;
-  return webText.includes("unsupportedOnWeb") && indexText.includes("unsupported-on-web") && !webText.includes("native-boundary-ready");
+function webPathIsUnsupported(webText: string | undefined, capabilityText: string | undefined): boolean {
+  if (!webText || !capabilityText) return false;
+  return (
+    webText.includes("unsupportedOnWeb") &&
+    capabilityText.includes("unsupported-on-web") &&
+    !webText.includes("requireNativeModule") &&
+    !webText.includes("native-boundary-ready")
+  );
+}
+
+function modulePackageEntries(packageJsonText: string | undefined): { main?: string; browser?: string; reactNative?: string } {
+  if (!packageJsonText) return {};
+  try {
+    const parsed: unknown = JSON.parse(packageJsonText);
+    if (!isRecord(parsed)) return {};
+    return {
+      main: typeof parsed.main === "string" ? parsed.main : undefined,
+      browser: typeof parsed.browser === "string" ? parsed.browser : undefined,
+      reactNative: typeof parsed["react-native"] === "string" ? parsed["react-native"] : undefined,
+    };
+  } catch {
+    return {};
+  }
 }
 
 function sourceDeclaresLifecycleAndEvents(text: string | undefined): boolean {
@@ -153,18 +183,24 @@ export function inspectExpoCustomModule(target: string): CustomModuleLayoutRepor
   const androidText = readOptionalText(
     path.join(target, `${EXPO_CUSTOM_MODULE_DIR}/android/src/main/java/app/example/b2cnativecapability/B2cNativeCapabilityModule.kt`),
   );
-  const webText = readOptionalText(path.join(target, `${EXPO_CUSTOM_MODULE_DIR}/src/B2cNativeCapability.web.ts`));
-  const indexText = readOptionalText(path.join(target, `${EXPO_CUSTOM_MODULE_DIR}/src/index.ts`));
+  const webText = readOptionalText(path.join(target, `${EXPO_CUSTOM_MODULE_DIR}/src/index.web.ts`));
+  const nativeEntryText = readOptionalText(path.join(target, `${EXPO_CUSTOM_MODULE_DIR}/src/index.ts`));
+  const capabilityText = readOptionalText(path.join(target, `${EXPO_CUSTOM_MODULE_DIR}/src/capability.ts`));
   const configText = readOptionalText(path.join(target, `${EXPO_CUSTOM_MODULE_DIR}/expo-module.config.json`));
   const modulePkg = readOptionalText(path.join(target, `${EXPO_CUSTOM_MODULE_DIR}/package.json`));
   const appPkg = readOptionalText(path.join(target, "package.json"));
+  const entries = modulePackageEntries(modulePkg);
   const iosSourcePresent = Boolean(iosText?.includes(EXPO_CUSTOM_MODULE_NAME));
   const androidSourcePresent = Boolean(androidText?.includes(EXPO_CUSTOM_MODULE_NAME));
-  const webUnsupported = webPathIsUnsupported(webText, indexText);
+  const requireNativeModulePresent = Boolean(
+    nativeEntryText?.includes("requireNativeModule") && nativeEntryText.includes(EXPO_CUSTOM_MODULE_NAME),
+  );
+  const metroSelectsWeb = entries.browser === METRO_WEB_ENTRY && entries.main === METRO_NATIVE_ENTRY;
+  const webUnsupported = webPathIsUnsupported(webText, capabilityText) && metroSelectsWeb;
   const omitsWeb = configOmitsWeb(configText);
   let status: CustomModuleLayoutStatus = "boundary-ready";
-  if (!webUnsupported || !omitsWeb) status = "web-false-parity";
-  else if (missingFiles.length > 0 || !iosSourcePresent || !androidSourcePresent) status = "incomplete";
+  if (!webUnsupported || !omitsWeb || !metroSelectsWeb) status = "web-false-parity";
+  else if (missingFiles.length > 0 || !iosSourcePresent || !androidSourcePresent || !requireNativeModulePresent) status = "incomplete";
   return {
     filesPresent,
     missingFiles,
@@ -173,12 +209,44 @@ export function inspectExpoCustomModule(target: string): CustomModuleLayoutRepor
     webSourcePresent: Boolean(webText),
     webUnsupported,
     configOmitsWeb: omitsWeb,
+    metroWebEntry: entries.browser,
+    metroNativeEntry: entries.main,
+    requireNativeModulePresent,
     lifecyclePresent: sourceDeclaresLifecycleAndEvents(iosText) && sourceDeclaresLifecycleAndEvents(androidText),
     eventsPresent: Boolean(iosText?.includes("Events") && androidText?.includes("Events")),
     fabricatedModulesCorePin: fabricatedModulesCorePin(modulePkg) || fabricatedModulesCorePin(appPkg),
     status,
     nativeCompileStatus: NATIVE_COMPILE_STATUS,
     autolinkingVerified: false,
+  };
+}
+
+export interface PackagedExpoStarterReport {
+  packageManager: typeof EXPO_PACKAGE_MANAGER;
+  lockfileInFixture: boolean;
+  packed: readonly string[];
+  missing: readonly string[];
+}
+
+export function inspectPackagedExpoStarter(skillRoot: string): PackagedExpoStarterReport {
+  const fixtureRoot = path.join(skillRoot, "catalog/stacks/expo-starter-fixture");
+  const lockfileInFixture = Boolean(lstatIfPresent(path.join(fixtureRoot, "package-lock.json")));
+  const required = EXPO_CUSTOM_MODULE_FILES.map((relative) => `catalog/stacks/expo-starter-fixture/${relative}`);
+  const pack = spawnSync("npm", ["pack", "--dry-run", "--json"], { cwd: skillRoot, encoding: "utf8", timeout: 120_000 });
+  let packed: string[] = [];
+  if (pack.status === 0) {
+    try {
+      const parsed = JSON.parse(pack.stdout) as Array<{ files?: Array<{ path: string }> }>;
+      packed = (parsed[0]?.files ?? []).map((file) => file.path);
+    } catch {
+      packed = [];
+    }
+  }
+  return {
+    packageManager: EXPO_PACKAGE_MANAGER,
+    lockfileInFixture,
+    packed,
+    missing: required.filter((relative) => !packed.includes(relative)),
   };
 }
 

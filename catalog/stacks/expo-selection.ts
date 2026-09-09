@@ -380,7 +380,7 @@ function operationSupport(): ExpoOperationSupport[] {
       evidenceTier: "blocked",
       queuedIssue: 82,
       notes:
-        "TypeScript boundary, Swift/Kotlin sources, and an explicit web-unsupported path are fixture-tested. Operation stays blocked: autolinking, native compile, and development-client rebuild were not run.",
+        "TypeScript requireNativeModule entry, Metro browser → index.web.ts, Swift/Kotlin sources, and web-unsupported are fixture-tested. Operation stays blocked: autolinking, native compile, and development-client rebuild were not run.",
     },
     {
       id: "authentication",

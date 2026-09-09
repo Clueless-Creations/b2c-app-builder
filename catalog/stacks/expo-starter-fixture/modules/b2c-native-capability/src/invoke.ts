@@ -3,7 +3,7 @@ import {
   unsupportedOnWeb,
   type CapabilityHost,
   type NativeCapabilityResult,
-} from "./index.js";
+} from "./capability.js";
 
 export function invokeNativeCapability(host: CapabilityHost, nativeModulePresentInBinary: boolean): NativeCapabilityResult {
   if (host === "web") return unsupportedOnWeb();

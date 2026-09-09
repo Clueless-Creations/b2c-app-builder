@@ -3,5 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "main": "src/index.ts",
-  "description": "Local Expo native-capability boundary. No expo-modules-core pin. Not a compiled binary."
+  "react-native": "src/index.ts",
+  "browser": "src/index.web.ts",
+  "description": "Local Expo native-capability boundary. Native entry uses requireNativeModule. Web uses browser → index.web.ts. Not a compiled binary."
 }

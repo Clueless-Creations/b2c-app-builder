@@ -20,7 +20,11 @@ import {
 } from "../../../catalog/stacks/expo-native-ownership.js";
 import {
   EXPO_CUSTOM_MODULE_FILES,
+  EXPO_PACKAGE_MANAGER,
+  METRO_NATIVE_ENTRY,
+  METRO_WEB_ENTRY,
   decideExpoCustomModule,
+  inspectPackagedExpoStarter,
   isolatedStarterCustomModule,
 } from "../../../catalog/stacks/expo-custom-module.js";
 import {
@@ -33,7 +37,7 @@ import {
 import {
   invokeNativeCapability,
 } from "../../../catalog/stacks/expo-starter-fixture/modules/b2c-native-capability/src/invoke.js";
-import { invokeNativeCapability as invokeWebCapability } from "../../../catalog/stacks/expo-starter-fixture/modules/b2c-native-capability/src/B2cNativeCapability.web.js";
+import { invokeNativeCapability as invokeWebCapability } from "../../../catalog/stacks/expo-starter-fixture/modules/b2c-native-capability/src/index.web.js";
 import {
   BUILDER_AUTHORITY_FILES,
   EXPO_STARTER_FIXTURE_DIR,
@@ -208,6 +212,9 @@ export function register(harness: Harness): void {
     assert(layout.status === "boundary-ready", `expected boundary-ready, got ${layout.status}`);
     assert(layout.iosSourcePresent && layout.androidSourcePresent, "Swift and Kotlin sources must both be present");
     assert(layout.webUnsupported && layout.configOmitsWeb, "web must be omitted and explicitly unsupported");
+    assert(layout.metroWebEntry === METRO_WEB_ENTRY, "Metro web must select browser → index.web.ts, not main");
+    assert(layout.metroNativeEntry === METRO_NATIVE_ENTRY, "native main must stay src/index.ts");
+    assert(layout.requireNativeModulePresent, "native entry must call requireNativeModule");
     assert(layout.lifecyclePresent && layout.eventsPresent, "native sources must declare lifecycle and error events");
     assert(layout.fabricatedModulesCorePin === false, "must not invent expo-modules-core latest");
     assert(layout.nativeCompileStatus === NATIVE_COMPILE_STATUS, "native compile stays not-run");
@@ -277,6 +284,13 @@ export function register(harness: Harness): void {
     assert(builder.action === "refuse" && builder.code === "builder-checkout", builder.reason);
     assert(!existsSync(path.join(target, "ios")), "local module sources must not create an app ios/ tree");
     assert(!existsSync(path.join(target, "android")), "local module sources must not create an app android/ tree");
+    const nativeEntry = readFileSync(path.join(EXPO_STARTER_FIXTURE_DIR, "modules/b2c-native-capability/src/index.ts"), "utf8");
+    assert(nativeEntry.includes('from "expo"') && nativeEntry.includes("requireNativeModule"), "native entry must use requireNativeModule from expo");
+    assert(!nativeEntry.includes("unsupported-on-web"), "native main must not be the web unsupported path");
+    const packed = inspectPackagedExpoStarter(skillRoot);
+    assert(packed.packageManager === EXPO_PACKAGE_MANAGER, "one package-manager path is npm");
+    assert(packed.lockfileInFixture === false, "must not fabricate a starter lockfile");
+    assert(packed.missing.length === 0, `builder npm pack must include the module sources, missing ${packed.missing.join(", ")}`);
   });
 
   harness.check("expo foundation: empty authorized target scaffolds only the selected platform and preserves product.yaml", () => {

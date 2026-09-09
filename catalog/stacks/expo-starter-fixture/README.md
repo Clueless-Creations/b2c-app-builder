@@ -9,6 +9,6 @@ This tree is a disposable TypeScript Expo app skeleton for issue 82. It is not a
 - `expo-router` is not pinned. The reviewed fact is bundled with SDK 57, not a workspace version. Do not invent one.
 - No Expo UI adapter manifest. SwiftUI remains the only implemented adapter.
 - Loading, error, empty, and retry are state contracts in `src/`, not runtime-verified screens.
-- `modules/b2c-native-capability` is a TypeScript/Swift/Kotlin boundary. Web is unsupported. Autolinking and native compile are not-run.
+- `modules/b2c-native-capability` is a TypeScript/Swift/Kotlin boundary. Native `main` calls `requireNativeModule`. Web is `browser` → `src/index.web.ts`. Autolinking and native compile are not-run.
 
 Copy this fixture only into an authorized empty workspace outside the builder checkout.

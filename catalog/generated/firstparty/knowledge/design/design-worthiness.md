@@ -1,6 +1,6 @@
 # Design Worthiness
 
-Use this file before a Design Room mutation hardens into engineering work.
+Use this file before DESIGN.md authoring or its generated Design Room review hardens into engineering work.
 
 This file does not replace eleven-star, emotional design, quality-lens, vibecoded-tells, motion craft, or [mobile-flow-craft.md](mobile-flow-craft.md).
 

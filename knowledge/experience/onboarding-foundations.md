@@ -178,9 +178,18 @@ not a not-applicable result.
 ## ONB-18 instrumented design prototype
 
 Design the actual journey against the screen/control contract, identity transitions,
-consent routes, event triggers and source-backed decisions. Show empty, loading,
-permission denial, cancellation, errors, resumed use and reduced-motion behavior
-where applicable. Do not copy another app's branding or invent findings.
+consent routes, event triggers and source-backed decisions. Author those decisions in
+`DESIGN.md`. Git owns revisions. Render the generated Design Room as a read-only review
+page; it is not a mutable design store. Cover the shipping platforms recorded in
+`studio/seed/business.json` `mobileApp.platforms` and `DESIGN.md` accepted surfaces,
+plus small viewports, large text, and reduced motion on those selected surfaces. Do
+not require an unselected platform. A selected platform without a supported adapter
+is an unsupported or missing-implementation hold, not implied parity from a shared
+component contract. The host recipe target, including `host/agent-cli`, is not the
+app's shipping scope. After `DESIGN.md` changes, regenerate the review page and renew
+affected proof. Show empty, loading, permission denial, cancellation, errors, resumed
+use and reduced-motion behavior where applicable. Do not copy another app's branding
+or invent findings.
 
 The Foundation contract has `schemaVersion`, `research`, `identity`, `measurement`,
 `screenContract`, `design` artifact references and `decisions`. Each decision maps

@@ -536,34 +536,35 @@ const onboardingGraphWorkflows = [
     areaIds: ["area.product-experience"],
     trigger: "Produce actual high-fidelity onboarding design, motion, an interactive prototype, and design QA",
     instructions:
-      "Produce the actual high-fidelity onboarding design and an interactive prototype through the Design Room (state, mutate, contract, version, render \u2014 not a separate proposal or mood board), covering the happy path and critical branches across iOS, Android, small viewports, and large text, honoring reduced motion, and run design QA against it. Record the design proof \u2014 with the inspectable artifact path, not just adjectives \u2014 in product/onboarding/graph/ONB-18-visual-design-prototype.md. Map each ONB-09 decision to rendered design evidence in the Foundation contract. Instrument the prototype now, not after implementation: capture fresh install, consent denial, unknown attribution and analytics-unavailable traces in product/onboarding/prototype-evidence.json; a static mockup or event-name list is insufficient. check:onboarding-evidence-onb-18 rejects a stub packet, and ONB-20's adversarial QA depends on this prototype actually existing.",
+      "Author the high-fidelity onboarding design in DESIGN.md \u2014 Git owns revisions \u2014 then render the generated read-only Design Room for review; the Design Room is not a mutable design store or a second design authority. Produce an interactive prototype covering the happy path and critical branches on the shipping platforms recorded in studio/seed/business.json mobileApp.platforms and DESIGN.md accepted surfaces, plus small viewports, large text, and reduced motion on those selected surfaces, and run design QA against it. Do not fabricate captures for an unselected platform; a selected platform without a supported adapter is an explicit unsupported or missing-implementation hold, not assumed parity from a shared component contract; the host recipe target, including host/agent-cli, is not the consumer app's shipping scope. After DESIGN.md changes, regenerate the review page and renew affected proof \u2014 old screenshots do not certify new code. Record the design proof \u2014 with the inspectable artifact path, not just adjectives \u2014 in product/onboarding/graph/ONB-18-visual-design-prototype.md. Map each ONB-09 decision to rendered design evidence in the Foundation contract. Instrument the prototype now, not after implementation: capture fresh install, consent denial, unknown attribution and analytics-unavailable traces in product/onboarding/prototype-evidence.json; a static mockup or event-name list is insufficient. check:onboarding-evidence-onb-18 rejects a stub packet, and ONB-20's adversarial QA depends on this prototype actually existing.",
     reads: [
       "product/onboarding/graph/ONB-16-journey-graph.md",
       "product/onboarding/graph/ONB-17-screen-control-paywall-contract.md",
       "product/onboarding/graph/ONB-12-state-identity-contract.md",
       "product/onboarding/graph/ONB-13-analytics-experiments.md",
       "DESIGN.md",
+      "studio/seed/business.json",
     ],
     roleId: "role.product-leader",
     laneIds: ["onboarding"],
     phaseIds: ["phase.2"],
-    // Depends on (not merely narrates) the workflow that actually produces the rendered
-    // design-state artifacts -- without this, the engine could accept ONB-18 and unblock
-    // ONB-20 on this node's own Markdown packet alone, with no real high-fidelity design or
-    // interactive prototype behind it.
+    // Depends on (not merely narrates) the workflow that authors DESIGN.md, structured
+    // studio routes, and the generated read-only review page -- without this, the engine
+    // could accept ONB-18 and unblock ONB-20 on this node's own Markdown packet alone, with
+    // no real high-fidelity design or interactive prototype behind it.
     dependencies: [
       "workflow.experience.onboarding-system.onb-16-journey-graph",
       "workflow.experience.onboarding-system.onb-17-screen-control-paywall-contract",
       "workflow.design.design-room",
     ],
     outputPaths: ["product/onboarding/graph/ONB-18-visual-design-prototype.md", "product/onboarding/prototype-evidence.json"],
-    // The Design Room dependency above proves the generic design workflow produced rendered
-    // artifacts; it does not prove THIS node's own ONB-18-visual-design-prototype.md packet is
-    // substantive. Same production-verification rationale as ONB-10 above: with no gate on its
-    // own output, an executor could return the declared artifact ID and fingerprint with an
-    // empty or stub packet, and neither ONB-20's own gate nor the final graph gate reads this
-    // file, letting ONB-20's adversarial QA proceed against a prototype packet that was never
-    // actually written.
+    // The Design Room dependency above proves the generic design workflow authored DESIGN.md
+    // and rendered the review page; it does not prove THIS node's own
+    // ONB-18-visual-design-prototype.md packet is substantive. Same production-verification
+    // rationale as ONB-10 above: with no gate on its own output, an executor could return the
+    // declared artifact ID and fingerprint with an empty or stub packet, and neither ONB-20's
+    // own gate nor the final graph gate reads this file, letting ONB-20's adversarial QA
+    // proceed against a prototype packet that was never actually written.
     gates: ["check:onboarding-evidence-onb-18", "check:onboarding-foundations-prototype"],
     actionClass: "mutate",
     idempotent: true,

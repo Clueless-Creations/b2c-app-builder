@@ -57,7 +57,7 @@ export interface PinnedKnowledgeReference {
 }
 
 /** Bump only on a deliberate, reviewed change to the dimension list below or a knowingly-accepted knowledge-doc edit. */
-export const DESIGN_TASTE_RUBRIC_VERSION = "1.2.0";
+export const DESIGN_TASTE_RUBRIC_VERSION = "1.2.1";
 
 /**
  * design-worthiness.md rule numbers this rubric maps to at least one dimension below.
@@ -91,7 +91,7 @@ export const PINNED_KNOWLEDGE_REFERENCES: readonly PinnedKnowledgeReference[] = 
   {
     referenceId: "reference.design.design-worthiness",
     documentPath: "knowledge/design/design-worthiness.md",
-    sourceSha256: "25fdf492aecd9e67a54c59ce7cb48c6bcb9a3411311596b2e565a17a46d37560",
+    sourceSha256: "1a772c7f3e0ffaac71e1954fb6128e39396a0d67a4af5059c56536519986d39f",
   },
 ];
 

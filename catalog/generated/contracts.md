@@ -611,7 +611,7 @@ _Produce actual high-fidelity onboarding design, motion, an interactive prototyp
 - **Role:** Product leader
 - **Phases:** 2
 - **Providers:** —
-- **Reads:** `product/onboarding/graph/ONB-16-journey-graph.md`, `product/onboarding/graph/ONB-17-screen-control-paywall-contract.md`, `product/onboarding/graph/ONB-12-state-identity-contract.md`, `product/onboarding/graph/ONB-13-analytics-experiments.md`, `DESIGN.md`
+- **Reads:** `product/onboarding/graph/ONB-16-journey-graph.md`, `product/onboarding/graph/ONB-17-screen-control-paywall-contract.md`, `product/onboarding/graph/ONB-12-state-identity-contract.md`, `product/onboarding/graph/ONB-13-analytics-experiments.md`, `DESIGN.md`, `studio/seed/business.json`
 - **Consults:** —
 - **Produces:** `product/onboarding/graph/ONB-18-visual-design-prototype.md`, `product/onboarding/prototype-evidence.json`
 - **Gates:** `check:onboarding-evidence-onb-18`, `check:onboarding-foundations-prototype`

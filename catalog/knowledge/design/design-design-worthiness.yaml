@@ -3,7 +3,7 @@ id: reference.design.design-worthiness
 title: Design Worthiness
 domain_id: domain.design
 document_path: knowledge/design/design-worthiness.md
-load_when: when a Design Room mutation needs the mechanical worthiness floor or its independent audit
+load_when: when DESIGN.md authoring or its generated Design Room review needs the mechanical worthiness floor or its independent audit
   must record the delegated taste decision before engineering harden, including native flow semantics and
   mechanical anti-generic consistency, with no beauty score
 lifecycle: active

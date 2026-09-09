@@ -13,9 +13,22 @@ import { loadProductInstanceDocument, productYamlPath } from "../../../catalog/o
 import { renderProductMarkdown } from "../../../catalog/ontology/render-product.js";
 import { OperationRouteRegistry, type OperationRoute } from "../../../kernel/session/operation-routes.js";
 import { runReducer } from "../../../kernel/session/reducer-cli.js";
-import { resolveWorkspacePaths } from "../../../kernel/session/run.js";
-import { loadRunState, writeRunState } from "../../../kernel/engine/runstate.js";
+import { loadBusinessStateFile, resolveWorkspacePaths } from "../../../kernel/session/run.js";
+import { loadRunState, seedRunState, writeRunState } from "../../../kernel/engine/runstate.js";
+import { compilePlan } from "../../../kernel/engine/compile.js";
+import { loadWorkspaceCatalog } from "../../../kernel/session/catalog-contract.js";
 import { workspaceRevision } from "../../../kernel/session/workspace-revision.js";
+import {
+  businessPlanSchema,
+  publicAttemptFailureCodes,
+  publicFounderQuestionClasses,
+  publicHoldKinds,
+} from "../../../contracts/public-api/contract.js";
+import { projectHeldWork, projectReadyBrief, PUBLIC_HELD_REASON } from "../../../kernel/services/plan-projection.js";
+import { attemptFailureCodes } from "../../../kernel/session/attempt-failure.js";
+import { founderQuestionClasses } from "../../../kernel/session/founder-gate.js";
+import type { HeldNode } from "../../../kernel/session/plan.js";
+import type { NodeBrief } from "../../../kernel/engine/node-brief.js";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 function data(operation: Parameters<typeof callPublicOperation>[0], input: unknown): any {
   const result = callPublicOperation(operation, input);
@@ -35,6 +48,53 @@ function acceptProduct(directory: string) {
   doc.meta.status = "accepted";
   writeFileSync(file, stringify(doc));
   writeFileSync(path.join(directory, "PRODUCT.md"), renderProductMarkdown(loadProductInstanceDocument(file)));
+}
+function grantDomain(
+  directory: string,
+  domainId: string,
+  prerequisites: Array<{ id: string; kind: "doppler_auth"; ttlSeconds: number; status: "unverified" }> = [],
+) {
+  const now = new Date().toISOString(),
+    paths = resolveWorkspacePaths(directory);
+  const grant = { domainId, level: "run-with-guardrails", prerequisites, grantedAt: now, grantedBy: "founder", updatedAt: now };
+  const authorized = runReducer(
+    [
+      "commit",
+      "--file",
+      paths.control,
+      "--manifest",
+      paths.manifest,
+      "--audit",
+      paths.audit,
+      "--session",
+      "fixture-founder",
+      "--now",
+      now,
+      "--founder-authority",
+      "true",
+    ],
+    JSON.stringify({
+      schemaVersion: "1.0.0",
+      patchId: `fixture-authority-${domainId}`,
+      targetDoc: "control",
+      reason: "Explicit fixture founder authorization",
+      authoredBy: "founder",
+      authoredAt: now,
+      preconditions: [],
+      ops: [{ op: "set", path: ["grants", domainId], value: grant }],
+      declaredOutputs: [["grants", domainId]],
+    }),
+  );
+  assert.equal(authorized.code, 0, authorized.output);
+}
+function snapshotPlanInputs(directory: string) {
+  const runPath = path.join(directory, "run/run-state.json");
+  return {
+    revision: workspaceRevision(directory),
+    control: readFileSync(path.join(directory, "control/control.json"), "utf8"),
+    run: existsSync(runPath) ? readFileSync(runPath) : null,
+    registry: readFileSync(path.join(process.env.B2C_APP_BUILDER_HOME!, "workspaces.json"), "utf8"),
+  };
 }
 test("public create, accepted initialization and passive planning preserve authority and registration boundaries", async () => {
   const env = setup(),
@@ -64,6 +124,9 @@ test("public create, accepted initialization and passive planning preserve autho
     assert.equal(plan.authorityGranted, false);
     assert.equal(plan.completion.deliveryAccepted, false);
     assert(!plan.completion.nextAction.includes("then initialize"));
+    assert.equal(typeof plan.founderQuestion?.prompt, "string");
+    assert.equal(plan.founderQuestion?.appliesToRevision, plan.revision);
+    assert.equal(plan.authorityGranted, false);
     const client = new Client({ name: "lifecycle-parity", version: "1.0.0" });
     try {
       await client.connect(
@@ -236,4 +299,168 @@ test("public run uses existing authority and trusted selected routes; exact requ
     else process.env.B2C_APP_BUILDER_HOME = prior;
     rmSync(env.temp, { recursive: true, force: true });
   }
+});
+test("public plan projects distinct hold kinds, ready briefs, and a revision-bound founder question", () => {
+  const env = setup(),
+    prior = process.env.B2C_APP_BUILDER_HOME;
+  process.env.B2C_APP_BUILDER_HOME = env.home;
+  try {
+    data("business.create", { workspaceId: "app", directory: env.directory, name: "Useful Habit", hypothesis: "A consumer need" });
+    acceptProduct(env.directory);
+    data("business.initialize", { workspaceId: "app", expectedRevision: workspaceRevision(env.directory) });
+    grantDomain(env.directory, "domain.operations");
+    grantDomain(env.directory, "domain.research");
+    grantDomain(env.directory, "domain.trust", [{ id: "doppler.trust", kind: "doppler_auth", ttlSeconds: 3600, status: "unverified" }]);
+    const before = snapshotPlanInputs(env.directory);
+    const plan = data("business.plan", { workspaceId: "app" });
+    assert.deepEqual(snapshotPlanInputs(env.directory), before, "passive planning must not write workspace or registry state");
+    assert.equal(plan.providerObservation, "not_requested");
+    assert.equal(plan.authorityGranted, false);
+    const holdKinds = new Set(plan.held.map((item: { holdKind?: string }) => item.holdKind));
+    assert(holdKinds.size >= 2, `expected at least two hold kinds, got ${JSON.stringify([...holdKinds])}`);
+    assert(holdKinds.has("founder_approval") && holdKinds.has("upstream"), JSON.stringify([...holdKinds]));
+    assert(plan.held.every((item: { reason?: string }) => item.reason === PUBLIC_HELD_REASON));
+    const details = new Set(plan.held.map((item: { detail?: string }) => item.detail));
+    assert(details.size >= 2, "held detail must distinguish planner facts instead of one generic sentence");
+    assert(!JSON.stringify(plan).includes("not logged in"));
+    assert(!plan.held.some((item: { detail?: string }) => /access is missing/i.test(item.detail ?? "")));
+    assert(plan.ready.length >= 1, JSON.stringify({ ready: plan.ready, holdKinds: [...holdKinds] }));
+    assert(plan.ready.every((item: { workflowId: string; brief?: { workflowId?: string } }) => item.brief?.workflowId === item.workflowId));
+    assert.equal(typeof plan.founderQuestion?.prompt, "string");
+    assert.equal(plan.founderQuestion?.appliesToRevision, plan.revision);
+    const target = plan.held[0]!;
+    const paths = resolveWorkspacePaths(env.directory);
+    const loaded = loadWorkspaceCatalog(env.directory);
+    assert(loaded.ok, "catalog must load to seed a failed attempt");
+    const businessState = loadBusinessStateFile(paths.state);
+    assert(businessState);
+    const compiled = compilePlan(loaded.catalog);
+    const seeded = seedRunState(compiled, businessState, {
+      ownerSessionId: "fixture",
+      ttlSeconds: 300,
+      wallClockCapSeconds: 300,
+      now: new Date().toISOString(),
+    });
+    const nodeId = `run.${target.workflowId.slice("workflow.".length)}`;
+    const node = seeded.nodes[nodeId];
+    assert(node, nodeId);
+    node.attempts.push({
+      id: "fixture-failed-attempt",
+      nodeId,
+      number: 1,
+      status: "failed",
+      ownerSessionId: "fixture",
+      heartbeatAt: new Date().toISOString(),
+      ttlSeconds: 300,
+      inputFingerprint: `sha256:${"0".repeat(64)}`,
+      evidence: [],
+      error:
+        // Fabricated values must not match SECRET_LIKE (sk_test_/ghp_ live-looking shapes).
+        "worker exited 1: api_key=fixture-not-a-live-token password=hunter2 Bearer fabricated-bearer-token-value-99 operator@example.com /Users/someone/secret.env \u0007",
+      readbackRequired: false,
+    });
+    mkdirSync(path.dirname(paths.runState), { recursive: true });
+    writeRunState(paths.runState, seeded);
+    const afterSeed = snapshotPlanInputs(env.directory);
+    const afterFailure = data("business.plan", { workspaceId: "app" });
+    assert.deepEqual(snapshotPlanInputs(env.directory), afterSeed, "planning a failed attempt must not write");
+    const failed = afterFailure.held.find((item: { workflowId: string }) => item.workflowId === target.workflowId);
+    assert(failed?.lastFailure?.summary, JSON.stringify(failed));
+    const encoded = JSON.stringify(afterFailure);
+    assert(!encoded.includes("fixture-not-a-live-token"));
+    assert(!encoded.includes("fabricated-bearer-token-value-99"));
+    assert(!encoded.includes("hunter2"));
+    assert(!encoded.includes("operator@example.com"));
+    assert(!encoded.includes("/Users/someone/secret.env"));
+    assert(!encoded.includes("\u0007"));
+    const cli = spawnSync(process.execPath, [path.join(root, "entrypoints/cli/b2c.mjs"), "business-plan", "--workspace", "app", "--json"], {
+      encoding: "utf8",
+      env: process.env,
+    });
+    assert.equal(cli.status, 0, cli.stderr);
+    assert.deepEqual(JSON.parse(cli.stdout).data, afterFailure);
+  } finally {
+    if (prior === undefined) delete process.env.B2C_APP_BUILDER_HOME;
+    else process.env.B2C_APP_BUILDER_HOME = prior;
+    rmSync(env.temp, { recursive: true, force: true });
+  }
+});
+test("public plan schema stays additive and bounds unsafe planner text", () => {
+  assert.deepEqual([...publicHoldKinds], ["founder_approval", "autonomy", "blocked", "upstream"]);
+  assert.deepEqual([...publicAttemptFailureCodes], [...attemptFailureCodes]);
+  assert.deepEqual([...publicFounderQuestionClasses], [...founderQuestionClasses]);
+  const oldPlan = {
+    completion: {
+      deliveryAccepted: false,
+      closeoutWorkflowId: "workflow.orchestration.full-launch-closeout",
+      requiredCount: 0,
+      excludedCount: 0,
+      outstandingCount: 0,
+      assessed: false,
+      nextAction: "Finish planning.",
+    },
+    workspaceId: "app",
+    revision: `sha256:${"a".repeat(64)}`,
+    planId: null,
+    status: "held",
+    ready: [],
+    held: [{ workflowId: "workflow.fixture.hold", title: "Held", status: "held", reason: PUBLIC_HELD_REASON }],
+    completed: 0,
+    providerObservation: "not_requested",
+    authorityGranted: false,
+    nextAction: "Resolve the reported holds; this passive plan did not observe provider prerequisites.",
+  };
+  assert.deepEqual(businessPlanSchema.parse(oldPlan).held[0], oldPlan.held[0]);
+  const dirty: HeldNode = {
+    nodeId: "run.fixture.hold",
+    workflowId: "workflow.fixture.hold",
+    title: "Held fixture",
+    domainId: "domain.engineering",
+    reason: "autonomy",
+    detail: `${"n".repeat(500)} api_key=fixture-not-a-live-token`,
+    lastFailure: "worker exited 1: password=hunter2 /Users/someone/secret.env",
+    lastFailureCode: "worker.exited",
+  };
+  const projected = projectHeldWork(dirty);
+  assert.equal(projected.holdKind, "autonomy");
+  assert.equal(projected.reason, PUBLIC_HELD_REASON);
+  assert(projected.detailTruncated);
+  assert((projected.detail?.length ?? 0) <= 400);
+  assert(!projected.detail?.includes("fixture-not-a-live-token"));
+  assert(projected.lastFailure?.truncated === false || projected.lastFailure?.summary);
+  assert(!projected.lastFailure?.summary.includes("hunter2"));
+  assert(!projected.lastFailure?.summary.includes("/Users/someone"));
+  const unobserved = projectHeldWork({
+    nodeId: "run.fixture.unobserved",
+    workflowId: "workflow.fixture.unobserved",
+    title: "Unobserved fixture",
+    domainId: "domain.trust",
+    reason: "autonomy",
+    detail: "Provider prerequisite was not observed by this passive plan.",
+    reasonCode: "autonomy.prerequisite_lapsed",
+  });
+  assert.equal(unobserved.holdKind, "autonomy");
+  assert.match(unobserved.detail ?? "", /not observed by this passive plan/i);
+  assert(!/access is missing/i.test(unobserved.detail ?? ""));
+  const brief = projectReadyBrief({
+    workflowId: "workflow.fixture.ready",
+    title: "Ready fixture",
+    contractFiles: [],
+    instructions: "Do this. ".repeat(400),
+    open: ["/etc/passwd", "operations/LAUNCH_PROGRAM.md", "../escape"],
+    consult: [],
+    load: [],
+    route: [],
+    skills: [],
+    tools: [],
+    produce: ["PRODUCT.md"],
+    verify: { kind: "none", gateCommands: ["check:catalog"], failClosed: true },
+    approvals: [],
+    tokenBudget: 8_000,
+  } satisfies NodeBrief);
+  assert.equal(brief.truncated, true);
+  assert(brief.instructions.endsWith("…"));
+  assert.deepEqual(brief.open, ["operations/LAUNCH_PROGRAM.md"]);
+  assert.deepEqual(brief.produce, ["PRODUCT.md"]);
+  assert.deepEqual(brief.verify.gateCommands, ["check:catalog"]);
 });

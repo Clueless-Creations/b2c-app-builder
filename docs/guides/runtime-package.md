@@ -102,7 +102,8 @@ Research first. After explicit acceptance, set product status to `accepted` in
 Read `b2c business-plan --workspace my-app --json`, then initialize with
 `b2c business-initialize --workspace my-app --revision <revision-from-plan> --json`.
 Initialization grants no work authority. Record approved authority with `b2c onboard`
-and inspect the current plan before a bounded `business-run`.
+and inspect the current plan before a bounded `business-run`. Initialized plan results
+include hold classification, bounded ready briefs, and the current founder question.
 
 Resume an existing registered workspace. Use `b2c workspaces register <id> <path>`
 only for an existing unregistered scaffold. The legacy `b2c new` and `b2c bootstrap`

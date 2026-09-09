@@ -14,8 +14,9 @@ permission. Its research successor includes independent review. Registration rou
 the target without inventing a final brand.
 
 Read `b2c business-plan --workspace ID --json` before work and after an interruption. Planning
-responses name saved artifacts and query checkpoints. Initialized responses identify ready and
-held work. `completion.deliveryAccepted` is separate from a session finishing successfully.
+responses name saved artifacts and query checkpoints. Initialized responses identify ready work
+with bounded briefs and held work with `holdKind`, bounded detail, and the current founder
+question bound to that revision. `completion.deliveryAccepted` is separate from a session finishing successfully.
 A research check or passing unit tests cannot establish complete delivery.
 
 ## Read the contract, not its validator source

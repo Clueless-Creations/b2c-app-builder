@@ -106,7 +106,9 @@ b2c business-initialize --workspace my-app --revision <revision-from-plan> --jso
 Initialization grants no work authority. Use
 `b2c onboard --workspace my-app --answers answers.json`
 to record approved authority, then inspect `business-plan`
-again before a bounded `business-run`.
+again before a bounded `business-run`. The plan names why work is held (`holdKind` and
+bounded `detail`), includes a bounded brief on each ready item, and may include one
+founder question bound to that revision. It does not grant authority.
 
 For an existing registered workspace, resume with `business-plan`. For an existing
 unregistered scaffold, use `b2c workspaces register <id> <path>`; registration does

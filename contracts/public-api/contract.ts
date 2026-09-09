@@ -242,6 +242,96 @@ export const marketReportSchema = z.strictObject({
 });
 
 const lifecycleRevisionSchema = z.string().regex(/^sha256:[a-f0-9]{64}$/);
+/** Additive `business.plan` output bounds. Kernel projects into these limits; it does not import this module's types into planner state. */
+export const PUBLIC_PLAN_BOUNDS = {
+  detail: 400,
+  failureSummary: 240,
+  instructions: 2000,
+  path: 240,
+  prompt: 400,
+  choiceLabel: 120,
+  choiceConsequence: 240,
+  loadWhen: 400,
+  loadEntries: 24,
+  pathList: 32,
+  gateCommands: 16,
+  approvals: 16,
+} as const;
+export const publicHoldKinds = ["founder_approval", "autonomy", "blocked", "upstream"] as const;
+export const publicHoldKindSchema = z.enum(publicHoldKinds);
+export const publicAttemptFailureCodes = [
+  "worker.runtime_unavailable",
+  "worker.exited",
+  "worker.timeout",
+  "worker.output_missing",
+  "worker.scope_violation",
+  "worker.receipt_rejected",
+  "attempt.error",
+] as const;
+export const publicAttemptFailureCodeSchema = z.enum(publicAttemptFailureCodes);
+export const publicFounderQuestionClasses = [
+  "confirm-product-kind",
+  "confirm-go",
+  "confirm-spend-cap",
+  "confirm-release-publish",
+  "confirm-approval",
+  "grant-initial-autonomy",
+  "raise-autonomy",
+  "scope-question",
+] as const;
+export const publicFounderQuestionClassSchema = z.enum(publicFounderQuestionClasses);
+const publicPathSchema = z.string().max(PUBLIC_PLAN_BOUNDS.path);
+export const publicPlanLastFailureSchema = z.strictObject({
+  code: publicAttemptFailureCodeSchema.optional(),
+  summary: z.string().max(PUBLIC_PLAN_BOUNDS.failureSummary),
+  withheld: z.boolean(),
+  truncated: z.boolean(),
+});
+export const publicReadyBriefSchema = z.strictObject({
+  workflowId: z.string(),
+  title: z.string(),
+  instructions: z.string().max(PUBLIC_PLAN_BOUNDS.instructions),
+  open: z.array(publicPathSchema).max(PUBLIC_PLAN_BOUNDS.pathList),
+  consult: z.array(publicPathSchema).max(PUBLIC_PLAN_BOUNDS.pathList),
+  load: z
+    .array(
+      z.strictObject({
+        path: publicPathSchema,
+        title: z.string(),
+        loadWhen: z.string().max(PUBLIC_PLAN_BOUNDS.loadWhen),
+        sectionId: z.string().max(160).optional(),
+        revision: z.string().max(160).optional(),
+      }),
+    )
+    .max(PUBLIC_PLAN_BOUNDS.loadEntries),
+  produce: z.array(publicPathSchema).max(PUBLIC_PLAN_BOUNDS.pathList),
+  verify: z.strictObject({
+    kind: z.string(),
+    gateCommands: z.array(z.string().max(240)).max(PUBLIC_PLAN_BOUNDS.gateCommands),
+    failClosed: z.boolean(),
+    requiresIndependentReview: z.boolean().optional(),
+  }),
+  approvals: z.array(z.string().max(400)).max(PUBLIC_PLAN_BOUNDS.approvals),
+  truncated: z.boolean(),
+});
+export const publicFounderQuestionSchema = z.strictObject({
+  phase: z.string().max(160),
+  class: publicFounderQuestionClassSchema,
+  prompt: z.string().max(PUBLIC_PLAN_BOUNDS.prompt),
+  choices: z
+    .array(
+      z.strictObject({
+        label: z.string().max(PUBLIC_PLAN_BOUNDS.choiceLabel),
+        consequence: z.string().max(PUBLIC_PLAN_BOUNDS.choiceConsequence),
+        recommended: z.boolean(),
+      }),
+    )
+    .min(2)
+    .max(4),
+  skippable: z.boolean(),
+  deferrable: z.boolean(),
+  appliesToRevision: lifecycleRevisionSchema,
+});
 export const businessCreateInputSchema = businessStatusInputSchema.extend({
   directory: z.string().min(1).max(4096),
   name: z.string().min(1).max(160),
@@ -280,6 +370,11 @@ const lifecycleWorkSchema = z.strictObject({
   status: z.string(),
   reasonCode: z.string().optional(),
   reason: z.string().optional(),
+  holdKind: publicHoldKindSchema.optional(),
+  detail: z.string().max(PUBLIC_PLAN_BOUNDS.detail).optional(),
+  detailTruncated: z.boolean().optional(),
+  lastFailure: publicPlanLastFailureSchema.optional(),
+  brief: publicReadyBriefSchema.optional(),
 });
 export const businessCompletionSchema = z.strictObject({
   deliveryAccepted: z.boolean(),
@@ -302,8 +397,13 @@ export const businessPlanSchema = z.strictObject({
   completed: z.number().int().nonnegative(),
   providerObservation: z.literal("not_requested"),
   authorityGranted: z.literal(false),
+  founderQuestion: publicFounderQuestionSchema.nullable().optional(),
   nextAction: z.string(),
 });
+export type BusinessPlan = z.infer<typeof businessPlanSchema>;
+export type PublicHoldKind = z.infer<typeof publicHoldKindSchema>;
+export type PublicReadyBrief = z.infer<typeof publicReadyBriefSchema>;
+export type PublicFounderQuestion = z.infer<typeof publicFounderQuestionSchema>;
 export const businessRunSchema = z.strictObject({
   completion: businessCompletionSchema,
   workspaceId: z.string(),
@@ -516,7 +616,7 @@ export const PUBLIC_OPERATIONS = [
     mcp: "b2c_business_plan",
     title: "Plan authorized consumer-business work",
     description:
-      "Passive registered-workspace frontier from existing compiler and autonomy owner. No network or provider prerequisite probes; unobserved prerequisites remain held.",
+      "Passive registered-workspace frontier from existing compiler and autonomy owner. No network or provider prerequisite probes; unobserved prerequisites remain held. Ready work includes bounded briefs. Held work includes hold classification, bounded detail, and a sanitized last failure when one exists. The current founder question is bound to this revision and is not an approval.",
     inputSchema: businessPlanInputSchema,
     outputSchema: resultSchema(businessPlanSchema),
     flags: ["workspace", "concurrency", "json"],

@@ -97,7 +97,11 @@ Use composition activation to change an installed execution contract.
 
 `business.plan` is passive: it reports ready and held workflow IDs without probes,
 network calls or writes. Ready means eligible at this snapshot; it does not grant
-authority or promise execution. `business.evidence` reports current, stale, pending
+authority or promise execution. Initialized results add hold classification (`holdKind`),
+bounded `detail`, an optional sanitized `lastFailure`, bounded ready `brief` objects,
+and at most one `founderQuestion` bound to `appliesToRevision`. The historical `reason`
+sentence on held work is unchanged. Missing additive fields remain valid for older
+saved results. `business.evidence` reports current, stale, pending
 or absent acceptance without exposing raw state or worker errors. A failed attempt
 carries `attempt.failed` and one classified `worker.*` or `attempt.error` reason code. Synthetic proof
 stays identified and neither response claims a live launch.

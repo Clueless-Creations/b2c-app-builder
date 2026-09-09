@@ -3,14 +3,16 @@
  * while operators and public evidence receive a stable classification and a sanitized summary.
  * Classification reads only the executor's own error prefixes; it never re-derives worker intent.
  */
-export type AttemptFailureCode =
-  | "worker.runtime_unavailable"
-  | "worker.exited"
-  | "worker.timeout"
-  | "worker.output_missing"
-  | "worker.scope_violation"
-  | "worker.receipt_rejected"
-  | "attempt.error";
+export const attemptFailureCodes = [
+  "worker.runtime_unavailable",
+  "worker.exited",
+  "worker.timeout",
+  "worker.output_missing",
+  "worker.scope_violation",
+  "worker.receipt_rejected",
+  "attempt.error",
+] as const;
+export type AttemptFailureCode = (typeof attemptFailureCodes)[number];
 
 const RUNTIME_UNAVAILABLE = /(auth|log[ -]?in|api[_ -]?key|unauthori[sz]ed|credential|newer version|upgrade|not logged|ENOENT|not found|spawn|invalid_grant)/i;
 
@@ -35,10 +37,22 @@ const SECRET_PATTERNS: readonly RegExp[] = [
 
 function redact(text: string): string {
   let out = text;
-  for (const pattern of SECRET_PATTERNS)
+  for (const pattern of SECRET_PATTERNS) {
+    pattern.lastIndex = 0;
     out = out.replace(pattern, (match, separator?: string) => (separator ? `${match.slice(0, match.indexOf(separator))}${separator}[redacted]` : "[redacted]"));
+    pattern.lastIndex = 0;
+  }
   const home = process.env.HOME?.trim();
   if (home && home.length > 1) out = out.split(home).join("~");
+  return out;
+}
+
+/** Public-boundary redaction: secrets, home paths, emails, control characters, and other host prefixes. */
+export function redactSensitiveText(text: string): string {
+  let out = redact(text);
+  out = out.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, "");
+  out = out.replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g, "[redacted]");
+  out = out.replace(/\/(?:Users|home)\/[^\s"'\\]+/g, "~");
   return out;
 }
 

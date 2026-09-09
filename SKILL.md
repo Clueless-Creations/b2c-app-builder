@@ -45,7 +45,8 @@ not the final product name. Do not hand-author runtime state during planning. Re
 `product.yaml`, then render `PRODUCT.md` with `b2c render-product --workspace ID`.
 After explicit product acceptance,
 `business-initialize` activates the complete-business default. Use
-`b2c_business_plan` to inspect eligible work and holds, then `business-run` with
+`b2c_business_plan` to inspect eligible work, hold classification, bounded briefs, and the
+current founder question, then `business-run` with
 the returned revision and a unique request ID for authorized execution. Read
 `b2c_business_evidence` for current acceptance and gaps. A successful bounded session
 is not delivery: inspect `completion.deliveryAccepted` on the business plan or run. Keep independent work

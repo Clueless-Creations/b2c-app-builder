@@ -4,9 +4,9 @@
 - **Date:** 2026-09-09
 - **Steward:** founder-directed architecture decision
 - **Affected rules and contracts:** ARCH-02, ARCH-03, ARCH-04, ARCH-06, ARCH-09, ARCH-10, ARCH-11
-- **Affected work:** provider adoption and maintenance; #79, #80, #84, #101–#108
+- **Affected work:** provider adoption and maintenance; #109–#117; RevenueCat/EAS proving cases #101–#106; #79, #80, #84, #107, #108
 
-This record does not grant provider access, credentials, spend, publication, deployment, or release authority.
+This record does not grant provider access, credentials, spend, publication, deployment, or release authority. Founder direction authorizes this target. Closing #109 still needs an independent reviewer of the exact source revision.
 
 ## Context
 

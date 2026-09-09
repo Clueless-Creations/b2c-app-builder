@@ -54,7 +54,7 @@ Do not continue into maintenance reading unless the task changes the builder its
 1. `AGENTS.md`.
 2. `agents/skills/b2c-maintainer/SKILL.md`.
 3. `docs/public-interface.md`, `docs/architecture.md`, and `docs/north-star-architecture.md` as applicable.
-4. `docs/architecture-conformance.md` and affected ADRs.
+4. `docs/architecture-conformance.md` and affected ADRs. New and upgraded provider transports also follow `docs/guides/provider-integrations.md` and the provider-integration ADR.
 5. Migration plan/unit only when the change belongs to that migration.
 6. Relevant source owner, generated projections, and tests.
 7. `knowledge/words/no-slop-writing.md` for public-facing product/console copy.
@@ -68,6 +68,8 @@ Do not continue into maintenance reading unless the task changes the builder its
 Use `docs/architecture-conformance.md` for bounded architecture work. Keep one logical owner per responsibility. Replace owners behind stable contracts when justified. Do not add competing routers, catalogs, knowledge stores, planners, reducers, task stores, summary stores, agent graphs, or workspace state stores.
 
 Changes to public contracts, truth ownership, dependency direction, authority, or migration guarantees require an architecture decision with evidence and migration treatment. Compatible internal choices remain implementation decisions.
+
+Provider adapters implement canonical operations. Intake stays on the contributor router; adapter implementation and upgrades stay on the maintainer router. Do not copy the provider lifecycle into this file or into a business workspace.
 
 ## Truth and active context
 

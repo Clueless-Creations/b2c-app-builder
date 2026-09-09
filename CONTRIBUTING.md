@@ -65,7 +65,9 @@ owns that manifest.
 [ADR-0005](docs/decisions/0005-source-adoption-and-upstream-maintenance.md)
 records the boundary and
 [ADR-0007](docs/decisions/0007-upstream-lifecycle-and-agent-scopes.md) records
-the lifecycle handoff.
+the lifecycle handoff. A wrap that implements a canonical operation continues
+through [provider integrations](docs/guides/provider-integrations.md) on the
+maintainer router after rights review.
 
 ## Keep the product focused
 

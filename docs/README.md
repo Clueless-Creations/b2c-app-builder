@@ -9,7 +9,8 @@ B2C App Builder supplies consumer-business primitives through a skill, CLI, and 
 | Build or improve one business         | [Business-building guide](guides/build-a-business.md)                                                                                                                |
 | Understand the stable interface       | [Public interface](public-interface.md) and [generated reference](../contracts/public-api/REFERENCE.md)                                                              |
 | Operate or capture a mobile app       | [Mobile app operation](guides/mobile-app-operation.md)                                                                                                               |
-| Add a provider, capability, or recipe | [Extension guide](guides/extend-the-system.md)                                                                                                                       |
+| Add a capability, recipe, or package  | [Extension guide](guides/extend-the-system.md)                                                                                                                       |
+| Implement or upgrade a provider transport | [Provider integrations](guides/provider-integrations.md) and [ADR-0012](decisions/0012-provider-integration-boundary.md)                                         |
 | Work on the platform                  | [Contributing](../CONTRIBUTING.md), then [AGENTS.md](../AGENTS.md)                                                                                                   |
 | Decide which scope you are in         | The three-scope table that opens [AGENTS.md](../AGENTS.md): one business, a reusable contribution, or the builder itself                                             |
 | Write builder-facing or console copy  | [No-slop writing](../knowledge/words/no-slop-writing.md)                                                                                                              |

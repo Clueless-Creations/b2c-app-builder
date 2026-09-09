@@ -2,7 +2,9 @@
 
 Use this guide when the builder adopts a new provider transport or updates an existing provider integration. It applies to APIs, CLIs, MCP tools, SDKs, hosted services, and combinations of them.
 
-Read [ADR-0012](../decisions/0012-provider-integration-boundary.md), ARCH-03/ARCH-04 in the north-star architecture, the provider's upstream manifest, and the maintainer skill first.
+Read [ADR-0012](../decisions/0012-provider-integration-boundary.md), ARCH-03,
+ARCH-04, ARCH-06, ARCH-10, and ARCH-11 in the north-star architecture, the
+provider's upstream manifest, and the maintainer skill first.
 
 The goal is not to wrap every provider command. The goal is to implement stable consumer-business operations while keeping provider churn at the edge.
 

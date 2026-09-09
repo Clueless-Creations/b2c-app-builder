@@ -21,45 +21,14 @@ evidence as `path:line`. Keep one owner per responsibility.
 
 ## Provider integration and upgrades
 
-For any new provider transport or provider upgrade, read
-`docs/guides/provider-integrations.md` and ADR-0012 before editing adapter code.
-Use the same lifecycle for APIs, CLIs, MCP tools, SDKs, and hosted services.
+For any new provider transport or provider upgrade, follow
+`docs/guides/provider-integrations.md` and ADR-0012. Do not copy that checklist
+here. Use the same lifecycle for APIs, CLIs, MCP tools, SDKs, and hosted services.
 
-Map in this order:
-
-**native capability → canonical operation → selected provider implementation → independent upstream conformance evidence**
-
-Core workflows depend on canonical operations, never provider command names,
-flags, endpoints, SDK response types, or native lifecycle states. Keep definition/support,
-encoding, transport, decoding, and reconciliation as separate logical responsibilities.
-Do not build a generic CLI framework merely because multiple providers expose CLIs.
-
-A provider adapter cannot prove its own native contract with fixtures generated
-from its encoder, decoder, local types, or fake transport. Derive conformance
-fixtures from a pinned official schema, pinned upstream source/tests, sanitized
-captured output from the reviewed version, or official examples when stronger
-evidence is unavailable. Record provenance with the fixture.
-
-For `UPGRADE_PROVIDER`, produce the Provider Capability Delta from the guide
-before adapter edits. Provider syntax, response, auth, pagination, or transport
-churn should normally change only upstream/support metadata, conformance fixtures,
-the provider adapter, and its support declaration. A workflow, kernel, business-state,
-or canonical-operation change needs a deliberately adopted new business semantic
-and architecture review.
-
-New upstream functionality maps to an existing canonical operation when the
-semantics match. Keep genuinely provider-specific functionality as an explicit
-provider extension or defer it. Do not create a generic-looking contract that is
-only one provider's API with the vendor name removed.
-
-The kernel remains the single owner of logical request identity, authority,
-effect progress, interruption recovery, and reconciliation. Provider adapters
-return observations and remote identities. They do not create a second scheduler,
-acceptance store, or operation journal. A confirmed mutation followed by failed
-readback resumes verification; it does not authorize blind replay.
-
-Fixture conformance, live provider execution, native app behavior, store behavior,
-and production behavior are separate proof classes. Report them separately.
+Map native capability → canonical operation → selected implementation →
+independent upstream conformance evidence. Keep adapter work on this router;
+keep intake and rights on `b2c-contributor`. Do not add provider-native types
+or a second execution journal to workflows or the kernel.
 
 ## Upstream support maintenance
 

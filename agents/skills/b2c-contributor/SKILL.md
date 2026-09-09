@@ -34,6 +34,11 @@ fetch, write, or probe the host. `evaluate` is CLI-only.
 
 Prefer the least transformation: reference, then adapt, then reuse, wrap, or vendor.
 
+When the unit is a provider implementation (typically wrap or managed-provider),
+finish intake and rights here, then continue through
+`docs/guides/provider-integrations.md` on the maintainer router. An official
+SDK, CLI, or `--help` output does not complete the integration.
+
 ## Commands
 
 ```sh

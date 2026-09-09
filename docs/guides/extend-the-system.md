@@ -3,6 +3,9 @@
 Start with a consumer-business responsibility. A capability defines an operation,
 a provider implements it, and a recipe arranges its work and review. The
 [north-star architecture](../north-star-architecture.md) owns these boundaries.
+Provider transports (API, CLI, MCP, SDK, hosted service) follow the
+[provider integration lifecycle](provider-integrations.md). This page is the
+package extension path.
 
 ## Package contract
 

@@ -7,10 +7,7 @@ load_when: when building iOS and Android with Expo, adopting an existing Expo ap
   module, or shipping Expo web only
 lifecycle: active
 bindings:
-  workflow_ids:
-    - workflow.engineering.engineering-orchestration-ce-production-readiness
-    - workflow.engineering.native-ios-proof-route-ladder
-    - workflow.engineering.app-quality-and-vitals
+  workflow_ids: []
   context_pack_ids:
     - context.engineering
 applicability_notes: Routes selected Expo work to child issues without claiming their execution. Unselected

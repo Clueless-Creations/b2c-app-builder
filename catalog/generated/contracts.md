@@ -327,7 +327,7 @@ _Request matches a known product shape (social / AI-chat / habit / photo-AI)_
 - **Consults:** —
 - **Produces:** —
 - **Gates:** `check:app-archetype`, `check:archetype-starter`
-- **Knowledge:** [Expo Stack Selection](../../knowledge/engineering/expo-stack-selection.md), [Core Loop And Complete Product Scope](../../knowledge/product/core-loop-and-complete-scope.md)
+- **Knowledge:** [Core Loop And Complete Product Scope](../../knowledge/product/core-loop-and-complete-scope.md)
 
 ## How The App Feels
 
@@ -842,7 +842,7 @@ _Before actual app implementation, builder prompts, or production-readiness clai
 - **Consults:** —
 - **Produces:** `engineering/ENGINEERING_PLAN.md`, `operations/ORCHESTRATION.md`, `engineering/PRODUCTION_READINESS.md`
 - **Gates:** `check:compound-engineering`, `check:orchestration`
-- **Knowledge:** [Design Acceptance Evidence](../../knowledge/design/design-acceptance.md), [Premium Mobile Craft](../../knowledge/design/premium-mobile-craft.md), [Quality Lens](../../knowledge/design/quality-lens.md), [Engineering Orchestration](../../knowledge/engineering/engineering-orchestration.md), [Expo Compatibility And CNG](../../knowledge/engineering/expo-compatibility.md), [Expo Operations Map](../../knowledge/engineering/expo-operations-map.md), [Expo Stack Selection](../../knowledge/engineering/expo-stack-selection.md), [Recommended Agent Skills](../../knowledge/engineering/recommended-agent-skills.md), [Eleven-Star Experience](../../knowledge/experience/eleven-star-experience.md), [Compound Engineering Routing](../../knowledge/orchestration/compound-engineering-routing.md), [Isolated Review](../../knowledge/orchestration/isolated-review.md), [Parallel Agent Orchestration](../../knowledge/orchestration/parallel-agent-orchestration.md), [Project State](../../knowledge/orchestration/project-state.md), [Engineering And Agent Orchestration](../../knowledge/process/tool-recipes/engineering-and-agent-orchestration.md)
+- **Knowledge:** [Design Acceptance Evidence](../../knowledge/design/design-acceptance.md), [Premium Mobile Craft](../../knowledge/design/premium-mobile-craft.md), [Quality Lens](../../knowledge/design/quality-lens.md), [Engineering Orchestration](../../knowledge/engineering/engineering-orchestration.md), [Recommended Agent Skills](../../knowledge/engineering/recommended-agent-skills.md), [Eleven-Star Experience](../../knowledge/experience/eleven-star-experience.md), [Compound Engineering Routing](../../knowledge/orchestration/compound-engineering-routing.md), [Isolated Review](../../knowledge/orchestration/isolated-review.md), [Parallel Agent Orchestration](../../knowledge/orchestration/parallel-agent-orchestration.md), [Project State](../../knowledge/orchestration/project-state.md), [Engineering And Agent Orchestration](../../knowledge/process/tool-recipes/engineering-and-agent-orchestration.md)
 
 ### Backend data contract
 
@@ -894,7 +894,7 @@ _First for any iOS or Android device automation, run-the-app, screen-check, flow
 - **Consults:** —
 - **Produces:** `proof/`
 - **Gates:** `check:native-ios`, `check:mobai-proof-workflow`, `check:native-android`
-- **Knowledge:** [Design Acceptance Evidence](../../knowledge/design/design-acceptance.md), [Expo Operations Map](../../knowledge/engineering/expo-operations-map.md), [XcodeBuildMCP Testing](../../knowledge/engineering/xcodebuildmcp-testing.md), [Device Capture And Proof](../../knowledge/process/tool-recipes/device-capture-and-proof.md), [Apple Signing Release](../../knowledge/store/apple-signing-release.md)
+- **Knowledge:** [Design Acceptance Evidence](../../knowledge/design/design-acceptance.md), [XcodeBuildMCP Testing](../../knowledge/engineering/xcodebuildmcp-testing.md), [Device Capture And Proof](../../knowledge/process/tool-recipes/device-capture-and-proof.md), [Apple Signing Release](../../knowledge/store/apple-signing-release.md)
 
 ### Accessibility common-task proof
 
@@ -920,7 +920,7 @@ _Before beta or store submission on every mobile launch_
 - **Consults:** —
 - **Produces:** `engineering/APP_QUALITY.md`
 - **Gates:** —
-- **Knowledge:** [App Quality And Vitals](../../knowledge/engineering/app-quality.md), [Expo Operations Map](../../knowledge/engineering/expo-operations-map.md), [Distribution, Offer, And Signal Validation](../../knowledge/research/distribution-offer-signal.md)
+- **Knowledge:** [App Quality And Vitals](../../knowledge/engineering/app-quality.md), [Distribution, Offer, And Signal Validation](../../knowledge/research/distribution-offer-signal.md)
 
 ## App Store And Google Play
 

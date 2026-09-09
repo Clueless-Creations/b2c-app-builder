@@ -365,9 +365,9 @@ function operationSupport(): ExpoOperationSupport[] {
       title: "Continuous native generation",
       selection: "app-framework",
       platforms: ["ios", "android"],
-      evidenceTier: "researched",
+      evidenceTier: "blocked",
       queuedIssue: 82,
-      notes: "SDK 57 changelog: prebuild regenerates native directories by default. Verify the executed CLI.",
+      notes: "Blocked until #82. Do not run prebuild or treat changelog notes as an executable #81 route.",
     },
     {
       id: "custom-native-module",
@@ -509,9 +509,9 @@ function operationSupport(): ExpoOperationSupport[] {
       title: "Official Expo skills",
       selection: "app-framework",
       platforms: ["host"],
-      evidenceTier: "researched",
+      evidenceTier: "blocked",
       queuedIssue: 87,
-      notes: "Optional after founder approval for a selected Expo session. Not a global install during intake.",
+      notes: "Blocked until #87. Do not install expo/skills or treat a citation as a live #81 route.",
     },
     {
       id: "quality-observability",

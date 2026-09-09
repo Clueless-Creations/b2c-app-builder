@@ -7,9 +7,7 @@ load_when: when selecting Expo as the app stack rather than SwiftUI or Flutter, 
   shipping
 lifecycle: active
 bindings:
-  workflow_ids:
-    - workflow.engineering.engineering-orchestration-ce-production-readiness
-    - workflow.product.app-archetype-detection-and-starter
+  workflow_ids: []
   context_pack_ids:
     - context.engineering
 applicability_notes: Expo is a selectable app stack, not the default. Detection of an expo dependency is not

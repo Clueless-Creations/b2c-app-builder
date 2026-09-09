@@ -1196,7 +1196,6 @@ workflows:
       - state/business-state.json
     consults: []
     reference_ids:
-      - reference.engineering.expo-stack-selection
       - reference.product.core-loop-and-complete-scope
     role_id: role.mobile-engineer
     lane_ids:
@@ -3541,9 +3540,6 @@ workflows:
       - reference.design.premium-mobile-craft
       - reference.design.quality-lens
       - reference.engineering.engineering-orchestration
-      - reference.engineering.expo-compatibility
-      - reference.engineering.expo-operations-map
-      - reference.engineering.expo-stack-selection
       - reference.engineering.recommended-agent-skills
       - reference.experience.eleven-star-experience
       - reference.orchestration.compound-engineering-routing
@@ -3714,7 +3710,6 @@ workflows:
     consults: []
     reference_ids:
       - reference.design.design-acceptance
-      - reference.engineering.expo-operations-map
       - reference.engineering.xcodebuildmcp-testing
       - reference.process.tool-recipes.device-capture-and-proof
       - reference.store.apple-signing-release
@@ -3797,7 +3792,6 @@ workflows:
     consults: []
     reference_ids:
       - reference.engineering.app-quality
-      - reference.engineering.expo-operations-map
       - reference.research.distribution-offer-signal
     role_id: role.engineering-leader
     lane_ids:

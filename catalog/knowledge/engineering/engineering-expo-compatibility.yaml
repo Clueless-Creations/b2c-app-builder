@@ -7,8 +7,7 @@ load_when: when checking Expo SDK, React Native, Router, CLI, or CNG compatibili
   native customizations
 lifecycle: active
 bindings:
-  workflow_ids:
-    - workflow.engineering.engineering-orchestration-ce-production-readiness
+  workflow_ids: []
   context_pack_ids:
     - context.engineering
 applicability_notes: Keep observed latest, reviewed baseline, supported range, workspace pin, and executed

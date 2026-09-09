@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { composeCatalog } from "../../../catalog/index.js";
 import { readFirstpartyPackage } from "../../../catalog/packs/installed-firstparty.js";
 import {
   EXPO_APP_RUNTIME,
@@ -76,6 +77,26 @@ export function register(harness: Harness): void {
     assert(!withEas.idleUnselectedServices.includes("eas-build"), "selected EAS Build is not idle");
     assert(withEas.idleUnselectedServices.includes("eas-update"), "unselected EAS Update stays idle");
     assert(operationFor(withEas, "eas-cloud-build").queuedIssue === 84, "EAS execution remains #84");
+    assert(operationFor(selected, "cng-prebuild").evidenceTier === "blocked", "CNG must stay blocked until #82");
+    assert(operationFor(selected, "official-skills").evidenceTier === "blocked", "official skills must stay blocked until #87");
+  });
+
+  harness.check("expo selection: Expo knowledge is not required guidance on SwiftUI-default workflows", () => {
+    const catalog = composeCatalog(skillRoot);
+    const swiftuiDefaultWorkflows = [
+      "workflow.product.app-archetype-detection-and-starter",
+      "workflow.engineering.native-ios-proof-route-ladder",
+      "workflow.engineering.app-quality-and-vitals",
+      "workflow.engineering.engineering-orchestration-ce-production-readiness",
+    ] as const;
+    for (const workflowId of swiftuiDefaultWorkflows) {
+      const workflow = catalog.workflows.find((entry) => entry.id === workflowId);
+      assert(workflow, `expected ${workflowId} in the composed catalog`);
+      const expoRefs = (workflow?.referenceIds ?? []).filter((id) =>
+        (EXPO_KNOWLEDGE_REFERENCE_IDS as readonly string[]).includes(id),
+      );
+      assert(expoRefs.length === 0, `${workflowId} must not list Expo refs as required guidance; got ${expoRefs.join(", ")}`);
+    }
   });
 
   harness.check("expo selection: missing or mismatched SDK pins are incompatibilities, never automatic upgrades", () => {

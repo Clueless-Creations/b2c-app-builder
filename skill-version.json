@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.25",
+  "version": "0.219.26",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Decode EAS CLI responses by command-specific envelopes instead of assuming one JSON object.",
-    "Keep paid-job identity, artifacts, and uncertainty command-specific so a matching build is never taken from array[0]."
+    "Persist prepared EAS intent on the job ledger before spawn so a fresh process cannot start a second paid job.",
+    "Compare the full request identity before reuse so a changed binding with the same key is refused."
   ]
 }

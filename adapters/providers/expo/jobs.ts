@@ -1,9 +1,17 @@
 /**
  * Persist EAS remote job identity and reconcile before retry.
  *
- * Upstream EAS is not treated as idempotent. A timeout after the process was accepted is
- * uncertain until build:view / workflow:status / submit:view reads the stored id. A remote
- * id that cannot be read stays mutation-uncertain. Paid and public effects are never replayed.
+ * Persistence owner: this ledger (workspace `.b2c/expo-eas-jobs.json` by default).
+ * It is subordinate provider execution data, not a kernel operation journal, not
+ * business acceptance, and not a generic provider scheduler. Coordinate #104: the
+ * same persist-before-effect, full request identity, and resume-observation rules
+ * apply there; do not extract a shared journal until both proving cases match.
+ *
+ * Upstream EAS is not treated as idempotent. Bind the full request identity before
+ * lookup. Persist prepared/dispatched intent before spawn. A timeout after the
+ * process was accepted is uncertain until build:view / workflow:status / submit:view
+ * reads the stored id. Unknown remote acceptance is not "no effect". Paid and public
+ * effects are never replayed.
  */
 
 import { closeSync, existsSync, fsyncSync, lstatSync, mkdirSync, openSync, readFileSync, renameSync, writeFileSync } from "node:fs";
@@ -24,6 +32,8 @@ export interface EasJobBinding {
   readonly runtimeVersion?: string;
   readonly commandId: ExpoEasCommandId;
   readonly easProjectId?: string;
+  readonly workflowRelativePath?: string;
+  readonly autoSubmit?: boolean;
 }
 
 export interface EasJobEntry {
@@ -31,6 +41,7 @@ export interface EasJobEntry {
   readonly remoteId?: string;
   readonly state: EasRemoteJobState;
   readonly binding: EasJobBinding;
+  readonly requestIdentity: string;
   readonly calls: number;
   readonly replays: number;
   readonly artifactUrl?: string;
@@ -41,7 +52,8 @@ export type EasJobReconciliation =
   | { readonly action: "proceed"; readonly reason: "no_prior_request" }
   | { readonly action: "reuse"; readonly entry: EasJobEntry }
   | { readonly action: "reconciled"; readonly entry: EasJobEntry }
-  | { readonly action: "uncertain"; readonly entry: EasJobEntry; readonly reason: "remote_id_unread" };
+  | { readonly action: "uncertain"; readonly entry: EasJobEntry; readonly reason: "remote_id_unread" | "dispatched_unconfirmed" }
+  | { readonly action: "conflict"; readonly entry: EasJobEntry; readonly reason: "request_identity_mismatch" };
 
 export interface EasJobRead {
   readonly state: EasRemoteJobState;
@@ -61,21 +73,41 @@ function assertNoSymlink(file: string): void {
   if (existsSync(file) && lstatSync(file).isSymbolicLink()) throw new Error("expo.eas_ledger_symlink_refused");
 }
 
-export function fingerprintBinding(binding: Omit<EasJobBinding, "commandId"> & { commandId: ExpoEasCommandId; sourceBytes: string }): string {
+function normalizedBinding(binding: EasJobBinding): Record<string, string | boolean> {
+  return {
+    sourceFingerprint: binding.sourceFingerprint,
+    profile: binding.profile,
+    platform: binding.platform,
+    environment: binding.environment,
+    artifactKind: binding.artifactKind,
+    runtimeVersion: binding.runtimeVersion ?? "",
+    commandId: binding.commandId,
+    easProjectId: binding.easProjectId ?? "",
+    workflowRelativePath: binding.workflowRelativePath ?? "",
+    autoSubmit: binding.autoSubmit === true,
+  };
+}
+
+/** Canonical identity of one EAS effect. Compared in full on every reuse path. */
+export function canonicalEasRequestIdentity(binding: EasJobBinding): string {
   return createHash("sha256")
-    .update(
-      JSON.stringify({
-        source: binding.sourceBytes,
-        profile: binding.profile,
-        platform: binding.platform,
-        environment: binding.environment,
-        artifactKind: binding.artifactKind,
-        runtimeVersion: binding.runtimeVersion ?? "",
-        commandId: binding.commandId,
-        easProjectId: binding.easProjectId ?? "",
-      }),
-    )
+    .update(JSON.stringify(normalizedBinding(binding)))
     .digest("hex");
+}
+
+export function easBindingsMatch(left: EasJobBinding, right: EasJobBinding): boolean {
+  return canonicalEasRequestIdentity(left) === canonicalEasRequestIdentity(right);
+}
+
+export function fingerprintBinding(binding: Omit<EasJobBinding, "sourceFingerprint"> & { sourceBytes: string }): string {
+  return canonicalEasRequestIdentity({
+    ...binding,
+    sourceFingerprint: createHash("sha256").update(binding.sourceBytes).digest("hex"),
+  });
+}
+
+function withIdentity(entry: Omit<EasJobEntry, "requestIdentity"> & { requestIdentity?: string }): EasJobEntry {
+  return { ...entry, requestIdentity: canonicalEasRequestIdentity(entry.binding) };
 }
 
 export function mapEasBuildStatus(status: string | undefined): EasRemoteJobState | "invalid" {
@@ -106,8 +138,13 @@ export function mapEasBuildStatus(status: string | undefined): EasRemoteJobState
   }
 }
 
+function isNonTerminal(state: EasRemoteJobState): boolean {
+  return state === "queued" || state === "running";
+}
+
 export class EasJobLedger {
   readonly #entries = new Map<string, EasJobEntry>();
+  readonly #inflight = new Set<string>();
   readonly #now: () => string;
 
   constructor(options: { now?: () => string } = {}) {
@@ -133,6 +170,10 @@ export class EasJobLedger {
     return [...this.#entries.values()];
   }
 
+  inflight(idempotencyKey: string): boolean {
+    return this.#inflight.has(idempotencyKey);
+  }
+
   load(file: string): void {
     assertNoSymlink(file);
     this.#entries.clear();
@@ -140,8 +181,8 @@ export class EasJobLedger {
     const parsed = JSON.parse(readFileSync(file, "utf8")) as Partial<LedgerFile>;
     if (parsed.schemaVersion !== "b2c.eas-job-ledger/v1" || !Array.isArray(parsed.entries)) throw new Error("expo.eas_ledger_invalid");
     for (const entry of parsed.entries) {
-      if (!entry || typeof entry.idempotencyKey !== "string") throw new Error("expo.eas_ledger_invalid");
-      this.#entries.set(entry.idempotencyKey, entry);
+      if (!entry || typeof entry.idempotencyKey !== "string" || !entry.binding) throw new Error("expo.eas_ledger_invalid");
+      this.#entries.set(entry.idempotencyKey, withIdentity(entry));
     }
   }
 
@@ -160,14 +201,43 @@ export class EasJobLedger {
     renameSync(temporary, file);
   }
 
+  /**
+   * Claim the logical request before a remote effect. Same-process overlapping
+   * dispatch is refused via the in-memory lease; crash recovery uses the persisted entry.
+   */
+  bindIntent(idempotencyKey: string, binding: EasJobBinding): EasJobEntry {
+    if (!idempotencyKey.trim()) throw new Error("expo.eas_idempotency_key_required");
+    const previous = this.#entries.get(idempotencyKey);
+    if (previous && !easBindingsMatch(previous.binding, binding)) {
+      throw new Error("expo.eas_request_identity_conflict");
+    }
+    this.#inflight.add(idempotencyKey);
+    if (previous) return previous;
+    const at = this.#now();
+    const entry = withIdentity({
+      idempotencyKey,
+      state: "uncertain",
+      binding,
+      calls: 1,
+      replays: 0,
+      history: [{ at, event: "bound", state: "uncertain" }],
+    });
+    this.#entries.set(idempotencyKey, entry);
+    return entry;
+  }
+
+  release(idempotencyKey: string): void {
+    this.#inflight.delete(idempotencyKey);
+  }
+
   record(idempotencyKey: string, binding: EasJobBinding, update: { remoteId?: string; state: EasRemoteJobState; artifactUrl?: string }): EasJobEntry {
     if (!idempotencyKey.trim()) throw new Error("expo.eas_idempotency_key_required");
     const previous = this.#entries.get(idempotencyKey);
-    if (previous && previous.binding.sourceFingerprint !== binding.sourceFingerprint) {
-      throw new Error("expo.eas_binding_mismatch");
+    if (previous && !easBindingsMatch(previous.binding, binding)) {
+      throw new Error("expo.eas_request_identity_conflict");
     }
     const at = this.#now();
-    const entry: EasJobEntry = {
+    const entry = withIdentity({
       idempotencyKey,
       remoteId: update.remoteId ?? previous?.remoteId,
       state: update.state,
@@ -176,7 +246,7 @@ export class EasJobLedger {
       replays: previous?.replays ?? 0,
       ...(update.artifactUrl ? { artifactUrl: update.artifactUrl } : previous?.artifactUrl ? { artifactUrl: previous.artifactUrl } : {}),
       history: [...(previous?.history ?? []), { at, event: "recorded", state: update.state, remoteId: update.remoteId }],
-    };
+    });
     this.#entries.set(idempotencyKey, entry);
     return entry;
   }
@@ -184,38 +254,73 @@ export class EasJobLedger {
   observe(remoteId: string, job: EasJobRead): EasJobEntry | undefined {
     const entry = this.byRemoteId(remoteId);
     if (!entry) return undefined;
-    const next: EasJobEntry = {
+    const next = withIdentity({
       ...entry,
       state: job.state,
       ...(job.artifactUrl ? { artifactUrl: job.artifactUrl } : {}),
       history: [...entry.history, { at: this.#now(), event: "observed", state: job.state, remoteId }],
-    };
+    });
     this.#entries.set(entry.idempotencyKey, next);
     return next;
   }
 
-  reconcile(transport: EasJobTransport, idempotencyKey: string): EasJobReconciliation {
+  reconcile(transport: EasJobTransport, idempotencyKey: string, binding: EasJobBinding): EasJobReconciliation {
+    const inflight = this.#inflight.has(idempotencyKey);
     const entry = this.#entries.get(idempotencyKey);
-    if (!entry) return { action: "proceed", reason: "no_prior_request" };
-    if (entry.state !== "uncertain") return { action: "reuse", entry };
-    if (!entry.remoteId) throw new Error("expo.eas_reconcile_unresolved");
+    if (!entry) {
+      if (inflight) throw new Error("expo.eas_lease_held");
+      return { action: "proceed", reason: "no_prior_request" };
+    }
+    if (!easBindingsMatch(entry.binding, binding)) {
+      return { action: "conflict", entry, reason: "request_identity_mismatch" };
+    }
+    if (inflight && !entry.remoteId) {
+      return { action: "uncertain", entry, reason: "dispatched_unconfirmed" };
+    }
+    if (entry.state === "uncertain") {
+      if (!entry.remoteId) return { action: "uncertain", entry, reason: "dispatched_unconfirmed" };
+      return this.#readback(transport, idempotencyKey, entry);
+    }
+    if (isNonTerminal(entry.state) || entry.state === "finished") {
+      return this.#refresh(transport, entry);
+    }
+    return { action: "reuse", entry };
+  }
+
+  #readback(transport: EasJobTransport, idempotencyKey: string, entry: EasJobEntry): EasJobReconciliation {
+    if (!entry.remoteId) return { action: "uncertain", entry, reason: "dispatched_unconfirmed" };
     const job = transport.readJob(entry.remoteId);
     if (job) {
-      const reconciled: EasJobEntry = {
+      const reconciled = withIdentity({
         ...entry,
         state: job.state,
         ...(job.artifactUrl ? { artifactUrl: job.artifactUrl } : {}),
         history: [...entry.history, { at: this.#now(), event: "reconciled", state: job.state, remoteId: entry.remoteId }],
-      };
+      });
       this.#entries.set(idempotencyKey, reconciled);
       return { action: "reconciled", entry: reconciled };
     }
-    const unread: EasJobEntry = {
+    const unread = withIdentity({
       ...entry,
       history: [...entry.history, { at: this.#now(), event: "remote-id-unread", state: entry.state, remoteId: entry.remoteId }],
-    };
+    });
     this.#entries.set(idempotencyKey, unread);
     return { action: "uncertain", entry: unread, reason: "remote_id_unread" };
+  }
+
+  #refresh(transport: EasJobTransport, entry: EasJobEntry): EasJobReconciliation {
+    if (!entry.remoteId) return { action: "uncertain", entry, reason: "dispatched_unconfirmed" };
+    const job = transport.readJob(entry.remoteId);
+    if (job) {
+      const refreshed = this.observe(entry.remoteId, job);
+      return { action: "reconciled", entry: refreshed ?? entry };
+    }
+    const missed = withIdentity({
+      ...entry,
+      history: [...entry.history, { at: this.#now(), event: "observe-missed", state: entry.state, remoteId: entry.remoteId }],
+    });
+    this.#entries.set(entry.idempotencyKey, missed);
+    return { action: "reuse", entry: missed };
   }
 }
 

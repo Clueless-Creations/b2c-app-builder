@@ -182,6 +182,7 @@ export function register(harness: Harness): void {
       intent: "reconcile-catalog",
       createIfMissing: true,
       idempotencyKey: "rc-create-k",
+      offeringCreate: { lookupKey: "default", displayName: "Default" },
     });
     const first = runRevenueCatCatalogSession(request);
     assert(first.evidence.created === true, "create must be recorded");
@@ -219,7 +220,7 @@ export function register(harness: Harness): void {
       idempotencyKey: "rc-pre",
       ledger,
     });
-    assert(pre.invoked === false, "missing offering id must not spawn");
+    assert(pre.invoked === false, "missing lookup-key must not spawn");
     assert(pre.effectProgress === "no-effect", `progress ${pre.effectProgress}`);
     assert(pre.replaySafe === true, "pre-spawn refusal is replay-safe");
     assert(offeringsCreateCount(calls) === 0, "no create spawn");
@@ -233,7 +234,8 @@ export function register(harness: Harness): void {
     const post = runRevenueCatCli({
       operationId: "rc.catalog.create",
       projectId: "proj_approved",
-      offeringId: "off_default",
+      lookupKey: "default",
+      displayName: "Default",
       hostAuthorityGranted: true,
       executable: "/opt/fake/bin/rc",
       cwd: home,
@@ -665,7 +667,8 @@ export function register(harness: Harness): void {
     const first = runRevenueCatCli({
       operationId: "rc.catalog.create",
       projectId: "proj_approved",
-      offeringId: "off_default",
+      lookupKey: "default",
+      displayName: "Default",
       hostAuthorityGranted: true,
       executable: "/opt/fake/bin/rc",
       cwd: home,
@@ -681,7 +684,8 @@ export function register(harness: Harness): void {
     const second = runRevenueCatCli({
       operationId: "rc.catalog.create",
       projectId: "proj_approved",
-      offeringId: "off_default",
+      lookupKey: "default",
+      displayName: "Default",
       hostAuthorityGranted: true,
       executable: "/opt/fake/bin/rc",
       cwd: home,

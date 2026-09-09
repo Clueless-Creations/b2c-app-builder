@@ -99,8 +99,10 @@ Use composition activation to change an installed execution contract.
 network calls or writes. Ready means eligible at this snapshot; it does not grant
 authority or promise execution. Initialized results add hold classification (`holdKind`),
 bounded `detail`, an optional sanitized `lastFailure`, bounded ready `brief` objects,
-and at most one `founderQuestion` bound to `appliesToRevision`. The historical `reason`
-sentence on held work is unchanged. Missing additive fields remain valid for older
+and at most one `founderQuestion` bound to `appliesToRevision`. Question and brief
+truncation is flagged and does not invent completeness. A `lastFailure` summary is
+redacted at this boundary; `withheld` is true when it is not the unsanitized error.
+The historical `reason` sentence on held work is unchanged. Missing additive fields remain valid for older
 saved results. `business.evidence` reports current, stale, pending
 or absent acceptance without exposing raw state or worker errors. A failed attempt
 carries `attempt.failed` and one classified `worker.*` or `attempt.error` reason code. Synthetic proof

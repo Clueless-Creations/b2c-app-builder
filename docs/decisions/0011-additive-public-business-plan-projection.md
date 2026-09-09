@@ -36,10 +36,15 @@ Initialized `business.plan` data may include:
 
 - `held[].holdKind`: `founder_approval` | `autonomy` | `blocked` | `upstream`
 - `held[].detail` and optional `detailTruncated`
-- `held[].lastFailure`: `{ summary, withheld, truncated, code? }`
+- `held[].lastFailure`: `{ summary, withheld, truncated, code? }`. Summary is
+  redacted at the public boundary against the repository secret-like set plus
+  cloud access-key prefixes. `withheld` is true when that summary is not
+  identical to the unsanitized attempt error.
 - `ready[].brief`: bounded workflow identity, workspace-relative paths,
-  knowledge selectors, verification, and `truncated`
+  knowledge selectors, verification, and `truncated` (including sliced
+  approval or gate-command strings)
 - `founderQuestion`: the validated engine question plus `appliesToRevision`
+  and optional `truncated` when prompt, phase, or choice text was sliced
 
 `reason` on held items stays the historical generic sentence. `authorityGranted`
 stays `false`. `providerObservation` stays `not_requested`. Planning remains

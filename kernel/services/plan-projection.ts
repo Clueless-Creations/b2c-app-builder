@@ -72,14 +72,14 @@ export function projectHeldWork(node: HeldNode): BusinessPlan["held"][number] {
 }
 
 function projectLastFailure(node: HeldNode): BusinessPlan["held"][number]["lastFailure"] {
-  if (!node.lastFailure && !node.lastFailureCode) return undefined;
-  const original = node.lastFailure ?? "";
-  const bounded = boundText(original || "The attempt failed without a recorded error.", PUBLIC_PLAN_BOUNDS.failureSummary);
+  if (!node.lastFailure && !node.lastFailureCode && node.lastFailureRaw === undefined) return undefined;
+  const unsanitized = node.lastFailureRaw ?? node.lastFailure ?? "";
+  const bounded = boundText(unsanitized || "The attempt failed without a recorded error.", PUBLIC_PLAN_BOUNDS.failureSummary);
   const parsed = node.lastFailureCode ? publicAttemptFailureCodeSchema.safeParse(node.lastFailureCode) : undefined;
-  const withheld = redactSensitiveText(original) !== original.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, "");
+  const summary = bounded.text || "The attempt failed. The recorded error was withheld.";
   return {
-    summary: bounded.text || "The attempt failed. The recorded error was withheld.",
-    withheld: withheld || !bounded.text,
+    summary,
+    withheld: summary !== unsanitized,
     truncated: bounded.truncated,
     ...(parsed?.success ? { code: parsed.data } : {}),
   };
@@ -91,30 +91,42 @@ export function projectReadyBrief(brief: NodeBrief): PublicReadyBrief {
   const consult = projectPaths(brief.consult);
   const produce = projectPaths(brief.produce);
   const loadSource = brief.load.slice(0, PUBLIC_PLAN_BOUNDS.loadEntries);
+  let loadFieldsTruncated = brief.load.length !== loadSource.length;
   const load = loadSource.flatMap((entry) => {
-    if (!isSafeWorkspacePath(entry.path)) return [];
+    if (!isSafeWorkspacePath(entry.path)) {
+      loadFieldsTruncated = true;
+      return [];
+    }
     const path = boundText(entry.path, PUBLIC_PLAN_BOUNDS.path);
+    const title = boundText(entry.title, PUBLIC_PLAN_BOUNDS.detail);
     const loadWhen = boundText(entry.loadWhen, PUBLIC_PLAN_BOUNDS.loadWhen);
+    const sectionId = entry.sectionId ? boundText(entry.sectionId, 160) : undefined;
+    const revision = entry.revision ? boundText(entry.revision, 160) : undefined;
+    if (path.truncated || title.truncated || loadWhen.truncated || sectionId?.truncated || revision?.truncated) loadFieldsTruncated = true;
     return [
       {
         path: path.text,
-        title: boundText(entry.title, PUBLIC_PLAN_BOUNDS.detail).text || "Untitled",
+        title: title.text || "Untitled",
         loadWhen: loadWhen.text,
-        ...(entry.sectionId ? { sectionId: boundText(entry.sectionId, 160).text } : {}),
-        ...(entry.revision ? { revision: boundText(entry.revision, 160).text } : {}),
+        ...(sectionId ? { sectionId: sectionId.text } : {}),
+        ...(revision ? { revision: revision.text } : {}),
       },
     ];
   });
   const approvalsSource = brief.approvals.slice(0, PUBLIC_PLAN_BOUNDS.approvals);
   const gateCommands = brief.verify.gateCommands.filter((command) => isSafeWorkspacePath(command) || !command.includes("/")).slice(0, PUBLIC_PLAN_BOUNDS.gateCommands);
+  const approvals = approvalsSource.map((approval) => boundText(approval, 400));
+  const gates = gateCommands.map((command) => boundText(command, 240));
   const truncated =
     instructions.truncated ||
     open.truncated ||
     consult.truncated ||
     produce.truncated ||
-    brief.load.length !== load.length ||
+    loadFieldsTruncated ||
     brief.approvals.length !== approvalsSource.length ||
-    brief.verify.gateCommands.length !== gateCommands.length;
+    brief.verify.gateCommands.length !== gateCommands.length ||
+    approvals.some((entry) => entry.truncated) ||
+    gates.some((entry) => entry.truncated);
   return {
     workflowId: brief.workflowId,
     title: brief.title,
@@ -125,11 +137,11 @@ export function projectReadyBrief(brief: NodeBrief): PublicReadyBrief {
     produce: produce.paths,
     verify: {
       kind: brief.verify.kind,
-      gateCommands: gateCommands.map((command) => boundText(command, 240).text),
+      gateCommands: gates.map((command) => command.text),
       failClosed: brief.verify.failClosed,
       ...(brief.verify.requiresIndependentReview ? { requiresIndependentReview: true } : {}),
     },
-    approvals: approvalsSource.map((approval) => boundText(approval, 400).text),
+    approvals: approvals.map((approval) => approval.text),
     truncated,
   };
 }
@@ -140,20 +152,26 @@ export function projectFounderQuestion(question: FounderQuestion, revision: stri
   if (!parsedClass.success) return null;
   const prompt = boundText(question.prompt, PUBLIC_PLAN_BOUNDS.prompt);
   if (!prompt.text) return null;
-  const choices = question.choices.map((choice) => ({
-    label: boundText(choice.label, PUBLIC_PLAN_BOUNDS.choiceLabel).text,
-    consequence: boundText(choice.consequence, PUBLIC_PLAN_BOUNDS.choiceConsequence).text,
+  const phase = boundText(question.phase, 160);
+  const choiceBounds = question.choices.map((choice) => ({
+    label: boundText(choice.label, PUBLIC_PLAN_BOUNDS.choiceLabel),
+    consequence: boundText(choice.consequence, PUBLIC_PLAN_BOUNDS.choiceConsequence),
     recommended: choice.recommended,
   }));
-  if (choices.some((choice) => !choice.label || !choice.consequence)) return null;
+  if (choiceBounds.some((choice) => !choice.label.text || !choice.consequence.text)) return null;
   return {
-    phase: boundText(question.phase, 160).text,
+    phase: phase.text,
     class: parsedClass.data,
     prompt: prompt.text,
-    choices,
+    choices: choiceBounds.map((choice) => ({
+      label: choice.label.text,
+      consequence: choice.consequence.text,
+      recommended: choice.recommended,
+    })),
     skippable: question.skippable,
     deferrable: question.deferrable,
     appliesToRevision: revision,
+    truncated: prompt.truncated || phase.truncated || choiceBounds.some((choice) => choice.label.truncated || choice.consequence.truncated),
   };
 }
 

@@ -24,12 +24,20 @@ import {
   publicFounderQuestionClasses,
   publicHoldKinds,
 } from "../../../contracts/public-api/contract.js";
-import { projectHeldWork, projectReadyBrief, PUBLIC_HELD_REASON } from "../../../kernel/services/plan-projection.js";
+import { projectFounderQuestion, projectHeldWork, projectReadyBrief, PUBLIC_HELD_REASON } from "../../../kernel/services/plan-projection.js";
 import { attemptFailureCodes } from "../../../kernel/session/attempt-failure.js";
 import { founderQuestionClasses } from "../../../kernel/session/founder-gate.js";
 import type { HeldNode } from "../../../kernel/session/plan.js";
 import type { NodeBrief } from "../../../kernel/engine/node-brief.js";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
+/** Built by concatenation so this file does not carry a raw-secret-shaped literal. */
+function fabricatedSecretLikeShapes() {
+  return {
+    webhook: ["whsec", "abcdefghijkl1234567890"].join("_"),
+    pem: ["-----BEGIN RSA", "PRIVATE KEY-----"].join(" "),
+    cloud: ["AKIA", "EXAMPLEKEY000000"].join(""),
+  };
+}
 function data(operation: Parameters<typeof callPublicOperation>[0], input: unknown): any {
   const result = callPublicOperation(operation, input);
   assert(result.ok, JSON.stringify(result));
@@ -344,6 +352,7 @@ test("public plan projects distinct hold kinds, ready briefs, and a revision-bou
     const nodeId = `run.${target.workflowId.slice("workflow.".length)}`;
     const node = seeded.nodes[nodeId];
     assert(node, nodeId);
+    const secretLike = fabricatedSecretLikeShapes();
     node.attempts.push({
       id: "fixture-failed-attempt",
       nodeId,
@@ -354,9 +363,7 @@ test("public plan projects distinct hold kinds, ready briefs, and a revision-bou
       ttlSeconds: 300,
       inputFingerprint: `sha256:${"0".repeat(64)}`,
       evidence: [],
-      error:
-        // Fabricated values must not match SECRET_LIKE (sk_test_/ghp_ live-looking shapes).
-        "worker exited 1: api_key=fixture-not-a-live-token password=hunter2 Bearer fabricated-bearer-token-value-99 operator@example.com /Users/someone/secret.env \u0007",
+      error: `worker exited 1: api_key=fixture-not-a-live-token password=hunter2 Bearer fabricated-bearer-token-value-99 webhook=${secretLike.webhook} ${secretLike.pem} cloud=${secretLike.cloud} operator@example.com /Users/someone/secret.env \u0007`,
       readbackRequired: false,
     });
     mkdirSync(path.dirname(paths.runState), { recursive: true });
@@ -366,10 +373,14 @@ test("public plan projects distinct hold kinds, ready briefs, and a revision-bou
     assert.deepEqual(snapshotPlanInputs(env.directory), afterSeed, "planning a failed attempt must not write");
     const failed = afterFailure.held.find((item: { workflowId: string }) => item.workflowId === target.workflowId);
     assert(failed?.lastFailure?.summary, JSON.stringify(failed));
+    assert.equal(failed?.lastFailure?.withheld, true, JSON.stringify(failed?.lastFailure));
     const encoded = JSON.stringify(afterFailure);
     assert(!encoded.includes("fixture-not-a-live-token"));
     assert(!encoded.includes("fabricated-bearer-token-value-99"));
     assert(!encoded.includes("hunter2"));
+    assert(!encoded.includes(secretLike.webhook), encoded);
+    assert(!encoded.includes(secretLike.pem), encoded);
+    assert(!encoded.includes(secretLike.cloud), encoded);
     assert(!encoded.includes("operator@example.com"));
     assert(!encoded.includes("/Users/someone/secret.env"));
     assert(!encoded.includes("\u0007"));
@@ -411,6 +422,7 @@ test("public plan schema stays additive and bounds unsafe planner text", () => {
     nextAction: "Resolve the reported holds; this passive plan did not observe provider prerequisites.",
   };
   assert.deepEqual(businessPlanSchema.parse(oldPlan).held[0], oldPlan.held[0]);
+  const secretLike = fabricatedSecretLikeShapes();
   const dirty: HeldNode = {
     nodeId: "run.fixture.hold",
     workflowId: "workflow.fixture.hold",
@@ -418,7 +430,8 @@ test("public plan schema stays additive and bounds unsafe planner text", () => {
     domainId: "domain.engineering",
     reason: "autonomy",
     detail: `${"n".repeat(500)} api_key=fixture-not-a-live-token`,
-    lastFailure: "worker exited 1: password=hunter2 /Users/someone/secret.env",
+    lastFailure: "worker exited 1: summarized",
+    lastFailureRaw: `worker exited 1: password=hunter2 /Users/someone/secret.env webhook=${secretLike.webhook} ${secretLike.pem} ${secretLike.cloud}`,
     lastFailureCode: "worker.exited",
   };
   const projected = projectHeldWork(dirty);
@@ -427,9 +440,17 @@ test("public plan schema stays additive and bounds unsafe planner text", () => {
   assert(projected.detailTruncated);
   assert((projected.detail?.length ?? 0) <= 400);
   assert(!projected.detail?.includes("fixture-not-a-live-token"));
+  assert.equal(projected.lastFailure?.withheld, true);
   assert(projected.lastFailure?.truncated === false || projected.lastFailure?.summary);
   assert(!projected.lastFailure?.summary.includes("hunter2"));
   assert(!projected.lastFailure?.summary.includes("/Users/someone"));
+  assert(!projected.lastFailure?.summary.includes(secretLike.webhook));
+  assert(!projected.lastFailure?.summary.includes(secretLike.pem));
+  assert(!projected.lastFailure?.summary.includes(secretLike.cloud));
+  const encodedHeld = JSON.stringify(projected);
+  assert(!encodedHeld.includes(secretLike.webhook));
+  assert(!encodedHeld.includes(secretLike.pem));
+  assert(!encodedHeld.includes(secretLike.cloud));
   const unobserved = projectHeldWork({
     nodeId: "run.fixture.unobserved",
     workflowId: "workflow.fixture.unobserved",
@@ -463,4 +484,41 @@ test("public plan schema stays additive and bounds unsafe planner text", () => {
   assert.deepEqual(brief.open, ["operations/LAUNCH_PROGRAM.md"]);
   assert.deepEqual(brief.produce, ["PRODUCT.md"]);
   assert.deepEqual(brief.verify.gateCommands, ["check:catalog"]);
+  const slicedBrief = projectReadyBrief({
+    workflowId: "workflow.fixture.sliced",
+    title: "Sliced fixture",
+    contractFiles: [],
+    instructions: "Do this.",
+    open: [],
+    consult: [],
+    load: [],
+    route: [],
+    skills: [],
+    tools: [],
+    produce: [],
+    verify: { kind: "none", gateCommands: [`check:${"c".repeat(240)}`], failClosed: true },
+    approvals: ["A".repeat(500)],
+    tokenBudget: 8_000,
+  } satisfies NodeBrief);
+  assert.equal(slicedBrief.truncated, true);
+  assert(slicedBrief.approvals[0]?.endsWith("…"));
+  assert(slicedBrief.verify.gateCommands[0]?.endsWith("…"));
+  const question = projectFounderQuestion(
+    {
+      phase: "operating",
+      class: "confirm-approval",
+      prompt: "Should this proceed? ".repeat(40),
+      choices: [
+        { label: "Y".repeat(200), consequence: "C".repeat(300), recommended: true },
+        { label: "No", consequence: "Leave this hold in place.", recommended: false },
+      ],
+      skippable: false,
+      deferrable: false,
+    },
+    `sha256:${"a".repeat(64)}`,
+  );
+  assert(question);
+  assert.equal(question.truncated, true);
+  assert(question.prompt.endsWith("…"));
+  assert((question.prompt.length ?? 0) <= 400);
 });

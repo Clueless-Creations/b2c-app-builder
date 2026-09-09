@@ -1,5 +1,5 @@
 import { assert, type Harness } from "./_harness.js";
-import { classifyAttemptFailure, summarizeAttemptFailure } from "../../../kernel/session/attempt-failure.js";
+import { classifyAttemptFailure, redactSensitiveText, summarizeAttemptFailure } from "../../../kernel/session/attempt-failure.js";
 
 const CODEX_STDERR = [
   'codex worker exited 1: eon.tech/.well-known/oauth-protected-resource/mcp\\"" })',
@@ -35,5 +35,10 @@ export function register(harness: Harness): void {
     );
     assert(!redacted.includes("sk-abcdefghijklmnop1234") && !redacted.includes("abc123secret"), `secrets must be redacted: ${redacted}`);
     assert(summarizeAttemptFailure(undefined) === "The attempt failed without a recorded error.", "an absent error has a fixed summary");
+    const webhook = ["whsec", "abcdefghijkl1234567890"].join("_");
+    const pem = ["-----BEGIN RSA", "PRIVATE KEY-----"].join(" ");
+    const cloud = ["AKIA", "EXAMPLEKEY000000"].join("");
+    const redactedShapes = redactSensitiveText(`worker exited 1: ${webhook} ${pem} ${cloud}`);
+    assert(!redactedShapes.includes(webhook) && !redactedShapes.includes(pem) && !redactedShapes.includes(cloud), `secret-like shapes must be redacted: ${redactedShapes}`);
   });
 }

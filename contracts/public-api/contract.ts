@@ -331,6 +331,7 @@ export const publicFounderQuestionSchema = z.strictObject({
   skippable: z.boolean(),
   deferrable: z.boolean(),
   appliesToRevision: lifecycleRevisionSchema,
+  truncated: z.boolean().optional(),
 });
 export const businessCreateInputSchema = businessStatusInputSchema.extend({
   directory: z.string().min(1).max(4096),

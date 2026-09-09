@@ -91,6 +91,8 @@ export interface HeldNode {
   /** Sanitized one-line summary of the latest failed attempt, when the last attempt failed. */
   readonly lastFailure?: string;
   readonly lastFailureCode?: AttemptFailureCode;
+  /** Unsanitized last attempt error. Public projection redacts this; it is never returned on the wire. */
+  readonly lastFailureRaw?: string;
 }
 
 export interface PlanReport {
@@ -121,6 +123,7 @@ function describe(
   reasonCode?: string,
   lastFailure?: string,
   lastFailureCode?: AttemptFailureCode,
+  lastFailureRaw?: string,
 ): HeldNode {
   return {
     nodeId: node.id,
@@ -130,7 +133,13 @@ function describe(
     reason,
     detail,
     reasonCode,
-    ...(lastFailure ? { lastFailure, ...(lastFailureCode ? { lastFailureCode } : {}) } : {}),
+    ...(lastFailure
+      ? {
+          lastFailure,
+          ...(lastFailureCode ? { lastFailureCode } : {}),
+          ...(lastFailureRaw !== undefined ? { lastFailureRaw } : {}),
+        }
+      : {}),
   };
 }
 
@@ -302,16 +311,25 @@ export function buildPlanReport(
     const lastAttempt = state?.attempts.at(-1);
     const lastFailure = lastAttempt?.status === "failed" ? summarizeAttemptFailure(lastAttempt.error) : undefined;
     const lastFailureCode = lastAttempt?.status === "failed" ? classifyAttemptFailure(lastAttempt.error) : undefined;
+    const lastFailureRaw = lastAttempt?.status === "failed" ? (lastAttempt.error ?? "") : undefined;
 
     if (status === "waiting_founder") {
       const approval = node.approvals.map((item) => item.description).join("; ");
       held.push(
-        describe(node, "founder_approval", approval || state?.blocker || "Waiting on a founder decision.", undefined, lastFailure, lastFailureCode),
+        describe(
+          node,
+          "founder_approval",
+          approval || state?.blocker || "Waiting on a founder decision.",
+          undefined,
+          lastFailure,
+          lastFailureCode,
+          lastFailureRaw,
+        ),
       );
     } else if (parkReason !== undefined) {
-      held.push(describe(node, "autonomy", parkReason, decision?.reasonCode, lastFailure, lastFailureCode));
+      held.push(describe(node, "autonomy", parkReason, decision?.reasonCode, lastFailure, lastFailureCode, lastFailureRaw));
     } else if (status === "blocked") {
-      held.push(describe(node, "blocked", state?.blocker ?? "Blocked.", decision?.reasonCode, lastFailure, lastFailureCode));
+      held.push(describe(node, "blocked", state?.blocker ?? "Blocked.", decision?.reasonCode, lastFailure, lastFailureCode, lastFailureRaw));
     } else {
       const pending = node.dependencies.filter((dependency) => run.nodes[dependency]?.status !== "succeeded");
       held.push(
@@ -322,6 +340,7 @@ export function buildPlanReport(
           undefined,
           lastFailure,
           lastFailureCode,
+          lastFailureRaw,
         ),
       );
     }

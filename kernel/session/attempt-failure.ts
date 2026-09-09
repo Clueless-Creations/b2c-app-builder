@@ -29,11 +29,25 @@ export function classifyAttemptFailure(error: string | undefined): AttemptFailur
   return "attempt.error";
 }
 
+/**
+ * Public-boundary secret shapes. Covers the repository `secretLike` set
+ * (`checks/validation/business/trust/check-secret-routing.ts`) plus cloud access-key
+ * prefixes the reviewer probe showed surviving into `business.plan`. Patterns are
+ * regexes, not live-looking literals.
+ */
 const SECRET_PATTERNS: readonly RegExp[] = [
   /\b(?:sk|rk|pk|ghp|gho|xox[abp])[-_][A-Za-z0-9_-]{8,}/g,
+  /\b(?:sk|rk)_(?:live|test)_[A-Za-z0-9]{12,}/g,
+  /whsec_[A-Za-z0-9]{12,}/g,
+  /ghp_[A-Za-z0-9]{20,}/g,
+  /-----BEGIN [A-Z ]{0,40}PRIVATE KEY-----[\s\S]*?-----END [A-Z ]{0,40}PRIVATE KEY-----/g,
+  /-----BEGIN [A-Z ]{0,40}PRIVATE KEY-----/g,
+  /\b(?:AKIA|ASIA)[A-Za-z0-9]{8,}/g,
   /Bearer\s+[^\s"'\\)]+/gi,
   /(?:api[_-]?key|token|secret|password)(\s*[=:]\s*)[^\s"'&]+/gi,
 ];
+const SECRET_LIKE_REMAINING =
+  /\b(?:sk|rk)_(?:live|test)_[A-Za-z0-9]{12,}|whsec_[A-Za-z0-9]{12,}|ghp_[A-Za-z0-9]{20,}|-----BEGIN [A-Z ]{0,40}PRIVATE KEY-----|\b(?:AKIA|ASIA)[A-Za-z0-9]{8,}/;
 
 function redact(text: string): string {
   let out = text;
@@ -53,6 +67,19 @@ export function redactSensitiveText(text: string): string {
   out = out.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, "");
   out = out.replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g, "[redacted]");
   out = out.replace(/\/(?:Users|home)\/[^\s"'\\]+/g, "~");
+  if (SECRET_LIKE_REMAINING.test(out)) {
+    SECRET_LIKE_REMAINING.lastIndex = 0;
+    out = out.replace(
+      /\b(?:sk|rk)_(?:live|test)_[A-Za-z0-9]{12,}|whsec_[A-Za-z0-9]{12,}|ghp_[A-Za-z0-9]{20,}|-----BEGIN [A-Z ]{0,40}PRIVATE KEY-----[\s\S]*?-----END [A-Z ]{0,40}PRIVATE KEY-----|-----BEGIN [A-Z ]{0,40}PRIVATE KEY-----|\b(?:AKIA|ASIA)[A-Za-z0-9]{8,}/g,
+      "[redacted]",
+    );
+  }
+  SECRET_LIKE_REMAINING.lastIndex = 0;
+  if (SECRET_LIKE_REMAINING.test(out)) {
+    SECRET_LIKE_REMAINING.lastIndex = 0;
+    return "The attempt failed. The recorded error was withheld.";
+  }
+  SECRET_LIKE_REMAINING.lastIndex = 0;
   return out;
 }
 
@@ -79,6 +106,6 @@ export function summarizeAttemptFailure(error: string | undefined, maxLength = 2
     if (nested.length) specific = nested.at(-1)!.replace(/\\"/g, '"');
   }
   const body = specific || head.slice(prefix.length).trim() || head;
-  const summary = redact(`${prefix ? `${prefix} ` : ""}${body}`.replace(/\s+/g, " ").trim());
+  const summary = redactSensitiveText(`${prefix ? `${prefix} ` : ""}${body}`.replace(/\s+/g, " ").trim());
   return summary.length > maxLength ? `${summary.slice(0, maxLength - 1)}…` : summary;
 }

@@ -2,6 +2,7 @@ export { EXPO_EAS_COMMAND_MATRIX_PATH, EXPO_EAS_COMMANDS, EAS_CLI_DOCUMENTED_VER
 export { buildExpoEasArgv, ExpoArgvRefusal } from "./argv.js";
 export { discoverExpoCli } from "./discovery.js";
 export { inspectCommandEffects, inspectProjectCommandEffects } from "./effects.js";
+export { decodeExpoEasResponse, ledgerArtifactUrl } from "./decode.js";
 export { runExpoEasCommand } from "./execute.js";
 export {
   EasJobLedger,

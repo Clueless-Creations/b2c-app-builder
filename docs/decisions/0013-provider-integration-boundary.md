@@ -1,4 +1,4 @@
-# ADR-0012: Provider integrations implement canonical operations
+# ADR-0013: Provider integrations implement canonical operations
 
 - **Status:** accepted
 - **Date:** 2026-09-09
@@ -29,7 +29,7 @@ A provider upgrade should normally change only:
 3. its adapter implementation; and
 4. its support declaration.
 
-A workflow, business-state, kernel, or canonical-operation change caused only by provider syntax or transport churn is an architecture smell. A canonical contract changes only when the builder deliberately adopts a genuinely new business semantic.
+A workflow, business-state, kernel, or canonical-operation change caused only by provider syntax or transport churn is an architecture smell. A canonical contract changes only when the builder deliberately adopts a genuinely new business semantic. A shared kernel security or recovery defect may be repaired without inventing a new business semantic.
 
 ### Adapter responsibilities
 
@@ -78,15 +78,19 @@ New-provider adoption and provider upgrades use one lifecycle:
 
 **discover → qualify → map → conform → implement → fixture verify → integrate → authorized live verify → supported**.
 
+Qualify does not wrap by default. Compare direct reviewed SDK or API use, a thin controlled adapter, adapted guidance, and deferral. An official library that already supplies adequate types and transport does not need a second complete client.
+
 An upgrade starts with a Provider Capability Delta before adapter edits. The delta records native operations added/removed/changed; input/output/schema changes; effects; authentication/permissions; pagination; idempotency/recovery semantics; cost or quota behavior; experimental/deprecation status; and the mapped canonical-operation impact.
 
-If `canonical_contract_change` is true, the maintainer must explain the new business semantic and route the change through architecture review. Provider churn alone is not sufficient justification.
+If `canonical_contract_change` is true, the maintainer must explain the new business semantic and route the change through architecture review. Provider churn alone is not sufficient justification. A `workflow_or_kernel_change` for a shared security or recovery defect does not require a new business semantic.
 
 ## Dependency direction
 
-Core workflows and capability contracts may depend on canonical operation contracts. They must not import provider-native request/response types or branch on provider CLI/API syntax. Provider implementations depend inward on canonical contracts and outward on their provider-native transport.
+Core workflows, capability contracts, business policy, and the kernel may depend on canonical operation contracts. They must not import provider-native request/response types or branch on provider CLI/API syntax. Provider implementations depend inward on canonical contracts and outward on their provider-native transport.
 
-Mechanical dependency checks should enforce this boundary where practical. The check is a guardrail, not a reason to create a new package hierarchy solely for aesthetics.
+The composition root and a generated app's selected-provider SDK integration may depend on that selected provider. Legitimate composition-root wiring is not a neutrality violation. Do not globally ban selected-provider SDK imports across generated native app files.
+
+Mechanical dependency checks should enforce this boundary where practical. The check is a guardrail, not a reason to create a new package hierarchy solely for aesthetics. Do not use it to ban composition-root or selected generated-app SDK imports.
 
 ## Compatibility and migration
 

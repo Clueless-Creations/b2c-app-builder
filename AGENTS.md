@@ -54,7 +54,7 @@ Do not continue into maintenance reading unless the task changes the builder its
 1. `AGENTS.md`.
 2. `agents/skills/b2c-maintainer/SKILL.md`.
 3. `docs/public-interface.md`, `docs/architecture.md`, and `docs/north-star-architecture.md` as applicable.
-4. `docs/architecture-conformance.md` and affected ADRs. New and upgraded provider transports also follow `docs/guides/provider-integrations.md` and the provider-integration ADR.
+4. `docs/architecture-conformance.md` and affected ADRs. New and upgraded provider transports also follow [provider integrations](docs/guides/provider-integrations.md) and [ADR-0013](docs/decisions/0013-provider-integration-boundary.md).
 5. Migration plan/unit only when the change belongs to that migration.
 6. Relevant source owner, generated projections, and tests.
 7. `knowledge/words/no-slop-writing.md` for public-facing product/console copy.

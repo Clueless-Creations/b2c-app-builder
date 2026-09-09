@@ -129,7 +129,7 @@ expose substitutions where the builder needs them. Domain judgment belongs in
 capability knowledge and recipes. Provider procedures belong with their selected
 implementation. New and upgraded provider transports follow
 [provider integrations](guides/provider-integrations.md) and
-[ADR-0012](decisions/0012-provider-integration-boundary.md) rather than
+[ADR-0013](decisions/0013-provider-integration-boundary.md) rather than
 mirroring upstream commands in workflows. Safety and authority invariants remain
 host-owned.
 

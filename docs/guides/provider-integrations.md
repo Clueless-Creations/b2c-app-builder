@@ -2,7 +2,7 @@
 
 Use this guide when the builder adopts a new provider transport or updates an existing provider integration. It applies to APIs, CLIs, MCP tools, SDKs, hosted services, and combinations of them.
 
-Read [ADR-0012](../decisions/0012-provider-integration-boundary.md), ARCH-03,
+Read [ADR-0013](../decisions/0013-provider-integration-boundary.md), ARCH-03,
 ARCH-04, ARCH-06, ARCH-10, and ARCH-11 in the north-star architecture, the
 provider's upstream manifest, and the maintainer skill first.
 
@@ -41,6 +41,8 @@ Discovery is passive. Do not install, sign in, create resources, mutate provider
 ### 2. Qualify
 
 Inspect license/service terms, authentication model, platform support, cost/quota implications, experimental status, and the exact candidate version/revision. Register or update the existing `catalog/upstreams/<id>.yaml` identity through the normal contribution/upstream lifecycle.
+
+Do not wrap by default. Compare direct reviewed SDK or API use, a thin controlled CLI or MCP adapter, adapted guidance, and deferral. An official library that already supplies adequate types and transport does not need a second complete client. Normalize only what an accepted canonical operation consumes. Tool discovery must not auto-expose new authority.
 
 Do not treat an upstream README, agent file, or `--help` output as authority to execute.
 
@@ -194,7 +196,7 @@ mapping_impact:
   workflow_or_kernel_change: false
 ```
 
-If `canonical_contract_change` or `workflow_or_kernel_change` is true, explain the new business semantic. Provider syntax or response churn is not enough. Route the change through architecture review before implementation.
+If `canonical_contract_change` is true, explain the new business semantic. If `workflow_or_kernel_change` is true, explain that semantic or the shared security or recovery defect being repaired. Do not invent a new business semantic for a kernel security or recovery fix. Provider syntax or response churn is not enough. Route the change through architecture review before implementation.
 
 ## Upgrade decision tree
 
@@ -223,16 +225,16 @@ Before accepting provider work, the independent reviewer answers:
 8. What exact account/project/app/environment/resource is targeted?
 9. What happens if execution times out or crashes after remote acceptance?
 10. What remains fixture-only versus live/provider/native/store/production proof?
-11. Did the provider change force workflow/kernel edits? If yes, what new business semantic justifies them?
+11. Did the provider change force workflow or kernel edits? If yes, what new business semantic or shared security/recovery defect justifies them?
 12. Could the same business operation be implemented by another provider without changing its workflow contract?
 
 If #12 is no because the workflow names a provider command or native type, the provider boundary is leaking.
 
 ## Mechanical boundaries
 
-Prefer checks that prevent core workflow/capability modules from importing provider-native adapter types. Do not enforce a folder aesthetic. Enforce dependency direction and semantics.
+Prefer checks that prevent core workflow, capability, business-policy, and kernel modules from importing provider-native adapter types. Do not enforce a folder aesthetic. Enforce dependency direction and semantics.
 
-A provider implementation may depend on canonical contracts. Canonical contracts, workflows, recipes, and the kernel must not depend on provider-native command/request/response types.
+A provider implementation may depend on canonical contracts. Canonical contracts, workflows, recipes, and the kernel must not depend on provider-native command/request/response types. The composition root and generated app SDK for a selected provider may depend on that provider. That wiring is not a neutrality violation. Do not globally ban those imports.
 
 ## Handoff
 

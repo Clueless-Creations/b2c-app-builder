@@ -22,7 +22,7 @@ evidence as `path:line`. Keep one owner per responsibility.
 ## Provider integration and upgrades
 
 For any new provider transport or provider upgrade, follow
-`docs/guides/provider-integrations.md` and ADR-0012. Do not copy that checklist
+`docs/guides/provider-integrations.md` and ADR-0013. Do not copy that checklist
 here. Use the same lifecycle for APIs, CLIs, MCP tools, SDKs, and hosted services.
 
 Map native capability → canonical operation → selected implementation →

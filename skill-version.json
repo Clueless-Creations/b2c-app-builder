@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.20",
+  "version": "0.219.21",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Commit a static-document invented-scrollytelling page-gate fixture.",
-    "Compile live ONB-08 and reopen an accepted packet when studio interaction changes."
+    "Restore the required AGENTS.md pointer and continuity terms in Claude adapters.",
+    "Stamp the skill after the context-first template CLAUDE.md skill-path change."
   ]
 }

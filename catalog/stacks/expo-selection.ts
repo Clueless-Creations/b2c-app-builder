@@ -360,7 +360,7 @@ function operationSupport(): ExpoOperationSupport[] {
       evidenceTier: "blocked",
       queuedIssue: 82,
       notes:
-        "Thin app/ file layout and src/ state contracts exist. Operation stays blocked: expo-router is unpinned, no Expo/RN runtime was executed, and SwiftUI remains the only UI adapter.",
+        "JSX Stack/Tabs routes and expo-router@57.0.9 exist. Navigation graph journeys are fixture-tested. Operation stays blocked: Expo Router runtime was not executed, and SwiftUI remains the only UI adapter.",
     },
     {
       id: "cng-prebuild",

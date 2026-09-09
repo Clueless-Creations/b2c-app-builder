@@ -1,6 +1,13 @@
 export const ROOT_STACK_SCREENS = ["(tabs)", "modal", "detail/[id]"] as const;
 export const TAB_SCREENS = ["index", "settings"] as const;
 
+export const ROUTE_HREFS = {
+  home: "/",
+  settings: "/settings",
+  modal: "/modal",
+  detail: (id: string) => `/detail/${id}` as const,
+} as const;
+
 export const rootStackLayout = {
   kind: "stack" as const,
   screens: ROOT_STACK_SCREENS,

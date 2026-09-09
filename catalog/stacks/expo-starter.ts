@@ -331,6 +331,7 @@ export interface ExpoStarterConsumerInstall {
   expoLocal: boolean;
   expoInstalledGlobally: false;
   localModuleInstalled: boolean;
+  expoRouterLocal: boolean;
   noticesPresent: readonly string[];
   peerResolution: "npm-default";
   nativeCompileStatus: typeof NATIVE_COMPILE_STATUS;
@@ -346,6 +347,7 @@ export function installExpoStarterConsumer(input: PlanExpoStarterScaffoldInput):
     expoLocal: false,
     expoInstalledGlobally: false,
     localModuleInstalled: false,
+    expoRouterLocal: false,
     noticesPresent: [],
     peerResolution: "npm-default",
     nativeCompileStatus: NATIVE_COMPILE_STATUS,
@@ -363,6 +365,7 @@ export function installExpoStarterConsumer(input: PlanExpoStarterScaffoldInput):
   const lockfileGenerated = existsSync(path.join(input.target, "package-lock.json"));
   const expoLocal = existsSync(path.join(input.target, "node_modules", "expo", "package.json"));
   const localModuleInstalled = existsSync(path.join(input.target, "node_modules", "b2c-native-capability", "package.json"));
+  const expoRouterLocal = existsSync(path.join(input.target, "node_modules", "expo-router", "package.json"));
   const noticesPresent = [
     path.join("node_modules", "expo", "LICENSE"),
     path.join("node_modules", "b2c-native-capability", "NOTICE"),
@@ -374,6 +377,7 @@ export function installExpoStarterConsumer(input: PlanExpoStarterScaffoldInput):
     expoLocal,
     expoInstalledGlobally: false,
     localModuleInstalled,
+    expoRouterLocal,
     noticesPresent,
     peerResolution: "npm-default",
     nativeCompileStatus: NATIVE_COMPILE_STATUS,

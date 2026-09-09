@@ -3,6 +3,7 @@
     "name": "Expo Consumer Fixture",
     "slug": "expo-consumer-fixture",
     "scheme": "expoconsumerfixture",
+    "plugins": ["expo-router"],
     "version": "0.0.0",
     "platforms": ["ios", "android", "web"],
     "ios": {

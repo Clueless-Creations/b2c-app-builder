@@ -1,9 +1,9 @@
 /**
- * Expo Router file-layout contract (#82).
+ * Expo Router file-layout and workspace pin (#82).
  *
- * Inspects thin `app/` routes and `src/` logic without importing expo-router, executing
- * plugins, or claiming a native UI adapter. Reviewed expo-router is bundled-with-sdk-57,
- * not a workspace pin — do not invent a package version.
+ * Inspects JSX `app/` routes and `src/` screens without executing expo-router,
+ * Metro, or a native UI adapter. The reviewed #81 fact remains bundled-with-sdk-57.
+ * The fixture workspace pin is the SDK 57 bundled package 57.0.9, not /latest/.
  *
  * Consumes `catalog/stacks/expo-selection.ts`.
  */
@@ -25,22 +25,24 @@ import {
 } from "./expo-native-ownership.js";
 import { EXPO_STARTER_FIXTURE_DIR, MARKETING_OR_BACKEND_DEPENDENCIES } from "./expo-starter.js";
 
+export const EXPO_ROUTER_WORKSPACE_PIN = "57.0.9";
 export const EXPO_ROUTER_ROUTE_FILES = [
-  "app/_layout.ts",
-  "app/(tabs)/_layout.ts",
-  "app/(tabs)/index.ts",
-  "app/(tabs)/settings.ts",
-  "app/modal.ts",
-  "app/detail/[id].ts",
+  "app/_layout.tsx",
+  "app/(tabs)/_layout.tsx",
+  "app/(tabs)/index.tsx",
+  "app/(tabs)/settings.tsx",
+  "app/modal.tsx",
+  "app/detail/[id].tsx",
 ] as const;
 
 export const EXPO_ROUTER_SRC_FILES = [
   "src/navigation/route-graph.ts",
   "src/navigation/deep-link.ts",
-  "src/screens/home.ts",
-  "src/screens/settings.ts",
-  "src/screens/modal.ts",
-  "src/screens/detail.ts",
+  "src/navigation/journeys.ts",
+  "src/screens/home.tsx",
+  "src/screens/settings.tsx",
+  "src/screens/modal.tsx",
+  "src/screens/detail.tsx",
   "src/states/surface-state.ts",
   "src/persistence/seam.ts",
   "src/ui/contract-binding.ts",
@@ -48,13 +50,16 @@ export const EXPO_ROUTER_SRC_FILES = [
 
 export const EXPO_UI_ADAPTER_RELATIVE_PATH = "surfaces/ui-library/adapters/expo.json";
 export const SWIFTUI_ADAPTER_RELATIVE_PATH = "surfaces/ui-library/adapters/swiftui.json";
-export const THIN_ROUTE_MAX_LINES = 8;
+export const THIN_ROUTE_MAX_LINES = 24;
 export const PRODUCT_HARDCODE_PATTERN = /\b(quiz|paywall|movie|habit-tracker)\b/i;
 export const FAT_ROUTE_PATTERN = /\b(fetch|AsyncStorage|localStorage|XMLHttpRequest)\b/;
 export const SRC_IMPORT_PATTERN = /from ["'](?:\.\.\/)+src\//;
+export const EXPO_ROUTER_IMPORT_PATTERN = /from ["']expo-router["']/;
+export const EXPO_ROUTER_JSX_LAYOUT_PATTERN = /<(Stack|Tabs)\b/;
+export const EXPO_ROUTER_MODAL_PRESENTATION_PATTERN = /presentation:\s*["']modal["']/;
 
 export type ExpoRouterPinStatus = "unpinned" | "workspace-pin" | "fabricated-latest";
-export type ExpoRouterLayoutStatus = "layout-ready" | "incomplete" | "fat-routes" | "hardcoded-product";
+export type ExpoRouterLayoutStatus = "layout-ready" | "incomplete" | "fat-routes" | "hardcoded-product" | "data-reexport";
 export type ExpoRouterDeliveryAction = "layout-ready" | "refuse";
 export type ExpoRouterRefusalCode =
   | "builder-checkout"
@@ -67,6 +72,7 @@ export type ExpoRouterRefusalCode =
   | "incomplete-layout"
   | "fat-routes"
   | "hardcoded-product"
+  | "data-reexport-routes"
   | "placeholder-expo-adapter";
 
 export interface ExpoRouterLayoutReport {
@@ -76,6 +82,7 @@ export interface ExpoRouterLayoutReport {
   missingSrcFiles: readonly string[];
   fatRoutes: readonly string[];
   hardcodedProduct: boolean;
+  jsxRoutes: boolean;
   pinStatus: ExpoRouterPinStatus;
   expoAdapterPresent: boolean;
   swiftuiAdapterPresent: boolean;
@@ -150,12 +157,25 @@ export function reviewedExpoRouterFact(): string {
 export function inspectExpoRouterPin(packageJsonText: string | undefined): ExpoRouterPinStatus {
   if (!packageJsonText || !packageJsonHasExactDependency(packageJsonText, "expo-router")) return "unpinned";
   const version = dependencyVersion(packageJsonText, "expo-router");
-  if (!version || version === "latest" || version === reviewedExpoRouterFact()) return "fabricated-latest";
+  if (!version || version === "latest" || version === "*" || version === reviewedExpoRouterFact()) return "fabricated-latest";
+  if (!/^57\.\d+\.\d+$/.test(version)) return "fabricated-latest";
   return "workspace-pin";
 }
 
 export function expoAdapterManifestExists(skillRoot: string): boolean {
   return existsSync(path.join(skillRoot, EXPO_UI_ADAPTER_RELATIVE_PATH));
+}
+
+function inspectJsxRoutes(target: string, routeFilesPresent: readonly string[]): boolean {
+  if (routeFilesPresent.length !== EXPO_ROUTER_ROUTE_FILES.length) return false;
+  if (routeFilesPresent.some((file) => !file.endsWith(".tsx"))) return false;
+  for (const relative of routeFilesPresent) {
+    const text = readOptionalText(path.join(target, relative)) ?? "";
+    if (!relative.includes("_layout")) continue;
+    if (!EXPO_ROUTER_IMPORT_PATTERN.test(text) || !EXPO_ROUTER_JSX_LAYOUT_PATTERN.test(text)) return false;
+    if (relative === "app/_layout.tsx" && !EXPO_ROUTER_MODAL_PRESENTATION_PATTERN.test(text)) return false;
+  }
+  return true;
 }
 
 export function inspectExpoRouterLayout(target: string, skillRoot: string): ExpoRouterLayoutReport {
@@ -171,11 +191,13 @@ export function inspectExpoRouterLayout(target: string, skillRoot: string): Expo
     .map((relative) => readOptionalText(path.join(target, relative)) ?? "")
     .join("\n");
   const hardcodedProduct = PRODUCT_HARDCODE_PATTERN.test(texts);
+  const jsxRoutes = inspectJsxRoutes(target, routeFilesPresent);
   const pinStatus = inspectExpoRouterPin(readOptionalText(path.join(target, "package.json")));
   let status: ExpoRouterLayoutStatus = "layout-ready";
   if (hardcodedProduct) status = "hardcoded-product";
   else if (fatRoutes.length > 0) status = "fat-routes";
   else if (missingRouteFiles.length > 0 || missingSrcFiles.length > 0) status = "incomplete";
+  else if (!jsxRoutes) status = "data-reexport";
   return {
     routeFilesPresent,
     srcFilesPresent,
@@ -183,6 +205,7 @@ export function inspectExpoRouterLayout(target: string, skillRoot: string): Expo
     missingSrcFiles,
     fatRoutes,
     hardcodedProduct,
+    jsxRoutes,
     pinStatus,
     expoAdapterPresent: expoAdapterManifestExists(skillRoot),
     swiftuiAdapterPresent: existsSync(path.join(skillRoot, SWIFTUI_ADAPTER_RELATIVE_PATH)),
@@ -249,17 +272,20 @@ export function planExpoRouterDelivery(input: {
   if (layout.status === "incomplete") {
     return refuse("incomplete-layout", "Stack, tabs, modal, and detail files plus src/ logic are required.");
   }
+  if (layout.status === "data-reexport") {
+    return refuse("data-reexport-routes", "Route files must be Expo Router JSX (Stack/Tabs), not data-object re-exports.");
+  }
   if (layout.pinStatus === "unpinned") {
     return refuse(
       "unpinned-expo-router",
-      "File layout is present. expo-router stays unpinned until a workspace lock exists. Not runtime-verified.",
+      "JSX file layout is present. expo-router stays unpinned until a workspace pin exists. Not runtime-verified.",
     );
   }
   return {
     action: "layout-ready",
     layout: layout.status,
     pinStatus: layout.pinStatus,
-    reason: "Thin route layout is present with a workspace expo-router pin. Native UI adapter and runtime proof remain separate.",
+    reason: "JSX Stack/Tabs layout is present with a workspace expo-router pin. Native UI adapter and runtime proof remain separate.",
     runtimeVerified,
   };
 }

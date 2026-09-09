@@ -34,6 +34,7 @@ import {
 import {
   EXPO_ROUTER_ROUTE_FILES,
   EXPO_ROUTER_SRC_FILES,
+  EXPO_ROUTER_WORKSPACE_PIN,
   isolatedStarterRouterLayout,
   planExpoRouterDelivery,
   reviewedExpoRouterFact,
@@ -55,6 +56,8 @@ import {
 import { SURFACE_STATES } from "../../../catalog/stacks/expo-starter-fixture/src/states/surface-state.js";
 import { PERSISTENCE_SEAM_BOUND } from "../../../catalog/stacks/expo-starter-fixture/src/persistence/seam.js";
 import { deepLinkRecovery } from "../../../catalog/stacks/expo-starter-fixture/src/navigation/deep-link.js";
+import { NAVIGATION_RUNTIME_VERIFIED, reduceNavigation } from "../../../catalog/stacks/expo-starter-fixture/src/navigation/journeys.js";
+import { ROUTE_HREFS } from "../../../catalog/stacks/expo-starter-fixture/src/navigation/route-graph.js";
 import { inspectWorkspace } from "../../../kernel/session/inspect.js";
 import { assert, skillRoot, type Harness } from "./_harness.js";
 
@@ -142,21 +145,37 @@ export function register(harness: Harness): void {
     });
     assert(compatibility.sdk === "match" && compatibility.reactNative === "match", compatibility.actionable);
     assert(compatibility.autoUpgradeAttempted === false, "fixture pins must not trigger auto-upgrade");
-    assert(pkg.dependencies?.["expo-router"] === undefined, "must not invent an expo-router workspace pin");
+    assert(pkg.dependencies?.["expo-router"] === EXPO_ROUTER_WORKSPACE_PIN, `fixture expo-router pin must be ${EXPO_ROUTER_WORKSPACE_PIN}`);
     assert(pkg.dependencies?.["expo-modules-core"] === undefined, "must not invent an expo-modules-core pin");
     assert(reviewedExpoRouterFact() === "bundled-with-sdk-57", "reviewed Router fact is not a package version");
   });
 
-  harness.check("expo foundation: thin Router file layout stays unpinned and is not native UI", () => {
+  harness.check("expo foundation: pinned Expo Router JSX routes are not native UI or runtime proof", () => {
     const layout = isolatedStarterRouterLayout(skillRoot);
     assert(layout.status === "layout-ready", `expected layout-ready, got ${layout.status}`);
-    assert(layout.pinStatus === "unpinned", `expo-router must stay unpinned, got ${layout.pinStatus}`);
+    assert(layout.jsxRoutes, "routes must be Expo Router JSX, not data-object re-exports");
+    assert(layout.pinStatus === "workspace-pin", `expo-router must be a workspace pin, got ${layout.pinStatus}`);
     assert(layout.expoAdapterPresent === false, "must not add a placeholder Expo UI adapter");
     assert(layout.swiftuiAdapterPresent, "SwiftUI remains the implemented adapter");
     assert(SURFACE_STATES.includes("loading") && SURFACE_STATES.includes("error"), "loading and error states are required");
     assert(SURFACE_STATES.includes("empty") && SURFACE_STATES.includes("retry"), "empty and retry states are required");
     assert(deepLinkRecovery.runtimeVerified === false, "deep-link recovery is a contract, not runtime proof");
+    assert(NAVIGATION_RUNTIME_VERIFIED === false, "navigation journeys are not Expo Router runtime");
     assert(PERSISTENCE_SEAM_BOUND === false, "persistence seam must stay unbound until a store is selected");
+    const cold = reduceNavigation([{ type: "cold-start" }]);
+    assert(cold.href === ROUTE_HREFS.home && cold.restoredFrom === "cold", "cold start must land on the home tab");
+    const warm = reduceNavigation([{ type: "cold-start" }, { type: "warm-link", href: ROUTE_HREFS.detail("42") }]);
+    assert(warm.href === "/detail/42" && warm.restoredFrom === "warm-link", "warm link must open the detail route");
+    const modal = reduceNavigation([{ type: "cold-start" }, { type: "tab", href: ROUTE_HREFS.settings }, { type: "open-modal" }]);
+    assert(modal.modalPresented && modal.tab === "settings" && modal.href === ROUTE_HREFS.modal, "modal must keep the tab anchor");
+    const back = reduceNavigation([{ type: "cold-start" }, { type: "open-modal" }, { type: "back" }]);
+    assert(!back.modalPresented && back.href === ROUTE_HREFS.home, "back must dismiss the modal");
+    const restored = reduceNavigation([
+      { type: "cold-start" },
+      { type: "open-detail", id: "7" },
+      { type: "offline-restart" },
+    ]);
+    assert(restored.href === "/detail/7" && restored.restoredFrom === "session", "offline restart must restore the last href");
     const target = harness.makeTempDir("expo-router-layout");
     materializeExpoStarterFixture({
       target,
@@ -165,13 +184,13 @@ export function register(harness: Harness): void {
       platforms: ["ios"],
       authorized: true,
     });
-    const unpinned = planExpoRouterDelivery({
+    const ready = planExpoRouterDelivery({
       target,
       skillRoot,
       compositionTarget: iosExpo(),
     });
-    assert(unpinned.action === "refuse" && unpinned.code === "unpinned-expo-router", unpinned.reason);
-    assert(unpinned.runtimeVerified === false, "layout is not Router runtime proof");
+    assert(ready.action === "layout-ready" && ready.pinStatus === "workspace-pin", ready.reason);
+    assert(ready.runtimeVerified === false, "layout is not Router runtime proof");
     const webAsIos = planExpoRouterDelivery({
       target,
       skillRoot,
@@ -185,7 +204,7 @@ export function register(harness: Harness): void {
       compositionTarget: iosExpo(),
     });
     assert(builder.action === "refuse" && builder.code === "builder-checkout", builder.reason);
-    writeFileSync(path.join(target, "app", "(tabs)", "index.ts"), "export async function defaultExport() { return fetch('https://example.com'); }\n");
+    writeFileSync(path.join(target, "app", "(tabs)", "index.tsx"), "export async function defaultExport() { return fetch('https://example.com'); }\n");
     const fat = planExpoRouterDelivery({
       target,
       skillRoot,
@@ -210,6 +229,24 @@ export function register(harness: Harness): void {
       compositionTarget: iosExpo(),
     });
     assert(latest.action === "refuse" && latest.code === "fabricated-router-pin", latest.reason);
+    const unpinned = harness.makeTempDir("expo-router-unpinned");
+    materializeExpoStarterFixture({
+      target: unpinned,
+      skillRoot,
+      compositionTarget: iosExpo(),
+      platforms: ["ios"],
+      authorized: true,
+    });
+    const unpinnedPkgPath = path.join(unpinned, "package.json");
+    const unpinnedPkg = JSON.parse(readFileSync(unpinnedPkgPath, "utf8")) as { dependencies: Record<string, string> };
+    delete unpinnedPkg.dependencies["expo-router"];
+    writeFileSync(unpinnedPkgPath, `${JSON.stringify(unpinnedPkg, null, 2)}\n`);
+    const missingPin = planExpoRouterDelivery({
+      target: unpinned,
+      skillRoot,
+      compositionTarget: iosExpo(),
+    });
+    assert(missingPin.action === "refuse" && missingPin.code === "unpinned-expo-router", missingPin.reason);
   });
 
   harness.check("expo foundation: custom module has a TypeScript boundary and explicit web-unsupported path", () => {
@@ -372,6 +409,7 @@ export function register(harness: Harness): void {
     assert(installed.expoLocal, "expo must install into the starter's node_modules");
     assert(installed.expoInstalledGlobally === false, "must not install Expo globally");
     assert(installed.localModuleInstalled, "file: b2c-native-capability must install into the starter consumer");
+    assert(installed.expoRouterLocal, "expo-router must install into the starter consumer");
     assert(installed.noticesPresent.includes(path.join("node_modules", "expo", "LICENSE")), "Expo LICENSE must arrive with the install");
     assert(installed.noticesPresent.includes(path.join("node_modules", "b2c-native-capability", "NOTICE")), "local module NOTICE must arrive with the install");
     assert(installed.peerResolution === "npm-default", "reviewed pins must install without --legacy-peer-deps or a global Expo");
@@ -379,8 +417,10 @@ export function register(harness: Harness): void {
     const lock = JSON.parse(readFileSync(path.join(target, "package-lock.json"), "utf8")) as { packages?: Record<string, { version?: string }> };
     const expoLock = lock.packages?.["node_modules/expo"]?.version;
     const reactLock = lock.packages?.["node_modules/react"]?.version;
+    const routerLock = lock.packages?.["node_modules/expo-router"]?.version;
     assert(typeof expoLock === "string" && expoLock.startsWith("57."), `lockfile expo pin must stay on SDK 57, got ${expoLock}`);
     assert(reactLock === "19.2.3", `lockfile react must be the RN 0.86.3 peer patch, got ${reactLock}`);
+    assert(routerLock === EXPO_ROUTER_WORKSPACE_PIN, `lockfile expo-router must be ${EXPO_ROUTER_WORKSPACE_PIN}, got ${routerLock}`);
   });
 
   harness.check("expo foundation: empty authorized target scaffolds only the selected platform and preserves product.yaml", () => {

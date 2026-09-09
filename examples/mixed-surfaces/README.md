@@ -1,12 +1,9 @@
 # Quiet Receipt mixed-surface fixture
 
 Synthetic fixture business for issue #70 step 7. It prepares three honest
-public pages and an empty second-context finding artifact. It is not a
-launched product, and it does not close the independent review.
-
-A later agent that never saw the producer transcript fills
-`business/design/reviews/MIXED_SURFACE_INDEPENDENT_REVIEW.md`. Do not treat
-producer and audit instruction agreement as that pass.
+public pages. Independent review findings live in
+`business/design/reviews/MIXED_SURFACE_INDEPENDENT_REVIEW.md`. That file is
+step 7 findings, not issue closeout.
 
 ## Surfaces
 
@@ -24,8 +21,8 @@ authority.
 
 ## Finding artifact
 
-`business/design/reviews/MIXED_SURFACE_INDEPENDENT_REVIEW.md` stays pending
-until a fresh-context reviewer writes findings against
+`business/design/reviews/MIXED_SURFACE_INDEPENDENT_REVIEW.md` records a
+fresh-context review against
 `business/design/reviews/rubrics/RUBRIC-mixed-surface-v1.md`.
 
 `business/growth/CRO_AUDIT.md` is only the mechanical page-job inventory for

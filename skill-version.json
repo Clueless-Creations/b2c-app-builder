@@ -1,11 +1,9 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.16",
+  "version": "0.219.17",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Prepare the Quiet Receipt mixed-surface fixture and a pending second-context finding artifact so a later reviewer can judge fit and usability.",
-    "Stop offering distilled motion recipes as the disconnected 60fps procedure, and follow editorial-scrollytelling.md only on selected or implemented scroll-linked pages.",
-    "Remove the example ONBOARDING shot-ID placeholder so empty inventory does not invent a 60fps row."
+    "Record the Quiet Receipt mixed-surface independent review against RUBRIC-mixed-surface-v1."
   ]
 }

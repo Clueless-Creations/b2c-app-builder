@@ -10,6 +10,8 @@ import { fingerprintAppSource } from "../../../../kernel/engine/source-fingerpri
 import { loadDesignSystem, parseFrontmatter, typographyDependencyPaths } from "../../../../tooling/lib/design-md.js";
 import { contentAssetDependencyPaths, CONTENT_ASSETS_VERSION } from "../../../../tooling/lib/content-assets.js";
 import { isRecord, issue, type Issue } from "../../../../tooling/lib/launch-state.js";
+import { loadDesignSurfaceApplicability } from "../../../../catalog/ontology/design-surface-applicability.js";
+import { surfaceRequiresMotionInteractionEvidence, validateFrozenPageTechniqueGates } from "./surface-page-gates.js";
 
 /** Evidence integrity, not a beauty scorer or an approval authority. The existing
  * design authority owns scope; existing frozen rubrics own judgment criteria. */
@@ -831,7 +833,8 @@ function imageDimensions(data: Buffer): { width: number; height: number } | unde
 /** Public closeout seam. Strict even when report is missing; invoke this gate only
  * for actual complete-design acceptance, not the advisory reference workspace. */
 export function validateDesignAcceptance(root: string, reportPath = DESIGN_ACCEPTANCE_REPORT): Issue[] {
-  const issues: Issue[] = validateDesignSourceReferences(root);
+  const issues: Issue[] = [...validateDesignSourceReferences(root), ...validateFrozenPageTechniqueGates(root, "design_acceptance.page_gates")];
+  const surfaceApplicability = loadDesignSurfaceApplicability(root);
   const fail = (code: string, message: string, file = reportPath): void => {
     issues.push(issue("error", `design_acceptance.${code}`, message, file));
   };
@@ -1843,10 +1846,10 @@ export function validateDesignAcceptance(root: string, reportPath = DESIGN_ACCEP
           fail("criterion_evidence", `${surface.id}/${criterion.id} must compare its own current capture with both native and landing captures`);
       } else if (result.evidenceIds.some((id) => !evidenceIds.includes(id)))
         fail("criterion_evidence", `${surface.id}/${criterion.id} cites evidence from another surface`);
-      if (
-        ["functionality", "accessibility", "motion"].includes(criterion.facet) &&
-        !result.evidenceIds.some((id) => resolvedReview.interactions.some((entry) => entry.evidenceId === id))
-      )
+      const requiresInteractionEvidence =
+        ["functionality", "accessibility"].includes(criterion.facet) ||
+        (criterion.facet === "motion" && surfaceRequiresMotionInteractionEvidence(surface.surfaceId, surface.kind, surfaceApplicability));
+      if (requiresInteractionEvidence && !result.evidenceIds.some((id) => resolvedReview.interactions.some((entry) => entry.evidenceId === id)))
         fail("criterion_evidence", `${surface.id}/${criterion.id} requires observed interaction evidence; screenshots alone are insufficient`);
     }
   }

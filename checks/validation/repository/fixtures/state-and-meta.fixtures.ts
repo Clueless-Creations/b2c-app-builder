@@ -596,6 +596,110 @@ export function register(h: Harness): void {
     "landing_funnel.motion.reduced_motion_missing",
   );
 
+  const writeAcceptedLanding = (
+    root: string,
+    input: {
+      landingPages: Array<Record<string, unknown>>;
+      contract: Record<string, unknown>;
+      cro?: string;
+    },
+  ): void => {
+    mkdirSync(path.join(root, "state"), { recursive: true });
+    const state = JSON.parse(readFileSync(path.join(skillRoot, "examples", "workspace", "business", "state/business-state.json"), "utf8")) as {
+      lanes: Record<string, { status: string; evidence: string[]; blockers: string[] }>;
+    };
+    state.lanes.design = { status: "succeeded", evidence: ["DESIGN.md"], blockers: [] };
+    writeFileSync(path.join(root, "state/business-state.json"), JSON.stringify(state, null, 2), "utf8");
+    mkdirSync(path.join(root, "growth", "landing"), { recursive: true });
+    writeFileSync(path.join(root, "growth", "landing", "index.html"), "<h1>Launch page</h1>\n<p>Static copy.</p>\n", "utf8");
+    writeFileSync(path.join(root, "growth", "landing", "README.md"), landingGateEvidence, "utf8");
+    mkdirSync(path.join(root, "public"), { recursive: true });
+    for (const staticFile of ["robots.txt", "llms.txt", "sitemap.xml"]) {
+      writeFileSync(path.join(root, "public", staticFile), "seeded by fixture\n", "utf8");
+    }
+    mkdirSync(path.join(root, "studio", "seed"), { recursive: true });
+    writeFileSync(
+      path.join(root, "studio", "seed", "business.json"),
+      JSON.stringify({ surfaces: { landingPages: input.landingPages, webFunnels: [], marketingAssets: [], mobileApp: { screens: [] } } }, null, 2),
+      "utf8",
+    );
+    writeFileSync(path.join(root, "growth", "landing", "surface-contract.json"), JSON.stringify(input.contract, null, 2), "utf8");
+    if (input.cro !== undefined) writeFileSync(path.join(root, "growth", "CRO_AUDIT.md"), input.cro, "utf8");
+  };
+  const frozenContract = (events: string[], scrollytellingApplicable = false): Record<string, unknown> => ({
+    analytics_events: events,
+    locales: [{ locale: "en-US", evidence: "English launch page fixture." }],
+    pricing: { applicable: false, evidence: "No paid plan on this fixture page." },
+    onboarding: { applicable: false, evidence: "No onboarding embed on this fixture page." },
+    screenshots: [{ locale: "en-US", evidence: "Synthetic slot", source_kind: "preview" }],
+    scrollytelling: { applicable: scrollytellingApplicable, evidence: "Studio interaction decides scrollytelling." },
+  });
+
+  const staticPrivacyPass = makeEmptyFixture("landing-funnel-static-privacy-pass");
+  writeAcceptedLanding(staticPrivacyPass, {
+    landingPages: [{ id: "privacy", status: "ready", interaction: "static-document" }],
+    contract: frozenContract(["landing_viewed"]),
+  });
+  runFixture("accepted static privacy page is not forced to invent CRO events", staticPrivacyPass, "check-landing-funnel.ts", 0);
+
+  const conversionMissingCro = makeEmptyFixture("landing-funnel-conversion-missing-cro");
+  writeAcceptedLanding(conversionMissingCro, {
+    landingPages: [{ id: "landing", status: "ready", interaction: "conversion" }],
+    contract: frozenContract(["landing_viewed", "landing_cta_clicked", "waitlist_submitted"]),
+  });
+  runFixture(
+    "accepted conversion landing without CRO evidence fails",
+    conversionMissingCro,
+    "check-landing-funnel.ts",
+    1,
+    "landing_funnel.page_gates.conversion_evidence_missing",
+  );
+
+  const conversionPass = makeEmptyFixture("landing-funnel-conversion-cro-pass");
+  writeAcceptedLanding(conversionPass, {
+    landingPages: [{ id: "landing", status: "ready", interaction: "conversion" }],
+    contract: frozenContract(["landing_viewed", "landing_cta_clicked", "waitlist_submitted"]),
+    cro: "# CRO audit\n\n## landing\n\nConversion goal: waitlist signup. Primary action is join the waitlist.\n",
+  });
+  runFixture("accepted conversion landing with CRO evidence passes the frozen page gates", conversionPass, "check-landing-funnel.ts", 0);
+
+  const staticInventedCro = makeEmptyFixture("landing-funnel-static-invented-cro");
+  writeAcceptedLanding(staticInventedCro, {
+    landingPages: [{ id: "privacy", status: "ready", interaction: "static-document" }],
+    contract: frozenContract(["landing_viewed", "landing_cta_clicked", "waitlist_submitted"]),
+  });
+  runFixture(
+    "accepted static privacy page fails when the contract invents conversion events",
+    staticInventedCro,
+    "check-landing-funnel.ts",
+    1,
+    "landing_funnel.page_gates.static_document_invented_conversion",
+  );
+
+  const unresolvedInteraction = makeEmptyFixture("landing-funnel-interaction-unresolved");
+  writeAcceptedLanding(unresolvedInteraction, {
+    landingPages: [{ id: "landing", status: "ready" }],
+    contract: frozenContract(["landing_viewed"]),
+  });
+  runFixture(
+    "accepted design with a listed surface missing interaction holds",
+    unresolvedInteraction,
+    "check-landing-funnel.ts",
+    1,
+    "landing_funnel.page_gates.interaction_unresolved",
+  );
+
+  const mixedSurfaces = makeEmptyFixture("landing-funnel-mixed-surfaces");
+  writeAcceptedLanding(mixedSurfaces, {
+    landingPages: [
+      { id: "privacy", status: "ready", interaction: "static-document" },
+      { id: "landing", status: "ready", interaction: "conversion" },
+    ],
+    contract: frozenContract(["landing_viewed", "landing_cta_clicked", "waitlist_submitted"]),
+    cro: "# CRO audit\n\n## landing\n\nConversion goal: waitlist signup.\n\n## privacy\n\nNo conversion job. Static document legal page.\n",
+  });
+  runFixture("mixed static and conversion inventory keeps CRO on the conversion page only", mixedSurfaces, "check-landing-funnel.ts", 0);
+
   // --- check-version-discipline (fail branches) ---
   const versionManifestMissing = makeEmptyFixture("version-discipline-manifest-missing");
   runScriptArgs(

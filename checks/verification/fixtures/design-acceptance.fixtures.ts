@@ -177,14 +177,18 @@ function example(harness: Harness): { root: string; report: DesignAcceptanceRepo
   put("app/Home.swift", "// Synthetic fixture source. Never real application proof.\n");
   put("web/index.html", "<h1>Synthetic fixture only</h1>\n");
   put("design/screens/home.md", "# Synthetic home screen contract\n\nThe primary action remains available in every declared state.\n");
+  put(
+    "growth/CRO_AUDIT.md",
+    "# CRO audit\n\n## landing\n\nConversion goal: waitlist signup. Primary action is join the waitlist.\n",
+  );
   put("design/flows/complete-task.md", "# Synthetic complete-task flow\n\nActivate the primary action and observe the saved result.\n");
   put("product.yaml", yaml({ meta: { status: "accepted" }, instances: [{ id: "screen.home", class_id: "class.screen", slots: {} }] }));
   put(
     "studio/seed/business.json",
     JSON.stringify({
       surfaces: {
-        mobileApp: { platforms: ["ios"], screens: [{ id: "home", status: "ready" }] },
-        landingPages: [{ id: "landing", status: "ready" }],
+        mobileApp: { platforms: ["ios"], screens: [{ id: "home", status: "ready", interaction: "standard-transition" }] },
+        landingPages: [{ id: "landing", status: "ready", interaction: "conversion" }],
         webFunnels: [],
       },
     }),
@@ -2169,7 +2173,7 @@ export function register(harness: Harness): void {
     ({ root, report }) => {
       const p = "studio/seed/business.json";
       const studio = JSON.parse(readFileSync(path.join(root, p), "utf8"));
-      studio.surfaces.mobileApp.screens.push({ id: "purchase", status: "ready" });
+      studio.surfaces.mobileApp.screens.push({ id: "purchase", status: "ready", interaction: "standard-transition" });
       writeFileSync(path.join(root, p), JSON.stringify(studio));
       report.sources[2] = designArtifact(root, p);
     },
@@ -2236,4 +2240,71 @@ export function register(harness: Harness): void {
     raw.surfaces[0].criteria[0].verdict = "looks-good";
     assert(!designAcceptanceReportSchema.safeParse(raw).success, "unknown verdict passed");
   });
+  harness.check("design-acceptance: a static legal page is not forced to invent motion interaction evidence", () => {
+    const fixture = example(harness);
+    const studioPath = path.join(fixture.root, "studio/seed/business.json");
+    const studio = JSON.parse(readFileSync(studioPath, "utf8")) as {
+      surfaces: { landingPages: Array<Record<string, unknown>> };
+    };
+    studio.surfaces.landingPages = [{ id: "landing", status: "ready", interaction: "static-document" }];
+    writeFileSync(studioPath, JSON.stringify(studio));
+    fixture.report.sources[2] = designArtifact(fixture.root, "studio/seed/business.json");
+    writeFileSync(path.join(fixture.root, "growth/CRO_AUDIT.md"), "# CRO audit\n\nNo conversion job. landing is a static document legal page.\n");
+    const landingReviews = fixture.report.surfaces.filter((entry) => entry.id === "mobile" || entry.id === "desktop");
+    assert(landingReviews.length === 2, "expected mobile and desktop landing reviews");
+    for (const surface of landingReviews) {
+      const motion = surface.criteria.find((entry) => entry.id === "motion")!;
+      motion.evidenceIds = [surface.captures[0]!.id];
+    }
+    fixture.save();
+    const issues = validateDesignAcceptance(fixture.root);
+    assert(
+      !issues.some((entry) => entry.code === "design_acceptance.criterion_evidence" && entry.message.includes("/motion")),
+      JSON.stringify(issues),
+    );
+    assert(issues.length === 0, JSON.stringify(issues));
+  });
+  harness.check("design-acceptance: a scroll-linked landing still fails without motion interaction evidence", () => {
+    const fixture = example(harness);
+    const studioPath = path.join(fixture.root, "studio/seed/business.json");
+    const studio = JSON.parse(readFileSync(studioPath, "utf8")) as {
+      surfaces: { landingPages: Array<Record<string, unknown>> };
+    };
+    studio.surfaces.landingPages = [{ id: "landing", status: "ready", interaction: "scroll-linked" }];
+    writeFileSync(studioPath, JSON.stringify(studio));
+    fixture.report.sources[2] = designArtifact(fixture.root, "studio/seed/business.json");
+    const landingReviews = fixture.report.surfaces.filter((entry) => entry.id === "mobile" || entry.id === "desktop");
+    assert(landingReviews.length === 2, "expected mobile and desktop landing reviews");
+    for (const surface of landingReviews) {
+      const motion = surface.criteria.find((entry) => entry.id === "motion")!;
+      motion.evidenceIds = [surface.captures[0]!.id];
+    }
+    fixture.save();
+    const issues = validateDesignAcceptance(fixture.root);
+    assert(
+      issues.some((entry) => entry.code === "design_acceptance.criterion_evidence" && entry.message.includes("/motion")),
+      JSON.stringify(issues),
+    );
+  });
+  reject(
+    "a listed surface that omits interaction cannot freeze design acceptance",
+    ({ root, report }) => {
+      const studioPath = "studio/seed/business.json";
+      const studio = JSON.parse(readFileSync(path.join(root, studioPath), "utf8")) as {
+        surfaces: { landingPages: Array<Record<string, unknown>> };
+      };
+      studio.surfaces.landingPages = [{ id: "landing", status: "ready" }];
+      writeFileSync(path.join(root, studioPath), JSON.stringify(studio));
+      report.sources[2] = designArtifact(root, studioPath);
+    },
+    "page_gates.interaction_unresolved",
+  );
+  reject(
+    "a conversion landing without CRO evidence cannot freeze",
+    ({ root, report }) => {
+      rmSync(path.join(root, "growth/CRO_AUDIT.md"));
+      report.sources[2] = designArtifact(root, "studio/seed/business.json");
+    },
+    "page_gates.conversion_evidence_missing",
+  );
 }

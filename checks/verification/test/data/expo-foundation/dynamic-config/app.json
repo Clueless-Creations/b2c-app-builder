@@ -1,0 +1,7 @@
+{
+  "expo": {
+    "name": "trap-static",
+    "slug": "trap-static",
+    "plugins": ["./plugin.js"]
+  }
+}

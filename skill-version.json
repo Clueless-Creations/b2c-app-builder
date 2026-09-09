@@ -1,11 +1,11 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.12",
+  "version": "0.219.13",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Align ONB-18 so workers author design in DESIGN.md and prove selected shipping platforms only.",
-    "Keep the generated Design Room as read-only review, not the design source of truth.",
-    "Re-pin design-worthiness to the live knowledge document hash after the instruction change."
+    "Add an isolated Expo TypeScript starter fixture, expo-router@57.0.17 JSX routes, and disposable consumer install.",
+    "Pin Router companions to published expo@57.0.17 bundledNativeModules.json and assert them so the set cannot drift.",
+    "Keep router-native-ui, custom-native-module, and cng-prebuild blocked; no native compile or device proof."
   ]
 }

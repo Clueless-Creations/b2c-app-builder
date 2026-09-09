@@ -1926,6 +1926,16 @@ sources:
       - catalog/knowledge/design/design-design-evidence-stack.yaml
     notes: Documented UI component guidance used as a specification seed before current platform and accessibility
       documentation is checked.
+  - id: unpkg-com-expo-57-0-17-bundlednativemodules-json
+    name: expo@57.0.17 bundledNativeModules.json
+    source_type: website
+    url: https://unpkg.com/expo@57.0.17/bundledNativeModules.json
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-router-contract.ts
+    notes: Published Expo SDK 57.0.17 bundled companion table. Workspace pin source for expo-router and companions.
+      Not a live CLI or /latest/ pin.
   - id: uxsnaps-breakdowns
     name: UXSnaps
     source_type: design_breakdown

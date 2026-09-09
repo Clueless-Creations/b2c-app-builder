@@ -195,7 +195,7 @@ export const EXPO_QUEUED_OWNERS: readonly ExpoQueuedOwner[] = [
   {
     issue: 82,
     owns: "Expo starter, Router/native UI, CNG, custom Swift/Kotlin module path",
-    consume: "catalog/stacks/expo-selection.ts runtime slug and version facts",
+    consume: "This mapping’s runtime slug and version facts; starter, native-ownership, router-contract, and custom-module modules import it",
     doNot: "Relabel the Next.js habit-tracker starter, or replace product.yaml / DESIGN.md ownership",
   },
   {
@@ -347,9 +347,10 @@ function operationSupport(): ExpoOperationSupport[] {
       title: "Expo TypeScript starter",
       selection: "app-framework",
       platforms: ["ios", "android", "web"],
-      evidenceTier: "blocked",
+      evidenceTier: "fixture-tested",
       queuedIssue: 82,
-      notes: "No Expo starter in this checkout. Habit-tracker starter is Next.js.",
+      notes:
+        "Isolated TypeScript starter fixture and empty/dirty target policy are fixture-tested. A disposable Expo-starter consumer can generate a lockfile with local npm install; the fixture tree still ships none. Not a development client. Habit-tracker starter remains Next.js.",
     },
     {
       id: "router-native-ui",
@@ -358,7 +359,8 @@ function operationSupport(): ExpoOperationSupport[] {
       platforms: ["ios", "android", "web"],
       evidenceTier: "blocked",
       queuedIssue: 82,
-      notes: "UI library permits an expo adapter slug; SwiftUI remains the only implemented adapter.",
+      notes:
+        "JSX Stack/Tabs routes and expo-router@57.0.17 (expo@57.0.17 bundled set) exist. Navigation graph journeys are fixture-tested. Operation stays blocked: Expo Router runtime was not executed, and SwiftUI remains the only UI adapter.",
     },
     {
       id: "cng-prebuild",
@@ -367,7 +369,8 @@ function operationSupport(): ExpoOperationSupport[] {
       platforms: ["ios", "android"],
       evidenceTier: "blocked",
       queuedIssue: 82,
-      notes: "Blocked until #82. Do not run prebuild or treat changelog notes as an executable #81 route.",
+      notes:
+        "Blocked until Expo CLI prebuild is executed in a disposable workspace. Ownership classification in expo-native-ownership.ts is fixture-tested; that is not CNG generation.",
     },
     {
       id: "custom-native-module",
@@ -376,7 +379,8 @@ function operationSupport(): ExpoOperationSupport[] {
       platforms: ["ios", "android"],
       evidenceTier: "blocked",
       queuedIssue: 82,
-      notes: "Native add requires a new binary. Web needs an explicit unsupported path.",
+      notes:
+        "TypeScript requireNativeModule entry, Metro browser → index.web.ts, Swift/Kotlin sources, and web-unsupported are fixture-tested. Operation stays blocked: autolinking, native compile, and development-client rebuild were not run.",
     },
     {
       id: "authentication",

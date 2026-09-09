@@ -1,0 +1,1 @@
+SYNTHETIC FIXTURE: a user-authored native note. Regeneration must refuse this tree until ownership is resolved.

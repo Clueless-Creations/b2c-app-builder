@@ -4,6 +4,7 @@
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Record the Quiet Receipt mixed-surface independent review against RUBRIC-mixed-surface-v1."
+    "Record the Quiet Receipt mixed-surface independent review against RUBRIC-mixed-surface-v1.",
+    "Pin the mixed-surface finding artifact as filled with a hold, not a pending producer verdict."
   ]
 }

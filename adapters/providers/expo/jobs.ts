@@ -81,16 +81,23 @@ export function fingerprintBinding(binding: Omit<EasJobBinding, "commandId"> & {
 export function mapEasBuildStatus(status: string | undefined): EasRemoteJobState | "invalid" {
   switch (status) {
     case "new":
+    case "NEW":
     case "in-queue":
+    case "IN_QUEUE":
       return "queued";
     case "in-progress":
+    case "IN_PROGRESS":
     case "pending-cancel":
+    case "PENDING_CANCEL":
       return "running";
     case "finished":
+    case "FINISHED":
       return "finished";
     case "errored":
+    case "ERRORED":
       return "errored";
     case "canceled":
+    case "CANCELED":
       return "canceled";
     case "expired":
       return "expired";

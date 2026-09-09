@@ -1,0 +1,13 @@
+{
+  "id": "11111111-1111-4111-8111-111111111111",
+  "status": "FINISHED",
+  "platform": "IOS",
+  "buildProfile": "preview",
+  "expirationDate": "2020-01-01T00:00:00.000Z",
+  "app": {
+    "id": "proj_approved"
+  },
+  "artifacts": {
+    "applicationArchiveUrl": "https://example.invalid/artifacts/expired.ipa"
+  }
+}

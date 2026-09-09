@@ -8,9 +8,10 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { getExpoEasCommand, isRemotePaidOrPublicEffect, type ExpoEasCommandId } from "../../../catalog/stacks/expo-eas-commands.js";
 import { buildExpoEasArgv, ExpoArgvRefusal } from "./argv.js";
+import { decodeExpoEasResponse, ledgerArtifactUrl, type EasDecodedObservation } from "./decode.js";
 import type { ExpoCliDiscovery } from "./discovery.js";
 import { inspectCommandEffects } from "./effects.js";
-import { EasJobLedger, isSuccessfulBuild, mapEasBuildStatus, type EasArtifactKind, type EasJobBinding, type EasJobTransport } from "./jobs.js";
+import { EasJobLedger, isSuccessfulBuild, type EasArtifactKind, type EasJobBinding, type EasJobTransport } from "./jobs.js";
 import { assessExpoEasPreflight, type ExpoEasPreflight, type ExpoEasTarget } from "./preflight.js";
 import { inspectExpoProject } from "./project-config.js";
 import {
@@ -56,11 +57,13 @@ export interface ExpoEasExecuteResult {
   readonly redactedArgv: readonly string[];
   readonly process?: ExpoProcessResult;
   readonly remoteId?: string;
+  readonly observedRemoteIds?: readonly string[];
   readonly jobState?: string;
   readonly submitStage?: SubmitStageReading;
   readonly sanitizedStdout: string;
   readonly sanitizedStderr: string;
   readonly uncertainRemote: boolean;
+  readonly decode?: EasDecodedObservation;
 }
 
 function sourceFingerprint(cwd: string): string {
@@ -71,20 +74,25 @@ function sourceFingerprint(cwd: string): string {
   return createHash("sha256").update(pieces.join("\n")).digest("hex");
 }
 
-function parseRemoteId(stdout: string): { id?: string; status?: string; artifactUrl?: string } {
-  try {
-    const parsed: unknown = JSON.parse(stdout);
-    if (!parsed || typeof parsed !== "object") return {};
-    const record = parsed as Record<string, unknown>;
-    const nested = Array.isArray(record.builds) ? record.builds[0] : undefined;
-    const body = nested && typeof nested === "object" ? (nested as Record<string, unknown>) : record;
-    const id = typeof body.id === "string" ? body.id : typeof record.buildId === "string" ? record.buildId : undefined;
-    const status = typeof body.status === "string" ? body.status : typeof record.status === "string" ? record.status : undefined;
-    const artifactUrl =
-      typeof body.artifactsUrl === "string" ? body.artifactsUrl : typeof body.applicationArchiveUrl === "string" ? body.applicationArchiveUrl : undefined;
-    return { id, status, artifactUrl };
-  } catch {
-    return {};
+function decodeUncertainPaidEffect(paid: boolean, decoded: EasDecodedObservation, timedOut: boolean): boolean {
+  if (!paid) return false;
+  if (timedOut) return true;
+  switch (decoded.code) {
+    case "malformed-json":
+    case "wrong-shape":
+    case "unsupported-multiplicity":
+    case "target-mismatch":
+    case "empty":
+      return true;
+    case "ok":
+    case "partial":
+    case "not-json":
+    case "unsupported-command":
+      return false;
+    default: {
+      const exhaustive: never = decoded.code;
+      throw new Error(`unhandled EAS decode code: ${String(exhaustive)}`);
+    }
   }
 }
 
@@ -118,6 +126,9 @@ export function runExpoEasCommand(input: ExpoEasExecuteRequest): ExpoEasExecuteR
   };
   if (preflight.status !== "ready") return empty;
 
+  // #106 owns comparing the current request binding before reuse and persisting intent
+  // before spawn. This executor still reconciles by idempotency key first; do not treat a
+  // decode change as that durability repair.
   if (isRemotePaidOrPublicEffect(closure.vector)) {
     try {
       const prior = input.ledger.reconcile(input.jobTransport, input.idempotencyKey);
@@ -211,11 +222,23 @@ export function runExpoEasCommand(input: ExpoEasExecuteRequest): ExpoEasExecuteR
   const processResult = input.run(request);
   const sanitizedStdout = sanitizeExpoProcessText(processResult.stdout);
   const sanitizedStderr = sanitizeExpoProcessText(processResult.stderr);
-  const parsed = parseRemoteId(processResult.stdout);
-  const mapped = mapEasBuildStatus(parsed.status);
+  const decoded = decodeExpoEasResponse({
+    commandId: input.operationId,
+    stdout: processResult.stdout,
+    expected: {
+      platform: input.platform,
+      profile: input.profile,
+      easProjectId: input.target.approvedProjectId ?? project.linkedProjectId,
+      buildId: input.buildId,
+      submissionId: input.submissionId,
+    },
+  });
+  const mapped = decoded.jobState;
+  const mappedInvalid = mapped === undefined;
   const timedOut = processResult.timedOut || processResult.cancelled;
-  const uncertainRemote = Boolean(isRemotePaidOrPublicEffect(closure.vector) && (timedOut || mapped === "invalid") && parsed.id);
-  const failedWithoutId = Boolean(isRemotePaidOrPublicEffect(closure.vector) && timedOut && !parsed.id);
+  const paid = isRemotePaidOrPublicEffect(closure.vector);
+  const failedWithoutId = Boolean(paid && timedOut && !decoded.boundRemoteId);
+  const uncertainRemote = decodeUncertainPaidEffect(paid, decoded, timedOut) || Boolean(paid && mappedInvalid && decoded.boundRemoteId);
 
   const binding: EasJobBinding = {
     sourceFingerprint: sourceFingerprint(input.cwd),
@@ -227,26 +250,26 @@ export function runExpoEasCommand(input: ExpoEasExecuteRequest): ExpoEasExecuteR
     commandId: input.operationId,
     easProjectId: input.target.approvedProjectId ?? project.linkedProjectId,
   };
-  if (isRemotePaidOrPublicEffect(closure.vector)) {
+  if (paid) {
     const state = failedWithoutId
       ? "uncertain"
       : uncertainRemote
         ? "uncertain"
-        : mapped === "invalid"
+        : mappedInvalid
           ? processResult.status === 0
             ? "uncertain"
             : "errored"
-          : mapped;
+          : (mapped ?? "uncertain");
     input.ledger.record(input.idempotencyKey, binding, {
-      remoteId: parsed.id,
+      remoteId: decoded.boundRemoteId,
       state,
-      artifactUrl: parsed.artifactUrl,
+      artifactUrl: ledgerArtifactUrl(decoded),
     });
   }
 
   const submitStage =
     spec.id === "eas.submit" || spec.id === "eas.submit.view"
-      ? interpretSubmitOutcome({ platform: input.platform ?? "ios", easStatus: parsed.status, json: tryJson(processResult.stdout) })
+      ? interpretSubmitOutcome({ platform: input.platform ?? "ios", easStatus: decoded.nativeStatus, json: tryJson(processResult.stdout) })
       : undefined;
   const successClaimed = isSuccessfulBuild(input.ledger.get(input.idempotencyKey));
   return {
@@ -255,12 +278,14 @@ export function runExpoEasCommand(input: ExpoEasExecuteRequest): ExpoEasExecuteR
     argv,
     redactedArgv: redactExpoArgv(argv),
     process: processResult,
-    remoteId: parsed.id,
-    jobState: mapped === "invalid" ? (uncertainRemote || failedWithoutId ? "uncertain" : undefined) : mapped,
+    remoteId: decoded.boundRemoteId,
+    observedRemoteIds: decoded.observedRemoteIds,
+    jobState: mappedInvalid ? (uncertainRemote || failedWithoutId ? "uncertain" : undefined) : mapped,
     submitStage,
     sanitizedStdout,
     sanitizedStderr,
-    uncertainRemote: uncertainRemote || failedWithoutId || (Boolean(parsed.status) && mapped === "invalid" && !successClaimed),
+    uncertainRemote: uncertainRemote || failedWithoutId || (Boolean(decoded.nativeStatus) && mappedInvalid && !successClaimed),
+    decode: decoded,
   };
 }
 

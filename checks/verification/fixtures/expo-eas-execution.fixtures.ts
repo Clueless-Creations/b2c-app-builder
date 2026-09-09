@@ -15,6 +15,7 @@ import {
   buildExpoEasArgv,
   buildExpoProcessEnv,
   createFakeEasJobTransport,
+  decodeExpoEasResponse,
   discoverExpoCli,
   inspectCommandEffects,
   inspectExpoProject,
@@ -30,6 +31,12 @@ import {
   type ExpoProcessRunner,
 } from "../../../adapters/providers/expo/index.js";
 import { assert, skillRoot, type Harness } from "./_harness.js";
+
+const EAS_NATIVE_DIR = path.join(skillRoot, "checks/verification/test/data/expo-eas");
+
+function loadEasNativeStdout(name: string): string {
+  return readFileSync(path.join(EAS_NATIVE_DIR, name), "utf8");
+}
 
 function ok(stdout: string, status = 0): ExpoProcessResult {
   return { stdout, stderr: "", status, timedOut: false, truncated: false, cancelled: false, signal: null };
@@ -372,7 +379,9 @@ export function register(harness: Harness): void {
     const ledger = new EasJobLedger({ now: () => "2026-09-09T00:00:00.000Z" });
     const transport = createFakeEasJobTransport({ jobs: { build_paid: { state: "finished", artifactUrl: "artifact:fake-ipa" } } });
     const { run, calls } = recordingRunner(() => ({
-      stdout: JSON.stringify({ id: "build_paid", status: "in-queue" }),
+      stdout: JSON.stringify([
+        { id: "build_paid", status: "IN_QUEUE", platform: "IOS", buildProfile: "preview", app: { id: "proj_approved" } },
+      ]),
       stderr: "",
       status: null,
       timedOut: true,
@@ -429,7 +438,9 @@ export function register(harness: Harness): void {
     const ledger = new EasJobLedger({ now: () => "2026-09-09T00:00:00.000Z" });
     const transport = createFakeEasJobTransport();
     const { run, calls } = recordingRunner(() => ({
-      stdout: JSON.stringify({ id: "build_paid", status: "in-queue" }),
+      stdout: JSON.stringify([
+        { id: "build_paid", status: "IN_QUEUE", platform: "IOS", buildProfile: "preview", app: { id: "proj_approved" } },
+      ]),
       stderr: "",
       status: null,
       timedOut: true,
@@ -463,6 +474,123 @@ export function register(harness: Harness): void {
     assert(second.uncertainRemote, "unread remote id stays uncertain");
     assert(calls.length === 1, `expected one spawn, got ${calls.length}`);
     assert(transport.reads.includes("build_paid"), "must attempt readback of the persisted remote id");
+  });
+
+  harness.check("expo-eas: cloud one-element array preserves id; build:view uses its own object decoder", () => {
+    const cwd = writeFakeApp(harness.makeTempDir("decode-array-app"));
+    const isolatedHome = isolatedConfigHome(harness.makeTempDir("decode-array-home"), "ws-a");
+    const discovery = trustedDiscovery(harness);
+    const ledger = new EasJobLedger({ now: () => "2026-09-09T00:00:00.000Z" });
+    const { run: buildRun } = recordingRunner(() => ok(loadEasNativeStdout("build-cloud-one-element-array.json")));
+    const built = runExpoEasCommand({
+      operationId: "eas.build.cloud",
+      executable: "/opt/fake/bin/eas",
+      cwd,
+      isolatedHome,
+      pathEnv: "/opt/fake/bin",
+      run: buildRun,
+      discovery,
+      target: selectedTarget(),
+      platform: "ios",
+      profile: "preview",
+      idempotencyKey: "decode-array",
+      ledger,
+      jobTransport: createFakeEasJobTransport(),
+    });
+    assert(built.remoteId === "11111111-1111-4111-8111-111111111111", built.remoteId ?? "");
+    assert(built.jobState === "queued", built.jobState ?? "");
+    assert(built.decode?.code === "ok" || built.decode?.code === "partial", built.decode?.code ?? "");
+    const { run: viewRun } = recordingRunner(() => ok(loadEasNativeStdout("build-view-single-object.json")));
+    const viewed = runExpoEasCommand({
+      operationId: "eas.build.view",
+      executable: "/opt/fake/bin/eas",
+      cwd,
+      isolatedHome,
+      pathEnv: "/opt/fake/bin",
+      run: viewRun,
+      discovery,
+      target: selectedTarget({ grantedAuthority: "observe" }),
+      platform: "ios",
+      profile: "preview",
+      buildId: "11111111-1111-4111-8111-111111111111",
+      idempotencyKey: "decode-view",
+      ledger: new EasJobLedger({ now: () => "2026-09-09T00:00:00.000Z" }),
+      jobTransport: createFakeEasJobTransport(),
+    });
+    assert(viewed.invoked, "view may spawn");
+    assert(viewed.remoteId === built.remoteId, `${viewed.remoteId} vs ${built.remoteId}`);
+    assert(viewed.decode?.qualifiedRemoteIds[0] === built.decode?.qualifiedRemoteIds[0], "same qualified id across commands");
+    const mistaken = decodeExpoEasResponse({
+      commandId: "eas.build.cloud",
+      stdout: loadEasNativeStdout("build-mistaken-single-object.json"),
+      expected: { platform: "ios", profile: "preview", easProjectId: "proj_approved" },
+    });
+    assert(mistaken.boundRemoteId === undefined, "executor-facing decode must not treat the old object as a cloud job");
+  });
+
+  harness.check("expo-eas: multiplicity and malformed JSON do not prove a successful paid build", () => {
+    const cwd = writeFakeApp(harness.makeTempDir("decode-multi-app"));
+    const isolatedHome = isolatedConfigHome(harness.makeTempDir("decode-multi-home"), "ws-a");
+    const discovery = trustedDiscovery(harness);
+    const { run: multiRun, calls: multiCalls } = recordingRunner(() => ok(loadEasNativeStdout("build-cloud-multi-array.json")));
+    const multiLedger = new EasJobLedger({ now: () => "2026-09-09T00:00:00.000Z" });
+    const multi = runExpoEasCommand({
+      operationId: "eas.build.cloud",
+      executable: "/opt/fake/bin/eas",
+      cwd,
+      isolatedHome,
+      pathEnv: "/opt/fake/bin",
+      run: multiRun,
+      discovery,
+      target: selectedTarget(),
+      platform: "ios",
+      profile: "preview",
+      idempotencyKey: "decode-multi",
+      ledger: multiLedger,
+      jobTransport: createFakeEasJobTransport(),
+    });
+    assert(multi.invoked, "dispatch may spawn");
+    assert(multi.remoteId === undefined, multi.remoteId ?? "");
+    assert(multi.observedRemoteIds?.length === 2, String(multi.observedRemoteIds?.length));
+    assert(multi.uncertainRemote, "unsupported multiplicity after a paid spawn stays uncertain");
+    assert(isSuccessfulBuild(multiLedger.get("decode-multi")) === false, "multiplicity is not success");
+    const retry = runExpoEasCommand({
+      operationId: "eas.build.cloud",
+      executable: "/opt/fake/bin/eas",
+      cwd,
+      isolatedHome,
+      pathEnv: "/opt/fake/bin",
+      run: multiRun,
+      discovery,
+      target: selectedTarget(),
+      platform: "ios",
+      profile: "preview",
+      idempotencyKey: "decode-multi",
+      ledger: multiLedger,
+      jobTransport: createFakeEasJobTransport(),
+    });
+    assert(retry.invoked === false, "uncertain multiplicity must not spawn a second paid build");
+    assert(multiCalls.length === 1, `expected one spawn, got ${multiCalls.length}`);
+    const { run: badRun } = recordingRunner(() => ok("{not-json"));
+    const badLedger = new EasJobLedger({ now: () => "2026-09-09T00:00:00.000Z" });
+    const bad = runExpoEasCommand({
+      operationId: "eas.build.cloud",
+      executable: "/opt/fake/bin/eas",
+      cwd,
+      isolatedHome,
+      pathEnv: "/opt/fake/bin",
+      run: badRun,
+      discovery,
+      target: selectedTarget(),
+      platform: "ios",
+      profile: "preview",
+      idempotencyKey: "decode-malformed",
+      ledger: badLedger,
+      jobTransport: createFakeEasJobTransport(),
+    });
+    assert(bad.remoteId === undefined, bad.remoteId ?? "");
+    assert(bad.decode?.code === "malformed-json", bad.decode?.code ?? "");
+    assert(isSuccessfulBuild(badLedger.get("decode-malformed")) === false, "malformed JSON is not success");
   });
 
   harness.check("expo-eas: workflow prod deploy and unknown jobs refuse instead of failing open", () => {

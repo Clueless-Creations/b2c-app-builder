@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.18",
+  "version": "0.219.19",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Show an honest waitlist confirmation on Quiet Receipt after a valid submit.",
-    "Drive the Quiet Receipt cinematic page from measured scroll so scene state and progress change in the browser."
+    "Re-score Quiet Receipt mixed-surface pages against rubric v1 after the waitlist and scroll repair.",
+    "Pin the mixed-surface finding harness to Verdict pass."
   ]
 }

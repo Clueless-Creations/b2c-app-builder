@@ -54,6 +54,17 @@
       nav a + a {
         margin-left: 1rem;
       }
+      #joined {
+        display: none;
+        margin: 0 0 1rem;
+        padding: 0.75rem 0.85rem;
+        border: 1px solid var(--rule);
+        background: #fff;
+      }
+      #joined:target,
+      #joined.is-visible {
+        display: block;
+      }
     </style>
   </head>
   <body>
@@ -74,7 +85,11 @@
       <p class="muted">
         This waitlist is a fixture. Submitting does not join a real list.
       </p>
-      <form action="#" method="get">
+      <p id="joined" role="status" tabindex="-1">
+        Received. This fixture put the address in the page URL. It did not
+        store it or join a real list.
+      </p>
+      <form action="./conversion.html#joined" method="get">
         <label for="email">Email for the iOS waitlist</label>
         <input id="email" name="email" type="email" autocomplete="email" required />
         <button type="submit">Join the waitlist</button>
@@ -84,5 +99,18 @@
         This page has no scroll-linked choreography.
       </p>
     </main>
+    <script>
+      (function () {
+        var joined = document.getElementById("joined");
+        var email = new URLSearchParams(window.location.search).get("email");
+        if (!joined || !email) return;
+        joined.textContent =
+          "Received " +
+          email +
+          ". This fixture put the address in the page URL. It did not store it or join a real list.";
+        joined.classList.add("is-visible");
+        joined.focus();
+      })();
+    </script>
   </body>
 </html>

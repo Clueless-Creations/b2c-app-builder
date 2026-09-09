@@ -28,7 +28,7 @@ export const UPSTREAM_SDK_PREVIEW_MINIMAL = {
 
 /**
  * Provenance: documented GET /v1/subscribers/{app_user_id}/offerings body
- * (https://www.revenuecat.com/docs/api-v1/offerings-model) plus paywall_components
+ * (https://www.revenuecat.com/docs/api-v1) plus paywall_components
  * from the pinned CLI preview command (null = fallback).
  */
 export const UPSTREAM_SDK_PREVIEW_WITH_PACKAGES = {
@@ -135,7 +135,7 @@ export const UPSTREAM_LIST_COMPLETE = {
 export const UPSTREAM_LIST_PARTIAL = {
   object: "list",
   items: [{ id: "ofrng", lookup_key: "default", object: "offering" }],
-  next_page: "https://api.revenuecat.com/v2/projects/proj/offerings?starting_after=ofrng",
+  next_page: "/projects/proj/offerings?starting_after=ofrng",
   url: "/projects/proj/offerings",
 } as const;
 

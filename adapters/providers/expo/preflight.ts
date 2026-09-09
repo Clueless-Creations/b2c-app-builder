@@ -138,19 +138,18 @@ export function assessExpoEasPreflight(input: {
   if (spec.support !== "implemented-fixture") {
     return hold("unsupported-operation", `${spec.id} is ${spec.support}. Passive plan does not run eas init, credentials, env:exec, or prebuild.`);
   }
-  if (input.target.mode === "plan") {
-    return hold("passive-plan", "Passive plan classified effects and did not spawn a process, evaluate plugins, log in, or run eas init.");
-  }
   if (input.discovery.code === "missing") return hold("missing-cli", input.discovery.message);
   if (input.discovery.code === "unrelated-executable") return hold("unrelated-executable", input.discovery.message);
-  if (spec.accountRequired && !input.target.hasCredential) {
-    return hold("missing-auth", `${spec.id} needs an authorized Expo token reference. Credential files are not read to prove login.`);
-  }
   if (!input.project.easJsonParseOk) return hold("invalid-eas-json", "eas.json is present but not static JSON. Dynamic evaluation is refused.");
   if (spec.projectLinkRequired && !input.project.easJsonPresent) {
     return hold("missing-eas-json", `${spec.id} needs an existing eas.json. eas init is not run to create one.`);
   }
-  if (input.target.mode === "dispatch" && input.project.dynamicConfigPresent && spec.effects.configPluginEvaluation && input.target.grantedAuthority === "observe") {
+  if (
+    input.target.mode === "dispatch" &&
+    input.project.dynamicConfigPresent &&
+    spec.effects.configPluginEvaluation &&
+    input.target.grantedAuthority === "observe"
+  ) {
     return hold("dynamic-config-plan", "Dynamic app.config.js/ts is present. Passive inspection does not evaluate it.");
   }
   const approvedPlatform = input.target.approvedPlatform;
@@ -182,7 +181,16 @@ export function assessExpoEasPreflight(input: {
     return hold("workflow-parse", "Workflow YAML did not parse. Nested effects are unknown; dispatch is refused.");
   }
   if (workflowTriggersExceedApproval(input.closure, input.target.allowWorkflowTriggers)) {
-    return hold("workflow-trigger-refused", "Workflow default push, pull_request, or schedule triggers exceed a one-shot approved effect. They are not enabled.");
+    return hold(
+      "workflow-trigger-refused",
+      "Workflow default push, pull_request, or schedule triggers exceed a one-shot approved effect. They are not enabled.",
+    );
+  }
+  if (input.target.mode === "plan") {
+    return hold("passive-plan", "Passive plan classified effects and did not spawn a process, evaluate plugins, log in, or run eas init.");
+  }
+  if (spec.accountRequired && !input.target.hasCredential) {
+    return hold("missing-auth", `${spec.id} needs an authorized Expo token reference. Credential files are not read to prove login.`);
   }
   const granted = input.target.grantedAuthority;
   const needed = input.closure.requiredAuthority;
@@ -215,7 +223,19 @@ export function assessExpoEasPreflight(input: {
   return { status: "ready", code: "ready", message: `${spec.id} preflight ready. Live cloud/signing remain separately evidenced.`, blocksUnrelatedWork: false };
 }
 
-function mappingOperation(commandId: ExpoEasCommandId): "expo-cli-process" | "direct-local-compile" | "eas-local-build" | "eas-cloud-build" | "eas-workflows" | "store-handoff" | "eas-update" | "eas-hosting" | "expo-web-export" | "cng-prebuild" {
+function mappingOperation(
+  commandId: ExpoEasCommandId,
+):
+  | "expo-cli-process"
+  | "direct-local-compile"
+  | "eas-local-build"
+  | "eas-cloud-build"
+  | "eas-workflows"
+  | "store-handoff"
+  | "eas-update"
+  | "eas-hosting"
+  | "expo-web-export"
+  | "cng-prebuild" {
   switch (commandId) {
     case "expo.version":
     case "expo.whoami":

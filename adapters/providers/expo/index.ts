@@ -3,8 +3,16 @@ export { buildExpoEasArgv, ExpoArgvRefusal } from "./argv.js";
 export { discoverExpoCli } from "./discovery.js";
 export { inspectCommandEffects, inspectProjectCommandEffects } from "./effects.js";
 export { runExpoEasCommand } from "./execute.js";
-export { EasJobLedger, createFakeEasJobTransport, easJobLedgerPath, fingerprintBinding, isSuccessfulBuild, mapEasBuildStatus } from "./jobs.js";
-export { assessExpoEasPreflight, authoritySatisfies, isolatedConfigHome } from "./preflight.js";
+export {
+  EasJobLedger,
+  createFakeEasJobTransport,
+  easJobLedgerPath,
+  fingerprintBinding,
+  isSuccessfulBuild,
+  mapEasBuildStatus,
+  type EasJobEntry,
+} from "./jobs.js";
+export { assessExpoEasPreflight, authoritySatisfies, isolatedConfigHome, type ExpoEasTarget } from "./preflight.js";
 export { inspectExpoProject, workflowRelativePathAllowed } from "./project-config.js";
 export {
   EXPO_PROCESS_DISCOVERY_TIMEOUT_MS,

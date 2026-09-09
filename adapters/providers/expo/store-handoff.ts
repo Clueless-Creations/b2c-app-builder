@@ -3,14 +3,7 @@
  * approval, or public release. Apple and Google tracks stay distinct.
  */
 
-export const STORE_HANDOFF_STAGES = [
-  "compiled-artifact",
-  "uploaded-binary",
-  "testing-track",
-  "submitted-for-review",
-  "approved",
-  "released",
-] as const;
+export const STORE_HANDOFF_STAGES = ["compiled-artifact", "uploaded-binary", "testing-track", "submitted-for-review", "approved", "released"] as const;
 
 export type StoreHandoffStage = (typeof STORE_HANDOFF_STAGES)[number];
 
@@ -53,7 +46,8 @@ export function interpretSubmitOutcome(input: SubmitOutcomeInput): SubmitStageRe
         stage: "uploaded-binary",
         released: false,
         testingTrack: false,
-        notes: "A finished iOS submit is an uploaded binary. TestFlight availability, App Review, approval, and App Store release are separate stages owned by ASC.",
+        notes:
+          "A finished iOS submit is an uploaded binary. TestFlight availability, App Review, approval, and App Store release are separate stages owned by ASC.",
       };
     }
     return {

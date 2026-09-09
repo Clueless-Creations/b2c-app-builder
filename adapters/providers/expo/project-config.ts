@@ -58,7 +58,15 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function workflowJobType(value: unknown): WorkflowJobType {
-  if (value === "build" || value === "submit" || value === "update" || value === "deploy" || value === "fingerprint" || value === "get-build" || value === "require") {
+  if (
+    value === "build" ||
+    value === "submit" ||
+    value === "update" ||
+    value === "deploy" ||
+    value === "fingerprint" ||
+    value === "get-build" ||
+    value === "require"
+  ) {
     return value;
   }
   return "unknown";

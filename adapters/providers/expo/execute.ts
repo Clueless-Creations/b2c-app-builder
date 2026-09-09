@@ -80,14 +80,15 @@ function parseRemoteId(stdout: string): { id?: string; status?: string; artifact
     const body = nested && typeof nested === "object" ? (nested as Record<string, unknown>) : record;
     const id = typeof body.id === "string" ? body.id : typeof record.buildId === "string" ? record.buildId : undefined;
     const status = typeof body.status === "string" ? body.status : typeof record.status === "string" ? record.status : undefined;
-    const artifactUrl = typeof body.artifactsUrl === "string" ? body.artifactsUrl : typeof body.applicationArchiveUrl === "string" ? body.applicationArchiveUrl : undefined;
+    const artifactUrl =
+      typeof body.artifactsUrl === "string" ? body.artifactsUrl : typeof body.applicationArchiveUrl === "string" ? body.applicationArchiveUrl : undefined;
     return { id, status, artifactUrl };
   } catch {
     return {};
   }
 }
 
-export async function runExpoEasCommand(input: ExpoEasExecuteRequest): Promise<ExpoEasExecuteResult> {
+export function runExpoEasCommand(input: ExpoEasExecuteRequest): ExpoEasExecuteResult {
   const spec = getExpoEasCommand(input.operationId);
   const project = inspectExpoProject(input.cwd);
   const closure = inspectCommandEffects(project, {
@@ -119,7 +120,7 @@ export async function runExpoEasCommand(input: ExpoEasExecuteRequest): Promise<E
 
   if (isRemotePaidOrPublicEffect(closure.vector)) {
     try {
-      const prior = await input.ledger.reconcile(input.jobTransport, input.idempotencyKey);
+      const prior = input.ledger.reconcile(input.jobTransport, input.idempotencyKey);
       if (prior.action === "reuse" || prior.action === "reconciled") {
         return {
           ...empty,
@@ -206,7 +207,15 @@ export async function runExpoEasCommand(input: ExpoEasExecuteRequest): Promise<E
     easProjectId: input.target.approvedProjectId ?? project.linkedProjectId,
   };
   if (isRemotePaidOrPublicEffect(closure.vector)) {
-    const state = failedWithoutId ? "uncertain" : uncertainRemote ? "uncertain" : mapped === "invalid" ? (processResult.status === 0 ? "uncertain" : "errored") : mapped;
+    const state = failedWithoutId
+      ? "uncertain"
+      : uncertainRemote
+        ? "uncertain"
+        : mapped === "invalid"
+          ? processResult.status === 0
+            ? "uncertain"
+            : "errored"
+          : mapped;
     input.ledger.record(input.idempotencyKey, binding, {
       remoteId: parsed.id,
       state,
@@ -214,7 +223,10 @@ export async function runExpoEasCommand(input: ExpoEasExecuteRequest): Promise<E
     });
   }
 
-  const submitStage = spec.id === "eas.submit" || spec.id === "eas.submit.view" ? interpretSubmitOutcome({ platform: input.platform ?? "ios", easStatus: parsed.status, json: tryJson(processResult.stdout) }) : undefined;
+  const submitStage =
+    spec.id === "eas.submit" || spec.id === "eas.submit.view"
+      ? interpretSubmitOutcome({ platform: input.platform ?? "ios", easStatus: parsed.status, json: tryJson(processResult.stdout) })
+      : undefined;
   const successClaimed = isSuccessfulBuild(input.ledger.get(input.idempotencyKey));
   return {
     invoked: true,

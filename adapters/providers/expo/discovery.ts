@@ -109,7 +109,7 @@ export function discoverExpoCli(input: DiscoverExpoCliInput): ExpoCliDiscovery {
       selected: null,
       candidates,
       documentedEasVersion: EAS_CLI_DOCUMENTED_VERSION,
-      message: `${commandName} is not on the isolated PATH. This is a hold, not an install, and not a global block on unrelated work. Do not run npm install -g or npx ${commandName}-cli@latest.`,
+      message: `${commandName} is not on the isolated PATH. This is a hold, not an install, and not a global block on unrelated work. Do not install Expo or EAS CLI from this hold, and do not use an unpinned installer.`,
     };
   }
   return {

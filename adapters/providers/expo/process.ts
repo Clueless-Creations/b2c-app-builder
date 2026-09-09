@@ -17,22 +17,7 @@ export const EXPO_PROCESS_DISCOVERY_TIMEOUT_MS = 10_000;
 export const EXPO_PROCESS_READ_TIMEOUT_MS = 30_000;
 export const EXPO_PROCESS_MUTATION_TIMEOUT_MS = 60_000;
 
-const DENIED_EXECUTABLE_BASENAMES = new Set([
-  "npx",
-  "npm",
-  "yarn",
-  "pnpm",
-  "bun",
-  "node",
-  "sh",
-  "bash",
-  "zsh",
-  "dash",
-  "cmd",
-  "cmd.exe",
-  "powershell",
-  "pwsh",
-]);
+const DENIED_EXECUTABLE_BASENAMES = new Set(["npx", "npm", "yarn", "pnpm", "bun", "node", "sh", "bash", "zsh", "dash", "cmd", "cmd.exe", "powershell", "pwsh"]);
 
 const REFUSED_INHERITED_ENV = new Set([
   "EXPO_APPLE_PASSWORD",

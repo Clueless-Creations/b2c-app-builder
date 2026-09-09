@@ -4,11 +4,7 @@
  * Neither flag grants authority.
  */
 
-import {
-  getExpoEasCommand,
-  type ExpoEasCommandId,
-  type ExpoEasCommandSpec,
-} from "../../../catalog/stacks/expo-eas-commands.js";
+import { getExpoEasCommand, type ExpoEasCommandId, type ExpoEasCommandSpec } from "../../../catalog/stacks/expo-eas-commands.js";
 
 export type ExpoArgvRefusalCode =
   | "unknown-operation"
@@ -128,12 +124,14 @@ export function buildExpoEasArgv(request: ExpoEasArgvRequest): string[] {
       break;
     case "eas.build.cloud":
     case "eas.build.local": {
-      if (!request.platform) throw new ExpoArgvRefusal("missing-platform", `${operation.id} requires an explicit ios or android platform. Platform all is refused.`);
+      if (!request.platform)
+        throw new ExpoArgvRefusal("missing-platform", `${operation.id} requires an explicit ios or android platform. Platform all is refused.`);
       if (!request.profile) throw new ExpoArgvRefusal("missing-profile", `${operation.id} requires an explicit eas.json profile. Production is not inferred.`);
       argv.push("build", "--platform", request.platform, "--profile", request.profile);
       if (operation.id === "eas.build.local") argv.push("--local");
       if (request.autoSubmit) {
-        if (!operation.documentedFlags.autoSubmit) throw new ExpoArgvRefusal("auto-submit-without-authority", `${operation.id} does not document --auto-submit.`);
+        if (!operation.documentedFlags.autoSubmit)
+          throw new ExpoArgvRefusal("auto-submit-without-authority", `${operation.id} does not document --auto-submit.`);
         argv.push("--auto-submit");
       }
       if (operation.documentedFlags.json) argv.push("--json");
@@ -161,7 +159,8 @@ export function buildExpoEasArgv(request: ExpoEasArgvRequest): string[] {
     case "eas.submit":
       if (!request.platform) throw new ExpoArgvRefusal("missing-platform", "eas.submit requires ios or android. Platform all is refused.");
       if (!request.profile) throw new ExpoArgvRefusal("missing-profile", "eas.submit requires an explicit submit profile.");
-      if (!request.buildId) throw new ExpoArgvRefusal("missing-build-id", "eas.submit requires an explicit build id. --latest is refused so the artifact stays bound.");
+      if (!request.buildId)
+        throw new ExpoArgvRefusal("missing-build-id", "eas.submit requires an explicit build id. --latest is refused so the artifact stays bound.");
       argv.push("submit", "--platform", request.platform, "--profile", request.profile, "--id", request.buildId);
       if (operation.documentedFlags.nonInteractive) argv.push("--non-interactive");
       if (operation.documentedFlags.wait && request.wait !== true) argv.push("--no-wait");

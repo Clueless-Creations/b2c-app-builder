@@ -112,7 +112,10 @@ export function inspectCommandEffects(project: InspectedExpoProject, request: Ef
   if (vector.serverDeployment) nested.push("server-deployment");
   if (vector.productionPromotion) nested.push("production-promotion");
   if (vector.storeSubmission) nested.push("store-submission");
-  if (project.npmHooks.length > 0 && (request.commandId === "eas.build.cloud" || request.commandId === "eas.build.local" || request.commandId === "eas.workflow.run")) {
+  if (
+    project.npmHooks.length > 0 &&
+    (request.commandId === "eas.build.cloud" || request.commandId === "eas.build.local" || request.commandId === "eas.workflow.run")
+  ) {
     vector = withEffect(vector, "localCodeExecution");
     nested.push("build-hook");
   }

@@ -361,7 +361,8 @@ export const EXPO_EAS_COMMANDS: readonly ExpoEasCommandSpec[] = [
     projectLinkRequired: true,
     requiredAuthority: "spend",
     documentedFlags: flags({ json: true, nonInteractive: true, local: true, autoSubmit: true, wait: true }),
-    notes: "Uploads source and may consume credits. --auto-submit is a nested store effect. --non-interactive is not permission. --local is a different operation.",
+    notes:
+      "Uploads source and may consume credits. --auto-submit is a nested store effect. --non-interactive is not permission. --local is a different operation.",
     docsUrl: EXPO_EAS_COMMAND_SOURCES.easCli,
   }),
   spec({
@@ -379,7 +380,8 @@ export const EXPO_EAS_COMMANDS: readonly ExpoEasCommandSpec[] = [
     projectLinkRequired: true,
     requiredAuthority: "compile",
     documentedFlags: flags({ json: true, nonInteractive: true, local: true, autoSubmit: true, wait: true }),
-    notes: "Documented experimental. Still authenticates and checks the EAS project; may download managed credentials. Not fully offline. Not identical to expo run:*. Platform `all` is disabled locally. iOS local still needs Xcode; Android local still needs an Android SDK. Live host toolchain remains not-run.",
+    notes:
+      "Documented experimental. Still authenticates and checks the EAS project; may download managed credentials. Not fully offline. Not identical to expo run:*. Platform `all` is disabled locally. iOS local still needs Xcode; Android local still needs an Android SDK. Live host toolchain remains not-run.",
     docsUrl: EXPO_EAS_COMMAND_SOURCES.localBuilds,
   }),
   spec({
@@ -451,7 +453,8 @@ export const EXPO_EAS_COMMANDS: readonly ExpoEasCommandSpec[] = [
     projectLinkRequired: true,
     requiredAuthority: "submit",
     documentedFlags: flags({ nonInteractive: true, wait: true }),
-    notes: "EAS CLI 23.2.0 documents submit without --json. Alias eas build:submit. Success is not TestFlight availability, review, approval, or release. --latest is refused. Live store submit remains not-run.",
+    notes:
+      "EAS CLI 23.2.0 documents submit without --json. Alias eas build:submit. Success is not TestFlight availability, review, approval, or release. --latest is refused. Live store submit remains not-run.",
     docsUrl: EXPO_EAS_COMMAND_SOURCES.submitIos,
   }),
   spec({
@@ -523,7 +526,8 @@ export const EXPO_EAS_COMMANDS: readonly ExpoEasCommandSpec[] = [
     projectLinkRequired: true,
     requiredAuthority: "spend",
     documentedFlags: flags({ json: true, nonInteractive: true, wait: true }),
-    notes: "Uploads the project unless --ref is used. Nested submit/update/deploy jobs are extra effects gated before spawn. Default PR/push/schedule triggers are refused. --ssh is experimental and excluded.",
+    notes:
+      "Uploads the project unless --ref is used. Nested submit/update/deploy jobs are extra effects gated before spawn. Default PR/push/schedule triggers are refused. --ssh is experimental and excluded.",
     docsUrl: EXPO_EAS_COMMAND_SOURCES.easCli,
   }),
   spec({

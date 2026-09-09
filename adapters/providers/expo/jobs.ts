@@ -48,7 +48,7 @@ export interface EasJobRead {
 }
 
 export interface EasJobTransport {
-  readJob(remoteId: string): Promise<EasJobRead | undefined>;
+  readJob(remoteId: string): EasJobRead | undefined;
 }
 
 interface LedgerFile {
@@ -152,11 +152,7 @@ export class EasJobLedger {
     renameSync(temporary, file);
   }
 
-  record(
-    idempotencyKey: string,
-    binding: EasJobBinding,
-    update: { remoteId?: string; state: EasRemoteJobState; artifactUrl?: string },
-  ): EasJobEntry {
+  record(idempotencyKey: string, binding: EasJobBinding, update: { remoteId?: string; state: EasRemoteJobState; artifactUrl?: string }): EasJobEntry {
     if (!idempotencyKey.trim()) throw new Error("expo.eas_idempotency_key_required");
     const previous = this.#entries.get(idempotencyKey);
     if (previous && previous.binding.sourceFingerprint !== binding.sourceFingerprint) {
@@ -190,12 +186,12 @@ export class EasJobLedger {
     return next;
   }
 
-  async reconcile(transport: EasJobTransport, idempotencyKey: string): Promise<EasJobReconciliation> {
+  reconcile(transport: EasJobTransport, idempotencyKey: string): EasJobReconciliation {
     const entry = this.#entries.get(idempotencyKey);
     if (!entry) return { action: "proceed", reason: "no_prior_request" };
     if (entry.state !== "uncertain") return { action: "reuse", entry };
     if (!entry.remoteId) throw new Error("expo.eas_reconcile_unresolved");
-    const job = await transport.readJob(entry.remoteId);
+    const job = transport.readJob(entry.remoteId);
     if (job) {
       const reconciled: EasJobEntry = {
         ...entry,
@@ -233,7 +229,9 @@ export interface FakeEasJobScript {
   readonly jobs?: Readonly<Record<string, EasJobRead | undefined>>;
 }
 
-export function createFakeEasJobTransport(script: FakeEasJobScript = {}): EasJobTransport & { readonly reads: readonly string[]; setJob(id: string, job: EasJobRead | undefined): void } {
+export function createFakeEasJobTransport(
+  script: FakeEasJobScript = {},
+): EasJobTransport & { readonly reads: readonly string[]; setJob(id: string, job: EasJobRead | undefined): void } {
   const jobs = new Map<string, EasJobRead | undefined>(Object.entries(script.jobs ?? {}));
   const reads: string[] = [];
   return {
@@ -241,7 +239,7 @@ export function createFakeEasJobTransport(script: FakeEasJobScript = {}): EasJob
     setJob(id, job) {
       jobs.set(id, job);
     },
-    async readJob(remoteId) {
+    readJob(remoteId) {
       reads.push(remoteId);
       const job = jobs.get(remoteId);
       return job ? { ...job } : undefined;

@@ -2,7 +2,7 @@
   "extension": {
     "apiVersion": "b2c.extension/v1",
     "id": "b2c/consumer-business",
-    "version": "0.219.8",
+    "version": "0.219.9",
     "hostApiVersion": "b2c/v1",
     "title": "Consumer business",
     "dependencies": [],
@@ -155,6 +155,24 @@
       {
         "id": "b2c/resource-833a6680c41b5949a885bb391842e47eddc2331100971c87ddebf1d6287319d2",
         "path": "knowledge/engineering/engineering-orchestration.md",
+        "kind": "knowledge",
+        "mediaType": "text/markdown"
+      },
+      {
+        "id": "b2c/resource-c5add73b19c3865c253715e7f4dc41eaf8cd1065fb5e13f4fd54c887dc409be4",
+        "path": "knowledge/engineering/expo-compatibility.md",
+        "kind": "knowledge",
+        "mediaType": "text/markdown"
+      },
+      {
+        "id": "b2c/resource-22b02332ba4a39650e1ae2c44c5d7241739f79bea7b807fe7152aaa2ec1ca122",
+        "path": "knowledge/engineering/expo-operations-map.md",
+        "kind": "knowledge",
+        "mediaType": "text/markdown"
+      },
+      {
+        "id": "b2c/resource-3d0c6683b37e4aadb7f961eab104cf88d7342ee214e9a187fc7c1d3a724f4f48",
+        "path": "knowledge/engineering/expo-stack-selection.md",
         "kind": "knowledge",
         "mediaType": "text/markdown"
       },
@@ -5072,7 +5090,7 @@
           "providerIds": [
             "provider.doppler"
           ],
-          "contextFingerprint": "sha256:9d7d4bd874291e442eddc8a30b201ff23b557a3c54fbd704122fdfd77653ee0d"
+          "contextFingerprint": "sha256:56931eb5d3dc203c38331a91ab162b86dfd0fb10dd43aa3df09232c625108743"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before any new secret, key, token, env var, webhook secret, or .env",
@@ -5102,6 +5120,9 @@
           "b2c/resource-7cfbcc8a046b5114c2f29ece76a35abfef9b27fdec4bb151b9de3c144042e8d8",
           "b2c/resource-4adbef7d6f265935f6d89954353f12a7df6cf2c4c8d3d6f4f48de29bb22603be",
           "b2c/resource-833a6680c41b5949a885bb391842e47eddc2331100971c87ddebf1d6287319d2",
+          "b2c/resource-c5add73b19c3865c253715e7f4dc41eaf8cd1065fb5e13f4fd54c887dc409be4",
+          "b2c/resource-22b02332ba4a39650e1ae2c44c5d7241739f79bea7b807fe7152aaa2ec1ca122",
+          "b2c/resource-3d0c6683b37e4aadb7f961eab104cf88d7342ee214e9a187fc7c1d3a724f4f48",
           "b2c/resource-3e816f16f11e9e8c89a37cd03164e873e003df3b3bc9879c4a4cc10cf3992a80",
           "b2c/resource-9133d79337c128746bb0303dd3f87d42ca0beef1aecce3214f86099727640ac9",
           "b2c/resource-6e4928ffb5429b6625d49b7f94e57b10abda01e4d5f24b9b74a7de4b341e800e",
@@ -5562,7 +5583,7 @@
             "provider.security-review",
             "provider.sentry"
           ],
-          "contextFingerprint": "sha256:2187fa2eea632a4320c6224cb36f46a770be26eb4b206468c43d89fb99dc1d79"
+          "contextFingerprint": "sha256:294693aff1be42f7718b287b2137e8ec87cb7319e74bbf8c97cfb06db9072bcb"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before threat modeling, hardening, scans, or any security-readiness claim. Founder phrasing: checked nobody can hack in or steal data.",
@@ -5593,6 +5614,9 @@
           "b2c/resource-7cfbcc8a046b5114c2f29ece76a35abfef9b27fdec4bb151b9de3c144042e8d8",
           "b2c/resource-4adbef7d6f265935f6d89954353f12a7df6cf2c4c8d3d6f4f48de29bb22603be",
           "b2c/resource-833a6680c41b5949a885bb391842e47eddc2331100971c87ddebf1d6287319d2",
+          "b2c/resource-c5add73b19c3865c253715e7f4dc41eaf8cd1065fb5e13f4fd54c887dc409be4",
+          "b2c/resource-22b02332ba4a39650e1ae2c44c5d7241739f79bea7b807fe7152aaa2ec1ca122",
+          "b2c/resource-3d0c6683b37e4aadb7f961eab104cf88d7342ee214e9a187fc7c1d3a724f4f48",
           "b2c/resource-3e816f16f11e9e8c89a37cd03164e873e003df3b3bc9879c4a4cc10cf3992a80",
           "b2c/resource-9133d79337c128746bb0303dd3f87d42ca0beef1aecce3214f86099727640ac9",
           "b2c/resource-4bd584057cdaa3acd8ac272a598ce30375ee549fab0b77e77b2c3112a3b2e2e3",
@@ -5662,7 +5686,7 @@
           "workflowId": "workflow.trust.community-and-user-safety",
           "instructions": "Confirm whether users can create, share, discover, or message content. When required, define moderation, reporting, blocking, escalation, support contact, age controls, response targets, and evidence. Record the operating model in trust/COMMUNITY_SAFETY.md. Test the common abuse and recovery paths. Do not mark this work as not needed without a reason and product evidence.",
           "providerIds": [],
-          "contextFingerprint": "sha256:12f4b59b49b4e4b0105467ee10d0789feb02f97632a3cbf0263f1d866fd96d26"
+          "contextFingerprint": "sha256:c8dca8e765b409686984465706fb0708bb3265aee4f83e733506ff993d790ff3"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "When the product includes social, chat, creator, or other user-generated content",
@@ -5693,6 +5717,9 @@
           "b2c/resource-7cfbcc8a046b5114c2f29ece76a35abfef9b27fdec4bb151b9de3c144042e8d8",
           "b2c/resource-4adbef7d6f265935f6d89954353f12a7df6cf2c4c8d3d6f4f48de29bb22603be",
           "b2c/resource-833a6680c41b5949a885bb391842e47eddc2331100971c87ddebf1d6287319d2",
+          "b2c/resource-c5add73b19c3865c253715e7f4dc41eaf8cd1065fb5e13f4fd54c887dc409be4",
+          "b2c/resource-22b02332ba4a39650e1ae2c44c5d7241739f79bea7b807fe7152aaa2ec1ca122",
+          "b2c/resource-3d0c6683b37e4aadb7f961eab104cf88d7342ee214e9a187fc7c1d3a724f4f48",
           "b2c/resource-3e816f16f11e9e8c89a37cd03164e873e003df3b3bc9879c4a4cc10cf3992a80",
           "b2c/resource-9133d79337c128746bb0303dd3f87d42ca0beef1aecce3214f86099727640ac9",
           "b2c/resource-4bd584057cdaa3acd8ac272a598ce30375ee549fab0b77e77b2c3112a3b2e2e3",
@@ -5720,7 +5747,7 @@
           "workflowId": "workflow.trust.generative-ai-safety",
           "instructions": "Confirm whether the product generates text, images, audio, or video. When required, define prohibited uses, input and output controls, reporting, enforcement, human escalation, age controls, and model or provider responsibilities. Test harmful, deceptive, exploitative, and sexual-content abuse cases. Define a named self-harm and crisis response — detect self-harm/suicide/crisis language and respond with a real crisis resource, not a generic refusal — and test that path explicitly; it is not covered by the general harmful-content test. Record controls and evidence in trust/AI_SAFETY.md. When a capability can create paid model-provider spend, write trust/AI_PROVIDER_CONTROLS.md with auth, entitlement, reservation, kill switch, one backend secret, and separate application versus provider-account cap status. If paid generation does not apply, still write that file with Paid generation: not applicable and a named reason. Do not mark this work as not needed without a reason and product evidence.",
           "providerIds": [],
-          "contextFingerprint": "sha256:dcd6200ea0200132ef31eb75b020ac7719eafadc4297ac9daf117f938db33964"
+          "contextFingerprint": "sha256:ed968e7be7a04a0851e334289e91584be7263df94c875f2e835107ccc72d709e"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "When the product generates text, images, audio, or video",
@@ -5751,6 +5778,9 @@
           "b2c/resource-7cfbcc8a046b5114c2f29ece76a35abfef9b27fdec4bb151b9de3c144042e8d8",
           "b2c/resource-4adbef7d6f265935f6d89954353f12a7df6cf2c4c8d3d6f4f48de29bb22603be",
           "b2c/resource-833a6680c41b5949a885bb391842e47eddc2331100971c87ddebf1d6287319d2",
+          "b2c/resource-c5add73b19c3865c253715e7f4dc41eaf8cd1065fb5e13f4fd54c887dc409be4",
+          "b2c/resource-22b02332ba4a39650e1ae2c44c5d7241739f79bea7b807fe7152aaa2ec1ca122",
+          "b2c/resource-3d0c6683b37e4aadb7f961eab104cf88d7342ee214e9a187fc7c1d3a724f4f48",
           "b2c/resource-3e816f16f11e9e8c89a37cd03164e873e003df3b3bc9879c4a4cc10cf3992a80",
           "b2c/resource-9133d79337c128746bb0303dd3f87d42ca0beef1aecce3214f86099727640ac9",
           "b2c/resource-4bd584057cdaa3acd8ac272a598ce30375ee549fab0b77e77b2c3112a3b2e2e3",
@@ -5778,7 +5808,7 @@
           "workflowId": "workflow.product.app-archetype-detection-and-starter",
           "instructions": "Compare the accepted product shape with the four shipped archetypes: habit tracker, photo or AI media, social network, and AI chat companion. When one is the product's center of gravity, copy its starter into the app instead of rebuilding the same wiring. Use an opening mandate that delegates stack and implementation choices. Ask the founder only when the match is ambiguous and that choice was not delegated. The copied starter and its README are the durable selection record. Do not rewrite PRODUCT.md or raw runtime state here. Run check:app-archetype and check:archetype-starter. If the product only contains a similar feature, use the general core-loop and complete-product method instead of forcing a pack.",
           "providerIds": [],
-          "contextFingerprint": "sha256:c76df0229588725d3f0b2fda21e0ea710f1453168ce8bbc35126bfb83ce2bad9"
+          "contextFingerprint": "sha256:1564cf610b6155d63b6b42eb03d470d80334050eed84a4d1e73a62c969409d4d"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Request matches a known product shape (social / AI-chat / habit / photo-AI)",
@@ -5805,6 +5835,9 @@
           "b2c/resource-7cfbcc8a046b5114c2f29ece76a35abfef9b27fdec4bb151b9de3c144042e8d8",
           "b2c/resource-4adbef7d6f265935f6d89954353f12a7df6cf2c4c8d3d6f4f48de29bb22603be",
           "b2c/resource-833a6680c41b5949a885bb391842e47eddc2331100971c87ddebf1d6287319d2",
+          "b2c/resource-c5add73b19c3865c253715e7f4dc41eaf8cd1065fb5e13f4fd54c887dc409be4",
+          "b2c/resource-22b02332ba4a39650e1ae2c44c5d7241739f79bea7b807fe7152aaa2ec1ca122",
+          "b2c/resource-3d0c6683b37e4aadb7f961eab104cf88d7342ee214e9a187fc7c1d3a724f4f48",
           "b2c/resource-3e816f16f11e9e8c89a37cd03164e873e003df3b3bc9879c4a4cc10cf3992a80",
           "b2c/resource-9133d79337c128746bb0303dd3f87d42ca0beef1aecce3214f86099727640ac9",
           "b2c/resource-fc94e922d6a5bb26c05fb6e41780af61fe53a062fed4771032459da317c7769f",
@@ -6088,7 +6121,7 @@
           "workflowId": "workflow.experience.emotional-design-audit-auditor",
           "instructions": "Audit EMOTIONAL_DESIGN.md against every card the app actually implements — for each, verify the specific bright-line/dark-line test from that card's own file (experience-cards/<name>-card.md) and verify the selection rationale against the actual product moment, not just that a card is named. When no card is selected, independently review the visible, explicit not-applicable decision and alternative; do not invent four required mechanisms. HIGH-risk cards (Variable Reward, Streak & Loss Aversion) get the strictest read: confirm the escape hatch, counter-metric, and non-empty fallback are real, not aspirational language. Write findings as EMOTIONAL_AUDIT.md's Audit Output Contract, and any dark-pattern violation or missing per-card attestation field becomes a failure card per failure-cards.md rather than a note to fix later — check:emotional-design enforces the attestation fields this audit must produce.",
           "providerIds": [],
-          "contextFingerprint": "sha256:2add184448ae1378a2f22592a7fc1cd85bbd6adcf3d371a1a6743fbde37af809"
+          "contextFingerprint": "sha256:9e43f7828494bb1ce60aea2cb4d1088650a325cdee3121ac429f2bd382616f5c"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "\"Audit this app's emotional design\" / \"emotional UX audit\"",
@@ -6125,6 +6158,9 @@
           "b2c/resource-7cfbcc8a046b5114c2f29ece76a35abfef9b27fdec4bb151b9de3c144042e8d8",
           "b2c/resource-4adbef7d6f265935f6d89954353f12a7df6cf2c4c8d3d6f4f48de29bb22603be",
           "b2c/resource-833a6680c41b5949a885bb391842e47eddc2331100971c87ddebf1d6287319d2",
+          "b2c/resource-c5add73b19c3865c253715e7f4dc41eaf8cd1065fb5e13f4fd54c887dc409be4",
+          "b2c/resource-22b02332ba4a39650e1ae2c44c5d7241739f79bea7b807fe7152aaa2ec1ca122",
+          "b2c/resource-3d0c6683b37e4aadb7f961eab104cf88d7342ee214e9a187fc7c1d3a724f4f48",
           "b2c/resource-3e816f16f11e9e8c89a37cd03164e873e003df3b3bc9879c4a4cc10cf3992a80",
           "b2c/resource-9133d79337c128746bb0303dd3f87d42ca0beef1aecce3214f86099727640ac9",
           "b2c/resource-4bd584057cdaa3acd8ac272a598ce30375ee549fab0b77e77b2c3112a3b2e2e3",
@@ -7524,7 +7560,7 @@
           "workflowId": "workflow.design.brand-definition",
           "instructions": "Write `strategy/BRAND.md` as the voice and identity contract every downstream copy and design surface answers to: name, one-line promise, the audience it speaks to (from `strategy/RESEARCH.md`'s evidence, not aspiration), voice register with three do/don't example pairs, vocabulary the brand owns and words it never uses, and the visual-identity intent the Design Room turns into tokens. Derive it from the research and the 11-star experience bar — a brand document that could describe any app in the category is template residue, not a brand. This file is the standard `writing-quality-no-slop` protects and the store listing speaks in.",
           "providerIds": [],
-          "contextFingerprint": "sha256:20d6bd7693190a9d6d2247b6b2a832d46113789f086d2cae7afb8850722e6c54"
+          "contextFingerprint": "sha256:5a6da55b602c8ff87ccaba8732f3d16285010b025406c875f24a65222d7fe823"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Crossing research into design: before the Design Room locks visual identity, and before any marketing or store copy claims a brand voice",
@@ -7576,7 +7612,7 @@
           "providerIds": [
             "provider.refero"
           ],
-          "contextFingerprint": "sha256:445cc0e82f34a8877ac43a06a11c93377e927f965a6bbad3e6fcf1c11d63de00"
+          "contextFingerprint": "sha256:c2cad2a4de390cab19196c14590b6dfa9f004b47a8c80c126bd2d45658b3582b"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before DESIGN.md mutation, generated visuals, native animation, or landing motion for a high-impact surface: onboarding, core loop, landing story, paywall, store first frames, trust and consent",
@@ -7633,7 +7669,7 @@
           "workflowId": "workflow.design.design-room",
           "instructions": "Read PRODUCT.md first. DESIGN.md is the design authority; studio/seed/business.json is its structured screen and flow map. Load only the bound evidence and craft references needed for the affected surface. For substantive work, develop at least three distinct concepts before selecting one. Preserve them in DESIGN.md frontmatter under exploration with unique concept IDs, reference-to-principle mappings, native/mobile-web/desktop-web treatments, a distinguishing mechanic, one selected decision, rejected decisions, and the rationale for each. The generated Design Room must expose this evidence beside the selected system. For new substantive design work, author the versioned foundation in DESIGN.md: communication priorities, material decision rationale, identity invariants, reference influence, and typography resources. Distinguish researched facts from creative hypotheses and platform or legibility constraints. Explore mechanisms that differ in communication and composition, not just names, palettes, or prose. For bounded maintenance of an accepted legacy design, the same Design Room owner follows quality-lens Focused review using direct compatible checks and fresh independent review; that procedure does not execute or accept this full workflow. Within this full workflow, repairs preserve accepted exploration and the required foundation while correcting the affected contract and dependencies. A physical metaphor, expressive motion, or layered composition is selected only when it improves the user job. Recompose each form factor with representative content and protect hierarchy. Keep durable decisions in DESIGN.md. Add screen or flow files only when the structured route is not enough. Use platform-neutral component contracts and the selected stack adapter. Update one coherent scope, validate it, and render the read-only Design Room. Git records revisions. When the opening mandate delegates design direction, choose and record the strongest direction. Otherwise, recommend it for founder approval.",
           "providerIds": [],
-          "contextFingerprint": "sha256:bb9f8fe7fac49fa17aa60cf79564c45ec27b7497acc54d2c5df9f66278bd452a"
+          "contextFingerprint": "sha256:343bebd8526a0829524082307727819ffe0d6e5608cd83e68f496c8352efb053"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "New or substantively revised design systems, concepts, or cross-surface direction. Founder phrasing: design how every screen looks and feels. A bounded correction to an accepted legacy contract uses the direct focused-maintenance procedure in quality-lens, not full Design Room execution.",
@@ -7685,7 +7721,7 @@
           "workflowId": "workflow.design.design-system-audit",
           "instructions": "Audit DESIGN.md, studio/seed/business.json, and design/design-room.html in a fresh context that never saw the producer's transcript, against the frozen rubric under design/reviews/rubrics/ and the reference pack for the surface. Use quality-lens defect diagnosis to separate brief, concept, composition, identity drift, typography, implementation, and claim failures. Inspect actual representative states; record a consequential defect, its evidence, the smallest appropriate repair, and any justified exception. Similar vocabulary or a completed checklist does not prove quality. Apply the quality-lens facets, the design-worthiness questions, the vibecoded tells, the audience-derived-identity checklist, and the twelve craft-bar conditions from the full-launch-program reference; score each condition meet, exceed, deliberately break with a reason, or fail. Run npx @google/design.md lint on DESIGN.md and diff it against the last accepted version; run the Impeccable critique and audit commands as read-only lenses when installed. Regenerate design/reviews/DESIGN_SYSTEM_REVIEW.md during every audit attempt; the engine rejects unchanged pre-existing review bytes instead of rebinding a stale decision. Write a ## Findings section with exactly one `Severity: <value>.` line; allowed values are none, minor, major, high, high-severity, and blocker, and any explanation follows the period. Also include `Candidate input fingerprint: <ENGINE-BOUND INPUT FINGERPRINT>` exactly once and `Frozen rubric: design/reviews/rubrics/<file> version <version>`. Read the immutable `ENGINE-ISSUED DESIGN TASTE DELEGATION` authority block. It is the externally trusted signed receipt snapshot captured for this exact attempt before dispatch. A delegation recorded after dispatch never authorizes these audit bytes and requires a fresh attempt. When its status is approved, also write exactly one ## Delegated Taste Decision table with columns Decision authority, Date, Surfaces reviewed, One-product stranger test, Copy-test, and Verdict. Omit that table when the status is rejected, absent, or stale; never infer delegation from workspace files or read run/run-state.json. Decision authority must be exactly Founder opening mandate; Verdict must be pass or fail; the three observations must be substantive. A pass cannot coexist with an unresolved blocker, a high or high-severity finding, or a major finding. Do not write or trust a reviewer identity or delegation claim in the artifact: the gate derives the current engine-issued audit identity, the current-run signed founder delegation, and producer exclusion from engine-owned state, the protected trust binding, its audit chain, and the exact artifact binding. A direct signed founder pass for the exact current DESIGN.md may resolve only a delegated taste fail after Findings contains no unresolved major, high, high-severity, or blocker issue; it never clears an independent finding. Do not edit DESIGN.md, restyle, edit copy, or mark the review done. A structured fail or an unresolved high or high-severity finding rejects the product direction and returns actionable findings only to the Design Room producer for bounded internal repair and a fresh independent review. Missing, malformed, stale, changed-after-gate, or non-independent audit evidence consumes a bounded retry of this audit node only and never reopens Design Room; persistent invalid audit evidence blocks at the audit cap. If product repair makes no progress, change the approach using the frozen rubric; ask the founder only for retained authority or a decision the mandate did not delegate. Exhausted repair attempts remain incomplete rather than lowering the bar.",
           "providerIds": [],
-          "contextFingerprint": "sha256:5cc355a819c6543f07287d8f2d37ee7036878d58f0dd8df51a3a04216deae21b"
+          "contextFingerprint": "sha256:a0d4e7253cfcbc6b3108edcdf2596adf7d0973e417f1d7a5a6d13dc56d147b2d"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "After DESIGN.md or the Design Room changes for a high-impact surface, before the recorded taste decision and before landing, screenshots, generated visuals, or engineering consume the direction",
@@ -7739,7 +7775,7 @@
           "workflowId": "workflow.design.implementation-craft-audit",
           "instructions": "Independently inspect the actual native app and desktop/mobile landing runtime against the accepted DESIGN.md acceptance scope and frozen reference rubrics. Apply reference.design.consumer-craft-benchmarks principles only where they serve this product. Diagnose brief, concept, composition, identity drift, typography, implementation, and claim defects separately using reference.design.quality-lens. Inspect actual font loading, script coverage, text expansion, fallback behavior, recovery, and repeated controls. Reject unsupported claims and report unobserved capabilities as missing evidence. A conventional control, system font, monochrome palette, or quiet surface can be the correct result. Regenerate design/proofs/design-acceptance.json and design/reviews/IMPLEMENTATION_REVIEW.md during every audit attempt; write exactly one `Acceptance report SHA-256: <64 lowercase hex>` line in the Markdown bound to the current JSON bytes. Set report.reviewer.sessionId to the immutable engine-issued execution identity for this exact audit attempt. Both audit files must remain exact output bindings produced by that same attempt; never invent a reviewer label or reuse another attempt's output. The engine rejects unchanged pre-existing audit bytes instead of rebinding stale evidence. Use reference.design.design-acceptance and record actionable findings. Load the optional Interfaces review guidance in reference.design.design-visual-system when available; scope it to implemented screens and states, record unreviewed domains, and keep its findings in this same review. Companion review never substitutes for the independent acceptance evidence. The report may only index capture and interaction receipts with `{id, receipt, producer}`. Consume machine-produced native evidence from the selected proof/ios-* or proof/android-* lane and browser evidence from growth/landing/proof/. Each strict producer receipt owns the evidence artifact byte digest, candidate and runtime identity, observed timestamp, surface and evidence IDs, platform, tool, and exact device or browser identity. Never author or repair producer receipts inside this audit. Register each installed native runtime in nativeRuntimes[] with id, platform (ios or android), its platform-specific target, candidateSha256, sourceFingerprint, deviceId, and receipt path/hash. Register each landing runtime in browserRuntimes[] from the immutable receipt selected by growth/landing/proof/browser-proof.json. Bind its current candidate and source fingerprint, exact build fingerprint, served origin and URL, browser and OS identity, new browser context ID, launch and navigation transcript hashes, and receipt path/hash. The browser receipt sessionId must equal the current accepted landing producer attempt that ran `b2c browser-proof --session-id`; reject a copied, hand-authored, older, or relabeled page even when its screenshot looks plausible. Require every browser surface, capture, and interaction to cite the matching runtime and browser context. iOS runtimes bind bundleId, buildNumber, executableSha256, and bundleContentSha256 identity. Consume simulator rung-2 receipts from proof/ios-simulator/ and physical-ios-install receipts from proof/ios-device/; physical iPhones also bind deviceModelIdentifier, osVersion, and osBuild plus the four hashed tool transcripts. Android runtimes bind packageName, integer versionCode, built APK-or-AAB format/hash, exact installation APK hash, device model/API/OS identity, and an android-emulator-install receipt from proof/android-emulator/ or physical-android-install receipt from proof/android-device/. For every Android receipt, builtPackage.source.root must equal the canonical business root and builtPackage.source.roots must equal the sorted, deduplicated Android native implementationPaths in accepted DESIGN.md. Consume only a named machine-produced strict receipt; never reconstruct or hand-author one from MobAI output. If the built package is an AAB, require the derived installation APK and a distinct hashed conversion transcript; install and read back that derived APK's package/version identity. All receipt timelines must build, install, read back the installed identity, and launch on the same target after candidate production and before review. Each native surface lists matching runtimeIds[]; every native capture and interaction receipt cites its matching runtimeId. screenReader: true is valid only for a physical-device runtime, and its VoiceOver or TalkBack interaction must cite that same physical runtime. For every evidence reference, require current accepted run-state provenance from the declared native or landing producer workflow and exact attempt, recompute the current ancestor artifact binding, and reject the implementation-craft audit as producedBy. Reject any identity, chronology, target, producer, or hash mismatch. Require every calibrated facet and every required state on each surface to meet its floor; never average away a failing native experience. Do not repair product code or weaken scope, references, or criteria during review. A product or craft rejection routes each finding only to a declared reviewOf producer for a fresh bounded repair attempt. A missing declared report, malformed report schema or worker knowledge receipt, stale report/candidate hash, invented or same-identity review, invalid review chronology, or audit output changed after its gate retries this audit node alone within its attempt budget; it never reopens a product producer. Other failed acceptance criteria route their actionable findings to the declared producer that owns the evidence. Continue while producer evidence changes, stop after two consecutive unchanged product rounds or eight audit attempts, and keep the work incomplete rather than lowering the bar. Mechanical integrity checks and independent rendered judgment must both pass.",
           "providerIds": [],
-          "contextFingerprint": "sha256:054eef26bc13ee63099cc9dcb6a9775ce1584996772e453fe5128755e17e424b"
+          "contextFingerprint": "sha256:f03706ee3449236e14db2c5d7a2cce5de879308bf98bb7abd945ff6772623aca"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "The native app and landing page run and their required behavior has evidence, before full business closeout",
@@ -7791,7 +7827,7 @@
           "workflowId": "workflow.design.token-promotion",
           "instructions": "Run npm run promote:design-tokens to derive the DTCG JSON, CSS, SwiftUI, Expo/React Native, and Flutter token files from the accepted tokens in DESIGN.md. This is a mechanical adapter step, not a redesign. Promoted values must match the authored contract exactly. Promote only after check:design-worthiness accepts either a direct founder/owner Taste Gate decision bound to the exact current DESIGN.md bytes by its protected-store-verified signed receipt, or the exact dispatch-bound delegated decision in design/reviews/DESIGN_SYSTEM_REVIEW.md under the same externally anchored current-run receipt chain. This acceptance does not grant publish or release authority. check:token-promotion proves that every emitted target is current.",
           "providerIds": [],
-          "contextFingerprint": "sha256:3aacdd74d9798a06700f1d2447014dfa6de3ca2e788d029cce95f0c7e842601a"
+          "contextFingerprint": "sha256:7086349b7a8a33f369a2f1f1551e106aeb6e10ac4a8cffb8eafb25c797e425fb"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "DESIGN.md tokens change and the design is accepted",
@@ -7843,7 +7879,7 @@
           "providerIds": [
             "provider.refero"
           ],
-          "contextFingerprint": "sha256:e9e10b4c2b432fc63669374c08e7f67ace8b32bb45b394e0fd4a7b082025fc1a"
+          "contextFingerprint": "sha256:852236262adb480154f080a2ce02da26037df09dd1b744df9b523177c05a3427"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before flow maps, state matrices, UX_PATTERNS.md, or bug-trap coverage",
@@ -7894,7 +7930,7 @@
           "workflowId": "workflow.design.premium-mobile-craft",
           "instructions": "Wire the five invisible premium details into every screen: press states, subtle structural motion, semantic haptics, keyboard behavior, and loading or empty states. Start with the platform-neutral contracts in surfaces/ui-library/components/. Then implement them through the selected stack adapter. SwiftUI has the current reference adapter in surfaces/ui-library/adapters/swiftui.json. For Expo, React Native, Flutter, or another stack, create the equivalent native adapter and record real implementation proof before marking it implemented. Shared tokens express intent; they do not imply behavioral parity. Never hand-type a motion value in view code. Read the promoted preset layer, reserve celebration motion for earned moments, and honor reduced-motion preferences. Route advanced effects to motion-craft-benchmarks.md. Bind every live effect to real state, a plain fallback, and a reduced-motion result. Ground catalog recipes in a live exemplar through the 60fps MCP when it is connected, and translate mechanics rather than brand or exact layout. check:motion-contract proves the contract was applied; adjectives in DESIGN.md do not.",
           "providerIds": [],
-          "contextFingerprint": "sha256:ae1b6af99ff64b2e4b200d88b8a250df3b931cd2720d378692a4cf359c91b382"
+          "contextFingerprint": "sha256:a7480772c6a5d97b276b74f3da69dc6ec6a2727ebdc8bb95a22bad71e27ae10f"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before in-app UI build/polish, press-state/haptics/loading-empty wiring, live-state effects, or \"premium feel\"",
@@ -7947,7 +7983,7 @@
           "providerIds": [
             "provider.higgsfield"
           ],
-          "contextFingerprint": "sha256:daf80a328377b6d229a16f189d38401225917950de7a2625c6c2997a744a1554"
+          "contextFingerprint": "sha256:1413b0fe975c99ece2cd9f48388f81c1efd045b4991c901a3640e29adca1e9db"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before rendered videos/stills, app previews, ad/social variants. Founder phrasing: demo videos and preview clips from real screens for ads.",
@@ -8114,7 +8150,7 @@
           "workflowId": "workflow.store.aso-and-store-ops",
           "instructions": "Build app-marketing-context (app name, category, target country, top competitors, primary/secondary/long-tail keyword candidates, current listing state, and public support/privacy URLs) before locking a single metadata field, then run keyword and name-collision checks in the target country and separate brand language from search language. Route any localization call through the demand-first priority tiers in LOCALIZATION_MARKET_RESEARCH.md rather than translating on inference, and route Apple Search Ads storefront targeting from the same tiers. Draft final metadata fields plus rejected alternatives with rationale into STORE_OPS.md, and run every metadata/keyword string through the no-slop-writing.md self-check before calling it locked. For the recurring post-launch loop, track keyword rank deltas, ASA search-term mining, and localization opportunities weekly rather than treating ASO as a one-time pass. Prefer `asc optimize keywords rank` first without Apple Ads credentials; record storefront, platform, locale, query set, CLI version, source availability, raw inputs, rank-window limitation, and collection time in STORE_OPS.md; keep `unavailable` as `unavailable`; do not auto-apply metadata.",
           "providerIds": [],
-          "contextFingerprint": "sha256:0f567119649d8b7b1213f0d86e6173f2b16076c4d56e0f369bec9ede13e65544"
+          "contextFingerprint": "sha256:018014fdf1c8050f83aeccabfe8c185b978c4e00a3ec2b70e21e711126fe218b"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before App Store/Play metadata, keyword research, ASA, or post-launch ASO loops",
@@ -8231,7 +8267,7 @@
           "providerIds": [
             "provider.app-store-connect"
           ],
-          "contextFingerprint": "sha256:c00cfcbf97f12060877243a376fbc57360d4916faa89c2730e7e5aefc1b8504f"
+          "contextFingerprint": "sha256:e49bbc3907f30343a286961aa7c360d8d71c643cbfd07064bfe6e8bfbe4c3168"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before Apple Developer enrollment, Team ID, signing, profiles, archive/upload, TestFlight. Founder phrasing: get on the App Store, ship to TestFlight, get the ios build signed and into testers hands.",
@@ -8262,6 +8298,9 @@
           "b2c/resource-7cfbcc8a046b5114c2f29ece76a35abfef9b27fdec4bb151b9de3c144042e8d8",
           "b2c/resource-4adbef7d6f265935f6d89954353f12a7df6cf2c4c8d3d6f4f48de29bb22603be",
           "b2c/resource-833a6680c41b5949a885bb391842e47eddc2331100971c87ddebf1d6287319d2",
+          "b2c/resource-c5add73b19c3865c253715e7f4dc41eaf8cd1065fb5e13f4fd54c887dc409be4",
+          "b2c/resource-22b02332ba4a39650e1ae2c44c5d7241739f79bea7b807fe7152aaa2ec1ca122",
+          "b2c/resource-3d0c6683b37e4aadb7f961eab104cf88d7342ee214e9a187fc7c1d3a724f4f48",
           "b2c/resource-3e816f16f11e9e8c89a37cd03164e873e003df3b3bc9879c4a4cc10cf3992a80",
           "b2c/resource-9133d79337c128746bb0303dd3f87d42ca0beef1aecce3214f86099727640ac9",
           "b2c/resource-6e4928ffb5429b6625d49b7f94e57b10abda01e4d5f24b9b74a7de4b341e800e",
@@ -8299,7 +8338,7 @@
           "providerIds": [
             "provider.app-store-connect"
           ],
-          "contextFingerprint": "sha256:9a49cd8babbcaf7a3873e2903472cad0c50e31d456f4345db23967ed7506b4b2"
+          "contextFingerprint": "sha256:6cdbe687cb1debc96c238b7594b39ccd00d5b3f8917902b9756cc02657b25e24"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before ASC upload — PrivacyInfo.xcprivacy, required-reason APIs, App Privacy answers",
@@ -8332,6 +8371,9 @@
           "b2c/resource-7cfbcc8a046b5114c2f29ece76a35abfef9b27fdec4bb151b9de3c144042e8d8",
           "b2c/resource-4adbef7d6f265935f6d89954353f12a7df6cf2c4c8d3d6f4f48de29bb22603be",
           "b2c/resource-833a6680c41b5949a885bb391842e47eddc2331100971c87ddebf1d6287319d2",
+          "b2c/resource-c5add73b19c3865c253715e7f4dc41eaf8cd1065fb5e13f4fd54c887dc409be4",
+          "b2c/resource-22b02332ba4a39650e1ae2c44c5d7241739f79bea7b807fe7152aaa2ec1ca122",
+          "b2c/resource-3d0c6683b37e4aadb7f961eab104cf88d7342ee214e9a187fc7c1d3a724f4f48",
           "b2c/resource-3e816f16f11e9e8c89a37cd03164e873e003df3b3bc9879c4a4cc10cf3992a80",
           "b2c/resource-9133d79337c128746bb0303dd3f87d42ca0beef1aecce3214f86099727640ac9",
           "b2c/resource-4bd584057cdaa3acd8ac272a598ce30375ee549fab0b77e77b2c3112a3b2e2e3",
@@ -8419,7 +8461,7 @@
           "providerIds": [
             "provider.app-store-connect"
           ],
-          "contextFingerprint": "sha256:1bf2b421aa141698f76681762a3fad6c7950aa2db5866676b55e042577dff239"
+          "contextFingerprint": "sha256:65118774138dec3333384879ce15bcdb6b44a869e4badbc39977c206bfc5f7df"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before Rork asc CLI app creation, metadata, screenshots, TestFlight, RevenueCat sync",
@@ -8453,6 +8495,9 @@
           "b2c/resource-7cfbcc8a046b5114c2f29ece76a35abfef9b27fdec4bb151b9de3c144042e8d8",
           "b2c/resource-4adbef7d6f265935f6d89954353f12a7df6cf2c4c8d3d6f4f48de29bb22603be",
           "b2c/resource-833a6680c41b5949a885bb391842e47eddc2331100971c87ddebf1d6287319d2",
+          "b2c/resource-c5add73b19c3865c253715e7f4dc41eaf8cd1065fb5e13f4fd54c887dc409be4",
+          "b2c/resource-22b02332ba4a39650e1ae2c44c5d7241739f79bea7b807fe7152aaa2ec1ca122",
+          "b2c/resource-3d0c6683b37e4aadb7f961eab104cf88d7342ee214e9a187fc7c1d3a724f4f48",
           "b2c/resource-3e816f16f11e9e8c89a37cd03164e873e003df3b3bc9879c4a4cc10cf3992a80",
           "b2c/resource-9133d79337c128746bb0303dd3f87d42ca0beef1aecce3214f86099727640ac9",
           "b2c/resource-6e4928ffb5429b6625d49b7f94e57b10abda01e4d5f24b9b74a7de4b341e800e",
@@ -8489,7 +8534,7 @@
           "providerIds": [
             "provider.app-store-connect"
           ],
-          "contextFingerprint": "sha256:0cd86baf5dee4e978a325a45b14a6c2dc4d0e951d26e9723c54de498a807d602"
+          "contextFingerprint": "sha256:3136f43d8d7b436c45a0ec293fb1fdc9e1095b9e66c02cbbbc190228a4f24a0e"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "When an App Store version is in review, or after a status change, before any remediation or resubmission",
@@ -8518,6 +8563,9 @@
           "b2c/resource-7cfbcc8a046b5114c2f29ece76a35abfef9b27fdec4bb151b9de3c144042e8d8",
           "b2c/resource-4adbef7d6f265935f6d89954353f12a7df6cf2c4c8d3d6f4f48de29bb22603be",
           "b2c/resource-833a6680c41b5949a885bb391842e47eddc2331100971c87ddebf1d6287319d2",
+          "b2c/resource-c5add73b19c3865c253715e7f4dc41eaf8cd1065fb5e13f4fd54c887dc409be4",
+          "b2c/resource-22b02332ba4a39650e1ae2c44c5d7241739f79bea7b807fe7152aaa2ec1ca122",
+          "b2c/resource-3d0c6683b37e4aadb7f961eab104cf88d7342ee214e9a187fc7c1d3a724f4f48",
           "b2c/resource-3e816f16f11e9e8c89a37cd03164e873e003df3b3bc9879c4a4cc10cf3992a80",
           "b2c/resource-9133d79337c128746bb0303dd3f87d42ca0beef1aecce3214f86099727640ac9",
           "b2c/resource-6e4928ffb5429b6625d49b7f94e57b10abda01e4d5f24b9b74a7de4b341e800e",
@@ -8556,7 +8604,7 @@
           "providerIds": [
             "provider.app-store-connect"
           ],
-          "contextFingerprint": "sha256:0f16577cd807f33cfca8ca3c526767c919e57f57aaffbbb69a8e3ed711b302db"
+          "contextFingerprint": "sha256:5beaff6893a93d3ff9f5039ae65675a21e07ad54124dfb393309b21a2355ef96"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "After App Review observe classifies a rejection, before any store submission",
@@ -8587,6 +8635,9 @@
           "b2c/resource-7cfbcc8a046b5114c2f29ece76a35abfef9b27fdec4bb151b9de3c144042e8d8",
           "b2c/resource-4adbef7d6f265935f6d89954353f12a7df6cf2c4c8d3d6f4f48de29bb22603be",
           "b2c/resource-833a6680c41b5949a885bb391842e47eddc2331100971c87ddebf1d6287319d2",
+          "b2c/resource-c5add73b19c3865c253715e7f4dc41eaf8cd1065fb5e13f4fd54c887dc409be4",
+          "b2c/resource-22b02332ba4a39650e1ae2c44c5d7241739f79bea7b807fe7152aaa2ec1ca122",
+          "b2c/resource-3d0c6683b37e4aadb7f961eab104cf88d7342ee214e9a187fc7c1d3a724f4f48",
           "b2c/resource-3e816f16f11e9e8c89a37cd03164e873e003df3b3bc9879c4a4cc10cf3992a80",
           "b2c/resource-9133d79337c128746bb0303dd3f87d42ca0beef1aecce3214f86099727640ac9",
           "b2c/resource-6e4928ffb5429b6625d49b7f94e57b10abda01e4d5f24b9b74a7de4b341e800e",
@@ -8623,7 +8674,7 @@
           "providerIds": [
             "provider.app-store-connect"
           ],
-          "contextFingerprint": "sha256:c95bfd7c61b548a6727c47e8e864b9f405c49d6a04da606b95c05a733cf90525"
+          "contextFingerprint": "sha256:3f5850cf00ef0f2664b7be106e3a74425ac1efceadfb272a618c2aeada6ee72c"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "After bounded App Review remediation is independently verified, before any further Apple mutation",
@@ -8655,6 +8706,9 @@
           "b2c/resource-7cfbcc8a046b5114c2f29ece76a35abfef9b27fdec4bb151b9de3c144042e8d8",
           "b2c/resource-4adbef7d6f265935f6d89954353f12a7df6cf2c4c8d3d6f4f48de29bb22603be",
           "b2c/resource-833a6680c41b5949a885bb391842e47eddc2331100971c87ddebf1d6287319d2",
+          "b2c/resource-c5add73b19c3865c253715e7f4dc41eaf8cd1065fb5e13f4fd54c887dc409be4",
+          "b2c/resource-22b02332ba4a39650e1ae2c44c5d7241739f79bea7b807fe7152aaa2ec1ca122",
+          "b2c/resource-3d0c6683b37e4aadb7f961eab104cf88d7342ee214e9a187fc7c1d3a724f4f48",
           "b2c/resource-3e816f16f11e9e8c89a37cd03164e873e003df3b3bc9879c4a4cc10cf3992a80",
           "b2c/resource-9133d79337c128746bb0303dd3f87d42ca0beef1aecce3214f86099727640ac9",
           "b2c/resource-6e4928ffb5429b6625d49b7f94e57b10abda01e4d5f24b9b74a7de4b341e800e",
@@ -8690,7 +8744,7 @@
           "providerIds": [
             "provider.app-store-screenshots"
           ],
-          "contextFingerprint": "sha256:20e82c4323105a6c9ec41005303a0b233c039f889dc0ed73f23e843d079949ca"
+          "contextFingerprint": "sha256:5ae693b143362dad250b305c7dff598aa903f8fe2c3afd29de0373b95ad9967b"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Store screenshots needed (raw capture → composed iPhone/iPad/Play assets), including the set uploaded to App Store Connect",
@@ -8747,7 +8801,7 @@
           "providerIds": [
             "provider.google-play"
           ],
-          "contextFingerprint": "sha256:99dbbaad59dec97f7ad99df11debd25404a9859fbd2e57ac50a372d5b7233282"
+          "contextFingerprint": "sha256:33f6d4b3ab51ee9d92f382221601989e1748f6fdd1da91b967caf486ae6d63cf"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Android in scope (platforms include android or an android bundle id exists)",
@@ -8777,6 +8831,9 @@
           "b2c/resource-7cfbcc8a046b5114c2f29ece76a35abfef9b27fdec4bb151b9de3c144042e8d8",
           "b2c/resource-4adbef7d6f265935f6d89954353f12a7df6cf2c4c8d3d6f4f48de29bb22603be",
           "b2c/resource-833a6680c41b5949a885bb391842e47eddc2331100971c87ddebf1d6287319d2",
+          "b2c/resource-c5add73b19c3865c253715e7f4dc41eaf8cd1065fb5e13f4fd54c887dc409be4",
+          "b2c/resource-22b02332ba4a39650e1ae2c44c5d7241739f79bea7b807fe7152aaa2ec1ca122",
+          "b2c/resource-3d0c6683b37e4aadb7f961eab104cf88d7342ee214e9a187fc7c1d3a724f4f48",
           "b2c/resource-3e816f16f11e9e8c89a37cd03164e873e003df3b3bc9879c4a4cc10cf3992a80",
           "b2c/resource-9133d79337c128746bb0303dd3f87d42ca0beef1aecce3214f86099727640ac9",
           "b2c/resource-6e4928ffb5429b6625d49b7f94e57b10abda01e4d5f24b9b74a7de4b341e800e",
@@ -8929,7 +8986,7 @@
           "providerIds": [
             "provider.google-play"
           ],
-          "contextFingerprint": "sha256:7f46d42c3414f0bcfe2af250563851642e805cfc780fb10be190da30273bbedc"
+          "contextFingerprint": "sha256:dc36cebdc7be971cf561c1abf7df458ab1fcd00b98b5c661ca209914fbec01be"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "An AAB is proven and an exact internal or closed-testing track standing envelope is current",
@@ -8957,6 +9014,9 @@
           "b2c/resource-7cfbcc8a046b5114c2f29ece76a35abfef9b27fdec4bb151b9de3c144042e8d8",
           "b2c/resource-4adbef7d6f265935f6d89954353f12a7df6cf2c4c8d3d6f4f48de29bb22603be",
           "b2c/resource-833a6680c41b5949a885bb391842e47eddc2331100971c87ddebf1d6287319d2",
+          "b2c/resource-c5add73b19c3865c253715e7f4dc41eaf8cd1065fb5e13f4fd54c887dc409be4",
+          "b2c/resource-22b02332ba4a39650e1ae2c44c5d7241739f79bea7b807fe7152aaa2ec1ca122",
+          "b2c/resource-3d0c6683b37e4aadb7f961eab104cf88d7342ee214e9a187fc7c1d3a724f4f48",
           "b2c/resource-3e816f16f11e9e8c89a37cd03164e873e003df3b3bc9879c4a4cc10cf3992a80",
           "b2c/resource-9133d79337c128746bb0303dd3f87d42ca0beef1aecce3214f86099727640ac9",
           "b2c/resource-6e4928ffb5429b6625d49b7f94e57b10abda01e4d5f24b9b74a7de4b341e800e",
@@ -8998,7 +9058,7 @@
             "provider.app-store-connect",
             "provider.google-play"
           ],
-          "contextFingerprint": "sha256:b0fa9f966fdfb61b153cc745832eb38a85dc96b5428116c02fcbc83b549453ce"
+          "contextFingerprint": "sha256:c5e72a3e6df36cd52d0817c98004e4eb084bb2e6e5b6d5ece1ede95ba8c9ed8f"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before store distribution in every selected region",
@@ -9025,6 +9085,9 @@
           "b2c/resource-7cfbcc8a046b5114c2f29ece76a35abfef9b27fdec4bb151b9de3c144042e8d8",
           "b2c/resource-4adbef7d6f265935f6d89954353f12a7df6cf2c4c8d3d6f4f48de29bb22603be",
           "b2c/resource-833a6680c41b5949a885bb391842e47eddc2331100971c87ddebf1d6287319d2",
+          "b2c/resource-c5add73b19c3865c253715e7f4dc41eaf8cd1065fb5e13f4fd54c887dc409be4",
+          "b2c/resource-22b02332ba4a39650e1ae2c44c5d7241739f79bea7b807fe7152aaa2ec1ca122",
+          "b2c/resource-3d0c6683b37e4aadb7f961eab104cf88d7342ee214e9a187fc7c1d3a724f4f48",
           "b2c/resource-3e816f16f11e9e8c89a37cd03164e873e003df3b3bc9879c4a4cc10cf3992a80",
           "b2c/resource-9133d79337c128746bb0303dd3f87d42ca0beef1aecce3214f86099727640ac9",
           "b2c/resource-6e4928ffb5429b6625d49b7f94e57b10abda01e4d5f24b9b74a7de4b341e800e",
@@ -9063,7 +9126,7 @@
           "workflowId": "workflow.engineering.source-change-manifest",
           "instructions": "Fingerprint the mobile source roots, dependency locks, build configuration, localization resources, analytics schema, onboarding, paywall, and privacy manifests. Compare them with the last accepted checkpoint. Write engineering/SOURCE_CHANGE_MANIFEST.json with changed paths, before/after digests, and every applicable Change Cascade Map type. A change can carry multiple types. Open the matching change-cascade work before the app slice merges. An empty change list is valid only when the current aggregate digest matches the accepted checkpoint.",
           "providerIds": [],
-          "contextFingerprint": "sha256:da3c8aef41abceba6c1f1c4148c1a52c90d7731a52bbc5f9bea3aa18a98abdbe"
+          "contextFingerprint": "sha256:04197cc14124d832f3099bc90cc9bbd5f628f5d3a10066f8bae2ae2e4b6c3686"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "When design is accepted and after every accepted app-source, build-config, localization, onboarding, feature, paywall, SDK, or visual change",
@@ -9092,6 +9155,9 @@
           "b2c/resource-7cfbcc8a046b5114c2f29ece76a35abfef9b27fdec4bb151b9de3c144042e8d8",
           "b2c/resource-4adbef7d6f265935f6d89954353f12a7df6cf2c4c8d3d6f4f48de29bb22603be",
           "b2c/resource-833a6680c41b5949a885bb391842e47eddc2331100971c87ddebf1d6287319d2",
+          "b2c/resource-c5add73b19c3865c253715e7f4dc41eaf8cd1065fb5e13f4fd54c887dc409be4",
+          "b2c/resource-22b02332ba4a39650e1ae2c44c5d7241739f79bea7b807fe7152aaa2ec1ca122",
+          "b2c/resource-3d0c6683b37e4aadb7f961eab104cf88d7342ee214e9a187fc7c1d3a724f4f48",
           "b2c/resource-3e816f16f11e9e8c89a37cd03164e873e003df3b3bc9879c4a4cc10cf3992a80",
           "b2c/resource-9133d79337c128746bb0303dd3f87d42ca0beef1aecce3214f86099727640ac9",
           "b2c/resource-fc94e922d6a5bb26c05fb6e41780af61fe53a062fed4771032459da317c7769f",
@@ -9127,7 +9193,7 @@
           "workflowId": "workflow.engineering.engineering-orchestration-ce-production-readiness",
           "instructions": "Route non-trivial implementation through the Compound Engineering loop. Use the five-stage Standalone Engineering Loop when CE is unavailable. Record the route in engineering/ENGINEERING_PLAN.md. When DESIGN.md is accepted, start app implementation and the local landing build in the same ready batch. Also dispatch the prepared launch-surface prompt for store copy, product-page plans, screenshot plans, marketing assets, and price-copy checks. Give each agent a disjoint write scope. Before each app slice merges, start a read-only launch-surface impact audit. Apply affected public-surface updates in parallel with the next app slice. Record file ownership and serialized resources in operations/ORCHESTRATION.md. Require build, typecheck, lint, integration tests, mobile end-to-end proof, provider proof, and an on-device taste pass. Write the results to engineering/PRODUCTION_READINESS.md. Run check:compound-engineering and check:orchestration before the engineering lane is done.",
           "providerIds": [],
-          "contextFingerprint": "sha256:29605cea46fbd4080fba86f3803eead746a313cfb573a37557e7355e0cab7fd0"
+          "contextFingerprint": "sha256:e7cd3e5f4cb5846a587abf8074b94106606ffd752e05b4208e716d89480ca644"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before actual app implementation, builder prompts, or production-readiness claims",
@@ -9163,6 +9229,9 @@
           "b2c/resource-e3b781fe04437d6d30b79857e04da7d279b933827888529058fa64262cc2091c",
           "b2c/resource-7cfbcc8a046b5114c2f29ece76a35abfef9b27fdec4bb151b9de3c144042e8d8",
           "b2c/resource-4adbef7d6f265935f6d89954353f12a7df6cf2c4c8d3d6f4f48de29bb22603be",
+          "b2c/resource-c5add73b19c3865c253715e7f4dc41eaf8cd1065fb5e13f4fd54c887dc409be4",
+          "b2c/resource-22b02332ba4a39650e1ae2c44c5d7241739f79bea7b807fe7152aaa2ec1ca122",
+          "b2c/resource-3d0c6683b37e4aadb7f961eab104cf88d7342ee214e9a187fc7c1d3a724f4f48",
           "b2c/resource-6e4928ffb5429b6625d49b7f94e57b10abda01e4d5f24b9b74a7de4b341e800e",
           "b2c/resource-12b9d685069e71d3b2028f541cddce1c9544b8594328b8b0c514d6aafc9c523e",
           "b2c/resource-71b8a9a9110807534832ae023728f7273b192b6d7df24031787aef62eeb048e7",
@@ -9196,7 +9265,7 @@
           "workflowId": "workflow.engineering.backend-data-contract",
           "instructions": "Pick one backend route (Supabase, Firebase, or custom), record the reason in engineering/TECH_SPEC.md's Backend Selection sub-section, and never silently substitute another route mid-build — a switch is a change-cascade event and a founder-only gate. Write the Data Model as one row per entity (owner, key fields, relationships, retention/deletion path, PII class) and the Authorization Model as a create/read/update/delete matrix expressed in the route's actual enforcement mechanism — RLS policies, Firestore security rules, or middleware authz — deny by default. Treat untested authorization as absent: exercise owner/anonymous/other-user access for every matrix row and record the exact test command and evidence path, not just 'RLS' in prose. Pass `npm run check:backend-contract -- --root . --state state/business-state.json`; the account-deletion promise in this contract's retention rules must match trust/PRIVACY.md's deletion promise exactly, not just approximately.",
           "providerIds": [],
-          "contextFingerprint": "sha256:b5c7b2fc66cf527018df66b7cd6fd1e802805034a00c48cc3d59c3570bc11672"
+          "contextFingerprint": "sha256:905bb27302056f800d5324d9978e8d17c7fa5c737a14a2bddf4e8270288ae498"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before schema/auth prompts or engineering/TECH_SPEC.md data/API sections harden",
@@ -9225,6 +9294,9 @@
           "b2c/resource-e3b781fe04437d6d30b79857e04da7d279b933827888529058fa64262cc2091c",
           "b2c/resource-7cfbcc8a046b5114c2f29ece76a35abfef9b27fdec4bb151b9de3c144042e8d8",
           "b2c/resource-833a6680c41b5949a885bb391842e47eddc2331100971c87ddebf1d6287319d2",
+          "b2c/resource-c5add73b19c3865c253715e7f4dc41eaf8cd1065fb5e13f4fd54c887dc409be4",
+          "b2c/resource-22b02332ba4a39650e1ae2c44c5d7241739f79bea7b807fe7152aaa2ec1ca122",
+          "b2c/resource-3d0c6683b37e4aadb7f961eab104cf88d7342ee214e9a187fc7c1d3a724f4f48",
           "b2c/resource-3e816f16f11e9e8c89a37cd03164e873e003df3b3bc9879c4a4cc10cf3992a80",
           "b2c/resource-9133d79337c128746bb0303dd3f87d42ca0beef1aecce3214f86099727640ac9",
           "b2c/resource-75ce409c2580630cb4693bb04a5a791bd29f253440ee18c4e353f3f8c3f58a29",
@@ -9306,7 +9378,7 @@
           "providerIds": [
             "provider.mobai"
           ],
-          "contextFingerprint": "sha256:656f6c0845343d686269a45a90b8b97f9f5aea97ace70eb4df66f518b7376245"
+          "contextFingerprint": "sha256:1e5ca51f0d29eb76ff29c77e68480f2f489746fb320f63551342aab8349f3f93"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before MobAI-delta device work — Android coverage, repeatable .mob suites, multi-device or physical-hardware runs, performance gates, MobAI CI, or recorder-skill demo videos/app previews — after the Route Ladder (native-ios-proof-route-ladder) routes past the in-app simulator",
@@ -9382,7 +9454,7 @@
             "provider.serve-sim",
             "provider.mobai"
           ],
-          "contextFingerprint": "sha256:16bc7ae6109be2d6a0fea7e63908cd50963ac462eb0b0a4d38c2aa0774bd2aab"
+          "contextFingerprint": "sha256:add1ab4210ab6356bd7d14f5da30d6c3e7b5c2bc00d62666377f963697276914"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "First for any iOS or Android device automation, run-the-app, screen-check, flow-walk, bug-repro, screenshot, or screen-recording request — read the selected platforms, then pick the lightest proof rung that covers them",
@@ -9455,7 +9527,7 @@
             "provider.in-app-ios-simulator",
             "provider.mobai"
           ],
-          "contextFingerprint": "sha256:5b97a02540fe1ae105e69496071646de6f8bb0a4fd99b5eff1855faeb1ccd970"
+          "contextFingerprint": "sha256:5c0f8f9de677cb0065fe9af1241573f6a211c51f8eaaab8e5ab3ebbf21825333"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before beta or store submission on every mobile launch",
@@ -9526,7 +9598,7 @@
           "providerIds": [
             "provider.sentry"
           ],
-          "contextFingerprint": "sha256:35e3458e0287c1fa3e3c35dbb7d396852c6c1b955be7372e2d4f26c5baa3e815"
+          "contextFingerprint": "sha256:717b943c30269f161e358650dd3e58a22d93bf84207119dde305ccc64396348d"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before beta or store submission on every mobile launch",
@@ -9553,6 +9625,9 @@
           "b2c/resource-e3b781fe04437d6d30b79857e04da7d279b933827888529058fa64262cc2091c",
           "b2c/resource-4adbef7d6f265935f6d89954353f12a7df6cf2c4c8d3d6f4f48de29bb22603be",
           "b2c/resource-833a6680c41b5949a885bb391842e47eddc2331100971c87ddebf1d6287319d2",
+          "b2c/resource-c5add73b19c3865c253715e7f4dc41eaf8cd1065fb5e13f4fd54c887dc409be4",
+          "b2c/resource-22b02332ba4a39650e1ae2c44c5d7241739f79bea7b807fe7152aaa2ec1ca122",
+          "b2c/resource-3d0c6683b37e4aadb7f961eab104cf88d7342ee214e9a187fc7c1d3a724f4f48",
           "b2c/resource-3e816f16f11e9e8c89a37cd03164e873e003df3b3bc9879c4a4cc10cf3992a80",
           "b2c/resource-9133d79337c128746bb0303dd3f87d42ca0beef1aecce3214f86099727640ac9",
           "b2c/resource-6e4928ffb5429b6625d49b7f94e57b10abda01e4d5f24b9b74a7de4b341e800e",
@@ -9592,7 +9667,7 @@
           "workflowId": "workflow.data.analytics-and-attribution-blueprint",
           "instructions": "Write analytics/ANALYTICS.md and render analytics/analytics-plan.html before onboarding, paywall, funnel, or store-CTA copy locks. Define one internal user ID, UTMs/click IDs plus self-reported source keys, and an event catalog with owner, trigger, properties, and QA method. Record the HDYHAU survey: randomize options, allow multi-select, include TV/offline, place it mid-onboarding, and connect it to blended ROAS. Name when paid acquisition would require AppsFlyer. Pass check:analytics-catalog and check:attribution against the authored contract and local implementation evidence. Live PostHog capture remains a later provider-proof boundary.",
           "providerIds": [],
-          "contextFingerprint": "sha256:2cfc419dff455abf2c372811e5a9664103b4f804a0461760faa4185fe1a74b58"
+          "contextFingerprint": "sha256:020e0feb33c058132f4f6d22fd0ef50aca0ba83670ef83e8a1845eccee2c9b8a"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before locking onboarding/paywall/funnels/store CTAs or any prompt naming events",
@@ -9623,6 +9698,9 @@
           "b2c/resource-7cfbcc8a046b5114c2f29ece76a35abfef9b27fdec4bb151b9de3c144042e8d8",
           "b2c/resource-4adbef7d6f265935f6d89954353f12a7df6cf2c4c8d3d6f4f48de29bb22603be",
           "b2c/resource-833a6680c41b5949a885bb391842e47eddc2331100971c87ddebf1d6287319d2",
+          "b2c/resource-c5add73b19c3865c253715e7f4dc41eaf8cd1065fb5e13f4fd54c887dc409be4",
+          "b2c/resource-22b02332ba4a39650e1ae2c44c5d7241739f79bea7b807fe7152aaa2ec1ca122",
+          "b2c/resource-3d0c6683b37e4aadb7f961eab104cf88d7342ee214e9a187fc7c1d3a724f4f48",
           "b2c/resource-3e816f16f11e9e8c89a37cd03164e873e003df3b3bc9879c4a4cc10cf3992a80",
           "b2c/resource-9133d79337c128746bb0303dd3f87d42ca0beef1aecce3214f86099727640ac9",
           "b2c/resource-6804079c8d105cf937281fb6bcec8ef0067773f99d891af7bdc334efa95c3890",
@@ -10173,7 +10251,7 @@
             "provider.revenuecat",
             "provider.stripe"
           ],
-          "contextFingerprint": "sha256:575dbc6314a3b9be431ad578ee6ab3e5a725972690f80e052ea49030b7dae7ec"
+          "contextFingerprint": "sha256:879edeae51b3154435280ea5d915861ca525ee016c5d902e593e202c5f802934"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before RevenueCat/Stripe/web billing, products, paywall, entitlement, webhooks, pricing. Founder phrasing: how do I charge for subscriptions or a purchase.",
@@ -10209,6 +10287,9 @@
           "b2c/resource-7cfbcc8a046b5114c2f29ece76a35abfef9b27fdec4bb151b9de3c144042e8d8",
           "b2c/resource-4adbef7d6f265935f6d89954353f12a7df6cf2c4c8d3d6f4f48de29bb22603be",
           "b2c/resource-833a6680c41b5949a885bb391842e47eddc2331100971c87ddebf1d6287319d2",
+          "b2c/resource-c5add73b19c3865c253715e7f4dc41eaf8cd1065fb5e13f4fd54c887dc409be4",
+          "b2c/resource-22b02332ba4a39650e1ae2c44c5d7241739f79bea7b807fe7152aaa2ec1ca122",
+          "b2c/resource-3d0c6683b37e4aadb7f961eab104cf88d7342ee214e9a187fc7c1d3a724f4f48",
           "b2c/resource-3e816f16f11e9e8c89a37cd03164e873e003df3b3bc9879c4a4cc10cf3992a80",
           "b2c/resource-9133d79337c128746bb0303dd3f87d42ca0beef1aecce3214f86099727640ac9",
           "b2c/resource-6e4928ffb5429b6625d49b7f94e57b10abda01e4d5f24b9b74a7de4b341e800e",
@@ -10255,7 +10336,7 @@
           "providerIds": [
             "provider.revenuecat"
           ],
-          "contextFingerprint": "sha256:1050f7b79b468705cf77e7363145c0bd442c30c302349fa7d1b029c8174d0a47"
+          "contextFingerprint": "sha256:096c461adff866ef6da5b7315126094326cb2e6d7da683cb62474509986d1e87"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "After a live paywall exists, or when the experiment backlog needs a next test",
@@ -10285,6 +10366,9 @@
           "b2c/resource-7cfbcc8a046b5114c2f29ece76a35abfef9b27fdec4bb151b9de3c144042e8d8",
           "b2c/resource-4adbef7d6f265935f6d89954353f12a7df6cf2c4c8d3d6f4f48de29bb22603be",
           "b2c/resource-833a6680c41b5949a885bb391842e47eddc2331100971c87ddebf1d6287319d2",
+          "b2c/resource-c5add73b19c3865c253715e7f4dc41eaf8cd1065fb5e13f4fd54c887dc409be4",
+          "b2c/resource-22b02332ba4a39650e1ae2c44c5d7241739f79bea7b807fe7152aaa2ec1ca122",
+          "b2c/resource-3d0c6683b37e4aadb7f961eab104cf88d7342ee214e9a187fc7c1d3a724f4f48",
           "b2c/resource-3e816f16f11e9e8c89a37cd03164e873e003df3b3bc9879c4a4cc10cf3992a80",
           "b2c/resource-9133d79337c128746bb0303dd3f87d42ca0beef1aecce3214f86099727640ac9",
           "b2c/resource-6e4928ffb5429b6625d49b7f94e57b10abda01e4d5f24b9b74a7de4b341e800e",
@@ -15304,8 +15388,8 @@
     ]
   },
   "files": {
-    "extension.yaml": "9eaea10faab9bae2eb3cd092f32a033cfc7e0ee36448759d9908b9c8befb985b",
-    "catalog-pack.yaml": "72e585f6a64fd65671fdcfe63db9865835bd3f4e0d4d5660b792331be5581b4a",
+    "extension.yaml": "a9ec9eb01d5089b523e02fcb03814cbb97a007ce22308ba6553dc1c7c45162ac",
+    "catalog-pack.yaml": "73d943b7e561a87fec210832c73ec2f2b515d5e0504f820de3ea520142c464a8",
     "knowledge/data/analytics-attribution.md": "0bba4685b2188b9e80b7fcc14fdac9472c6c4aeac5bc59703188eaa5e26f234a",
     "knowledge/data/posthog-agent-tooling.md": "61ffdbc79a985a41a11fbe6e1c7c5663050104208baa9d05b8ebe33186ab93cc",
     "knowledge/design/audience-derived-identity.md": "04c90b39c9d41cf00257c70b4e579f3e29684254d444917b9a5690d48be74f5f",
@@ -15329,10 +15413,13 @@
     "knowledge/engineering/app-agent-roster.md": "723f94c8d160ec5e97e1284e35ee299cf344ca249658303b1c4bf0311625b90d",
     "knowledge/engineering/app-quality.md": "0e574063b35110cca3ab247fc9747b0817a76a74548b157ba885184f3991be38",
     "knowledge/engineering/backend-data-contract.md": "4519931a783e460c9eca66792e7bf8a0b9293739a1332b143bf1a7818fede601",
-    "knowledge/engineering/engineering-orchestration.md": "b0ff7d4ef9723d2157fe4cf56600650c8e5acff4ef677661d4885183009ce00b",
+    "knowledge/engineering/engineering-orchestration.md": "2994974c9f86ccbb9271227803abf4e7fd7ffdbb14459986d896f6ad2d43ac8c",
+    "knowledge/engineering/expo-compatibility.md": "c71a45e51518d7f14f8d561312544b3cc151ac5045886935cad8e3176a989055",
+    "knowledge/engineering/expo-operations-map.md": "36a3db4d77f5dde0095ce74805d195d85f84f9e216e80825f7457814bc93bd1a",
+    "knowledge/engineering/expo-stack-selection.md": "5000848db4a304a6b8d01473ca8066be16ccf896bf59d878f81faf696b14f548",
     "knowledge/engineering/external-skill-packs.md": "84cd559560ab95e737cce7421106e8fd39fbe8eb6e38a880ce2e3fcb5f1584b1",
     "knowledge/engineering/mobai-toolbelt.md": "5b510e6ecb4a4eebb34b20040a8300698e24a7c9cf5dfdcd410f8f937cfac7e0",
-    "knowledge/engineering/recommended-agent-skills.md": "52c18bab21c9028b4c9a9ee40debc5f430c846e18151cbc4bc37111e8efe0143",
+    "knowledge/engineering/recommended-agent-skills.md": "37f9b86e3205c49b59596bda4e9a0358b9657bfa6580bceae74ce2e3b49f46ba",
     "knowledge/engineering/technical-documentation-ste100.md": "3044d92ded449d6d0e4c14d050bb15b5c7ea40207c1e50da7d2be545ed6920d3",
     "knowledge/engineering/xcodebuildmcp-testing.md": "b3d51f1c382dbe50da9429bdc636631b441097dce008faf048e6ba7237df78fa",
     "knowledge/experience/experience-cards/commitment-card.md": "9dfc36af989482bf403846cbaf50790a7b77593ca544bad71236226231195ba1",
@@ -15449,7 +15536,7 @@
     "knowledge/words/conversion-copy.md": "68739b91f0f977f28718f48dd2368bb8c59a03a3f3d44a30efa08d12eb2956ab",
     "knowledge/words/no-slop-writing.md": "43a82efe1c0e03ba7315fded03a971f83777e1d7092eb5c6c97bb3eb28f171a8",
     "checks/validation/repository/audit-skill-links.ts": "781b1715e075b59ce673fbefad9bacab29eceb93e9f96ef60944bfda884eaf5c",
-    "package.json": "e5b8425fa8cb49793d1172f7da6f4588b5b20c78301b6685d2e9d161420964d3",
+    "package.json": "6fbe2bda8183e68bd82834f8e95eb74eba98c6708411f17498cbc215ad11af00",
     "tooling/catalog-scaffold.ts": "6a54386c9259c97834599249115b0dd82308c16e2c9bb35c02f3058280467077",
     "catalog/render-routing.ts": "f170fbd755998b843a057be9ae83dc1cc3ec5c9952fcebd4982d253621dd161a",
     "checks/validation/repository/check-agent-entrypoints.ts": "58486e6e69f424c422a3d005cfc432f92fd0bd4cb7dc168f2dafeedfbe137be5",
@@ -15760,5 +15847,5 @@
     "catalog/upstreams/notices/parth-app-store-screenshots.txt": "a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a"
   },
   "dependencies": [],
-  "digest": "sha256:8cb734806406943d0a3b3dbeef07f2f9f4611c221ebbcdd311a0056e18fba7c2"
+  "digest": "sha256:ddc35ddbbebccf020784966f1f4a8f100f1549af327b6ef17e154494921f50ec"
 }

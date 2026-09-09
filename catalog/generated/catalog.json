@@ -1,6 +1,6 @@
 {
   "schemaVersion": "2.0.0",
-  "skillVersion": "0.219.8",
+  "skillVersion": "0.219.9",
   "areas": [
     {
       "id": "area.operating-system",
@@ -1825,6 +1825,9 @@
         "reference.engineering.app-quality",
         "reference.engineering.backend-data-contract",
         "reference.engineering.engineering-orchestration",
+        "reference.engineering.expo-compatibility",
+        "reference.engineering.expo-operations-map",
+        "reference.engineering.expo-stack-selection",
         "reference.engineering.recommended-agent-skills",
         "reference.process.tool-recipes.engineering-and-agent-orchestration"
       ]
@@ -3770,7 +3773,179 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/engineering/engineering-orchestration.md",
-        "sha256": "sha256:b0ff7d4ef9723d2157fe4cf56600650c8e5acff4ef677661d4885183009ce00b",
+        "sha256": "sha256:2994974c9f86ccbb9271227803abf4e7fd7ffdbb14459986d896f6ad2d43ac8c",
+        "origin": "skill"
+      }
+    },
+    {
+      "id": "reference.engineering.expo-compatibility",
+      "path": "knowledge/engineering/expo-compatibility.md",
+      "domainId": "domain.engineering",
+      "title": "Expo Compatibility And CNG",
+      "loadWhen": "when checking Expo SDK, React Native, Router, CLI, or CNG compatibility, or upgrading without losing native customizations",
+      "lifecycle": "active",
+      "applicabilityNotes": "Keep observed latest, reviewed baseline, supported range, workspace pin, and executed version distinct. Missing or mismatched pins are incompatibilities, not automatic upgrades.",
+      "sources": [
+        {
+          "id": "expo-dev-changelog-sdk-57",
+          "name": "Expo SDK 57 changelog",
+          "sourceType": "official_docs",
+          "url": "https://expo.dev/changelog/sdk-57",
+          "reviewCadenceDays": 7,
+          "claimScope": "Candidate SDK 57 pairing with React Native 0.86.x, React 19.2, prebuild regeneration default, and known patch notes. Not an executed CLI or workspace pin.",
+          "lastReviewDate": "2026-09-08",
+          "reviewer": "b2c-maintainers",
+          "publisher": "Expo"
+        },
+        {
+          "id": "docs-expo-dev-workflow-continuous-native-generation",
+          "name": "Continuous Native Generation",
+          "sourceType": "official_docs",
+          "url": "https://docs.expo.dev/workflow/continuous-native-generation/",
+          "reviewCadenceDays": 7,
+          "claimScope": "CNG generates native projects from declared configuration. Custom native modules can remain on Expo. Not permission to run prebuild during discovery.",
+          "lastReviewDate": "2026-09-08",
+          "reviewer": "b2c-maintainers",
+          "publisher": "Expo"
+        }
+      ],
+      "derivations": [
+        {
+          "sourceIds": [
+            "expo-dev-changelog-sdk-57",
+            "docs-expo-dev-workflow-continuous-native-generation"
+          ],
+          "relationship": "informed",
+          "rationale": "Version-fact separation and CNG ownership rules are builder contracts informed by the changelog and CNG overview. Exact CLI flags must be rechecked against the selected executable.",
+          "reviewer": "b2c-maintainers",
+          "reviewedAt": "2026-09-08"
+        }
+      ],
+      "replacementIds": [],
+      "resource": {
+        "path": "catalog/generated/firstparty/knowledge/engineering/expo-compatibility.md",
+        "sha256": "sha256:c71a45e51518d7f14f8d561312544b3cc151ac5045886935cad8e3176a989055",
+        "origin": "skill"
+      }
+    },
+    {
+      "id": "reference.engineering.expo-operations-map",
+      "path": "knowledge/engineering/expo-operations-map.md",
+      "domainId": "domain.engineering",
+      "title": "Expo Operations Map",
+      "loadWhen": "when building iOS and Android with Expo, adopting an existing Expo app without EAS, adding a native module, or shipping Expo web only",
+      "lifecycle": "active",
+      "applicabilityNotes": "Routes selected Expo work to child issues without claiming their execution. Unselected EAS, MCP, and RevenueCat stay idle. Native purchases are not the RevenueCat CLI.",
+      "sources": [
+        {
+          "id": "docs-expo-dev-eas",
+          "name": "Expo Application Services",
+          "sourceType": "official_docs",
+          "url": "https://docs.expo.dev/eas/",
+          "reviewCadenceDays": 7,
+          "claimScope": "EAS is a family of optional hosted services (Build, Submit, Update, Hosting, Workflows, Observe), not a bundled obligation of selecting Expo.",
+          "lastReviewDate": "2026-09-08",
+          "reviewer": "b2c-maintainers",
+          "publisher": "Expo"
+        },
+        {
+          "id": "docs-expo-dev-mcp",
+          "name": "Expo MCP",
+          "sourceType": "official_docs",
+          "url": "https://docs.expo.dev/mcp/",
+          "reviewCadenceDays": 7,
+          "claimScope": "Expo MCP is an optional agent connection with local and remote tool boundaries. Discovery is not authorization.",
+          "lastReviewDate": "2026-09-08",
+          "reviewer": "b2c-maintainers",
+          "publisher": "Expo"
+        },
+        {
+          "id": "github-com-expo-skills",
+          "name": "Official Expo skills",
+          "sourceType": "agent_skill_pack",
+          "url": "https://github.com/expo/skills",
+          "reviewCadenceDays": 7,
+          "claimScope": "Official Expo skill pack named as an optional selected-session install. Intake does not vendor or install it. Rights and exact commit review belong to issue 87.",
+          "lastReviewDate": "2026-09-08",
+          "reviewer": "b2c-maintainers",
+          "publisher": "Expo",
+          "rights": {
+            "status": "unknown",
+            "notes": "Named as a citation only. No skill text is copied. Issue 87 completes rights review before any adapt or vendor disposition."
+          }
+        }
+      ],
+      "derivations": [
+        {
+          "sourceIds": [
+            "docs-expo-dev-eas",
+            "docs-expo-dev-mcp",
+            "github-com-expo-skills"
+          ],
+          "relationship": "informed",
+          "rationale": "Operation routing treats EAS services, MCP, and official skills as separate optional selections with explicit gaps until child packages land.",
+          "reviewer": "b2c-maintainers",
+          "reviewedAt": "2026-09-08"
+        }
+      ],
+      "replacementIds": [],
+      "resource": {
+        "path": "catalog/generated/firstparty/knowledge/engineering/expo-operations-map.md",
+        "sha256": "sha256:36a3db4d77f5dde0095ce74805d195d85f84f9e216e80825f7457814bc93bd1a",
+        "origin": "skill"
+      }
+    },
+    {
+      "id": "reference.engineering.expo-stack-selection",
+      "path": "knowledge/engineering/expo-stack-selection.md",
+      "domainId": "domain.engineering",
+      "title": "Expo Stack Selection",
+      "loadWhen": "when selecting Expo as the app stack rather than SwiftUI or Flutter, including iOS Android or web shipping",
+      "lifecycle": "active",
+      "applicabilityNotes": "Expo is a selectable app stack, not the default. Detection of an expo dependency is not consent to select EAS or claim native proof. Consume catalog/stacks/expo-selection.ts.",
+      "sources": [
+        {
+          "id": "docs-expo-dev",
+          "name": "Expo documentation",
+          "sourceType": "official_docs",
+          "url": "https://docs.expo.dev/",
+          "reviewCadenceDays": 7,
+          "claimScope": "Official Expo documentation home used as the research starting point for stack selection. Not a version pin and not redistribution of the docs corpus.",
+          "lastReviewDate": "2026-09-08",
+          "reviewer": "b2c-maintainers",
+          "publisher": "Expo",
+          "selectors": [
+            "/"
+          ]
+        },
+        {
+          "id": "docs-expo-dev-workflow-overview",
+          "name": "Expo development workflow",
+          "sourceType": "official_docs",
+          "url": "https://docs.expo.dev/workflow/overview/",
+          "reviewCadenceDays": 7,
+          "claimScope": "Distinguishes the open-source app framework from optional Expo Application Services and development builds from Expo Go.",
+          "lastReviewDate": "2026-09-08",
+          "reviewer": "b2c-maintainers",
+          "publisher": "Expo"
+        }
+      ],
+      "derivations": [
+        {
+          "sourceIds": [
+            "docs-expo-dev",
+            "docs-expo-dev-workflow-overview"
+          ],
+          "relationship": "informed",
+          "rationale": "Builder selection rules restate that Expo is optional, EAS is a separate service family, and Expo Go is not production proof. No docs text is copied.",
+          "reviewer": "b2c-maintainers",
+          "reviewedAt": "2026-09-08"
+        }
+      ],
+      "replacementIds": [],
+      "resource": {
+        "path": "catalog/generated/firstparty/knowledge/engineering/expo-stack-selection.md",
+        "sha256": "sha256:5000848db4a304a6b8d01473ca8066be16ccf896bf59d878f81faf696b14f548",
         "origin": "skill"
       }
     },
@@ -4045,7 +4220,7 @@
       "title": "Recommended Agent Skills",
       "loadWhen": "before Expo or SwiftUI implementation when choosing recommended external agent skill packs for craft, motion, store work, optional recency research, or optional design-research provider guidance without vendor lock-in",
       "lifecycle": "active",
-      "applicabilityNotes": "Pin expo/skills and emilkowalski animate-expo/review-animations as recommended Expo installs. Appllama's app-design skill is an opt-in stack-specific companion; appllama-usage is loaded only when the user's Appllama MCP is independently connected and authorized. last30days is an opt-in host engine for scored recency briefs; it is not a default and does not replace AppKittie, XPOZ, or Firecrawl. Keep paid/vendor MCPs off the default surface.",
+      "applicabilityNotes": "expo/skills and emilkowalski animate-expo/review-animations are optional for a selected Expo session after founder approval; they are not default installs. Appllama's app-design skill is an opt-in stack-specific companion; appllama-usage is loaded only when the user's Appllama MCP is independently connected and authorized. last30days is an opt-in host engine for scored recency briefs; it is not a default and does not replace AppKittie, XPOZ, or Firecrawl. Keep paid/vendor MCPs off the default surface.",
       "sources": [
         {
           "id": "github-appllama-skills",
@@ -4102,7 +4277,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/engineering/recommended-agent-skills.md",
-        "sha256": "sha256:52c18bab21c9028b4c9a9ee40debc5f430c846e18151cbc4bc37111e8efe0143",
+        "sha256": "sha256:37f9b86e3205c49b59596bda4e9a0358b9657bfa6580bceae74ce2e3b49f46ba",
         "origin": "skill"
       }
     },
@@ -18422,14 +18597,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "03f7bda2b19b6dcf0a300662e7f1840017547780a3d01a567bd758de2c658339",
+    "fingerprint": "becc2559632b610dfcef0b55c510f5d086d99328692fee36639af43069999607",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
-        "version": "0.219.8",
-        "revision": "0.219.8",
-        "contentDigest": "d8650384439c19ae377ea5d783a7c7214bf58c043399486d3bcfed1efca18f5d"
+        "version": "0.219.9",
+        "revision": "0.219.9",
+        "contentDigest": "102fe50d1916fa52d256cc854749dd8f8af1cabf67582812adef68046f02508e"
       }
     ],
     "base": {
@@ -18441,7 +18616,7 @@
       "business-pack.consumer-business": {
         "domains": 15,
         "workflows": 112,
-        "references": 142
+        "references": 145
       }
     }
   }

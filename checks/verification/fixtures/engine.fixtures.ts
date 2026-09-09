@@ -1,7 +1,9 @@
 import { existsSync, lstatSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { createHash, generateKeyPairSync, sign as signEd25519, type KeyObject } from "node:crypto";
 import path from "node:path";
-import { assert, assertSchemaValid, type Harness } from "./_harness.js";
+import { toCatalogInput } from "../../../catalog/bridge.js";
+import { composeCatalog } from "../../../catalog/index.js";
+import { assert, assertSchemaValid, skillRoot, type Harness } from "./_harness.js";
 import {
   laneKeys,
   type BusinessStateV2,
@@ -68,6 +70,7 @@ import {
   isWallClockExceeded,
   loadCheckpoint,
   loadRunState,
+  reconcileEnvironmentalArtifacts,
   reconcilePatch,
   reconcileRunPlan,
   invalidateStaleReviews,
@@ -2668,6 +2671,119 @@ export function register(harness: Harness): void {
     const invalidated = invalidateDescendants(plan, run, ["artifact.strategy-tool-decisions-md"], plusSeconds(now, 1));
     assert(invalidated.includes(consumer.id), "changing TOOL_DECISIONS must reopen the node that reads it");
     assert(run.nodes[unrelated.id]!.status === "succeeded", "unrelated accepted outputs must remain");
+  });
+
+  harness.check("live compile: accepted ONB-08 packet reopens when studio interaction later changes", () => {
+    const catalog = toCatalogInput(composeCatalog(skillRoot));
+    const plan = compilePlan(catalog, now);
+    const onb08 = plan.nodes.find((node) => node.workflowId === "workflow.experience.onboarding-system.onb-08-motion-research");
+    const onb02 = plan.nodes.find((node) => node.workflowId === "workflow.experience.onboarding-system.onb-02-evidence-plan");
+    const onb03 = plan.nodes.find((node) => node.workflowId === "workflow.experience.onboarding-system.onb-03-current-guidance");
+    const designRoom = plan.nodes.find((node) => node.workflowId === "workflow.design.design-room");
+    assert(Boolean(onb08), "the live catalog must compile ONB-08");
+    assert(Boolean(onb02), "the live catalog must compile ONB-02");
+    assert(Boolean(onb03), "the live catalog must compile ONB-03");
+    assert(Boolean(designRoom), "the live catalog must compile Design Room");
+    assert(onb08!.consults?.includes("studio/seed/business.json"), "live ONB-08 must consult studio/seed/business.json");
+    assert(onb08!.consults?.includes("DESIGN.md"), "live ONB-08 must consult DESIGN.md");
+    assert(!onb08!.inputs.includes("artifact.studio-seed-business-json"), "studio seed must stay a consult, never an ONB-08 input");
+    assert(
+      consultedArtifactIds(onb08!, plan.artifactBindings).includes("artifact.studio-seed-business-json"),
+      "live ONB-08 must watch the studio seed for invalidation",
+    );
+    assert(
+      onb08!.outputs.includes("artifact.product-onboarding-graph-onb-08-motion-research-md"),
+      "live ONB-08 must produce the motion-research packet",
+    );
+    assert(
+      !consultedArtifactIds(designRoom!, plan.artifactBindings).includes("artifact.studio-seed-business-json"),
+      "Design Room must not self-watch the studio seed it produces",
+    );
+    assert(
+      !consultedArtifactIds(onb03!, plan.artifactBindings).includes("artifact.studio-seed-business-json"),
+      "ONB-03 must not consult the studio seed",
+    );
+
+    const workspace = harness.makeTempDir("live-onb08-consult");
+    mkdirSync(path.join(workspace, "studio/seed"), { recursive: true });
+    mkdirSync(path.join(workspace, "strategy"), { recursive: true });
+    const seed = {
+      surfaces: {
+        landingPages: [{ id: "privacy", status: "ready", interaction: "static-document" as string, purpose: "disclosures" }],
+        webFunnels: [] as unknown[],
+        marketingAssets: [] as unknown[],
+        mobileApp: { screens: [] as unknown[] },
+      },
+    };
+    writeFileSync(path.join(workspace, "studio/seed/business.json"), `${JSON.stringify(seed, null, 2)}\n`, "utf8");
+    writeFileSync(path.join(workspace, "product.yaml"), "meta:\n  status: accepted\ninstances: []\n", "utf8");
+    writeFileSync(
+      path.join(workspace, "strategy/TOOL_DECISIONS.md"),
+      [
+        "## Workflow intake",
+        "",
+        "| Tool | Lane | Access status | Founder confirmation | Selected route | Fallback limitation |",
+        "| --- | --- | --- | --- | --- | --- |",
+        "| 60fps.design MCP | design | connected | required before paid access | 60fps MCP | distilled recipes are not equivalent |",
+        "",
+      ].join("\n"),
+      "utf8",
+    );
+
+    const businessState = baseBusinessState();
+    const run = seedRunState(plan, businessState, { ownerSessionId: "session-1", ttlSeconds: 600, wallClockCapSeconds: 3600, now });
+    reconcileEnvironmentalArtifacts(plan, run, workspace, now);
+    const studioBinding = run.artifactBindings.find((binding) => binding.artifactId === "artifact.studio-seed-business-json");
+    assert(Boolean(studioBinding?.accepted), "pre-existing studio seed must be accepted as environmental material");
+    assert(studioBinding?.producedBy === undefined, "this fixture must not invent a live Design Room producer");
+
+    const acceptLive = (node: (typeof plan.nodes)[number], fingerprint: string, when: string): void => {
+      const attempt = beginAttempt(plan, run, node.id, "session-1", when);
+      reconcilePatch(
+        plan,
+        run,
+        {
+          nodeId: node.id,
+          attemptId: attempt.id,
+          outputs: node.outputs.map((artifactId) => ({
+            artifactId,
+            path: plan.artifactBindings.find((binding) => binding.artifactId === artifactId)!.path,
+            fingerprint,
+            evidence: ["live ONB-08 consult-invalidation fixture"],
+          })),
+        },
+        when,
+      );
+      acceptVerification(plan, run, node.id, ["accepted for live consult-invalidation fixture"], when, "session-1");
+    };
+    acceptLive(onb02!, "sha256:onb-02-v1", now);
+    acceptLive(onb08!, "sha256:onb-08-v1", now);
+    acceptLive(onb03!, "sha256:onb-03-v1", now);
+    assert(run.nodes[onb08!.id]!.status === "succeeded", "ONB-08 must start accepted");
+    assert(run.nodes[onb08!.id]!.acceptedOutputFingerprint !== undefined, "ONB-08 must keep an accepted fingerprint");
+    assert(
+      run.artifactBindings.find((binding) => binding.artifactId === "artifact.product-onboarding-graph-onb-08-motion-research-md")!.accepted,
+      "the ONB-08 packet must start accepted",
+    );
+
+    seed.surfaces.landingPages[0]!.interaction = "scroll-linked";
+    writeFileSync(path.join(workspace, "studio/seed/business.json"), `${JSON.stringify(seed, null, 2)}\n`, "utf8");
+    const invalidated = reconcileEnvironmentalArtifacts(plan, run, workspace, plusSeconds(now, 1));
+    assert(invalidated.includes(onb08!.id), "changing studio interaction must reopen accepted ONB-08");
+    assert(run.nodes[onb08!.id]!.status === "stale", "ONB-08 must become stale, not a silent check recompute");
+    assert(run.nodes[onb08!.id]!.acceptedOutputFingerprint === undefined, "ONB-08 accepted fingerprint must clear");
+    assert(
+      !run.artifactBindings.find((binding) => binding.artifactId === "artifact.product-onboarding-graph-onb-08-motion-research-md")!.accepted,
+      "the ONB-08 packet must un-accept",
+    );
+    assert(run.nodes[onb03!.id]!.status === "succeeded", "unrelated accepted ONB-03 must stay accepted");
+    assert(
+      run.artifactBindings.find((binding) => binding.artifactId === "artifact.product-onboarding-graph-onb-03-current-guidance-md")!.accepted,
+      "unrelated ONB-03 output must remain accepted",
+    );
+    assert(run.nodes[designRoom!.id]!.status !== "succeeded", "Design Room must not be invented as an accepted producer");
+    const reopened = computeFrontier(plan, structuredClone(run), businessState, allowAllAutonomyEvaluator);
+    assert(reopened.ready.includes(onb08!.id), "stale ONB-08 must be frontier-eligible after the consult change");
   });
 
   harness.check(

@@ -676,6 +676,19 @@ export function register(h: Harness): void {
     "landing_funnel.page_gates.static_document_invented_conversion",
   );
 
+  const staticInventedScrollytelling = makeEmptyFixture("landing-funnel-static-invented-scrollytelling");
+  writeAcceptedLanding(staticInventedScrollytelling, {
+    landingPages: [{ id: "privacy", status: "ready", interaction: "static-document" }],
+    contract: frozenContract(["landing_viewed"], true),
+  });
+  runFixture(
+    "accepted static privacy page fails when the contract invents scrollytelling",
+    staticInventedScrollytelling,
+    "check-landing-funnel.ts",
+    1,
+    "landing_funnel.page_gates.static_document_invented_scrollytelling",
+  );
+
   const unresolvedInteraction = makeEmptyFixture("landing-funnel-interaction-unresolved");
   writeAcceptedLanding(unresolvedInteraction, {
     landingPages: [{ id: "landing", status: "ready" }],

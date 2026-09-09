@@ -195,7 +195,7 @@ export const EXPO_QUEUED_OWNERS: readonly ExpoQueuedOwner[] = [
   {
     issue: 82,
     owns: "Expo starter, Router/native UI, CNG, custom Swift/Kotlin module path",
-    consume: "This mapping’s runtime slug and version facts; starter, native-ownership, and router-contract modules import it",
+    consume: "This mapping’s runtime slug and version facts; starter, native-ownership, router-contract, and custom-module modules import it",
     doNot: "Relabel the Next.js habit-tracker starter, or replace product.yaml / DESIGN.md ownership",
   },
   {
@@ -379,7 +379,8 @@ function operationSupport(): ExpoOperationSupport[] {
       platforms: ["ios", "android"],
       evidenceTier: "blocked",
       queuedIssue: 82,
-      notes: "Native add requires a new binary. Web needs an explicit unsupported path.",
+      notes:
+        "TypeScript boundary, Swift/Kotlin sources, and an explicit web-unsupported path are fixture-tested. Operation stays blocked: autolinking, native compile, and development-client rebuild were not run.",
     },
     {
       id: "authentication",

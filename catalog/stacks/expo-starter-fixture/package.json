@@ -6,6 +6,12 @@
   "dependencies": {
     "expo": "57.0.17",
     "react": "19.2.0",
-    "react-native": "0.86.3"
+    "react-native": "0.86.3",
+    "b2c-native-capability": "file:modules/b2c-native-capability"
+  },
+  "expo": {
+    "autolinking": {
+      "nativeModulesDir": "./modules"
+    }
   }
 }

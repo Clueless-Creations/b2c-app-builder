@@ -19,12 +19,21 @@ import {
   writeNativeGenerationFingerprint,
 } from "../../../catalog/stacks/expo-native-ownership.js";
 import {
+  EXPO_CUSTOM_MODULE_FILES,
+  decideExpoCustomModule,
+  isolatedStarterCustomModule,
+} from "../../../catalog/stacks/expo-custom-module.js";
+import {
   EXPO_ROUTER_ROUTE_FILES,
   EXPO_ROUTER_SRC_FILES,
   isolatedStarterRouterLayout,
   planExpoRouterDelivery,
   reviewedExpoRouterFact,
 } from "../../../catalog/stacks/expo-router-contract.js";
+import {
+  invokeNativeCapability,
+} from "../../../catalog/stacks/expo-starter-fixture/modules/b2c-native-capability/src/invoke.js";
+import { invokeNativeCapability as invokeWebCapability } from "../../../catalog/stacks/expo-starter-fixture/modules/b2c-native-capability/src/B2cNativeCapability.web.js";
 import {
   BUILDER_AUTHORITY_FILES,
   EXPO_STARTER_FIXTURE_DIR,
@@ -93,7 +102,7 @@ export function register(harness: Harness): void {
     assert(operationFor(selected, "cng-prebuild").evidenceTier === "blocked", "CNG prebuild stays blocked until an executed CLI is fixture-tested");
     assert(operationFor(selected, "official-skills").evidenceTier === "blocked", "official Expo skills stay blocked until #87 fixture-tests them");
     assert(operationFor(selected, "router-native-ui").evidenceTier === "blocked", "Router/native UI stays blocked without an expo-router pin and native adapter");
-    assert(operationFor(selected, "custom-native-module").evidenceTier === "blocked", "custom native module is not delivered this increment");
+    assert(operationFor(selected, "custom-native-module").evidenceTier === "blocked", "custom native module stays blocked until autolink and rebuild are proven");
     const unselected = resolveExpoSelection({ compositionTarget: { platform: "host", runtime: HOST_AGENT_RUNTIME } });
     assert(operationFor(unselected, "starter-scaffold").evidenceTier === "blocked", "unselected Expo must not inherit the starter");
     assert(!shippingSatisfiesRequirement("web", "ios"), "web must not satisfy iOS");
@@ -103,7 +112,7 @@ export function register(harness: Harness): void {
     const files = isolatedExpoStarterPaths();
     assert(files.includes("package.json"), "starter fixture must include package.json");
     assert(files.includes("app.json"), "starter fixture must include static app.json");
-    for (const relative of [...EXPO_ROUTER_ROUTE_FILES, ...EXPO_ROUTER_SRC_FILES]) {
+    for (const relative of [...EXPO_ROUTER_ROUTE_FILES, ...EXPO_ROUTER_SRC_FILES, ...EXPO_CUSTOM_MODULE_FILES]) {
       assert(files.includes(relative), `starter fixture must include ${relative}`);
     }
     assert(files.includes("gitignore.template"), "starter fixture must use gitignore.template so npm can pack it");
@@ -125,6 +134,7 @@ export function register(harness: Harness): void {
     assert(compatibility.sdk === "match" && compatibility.reactNative === "match", compatibility.actionable);
     assert(compatibility.autoUpgradeAttempted === false, "fixture pins must not trigger auto-upgrade");
     assert(pkg.dependencies?.["expo-router"] === undefined, "must not invent an expo-router workspace pin");
+    assert(pkg.dependencies?.["expo-modules-core"] === undefined, "must not invent an expo-modules-core pin");
     assert(reviewedExpoRouterFact() === "bundled-with-sdk-57", "reviewed Router fact is not a package version");
   });
 
@@ -191,6 +201,82 @@ export function register(harness: Harness): void {
       compositionTarget: iosExpo(),
     });
     assert(latest.action === "refuse" && latest.code === "fabricated-router-pin", latest.reason);
+  });
+
+  harness.check("expo foundation: custom module has a TypeScript boundary and explicit web-unsupported path", () => {
+    const layout = isolatedStarterCustomModule();
+    assert(layout.status === "boundary-ready", `expected boundary-ready, got ${layout.status}`);
+    assert(layout.iosSourcePresent && layout.androidSourcePresent, "Swift and Kotlin sources must both be present");
+    assert(layout.webUnsupported && layout.configOmitsWeb, "web must be omitted and explicitly unsupported");
+    assert(layout.lifecyclePresent && layout.eventsPresent, "native sources must declare lifecycle and error events");
+    assert(layout.fabricatedModulesCorePin === false, "must not invent expo-modules-core latest");
+    assert(layout.nativeCompileStatus === NATIVE_COMPILE_STATUS, "native compile stays not-run");
+    assert(layout.autolinkingVerified === false, "autolinking stays unverified");
+    const web = invokeNativeCapability("web", true);
+    assert(web.ok === false, "web must not fake native parity");
+    if (web.ok) return;
+    assert(web.reason === "unsupported-on-web", "web must not fake native parity");
+    assert(web.error.retryInJavaScript === false, "unsupported web is not a JS retry");
+    const webEntry = invokeWebCapability();
+    assert(webEntry.ok === false, "the .web entry must stay unsupported");
+    if (webEntry.ok) return;
+    assert(webEntry.reason === "unsupported-on-web", "the .web entry must stay unsupported");
+    const missing = invokeNativeCapability("ios", false);
+    assert(missing.ok === false, "an old binary needs a rebuild");
+    if (missing.ok) return;
+    assert(missing.reason === "rebuild-required", "an old binary needs a rebuild");
+    assert(missing.error.retryInJavaScript === false, "missing native module is not a JavaScript retry loop");
+    assert(missing.error.message.includes("Rebuild"), "rebuild requirement must be named");
+    assert(!missing.error.message.toLowerCase().includes("try again"), "rebuild message must not suggest a JavaScript retry loop");
+    const target = harness.makeTempDir("expo-custom-module");
+    materializeExpoStarterFixture({
+      target,
+      skillRoot,
+      compositionTarget: iosExpo(),
+      platforms: ["ios"],
+      authorized: true,
+    });
+    const unknownBinary = decideExpoCustomModule({
+      target,
+      skillRoot,
+      compositionTarget: iosExpo(),
+    });
+    assert(unknownBinary.action === "refuse" && unknownBinary.code === "executed-binary-unverified", unknownBinary.reason);
+    const rebuild = decideExpoCustomModule({
+      target,
+      skillRoot,
+      compositionTarget: iosExpo(),
+      nativeModulePresentInBinary: false,
+    });
+    assert(rebuild.action === "rebuild-required", rebuild.reason);
+    const webTarget = decideExpoCustomModule({
+      target,
+      skillRoot,
+      compositionTarget: { platform: "web", runtime: EXPO_APP_RUNTIME },
+    });
+    assert(webTarget.action === "unsupported-on-web", webTarget.reason);
+    const iosAsAndroid = decideExpoCustomModule({
+      target,
+      skillRoot,
+      compositionTarget: iosExpo(),
+      claimedProofPlatform: "android",
+    });
+    assert(iosAsAndroid.action === "refuse" && iosAsAndroid.code === "ios-does-not-prove-android", iosAsAndroid.reason);
+    const webAsIos = decideExpoCustomModule({
+      target,
+      skillRoot,
+      compositionTarget: { platform: "web", runtime: EXPO_APP_RUNTIME },
+      claimedProofPlatform: "ios",
+    });
+    assert(webAsIos.action === "refuse" && webAsIos.code === "web-false-parity", webAsIos.reason);
+    const builder = decideExpoCustomModule({
+      target: skillRoot,
+      skillRoot,
+      compositionTarget: iosExpo(),
+    });
+    assert(builder.action === "refuse" && builder.code === "builder-checkout", builder.reason);
+    assert(!existsSync(path.join(target, "ios")), "local module sources must not create an app ios/ tree");
+    assert(!existsSync(path.join(target, "android")), "local module sources must not create an app android/ tree");
   });
 
   harness.check("expo foundation: empty authorized target scaffolds only the selected platform and preserves product.yaml", () => {

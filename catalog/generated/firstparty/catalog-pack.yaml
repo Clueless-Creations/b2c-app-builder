@@ -1,8 +1,8 @@
 id: business-pack.consumer-business
 title: Consumer business
 kind: business-pack
-version: 0.219.13
-revision: 0.219.13
+version: 0.219.14
+revision: 0.219.14
 depends_on: []
 creates_provider_spend: false
 domains:
@@ -2065,15 +2065,19 @@ workflows:
     domain_id: domain.experience
     area_ids:
       - area.product-experience
-    trigger: Research interaction and motion references with 60fps and translate them into the target framework
+    trigger: Research interaction and motion for the selected surfaces and translate applicable references into the target framework
     founder_phrasings:
       - find motion references worth copying for onboarding
       - research good interaction animations for signup
       - translate reference motion into our onboarding
-    instructions: Research interaction and motion references using the 60fps MCP (search_shots, get_shot, get_motion_breakdown, get_related_shots; motion code only when it clarifies) and translate the adopted principles into this product's own behavior and target framework, not a copy of the reference. Record each as a 60fps Motion Register row (target/problem, reference shot ID, adopted principle, implementation/haptic/interruption behavior, reduced-motion behavior) in product/onboarding/graph/ONB-08-motion-research.md; check:onboarding-evidence-onb-08 rejects a stub packet.
+    instructions: Research interaction and motion for the surfaces actually selected. Resolve applicability from studio/seed/business.json `interaction` on each listed surface, implemented scroll-linked hooks under growth/landing, growth/funnel, or web when that landing is active, and growth/landing/surface-contract.json `scrollytelling.applicable` when that file exists; do not infer a technique from purpose prose or from packet sentences. Not selected, selected but unavailable, and not yet inspected stay different. A producer sentence that motion research is not applicable cannot override a selected or implemented rich-motion surface. static-document and conversion surfaces need semantic content, legibility, accessibility, and truthful claims — not invented scroll choreography or 60fps shot IDs. standard-transition native UI needs usable feedback, interruption, accessibility, and applicable performance, not a paid catalog. When interaction is bespoke-motion or scroll-linked, or landing source already implements scroll-linked hooks, and strategy/TOOL_DECISIONS.md records the 60fps MCP as ready, active, or connected without a fallback route, use search_shots, get_shot, get_motion_breakdown, and get_related_shots (motion code only when it clarifies) and record Motion Research rows (target/problem, reference shot ID, adopted principle, implementation/haptic/interruption behavior, reduced-motion behavior). When that technique is selected and the 60fps MCP is blocked or a fallback, hold with the current selection and authority — do not spend, and do not claim a distilled recipe is equivalent. When a listed surface omits `interaction`, hold. An empty studio inventory means 60fps is not selected. Translate adopted principles into this product's own behavior and target framework, not a copy of the reference. Write the packet to product/onboarding/graph/ONB-08-motion-research.md; check:onboarding-evidence-onb-08 rejects a stub packet and an applicability hold.
     reads:
       - product/onboarding/graph/ONB-02-evidence-plan.md
-    consults: []
+      - product.yaml
+      - strategy/TOOL_DECISIONS.md
+    consults:
+      - studio/seed/business.json
+      - DESIGN.md
     reference_ids:
       - reference.experience.onboarding-conversion
     role_id: role.product-leader
@@ -2713,7 +2717,7 @@ workflows:
       - the app feels cheap, make it feel premium
       - add haptics and polish to every screen
       - make buttons and loading states feel high quality
-    instructions: "Wire the five invisible premium details into every screen: press states, subtle structural motion, semantic haptics, keyboard behavior, and loading or empty states. Start with the platform-neutral contracts in surfaces/ui-library/components/. Then implement them through the selected stack adapter. SwiftUI has the current reference adapter in surfaces/ui-library/adapters/swiftui.json. For Expo, React Native, Flutter, or another stack, create the equivalent native adapter and record real implementation proof before marking it implemented. Shared tokens express intent; they do not imply behavioral parity. Never hand-type a motion value in view code. Read the promoted preset layer, reserve celebration motion for earned moments, and honor reduced-motion preferences. Route advanced effects to motion-craft-benchmarks.md. Bind every live effect to real state, a plain fallback, and a reduced-motion result. Ground catalog recipes in a live exemplar through the 60fps MCP when it is connected, and translate mechanics rather than brand or exact layout. check:motion-contract proves the contract was applied; adjectives in DESIGN.md do not."
+    instructions: "Wire the five invisible premium details into every screen: press states, subtle structural motion, semantic haptics, keyboard behavior, and loading or empty states. Start with the platform-neutral contracts in surfaces/ui-library/components/. Then implement them through the selected stack adapter. SwiftUI has the current reference adapter in surfaces/ui-library/adapters/swiftui.json. For Expo, React Native, Flutter, or another stack, create the equivalent native adapter and record real implementation proof before marking it implemented. Shared tokens express intent; they do not imply behavioral parity. Never hand-type a motion value in view code. Read the promoted preset layer, reserve celebration motion for earned moments, and honor reduced-motion preferences. Route advanced effects to motion-craft-benchmarks.md. Bind every live effect to real state, a plain fallback, and a reduced-motion result. Ground catalog recipes in a live 60fps MCP exemplar only when studio/seed/business.json records interaction bespoke-motion or scroll-linked and strategy/TOOL_DECISIONS.md records that MCP as ready, active, or connected; if the technique is selected and the MCP is unavailable, hold rather than claiming a distilled recipe is equivalent. Translate mechanics rather than brand or exact layout. check:motion-contract proves the contract was applied; adjectives in DESIGN.md do not."
     reads:
       - DESIGN.md
       - studio/seed/business.json
@@ -4173,7 +4177,7 @@ workflows:
       - build a landing page and waitlist before launch
       - spin up a local landing site while the app is being built
       - get a waitlist collecting signups before we ship
-    instructions: "Build a runnable local landing site in growth/landing/ after the landing-specific Design Room refresh. Use the approved promise, one conversion goal, current copy keys, a mobile CTA, truthful proof, responsive behavior, and a local build check. Add onboarding, localization, pricing, or screenshot material only when the accepted product makes it applicable. Write growth/landing/surface-contract.json with canonical input digests, applicability decisions, and local proof. Apply scrollytelling only when evidence supports it. Follow editorial-scrollytelling.md: move from situation to mechanism to outcome to proof; record stable scene states, copy hashes, accessible descriptions, save-data and reduced-motion behavior, forward/reverse behavior, and desktop/mobile browser QA. Use live motion exemplars when available, but express them through this product's design system. Author growth/landing/browser-proof.json for the accepted landing surface IDs with the current candidate SHA-256, exact implementation source roots, exact built entrypoint and resource-to-URL mapping, served origin and URL, and Chrome channel. Start the local server, then run `b2c browser-proof --workspace . --session-id <authorization.executionIdentity>` inside this exact engine attempt. The command must open a new browser context and materialize growth/landing/proof/browser-proof.json plus its immutable build, response, launch, navigation, and runtime receipt files. Never author, copy, relabel, or repair those proof files by hand. Run check:design-md, check:design-room, check:design-worthiness, check:vibecoded-tells, check:scrollytelling, and check:browser-runtime-proof. Do not deploy from this node."
+    instructions: "Build a runnable local landing site in growth/landing/ after the landing-specific Design Room refresh. Use the approved promise, one conversion goal, current copy keys, a mobile CTA, truthful proof, responsive behavior, and a local build check. Add onboarding, localization, pricing, or screenshot material only when the accepted product makes it applicable. Write growth/landing/surface-contract.json with canonical input digests, applicability decisions, and local proof. Apply scrollytelling only when studio/seed/business.json records interaction scroll-linked or landing source already implements scroll-linked hooks; static-document and conversion surfaces must not invent a scroll choreography because another recipe uses one. Follow editorial-scrollytelling.md: move from situation to mechanism to outcome to proof; record stable scene states, copy hashes, accessible descriptions, save-data and reduced-motion behavior, forward/reverse behavior, and desktop/mobile browser QA. Use live motion exemplars when available, but express them through this product's design system. Author growth/landing/browser-proof.json for the accepted landing surface IDs with the current candidate SHA-256, exact implementation source roots, exact built entrypoint and resource-to-URL mapping, served origin and URL, and Chrome channel. Start the local server, then run `b2c browser-proof --workspace . --session-id <authorization.executionIdentity>` inside this exact engine attempt. The command must open a new browser context and materialize growth/landing/proof/browser-proof.json plus its immutable build, response, launch, navigation, and runtime receipt files. Never author, copy, relabel, or repair those proof files by hand. Run check:design-md, check:design-room, check:design-worthiness, check:vibecoded-tells, check:scrollytelling, and check:browser-runtime-proof. Do not deploy from this node."
     reads:
       - GEO_SEO.md
       - analytics/ANALYTICS.md
@@ -4236,7 +4240,7 @@ workflows:
       - have someone who didn't build the landing page tear it apart
       - does this website actually convert or just look busy
       - audit every public page before we go live
-    instructions: "Audit every modeled public page in growth/landing/ in a fresh context that never saw the producer's transcript: landing, waitlist, web-to-app worksheet, support, privacy, terms, deletion, and any referral or purchase page. Score conversion structure with the CRO discipline in reference.growth.cro-landing (promise, proof, first useful action before email; no invented social proof, no fake processing). Score the story map against reference.design.editorial-scrollytelling: situation to mechanism to outcome to proof, one measured controller, stable scene IDs, no-JS reading sequence, reduced-motion and Save-Data behavior, mobile recomposition. Apply the vibecoded tells and the twelve craft-bar conditions. Run no-ai-slop in detect mode on every visible string and the Impeccable detector when installed; record the detector JSON path. Re-run the GEO/SEO audit against the local preview and compare it with the dated baseline in GEO_SEO.md. Write findings only, with severity per page and the rubric version, into growth/CRO_AUDIT.md. Do not restyle or edit copy. An unresolved high-severity finding blocks publication."
+    instructions: "Audit every modeled public page in growth/landing/ in a fresh context that never saw the producer's transcript: landing, waitlist, web-to-app worksheet, support, privacy, terms, deletion, and any referral or purchase page. Resolve each page from studio/seed/business.json `interaction`, implemented scroll-linked hooks, and growth/landing/surface-contract.json when that file exists; do not infer a technique from purpose prose. Score conversion structure with the CRO discipline in reference.growth.cro-landing only when that page has a conversion job (promise, proof, first useful action before email; no invented social proof, no fake processing). Score the story map against reference.design.editorial-scrollytelling only when scroll-linked is selected or implemented: situation to mechanism to outcome to proof, one measured controller, stable scene IDs, no-JS reading sequence, reduced-motion and Save-Data behavior, mobile recomposition. A static legal or support page is scored for semantic content, legibility, accessibility, and working links — not invented scroll choreography or conversion experiments. Selected or implemented scrollytelling still needs the full interaction, interruption, reduced-motion, and performance evidence. Apply the vibecoded tells and the twelve craft-bar conditions to the techniques that page actually uses. Run no-ai-slop in detect mode on every visible string and the Impeccable detector when installed; record the detector JSON path. Re-run the GEO/SEO audit against the local preview and compare it with the dated baseline in GEO_SEO.md. Write findings only, with severity per page and the rubric version, into growth/CRO_AUDIT.md. Do not restyle or edit copy. An unresolved high-severity finding blocks publication."
     reads:
       - growth/landing/
       - GEO_SEO.md
@@ -4244,6 +4248,7 @@ workflows:
       - DESIGN.md
       - design/reviews/rubrics/
     consults:
+      - studio/seed/business.json
       - product/copy/COPY_REVIEW.md
       - design/reviews/DESIGN_SYSTEM_REVIEW.md
     reference_ids:
@@ -7041,7 +7046,7 @@ references:
     path: knowledge/experience/onboarding-conversion.md
     load_when: before onboarding quizzes, welcome/splash screens, personalization, attribution questions, demo videos, App Review popups, paywall timing, closing offers, trials, or first-session activation
     lifecycle: active
-    applicability_notes: Commitment Funnel and Paywall Goal Headline tables are required only when the matching product.yaml feature is required. Excluded or non-goal omits those binds. Absence holds. Packet prose cannot override a required feature. Do not silently select a funnel, billing provider, or extra platform.
+    applicability_notes: Commitment Funnel and Paywall Goal Headline tables are required only when the matching product.yaml feature is required. Excluded or non-goal omits those binds. Absence holds. Packet prose cannot override a required feature. Do not silently select a funnel, billing provider, or extra platform. ONB-08 60fps shot IDs are required only when studio interaction is bespoke-motion or scroll-linked, or an active landing already implements scroll-linked hooks, and the 60fps MCP is recorded ready; blocked or fallback is a hold, not an equivalent recipe. Empty studio inventory does not select 60fps. Listed surfaces that omit interaction stay unresolved.
     sources:
       - id: developer-android-com-guide-playcore-in-app-review
         name: developer.android.com
@@ -8168,7 +8173,7 @@ references:
     path: knowledge/orchestration/full-launch-program.md
     load_when: a founder asks for a complete end-to-end consumer delivery (app, full web funnel, store packet, analytics, trust, revenue, growth) carried to Submit-for-Review ready; when opening, resuming, or closing workflow.orchestration.full-launch-program; when checking the definition of done
     lifecycle: active
-    applicability_notes: The program is the loadable replacement for a pasted launch prompt. It adds a mandate record, the isolated-review edges, the reference-pack edge, and the closeout gates on top of the existing catalog nodes. It adds no second router, catalog, planner, or state store. Workspace identities belong in operations/LAUNCH_PROGRAM.md and reducer-owned state, never in this reference.
+    applicability_notes: The program is the loadable replacement for a pasted launch prompt. It adds a mandate record, the isolated-review edges, the reference-pack edge, and the closeout gates on top of the existing catalog nodes. It adds no second router, catalog, planner, or state store. Workspace identities belong in operations/LAUNCH_PROGRAM.md and reducer-owned state, never in this reference. CRO, scrollytelling, and 60fps shot-ID audits apply per selected or implemented surface, not to every public URL.
     source_exemption: This package contains internal operating guidance that sequences existing catalog nodes and gates. It makes no factual claim about a third-party product.
     sources: []
     replacement_ids: []
@@ -10919,7 +10924,7 @@ roles:
       - id: design.md CLI (npx @google/design.md lint, diff, export)
         when: DESIGN.md is authored, mutated, or audited
       - id: 60fps.design MCP, Refero MCP, and the quarantined reference catalogs
-        when: a reference pack is assembled before a surface is designed
+        when: bespoke-motion or scroll-linked is selected on a studio surface and 60fps MCP access is recorded as ready; an unlabeled fallback is not equivalent
     capability_ids:
       - provider.refero
       - provider.higgsfield

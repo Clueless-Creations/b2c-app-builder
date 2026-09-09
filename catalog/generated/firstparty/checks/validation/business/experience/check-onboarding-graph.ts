@@ -5,6 +5,7 @@
  * This validator does not grade conversion taste. It proves that the canonical artifact carries the graph, evidence joins, first-value and activation distinctions,
  * screen and control contracts, provider and policy research, typed analytics, compliant review timing, visual design requirements, and replacement-mode deletion plan.
  */
+import { loadDesignSurfaceApplicability } from "../../../../catalog/ontology/design-surface-applicability.js";
 import { loadOnboardingApplicability } from "../../../../catalog/ontology/onboarding-applicability.js";
 import {
   asArray,
@@ -77,7 +78,7 @@ const EXPECTED_VERIFICATION_ITEM_COUNT = 11;
 // present as text anywhere in the section.
 const VERIFICATION_ITEM_FINGERPRINTS = [
   "ONB-00` through `ONB-22` are done, or the lane is not claimed done",
-  "internal guidance, provider, policy, seven-principle, and 60fps research are joined",
+  "internal guidance, provider, policy, seven-principle, and motion research are joined",
   "review eligibility, and completion are distinct",
   "personalization proof, and the interruption budget are justified",
   "Experiment, review, permission, and lifecycle owners are explicit",
@@ -164,6 +165,7 @@ if (!skip && artifact) {
   const liveText = stripNonRenderedMarkdown(text);
   const relativePath = artifact.relativePath;
   const applicability = loadOnboardingApplicability(args.root);
+  const designApplicability = loadDesignSurfaceApplicability(args.root);
   const requiredSections = [
     "Execution Mode",
     "Graph Run",
@@ -175,7 +177,7 @@ if (!skip && artifact) {
     "Seven-Principle Activation Audit",
     "Provider Capability Matrix",
     "Platform Policy Matrix",
-    "60fps Motion Register",
+    "Motion Research",
     "Evidence Decision And Complaint Traceability",
     "First Value And Activation",
     "Effort-Before-Value Ledger",
@@ -232,6 +234,36 @@ if (!skip && artifact) {
       ),
     );
   }
+  if (designApplicability.interactionUnresolved) {
+    issues.push(
+      issue(
+        "error",
+        "onboarding_graph.surface_interaction_unresolved",
+        `${relativePath} cannot treat motion, scrollytelling, or conversion techniques as free, skipped, or selected until every listed studio/seed/business.json surface records interaction as static-document, conversion, scroll-linked, standard-transition, or bespoke-motion. Do not infer the class from purpose prose.`,
+        "studio/seed/business.json",
+      ),
+    );
+  }
+  if (designApplicability.sixtyFpsRegister === "unresolved") {
+    issues.push(
+      issue(
+        "error",
+        "onboarding_graph.motion_reference_unresolved",
+        `${relativePath} cannot treat 60fps motion research as free, skipped, or selected until studio interaction (or implemented scroll-linked behavior) is classified and strategy/TOOL_DECISIONS.md records 60fps MCP access. Absence is not a free distilled-recipe default.`,
+        "strategy/TOOL_DECISIONS.md",
+      ),
+    );
+  }
+  if (designApplicability.sixtyFpsRegister === "unavailable") {
+    issues.push(
+      issue(
+        "error",
+        "onboarding_graph.motion_reference_unavailable",
+        `${relativePath} selected bespoke-motion or scroll-linked research, but strategy/TOOL_DECISIONS.md records the 60fps MCP as blocked, unavailable, or fallback. Hold with the current selection. Do not claim a distilled recipe is equivalent and do not spend.`,
+        relativePath,
+      ),
+    );
+  }
 
   for (const section of requiredSections) {
     if (!hasHeading(liveText, section)) {
@@ -260,21 +292,19 @@ if (!skip && artifact) {
     relativePath,
     liveText,
     "onboarding_graph.evidence_contract",
-    [
-      "authorized Onbo Hub",
-      "Do not scrape",
-      "positive",
-      "root-cause",
-      "60fps MCP",
-      "search_shots",
-      "get_motion_breakdown",
-      "RevenueCat",
-      "technically possible",
-      "policy permitted",
-      "seven-principle",
-    ],
-    "The evidence contract must cover authorized Onbo Hub research, review controls, 60fps MCP, provider capabilities, policy distinctions, and the seven-principle audit.",
+    ["authorized Onbo Hub", "Do not scrape", "positive", "root-cause", "RevenueCat", "technically possible", "policy permitted", "seven-principle"],
+    "The evidence contract must cover authorized Onbo Hub research, review controls, provider capabilities, policy distinctions, and the seven-principle audit.",
   );
+  if (designApplicability.sixtyFpsRegister === "selected") {
+    requirePhrases(
+      issues,
+      relativePath,
+      liveText,
+      "onboarding_graph.motion_reference",
+      ["60fps MCP", "search_shots", "get_motion_breakdown"],
+      "When 60fps motion research is selected and available, the evidence contract must name the 60fps MCP and its shot operations.",
+    );
+  }
 
   requirePhrases(
     issues,

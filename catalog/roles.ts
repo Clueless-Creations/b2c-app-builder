@@ -197,7 +197,10 @@ export const roles: CatalogRole[] = [
       route("image generation and visual inspection", "the assignment includes imagery or visual QA"),
       route("Design Room renderer", "design state or tokens change"),
       route("design.md CLI (npx @google/design.md lint, diff, export)", "DESIGN.md is authored, mutated, or audited"),
-      route("60fps.design MCP, Refero MCP, and the quarantined reference catalogs", "a reference pack is assembled before a surface is designed"),
+      route(
+        "60fps.design MCP, Refero MCP, and the quarantined reference catalogs",
+        "bespoke-motion or scroll-linked is selected on a studio surface and 60fps MCP access is recorded as ready; an unlabeled fallback is not equivalent",
+      ),
     ],
     ["provider.refero", "provider.higgsfield", "provider.app-store-screenshots"],
     // strategy/BRAND.md joined this scope with the brand-definition node (2026-08-19): the brand

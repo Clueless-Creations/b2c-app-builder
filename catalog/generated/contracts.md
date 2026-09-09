@@ -476,13 +476,13 @@ _Refresh monetization, identity, analytics, RevenueCat, billing, platform-policy
 
 ### Onboarding ONB-08: motion research
 
-_Research interaction and motion references with 60fps and translate them into the target framework_
+_Research interaction and motion for the selected surfaces and translate applicable references into the target framework_
 
 - **Role:** Product leader
 - **Phases:** 1c
 - **Providers:** —
-- **Reads:** `product/onboarding/graph/ONB-02-evidence-plan.md`
-- **Consults:** —
+- **Reads:** `product/onboarding/graph/ONB-02-evidence-plan.md`, `product.yaml`, `strategy/TOOL_DECISIONS.md`
+- **Consults:** `studio/seed/business.json`, `DESIGN.md`
 - **Produces:** `product/onboarding/graph/ONB-08-motion-research.md`
 - **Gates:** `check:onboarding-evidence-onb-08`
 - **Knowledge:** [Onboarding Conversion](../../knowledge/experience/onboarding-conversion.md)
@@ -1222,7 +1222,7 @@ _After the local landing and funnel pages build, before publication and before a
 - **Phases:** 4
 - **Providers:** —
 - **Reads:** `growth/landing/`, `GEO_SEO.md`, `product/copy/COPY_DECK.md`, `DESIGN.md`, `design/reviews/rubrics/`
-- **Consults:** `product/copy/COPY_REVIEW.md`, `design/reviews/DESIGN_SYSTEM_REVIEW.md`
+- **Consults:** `studio/seed/business.json`, `product/copy/COPY_REVIEW.md`, `design/reviews/DESIGN_SYSTEM_REVIEW.md`
 - **Produces:** `growth/CRO_AUDIT.md`
 - **Gates:** `check:scrollytelling`, `check:vibecoded-tells`
 - **Knowledge:** [Design Acceptance Evidence](../../knowledge/design/design-acceptance.md), [Evidence-Led Editorial Scrollytelling](../../knowledge/design/editorial-scrollytelling.md), [Landing Motion Craft](../../knowledge/design/landing-motion-craft.md), [Quality Lens](../../knowledge/design/quality-lens.md), [Vibecoded Tells](../../knowledge/design/vibecoded-tells.md), [External Skill Packs](../../knowledge/engineering/external-skill-packs.md), [CRO Landing](../../knowledge/growth/cro-landing.md), [GEO/SEO](../../knowledge/growth/geo-seo.md), [Isolated Review](../../knowledge/orchestration/isolated-review.md), [No-Slop Writing](../../knowledge/words/no-slop-writing.md)

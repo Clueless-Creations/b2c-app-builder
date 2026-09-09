@@ -277,6 +277,17 @@
         "purpose": {
           "type": "string"
         },
+        "interaction": {
+          "type": "string",
+          "enum": [
+            "static-document",
+            "conversion",
+            "scroll-linked",
+            "standard-transition",
+            "bespoke-motion"
+          ],
+          "description": "Machine-readable technique class for this surface. Do not infer it from purpose prose. Listed surfaces that omit it stay unresolved."
+        },
         "decisions": {
           "type": "array",
           "items": {

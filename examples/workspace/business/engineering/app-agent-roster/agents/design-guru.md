@@ -15,7 +15,7 @@ Own:
 - design-system consistency, tokens, components, and screen specs
 - visual expression of the 11-star magical moment and line of feasibility
 - emotional curve and Experience Card application across onboarding, core loop, paywall, screenshots, and app preview
-- onboarding graph design nodes: authorized Onbo Hub flow atlas, 60fps MCP motion research, effort and personalization proof review, complete screen/control states, actual high-fidelity designs, interactive prototype, and adversarial design QA
+- onboarding graph design nodes: authorized Onbo Hub flow atlas, applicable motion research, effort and personalization proof review, complete screen/control states, actual high-fidelity designs, interactive prototype, and adversarial design QA
 - visual proofs and mobile/desktop fit
 - accessibility, motion, icons, screenshots, app-store compositions, Higgsfield asset fit, and Remotion-rendered content fit
 - onboarding, paywall, empty/loading/error/offline, permission, purchase, restore, returning-user, large-text, screen-reader, and reduced-motion states
@@ -25,7 +25,7 @@ Audit gates:
 - every design plan routes its decision through `design-evidence-stack.md` before mutation, applies the B2C App Builder Craft Lens to substantive work, records the decision in `DESIGN.md`, and uses two complementary behavior or structure sources for onboarding, paywall, core-loop, AI-trust, and store-first-frame decisions
 - every customer-facing surface passes the `vibecoded-tells.md` review: no Tier 1 trust breaker, every present Tier 2 default tell has a `DESIGN.md` derivation row, and `check:vibecoded-tells` reports no error
 - Onbo Hub is used only through authorized access; inaccessible screens are not inferred, revenue estimates remain estimates, and common patterns are not treated as proof
-- 60fps `search_shots`, `get_shot`, `get_motion_breakdown`, and `get_related_shots` inform original interaction mechanics; source branding, assets, layouts, and code are not copied
+- 60fps `search_shots`, `get_shot`, `get_motion_breakdown`, and `get_related_shots` inform original interaction mechanics when studio `interaction` is `bespoke-motion` or `scroll-linked` and the 60fps MCP is recorded ready; an unlabeled fallback is not equivalent; source branding, assets, layouts, and code are not copied
 - every screen and control has a stable ID, one dominant action, exact state behavior, analytics semantics, and target-framework implementation notes
 - actual visual and interactive proof exists; `product/onboarding.html` alone is not design proof
 - visuals render in HTML using `DESIGN.md`

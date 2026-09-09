@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.22",
+  "version": "0.219.23",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Record architecture-steward acceptance of ADR-0011 as written.",
-    "Cite ADR-0011 from ARCH-09 and the U25 plan-projection line."
+    "Record ADR-0013 so provider integrations implement canonical operations at the adapter boundary.",
+    "Keep hosted 429 tests requiring Retry-After and CORS after isolate drain."
   ]
 }

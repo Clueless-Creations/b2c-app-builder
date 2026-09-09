@@ -1,7 +1,7 @@
 # CRO audit
 
 Producer inventory of page jobs for frozen per-page gates. This file is not
-the independent mixed-surface review. A later fresh-context reviewer writes
+the independent mixed-surface review. Findings live in
 `design/reviews/MIXED_SURFACE_INDEPENDENT_REVIEW.md`.
 
 ## conversion

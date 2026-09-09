@@ -325,12 +325,16 @@ export function register(harness: Harness): void {
     assert(issues.length === 0, JSON.stringify(issues));
   });
 
-  harness.check("mixed live fixture leaves the second-context finding artifact pending", () => {
+  harness.check("mixed live fixture finding artifact is filled against the frozen rubric", () => {
     const review = readFileSync(path.join(mixedFixtureRoot, "design/reviews/MIXED_SURFACE_INDEPENDENT_REVIEW.md"), "utf8");
-    assert(/\bStatus:\s*\*\*pending\*\*/.test(review), "finding artifact must stay pending");
-    assert(/\bVerdict\n\npending\b/.test(review), "verdict cell must stay pending");
-    assert(!/\bAccept increment\b/.test(review), "producer must not write an accept verdict");
-    assert(!/\b(pass|fail|accepted)\b/i.test(review.split("## Verdict")[1] ?? ""), "producer must not fill a pass or fail");
+    assert(/\bStatus:\s*\*\*filled\*\*/.test(review), "finding artifact must be filled");
+    assert(!/\bStatus:\s*\*\*pending\*\*/.test(review), "finding artifact must leave pending");
+    assert(!/Awaiting a fresh-context reviewer/.test(review), "placeholder finding rows must be gone");
+    const verdict = review.split("## Verdict")[1] ?? "";
+    assert(/^\s*hold\b/m.test(verdict), "verdict must record hold");
+    assert(!/\bAccept increment\b/.test(review), "reviewer must not write an accept increment");
+    assert(/\bprivacy\b/i.test(review) && /\bconversion\b/i.test(review) && /\bcinematic\b/i.test(review), "findings must cover all three surfaces");
+    assert(/RUBRIC-mixed-surface-v1/.test(review), "review must name the frozen rubric");
     const privacy = readFileSync(path.join(mixedFixtureRoot, "growth/landing/privacy.html"), "utf8");
     const conversion = readFileSync(path.join(mixedFixtureRoot, "growth/landing/conversion.html"), "utf8");
     const cinematic = readFileSync(path.join(mixedFixtureRoot, "growth/landing/cinematic.html"), "utf8");

@@ -19,6 +19,13 @@ import {
   writeNativeGenerationFingerprint,
 } from "../../../catalog/stacks/expo-native-ownership.js";
 import {
+  EXPO_ROUTER_ROUTE_FILES,
+  EXPO_ROUTER_SRC_FILES,
+  isolatedStarterRouterLayout,
+  planExpoRouterDelivery,
+  reviewedExpoRouterFact,
+} from "../../../catalog/stacks/expo-router-contract.js";
+import {
   BUILDER_AUTHORITY_FILES,
   EXPO_STARTER_FIXTURE_DIR,
   habitTrackerStarterIsNextNotExpo,
@@ -27,6 +34,9 @@ import {
   planExpoStarterScaffold,
   reviewedExpoFixturePins,
 } from "../../../catalog/stacks/expo-starter.js";
+import { SURFACE_STATES } from "../../../catalog/stacks/expo-starter-fixture/src/states/surface-state.js";
+import { PERSISTENCE_SEAM_BOUND } from "../../../catalog/stacks/expo-starter-fixture/src/persistence/seam.js";
+import { deepLinkRecovery } from "../../../catalog/stacks/expo-starter-fixture/src/navigation/deep-link.js";
 import { inspectWorkspace } from "../../../kernel/session/inspect.js";
 import { assert, skillRoot, type Harness } from "./_harness.js";
 
@@ -81,7 +91,8 @@ export function register(harness: Harness): void {
     const selected = resolveExpoSelection({ compositionTarget: iosExpo() });
     assert(operationFor(selected, "starter-scaffold").evidenceTier === "fixture-tested", "selected Expo starter fixture must be fixture-tested");
     assert(operationFor(selected, "cng-prebuild").evidenceTier === "blocked", "CNG prebuild stays blocked until an executed CLI is fixture-tested");
-    assert(operationFor(selected, "router-native-ui").evidenceTier === "blocked", "Router/native UI is not delivered this increment");
+    assert(operationFor(selected, "official-skills").evidenceTier === "blocked", "official Expo skills stay blocked until #87 fixture-tests them");
+    assert(operationFor(selected, "router-native-ui").evidenceTier === "blocked", "Router/native UI stays blocked without an expo-router pin and native adapter");
     assert(operationFor(selected, "custom-native-module").evidenceTier === "blocked", "custom native module is not delivered this increment");
     const unselected = resolveExpoSelection({ compositionTarget: { platform: "host", runtime: HOST_AGENT_RUNTIME } });
     assert(operationFor(unselected, "starter-scaffold").evidenceTier === "blocked", "unselected Expo must not inherit the starter");
@@ -92,6 +103,9 @@ export function register(harness: Harness): void {
     const files = isolatedExpoStarterPaths();
     assert(files.includes("package.json"), "starter fixture must include package.json");
     assert(files.includes("app.json"), "starter fixture must include static app.json");
+    for (const relative of [...EXPO_ROUTER_ROUTE_FILES, ...EXPO_ROUTER_SRC_FILES]) {
+      assert(files.includes(relative), `starter fixture must include ${relative}`);
+    }
     assert(files.includes("gitignore.template"), "starter fixture must use gitignore.template so npm can pack it");
     assert(!files.includes("package-lock.json"), "must not fabricate a lockfile");
     for (const name of BUILDER_AUTHORITY_FILES) {
@@ -110,6 +124,73 @@ export function register(harness: Harness): void {
     });
     assert(compatibility.sdk === "match" && compatibility.reactNative === "match", compatibility.actionable);
     assert(compatibility.autoUpgradeAttempted === false, "fixture pins must not trigger auto-upgrade");
+    assert(pkg.dependencies?.["expo-router"] === undefined, "must not invent an expo-router workspace pin");
+    assert(reviewedExpoRouterFact() === "bundled-with-sdk-57", "reviewed Router fact is not a package version");
+  });
+
+  harness.check("expo foundation: thin Router file layout stays unpinned and is not native UI", () => {
+    const layout = isolatedStarterRouterLayout(skillRoot);
+    assert(layout.status === "layout-ready", `expected layout-ready, got ${layout.status}`);
+    assert(layout.pinStatus === "unpinned", `expo-router must stay unpinned, got ${layout.pinStatus}`);
+    assert(layout.expoAdapterPresent === false, "must not add a placeholder Expo UI adapter");
+    assert(layout.swiftuiAdapterPresent, "SwiftUI remains the implemented adapter");
+    assert(SURFACE_STATES.includes("loading") && SURFACE_STATES.includes("error"), "loading and error states are required");
+    assert(SURFACE_STATES.includes("empty") && SURFACE_STATES.includes("retry"), "empty and retry states are required");
+    assert(deepLinkRecovery.runtimeVerified === false, "deep-link recovery is a contract, not runtime proof");
+    assert(PERSISTENCE_SEAM_BOUND === false, "persistence seam must stay unbound until a store is selected");
+    const target = harness.makeTempDir("expo-router-layout");
+    materializeExpoStarterFixture({
+      target,
+      skillRoot,
+      compositionTarget: iosExpo(),
+      platforms: ["ios"],
+      authorized: true,
+    });
+    const unpinned = planExpoRouterDelivery({
+      target,
+      skillRoot,
+      compositionTarget: iosExpo(),
+    });
+    assert(unpinned.action === "refuse" && unpinned.code === "unpinned-expo-router", unpinned.reason);
+    assert(unpinned.runtimeVerified === false, "layout is not Router runtime proof");
+    const webAsIos = planExpoRouterDelivery({
+      target,
+      skillRoot,
+      compositionTarget: { platform: "web", runtime: EXPO_APP_RUNTIME },
+      claimedProofPlatform: "ios",
+    });
+    assert(webAsIos.action === "refuse" && webAsIos.code === "web-is-not-native-router", webAsIos.reason);
+    const builder = planExpoRouterDelivery({
+      target: skillRoot,
+      skillRoot,
+      compositionTarget: iosExpo(),
+    });
+    assert(builder.action === "refuse" && builder.code === "builder-checkout", builder.reason);
+    writeFileSync(path.join(target, "app", "(tabs)", "index.ts"), "export async function defaultExport() { return fetch('https://example.com'); }\n");
+    const fat = planExpoRouterDelivery({
+      target,
+      skillRoot,
+      compositionTarget: iosExpo(),
+    });
+    assert(fat.action === "refuse" && fat.code === "fat-routes", fat.reason);
+    const fabricated = harness.makeTempDir("expo-router-fabricated");
+    materializeExpoStarterFixture({
+      target: fabricated,
+      skillRoot,
+      compositionTarget: iosExpo(),
+      platforms: ["ios"],
+      authorized: true,
+    });
+    const pkgPath = path.join(fabricated, "package.json");
+    const pkg = JSON.parse(readFileSync(pkgPath, "utf8")) as { dependencies: Record<string, string> };
+    pkg.dependencies["expo-router"] = "latest";
+    writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
+    const latest = planExpoRouterDelivery({
+      target: fabricated,
+      skillRoot,
+      compositionTarget: iosExpo(),
+    });
+    assert(latest.action === "refuse" && latest.code === "fabricated-router-pin", latest.reason);
   });
 
   harness.check("expo foundation: empty authorized target scaffolds only the selected platform and preserves product.yaml", () => {

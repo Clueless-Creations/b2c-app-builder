@@ -195,7 +195,7 @@ export const EXPO_QUEUED_OWNERS: readonly ExpoQueuedOwner[] = [
   {
     issue: 82,
     owns: "Expo starter, Router/native UI, CNG, custom Swift/Kotlin module path",
-    consume: "This mapping’s runtime slug and version facts; starter and native-ownership modules import it",
+    consume: "This mapping’s runtime slug and version facts; starter, native-ownership, and router-contract modules import it",
     doNot: "Relabel the Next.js habit-tracker starter, or replace product.yaml / DESIGN.md ownership",
   },
   {
@@ -359,7 +359,8 @@ function operationSupport(): ExpoOperationSupport[] {
       platforms: ["ios", "android", "web"],
       evidenceTier: "blocked",
       queuedIssue: 82,
-      notes: "UI library permits an expo adapter slug; SwiftUI remains the only implemented adapter.",
+      notes:
+        "Thin app/ file layout and src/ state contracts exist. Operation stays blocked: expo-router is unpinned, no Expo/RN runtime was executed, and SwiftUI remains the only UI adapter.",
     },
     {
       id: "cng-prebuild",

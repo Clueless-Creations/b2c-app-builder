@@ -263,6 +263,11 @@ receipts. It must not spawn upstream executables or perform scoped provider
 reads. Approved workers, connected tools, or CLI adapters perform the scoped
 provider work and record receipts. See [ADR-0010](decisions/0010-first-run-honesty-owners.md).
 
+Initialized `business.plan` projects typed holds, bounded briefs, a sanitized last
+failure, and at most one founder question bound to `appliesToRevision` from the
+existing planner report. Historical held `reason` text is unchanged. The question
+is not an approval. See [ADR-0011](decisions/0011-additive-public-business-plan-projection.md).
+
 Existing explicitly enabled MCP writes retain their current gates. New bindings
 do not widen the MCP write surface. Selected capability and provider knowledge
 must reach worker briefs through the existing bounded knowledge service, with

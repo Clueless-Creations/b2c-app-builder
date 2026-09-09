@@ -26,7 +26,8 @@ roadmap's decision text in place.
 | [0008](0008-agent-onboarding-entry-path.md)                   | Distinguish business creation from workspace adoption              | accepted | ARCH-07, 09, 11; U25                            |
 | [0009](0009-bespoke-design-foundations.md)                    | Bespoke design foundations in existing authorities                 | accepted | ARCH-03–09, ARCH-11–15; U9, U13, U18, U19       |
 | [0010](0010-first-run-honesty-owners.md)                      | First-run honesty owners for doctor, portfolio, and exclusions     | accepted | ARCH-07, 09; ADR-0005, 0007; U1, U4             |
-| [0011](0011-additive-public-business-plan-projection.md)      | Additive public business-plan projection                         | proposed | ARCH-09; U25; public `business.plan`           |
+| [0011](0011-additive-public-business-plan-projection.md)      | Additive public business-plan projection                         | accepted | ARCH-09; U25; public `business.plan`           |
+| [0012](0012-context-first-agent-routing.md)                   | Context-first agent routing and thin host adapters                 | accepted | ARCH-02, 07, 09, 11                             |
 
 ## Write a record
 

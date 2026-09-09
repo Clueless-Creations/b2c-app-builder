@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.21",
+  "version": "0.219.22",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Restore the required AGENTS.md pointer and continuity terms in Claude adapters.",
-    "Stamp the skill after the context-first template CLAUDE.md skill-path change."
+    "Record architecture-steward acceptance of ADR-0011 as written.",
+    "Cite ADR-0011 from ARCH-09 and the U25 plan-projection line."
   ]
 }

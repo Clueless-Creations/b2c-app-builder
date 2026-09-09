@@ -1,8 +1,8 @@
 # ADR-0011: Additive public business-plan projection
 
-- **Status:** proposed
+- **Status:** accepted
 - **Date:** 2026-09-08
-- **Steward:** pending architecture-steward acceptance
+- **Steward:** architecture steward on pin `5461837`
 - **Affected rules and contracts:** ARCH-09; public interface `business.plan`; U25
 - **Affected units:** U25; consumed by #71 and #74
 

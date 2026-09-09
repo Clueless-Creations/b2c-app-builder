@@ -112,7 +112,7 @@ if (!relativePath) {
             issue(
               "error",
               "onboarding_evidence.onb17_paywall_goal_headline_unresolved",
-              `${relativePath} cannot decide the Paywall Goal Headline bind until product.yaml records feature.paywall-goal-headline with slot.feature.scope required, excluded, or non-goal. Absence is not a free or no-billing default. Packet prose cannot make that decision.`,
+              `${relativePath} cannot decide the Paywall Goal Headline bind until product.yaml records feature.paywall-goal-headline with slot.feature.scope required, excluded, or non-goal, and a parseable b2c.yaml declares the present-paywall owner. Absence of either is not a free or no-billing default. Packet prose cannot make that decision.`,
               "product.yaml",
             ),
           );

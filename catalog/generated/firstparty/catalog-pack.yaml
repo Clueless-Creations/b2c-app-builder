@@ -2389,6 +2389,8 @@ workflows:
     reads:
       - product/onboarding/graph/ONB-15-architecture-decision.md
       - product.yaml
+      - b2c.yaml
+      - b2c.json
     consults: []
     reference_ids:
       - reference.design.design-evidence-stack
@@ -2427,6 +2429,8 @@ workflows:
       - product/onboarding/graph/ONB-16-journey-graph.md
       - product/copy/COPY_DECK.md
       - product.yaml
+      - b2c.yaml
+      - b2c.json
     consults: []
     reference_ids:
       - reference.design.design-evidence-stack

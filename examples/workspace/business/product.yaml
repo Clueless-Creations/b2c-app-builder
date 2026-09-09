@@ -105,7 +105,7 @@ instances:
   - id: feature.paywall-goal-headline
     class_id: class.feature
     slots:
-      slot.feature.scope: required
+      slot.feature.scope: excluded
   - id: requirement.req-001
     class_id: class.requirement
     slots: {}

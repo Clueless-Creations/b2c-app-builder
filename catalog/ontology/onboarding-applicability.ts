@@ -86,9 +86,9 @@ function headlineBindApplicability(feature: FeatureApplicability, presentPaywall
     case "selected": {
       switch (presentPaywall.status) {
         case "unresolved":
-          // The feature *is* the RevenueCat offering-metadata bind. Missing composition is not a
-          // free or no-billing default; keep the four-phrase contract until a presenter is declared.
-          return "selected";
+          // The feature is selected, but no parseable present-paywall owner exists yet. Missing
+          // composition is an explicit hold, not a free default and not a silent RevenueCat pick.
+          return "unresolved";
         case "not_required":
           return "unavailable";
         case "selected":

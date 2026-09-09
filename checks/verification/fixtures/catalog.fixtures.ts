@@ -710,6 +710,12 @@ export function register(harness: Harness): void {
       !runtimeState.some((issue) => issue.code === "catalog_graph.workflow.read_unresolvable"),
       "reducer-owned runtime state must resolve without a template file",
     );
+    catalog.workflows = [baseWorkflow({ reads: ["b2c.yaml", "b2c.json"] })];
+    const runtimeComposition = validateCatalog(catalog, skillRoot);
+    assert(
+      !runtimeComposition.some((issue) => issue.code === "catalog_graph.workflow.read_unresolvable"),
+      "initialization-owned composition must resolve without a template file",
+    );
   });
 
   harness.check("validate: a spend workflow without costEstimate is surfaced as a WARNING — the fail-closed park is the designed control, not a defect", () => {
@@ -989,9 +995,7 @@ export function register(harness: Harness): void {
       localization!.dependencies.includes("run.research.research-backed-spec"),
       "compiled localization-market-research must wait for research-backed-spec",
     );
-    const businessState = JSON.parse(
-      readFileSync(path.join(skillRoot, "examples/workspace/business/state/business-state.json"), "utf8"),
-    ) as BusinessStateV2;
+    const businessState = JSON.parse(readFileSync(path.join(skillRoot, "examples/workspace/business/state/business-state.json"), "utf8")) as BusinessStateV2;
     const run = seedRunState(plan, businessState, {
       ownerSessionId: "session.frontier-portfolio-hold",
       ttlSeconds: 3600,
@@ -999,10 +1003,7 @@ export function register(harness: Harness): void {
       now: "2026-09-08T00:00:00.000Z",
       runId: "run.frontier-portfolio-hold",
     });
-    assert(
-      run.nodes["run.operations.live-app-store-portfolio"]?.status !== "succeeded",
-      "example workspace must not seed a succeeded portfolio observe",
-    );
+    assert(run.nodes["run.operations.live-app-store-portfolio"]?.status !== "succeeded", "example workspace must not seed a succeeded portfolio observe");
     const frontier = computeFrontier(plan, run, businessState, allowAllAutonomyEvaluator);
     assert(
       !frontier.ready.includes("run.research.research-backed-spec"),
@@ -1532,12 +1533,9 @@ function deriveWorkflowIntakeTools(catalog: Catalog, startId: CatalogWorkflowDef
     }
   }
   const blob = texts.join("\n");
-  const matched: string[] = PAID_TOOL_INTAKE_NEEDLES.filter((tool) => tool.needles.some((needle) => blob.includes(needle))).map(
-    (tool) => tool.id,
-  );
+  const matched: string[] = PAID_TOOL_INTAKE_NEEDLES.filter((tool) => tool.needles.some((needle) => blob.includes(needle))).map((tool) => tool.id);
   const includesResearchHold = nodes.some(
-    (workflow) =>
-      workflow.id === "workflow.research.research-backed-spec" || workflow.id === "workflow.operations.live-app-store-portfolio",
+    (workflow) => workflow.id === "workflow.research.research-backed-spec" || workflow.id === "workflow.operations.live-app-store-portfolio",
   );
   if (includesResearchHold) {
     if (!matched.includes("App Store Connect")) matched.push("App Store Connect");

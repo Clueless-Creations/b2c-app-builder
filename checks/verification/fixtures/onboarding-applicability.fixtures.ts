@@ -1,4 +1,4 @@
-import { cpSync, writeFileSync } from "node:fs";
+import { cpSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { firstpartyImplementations, firstpartyRecipes } from "../../../catalog/firstparty-declarations.js";
 import { FIRSTPARTY_BUSINESS_RECIPE } from "../../../catalog/firstparty-recipes.js";
@@ -100,16 +100,26 @@ export function register(harness: Harness): void {
     assert(projected.headlineBind === "unresolved", `headline ${projected.headlineBind}`);
   });
 
-  harness.check("onboarding-applicability: required headline without composition still selects the bind", () => {
+  harness.check("onboarding-applicability: required headline without composition holds the bind unresolved", () => {
     const projected = projectOnboardingApplicability(requiredHeadline, undefined);
     assert(projected.commitmentFunnel === "selected", `funnel ${projected.commitmentFunnel}`);
-    assert(projected.headlineBind === "selected", `headline ${projected.headlineBind}`);
+    assert(projected.paywallGoalHeadline === "selected", `headline feature ${projected.paywallGoalHeadline}`);
+    assert(projected.headlineBind === "unresolved", `headline ${projected.headlineBind}`);
     assert(projected.presentPaywall.status === "unresolved", "no b2c.yaml is unresolved, not a free default");
   });
 
   harness.check("onboarding-applicability: subscription-app recipe defaults present-paywall to RevenueCat", () => {
     const projected = projectOnboardingApplicability(requiredHeadline, composition("b2c/subscription-app"));
     assert(projected.presentPaywall.status === "selected" && projected.presentPaywall.providerId === REVENUECAT_PROVIDER_ID, "expected RevenueCat default");
+    assert(projected.headlineBind === "selected", `headline ${projected.headlineBind}`);
+  });
+
+  harness.check("onboarding-applicability: explicit RevenueCat present-paywall binding selects the bind", () => {
+    const projected = projectOnboardingApplicability(requiredHeadline, composition("b2c/subscription-app", REVENUECAT_PROVIDER_ID));
+    assert(
+      projected.presentPaywall.status === "selected" && projected.presentPaywall.providerId === REVENUECAT_PROVIDER_ID,
+      "expected explicit RevenueCat binding",
+    );
     assert(projected.headlineBind === "selected", `headline ${projected.headlineBind}`);
   });
 
@@ -125,19 +135,26 @@ export function register(harness: Harness): void {
     assert(projected.headlineBind === "unavailable", "required headline without a presenter is unavailable, not a RevenueCat pass");
   });
 
-  harness.check("onboarding-applicability: example workspace selects both features and leaves composition unresolved", () => {
+  harness.check("onboarding-applicability: example workspace leaves composition unresolved and does not select the headline bind", () => {
     const projected = loadOnboardingApplicability(path.join(skillRoot, "examples/workspace/business"));
     assert(projected.commitmentFunnel === "selected", `funnel ${projected.commitmentFunnel}`);
-    assert(projected.paywallGoalHeadline === "selected", `headline feature ${projected.paywallGoalHeadline}`);
-    assert(projected.headlineBind === "selected", `headline bind ${projected.headlineBind}`);
+    assert(projected.paywallGoalHeadline === "not_required", `headline feature ${projected.paywallGoalHeadline}`);
+    assert(projected.headlineBind === "not_required", `headline bind ${projected.headlineBind}`);
     assert(projected.presentPaywall.status === "unresolved", "example workspace must not ship a silent b2c.yaml default");
   });
 
   harness.check("onboarding-applicability: changing b2c.yaml recomputes the headline bind", () => {
     const root = harness.makeTempDir("onboarding-applicability-recompute");
-    cpSync(path.join(skillRoot, "examples/workspace/business/product.yaml"), path.join(root, "product.yaml"));
+    const yamlPath = path.join(root, "product.yaml");
+    cpSync(path.join(skillRoot, "examples/workspace/business/product.yaml"), yamlPath);
+    const yaml = readFileSync(yamlPath, "utf8").replace(
+      /(- id: feature\.paywall-goal-headline\n    class_id: class.feature\n    slots:\n      slot.feature.scope: )\S+/,
+      "$1required",
+    );
+    writeFileSync(yamlPath, yaml, "utf8");
     const before = loadOnboardingApplicability(root);
-    assert(before.headlineBind === "selected", `before ${before.headlineBind}`);
+    assert(before.headlineBind === "unresolved", `before ${before.headlineBind}`);
+    assert(before.presentPaywall.status === "unresolved", "copied workspace has no composition yet");
     writeFileSync(
       path.join(root, "b2c.yaml"),
       "apiVersion: b2c/v1\nrecipe: {id: b2c/subscription-app, version: 1.0.0}\ntarget: {platform: ios, runtime: swiftui}\nbindings:\n  b2c/monetization.present-paywall:\n    provider: {id: b2c/superwall, version: 1.0.0}\n",

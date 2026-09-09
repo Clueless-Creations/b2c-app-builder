@@ -15305,7 +15305,7 @@
   },
   "files": {
     "extension.yaml": "3691de1ae36729f5daf15d8c591fe3570df8a52813ed6b3549087da890efda04",
-    "catalog-pack.yaml": "5e59a8600e4c5c1ebd1f2a35c133dbea746946bcfe767c1c42d016b3aba08ded",
+    "catalog-pack.yaml": "38f5e2f3ea9ebd7d62182150041cd977778970403dd60f57167043ea272a7af7",
     "knowledge/data/analytics-attribution.md": "0bba4685b2188b9e80b7fcc14fdac9472c6c4aeac5bc59703188eaa5e26f234a",
     "knowledge/data/posthog-agent-tooling.md": "61ffdbc79a985a41a11fbe6e1c7c5663050104208baa9d05b8ebe33186ab93cc",
     "knowledge/design/audience-derived-identity.md": "04c90b39c9d41cf00257c70b4e579f3e29684254d444917b9a5690d48be74f5f",
@@ -15508,9 +15508,9 @@
     "checks/validation/business/engineering/check-native-ios-proof.ts": "d70475d16d7748b23bafd9202274afdb1a420b9b15c69202c40a3639443574fb",
     "checks/validation/business/words/check-no-slop.ts": "d67efd5d36be1ccbb41f6c14aa6227faf6757b0b80437588c921af0858118c71",
     "checks/validation/business/experience/check-onboarding-cutover-repository.ts": "27e584499baa64046e0258a9940e40bbd590be5c25b8939b1a297fc788c320fe",
-    "checks/validation/business/experience/check-onboarding-evidence-packet.ts": "8f44febcf3d74574d05d1191a4a8007226d63fb17fa4742bee167d088d514b35",
+    "checks/validation/business/experience/check-onboarding-evidence-packet.ts": "e5c1ab37306a5c49a13addef2566602e87ecbe4092223b5717179f55e4afd444",
     "checks/validation/business/experience/check-onboarding-foundations.ts": "d549271f29dacdbdbaf1d232ca1223232749a02c8fa15254c5f11ba71ce01e21",
-    "checks/validation/business/experience/check-onboarding-graph.ts": "b1ff792b531dcbeba4fae98f2bc40396b253f9967d578082a558ded01bad99ff",
+    "checks/validation/business/experience/check-onboarding-graph.ts": "e992aab2ecd9b364f185bc5bdec0e66d5f8a84136486cff7550d7db8ab194852",
     "checks/validation/repository/check-operating-graph.ts": "0ef4abde62b8754069ee764766f5145c3e1a2f4872f9412dd9b0bc8f6639333e",
     "checks/validation/business/orchestration/check-parallel-orchestration.ts": "4e363997f7b6cd9d2d367c09bd5c7f9ee0fb9d860df02a1c139370d8a670f5a1",
     "checks/validation/repository/check-pack-composition.ts": "e703d35b21137dd9e6a6e643ef63ee15a6d2731d3e47258f0de2161e9a09a156",
@@ -15760,5 +15760,5 @@
     "catalog/upstreams/notices/parth-app-store-screenshots.txt": "a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a"
   },
   "dependencies": [],
-  "digest": "sha256:fa02bb07583519d65a72ad34929ed7766ef779f662e931503357f6761d8469f7"
+  "digest": "sha256:20349678f93dc338c6409fa420fcffdbf957d5202bf23a7c7a49f7d74d3e3f52"
 }

@@ -196,7 +196,7 @@ Cover trial eligible and ineligible, packages, promotions, existing subscriber, 
 
 ## Paywall Goal Headline
 
-The quiz writes `paywall_headline_key` when `product.yaml` records `feature.paywall-goal-headline` as required and the declared present-paywall owner can bind it. This reference workspace records that feature as required. Interpolate only that selected key into the paywall headline. A skip uses the fallback template. Keep templates in RevenueCat offering metadata and bind them at present time with `customVariables`. Do not invent a goal or outcome. If the feature is excluded or a non-goal, omit this bind. If the instance is absent, hold. Packet prose cannot make that decision. See `knowledge/experience/paywall-goal-headline.md`.
+The quiz writes `paywall_headline_key` when `product.yaml` records `feature.paywall-goal-headline` as required and the declared present-paywall owner can bind it. This reference workspace records that feature as excluded. Interpolate only that selected key into the paywall headline. A skip uses the fallback template. Keep templates in RevenueCat offering metadata and bind them at present time with `customVariables`. Do not invent a goal or outcome. If the feature is excluded or a non-goal, omit this bind. If the instance is absent, or no parseable `b2c.yaml` declares the present-paywall owner, hold. Packet prose cannot make that decision. See `knowledge/experience/paywall-goal-headline.md`.
 
 | Goal key       | User-facing prompt | Headline template           | Fallback when skipped       |
 | -------------- | ------------------ | --------------------------- | --------------------------- |

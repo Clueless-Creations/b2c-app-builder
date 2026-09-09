@@ -13,7 +13,8 @@ import type { Catalog, CatalogIssue } from "./types.js";
 import { repositoryProfileIds } from "../kernel/schema/types.js";
 import { validateDefinitionOverlays } from "./overlays.js";
 
-const RUNTIME_OWNED_READS = new Set(["state/business-state.json"]);
+// Initialization writes composition; the example template does not ship these files.
+const RUNTIME_OWNED_READS = new Set(["state/business-state.json", "b2c.yaml", "b2c.json"]);
 
 /**
  * The provider registry workflow providerIds are validated against. Injectable so fixture

@@ -12779,7 +12779,9 @@
       "instructions": "Draw the acquisition-specific journeys and converge them into one semantic onboarding state graph, marking each step's entry condition, owner/renderer, input/transition, canonical event, back/skip/close/resume behavior, and failure/next-step path — and mark where the acquisition promise, first effort, first value, engagement, account creation, paywall, purchase, activation, review eligibility, normal-product entry, and interruption budget each land on the graph. Resolve applicability from accepted product.yaml feature scopes and declared b2c.yaml monetization bindings when present: not selected, selected but unavailable, and unresolved stay different. Record first value, navigation/recovery, identity, accessibility, and the monetization boundary actually selected. When feature.commitment-funnel is required, record the Commitment Funnel in first-session order (welcome, quiz or goals, micro-commitment with a skip path, personalized insight, hard paywall) and Funnel Quality Metrics; when that feature is excluded or a non-goal, do not add a quiz or hard paywall to satisfy a gate; when the instance is absent, hold rather than treating the funnel as free or as selected. Keep that funnel in its recipe and reference.experience.commitment-funnel; do not silently select RevenueCat. Write the graph to product/onboarding/graph/ONB-16-journey-graph.md; check:onboarding-evidence-onb-16 rejects a stub packet.",
       "reads": [
         "product/onboarding/graph/ONB-15-architecture-decision.md",
-        "product.yaml"
+        "product.yaml",
+        "b2c.yaml",
+        "b2c.json"
       ],
       "consults": [],
       "referenceIds": [
@@ -12829,7 +12831,9 @@
       "reads": [
         "product/onboarding/graph/ONB-16-journey-graph.md",
         "product/copy/COPY_DECK.md",
-        "product.yaml"
+        "product.yaml",
+        "b2c.yaml",
+        "b2c.json"
       ],
       "consults": [],
       "referenceIds": [
@@ -18418,14 +18422,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "9d7695e858a00833d26585e00661e131bf334d3979354074875b57cf32e58b23",
+    "fingerprint": "a018270111b86d56ea17239f9d36c46931f0849e8ae654d86f74fbc4f7b1f507",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
         "version": "0.219.5",
         "revision": "0.219.5",
-        "contentDigest": "54382725ae6e742eee410bb22d4cc7375fa5cf308b4881a1760fce6f0ebd359a"
+        "contentDigest": "7793c376847bfe9895ae26db03a128ebd1416069a502b5fa75c7a12c85b14032"
       }
     ],
     "base": {

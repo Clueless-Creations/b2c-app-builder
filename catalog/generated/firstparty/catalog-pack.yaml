@@ -2467,13 +2467,14 @@ workflows:
       - build the actual high-fidelity onboarding design
       - turn the onboarding plan into a real interactive prototype
       - get onboarding into visual design and QA
-    instructions: "Produce the actual high-fidelity onboarding design and an interactive prototype through the Design Room (state, mutate, contract, version, render — not a separate proposal or mood board), covering the happy path and critical branches across iOS, Android, small viewports, and large text, honoring reduced motion, and run design QA against it. Record the design proof — with the inspectable artifact path, not just adjectives — in product/onboarding/graph/ONB-18-visual-design-prototype.md. Map each ONB-09 decision to rendered design evidence in the Foundation contract. Instrument the prototype now, not after implementation: capture fresh install, consent denial, unknown attribution and analytics-unavailable traces in product/onboarding/prototype-evidence.json; a static mockup or event-name list is insufficient. check:onboarding-evidence-onb-18 rejects a stub packet, and ONB-20's adversarial QA depends on this prototype actually existing."
+    instructions: "Author the high-fidelity onboarding design in DESIGN.md — Git owns revisions — then render the generated read-only Design Room for review; the Design Room is not a mutable design store or a second design authority. Produce an interactive prototype covering the happy path and critical branches on the shipping platforms recorded in studio/seed/business.json mobileApp.platforms and DESIGN.md accepted surfaces, plus small viewports, large text, and reduced motion on those selected surfaces, and run design QA against it. Do not fabricate captures for an unselected platform; a selected platform without a supported adapter is an explicit unsupported or missing-implementation hold, not assumed parity from a shared component contract; the host recipe target, including host/agent-cli, is not the consumer app's shipping scope. After DESIGN.md changes, regenerate the review page and renew affected proof — old screenshots do not certify new code. Record the design proof — with the inspectable artifact path, not just adjectives — in product/onboarding/graph/ONB-18-visual-design-prototype.md. Map each ONB-09 decision to rendered design evidence in the Foundation contract. Instrument the prototype now, not after implementation: capture fresh install, consent denial, unknown attribution and analytics-unavailable traces in product/onboarding/prototype-evidence.json; a static mockup or event-name list is insufficient. check:onboarding-evidence-onb-18 rejects a stub packet, and ONB-20's adversarial QA depends on this prototype actually existing."
     reads:
       - product/onboarding/graph/ONB-16-journey-graph.md
       - product/onboarding/graph/ONB-17-screen-control-paywall-contract.md
       - product/onboarding/graph/ONB-12-state-identity-contract.md
       - product/onboarding/graph/ONB-13-analytics-experiments.md
       - DESIGN.md
+      - studio/seed/business.json
     consults: []
     reference_ids:
       - reference.data.analytics-attribution
@@ -5483,7 +5484,7 @@ references:
     title: Design Worthiness
     domain_id: domain.design
     path: knowledge/design/design-worthiness.md
-    load_when: when a Design Room mutation needs the mechanical worthiness floor or its independent audit must record the delegated taste decision before engineering harden, including native flow semantics and mechanical anti-generic consistency, with no beauty score
+    load_when: when DESIGN.md authoring or its generated Design Room review needs the mechanical worthiness floor or its independent audit must record the delegated taste decision before engineering harden, including native flow semantics and mechanical anti-generic consistency, with no beauty score
     lifecycle: active
     applicability_notes: Orchestrate holes only. Do not rewrite eleven-star, emotional design, quality-lens, vibecoded-tells, motion recipes, or mobile-flow-craft. DESIGN.md stays producer-owned. Mechanical, attested, and independently bound taste tiers decide what an agent may assert; runtime proof remains design-acceptance's job.
     sources:

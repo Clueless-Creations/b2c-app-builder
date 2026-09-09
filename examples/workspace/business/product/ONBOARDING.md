@@ -260,7 +260,7 @@ Set P50, P95, and failure budgets for startup, first value, provider initializat
 
 | Artifact                    | Path or stable link             | Journey and states               | Platforms and viewports                      | Accessibility and reduced motion | QA           |
 | --------------------------- | ------------------------------- | -------------------------------- | -------------------------------------------- | -------------------------------- | ------------ |
-| Actual high-fidelity design | Record the inspectable artifact | Record coverage                  | iOS, Android, small viewport, and large text | Record                           | Pass or gaps |
+| Actual high-fidelity design | Record the inspectable artifact | Record coverage                  | Record selected shipping platforms; small viewport and large text | Record                           | Pass or gaps |
 | Interactive prototype       | Record the inspectable artifact | Happy path and critical branches | Record                                       | Record                           | Pass or gaps |
 
 ## Synthetic One-Star Pre-Mortem

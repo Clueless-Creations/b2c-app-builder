@@ -598,8 +598,24 @@ export function register(h: Harness): void {
     assert(measurement.workflow.referenceIds.includes("reference.data.analytics-attribution"), "analytics knowledge absent");
     const spec = measurement.route.outputs.find((o) => o.path === packetPaths.measurement)!.specifications[0];
     assert(spec && service.get(spec.get).markdown.includes("initialization"), "artifact specification not reachable in two calls");
-    const prototype = service.workflow({ workflowId: id("onb-18-visual-design-prototype") });
+    const prototype = service.workflow({ workflowId: id("onb-18-visual-design-prototype"), include: "instructions" });
     assert(prototype.workflow.dependencies.includes(id("onb-17-screen-control-paywall-contract") as never), "prototype bypasses screen contract");
+    assert(!prototype.workflow.instructions.includes("state, mutate, contract, version, render"), "served ONB-18 still teaches a mutable Design Room");
+    assert(!prototype.workflow.instructions.includes("across iOS, Android"), "served ONB-18 still requires unselected platforms");
+    assert(
+      prototype.workflow.instructions.includes("DESIGN.md") &&
+        prototype.workflow.instructions.includes("read-only") &&
+        prototype.workflow.instructions.includes("mobileApp.platforms") &&
+        prototype.workflow.instructions.includes("host/agent-cli") &&
+        prototype.workflow.instructions.includes("static mockup"),
+      "served ONB-18 lost DESIGN.md ownership, selected-platform scope, or the prototype evidence bar",
+    );
+    const onboardingTemplate = readFileSync(path.join(skillRoot, "examples/workspace/business/product/ONBOARDING.md"), "utf8");
+    assert(
+      !onboardingTemplate.includes("iOS, Android, small viewport, and large text") &&
+        onboardingTemplate.includes("Record selected shipping platforms"),
+      "the example ONBOARDING.md template still prescribes iOS and Android coverage",
+    );
     const reviewer = service.workflow({ workflowId: id("onb-20-adversarial-qa") });
     assert(reviewer.workflow.reviewOf?.includes(id("onb-18-visual-design-prototype") as never), "review independence is prose-only");
     const final = service.workflow({ workflowId: "workflow.experience.onboarding-conversion" });

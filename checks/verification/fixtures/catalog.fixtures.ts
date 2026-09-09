@@ -360,6 +360,32 @@ export function register(harness: Harness): void {
     }
   });
 
+  harness.check("catalog: ONB-18 authors DESIGN.md and selected platforms, not a mutable Design Room", () => {
+    const catalog = composeCatalog(skillRoot);
+    const onb18 = catalog.workflows.find((workflow) => workflow.id === "workflow.experience.onboarding-system.onb-18-visual-design-prototype");
+    assert(onb18 !== undefined, "missing ONB-18 workflow");
+    const instructions = onb18.instructions;
+    assert(!instructions.includes("state, mutate, contract, version, render"), "ONB-18 must not teach the obsolete mutable Design Room sequence");
+    assert(!instructions.includes("across iOS, Android"), "ONB-18 must not require an unselected Android or iOS platform");
+    assert(instructions.includes("DESIGN.md") && instructions.includes("read-only"), "ONB-18 must author DESIGN.md and treat Design Room as generated review");
+    assert(
+      instructions.includes("mobileApp.platforms") && instructions.includes("host/agent-cli") && instructions.includes("static mockup"),
+      "ONB-18 must cover studio shipping platforms, keep host/agent-cli distinct, and retain the interactive prototype bar",
+    );
+    assert(
+      onb18.reads.includes("DESIGN.md") && onb18.reads.includes("studio/seed/business.json"),
+      "ONB-18 must read DESIGN.md and studio/seed/business.json for shipping-platform scope",
+    );
+    assert(
+      onb18.dependencies.includes("workflow.design.design-room") &&
+        onb18.gateCommands.includes("check:onboarding-evidence-onb-18") &&
+        onb18.gateCommands.includes("check:onboarding-foundations-prototype"),
+      "ONB-18 must keep accepted design work and the prototype evidence gates",
+    );
+    const nativeProof = catalog.workflows.find((workflow) => workflow.id === "workflow.engineering.native-ios-proof-route-ladder");
+    assert(nativeProof !== undefined && nativeProof.instructions.includes("Android"), "ordinary Android requirements on the Route Ladder must remain");
+  });
+
   harness.check("validate: a knowledge-less business workflow fails while a machine workflow stays exempt", () => {
     const catalog = baseFixtureCatalog();
     catalog.workflows = [baseWorkflow({ referenceIds: [] })];

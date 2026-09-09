@@ -350,6 +350,7 @@ export function register(harness: Harness): void {
     const result = runRevenueCatCli({
       operationId: "rc.catalog.create",
       projectId: "proj_approved",
+      offeringId: "off_default",
       hostAuthorityGranted: true,
       executable: "/opt/fake/bin/rc",
       cwd: isolatedConfigHome(harness.makeTempDir("rc-timeout-cwd"), "ws-a"),
@@ -521,5 +522,113 @@ export function register(harness: Harness): void {
     assert(row.manifest.baselines.reviewedSource?.revision === REVENUECAT_CLI_RELEASE.commit, "executable candidate must be the v0.1.1 commit");
     assert(row.observation?.host === null || row.observation?.host === undefined, "historical observation must not invent a host executable");
     assert(REVENUECAT_PROVISIONING.accessRoutes.includes("cli"), "CLI is a declared access route only after the runner exists");
+  });
+
+  harness.check("revenuecat-cli: request project other than approved is refused before spawn", () => {
+    const { run, calls } = recordingRunner(trustedDiscoveryHandler());
+    const discovery = discoverTrusted(harness, "rc-req-proj", run);
+    const result = runRevenueCatCli({
+      operationId: "rc.catalog.create",
+      projectId: "proj_attacker",
+      offeringId: "off_default",
+      hostAuthorityGranted: true,
+      executable: "/opt/fake/bin/rc",
+      cwd: isolatedConfigHome(harness.makeTempDir("rc-req-proj-cwd"), "ws-a"),
+      isolatedHome: isolatedConfigHome(harness.makeTempDir("rc-req-proj-home"), "ws-a"),
+      pathEnv: "/opt/fake/bin",
+      apiKey: "rc-fixture-key",
+      run,
+      discovery,
+      target: selectedTarget({ approvedProjectId: "proj_approved", hostAuthorityGranted: true }),
+    });
+    assert(result.invoked === false, "attacker project must not spawn");
+    assert(result.preflight.code === "request-project-mismatch", `code ${result.preflight.code}`);
+    assert(
+      calls.every((call) => call.argv[0] === "--version" || call.argv[0] === "commands"),
+      "only discovery argv allowed when request project mismatches",
+    );
+    assert(!JSON.stringify(result.argv).includes("proj_attacker"), "attacker project must not reach argv");
+  });
+
+  harness.check("revenuecat-cli: request app other than approved is refused even for Test Store", () => {
+    const { run, calls } = recordingRunner(trustedDiscoveryHandler());
+    const discovery = discoverTrusted(harness, "rc-req-app", run);
+    const result = runRevenueCatCli({
+      operationId: "rc.customers.simulate-purchase",
+      projectId: "proj_approved",
+      appId: "app_other",
+      productId: "premium_monthly",
+      appUserId: "user_synth",
+      hostAuthorityGranted: true,
+      executable: "/opt/fake/bin/rc",
+      cwd: isolatedConfigHome(harness.makeTempDir("rc-req-app-cwd"), "ws-a"),
+      isolatedHome: isolatedConfigHome(harness.makeTempDir("rc-req-app-home"), "ws-a"),
+      pathEnv: "/opt/fake/bin",
+      apiKey: "rc-fixture-key",
+      run,
+      discovery,
+      target: selectedTarget({ approvedAppId: "app_test", appStoreKind: "test-store", hostAuthorityGranted: true }),
+    });
+    assert(result.invoked === false, "other app must not spawn");
+    assert(result.preflight.code === "request-app-mismatch", `code ${result.preflight.code}`);
+    assert(
+      calls.every((call) => call.argv[0] === "--version" || call.argv[0] === "commands"),
+      "only discovery argv allowed when request app mismatches",
+    );
+    assert(!JSON.stringify(result.argv).includes("app_other"), "other app must not reach argv");
+  });
+
+  harness.check("revenuecat-cli: extraFlags equals-form project and base-url are refused", () => {
+    const base: CliArgvRequest = {
+      operationId: "rc.offerings.list",
+      projectId: "proj_approved",
+      hostAuthorityGranted: false,
+    };
+    let projectOverride = "";
+    try {
+      buildRevenueCatCliArgv({ ...base, extraFlags: ["--project-id=proj_other"] });
+    } catch (error) {
+      projectOverride = error instanceof Error ? error.message : String(error);
+    }
+    let baseUrl = "";
+    try {
+      buildRevenueCatCliArgv({ ...base, extraFlags: ["--base-url=https://evil.example"] });
+    } catch (error) {
+      baseUrl = error instanceof Error ? error.message : String(error);
+    }
+    assert(projectOverride.includes("project-id") || projectOverride.includes("extra flag"), projectOverride);
+    assert(baseUrl.includes("base-url") || baseUrl.includes("extra flag"), baseUrl);
+  });
+
+  harness.check("revenuecat-cli: verify document without issues field is not complete", () => {
+    const missing = offeringVerifyIsComplete({});
+    assert(missing.complete === false, "missing issues must not be complete");
+    const unknown = offeringVerifyIsComplete({ completeness: "unknown" });
+    assert(unknown.complete === false, "non-array issues must not be complete");
+    const notArray = offeringVerifyIsComplete({ issues: "ok" });
+    assert(notArray.complete === false, "string issues must not be complete");
+  });
+
+  harness.check("revenuecat-cli: catalog create without a typed offering id does not spawn", () => {
+    const { run, calls } = recordingRunner(trustedDiscoveryHandler());
+    const discovery = discoverTrusted(harness, "rc-create-stub", run);
+    const result = runRevenueCatCli({
+      operationId: "rc.catalog.create",
+      projectId: "proj_approved",
+      hostAuthorityGranted: true,
+      executable: "/opt/fake/bin/rc",
+      cwd: isolatedConfigHome(harness.makeTempDir("rc-create-stub-cwd"), "ws-a"),
+      isolatedHome: isolatedConfigHome(harness.makeTempDir("rc-create-stub-home"), "ws-a"),
+      pathEnv: "/opt/fake/bin",
+      apiKey: "rc-fixture-key",
+      run,
+      discovery,
+      target: selectedTarget({ hostAuthorityGranted: true }),
+    });
+    assert(result.invoked === false, "bare offerings create must not spawn");
+    assert(
+      calls.every((call) => call.argv[0] === "--version" || call.argv[0] === "commands"),
+      "stub catalog create must not start a process",
+    );
   });
 }

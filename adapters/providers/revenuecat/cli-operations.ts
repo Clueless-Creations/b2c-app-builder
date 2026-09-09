@@ -312,8 +312,6 @@ export function findRevenueCatCliOperationByArgv(argv: readonly string[]): CliOp
   return best;
 }
 
-const REFUSED_FLAG_PREFIXES = ["--api-key", "--format", "--body", "--header", "--password", "--apple-password"] as const;
-
 export type ArgvBuildRefusal =
   | "unknown-operation"
   | "unsupported-operation"
@@ -365,14 +363,12 @@ export function buildRevenueCatCliArgv(request: CliArgvRequest): string[] {
   assertSafeId(request.productId, "product id");
   assertSafeId(request.appUserId, "app user id");
   assertSafeId(request.profile, "profile name");
-  if (request.extraFlags) {
-    for (const flag of request.extraFlags) {
-      const name = flag.split("=")[0] ?? flag;
-      if (REFUSED_FLAG_PREFIXES.some((prefix) => name === prefix || name.startsWith(`${prefix}=`)) || name === "--yes" || name === "-y") {
-        throw new CliArgvRefusal("model-authored-flag", `Refusing extra flag ${name}. Secrets, jq formats, raw bodies, and --yes are not caller-authored.`);
-      }
-      if (!name.startsWith("--")) throw new CliArgvRefusal("model-authored-flag", "Extra CLI tokens must be explicit flags from the typed schema.");
-    }
+  if (request.extraFlags && request.extraFlags.length > 0) {
+    const name = request.extraFlags[0]!.split("=")[0] ?? request.extraFlags[0];
+    throw new CliArgvRefusal(
+      "model-authored-flag",
+      `Refusing extra flag ${name}. Caller-authored flags, including equals-form --project-id and --base-url, are not a generic escape hatch.`,
+    );
   }
   if (operation.requiresProject && !request.projectId?.trim()) {
     throw new CliArgvRefusal("missing-project", `${operation.id} requires an explicit validated --project-id. Profile defaults are not used.`);
@@ -409,9 +405,14 @@ export function buildRevenueCatCliArgv(request: CliArgvRequest): string[] {
     if (request.productId) argv.push("--product", request.productId);
     if (request.appUserId) argv.push("--app-user-id", request.appUserId);
   }
+  if (operation.id === "rc.catalog.create") {
+    if (!request.offeringId?.trim()) {
+      throw new CliArgvRefusal("missing-project", `${operation.id} requires a typed offering id before spawn. A bare offerings create is not authorized.`);
+    }
+    argv.push(request.offeringId);
+  }
   argv.push(...NONINTERACTIVE_FLAGS);
   if (operation.allowsYesFlag && request.hostAuthorityGranted) argv.push("--yes");
-  if (request.extraFlags) argv.push(...request.extraFlags);
   return argv;
 }
 

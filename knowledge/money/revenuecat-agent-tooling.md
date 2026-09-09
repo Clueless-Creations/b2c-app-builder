@@ -111,7 +111,7 @@ CLI proof uses collector `revenuecat-cli@1`. It is not the REST probe marker
 | Offering verify | `rc --project-id <id> offerings verify <offering-id> --json --no-input --no-color` | authenticated read; inspect `issues` even on exit 0 | argv and result schema tested |
 | Offering preview | `rc --project-id <id> offerings preview <app-id> --app-user-id <id> --json --no-input --no-color` | authenticated read that may touch a user | argv tested; not assumed effect-free |
 | Test Store purchase | `rc --project-id <id> customers simulate-purchase --app-id <test-store-app> --product <id> --app-user-id <id> --yes --json --no-input --no-color` | remote mutation | refused unless app is a verified Test Store and host authority is granted |
-| Catalog create | `rc --project-id <id> offerings create ...` | catalog mutation | refused without host authority |
+| Catalog create | `rc --project-id <id> offerings create <offering-id> --json --no-input --no-color` | catalog mutation | refused without host authority and a typed offering id; a bare create does not spawn |
 | Raw `api`, `setup`, `rico`, `skills install`, signup, refunds, publish/unpublish, AI generate/edit, store plan/apply/sync, entitlement grant/revoke/transfer, `projects use` / `profiles use` | n/a | excluded | refused; not a generic shell |
 
 Selected families are implemented only through the builder's typed RevenueCat CLI

@@ -21,7 +21,9 @@ export type RevenueCatCliHoldCode =
   | "raw-api-refused"
   | "nested-orchestration-refused"
   | "profile-default-refused"
-  | "mutation-uncertain";
+  | "mutation-uncertain"
+  | "request-project-mismatch"
+  | "request-app-mismatch";
 
 export type RevenueCatCliPreflightStatus = "hold" | "skip" | "ready";
 
@@ -69,6 +71,8 @@ export function assessRevenueCatCliPreflight(input: {
   readonly discovery: RevenueCatCliDiscovery;
   readonly operation: CliOperationSpec;
   readonly target: RevenueCatCliTarget;
+  readonly requestProjectId?: string;
+  readonly requestAppId?: string;
 }): RevenueCatCliPreflight {
   if (!input.target.providerSelected) {
     return {
@@ -137,6 +141,35 @@ export function assessRevenueCatCliPreflight(input: {
         status: "hold",
         code: "ambiguous-project",
         message: "An ambient profile cannot select the project. Pass the approved --project-id.",
+        blocksUnrelatedWork: false,
+      };
+    }
+    const requestedProject = input.requestProjectId?.trim();
+    if (!requestedProject || requestedProject !== approved) {
+      return {
+        status: "hold",
+        code: "request-project-mismatch",
+        message: `Request project ${requestedProject || "(missing)"} does not match approved project ${approved}. The approved project is retained; the process is not started.`,
+        blocksUnrelatedWork: false,
+      };
+    }
+  }
+  if (input.operation.requiresApp || input.operation.effectClass === "test-store-mutation") {
+    const approvedApp = input.target.approvedAppId?.trim();
+    const requestedApp = input.requestAppId?.trim();
+    if (!approvedApp) {
+      return {
+        status: "hold",
+        code: "unresolved-project",
+        message: `${input.operation.id} needs an explicit approved RevenueCat app id before spawn.`,
+        blocksUnrelatedWork: false,
+      };
+    }
+    if (!requestedApp || requestedApp !== approvedApp) {
+      return {
+        status: "hold",
+        code: "request-app-mismatch",
+        message: `Request app ${requestedApp || "(missing)"} does not match approved app ${approvedApp}. The approved app is retained; the process is not started.`,
         blocksUnrelatedWork: false,
       };
     }

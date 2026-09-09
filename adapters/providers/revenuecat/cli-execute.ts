@@ -67,8 +67,9 @@ export function offeringVerifyIsComplete(data: unknown): { complete: boolean; is
   if (!data || typeof data !== "object") return { complete: false, issues: "missing-document" };
   const record = data as Record<string, unknown>;
   const issues = record.issues;
-  if (Array.isArray(issues) && issues.length > 0) return { complete: false, issues };
-  return { complete: true, issues: issues ?? [] };
+  if (!Array.isArray(issues)) return { complete: false, issues: issues ?? "missing-issues" };
+  if (issues.length > 0) return { complete: false, issues };
+  return { complete: true, issues };
 }
 
 export function paginationState(data: unknown): "complete" | "partial" | "unknown" {
@@ -112,9 +113,50 @@ export function runRevenueCatCli(input: RevenueCatCliRunRequest): RevenueCatCliR
       replaySafe: true,
     };
   }
-  const preflight = assessRevenueCatCliPreflight({ discovery: input.discovery, operation, target: input.target });
+  const preflight = assessRevenueCatCliPreflight({
+    discovery: input.discovery,
+    operation,
+    target: input.target,
+    requestProjectId: input.projectId,
+    requestAppId: input.appId,
+  });
   if (preflight.status !== "ready") {
     return { invoked: false, preflight, operation, argv: [], collector: CLI_PROOF_COLLECTOR, uncertainMutation: false, replaySafe: true };
+  }
+  if (operation.requiresProject && input.projectId?.trim() !== input.target.approvedProjectId?.trim()) {
+    return {
+      invoked: false,
+      preflight: {
+        status: "hold",
+        code: "request-project-mismatch",
+        message: "Request project id must equal the approved project before spawn.",
+        blocksUnrelatedWork: false,
+      },
+      operation,
+      argv: [],
+      collector: CLI_PROOF_COLLECTOR,
+      uncertainMutation: false,
+      replaySafe: true,
+    };
+  }
+  if (
+    (operation.requiresApp || operation.effectClass === "test-store-mutation") &&
+    input.appId?.trim() !== input.target.approvedAppId?.trim()
+  ) {
+    return {
+      invoked: false,
+      preflight: {
+        status: "hold",
+        code: "request-app-mismatch",
+        message: "Request app id must equal the approved app before spawn.",
+        blocksUnrelatedWork: false,
+      },
+      operation,
+      argv: [],
+      collector: CLI_PROOF_COLLECTOR,
+      uncertainMutation: false,
+      replaySafe: true,
+    };
   }
   let argv: string[];
   try {

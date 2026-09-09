@@ -19,7 +19,9 @@ export function register(h: Harness): void {
       "discovery was called truncation",
     );
     assert(result.route.warnings.length > 0, "required guidance warning missing");
-    assert(Buffer.byteLength(JSON.stringify(result)) < 12000, "route exceeds measured metadata budget");
+    // Research-backed-spec now lists the live-portfolio and paid-tool holds in route metadata.
+    // The body still stays empty; 14 KiB is the measured ceiling after that graph change.
+    assert(Buffer.byteLength(JSON.stringify(result)) < 14000, "route exceeds measured metadata budget");
   });
   h.check("Porchwatch F4: research artifact requirements resolve in exactly two service calls without filesystem access", () => {
     const result = service.workflow({ workflowId });

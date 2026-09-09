@@ -1,11 +1,11 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.7",
+  "version": "0.219.8",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Discover a trusted host RevenueCat CLI and spawn only through the pinned process adapter.",
-    "Refuse spawn when the request project or app, extra flags, or catalog create operands escape the approved binding.",
-    "Treat offering verify as incomplete unless the CLI returns an issues array, even on exit 0."
+    "Project public business.plan holds, ready briefs, and founder questions as additive fields without changing historical held reason text.",
+    "Sanitize lastFailure at the public plan boundary so secret-like attempt text is withheld instead of copied through.",
+    "Keep ADR-0011 proposed; this increment does not update the north-star or close the steward review."
   ]
 }

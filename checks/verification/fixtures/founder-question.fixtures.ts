@@ -44,7 +44,7 @@ function planNode(overrides: Partial<FounderQuestionNode> = {}): FounderQuestion
 }
 
 function heldNode(nodeId: RunNodeId, reason: HeldReason, detail: string, title = "Node title", reasonCode?: string): HeldNode {
-  return { nodeId, title, domainId: "domain.growth", reason, detail, reasonCode };
+  return { nodeId, workflowId: `workflow.${nodeId.slice("run.".length)}`, title, domainId: "domain.growth", reason, detail, reasonCode };
 }
 
 export function register(harness: Harness): void {

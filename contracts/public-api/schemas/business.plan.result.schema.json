@@ -209,6 +209,180 @@
                   },
                   "reason": {
                     "type": "string"
+                  },
+                  "holdKind": {
+                    "type": "string",
+                    "enum": [
+                      "founder_approval",
+                      "autonomy",
+                      "blocked",
+                      "upstream"
+                    ]
+                  },
+                  "detail": {
+                    "type": "string",
+                    "maxLength": 400
+                  },
+                  "detailTruncated": {
+                    "type": "boolean"
+                  },
+                  "lastFailure": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "type": "string",
+                        "enum": [
+                          "worker.runtime_unavailable",
+                          "worker.exited",
+                          "worker.timeout",
+                          "worker.output_missing",
+                          "worker.scope_violation",
+                          "worker.receipt_rejected",
+                          "attempt.error"
+                        ]
+                      },
+                      "summary": {
+                        "type": "string",
+                        "maxLength": 240
+                      },
+                      "withheld": {
+                        "type": "boolean"
+                      },
+                      "truncated": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "summary",
+                      "withheld",
+                      "truncated"
+                    ],
+                    "additionalProperties": true
+                  },
+                  "brief": {
+                    "type": "object",
+                    "properties": {
+                      "workflowId": {
+                        "type": "string"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "instructions": {
+                        "type": "string",
+                        "maxLength": 2000
+                      },
+                      "open": {
+                        "maxItems": 32,
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "maxLength": 240
+                        }
+                      },
+                      "consult": {
+                        "maxItems": 32,
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "maxLength": 240
+                        }
+                      },
+                      "load": {
+                        "maxItems": 24,
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "path": {
+                              "type": "string",
+                              "maxLength": 240
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "loadWhen": {
+                              "type": "string",
+                              "maxLength": 400
+                            },
+                            "sectionId": {
+                              "type": "string",
+                              "maxLength": 160
+                            },
+                            "revision": {
+                              "type": "string",
+                              "maxLength": 160
+                            }
+                          },
+                          "required": [
+                            "path",
+                            "title",
+                            "loadWhen"
+                          ],
+                          "additionalProperties": true
+                        }
+                      },
+                      "produce": {
+                        "maxItems": 32,
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "maxLength": 240
+                        }
+                      },
+                      "verify": {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "type": "string"
+                          },
+                          "gateCommands": {
+                            "maxItems": 16,
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "maxLength": 240
+                            }
+                          },
+                          "failClosed": {
+                            "type": "boolean"
+                          },
+                          "requiresIndependentReview": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "gateCommands",
+                          "failClosed"
+                        ],
+                        "additionalProperties": true
+                      },
+                      "approvals": {
+                        "maxItems": 16,
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "maxLength": 400
+                        }
+                      },
+                      "truncated": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "workflowId",
+                      "title",
+                      "instructions",
+                      "open",
+                      "consult",
+                      "load",
+                      "produce",
+                      "verify",
+                      "approvals",
+                      "truncated"
+                    ],
+                    "additionalProperties": true
                   }
                 },
                 "required": [
@@ -238,6 +412,180 @@
                   },
                   "reason": {
                     "type": "string"
+                  },
+                  "holdKind": {
+                    "type": "string",
+                    "enum": [
+                      "founder_approval",
+                      "autonomy",
+                      "blocked",
+                      "upstream"
+                    ]
+                  },
+                  "detail": {
+                    "type": "string",
+                    "maxLength": 400
+                  },
+                  "detailTruncated": {
+                    "type": "boolean"
+                  },
+                  "lastFailure": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "type": "string",
+                        "enum": [
+                          "worker.runtime_unavailable",
+                          "worker.exited",
+                          "worker.timeout",
+                          "worker.output_missing",
+                          "worker.scope_violation",
+                          "worker.receipt_rejected",
+                          "attempt.error"
+                        ]
+                      },
+                      "summary": {
+                        "type": "string",
+                        "maxLength": 240
+                      },
+                      "withheld": {
+                        "type": "boolean"
+                      },
+                      "truncated": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "summary",
+                      "withheld",
+                      "truncated"
+                    ],
+                    "additionalProperties": true
+                  },
+                  "brief": {
+                    "type": "object",
+                    "properties": {
+                      "workflowId": {
+                        "type": "string"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "instructions": {
+                        "type": "string",
+                        "maxLength": 2000
+                      },
+                      "open": {
+                        "maxItems": 32,
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "maxLength": 240
+                        }
+                      },
+                      "consult": {
+                        "maxItems": 32,
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "maxLength": 240
+                        }
+                      },
+                      "load": {
+                        "maxItems": 24,
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "path": {
+                              "type": "string",
+                              "maxLength": 240
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "loadWhen": {
+                              "type": "string",
+                              "maxLength": 400
+                            },
+                            "sectionId": {
+                              "type": "string",
+                              "maxLength": 160
+                            },
+                            "revision": {
+                              "type": "string",
+                              "maxLength": 160
+                            }
+                          },
+                          "required": [
+                            "path",
+                            "title",
+                            "loadWhen"
+                          ],
+                          "additionalProperties": true
+                        }
+                      },
+                      "produce": {
+                        "maxItems": 32,
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "maxLength": 240
+                        }
+                      },
+                      "verify": {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "type": "string"
+                          },
+                          "gateCommands": {
+                            "maxItems": 16,
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "maxLength": 240
+                            }
+                          },
+                          "failClosed": {
+                            "type": "boolean"
+                          },
+                          "requiresIndependentReview": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "gateCommands",
+                          "failClosed"
+                        ],
+                        "additionalProperties": true
+                      },
+                      "approvals": {
+                        "maxItems": 16,
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "maxLength": 400
+                        }
+                      },
+                      "truncated": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "workflowId",
+                      "title",
+                      "instructions",
+                      "open",
+                      "consult",
+                      "load",
+                      "produce",
+                      "verify",
+                      "approvals",
+                      "truncated"
+                    ],
+                    "additionalProperties": true
                   }
                 },
                 "required": [
@@ -260,6 +608,89 @@
             "authorityGranted": {
               "type": "boolean",
               "const": false
+            },
+            "founderQuestion": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "phase": {
+                      "type": "string",
+                      "maxLength": 160
+                    },
+                    "class": {
+                      "type": "string",
+                      "enum": [
+                        "confirm-product-kind",
+                        "confirm-go",
+                        "confirm-spend-cap",
+                        "confirm-release-publish",
+                        "confirm-approval",
+                        "grant-initial-autonomy",
+                        "raise-autonomy",
+                        "scope-question"
+                      ]
+                    },
+                    "prompt": {
+                      "type": "string",
+                      "maxLength": 400
+                    },
+                    "choices": {
+                      "minItems": 2,
+                      "maxItems": 4,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "label": {
+                            "type": "string",
+                            "maxLength": 120
+                          },
+                          "consequence": {
+                            "type": "string",
+                            "maxLength": 240
+                          },
+                          "recommended": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "label",
+                          "consequence",
+                          "recommended"
+                        ],
+                        "additionalProperties": true
+                      }
+                    },
+                    "skippable": {
+                      "type": "boolean"
+                    },
+                    "deferrable": {
+                      "type": "boolean"
+                    },
+                    "appliesToRevision": {
+                      "type": "string",
+                      "pattern": "^sha256:[a-f0-9]{64}$"
+                    },
+                    "truncated": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "phase",
+                    "class",
+                    "prompt",
+                    "choices",
+                    "skippable",
+                    "deferrable",
+                    "appliesToRevision"
+                  ],
+                  "additionalProperties": true
+                },
+                {
+                  "type": "null"
+                }
+              ]
             },
             "nextAction": {
               "type": "string"

@@ -3,14 +3,16 @@
  * while operators and public evidence receive a stable classification and a sanitized summary.
  * Classification reads only the executor's own error prefixes; it never re-derives worker intent.
  */
-export type AttemptFailureCode =
-  | "worker.runtime_unavailable"
-  | "worker.exited"
-  | "worker.timeout"
-  | "worker.output_missing"
-  | "worker.scope_violation"
-  | "worker.receipt_rejected"
-  | "attempt.error";
+export const attemptFailureCodes = [
+  "worker.runtime_unavailable",
+  "worker.exited",
+  "worker.timeout",
+  "worker.output_missing",
+  "worker.scope_violation",
+  "worker.receipt_rejected",
+  "attempt.error",
+] as const;
+export type AttemptFailureCode = (typeof attemptFailureCodes)[number];
 
 const RUNTIME_UNAVAILABLE = /(auth|log[ -]?in|api[_ -]?key|unauthori[sz]ed|credential|newer version|upgrade|not logged|ENOENT|not found|spawn|invalid_grant)/i;
 
@@ -27,18 +29,59 @@ export function classifyAttemptFailure(error: string | undefined): AttemptFailur
   return "attempt.error";
 }
 
+/**
+ * Public-boundary secret shapes. Covers the repository `secretLike` set
+ * (`checks/validation/business/trust/check-secret-routing.ts`) plus cloud access-key
+ * prefixes the reviewer probe showed surviving into `business.plan`. Patterns are
+ * regexes, not live-looking literals.
+ */
 const SECRET_PATTERNS: readonly RegExp[] = [
   /\b(?:sk|rk|pk|ghp|gho|xox[abp])[-_][A-Za-z0-9_-]{8,}/g,
+  /\b(?:sk|rk)_(?:live|test)_[A-Za-z0-9]{12,}/g,
+  /whsec_[A-Za-z0-9]{12,}/g,
+  /ghp_[A-Za-z0-9]{20,}/g,
+  /-----BEGIN [A-Z ]{0,40}PRIVATE KEY-----[\s\S]*?-----END [A-Z ]{0,40}PRIVATE KEY-----/g,
+  /-----BEGIN [A-Z ]{0,40}PRIVATE KEY-----/g,
+  /\b(?:AKIA|ASIA)[A-Za-z0-9]{8,}/g,
   /Bearer\s+[^\s"'\\)]+/gi,
   /(?:api[_-]?key|token|secret|password)(\s*[=:]\s*)[^\s"'&]+/gi,
 ];
+const SECRET_LIKE_REMAINING =
+  /\b(?:sk|rk)_(?:live|test)_[A-Za-z0-9]{12,}|whsec_[A-Za-z0-9]{12,}|ghp_[A-Za-z0-9]{20,}|-----BEGIN [A-Z ]{0,40}PRIVATE KEY-----|\b(?:AKIA|ASIA)[A-Za-z0-9]{8,}/;
 
 function redact(text: string): string {
   let out = text;
-  for (const pattern of SECRET_PATTERNS)
-    out = out.replace(pattern, (match, separator?: string) => (separator ? `${match.slice(0, match.indexOf(separator))}${separator}[redacted]` : "[redacted]"));
+  for (const pattern of SECRET_PATTERNS) {
+    pattern.lastIndex = 0;
+    out = out.replace(pattern, (match, separator: unknown) =>
+      typeof separator === "string" ? `${match.slice(0, match.indexOf(separator))}${separator}[redacted]` : "[redacted]",
+    );
+    pattern.lastIndex = 0;
+  }
   const home = process.env.HOME?.trim();
   if (home && home.length > 1) out = out.split(home).join("~");
+  return out;
+}
+
+/** Public-boundary redaction: secrets, home paths, emails, control characters, and other host prefixes. */
+export function redactSensitiveText(text: string): string {
+  let out = redact(text);
+  out = out.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, "");
+  out = out.replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g, "[redacted]");
+  out = out.replace(/\/(?:Users|home)\/[^\s"'\\]+/g, "~");
+  if (SECRET_LIKE_REMAINING.test(out)) {
+    SECRET_LIKE_REMAINING.lastIndex = 0;
+    out = out.replace(
+      /\b(?:sk|rk)_(?:live|test)_[A-Za-z0-9]{12,}|whsec_[A-Za-z0-9]{12,}|ghp_[A-Za-z0-9]{20,}|-----BEGIN [A-Z ]{0,40}PRIVATE KEY-----[\s\S]*?-----END [A-Z ]{0,40}PRIVATE KEY-----|-----BEGIN [A-Z ]{0,40}PRIVATE KEY-----|\b(?:AKIA|ASIA)[A-Za-z0-9]{8,}/g,
+      "[redacted]",
+    );
+  }
+  SECRET_LIKE_REMAINING.lastIndex = 0;
+  if (SECRET_LIKE_REMAINING.test(out)) {
+    SECRET_LIKE_REMAINING.lastIndex = 0;
+    return "The attempt failed. The recorded error was withheld.";
+  }
+  SECRET_LIKE_REMAINING.lastIndex = 0;
   return out;
 }
 
@@ -65,6 +108,6 @@ export function summarizeAttemptFailure(error: string | undefined, maxLength = 2
     if (nested.length) specific = nested.at(-1)!.replace(/\\"/g, '"');
   }
   const body = specific || head.slice(prefix.length).trim() || head;
-  const summary = redact(`${prefix ? `${prefix} ` : ""}${body}`.replace(/\s+/g, " ").trim());
+  const summary = redactSensitiveText(`${prefix ? `${prefix} ` : ""}${body}`.replace(/\s+/g, " ").trim());
   return summary.length > maxLength ? `${summary.slice(0, maxLength - 1)}…` : summary;
 }

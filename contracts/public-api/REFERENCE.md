@@ -136,7 +136,7 @@ CLI-only initialization of an accepted authored product through the existing boo
 
 ## business.plan
 
-Passive registered-workspace frontier from existing compiler and autonomy owner. No network or provider prerequisite probes; unobserved prerequisites remain held.
+Passive registered-workspace frontier from existing compiler and autonomy owner. No network or provider prerequisite probes; unobserved prerequisites remain held. Ready work includes bounded briefs. Held work includes hold classification, bounded detail, and a sanitized last failure when one exists. The current founder question is bound to this revision and is not an approval.
 
 - CLI: `b2c business-plan`
 - Accepted CLI flags: `--workspace`, `--concurrency`, `--json`. See `b2c business-plan --help` for usage.

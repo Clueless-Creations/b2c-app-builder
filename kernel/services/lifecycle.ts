@@ -8,6 +8,7 @@ import { loadRegistry, registerWorkspace } from "../../adapters/registry.js";
 import { registeredWorkspace, resolveWorkspaceRegistration } from "./installed-composition.js";
 import { createPlanningWorkspace } from "../session/new.js";
 import { planWorkspace } from "../session/plan.js";
+import { projectInitializedBusinessPlan } from "./plan-projection.js";
 import { runSession, recoverPublicRequest, loadControlFile, resolveWorkspacePaths, type SessionHost } from "../session/run.js";
 import { workspaceRevision } from "../session/workspace-revision.js";
 import { loadWorkspaceCatalog } from "../session/catalog-contract.js";
@@ -73,27 +74,12 @@ export function planBusiness(input: { workspaceId: string; maxConcurrency: numbe
   }
   const report = planWorkspace(workspace, { maxConcurrency: input.maxConcurrency, observeProviders: false });
   if (workspaceRevision(workspace) !== revision) throw new Error("business.concurrent_plan_change");
-  return {
+  return projectInitializedBusinessPlan({
     workspaceId: input.workspaceId,
     revision,
-    planId: report.planId,
+    report,
     completion: readBusinessCompletion(input.workspaceId, revision),
-    status: report.batches.flat().length ? ("ready" as const) : ("held" as const),
-    ready: report.batches.flat().map((node) => ({ workflowId: `workflow.${node.nodeId.slice(4)}`, title: node.title, status: "ready" })),
-    held: report.held.map((node) => ({
-      workflowId: `workflow.${node.nodeId.slice(4)}`,
-      title: node.title,
-      status: "held",
-      reason: "This workflow requires current prerequisites, evidence or an authorized decision before dispatch.",
-      ...(node.reasonCode ? { reasonCode: node.reasonCode } : {}),
-    })),
-    completed: report.done,
-    providerObservation: "not_requested" as const,
-    authorityGranted: false as const,
-    nextAction: report.batches.flat().length
-      ? "Run the bounded session against this exact revision using existing authority."
-      : "Resolve the reported holds; this passive plan did not observe provider prerequisites.",
-  };
+  });
 }
 export async function runBusiness(
   input: { workspaceId: string; expectedRevision: string; requestId: string; scope: string[]; wallClockSeconds: number; maxConcurrency: number },

@@ -31,7 +31,7 @@ import { translateParkReason } from "./digest.js";
 import { buildGoNoGoQuestion, buildSoftQuestion, validateFounderQuestion, type FounderQuestion, type FounderQuestionClass } from "./founder-gate.js";
 import { routeUtterance } from "./route-utterance.js";
 import { withOnboardingStepper } from "./stepper.js";
-import { summarizeAttemptFailure } from "./attempt-failure.js";
+import { classifyAttemptFailure, summarizeAttemptFailure, type AttemptFailureCode } from "./attempt-failure.js";
 
 /**
  * The frontier, for a session that is a conversation rather than a headless run.
@@ -81,6 +81,7 @@ export type HeldReason = "founder_approval" | "autonomy" | "blocked" | "upstream
 
 export interface HeldNode {
   readonly nodeId: RunNodeId;
+  readonly workflowId: string;
   readonly title: string;
   readonly domainId: string;
   readonly reason: HeldReason;
@@ -89,6 +90,9 @@ export interface HeldNode {
   readonly reasonCode?: string;
   /** Sanitized one-line summary of the latest failed attempt, when the last attempt failed. */
   readonly lastFailure?: string;
+  readonly lastFailureCode?: AttemptFailureCode;
+  /** Unsanitized last attempt error. Public projection redacts this; it is never returned on the wire. */
+  readonly lastFailureRaw?: string;
 }
 
 export interface PlanReport {
@@ -112,8 +116,31 @@ export interface PlanReport {
   readonly founderQuestion: FounderQuestion | null;
 }
 
-function describe(node: CompiledRunNode, reason: HeldReason, detail: string, reasonCode?: string, lastFailure?: string): HeldNode {
-  return { nodeId: node.id, title: node.title, domainId: node.domainId, reason, detail, reasonCode, ...(lastFailure ? { lastFailure } : {}) };
+function describe(
+  node: CompiledRunNode,
+  reason: HeldReason,
+  detail: string,
+  reasonCode?: string,
+  lastFailure?: string,
+  lastFailureCode?: AttemptFailureCode,
+  lastFailureRaw?: string,
+): HeldNode {
+  return {
+    nodeId: node.id,
+    workflowId: node.workflowId,
+    title: node.title,
+    domainId: node.domainId,
+    reason,
+    detail,
+    reasonCode,
+    ...(lastFailure
+      ? {
+          lastFailure,
+          ...(lastFailureCode ? { lastFailureCode } : {}),
+          ...(lastFailureRaw !== undefined ? { lastFailureRaw } : {}),
+        }
+      : {}),
+  };
 }
 
 /** The slice of a compiled node `pickFounderQuestion` actually reads — narrow on purpose so it is unit-testable without a real compiled plan. */
@@ -283,18 +310,38 @@ export function buildPlanReport(
     const parkReason = parked.get(node.id);
     const lastAttempt = state?.attempts.at(-1);
     const lastFailure = lastAttempt?.status === "failed" ? summarizeAttemptFailure(lastAttempt.error) : undefined;
+    const lastFailureCode = lastAttempt?.status === "failed" ? classifyAttemptFailure(lastAttempt.error) : undefined;
+    const lastFailureRaw = lastAttempt?.status === "failed" ? (lastAttempt.error ?? "") : undefined;
 
     if (status === "waiting_founder") {
       const approval = node.approvals.map((item) => item.description).join("; ");
-      held.push(describe(node, "founder_approval", approval || state?.blocker || "Waiting on a founder decision.", undefined, lastFailure));
+      held.push(
+        describe(
+          node,
+          "founder_approval",
+          approval || state?.blocker || "Waiting on a founder decision.",
+          undefined,
+          lastFailure,
+          lastFailureCode,
+          lastFailureRaw,
+        ),
+      );
     } else if (parkReason !== undefined) {
-      held.push(describe(node, "autonomy", parkReason, decision?.reasonCode, lastFailure));
+      held.push(describe(node, "autonomy", parkReason, decision?.reasonCode, lastFailure, lastFailureCode, lastFailureRaw));
     } else if (status === "blocked") {
-      held.push(describe(node, "blocked", state?.blocker ?? "Blocked.", decision?.reasonCode, lastFailure));
+      held.push(describe(node, "blocked", state?.blocker ?? "Blocked.", decision?.reasonCode, lastFailure, lastFailureCode, lastFailureRaw));
     } else {
       const pending = node.dependencies.filter((dependency) => run.nodes[dependency]?.status !== "succeeded");
       held.push(
-        describe(node, "upstream", pending.length > 0 ? `Waits on ${pending.length} earlier step(s).` : "Inputs not produced yet.", undefined, lastFailure),
+        describe(
+          node,
+          "upstream",
+          pending.length > 0 ? `Waits on ${pending.length} earlier step(s).` : "Inputs not produced yet.",
+          undefined,
+          lastFailure,
+          lastFailureCode,
+          lastFailureRaw,
+        ),
       );
     }
   }

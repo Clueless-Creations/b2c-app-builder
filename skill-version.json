@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.27",
+  "version": "0.219.28",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Encode RevenueCat offerings, products, entitlements, and packages create with pinned v0.1.1 lookup, display, and store flags.",
-    "Qualify create and attach argv against independently transcribed cobra schemas that do not import the encoder."
+    "Decode pinned RevenueCat CLI v0.1.1 responses by command instead of a generic JSON blob.",
+    "Keep preview lookup keys, verify graphs, unread list pages, and simulate-purchase product identity command-specific."
   ]
 }

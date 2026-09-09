@@ -1,6 +1,6 @@
 {
   "schemaVersion": "2.0.0",
-  "skillVersion": "0.219.6",
+  "skillVersion": "0.219.7",
   "areas": [
     {
       "id": "area.operating-system",
@@ -5664,9 +5664,9 @@
           "sourceType": "github",
           "url": "https://github.com/RevenueCat/cli",
           "reviewCadenceDays": 7,
-          "claimScope": "Selected procedures and limitations; no installed or live-provider support claim.",
-          "lastReviewDate": "2026-09-06",
-          "reviewer": "b2c-contributor source review",
+          "claimScope": "Selected v0.1.1 procedures, typed executable mapping, and limitations; no live-host execution or unpinned latest-binary claim.",
+          "lastReviewDate": "2026-09-08",
+          "reviewer": "b2c-maintainers",
           "publisher": "RevenueCat",
           "revision": "1a3d2820b3166dd6d4cc4775902e43eeeab5f004",
           "retrievedAt": "2026-09-06T13:59:35.856259Z",
@@ -5726,12 +5726,12 @@
           "selectors": [
             "README.md"
           ],
-          "rationale": "Retain relevant official procedures while preserving existing artifact ownership, scoped authority and independently verified acceptance.",
+          "rationale": "Retain relevant official procedures while preserving existing artifact ownership, scoped authority and independently verified acceptance. Executable mapping is qualified against release v0.1.1, not this later guidance commit.",
           "omissions": [
-            "Automatic installation, broad agent workflows, unreviewed remotely fetched skills and implicit acceptance."
+            "Automatic installation, unpinned latest binaries, raw API passthrough, nested setup/rico/skills, and implicit acceptance."
           ],
-          "reviewer": "b2c-contributor source review",
-          "reviewedAt": "2026-09-06",
+          "reviewer": "b2c-maintainers",
+          "reviewedAt": "2026-09-08",
           "evaluation": "npm run test:fixtures -- official-upstreams",
           "notice": "catalog/upstreams/notices/revenuecat-cli.txt"
         }
@@ -5739,7 +5739,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/money/revenuecat-agent-tooling.md",
-        "sha256": "sha256:aa38615609f006aeb21add54cda3cf36cb7a552a1fe149b2705d493bd815f13c",
+        "sha256": "sha256:620358e8a7f09ef1d5c0e11b1c1ffe16254d17111796d8099f9310ee57b52d14",
         "origin": "skill"
       }
     },
@@ -18422,14 +18422,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "b1edec38f063eeac6829784423b4c9f5f851cea1b3b28aff89b0867958e4333a",
+    "fingerprint": "b661d8981fd7bebedd8684451309fb9b1e3c37bec2d644e32ae41188e5f7c6ae",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
-        "version": "0.219.6",
-        "revision": "0.219.6",
-        "contentDigest": "b59a0507726d53150c241f06dae5628378f0b95e43add16bd79a856495118159"
+        "version": "0.219.7",
+        "revision": "0.219.7",
+        "contentDigest": "dfad1deb350acaa4850bf1a4d9d2f88f02e657ee4f548c58d68f911cee31be95"
       }
     ],
     "base": {

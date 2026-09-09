@@ -1,13 +1,13 @@
 apiVersion: b2c.contribution/v1
 id: official-provider-tooling
-goal: Adapt reviewed official RevenueCat and PostHog procedures without importing provider authority; preserve upstream
-  tracking and notices.
-scope: contribution
+goal: Adapt reviewed official RevenueCat and PostHog procedures and wrap the selected RevenueCat CLI
+  host executable without importing provider authority; preserve upstream tracking and notices.
+scope: maintenance
 routing:
-  intendedTarget: Selected knowledge references and upstream metadata
-  effect: Authored guidance and provenance only; no external provider setup
-  verdict: contribution
-  reason: Uses existing contribution, knowledge, package-notice and authority contracts.
+  intendedTarget: Selected knowledge references, the RevenueCat provider adapter, and upstream metadata
+  effect: Authored guidance, provenance, and a typed host-executable wrap; no external provider setup
+  verdict: maintenance
+  reason: Targets a maintainer-owned adapter path plus knowledge references; no business workspace.
 createdAt: 2026-09-06T14:00:00Z
 synthetic: false
 sources:
@@ -145,7 +145,27 @@ units:
       - npm run test:fixtures -- official-upstreams
     selection: selected-method
     omitted:
-      - Global installation, live credentials and automatic business adoption.
+      - Global installation, live credentials, unpinned latest binaries, and automatic business adoption.
+  - id: revenuecat-cli-executable
+    kind: implementation
+    title: RevenueCat CLI executable adapter
+    upstream:
+      sourceId: revenuecat-cli
+      selector: Release v0.1.1 command surface and process model
+    target:
+      kind: provider-adapter
+      path: adapters/providers/revenuecat
+      owner: adapters/providers/revenuecat
+    disposition: wrap
+    status: proposed
+    rationale: Wrap a trusted host rc/revenuecat binary for selected typed operations. Do not vendor Go source or
+      duplicate the RevenueCat provider, secret registry, or entitlement owner.
+    verification:
+      - npm run test:fixtures -- revenuecat-cli
+    selection: selected-method
+    omitted:
+      - Host installation, live credentials, OAuth refresh during discovery, raw api, nested setup/rico/skills, and
+        global profile default mutation.
   - id: posthog-wizard-guidance
     kind: knowledge
     title: PostHog wizard adoption
@@ -258,6 +278,27 @@ evaluations:
     mustPass:
       - Complete source-specific adoption record with no provider execution
     path: checks/verification/fixtures/official-upstreams.fixtures.ts
+  - id: revenuecat-cli-executable-boundaries
+    unitId: revenuecat-cli-executable
+    kind: counterexample
+    description: Executable wrapping stays on the existing revenuecat-cli identity and refuses raw api, nested setup, and
+      unpinned latest launchers.
+    mustFail:
+      - Second upstream identity for RevenueCat/cli
+      - Process spawn for excluded commands
+      - npx as the trusted executable
+    mustPass:
+      - Fake-process discovery, version/schema holds, and authority refusals
+    path: checks/verification/fixtures/revenuecat-cli.fixtures.ts
+  - id: revenuecat-cli-executable-command
+    unitId: revenuecat-cli-executable
+    kind: command
+    description: Fake-process discovery, argv construction, and preflight refusals for release v0.1.1.
+    command: npm run test:fixtures -- revenuecat-cli
+    mustPass:
+      - Trusted 0.1.1 discovery
+      - Authority, target, and excluded-command refusals
+    path: checks/verification/fixtures/revenuecat-cli.fixtures.ts
   - id: posthog-wizard-boundaries
     unitId: posthog-wizard-guidance
     kind: counterexample
@@ -283,6 +324,7 @@ notices:
     noticePath: notices/revenuecat-cli.txt
     covers:
       - knowledge/money/revenuecat-agent-tooling.md
+      - adapters/providers/revenuecat
   - sourceId: posthog-wizard
     spdx: MIT
     copyright: Copyright (c) 2025 PostHog
@@ -291,6 +333,7 @@ notices:
       - knowledge/data/posthog-agent-tooling.md
 requiredChecks:
   - npm run test:fixtures -- official-upstreams
+  - npm run test:fixtures -- revenuecat-cli
   - npm run check:upstreams
   - npm run check:credits
 missingCoreMechanism:
@@ -298,3 +341,4 @@ missingCoreMechanism:
 uncertainties:
   - No live provider or installed SDK support verified.
   - Context mill is deferred for rights review and is not imported.
+  - Release v0.1.1 is the executable candidate; the host binary was not installed or authenticated.

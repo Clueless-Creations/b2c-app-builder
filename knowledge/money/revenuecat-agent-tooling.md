@@ -76,15 +76,47 @@ compare it with reviewed compatibility evidence. A builder package pin does not
 freeze a globally installed executable. The source review here does not certify any
 host binary. `rc` and the Rork `asc` CLI are different tools.
 
-The reviewed CLI supplies `rc commands --json`, `rc commands --schemas --json`, and
-space-separated `rc schema <command> --json`. Check the chosen command schema; do
-not infer flags or output shape from a similarly named MCP tool. Prefer explicit
-project selection and noninteractive error handling. Never use `--yes` to create
-approval. Store setup can create and upload credentials and requires its own gate.
+The executable candidate is GitHub release **v0.1.1**
+(`448a9998bd2107c274b9eb1cf55ad5d5d81f6377`, published 2026-08-27). npm
+`@revenuecat/cli@0.1.1` ships the same native binaries as `rc` and `revenuecat`.
+The later source head is not the installed release. Do not run
+`npx @revenuecat/cli@latest` at runtime.
+
+Discovery uses a trusted absolute path, `--version`, and `commands --json` with
+`--no-input --no-color`. It does not install, log in, refresh OAuth, or change
+profiles. An unrelated binary named `rc` is not RevenueCat. A profile named
+`staging` is not a Test Store.
+
+Use `--json --no-input --no-color` for supported noninteractive commands. Check
+the chosen command schema; do not infer flags or output shape from a similarly
+named MCP tool. Prefer explicit `--project-id`. Never use `--yes` to create
+approval. `--no-input` prevents prompts, not mutations.
 
 A newly available command is a support candidate, not an automatically enabled
-operation. In particular, generated paywalls and published paywalls are different
-effects. Reconcile uncertain mutations before retrying.
+operation. Generated paywalls and published paywalls are different effects.
+A command named `plan` can persist remote state. Reconcile uncertain mutations
+before retrying. Do not invent upstream idempotency.
+
+CLI proof uses collector `revenuecat-cli@1`. It is not the REST probe marker
+`revenuecat@1`.
+
+### Command-to-operation matrix (v0.1.1)
+
+| Builder operation | CLI argv (v0.1.1) | Effect | Status |
+| ----------------- | ----------------- | ------ | ------ |
+| Local identity | `rc --version` | none | implemented, fake-process tested |
+| Command tree | `rc commands --json --no-input --no-color` | none | implemented, fake-process tested |
+| Command schema | `rc schema <cmd> --json --no-input --no-color` | none | implemented, fake-process tested |
+| List/show catalog | `rc --project-id <id> offerings\|apps\|products\|entitlements list\|show --json --no-input --no-color` | authenticated read | argv and preflight tested; live auth not run |
+| Offering verify | `rc --project-id <id> offerings verify <offering-id> --json --no-input --no-color` | authenticated read; inspect `issues` even on exit 0 | argv and result schema tested |
+| Offering preview | `rc --project-id <id> offerings preview <app-id> --app-user-id <id> --json --no-input --no-color` | authenticated read that may touch a user | argv tested; not assumed effect-free |
+| Test Store purchase | `rc --project-id <id> customers simulate-purchase --app-id <test-store-app> --product <id> --app-user-id <id> --yes --json --no-input --no-color` | remote mutation | refused unless app is a verified Test Store and host authority is granted |
+| Catalog create | `rc --project-id <id> offerings create <offering-id> --json --no-input --no-color` | catalog mutation | refused without host authority and a typed offering id; a bare create does not spawn |
+| Raw `api`, `setup`, `rico`, `skills install`, signup, refunds, publish/unpublish, AI generate/edit, store plan/apply/sync, entitlement grant/revoke/transfer, `projects use` / `profiles use` | n/a | excluded | refused; not a generic shell |
+
+Selected families are implemented only through the builder's typed RevenueCat CLI
+adapter. Store credential setup remains experimental upstream. Nested setup must
+not become the builder orchestrator.
 
 ## Verify the actual integration
 

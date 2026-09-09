@@ -42,9 +42,8 @@ if (!existsSync(receiptPath)) {
 }
 
 function validateReceipt(): void {
-
-let raw: unknown;
-try {
+  let raw: unknown;
+  try {
     raw = JSON.parse(readFileSync(receiptPath, "utf8"));
   } catch {
     issues.push(issue("error", "app_store_portfolio.receipt_invalid", "run/app-store-portfolio.json is present but is not valid JSON.", receiptRel));
@@ -58,168 +57,172 @@ try {
     return;
   }
 
-for (const key of Object.keys(raw)) {
-  if (FORBIDDEN_RECEIPT_KEYS.has(key.toLowerCase())) {
-    issues.push(
-      issue(
-        "error",
-        "app_store_portfolio.forbidden_field",
-        `run/app-store-portfolio.json must not store ${key}. Keep name and optional bundleId only.`,
-        receiptRel,
-      ),
-    );
-  }
-}
-
-if (raw.schemaVersion !== "1.0.0") {
-  issues.push(issue("error", "app_store_portfolio.schema_unsupported", "App Store portfolio receipt must use schema 1.0.0.", receiptRel));
-}
-if (raw.command !== "asc apps list") {
-  issues.push(
-    issue(
-      "error",
-      "app_store_portfolio.command_invalid",
-      "Portfolio receipt command must be exactly asc apps list. A web session never satisfies the hold.",
-      receiptRel,
-    ),
-  );
-}
-if (raw.authFamily !== "api") {
-  issues.push(
-    issue(
-      "error",
-      "app_store_portfolio.auth_family_invalid",
-      "Portfolio receipt authFamily must be api. Web session never satisfies the hold.",
-      receiptRel,
-    ),
-  );
-}
-
-const winnerVersion = asString(raw.winnerVersion) ?? "";
-if (!/^\d+\.\d+\.\d+/.test(winnerVersion)) {
-  issues.push(
-    issue("error", "app_store_portfolio.winner_version_missing", "Portfolio receipt must record the winning asc version that ran apps list.", receiptRel),
-  );
-}
-
-const observedAt = asString(raw.observedAt) ?? "";
-const observedMs = Date.parse(observedAt);
-if (!observedAt || Number.isNaN(observedMs)) {
-  issues.push(issue("error", "app_store_portfolio.observed_at_missing", "Portfolio receipt must record observedAt as an ISO timestamp from the live command.", receiptRel));
-} else {
-  if (Date.now() - observedMs > FRESHNESS_MS) {
-    issues.push(
-      issue(
-        "error",
-        "app_store_portfolio.receipt_stale",
-        "Portfolio receipt is older than seven days. Re-run asc apps list before research-backed-spec is admissible.",
-        receiptRel,
-      ),
-    );
-  }
-  const appleCheckedAt = readAppleCheckedAt(args.root);
-  const appleCheckedMs = appleCheckedAt ? Date.parse(appleCheckedAt) : Number.NaN;
-  if (!Number.isNaN(appleCheckedMs) && appleCheckedMs > observedMs) {
-    issues.push(
-      issue(
-        "error",
-        "app_store_portfolio.receipt_stale_after_auth_change",
-        "Apple account checkedAt is newer than the portfolio receipt. Re-run asc apps list after the auth or team change.",
-        receiptRel,
-      ),
-    );
-  }
-}
-
-const appCount = raw.appCount;
-if (typeof appCount !== "number" || !Number.isInteger(appCount) || appCount < 0) {
-  issues.push(issue("error", "app_store_portfolio.app_count_invalid", "Portfolio receipt appCount must be a non-negative integer from the live list.", receiptRel));
-}
-
-const apps = asArray(raw.apps).filter(isRecord);
-if (typeof appCount === "number" && apps.length !== appCount) {
-  issues.push(issue("error", "app_store_portfolio.app_count_mismatch", "Portfolio receipt apps length must equal appCount.", receiptRel));
-}
-
-if (appCount === 0) {
-  if (raw.empty !== true) {
-    issues.push(
-      issue(
-        "error",
-        "app_store_portfolio.empty_unproven",
-        "An empty portfolio must set empty: true from live asc apps list output. Do not author an empty list from memory.",
-        receiptRel,
-      ),
-    );
-  }
-} else if (raw.empty === true) {
-  issues.push(issue("error", "app_store_portfolio.empty_conflict", "empty: true is valid only when appCount is 0.", receiptRel));
-}
-
-for (const [index, app] of apps.entries()) {
-  const name = asString(app.name) ?? "";
-  if (!name.trim()) {
-    issues.push(issue("error", "app_store_portfolio.app_name_missing", `Portfolio app ${index} must include a sanitized name.`, receiptRel));
-  } else if (/^\d+$/.test(name.trim())) {
-    issues.push(issue("error", "app_store_portfolio.numeric_id", `Portfolio app ${index} must not store an Apple numeric id as the name.`, receiptRel));
-  }
-  const bundleId = asString(app.bundleId);
-  if (bundleId !== undefined) {
-    if (!bundleId.includes(".") || /\s/.test(bundleId)) {
-      issues.push(issue("error", "app_store_portfolio.bundle_id_invalid", `Portfolio app ${index} bundleId must be a reverse-DNS identifier when present.`, receiptRel));
-    }
-  }
-  for (const key of Object.keys(app)) {
-    if (!["name", "bundleId"].includes(key)) {
-      issues.push(
-        issue("error", "app_store_portfolio.forbidden_field", `Portfolio app ${index} may only store name and optional bundleId.`, receiptRel),
-      );
-    }
-  }
-}
-
-const forbidden = readForbiddenProjects(args.root);
-const productTargets = readProductTargets(args.root);
-for (const entry of forbidden) {
-  const forbiddenName = entry.name.toLowerCase();
-  const forbiddenBundle = entry.bundleId?.toLowerCase();
-  for (const app of apps) {
-    const appName = (asString(app.name) ?? "").toLowerCase();
-    const appBundle = (asString(app.bundleId) ?? "").toLowerCase();
-    if (appName && appName === forbiddenName) {
+  for (const key of Object.keys(raw)) {
+    if (FORBIDDEN_RECEIPT_KEYS.has(key.toLowerCase())) {
       issues.push(
         issue(
           "error",
-          "app_store_portfolio.forbidden_project",
-          `Live portfolio names a forbidden provider project (${entry.name}). Research that would target that product is refused.`,
-          receiptRel,
-        ),
-      );
-    }
-    if (forbiddenBundle && appBundle && appBundle === forbiddenBundle) {
-      issues.push(
-        issue(
-          "error",
-          "app_store_portfolio.forbidden_project",
-          `Live portfolio includes a forbidden bundleId. Research that would target that product is refused.`,
+          "app_store_portfolio.forbidden_field",
+          `run/app-store-portfolio.json must not store ${key}. Keep name and optional bundleId only.`,
           receiptRel,
         ),
       );
     }
   }
-  for (const target of productTargets) {
-    if (target.toLowerCase() === forbiddenName || (forbiddenBundle && target.toLowerCase() === forbiddenBundle)) {
+
+  if (raw.schemaVersion !== "1.0.0") {
+    issues.push(issue("error", "app_store_portfolio.schema_unsupported", "App Store portfolio receipt must use schema 1.0.0.", receiptRel));
+  }
+  if (raw.command !== "asc apps list") {
+    issues.push(
+      issue(
+        "error",
+        "app_store_portfolio.command_invalid",
+        "Portfolio receipt command must be exactly asc apps list. A web session never satisfies the hold.",
+        receiptRel,
+      ),
+    );
+  }
+  if (raw.authFamily !== "api") {
+    issues.push(
+      issue("error", "app_store_portfolio.auth_family_invalid", "Portfolio receipt authFamily must be api. Web session never satisfies the hold.", receiptRel),
+    );
+  }
+
+  const winnerVersion = asString(raw.winnerVersion) ?? "";
+  if (!/^\d+\.\d+\.\d+/.test(winnerVersion)) {
+    issues.push(
+      issue("error", "app_store_portfolio.winner_version_missing", "Portfolio receipt must record the winning asc version that ran apps list.", receiptRel),
+    );
+  }
+
+  const observedAt = asString(raw.observedAt) ?? "";
+  const observedMs = Date.parse(observedAt);
+  if (!observedAt || Number.isNaN(observedMs)) {
+    issues.push(
+      issue(
+        "error",
+        "app_store_portfolio.observed_at_missing",
+        "Portfolio receipt must record observedAt as an ISO timestamp from the live command.",
+        receiptRel,
+      ),
+    );
+  } else {
+    if (Date.now() - observedMs > FRESHNESS_MS) {
       issues.push(
         issue(
           "error",
-          "app_store_portfolio.forbidden_compose_target",
-          `Product compose target matches a forbidden provider project (${entry.name}).`,
-          "product.yaml",
+          "app_store_portfolio.receipt_stale",
+          "Portfolio receipt is older than seven days. Re-run asc apps list before research-backed-spec is admissible.",
+          receiptRel,
+        ),
+      );
+    }
+    const appleCheckedAt = readAppleCheckedAt(args.root);
+    const appleCheckedMs = appleCheckedAt ? Date.parse(appleCheckedAt) : Number.NaN;
+    if (!Number.isNaN(appleCheckedMs) && appleCheckedMs > observedMs) {
+      issues.push(
+        issue(
+          "error",
+          "app_store_portfolio.receipt_stale_after_auth_change",
+          "Apple account checkedAt is newer than the portfolio receipt. Re-run asc apps list after the auth or team change.",
+          receiptRel,
         ),
       );
     }
   }
-}
+
+  const appCount = raw.appCount;
+  if (typeof appCount !== "number" || !Number.isInteger(appCount) || appCount < 0) {
+    issues.push(
+      issue("error", "app_store_portfolio.app_count_invalid", "Portfolio receipt appCount must be a non-negative integer from the live list.", receiptRel),
+    );
+  }
+
+  const apps = asArray(raw.apps).filter(isRecord);
+  if (typeof appCount === "number" && apps.length !== appCount) {
+    issues.push(issue("error", "app_store_portfolio.app_count_mismatch", "Portfolio receipt apps length must equal appCount.", receiptRel));
+  }
+
+  if (appCount === 0) {
+    if (raw.empty !== true) {
+      issues.push(
+        issue(
+          "error",
+          "app_store_portfolio.empty_unproven",
+          "An empty portfolio must set empty: true from live asc apps list output. Do not author an empty list from memory.",
+          receiptRel,
+        ),
+      );
+    }
+  } else if (raw.empty === true) {
+    issues.push(issue("error", "app_store_portfolio.empty_conflict", "empty: true is valid only when appCount is 0.", receiptRel));
+  }
+
+  for (const [index, app] of apps.entries()) {
+    const name = asString(app.name) ?? "";
+    if (!name.trim()) {
+      issues.push(issue("error", "app_store_portfolio.app_name_missing", `Portfolio app ${index} must include a sanitized name.`, receiptRel));
+    } else if (/^\d+$/.test(name.trim())) {
+      issues.push(issue("error", "app_store_portfolio.numeric_id", `Portfolio app ${index} must not store an Apple numeric id as the name.`, receiptRel));
+    }
+    const bundleId = asString(app.bundleId);
+    if (bundleId !== undefined) {
+      if (!bundleId.includes(".") || /\s/.test(bundleId)) {
+        issues.push(
+          issue("error", "app_store_portfolio.bundle_id_invalid", `Portfolio app ${index} bundleId must be a reverse-DNS identifier when present.`, receiptRel),
+        );
+      }
+    }
+    for (const key of Object.keys(app)) {
+      if (!["name", "bundleId"].includes(key)) {
+        issues.push(issue("error", "app_store_portfolio.forbidden_field", `Portfolio app ${index} may only store name and optional bundleId.`, receiptRel));
+      }
+    }
+  }
+
+  const forbidden = readForbiddenProjects(args.root);
+  const productTargets = readProductTargets(args.root);
+  for (const entry of forbidden) {
+    const forbiddenName = entry.name.toLowerCase();
+    const forbiddenBundle = entry.bundleId?.toLowerCase();
+    for (const app of apps) {
+      const appName = (asString(app.name) ?? "").toLowerCase();
+      const appBundle = (asString(app.bundleId) ?? "").toLowerCase();
+      if (appName && appName === forbiddenName) {
+        issues.push(
+          issue(
+            "error",
+            "app_store_portfolio.forbidden_project",
+            `Live portfolio names a forbidden provider project (${entry.name}). Research that would target that product is refused.`,
+            receiptRel,
+          ),
+        );
+      }
+      if (forbiddenBundle && appBundle && appBundle === forbiddenBundle) {
+        issues.push(
+          issue(
+            "error",
+            "app_store_portfolio.forbidden_project",
+            `Live portfolio includes a forbidden bundleId. Research that would target that product is refused.`,
+            receiptRel,
+          ),
+        );
+      }
+    }
+    for (const target of productTargets) {
+      if (target.toLowerCase() === forbiddenName || (forbiddenBundle && target.toLowerCase() === forbiddenBundle)) {
+        issues.push(
+          issue(
+            "error",
+            "app_store_portfolio.forbidden_compose_target",
+            `Product compose target matches a forbidden provider project (${entry.name}).`,
+            "product.yaml",
+          ),
+        );
+      }
+    }
+  }
 
   reportAndExit("App Store portfolio receipt check", issues);
 }

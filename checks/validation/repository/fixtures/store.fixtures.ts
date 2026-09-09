@@ -1329,14 +1329,9 @@ function registerAppReviewContract(h: Harness): void {
 
   const missingPortfolio = makeFixture("app-store-portfolio-missing");
   runFixture("missing portfolio receipt is a no-op for the audit gate", missingPortfolio, "check-app-store-portfolio.ts", 0);
-  runFixture(
-    "missing portfolio receipt fails the workflow gate",
-    missingPortfolio,
-    "check-app-store-portfolio.ts",
-    1,
-    "app_store_portfolio.receipt_missing",
-    ["--require-receipt"],
-  );
+  runFixture("missing portfolio receipt fails the workflow gate", missingPortfolio, "check-app-store-portfolio.ts", 1, "app_store_portfolio.receipt_missing", [
+    "--require-receipt",
+  ]);
 
   const nowMs = Date.now();
   const recentObservedAt = new Date(nowMs - 60 * 60 * 1000).toISOString();
@@ -1359,14 +1354,7 @@ function registerAppReviewContract(h: Harness): void {
     apps: [],
     observedAt: recentObservedAt,
   });
-  runFixture(
-    "prose-only empty portfolio fails",
-    inventedEmpty,
-    "check-app-store-portfolio.ts",
-    1,
-    "app_store_portfolio.empty_unproven",
-    ["--require-receipt"],
-  );
+  runFixture("prose-only empty portfolio fails", inventedEmpty, "check-app-store-portfolio.ts", 1, "app_store_portfolio.empty_unproven", ["--require-receipt"]);
 
   const webPortfolio = makeFixture("app-store-portfolio-web");
   writePortfolioReceipt(webPortfolio, {

@@ -15464,7 +15464,7 @@
     "checks/validation/business/product/check-app-archetype.ts": "f110eac5c9b1a86cc6014ad530f2a0670c70d4cc246d4a0c62d2ed32662bb250",
     "checks/validation/business/words/check-app-copy.ts": "0e000f7e94112bb2f672ab3a301661adf2b0b1778e98fac12b9edf050fb70131",
     "checks/validation/business/store/check-app-review-contract.ts": "0df66c89a8eb5b24f6d6c2c2c09b7693fc8d21de7e1ecf44c535dace6f7139eb",
-    "checks/validation/business/store/check-app-store-portfolio.ts": "195e118e32d79667c5afe55d4355ab89cdbdadf188c7d236e840efac87593303",
+    "checks/validation/business/store/check-app-store-portfolio.ts": "bca69a90e45e9f3ef4bacb81cf82e972fb6f3502be35b52e6cfeb6afeda8aa0b",
     "checks/validation/business/store/check-apple-app-store-requirements.ts": "160d340517367795b4071acc7ca6870dc3a3cd03447449c03a805852478c4307",
     "checks/validation/business/engineering/check-archetype-starter.ts": "d75c7e552dc6aa96781e1d419890c966613e4702a545435dad08ec69245c6bc8",
     "checks/validation/repository/check-architecture.ts": "eefcfa9ddf6ffb82ebbaa9200775b2e2400e3dc837283167165d53103acd0e77",
@@ -15494,7 +15494,7 @@
     "checks/validation/repository/check-engine-e2e.ts": "aae06c7d2ff56e2ec3ddb77ac93baa672388623d894a56e2acd06d2c9f876357",
     "checks/validation/business/research/check-evidence-schema-drift.ts": "1ee6973050bcf6108be3f75ff2ca501a839d7c7f790122fa42033b5ba7139a2d",
     "checks/validation/business/words/check-founder-copy.ts": "e1fe357003369611ac57571b1290cbee349a20499c08c838c792509a432f87bb",
-    "checks/validation/business/operations/check-founder-operator-bootstrap.ts": "272139365570222c6d2625cbbdc6f24fd7c4eaab7918e4b57c3e0d8f469da56d",
+    "checks/validation/business/operations/check-founder-operator-bootstrap.ts": "f971a2ab37b72b7c295e662e07bd93926ac1b59b7af6787fbcaf4cc7c4bc581b",
     "checks/validation/repository/check-gates-layout.ts": "15b01996597655712ce63fd31bcac34c74cdfa8065b719944507e0439579ff62",
     "checks/validation/business/process/check-generated-pages.ts": "ce061e8c22491f04d3d3eff55392c7300c03af2a72a574d65b4fed53db892f53",
     "checks/validation/repository/check-graph-foundations.ts": "7fcf85053ab148d60b723a38fb14fe93f0680818236fa02c0e354022004ea7a9",
@@ -15517,7 +15517,7 @@
     "checks/validation/business/orchestration/check-parallel-orchestration.ts": "4e363997f7b6cd9d2d367c09bd5c7f9ee0fb9d860df02a1c139370d8a670f5a1",
     "checks/validation/repository/check-pack-composition.ts": "e703d35b21137dd9e6a6e643ef63ee15a6d2731d3e47258f0de2161e9a09a156",
     "checks/validation/repository/check-package-parity.ts": "36f6b07c231dfe04452d9cb091453635c620a2590b32d10e4047182f172b39c2",
-    "checks/validation/business/operations/check-paid-tool-intake.ts": "f5c9325c2932374a8650b680893269e44722e80441a7c439d31fa5516c50bb9a",
+    "checks/validation/business/operations/check-paid-tool-intake.ts": "3f246b91a30ddcebd156bb00f1469b6c1166fc05a199214e49a6ee65c1b3fe34",
     "checks/validation/business/growth/check-paid-user-acquisition.ts": "9ba895a9d029cfd5a259701e1f8a114f6a24f7d55c3478e292aa65d1edce4e88",
     "checks/validation/business/operations/check-portfolio-registry.ts": "00be2669e925ee74d2563be2edaa6d08b725128809e9b90a4b0ddc7ac2934a56",
     "checks/validation/business/operations/check-post-launch-ops.ts": "8b6a23d025ede84b1fb9cd6e7b3e7f1dc278c9f384e50eb5496fae80312dcd1d",
@@ -15762,5 +15762,5 @@
     "catalog/upstreams/notices/parth-app-store-screenshots.txt": "a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a"
   },
   "dependencies": [],
-  "digest": "sha256:2f6597f914d6d46dbe00e35b1b8e2daca46c4c173f9005046d0b96e49e5092e8"
+  "digest": "sha256:f9457640aeebd4d2285442595bc565912df54057eb1507b2d3e49c860a3f6a79"
 }

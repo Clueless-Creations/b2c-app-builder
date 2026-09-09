@@ -42,12 +42,7 @@ function run(): void {
   if (text.includes(unusedMarker)) {
     if (requireIntake) {
       issues.push(
-        issue(
-          "error",
-          "paid_tool_intake.not_recorded",
-          "Paid-tool routing cannot succeed while workflow intake is still the unused seed.",
-          decisionsRel,
-        ),
+        issue("error", "paid_tool_intake.not_recorded", "Paid-tool routing cannot succeed while workflow intake is still the unused seed.", decisionsRel),
       );
     }
     reportAndExit("Paid-tool intake check", issues);
@@ -66,12 +61,7 @@ function run(): void {
     );
   } else if (!/^\s*Selected route:/im.test(intakeSection) && !/^\s*no optional tools\b/im.test(intakeSection)) {
     issues.push(
-      issue(
-        "error",
-        "paid_tool_intake.decision_missing",
-        "Workflow intake must record a selected route or an explicit no optional tools row.",
-        decisionsRel,
-      ),
+      issue("error", "paid_tool_intake.decision_missing", "Workflow intake must record a selected route or an explicit no optional tools row.", decisionsRel),
     );
   }
 

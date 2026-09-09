@@ -40,19 +40,20 @@ export function register(h: Harness): void {
   const leftoverLedger = readLedger(leftoverSchema);
   leftoverLedger.schemaVersion = "2.0.0";
   writeLedger(leftoverSchema, leftoverLedger);
-  runFixture("schema 2.0.0 fails closed after the 2.1.0 bump", leftoverSchema, "check-founder-operator-bootstrap.ts", 1, "founder_operator.gate_contract_unsupported");
+  runFixture(
+    "schema 2.0.0 fails closed after the 2.1.0 bump",
+    leftoverSchema,
+    "check-founder-operator-bootstrap.ts",
+    1,
+    "founder_operator.gate_contract_unsupported",
+  );
 
   const unusedIntake = makeFixture("paid-tool-intake-unused");
   runFixture("unused tool-intake seed is a no-op for the audit gate", unusedIntake, "check-paid-tool-intake.ts", 0);
   const unusedIntakeRequired = makeFixture("paid-tool-intake-unused-required");
-  runFixture(
-    "unused tool-intake seed fails the workflow gate",
-    unusedIntakeRequired,
-    "check-paid-tool-intake.ts",
-    1,
-    "paid_tool_intake.not_recorded",
-    ["--require-intake"],
-  );
+  runFixture("unused tool-intake seed fails the workflow gate", unusedIntakeRequired, "check-paid-tool-intake.ts", 1, "paid_tool_intake.not_recorded", [
+    "--require-intake",
+  ]);
 
   const recordedIntake = makeFixture("paid-tool-intake-recorded");
   writeFileSync(
@@ -80,14 +81,9 @@ export function register(h: Harness): void {
     ),
     "utf8",
   );
-  runFixture(
-    "defer-optional intake with labeled research fallback passes the required gate",
-    deferOptionalIntake,
-    "check-paid-tool-intake.ts",
-    0,
-    undefined,
-    ["--require-intake"],
-  );
+  runFixture("defer-optional intake with labeled research fallback passes the required gate", deferOptionalIntake, "check-paid-tool-intake.ts", 0, undefined, [
+    "--require-intake",
+  ]);
 
   const pickNextNoNames = makeFixture("paid-tool-intake-pick-next-unnamed");
   writeFileSync(

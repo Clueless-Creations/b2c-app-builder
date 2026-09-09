@@ -574,9 +574,7 @@ function validateForbiddenProjects(value: Record<string, unknown>): void {
   }
   for (const [index, entry] of entries.entries()) {
     if (!isRecord(entry)) {
-      issues.push(
-        issue("error", "founder_operator.forbidden_project_invalid", `forbiddenProviderProjects[${index}] must be an object.`, ledgerRelative),
-      );
+      issues.push(issue("error", "founder_operator.forbidden_project_invalid", `forbiddenProviderProjects[${index}] must be an object.`, ledgerRelative));
       continue;
     }
     const evidenceCommand = asString(entry.evidenceCommand) ?? "";

@@ -657,14 +657,31 @@ test("authorization-code replay fails and native rate limits reject excess reque
     }),
   );
   try {
+    await limited.ready;
     await seedWorker(limited);
-    const first = await limited.dispatchFetch(`${origin}/api/v1/catalog`, { headers: authorization });
+    // Native RateLimit.limit is permissive and eventually consistent: each isolate
+    // checks a local cache and publishes the increment asynchronously
+    // (https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/).
+    // Drain each body before the next fetch so the first catalog response cannot
+    // overlap the next limit() call on another isolate.
+    const headers = { ...authorization, "CF-Connecting-IP": "198.51.100.64" };
+    const first = await limited.dispatchFetch(`${origin}/api/v1/catalog`, { headers });
     assert.equal(first.status, 200);
-    const second = await limited.dispatchFetch(`${origin}/api/v1/catalog`, { headers: { ...authorization, Origin: origin } });
-    assert.equal(second.status, 429);
-    assert.equal(second.headers.get("retry-after"), "60");
-    assert.equal(second.headers.get("access-control-allow-origin"), origin);
-    assert.ok(second.headers.get("access-control-expose-headers")?.includes("Retry-After"));
+    await first.arrayBuffer();
+    let blocked: Awaited<ReturnType<Miniflare["dispatchFetch"]>> | undefined;
+    for (let attempt = 0; attempt < 4; attempt += 1) {
+      const response = await limited.dispatchFetch(`${origin}/api/v1/catalog`, { headers: { ...headers, Origin: origin } });
+      if (response.status === 429) {
+        blocked = response;
+        break;
+      }
+      assert.equal(response.status, 200);
+      await response.arrayBuffer();
+    }
+    assert.equal(blocked?.status, 429);
+    assert.equal(blocked?.headers.get("retry-after"), "60");
+    assert.equal(blocked?.headers.get("access-control-allow-origin"), origin);
+    assert.ok(blocked?.headers.get("access-control-expose-headers")?.includes("Retry-After"));
   } finally {
     await limited.dispose();
   }

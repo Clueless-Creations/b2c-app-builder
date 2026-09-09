@@ -232,7 +232,10 @@ The contributor MCP registers only with `B2C_APP_BUILDER_MCP_CONTRIBUTOR=1`. It
 is read-only and reads local paths inside `B2C_APP_BUILDER_CONTRIBUTION_ROOTS`
 only. Business workers never receive contribution tools or results. See
 [ADR-0005](decisions/0005-source-adoption-and-upstream-maintenance.md) and the
-[adoption guide](guides/adopt-external-sources.md).
+[adoption guide](guides/adopt-external-sources.md). Provider adapters that wrap
+a remote-service or executable relationship follow
+[provider integrations](guides/provider-integrations.md) rather than adding a
+second execution journal.
 
 ## Knowledge graph and agent graph
 

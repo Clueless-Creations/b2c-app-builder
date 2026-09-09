@@ -67,7 +67,7 @@ least transformation that serves the goal.
 | reference   | Cite the source. Copy nothing.                                      |
 | adapt       | Reauthor selected material in the builder's vocabulary.             |
 | reuse       | Use the upstream as a dependency without change.                    |
-| wrap        | Call the upstream through an adapter that owns the effect boundary. |
+| wrap        | Call the upstream through an adapter that owns the effect boundary. Canonical operations then follow [provider integrations](provider-integrations.md). |
 | vendor      | Copy bytes with the retained notice.                                |
 | defer       | Record the unit and the reason. Decide later.                       |
 | reject      | Record the unit and the reason. Do not adopt.                       |
@@ -180,7 +180,11 @@ hosted endpoint reached through an adapter). One project may hold several. The
 kind decides whether code executes, which notice travels, what an upgrade can
 break, which check applies, and whether a business worker ever sees the project.
 A wrapper is an adapter over one of these kinds, not a kind of its own. An
-informational citation is a source-registry row, not a relationship.
+informational citation is a source-registry row, not a relationship. When the
+wrapper implements a canonical consumer-business operation, continue through
+[provider integrations](provider-integrations.md) after intake and rights
+review. That guide owns NEW_PROVIDER / UPGRADE_PROVIDER. This page owns source
+rights and the upstream manifest.
 
 Ownership follows the lifecycle. The contributor proposes the manifest when an
 accepted unit reuses repository material; `check` reports `upstream_required`

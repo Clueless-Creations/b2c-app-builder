@@ -28,6 +28,7 @@ roadmap's decision text in place.
 | [0010](0010-first-run-honesty-owners.md)                      | First-run honesty owners for doctor, portfolio, and exclusions     | accepted | ARCH-07, 09; ADR-0005, 0007; U1, U4             |
 | [0011](0011-additive-public-business-plan-projection.md)      | Additive public business-plan projection                         | accepted | ARCH-09; U25; public `business.plan`           |
 | [0012](0012-context-first-agent-routing.md)                   | Context-first agent routing and thin host adapters                 | accepted | ARCH-02, 07, 09, 11                             |
+| [0013](0013-provider-integration-boundary.md)                 | Provider integrations implement canonical operations               | accepted | ARCH-03, 04, 06, 10, 11; #109                   |
 
 ## Write a record
 

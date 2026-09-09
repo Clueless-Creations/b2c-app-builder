@@ -1,6 +1,6 @@
 # Consumer-business primitives: north-star architecture
 
-Revision: 6 · Established: 2026-09-04 · Role: normative target architecture
+Revision: 7 · Established: 2026-09-04 · Role: normative target architecture
 
 This is the architecture against which new work and refactoring are reviewed. It
 defines the intended system; it does **not** claim that every boundary exists in
@@ -127,7 +127,11 @@ with a strong opinion and a short setup path.
 Do not make every option mandatory during onboarding. Start from the default;
 expose substitutions where the builder needs them. Domain judgment belongs in
 capability knowledge and recipes. Provider procedures belong with their selected
-implementation. Safety and authority invariants remain host-owned.
+implementation. New and upgraded provider transports follow
+[provider integrations](guides/provider-integrations.md) and
+[ADR-0013](decisions/0013-provider-integration-boundary.md) rather than
+mirroring upstream commands in workflows. Safety and authority invariants remain
+host-owned.
 
 ### ARCH-04: Bind operations, preserve semantic differences
 
@@ -142,8 +146,13 @@ all operations. Each entitlement responsibility and experiment assignment has
 one authoritative owner; explicit delegation describes the relationship.
 
 Common contracts preserve business semantics, not just matching method names.
-Expose provider-specific optional features with declared requirements instead of
-reducing all providers to the weakest common feature set.
+Matching names do not prove substitutability: a RevenueCat experiment is not a
+PostHog experiment, and paywall display is not entitlement truth. Provider-qualified
+remote IDs, opaque pagination or job references, and sanitized source observations
+may cross the adapter boundary as typed evidence. Business policy must not inspect
+vendor-specific payload layouts. Expose provider-specific optional features with
+declared requirements instead of reducing all providers to the weakest common
+feature set.
 
 ### ARCH-05: One public extension path
 
@@ -196,6 +205,9 @@ composition pin, and the executable or service observed at execution. Each fact
 keeps its own field: `baselines` and `support` in `catalog/upstreams/<id>.yaml`,
 the recorded observation, and the workspace pin. A newer upstream release changes
 none of the others until a maintainer reviews it. ADR-0007 records this rule.
+Provider upgrades keep those facts distinct through the
+[provider integration lifecycle](guides/provider-integrations.md); they do not
+repin a business or invalidate pinned historical evidence by observation alone.
 
 ### ARCH-07: One owner for each kind of truth
 
@@ -290,9 +302,13 @@ the existing access mechanism. Never persist those values in packages or receipt
 ### ARCH-10: Authority and resource claims are executable contracts
 
 Tools, provider support, recipe selection, and manifest declarations never grant
-authority. Enforce the existing mandate and approval rules at the effect boundary.
-Retries and recipes cannot bypass them. Read-only observations remain distinct
-from writes, spending, access changes, and release actions.
+authority. Tool discovery and official SDKs also do not. Enforce the existing
+mandate and approval rules at the effect boundary. Retries and recipes cannot
+bypass them. Read-only observations remain distinct from writes, spending, access
+changes, and release actions. Provider adapters return observations and remote
+identities to the existing execution owner. They do not create a second scheduler
+or operation journal. After a confirmed write, a failed readback resumes
+observation; it does not authorize blind replay.
 
 Separate acceptance-artifact ownership from read/create/update resource claims.
 A workflow can read an accepted artifact and update a declared source tree or
@@ -329,6 +345,8 @@ Report at least these independent dimensions: declared support, implementation
 maturity, workspace configuration, available execution route, granted authority,
 and observed proof. No requirements or missing observations mean unknown, not
 ready. A fixture can prove package conformance; it cannot prove a live business.
+Fixture conformance, live provider execution, native app behavior, store behavior,
+and production behavior remain different evidence classes.
 
 Each observation identifies the claim and operation, capability contract,
 implementation/package digest, binding, account/project/app/environment, relevant

@@ -31,6 +31,7 @@ relationships:
       - adapters/providers/revenuecat/cli-discovery.ts
       - adapters/providers/revenuecat/cli-process.ts
       - adapters/providers/revenuecat/cli-operations.ts
+      - adapters/providers/revenuecat/cli-command-schema.ts
       - adapters/providers/revenuecat/cli-preflight.ts
       - adapters/providers/revenuecat/cli-execute.ts
       - adapters/providers/revenuecat/cli-proof.ts
@@ -43,13 +44,18 @@ relationships:
       - docs/command-surface.md
       - AGENTS.md
       - LICENSE
+      - internal/cli/offerings.go
+      - internal/cli/products.go
+      - internal/cli/entitlements.go
+      - internal/cli/packages.go
+      - internal/cli/paywalls.go
     pin_authority: PATH lookup of a trusted absolute rc or revenuecat binary at execution time; recorded as a host observation, never as a lock or npm @latest pin.
 baselines:
   reviewed_source:
     revision: 448a9998bd2107c274b9eb1cf55ad5d5d81f6377
     observed_at: "2026-09-08"
     by: b2c-maintainers
-    note: GitHub release v0.1.1 (published 2026-08-27). npm @revenuecat/cli 0.1.1 ships the same native binaries. This is the executable candidate. It is not a host-install proof.
+    note: GitHub release v0.1.1 (published 2026-08-27). npm @revenuecat/cli 0.1.1 ships the same native binaries. This is the executable candidate. It is not a host-install proof. Create/attach argv is qualified against this commit's cobra schemas, not branch-head README.
   reviewed_guidance:
     revision: 1a3d2820b3166dd6d4cc4775902e43eeeab5f004
     observed_at: "2026-09-06"
@@ -143,7 +149,7 @@ host_probe:
 review:
   owner: b2c-maintainers
   cadence_days: 7
-  last_review: "2026-09-08"
+  last_review: "2026-09-09"
   status: current
 credits:
   acknowledge: true

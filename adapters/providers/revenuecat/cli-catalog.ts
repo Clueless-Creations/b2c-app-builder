@@ -72,6 +72,10 @@ export interface CatalogSessionRequest {
   readonly storePlanApproval?: StorePlanIdentity;
   readonly currentStorePlan?: StorePlanIdentity;
   readonly synthetic?: boolean;
+  readonly offeringCreate?: {
+    readonly lookupKey: string;
+    readonly displayName: string;
+  };
 }
 
 export interface RevenueCatCliCatalogEvidence {
@@ -223,6 +227,11 @@ function runStep(
     subscriptionId: request.subscriptionId,
     chartName: request.chartName,
     auditLimit: request.auditLimit,
+    lookupKey: request.offeringCreate?.lookupKey,
+    displayName: request.offeringCreate?.displayName,
+    storeIdentifier: extra.storeIdentifier,
+    productType: extra.productType,
+    duration: extra.duration,
     hostAuthorityGranted: request.hostAuthorityGranted,
     executable: request.executable,
     cwd: request.cwd,
@@ -377,7 +386,10 @@ function reconcileCatalog(request: CatalogSessionRequest): CatalogSessionResult 
       blocksUnrelatedWork: false,
     }, invoked);
   }
-  const create = runStep(request, "rc.catalog.create", { offeringId: request.expected.offeringId });
+  const create = runStep(request, "rc.catalog.create", {
+    lookupKey: request.offeringCreate?.lookupKey,
+    displayName: request.offeringCreate?.displayName,
+  });
   invoked.push(create);
   if (!create.invoked) return refused(request, create.preflight, invoked);
   if (create.uncertainMutation) {

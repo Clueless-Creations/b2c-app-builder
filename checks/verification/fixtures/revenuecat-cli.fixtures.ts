@@ -12,6 +12,7 @@ import { discoverRevenueCatCli } from "../../../adapters/providers/revenuecat/cl
 import {
   CLI_PROOF_COLLECTOR,
   REST_PROBE_COLLECTOR,
+  REVENUECAT_CLI_OPERATIONS,
   REVENUECAT_CLI_RELEASE,
   buildRevenueCatCliArgv,
   commandLooksLikePlan,
@@ -33,6 +34,20 @@ import {
   runRevenueCatCatalogSession,
   type CatalogSessionRequest,
 } from "../../../adapters/providers/revenuecat/cli-catalog.js";
+import {
+  argvContainsBareToken,
+  INCREMENT_B_MALFORMED_OFFERINGS_CREATE_ARGV,
+  PINNED_CREATE_ATTACH_SCHEMAS,
+  PINNED_ENTITLEMENTS_ATTACH_ARGV,
+  PINNED_ENTITLEMENTS_CREATE_ARGV,
+  PINNED_OFFERINGS_CREATE_ARGV,
+  PINNED_PACKAGES_ATTACH_ARGV,
+  PINNED_PACKAGES_CREATE_ARGV,
+  PINNED_PAYWALLS_ATTACH_ARGV,
+  PINNED_PRODUCTS_CREATE_ARGV,
+  qualifyRevenueCatNativeArgv,
+  REVENUECAT_CLI_COMMAND_SCHEMA_PIN,
+} from "../../../adapters/providers/revenuecat/cli-command-schema.js";
 import { CLI_CATALOG_KIND, classifyRevenueCatCliCatalogEvidence, classifyRevenueCatProofDocument } from "../../../adapters/providers/revenuecat/cli-proof.js";
 import { issuesFromRevenueCatCliCatalogArtifact } from "../../../adapters/providers/revenuecat/revenue-validation.js";
 import { REVENUECAT_PROVISIONING } from "../../../adapters/providers/revenuecat/provisioning.js";
@@ -130,6 +145,7 @@ function catalogSession(
     },
     hostAuthorityGranted: false,
     synthetic: true,
+    offeringCreate: { lookupKey: "default", displayName: "Default" },
     ...overrides,
   };
 }
@@ -399,7 +415,8 @@ export function register(harness: Harness): void {
     const result = runRevenueCatCli({
       operationId: "rc.catalog.create",
       projectId: "proj_approved",
-      offeringId: "off_default",
+      lookupKey: "default",
+      displayName: "Default",
       hostAuthorityGranted: true,
       executable: "/opt/fake/bin/rc",
       cwd: isolatedConfigHome(harness.makeTempDir("rc-timeout-cwd"), "ws-a"),
@@ -755,9 +772,11 @@ export function register(harness: Harness): void {
     assert(result.evidence.catalog.missing_ids.includes("ent_premium"), `missing ${result.evidence.catalog.missing_ids.join(",")}`);
     assert(result.evidence.catalog.missing_ids.includes("pkg_monthly"), `missing ${result.evidence.catalog.missing_ids.join(",")}`);
     assert(
-      calls.some((call) => call.argv.includes("offerings") && call.argv.includes("create")),
-      "offering create should spawn when authorized",
+      calls.some((call) => call.argv.includes("offerings") && call.argv.includes("create") && call.argv.includes("--lookup-key") && call.argv.includes("default")),
+      "offering create should spawn with pinned --lookup-key",
     );
+    const createArgv = calls.find((call) => call.argv.includes("offerings") && call.argv.includes("create"))!.argv;
+    assert(!argvContainsBareToken(createArgv, "off_default"), `server id must not be a create positional: ${JSON.stringify(createArgv)}`);
   });
 
   harness.check("revenuecat-cli: missing catalog without authority does not create", () => {
@@ -1007,5 +1026,217 @@ export function register(harness: Harness): void {
     const issues = issuesFromRevenueCatCliCatalogArtifact(JSON.stringify({ ...okDoc, probe: REST_PROBE_COLLECTOR }), "revenue/revenuecat-cli-catalog.json");
     assert(issues.some((row) => row.code === "revenue.cli_catalog.collector_mismatch"), JSON.stringify(issues));
     assert(extractResourceIds({ items: [{ id: "off_default" }], next_page: "https://example/next" }).pagination === "partial", "partial list is not empty");
+  });
+
+  harness.check("revenuecat-cli: independent pin matches the adapter release", () => {
+    assert(REVENUECAT_CLI_COMMAND_SCHEMA_PIN.commit === REVENUECAT_CLI_RELEASE.commit, "schema pin drifted from adapter release");
+    assert(REVENUECAT_CLI_COMMAND_SCHEMA_PIN.tag === REVENUECAT_CLI_RELEASE.tag, "schema tag drifted from adapter release");
+    const implemented = new Set(
+      [...PINNED_CREATE_ATTACH_SCHEMAS].map((schema) => schema.builderOperationId),
+    );
+    for (const operation of REVENUECAT_CLI_OPERATIONS) {
+      if (operation.support !== "implemented-fixture" || operation.effectClass !== "catalog-mutation") continue;
+      assert(implemented.has(operation.id), `${operation.id} is implemented but has no independently pinned create/attach schema`);
+      const schema = PINNED_CREATE_ATTACH_SCHEMAS.find((row) => row.builderOperationId === operation.id);
+      assert(schema !== undefined && schema.command.every((part, index) => operation.command[index] === part), `${operation.id} command drifted from the pin`);
+    }
+    assert(getRevenueCatCliOperation("rc.offerings.set-current")?.support !== "implemented-fixture", "updates/set-current stay unavailable");
+  });
+
+  harness.check("revenuecat-cli: increment-B malformed offerings create fails without the encoder", () => {
+    const qualified = qualifyRevenueCatNativeArgv(INCREMENT_B_MALFORMED_OFFERINGS_CREATE_ARGV);
+    assert(qualified.ok === false, "positional offering id must not satisfy pinned offerings create");
+    assert(
+      qualified.ok === false && (qualified.code === "unexpected-positional" || qualified.code === "missing-flag"),
+      JSON.stringify(qualified),
+    );
+  });
+
+  harness.check("revenuecat-cli: offerings create emits lookup-key and display-name, not a server id", () => {
+    const argv = buildRevenueCatCliArgv({
+      operationId: "rc.catalog.create",
+      projectId: "proj_approved",
+      offeringId: "ofrng_default",
+      lookupKey: "default",
+      displayName: "Default",
+      hostAuthorityGranted: true,
+    });
+    assert(JSON.stringify(argv) === JSON.stringify([...PINNED_OFFERINGS_CREATE_ARGV]), JSON.stringify(argv));
+    const qualified = qualifyRevenueCatNativeArgv(argv);
+    assert(qualified.ok === true, JSON.stringify(qualified));
+    assert(!argvContainsBareToken(argv, "ofrng_default"), "server id must not become a create positional");
+    let missing = "";
+    try {
+      buildRevenueCatCliArgv({
+        operationId: "rc.catalog.create",
+        projectId: "proj_approved",
+        offeringId: "off_default",
+        hostAuthorityGranted: true,
+      });
+    } catch (error) {
+      missing = error instanceof Error ? error.message : String(error);
+    }
+    assert(missing.includes("lookup-key"), missing);
+  });
+
+  harness.check("revenuecat-cli: products and entitlements create match pinned flags", () => {
+    const products = buildRevenueCatCliArgv({
+      operationId: "rc.products.create",
+      projectId: "proj_approved",
+      appId: "app_test",
+      storeIdentifier: "premium_monthly",
+      productType: "subscription",
+      createTitle: "Premium Monthly",
+      duration: "P1M",
+      hostAuthorityGranted: true,
+    });
+    assert(JSON.stringify(products) === JSON.stringify([...PINNED_PRODUCTS_CREATE_ARGV]), JSON.stringify(products));
+    assert(qualifyRevenueCatNativeArgv(products).ok === true, JSON.stringify(qualifyRevenueCatNativeArgv(products)));
+    const entitlements = buildRevenueCatCliArgv({
+      operationId: "rc.entitlements.create",
+      projectId: "proj_approved",
+      lookupKey: "pro",
+      displayName: "Pro",
+      hostAuthorityGranted: true,
+    });
+    assert(JSON.stringify(entitlements) === JSON.stringify([...PINNED_ENTITLEMENTS_CREATE_ARGV]), JSON.stringify(entitlements));
+    assert(qualifyRevenueCatNativeArgv(entitlements).ok === true, JSON.stringify(qualifyRevenueCatNativeArgv(entitlements)));
+    let missingStore = "";
+    try {
+      buildRevenueCatCliArgv({
+        operationId: "rc.products.create",
+        projectId: "proj_approved",
+        appId: "app_test",
+        productId: "prod_monthly",
+        createTitle: "Monthly",
+        hostAuthorityGranted: true,
+      });
+    } catch (error) {
+      missingStore = error instanceof Error ? error.message : String(error);
+    }
+    assert(missingStore.includes("store-id"), missingStore);
+    let missingLookup = "";
+    try {
+      buildRevenueCatCliArgv({
+        operationId: "rc.entitlements.create",
+        projectId: "proj_approved",
+        entitlementId: "entl_pro",
+        hostAuthorityGranted: true,
+      });
+    } catch (error) {
+      missingLookup = error instanceof Error ? error.message : String(error);
+    }
+    assert(missingLookup.includes("lookup-key"), missingLookup);
+  });
+
+  harness.check("revenuecat-cli: packages create and attach commands match pinned argv", () => {
+    const created = buildRevenueCatCliArgv({
+      operationId: "rc.packages.create",
+      projectId: "proj_approved",
+      offeringId: "ofrng_default",
+      lookupKey: "$rc_monthly",
+      displayName: "Monthly",
+      hostAuthorityGranted: true,
+    });
+    assert(JSON.stringify(created) === JSON.stringify([...PINNED_PACKAGES_CREATE_ARGV]), JSON.stringify(created));
+    assert(qualifyRevenueCatNativeArgv(created).ok === true, JSON.stringify(qualifyRevenueCatNativeArgv(created)));
+    const attached = buildRevenueCatCliArgv({
+      operationId: "rc.packages.attach",
+      projectId: "proj_approved",
+      packageId: "pkg_x",
+      attachProductIds: ["prod_monthly"],
+      hostAuthorityGranted: true,
+    });
+    assert(JSON.stringify(attached) === JSON.stringify([...PINNED_PACKAGES_ATTACH_ARGV]), JSON.stringify(attached));
+    let missingPackageLookup = "";
+    try {
+      buildRevenueCatCliArgv({
+        operationId: "rc.packages.create",
+        projectId: "proj_approved",
+        offeringId: "ofrng_default",
+        hostAuthorityGranted: true,
+      });
+    } catch (error) {
+      missingPackageLookup = error instanceof Error ? error.message : String(error);
+    }
+    assert(missingPackageLookup.includes("lookup-key"), missingPackageLookup);
+  });
+
+  harness.check("revenuecat-cli: entitlement and paywall attach match pinned argv", () => {
+    const entitlement = buildRevenueCatCliArgv({
+      operationId: "rc.entitlements.attach",
+      projectId: "proj_approved",
+      entitlementId: "entl_pro",
+      attachProductIds: ["prod_monthly"],
+      hostAuthorityGranted: true,
+    });
+    assert(JSON.stringify(entitlement) === JSON.stringify([...PINNED_ENTITLEMENTS_ATTACH_ARGV]), JSON.stringify(entitlement));
+    assert(qualifyRevenueCatNativeArgv(entitlement).ok === true, JSON.stringify(qualifyRevenueCatNativeArgv(entitlement)));
+    const paywall = buildRevenueCatCliArgv({
+      operationId: "rc.paywalls.attach",
+      projectId: "proj_approved",
+      paywallId: "pw_abc",
+      offeringId: "ofrng_default",
+      hostAuthorityGranted: true,
+    });
+    assert(JSON.stringify(paywall) === JSON.stringify([...PINNED_PAYWALLS_ATTACH_ARGV]), JSON.stringify(paywall));
+    assert(qualifyRevenueCatNativeArgv(paywall).ok === true, JSON.stringify(qualifyRevenueCatNativeArgv(paywall)));
+    let missingAttach = "";
+    try {
+      buildRevenueCatCliArgv({
+        operationId: "rc.entitlements.attach",
+        projectId: "proj_approved",
+        entitlementId: "entl_pro",
+        hostAuthorityGranted: true,
+      });
+    } catch (error) {
+      missingAttach = error instanceof Error ? error.message : String(error);
+    }
+    assert(missingAttach.includes("product"), missingAttach);
+    let missingPaywall = "";
+    try {
+      buildRevenueCatCliArgv({
+        operationId: "rc.paywalls.attach",
+        projectId: "proj_approved",
+        paywallId: "pw_abc",
+        hostAuthorityGranted: true,
+      });
+    } catch (error) {
+      missingPaywall = error instanceof Error ? error.message : String(error);
+    }
+    assert(missingPaywall.includes("offering"), missingPaywall);
+  });
+
+  harness.check("revenuecat-cli: create encoding recovers after a malformed request", () => {
+    let first = "";
+    try {
+      buildRevenueCatCliArgv({
+        operationId: "rc.catalog.create",
+        projectId: "proj_approved",
+        offeringId: "off_default",
+        hostAuthorityGranted: true,
+      });
+    } catch (error) {
+      first = error instanceof Error ? error.message : String(error);
+    }
+    assert(first.includes("lookup-key"), first);
+    const recovered = buildRevenueCatCliArgv({
+      operationId: "rc.catalog.create",
+      projectId: "proj_approved",
+      lookupKey: "default",
+      displayName: "Default",
+      hostAuthorityGranted: true,
+    });
+    assert(JSON.stringify(recovered) === JSON.stringify([...PINNED_OFFERINGS_CREATE_ARGV]), JSON.stringify(recovered));
+    const show = buildRevenueCatCliArgv({
+      operationId: "rc.offerings.show",
+      projectId: "proj_approved",
+      offeringId: "ofrng_default",
+      lookupKey: "default",
+      hostAuthorityGranted: false,
+    });
+    assert(show.includes("ofrng_default"), JSON.stringify(show));
+    assert(!show.includes("default") || show[show.indexOf("ofrng_default")] === "ofrng_default", JSON.stringify(show));
+    assert(!argvContainsBareToken(show, "default"), `show must keep the server id, not the lookup key: ${JSON.stringify(show)}`);
   });
 }

@@ -3,8 +3,11 @@
  * (commit 448a9998bd2107c274b9eb1cf55ad5d5d81f6377). Branch-head README commands are not
  * treated as present in the installed binary. This module is the executable matrix: it
  * classifies effects and builds typed argv. It does not spawn processes and does not grant
- * authority.
+ * authority. Create encoding maps lookup-key/display-name/store-id flags from the pinned
+ * cobra schema; it does not invent server-assigned resource ids.
  */
+
+import { REVENUECAT_PRODUCT_TYPES, type RevenueCatProductType } from "./cli-command-schema.js";
 
 export const REVENUECAT_CLI_RELEASE = {
   tag: "v0.1.1",
@@ -281,7 +284,7 @@ export const REVENUECAT_CLI_OPERATIONS: readonly CliOperationSpec[] = [
     support: "implemented-fixture",
     requiresAuth: true,
     requiresProject: true,
-    requiresApp: false,
+    requiresApp: true,
     requiresHostAuthority: true,
     allowsYesFlag: false,
     experimental: false,
@@ -627,6 +630,11 @@ export interface CliArgvRequest {
   readonly entitlementId?: string;
   readonly chartName?: string;
   readonly auditLimit?: number;
+  readonly lookupKey?: string;
+  readonly displayName?: string;
+  readonly storeIdentifier?: string;
+  readonly productType?: string;
+  readonly duration?: string;
   readonly createTitle?: string;
   readonly attachProductIds?: readonly string[];
   readonly schemaCommand?: CliCommandPath;
@@ -637,6 +645,8 @@ export interface CliArgvRequest {
 
 const NONINTERACTIVE_FLAGS = ["--json", "--no-input", "--no-color"] as const;
 const RESOURCE_ID_PATTERN = /^[A-Za-z0-9._-]+$/u;
+const LOOKUP_KEY_PATTERN = /^[A-Za-z0-9._$-]{1,80}$/u;
+const DURATION_PATTERN = /^P\d+[YMWD]$/u;
 const SAFE_TITLE_PATTERN = /^[A-Za-z0-9._ -]{1,80}$/u;
 export const REVENUECAT_CHART_NAMES = [
   "actives",
@@ -673,6 +683,102 @@ function assertSafeId(value: string | undefined, label: string): void {
   if (!RESOURCE_ID_PATTERN.test(value)) throw new CliArgvRefusal("ambiguous-target", `${label} is not a validated RevenueCat identifier.`);
 }
 
+function assertSafeLookupKey(value: string | undefined): void {
+  if (value === undefined) return;
+  if (!LOOKUP_KEY_PATTERN.test(value) || value.startsWith("-")) {
+    throw new CliArgvRefusal("ambiguous-target", "lookup key is not a validated RevenueCat lookup key.");
+  }
+}
+
+function assertSafeTitle(value: string | undefined, label: string): void {
+  if (value === undefined) return;
+  if (!SAFE_TITLE_PATTERN.test(value) || value.startsWith("-")) {
+    throw new CliArgvRefusal("ambiguous-target", `${label} is not a validated catalog title.`);
+  }
+}
+
+function requireText(value: string | undefined, label: string): string {
+  const trimmed = value?.trim();
+  if (!trimmed) throw new CliArgvRefusal("missing-resource", `${label} is required under --no-input.`);
+  return trimmed;
+}
+
+function appendFlag(argv: string[], flag: string, value: string): void {
+  argv.push(flag, value);
+}
+
+function appendCreateAttachOperands(operation: CliOperationSpec, request: CliArgvRequest, argv: string[]): void {
+  switch (operation.id) {
+    case "rc.catalog.create": {
+      const lookupKey = requireText(request.lookupKey, "rc.catalog.create --lookup-key");
+      const displayName = requireText(request.displayName, "rc.catalog.create --display-name");
+      appendFlag(argv, "--lookup-key", lookupKey);
+      appendFlag(argv, "--display-name", displayName);
+      return;
+    }
+    case "rc.products.create": {
+      const storeIdentifier = requireText(request.storeIdentifier, "rc.products.create --store-id");
+      const productType = requireText(request.productType, "rc.products.create --type");
+      if (!(REVENUECAT_PRODUCT_TYPES as readonly string[]).includes(productType)) {
+        throw new CliArgvRefusal("ambiguous-target", `${productType} is not a pinned RevenueCat product type.`);
+      }
+      const typedType: RevenueCatProductType = productType as RevenueCatProductType;
+      const appId = requireText(request.appId, "rc.products.create --app-id");
+      appendFlag(argv, "--store-id", storeIdentifier);
+      appendFlag(argv, "--type", typedType);
+      appendFlag(argv, "--app-id", appId);
+      if (request.createTitle) appendFlag(argv, "--title", request.createTitle);
+      if (request.displayName) appendFlag(argv, "--display-name", request.displayName);
+      if (request.duration) {
+        if (!DURATION_PATTERN.test(request.duration)) {
+          throw new CliArgvRefusal("ambiguous-target", "duration is not a validated ISO 8601 period (for example P1M).");
+        }
+        appendFlag(argv, "--duration", request.duration);
+      }
+      return;
+    }
+    case "rc.entitlements.create": {
+      const lookupKey = requireText(request.lookupKey, "rc.entitlements.create --lookup-key");
+      const displayName = requireText(request.displayName, "rc.entitlements.create --display-name");
+      appendFlag(argv, "--lookup-key", lookupKey);
+      appendFlag(argv, "--display-name", displayName);
+      return;
+    }
+    case "rc.packages.create": {
+      const offeringId = requireText(request.offeringId, "rc.packages.create offering id");
+      const lookupKey = requireText(request.lookupKey, "rc.packages.create --lookup-key");
+      const displayName = requireText(request.displayName, "rc.packages.create --display-name");
+      argv.push(offeringId);
+      appendFlag(argv, "--lookup-key", lookupKey);
+      appendFlag(argv, "--display-name", displayName);
+      return;
+    }
+    case "rc.entitlements.attach": {
+      if (!request.entitlementId?.trim() || !request.attachProductIds?.length) {
+        throw new CliArgvRefusal("missing-resource", "rc.entitlements.attach requires an entitlement id and at least one product id.");
+      }
+      argv.push(request.entitlementId, ...request.attachProductIds);
+      return;
+    }
+    case "rc.packages.attach": {
+      if (!request.packageId?.trim() || !request.attachProductIds?.length) {
+        throw new CliArgvRefusal("missing-resource", "rc.packages.attach requires a package id and at least one product id.");
+      }
+      argv.push(request.packageId, ...request.attachProductIds);
+      return;
+    }
+    case "rc.paywalls.attach": {
+      if (!request.paywallId?.trim() || !request.offeringId?.trim()) {
+        throw new CliArgvRefusal("missing-resource", "rc.paywalls.attach requires a paywall id and an offering id.");
+      }
+      argv.push(request.paywallId, request.offeringId);
+      return;
+    }
+    default:
+      return;
+  }
+}
+
 export function buildRevenueCatCliArgv(request: CliArgvRequest): string[] {
   const operation = getRevenueCatCliOperation(request.operationId);
   if (!operation) throw new CliArgvRefusal("unknown-operation", `Unknown RevenueCat CLI operation ${request.operationId}.`);
@@ -690,12 +796,13 @@ export function buildRevenueCatCliArgv(request: CliArgvRequest): string[] {
   assertSafeId(request.packageId, "package id");
   assertSafeId(request.entitlementId, "entitlement id");
   assertSafeId(request.profile, "profile name");
+  assertSafeLookupKey(request.lookupKey);
+  assertSafeTitle(request.displayName, "display name");
+  assertSafeId(request.storeIdentifier, "store identifier");
   if (request.attachProductIds) {
     for (const productId of request.attachProductIds) assertSafeId(productId, "attach product id");
   }
-  if (request.createTitle !== undefined && (!SAFE_TITLE_PATTERN.test(request.createTitle) || request.createTitle.startsWith("-"))) {
-    throw new CliArgvRefusal("ambiguous-target", "create title is not a validated catalog title.");
-  }
+  assertSafeTitle(request.createTitle, "create title");
   if (request.chartName !== undefined && !REVENUECAT_CHART_NAMES.includes(request.chartName as RevenueCatChartName)) {
     throw new CliArgvRefusal("invalid-chart", `${request.chartName} is not a reviewed RevenueCat chart name.`);
   }
@@ -781,47 +888,7 @@ export function buildRevenueCatCliArgv(request: CliArgvRequest): string[] {
     if (request.productId) argv.push("--product", request.productId);
     if (request.appUserId) argv.push("--app-user-id", request.appUserId);
   }
-  if (operation.id === "rc.catalog.create") {
-    if (!request.offeringId?.trim()) {
-      throw new CliArgvRefusal("missing-resource", `${operation.id} requires a typed offering id before spawn. A bare offerings create is not authorized.`);
-    }
-    argv.push(request.offeringId);
-  }
-  if (operation.id === "rc.products.create") {
-    if (!request.productId?.trim()) {
-      throw new CliArgvRefusal("missing-resource", `${operation.id} requires a typed product id before spawn. A bare products create is not authorized.`);
-    }
-    argv.push(request.productId);
-    if (request.createTitle) argv.push("--title", request.createTitle);
-  }
-  if (operation.id === "rc.entitlements.create") {
-    if (!request.entitlementId?.trim()) {
-      throw new CliArgvRefusal("missing-resource", `${operation.id} requires a typed entitlement id before spawn. A bare entitlements create is not authorized.`);
-    }
-    argv.push(request.entitlementId);
-  }
-  if (operation.id === "rc.packages.create") {
-    if (!request.offeringId?.trim()) throw new CliArgvRefusal("missing-resource", "rc.packages.create requires an offering id.");
-    argv.push(request.offeringId);
-  }
-  if (operation.id === "rc.entitlements.attach") {
-    if (!request.entitlementId?.trim() || !request.attachProductIds?.length) {
-      throw new CliArgvRefusal("missing-resource", "rc.entitlements.attach requires an entitlement id and at least one product id.");
-    }
-    argv.push(request.entitlementId, ...request.attachProductIds);
-  }
-  if (operation.id === "rc.packages.attach") {
-    if (!request.packageId?.trim() || !request.attachProductIds?.length) {
-      throw new CliArgvRefusal("missing-resource", "rc.packages.attach requires a package id and at least one product id.");
-    }
-    argv.push(request.packageId, ...request.attachProductIds);
-  }
-  if (operation.id === "rc.paywalls.attach") {
-    if (!request.paywallId?.trim() || !request.offeringId?.trim()) {
-      throw new CliArgvRefusal("missing-resource", "rc.paywalls.attach requires a paywall id and an offering id.");
-    }
-    argv.push(request.paywallId, request.offeringId);
-  }
+  appendCreateAttachOperands(operation, request, argv);
   argv.push(...NONINTERACTIVE_FLAGS);
   if (operation.allowsYesFlag && request.hostAuthorityGranted) argv.push("--yes");
   return argv;

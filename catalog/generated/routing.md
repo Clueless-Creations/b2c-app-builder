@@ -104,7 +104,7 @@ Generated from catalog/knowledge/**/*.yaml.
 
 | Load when | Reference |
 | --- | --- |
-| before first-session screen order; when onboarding needs welcome, quiz, micro-commitment, personalized insight, hard paywall, and install-to-trial quality metrics | [`knowledge/experience/commitment-funnel.md`](../../knowledge/experience/commitment-funnel.md) |
+| before first-session screen order; when product.yaml records feature.commitment-funnel as required and onboarding needs welcome, quiz, micro-commitment, personalized insight, hard paywall, and install-to-trial quality metrics | [`knowledge/experience/commitment-funnel.md`](../../knowledge/experience/commitment-funnel.md) |
 | grounding the emotional/behavioral layer in its research tiers, or auditing whether the four foundational Experience Cards are implemented | [`knowledge/experience/consumer-product-design-agency.md`](../../knowledge/experience/consumer-product-design-agency.md) |
 | before PRODUCT.md, DESIGN.md, onboarding, ads, store screenshots, content assets, or engineering plans are treated as ready; on "11-star run"/"11-star pass" — follow the reference's 11-Star Run Protocol before any other output | [`knowledge/experience/eleven-star-experience.md`](../../knowledge/experience/eleven-star-experience.md) |
 | any product, onboarding, core-loop, paywall, or return-session work targeting 6-star ("better than expected") or higher; "charge this feature with emotion", "apply the <name> card", "emotional UX audit" — the methodology hub | [`knowledge/experience/emotional-design-system.md`](../../knowledge/experience/emotional-design-system.md) |
@@ -126,7 +126,7 @@ Generated from catalog/knowledge/**/*.yaml.
 | HIGH-risk: an unpredictable-positive-outcome mechanic (reveal, spin, box); pins a canonical motion-contract spring; escape hatch and counter-metric required — routed from experience-cards.md _(role-scoped: on hand via the Implemented emotional experience cards pack, not task-triggered)_ | [`knowledge/experience/experience-cards/variable-reward-card.md`](../../knowledge/experience/experience-cards/variable-reward-card.md) |
 | before onboarding quizzes, welcome/splash screens, personalization, attribution questions, demo videos, App Review popups, paywall timing, closing offers, trials, or first-session activation | [`knowledge/experience/onboarding-conversion.md`](../../knowledge/experience/onboarding-conversion.md) |
 | Before onboarding research acceptance, identity and analytics decisions, design lock, prototype acceptance or final onboarding verification. | [`knowledge/experience/onboarding-foundations.md`](../../knowledge/experience/onboarding-foundations.md) |
-| before paywall copy lock; when onboarding goals must interpolate an honest headline and a skipped-goal fallback | [`knowledge/experience/paywall-goal-headline.md`](../../knowledge/experience/paywall-goal-headline.md) |
+| before paywall copy lock; when product.yaml records feature.paywall-goal-headline as required and the declared present-paywall owner can bind RevenueCat offering metadata | [`knowledge/experience/paywall-goal-headline.md`](../../knowledge/experience/paywall-goal-headline.md) |
 | before push permission priming, opt-in timing, or notification lifecycle design; for transactional and lifecycle email mechanics load operations/resend-email-ops.md instead | [`knowledge/experience/push-notification-lifecycle.md`](../../knowledge/experience/push-notification-lifecycle.md) |
 
 ## Look And Feel

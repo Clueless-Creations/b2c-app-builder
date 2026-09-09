@@ -159,9 +159,9 @@ Ask questions only when the answer changes personalization, attribution, segment
 
 ### Commitment Funnel
 
-Load [`commitment-funnel.md`](commitment-funnel.md) before locking first-session screen order.
+Load [`commitment-funnel.md`](commitment-funnel.md) before locking first-session screen order when `product.yaml` records `feature.commitment-funnel` as required. When that feature is excluded or a non-goal, do not add a quiz or hard paywall to satisfy a gate. When the instance is absent, hold.
 
-The first two minutes run this sequence:
+The first two minutes run this sequence when the feature is required:
 
 1. welcome
 2. quiz or goals
@@ -172,10 +172,13 @@ The first two minutes run this sequence:
 Do not treat trial starts as done.
 Record onboarding complete, install-to-trial, trial-to-paid, drop-off, and refund rate.
 
-Load [`paywall-goal-headline.md`](paywall-goal-headline.md) after quiz or goals.
+Load [`paywall-goal-headline.md`](paywall-goal-headline.md) after quiz or goals when `feature.paywall-goal-headline` is required and the declared present-paywall owner can bind it.
 The selected goal writes `paywall_headline_key`.
 The paywall interpolates only that key.
 A skipped goal uses the fallback template.
+When the feature is excluded or a non-goal, omit that bind.
+When the instance is absent, hold.
+A producer sentence that the bind is not applicable cannot override a required feature.
 
 Ethics vetoes:
 

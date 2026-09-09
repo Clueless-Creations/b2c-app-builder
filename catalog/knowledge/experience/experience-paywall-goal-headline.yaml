@@ -3,8 +3,8 @@ id: reference.experience.paywall-goal-headline
 title: Paywall Goal Headline
 domain_id: domain.experience
 document_path: knowledge/experience/paywall-goal-headline.md
-load_when: before paywall copy lock; when onboarding goals must interpolate an honest headline and
-  a skipped-goal fallback
+load_when: before paywall copy lock; when product.yaml records feature.paywall-goal-headline as
+  required and the declared present-paywall owner can bind RevenueCat offering metadata
 lifecycle: active
 bindings:
   workflow_ids:
@@ -14,8 +14,11 @@ bindings:
   context_pack_ids:
     - context.experience
     - context.money
-applicability_notes: Default starter contract. Interpolate only the selected goal key. A skipped
-  goal uses the fallback template. Do not invent an outcome.
+applicability_notes: Required only when feature.paywall-goal-headline is required and the presenter
+  can bind it. Excluded or non-goal omits the bind. Absence holds. Superwall or another non-RevenueCat
+  presenter with the feature required is unavailable, not a fake RevenueCat pass. Packet prose cannot
+  override a required feature. Interpolate only the selected goal key. A skipped goal uses the
+  fallback template. Do not invent an outcome.
 sources:
   - id: www-revenuecat-com-docs-tools-offering-metadata
     name: www.revenuecat.com

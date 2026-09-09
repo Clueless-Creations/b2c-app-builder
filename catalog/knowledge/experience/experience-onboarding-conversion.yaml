@@ -34,6 +34,10 @@ bindings:
     - workflow.growth.viral-growth-loop
   context_pack_ids:
     - context.experience
+applicability_notes: Commitment Funnel and Paywall Goal Headline tables are required only when the
+  matching product.yaml feature is required. Excluded or non-goal omits those binds. Absence holds.
+  Packet prose cannot override a required feature. Do not silently select a funnel, billing provider,
+  or extra platform.
 sources:
   - id: developer-android-com-guide-playcore-in-app-review
     name: developer.android.com

@@ -3,8 +3,9 @@ id: reference.experience.commitment-funnel
 title: Commitment Funnel
 domain_id: domain.experience
 document_path: knowledge/experience/commitment-funnel.md
-load_when: before first-session screen order; when onboarding needs welcome, quiz, micro-commitment,
-  personalized insight, hard paywall, and install-to-trial quality metrics
+load_when: before first-session screen order; when product.yaml records feature.commitment-funnel as
+  required and onboarding needs welcome, quiz, micro-commitment, personalized insight, hard paywall,
+  and install-to-trial quality metrics
 lifecycle: active
 bindings:
   workflow_ids:
@@ -13,7 +14,9 @@ bindings:
     - workflow.experience.onboarding-system.onb-17-screen-control-paywall-contract
   context_pack_ids:
     - context.experience
-applicability_notes: Extend the ONB graph. Do not replace it. Quality metrics include refund rate,
-  not trial starts alone.
+applicability_notes: Required only when feature.commitment-funnel is required. Excluded or non-goal
+  does not add a quiz or hard paywall to satisfy a gate. Absence holds and is not a free or selected
+  default. Extend the ONB graph. Do not replace it. Quality metrics include refund rate, not trial
+  starts alone. Do not silently select RevenueCat.
 sources: []
 source_exemption: This package contains internal operating guidance or has no external factual claims.

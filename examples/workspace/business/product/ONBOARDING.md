@@ -148,7 +148,7 @@ Mark acquisition promise, first effort, first value, engagement, account, paywal
 
 ## Commitment Funnel
 
-First-session order is welcome, then quiz or goals, then micro-commitment, then personalized insight, then hard paywall. Feature depth does not replace this sequence. See `knowledge/experience/commitment-funnel.md`.
+First-session order is welcome, then quiz or goals, then micro-commitment, then personalized insight, then hard paywall when `product.yaml` records `feature.commitment-funnel` as required. This reference workspace records that feature as required. If the feature is excluded or a non-goal, omit this table rather than inventing a quiz or hard paywall. If the instance is absent, hold. See `knowledge/experience/commitment-funnel.md`.
 
 | Step                 | Required | Skip path          | Ethics veto                                 | Event  |
 | -------------------- | -------- | ------------------ | ------------------------------------------- | ------ |
@@ -196,7 +196,7 @@ Cover trial eligible and ineligible, packages, promotions, existing subscriber, 
 
 ## Paywall Goal Headline
 
-The quiz writes `paywall_headline_key`. Interpolate only that selected key into the paywall headline. A skip uses the fallback template. Keep templates in RevenueCat offering metadata and bind them at present time with `customVariables`. Do not invent a goal or outcome. See `knowledge/experience/paywall-goal-headline.md`.
+The quiz writes `paywall_headline_key` when `product.yaml` records `feature.paywall-goal-headline` as required and the declared present-paywall owner can bind it. This reference workspace records that feature as excluded. Interpolate only that selected key into the paywall headline. A skip uses the fallback template. Keep templates in RevenueCat offering metadata and bind them at present time with `customVariables`. Do not invent a goal or outcome. If the feature is excluded or a non-goal, omit this bind. If the instance is absent, or no parseable `b2c.yaml` declares the present-paywall owner, hold. Packet prose cannot make that decision. See `knowledge/experience/paywall-goal-headline.md`.
 
 | Goal key       | User-facing prompt | Headline template           | Fallback when skipped       |
 | -------------- | ------------------ | --------------------------- | --------------------------- |

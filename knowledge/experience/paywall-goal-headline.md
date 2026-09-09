@@ -1,8 +1,20 @@
 # Paywall Goal Headline
 
-Use this after the onboarding quiz collects a goal.
-Use the user's selected goal as the paywall headline.
+Use this after the onboarding quiz collects a goal, and only when
+`product.yaml` records `feature.paywall-goal-headline` as required.
+
+Not selected, selected but unavailable, and unresolved stay different:
+
+- required: interpolate the selected goal as the paywall headline
+- excluded or non-goal: omit the RevenueCat offering-metadata / `customVariables` bind
+- instance absent: hold; do not treat the bind as free or as selected
+- required with a non-RevenueCat present-paywall owner: unavailable; do not invent a RevenueCat pass
+
+A producer sentence that the bind is not applicable cannot override a required feature.
 Do not invent an outcome the user did not choose.
+
+Workflow `providers:` lists and installed SDKs are not selection.
+Declared `b2c.yaml` monetization bindings are.
 
 Load `commitment-funnel.md` for first-session order.
 Load `onboarding-conversion.md` for the ONB graph.
@@ -19,7 +31,7 @@ Load `../money/paywall-pricing-and-experiments.md` for RevenueCat Experiments.
 
 ## 1. Goal Contract
 
-Record a Paywall Goal Headline table in `product/ONBOARDING.md`.
+Record a Paywall Goal Headline table in `product/ONBOARDING.md` when the feature is required.
 
 The table must name:
 

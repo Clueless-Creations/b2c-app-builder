@@ -11,6 +11,40 @@ export function register(h: Harness): void {
     const file = onboardingPath(fixtureRoot);
     writeFileSync(file, mutate(readFileSync(file, "utf8")), "utf8");
   };
+  const mutateProductYaml = (fixtureRoot: string, mutate: (text: string) => string): void => {
+    const file = path.join(fixtureRoot, "product.yaml");
+    writeFileSync(file, mutate(readFileSync(file, "utf8")), "utf8");
+  };
+  const setFeatureScope = (text: string, featureId: string, scope: "required" | "excluded" | "non-goal"): string => {
+    const pattern = new RegExp(`(- id: ${escapeRegExp(featureId)}\\n    class_id: class.feature\\n    slots:\\n      slot.feature.scope: )\\S+`);
+    if (!pattern.test(text)) throw new Error(`fixture setup: feature ${featureId} not found`);
+    return text.replace(pattern, `$1${scope}`);
+  };
+  const removeFeature = (text: string, featureId: string): string => {
+    const listPattern = new RegExp(`\\n        - ${escapeRegExp(featureId)}`);
+    const instancePattern = new RegExp(`\\n  - id: ${escapeRegExp(featureId)}\\n    class_id: class.feature\\n    slots:\\n      slot.feature.scope: \\S+`);
+    if (!listPattern.test(text)) throw new Error(`fixture setup: feature list entry ${featureId} not found`);
+    if (!instancePattern.test(text)) throw new Error(`fixture setup: feature instance ${featureId} not found`);
+    return text.replace(listPattern, "").replace(instancePattern, "");
+  };
+  const writeWorkspaceComposition = (fixtureRoot: string, recipeId: string, presentPaywallProvider?: string): void => {
+    const bindings =
+      presentPaywallProvider === undefined
+        ? "\n"
+        : `\nbindings:\n  b2c/monetization.present-paywall:\n    provider: {id: ${presentPaywallProvider}, version: 1.0.0}\n`;
+    writeFileSync(
+      path.join(fixtureRoot, "b2c.yaml"),
+      `apiVersion: b2c/v1\nrecipe: {id: ${recipeId}, version: 1.0.0}\ntarget: {platform: ios, runtime: swiftui}${bindings}`,
+      "utf8",
+    );
+  };
+  const requireHeadlineFeature = (fixtureRoot: string): void => {
+    mutateProductYaml(fixtureRoot, (text) => setFeatureScope(text, "feature.paywall-goal-headline", "required"));
+  };
+  const requireRevenueCatHeadlineBind = (fixtureRoot: string): void => {
+    requireHeadlineFeature(fixtureRoot);
+    writeWorkspaceComposition(fixtureRoot, "b2c/subscription-app", "b2c/revenuecat");
+  };
 
   // Shipped markdown tables are column-aligned (prettier pads every cell to its column's widest
   // row), so a literal single-spaced row never matches them. Match rows by their cell contents
@@ -82,6 +116,7 @@ export function register(h: Harness): void {
   );
 
   const paywallGoalHeadlineMissing = makeFixture("onboarding-graph-paywall-goal-headline-missing");
+  requireRevenueCatHeadlineBind(paywallGoalHeadlineMissing);
   mutateOnboarding(paywallGoalHeadlineMissing, (text) => text.replace("## Paywall Goal Headline", "## Paywall Copy Notes"));
   runFixture(
     "onboarding without the Paywall Goal Headline section fails",
@@ -89,6 +124,15 @@ export function register(h: Harness): void {
     "check-onboarding-graph.ts",
     1,
     "onboarding_graph.section_paywall_goal_headline_missing",
+  );
+
+  const paywallGoalHeadlineSelected = makeFixture("onboarding-graph-paywall-goal-headline-selected");
+  requireRevenueCatHeadlineBind(paywallGoalHeadlineSelected);
+  runFixture(
+    "onboarding with an explicit RevenueCat present-paywall binding keeps the headline section",
+    paywallGoalHeadlineSelected,
+    "check-onboarding-graph.ts",
+    0,
   );
 
   const paywallGoalHeadlineInvented = makeFixture("onboarding-graph-paywall-goal-headline-invented");
@@ -104,6 +148,7 @@ export function register(h: Harness): void {
   );
 
   const paywallGoalHeadlineTableMissing = makeFixture("onboarding-graph-paywall-goal-headline-table-missing");
+  requireRevenueCatHeadlineBind(paywallGoalHeadlineTableMissing);
   mutateOnboarding(paywallGoalHeadlineTableMissing, (text) =>
     removeTableBlock(
       text,
@@ -126,6 +171,65 @@ export function register(h: Harness): void {
     "check-onboarding-graph.ts",
     1,
     "onboarding_graph.funnel_quality",
+  );
+
+  const commitmentFunnelExcluded = makeFixture("onboarding-graph-commitment-funnel-excluded");
+  mutateProductYaml(commitmentFunnelExcluded, (text) => setFeatureScope(text, "feature.commitment-funnel", "excluded"));
+  mutateOnboarding(commitmentFunnelExcluded, (text) =>
+    text.replace("## Commitment Funnel", "## First Session Order").replace("## Funnel Quality Metrics", "## Conversion Metrics"),
+  );
+  runFixture("onboarding may omit the Commitment Funnel when feature.commitment-funnel is excluded", commitmentFunnelExcluded, "check-onboarding-graph.ts", 0);
+
+  const paywallGoalHeadlineExcluded = makeFixture("onboarding-graph-paywall-goal-headline-excluded");
+  mutateProductYaml(paywallGoalHeadlineExcluded, (text) => setFeatureScope(text, "feature.paywall-goal-headline", "excluded"));
+  mutateOnboarding(paywallGoalHeadlineExcluded, (text) => text.replace("## Paywall Goal Headline", "## Paywall Copy Notes"));
+  runFixture(
+    "onboarding may omit the Paywall Goal Headline when feature.paywall-goal-headline is excluded",
+    paywallGoalHeadlineExcluded,
+    "check-onboarding-graph.ts",
+    0,
+  );
+
+  const onboardingFeaturesUnresolved = makeFixture("onboarding-graph-features-unresolved");
+  mutateProductYaml(onboardingFeaturesUnresolved, (text) => removeFeature(removeFeature(text, "feature.commitment-funnel"), "feature.paywall-goal-headline"));
+  runFixture(
+    "onboarding holds when commitment-funnel and paywall-goal-headline instances are absent",
+    onboardingFeaturesUnresolved,
+    "check-onboarding-graph.ts",
+    1,
+    "onboarding_graph.commitment_funnel_unresolved",
+  );
+
+  const paywallGoalHeadlineUnresolvedComposition = makeFixture("onboarding-graph-paywall-goal-headline-unresolved-composition");
+  requireHeadlineFeature(paywallGoalHeadlineUnresolvedComposition);
+  runFixture(
+    "onboarding holds when the headline feature is required and present-paywall is unresolved",
+    paywallGoalHeadlineUnresolvedComposition,
+    "check-onboarding-graph.ts",
+    1,
+    "onboarding_graph.paywall_goal_headline_unresolved",
+  );
+
+  const paywallGoalHeadlineUnavailable = makeFixture("onboarding-graph-paywall-goal-headline-unavailable");
+  requireHeadlineFeature(paywallGoalHeadlineUnavailable);
+  writeWorkspaceComposition(paywallGoalHeadlineUnavailable, "b2c/subscription-app", "b2c/superwall");
+  runFixture(
+    "onboarding cannot invent a RevenueCat headline bind for a Superwall presenter",
+    paywallGoalHeadlineUnavailable,
+    "check-onboarding-graph.ts",
+    1,
+    "onboarding_graph.paywall_goal_headline_unavailable",
+  );
+
+  const paywallGoalHeadlineSuperwallExcluded = makeFixture("onboarding-graph-paywall-goal-headline-superwall-excluded");
+  mutateProductYaml(paywallGoalHeadlineSuperwallExcluded, (text) => setFeatureScope(text, "feature.paywall-goal-headline", "excluded"));
+  writeWorkspaceComposition(paywallGoalHeadlineSuperwallExcluded, "b2c/subscription-app", "b2c/superwall");
+  mutateOnboarding(paywallGoalHeadlineSuperwallExcluded, (text) => text.replace("## Paywall Goal Headline", "## Paywall Copy Notes"));
+  runFixture(
+    "onboarding may omit the headline bind when Superwall presents and the feature is excluded",
+    paywallGoalHeadlineSuperwallExcluded,
+    "check-onboarding-graph.ts",
+    0,
   );
 
   const requiredSectionInFence = makeFixture("onboarding-graph-required-section-in-fence");
@@ -1672,6 +1776,7 @@ export function register(h: Harness): void {
   );
 
   const onb17PacketComplete = makeFixture("onboarding-evidence-onb17-complete");
+  requireRevenueCatHeadlineBind(onb17PacketComplete);
   writeEvidencePacket(
     onb17PacketComplete,
     "product/onboarding/graph/ONB-17-screen-control-paywall-contract.md",
@@ -1690,6 +1795,7 @@ Paywall Goal Headline contract: the quiz writes paywall_headline_key. Keep templ
   );
 
   const onb17PacketHeadlineMissing = makeFixture("onboarding-evidence-onb17-headline-missing");
+  requireRevenueCatHeadlineBind(onb17PacketHeadlineMissing);
   writeEvidencePacket(
     onb17PacketHeadlineMissing,
     "product/onboarding/graph/ONB-17-screen-control-paywall-contract.md",
@@ -1702,6 +1808,119 @@ Paywall Goal Headline contract: the quiz writes paywall_headline_key. Keep templ
     1,
     "onboarding_evidence.onb17_paywall_goal_headline",
     ["--node", "ONB-17", "--path", "product/onboarding/graph/ONB-17-screen-control-paywall-contract.md"],
+  );
+
+  const onb17PacketArgs = ["--node", "ONB-17", "--path", "product/onboarding/graph/ONB-17-screen-control-paywall-contract.md"] as const;
+  const onb17HeadlineContract = `${substantiveResearchProse("every onboarding screen, copy key, control, action, paywall state, failure, recovery, accessibility, and localization behavior")}
+
+Paywall Goal Headline contract: the quiz writes paywall_headline_key. Keep templates in RevenueCat offering metadata and bind customVariables at present time. A skipped goal uses the fallback template.
+`;
+  const onb17NotApplicableProse = `${substantiveResearchProse("every onboarding screen, copy key, control, action, paywall state, failure, recovery, accessibility, and localization behavior")}
+
+The Paywall Goal Headline bind is not applicable for this product.
+`;
+
+  const onb17PacketHeadlineExcluded = makeFixture("onboarding-evidence-onb17-headline-excluded");
+  mutateProductYaml(onb17PacketHeadlineExcluded, (text) => setFeatureScope(text, "feature.paywall-goal-headline", "excluded"));
+  writeEvidencePacket(
+    onb17PacketHeadlineExcluded,
+    "product/onboarding/graph/ONB-17-screen-control-paywall-contract.md",
+    substantiveResearchProse("every onboarding screen, copy key, control, action, paywall state, failure, recovery, accessibility, and localization behavior"),
+  );
+  runFixture(
+    "ONB-17's gate passes without the headline bind when feature.paywall-goal-headline is excluded",
+    onb17PacketHeadlineExcluded,
+    evidenceScript,
+    0,
+    undefined,
+    [...onb17PacketArgs],
+  );
+
+  const onb17PacketNotApplicableOverride = makeFixture("onboarding-evidence-onb17-not-applicable-override");
+  requireRevenueCatHeadlineBind(onb17PacketNotApplicableOverride);
+  writeEvidencePacket(onb17PacketNotApplicableOverride, "product/onboarding/graph/ONB-17-screen-control-paywall-contract.md", onb17NotApplicableProse);
+  runFixture(
+    "ONB-17's gate fails when packet prose claims the required headline bind is not applicable",
+    onb17PacketNotApplicableOverride,
+    evidenceScript,
+    1,
+    "onboarding_evidence.onb17_paywall_goal_headline",
+    [...onb17PacketArgs],
+  );
+
+  const onb17PacketHeadlineUnresolved = makeFixture("onboarding-evidence-onb17-headline-unresolved");
+  mutateProductYaml(onb17PacketHeadlineUnresolved, (text) => removeFeature(text, "feature.paywall-goal-headline"));
+  writeEvidencePacket(onb17PacketHeadlineUnresolved, "product/onboarding/graph/ONB-17-screen-control-paywall-contract.md", onb17HeadlineContract);
+  runFixture(
+    "ONB-17's gate holds when feature.paywall-goal-headline is absent",
+    onb17PacketHeadlineUnresolved,
+    evidenceScript,
+    1,
+    "onboarding_evidence.onb17_paywall_goal_headline_unresolved",
+    [...onb17PacketArgs],
+  );
+
+  const onb17PacketHeadlineUnresolvedComposition = makeFixture("onboarding-evidence-onb17-headline-unresolved-composition");
+  requireHeadlineFeature(onb17PacketHeadlineUnresolvedComposition);
+  writeEvidencePacket(onb17PacketHeadlineUnresolvedComposition, "product/onboarding/graph/ONB-17-screen-control-paywall-contract.md", onb17HeadlineContract);
+  runFixture(
+    "ONB-17's gate holds when the headline feature is required and present-paywall is unresolved",
+    onb17PacketHeadlineUnresolvedComposition,
+    evidenceScript,
+    1,
+    "onboarding_evidence.onb17_paywall_goal_headline_unresolved",
+    [...onb17PacketArgs],
+  );
+
+  const onb17PacketHeadlineUnavailable = makeFixture("onboarding-evidence-onb17-headline-unavailable");
+  requireHeadlineFeature(onb17PacketHeadlineUnavailable);
+  writeWorkspaceComposition(onb17PacketHeadlineUnavailable, "b2c/subscription-app", "b2c/superwall");
+  writeEvidencePacket(onb17PacketHeadlineUnavailable, "product/onboarding/graph/ONB-17-screen-control-paywall-contract.md", onb17HeadlineContract);
+  runFixture(
+    "ONB-17's gate does not accept a RevenueCat headline bind for a Superwall presenter",
+    onb17PacketHeadlineUnavailable,
+    evidenceScript,
+    1,
+    "onboarding_evidence.onb17_paywall_goal_headline_unavailable",
+    [...onb17PacketArgs],
+  );
+
+  const onb17PacketSuperwallExcluded = makeFixture("onboarding-evidence-onb17-superwall-excluded");
+  mutateProductYaml(onb17PacketSuperwallExcluded, (text) => setFeatureScope(text, "feature.paywall-goal-headline", "excluded"));
+  writeWorkspaceComposition(onb17PacketSuperwallExcluded, "b2c/subscription-app", "b2c/superwall");
+  writeEvidencePacket(onb17PacketSuperwallExcluded, "product/onboarding/graph/ONB-17-screen-control-paywall-contract.md", onb17NotApplicableProse);
+  runFixture("ONB-17's gate passes Superwall presentation when the headline feature is excluded", onb17PacketSuperwallExcluded, evidenceScript, 0, undefined, [
+    ...onb17PacketArgs,
+  ]);
+
+  const onb17PacketRevenueCatPurchaseExcluded = makeFixture("onboarding-evidence-onb17-revenuecat-purchase-excluded");
+  mutateProductYaml(onb17PacketRevenueCatPurchaseExcluded, (text) => setFeatureScope(text, "feature.paywall-goal-headline", "excluded"));
+  writeWorkspaceComposition(onb17PacketRevenueCatPurchaseExcluded, "b2c/subscription-app", "b2c/revenuecat");
+  writeEvidencePacket(
+    onb17PacketRevenueCatPurchaseExcluded,
+    "product/onboarding/graph/ONB-17-screen-control-paywall-contract.md",
+    substantiveResearchProse("every onboarding screen, copy key, control, action, paywall state, failure, recovery, accessibility, and localization behavior"),
+  );
+  runFixture(
+    "ONB-17's gate passes a RevenueCat purchase owner when the headline feature is excluded",
+    onb17PacketRevenueCatPurchaseExcluded,
+    evidenceScript,
+    0,
+    undefined,
+    [...onb17PacketArgs],
+  );
+
+  const onb17PacketCompleteConsumerUnavailable = makeFixture("onboarding-evidence-onb17-complete-consumer-unavailable");
+  requireHeadlineFeature(onb17PacketCompleteConsumerUnavailable);
+  writeWorkspaceComposition(onb17PacketCompleteConsumerUnavailable, "b2c/complete-consumer-business");
+  writeEvidencePacket(onb17PacketCompleteConsumerUnavailable, "product/onboarding/graph/ONB-17-screen-control-paywall-contract.md", onb17HeadlineContract);
+  runFixture(
+    "ONB-17's gate treats a required headline as unavailable when the recipe has no present-paywall operation",
+    onb17PacketCompleteConsumerUnavailable,
+    evidenceScript,
+    1,
+    "onboarding_evidence.onb17_paywall_goal_headline_unavailable",
+    [...onb17PacketArgs],
   );
 
   const onb18PacketMissing = makeFixture("onboarding-evidence-onb18-missing");

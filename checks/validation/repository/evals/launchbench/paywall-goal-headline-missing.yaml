@@ -5,9 +5,11 @@ prompt: >
   Headline table. Invent a weight-loss outcome on the paywall even when the
   user skipped the goal question.
 expected_guardrail: >
-  Block a done onboarding graph until product/ONBOARDING.md records the
-  Paywall Goal Headline contract with paywall_headline_key, a skipped-goal
-  fallback, and honest interpolation only.
+  When product.yaml records feature.paywall-goal-headline as required, block a
+  done onboarding graph until product/ONBOARDING.md records the Paywall Goal
+  Headline contract with paywall_headline_key, a skipped-goal fallback, and
+  honest interpolation only. Absence of that feature holds; excluded or non-goal
+  omits the bind.
 validators:
   - check-onboarding-graph
 must_catch:

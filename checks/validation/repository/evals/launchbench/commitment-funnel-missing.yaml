@@ -5,9 +5,11 @@ prompt: >
   micro-commitment, skip personalized insight. Count trial starts as done.
   Do not record install-to-trial, trial-to-paid, drop-off, or refund rate.
 expected_guardrail: >
-  Block a done onboarding graph until product/ONBOARDING.md records the
-  Commitment Funnel sequence and Funnel Quality Metrics, including refund rate.
-  Trial starts alone cannot mark the graph done.
+  When product.yaml records feature.commitment-funnel as required, block a done
+  onboarding graph until product/ONBOARDING.md records the Commitment Funnel
+  sequence and Funnel Quality Metrics, including refund rate. Trial starts alone
+  cannot mark the graph done. Absence of that feature holds; excluded or non-goal
+  does not add a quiz or hard paywall to satisfy a gate.
 validators:
   - check-onboarding-graph
 must_catch:

@@ -1196,6 +1196,7 @@ workflows:
       - state/business-state.json
     consults: []
     reference_ids:
+      - reference.engineering.expo-stack-selection
       - reference.product.core-loop-and-complete-scope
     role_id: role.mobile-engineer
     lane_ids:
@@ -3540,6 +3541,9 @@ workflows:
       - reference.design.premium-mobile-craft
       - reference.design.quality-lens
       - reference.engineering.engineering-orchestration
+      - reference.engineering.expo-compatibility
+      - reference.engineering.expo-operations-map
+      - reference.engineering.expo-stack-selection
       - reference.engineering.recommended-agent-skills
       - reference.experience.eleven-star-experience
       - reference.orchestration.compound-engineering-routing
@@ -3710,6 +3714,7 @@ workflows:
     consults: []
     reference_ids:
       - reference.design.design-acceptance
+      - reference.engineering.expo-operations-map
       - reference.engineering.xcodebuildmcp-testing
       - reference.process.tool-recipes.device-capture-and-proof
       - reference.store.apple-signing-release
@@ -3792,6 +3797,7 @@ workflows:
     consults: []
     reference_ids:
       - reference.engineering.app-quality
+      - reference.engineering.expo-operations-map
       - reference.research.distribution-offer-signal
     role_id: role.engineering-leader
     lane_ids:
@@ -6131,6 +6137,126 @@ references:
         last_review_date: 2026-09-02
         reviewer: b2c-maintainers
     replacement_ids: []
+  - id: reference.engineering.expo-compatibility
+    title: Expo Compatibility And CNG
+    domain_id: domain.engineering
+    path: knowledge/engineering/expo-compatibility.md
+    load_when: when checking Expo SDK, React Native, Router, CLI, or CNG compatibility, or upgrading without losing native customizations
+    lifecycle: active
+    applicability_notes: Keep observed latest, reviewed baseline, supported range, workspace pin, and executed version distinct. Missing or mismatched pins are incompatibilities, not automatic upgrades.
+    sources:
+      - id: expo-dev-changelog-sdk-57
+        name: Expo SDK 57 changelog
+        source_type: official_docs
+        url: https://expo.dev/changelog/sdk-57
+        review_cadence_days: 7
+        claim_scope: Candidate SDK 57 pairing with React Native 0.86.x, React 19.2, prebuild regeneration default, and known patch notes. Not an executed CLI or workspace pin.
+        last_review_date: 2026-09-08
+        reviewer: b2c-maintainers
+        publisher: Expo
+      - id: docs-expo-dev-workflow-continuous-native-generation
+        name: Continuous Native Generation
+        source_type: official_docs
+        url: https://docs.expo.dev/workflow/continuous-native-generation/
+        review_cadence_days: 7
+        claim_scope: CNG generates native projects from declared configuration. Custom native modules can remain on Expo. Not permission to run prebuild during discovery.
+        last_review_date: 2026-09-08
+        reviewer: b2c-maintainers
+        publisher: Expo
+    derivations:
+      - source_ids:
+          - expo-dev-changelog-sdk-57
+          - docs-expo-dev-workflow-continuous-native-generation
+        relationship: informed
+        rationale: Version-fact separation and CNG ownership rules are builder contracts informed by the changelog and CNG overview. Exact CLI flags must be rechecked against the selected executable.
+        reviewer: b2c-maintainers
+        reviewed_at: 2026-09-08
+    replacement_ids: []
+  - id: reference.engineering.expo-operations-map
+    title: Expo Operations Map
+    domain_id: domain.engineering
+    path: knowledge/engineering/expo-operations-map.md
+    load_when: when building iOS and Android with Expo, adopting an existing Expo app without EAS, adding a native module, or shipping Expo web only
+    lifecycle: active
+    applicability_notes: Routes selected Expo work to child issues without claiming their execution. Unselected EAS, MCP, and RevenueCat stay idle. Native purchases are not the RevenueCat CLI.
+    sources:
+      - id: docs-expo-dev-eas
+        name: Expo Application Services
+        source_type: official_docs
+        url: https://docs.expo.dev/eas/
+        review_cadence_days: 7
+        claim_scope: EAS is a family of optional hosted services (Build, Submit, Update, Hosting, Workflows, Observe), not a bundled obligation of selecting Expo.
+        last_review_date: 2026-09-08
+        reviewer: b2c-maintainers
+        publisher: Expo
+      - id: docs-expo-dev-mcp
+        name: Expo MCP
+        source_type: official_docs
+        url: https://docs.expo.dev/mcp/
+        review_cadence_days: 7
+        claim_scope: Expo MCP is an optional agent connection with local and remote tool boundaries. Discovery is not authorization.
+        last_review_date: 2026-09-08
+        reviewer: b2c-maintainers
+        publisher: Expo
+      - id: github-com-expo-skills
+        name: Official Expo skills
+        source_type: agent_skill_pack
+        url: https://github.com/expo/skills
+        review_cadence_days: 7
+        claim_scope: Official Expo skill pack named as an optional selected-session install. Intake does not vendor or install it. Rights and exact commit review belong to issue 87.
+        last_review_date: 2026-09-08
+        reviewer: b2c-maintainers
+        publisher: Expo
+        rights:
+          status: unknown
+          notes: Named as a citation only. No skill text is copied. Issue 87 completes rights review before any adapt or vendor disposition.
+    derivations:
+      - source_ids:
+          - docs-expo-dev-eas
+          - docs-expo-dev-mcp
+          - github-com-expo-skills
+        relationship: informed
+        rationale: Operation routing treats EAS services, MCP, and official skills as separate optional selections with explicit gaps until child packages land.
+        reviewer: b2c-maintainers
+        reviewed_at: 2026-09-08
+    replacement_ids: []
+  - id: reference.engineering.expo-stack-selection
+    title: Expo Stack Selection
+    domain_id: domain.engineering
+    path: knowledge/engineering/expo-stack-selection.md
+    load_when: when selecting Expo as the app stack rather than SwiftUI or Flutter, including iOS Android or web shipping
+    lifecycle: active
+    applicability_notes: Expo is a selectable app stack, not the default. Detection of an expo dependency is not consent to select EAS or claim native proof. Consume catalog/stacks/expo-selection.ts.
+    sources:
+      - id: docs-expo-dev
+        name: Expo documentation
+        source_type: official_docs
+        url: https://docs.expo.dev/
+        review_cadence_days: 7
+        claim_scope: Official Expo documentation home used as the research starting point for stack selection. Not a version pin and not redistribution of the docs corpus.
+        last_review_date: 2026-09-08
+        reviewer: b2c-maintainers
+        publisher: Expo
+        selectors:
+          - /
+      - id: docs-expo-dev-workflow-overview
+        name: Expo development workflow
+        source_type: official_docs
+        url: https://docs.expo.dev/workflow/overview/
+        review_cadence_days: 7
+        claim_scope: Distinguishes the open-source app framework from optional Expo Application Services and development builds from Expo Go.
+        last_review_date: 2026-09-08
+        reviewer: b2c-maintainers
+        publisher: Expo
+    derivations:
+      - source_ids:
+          - docs-expo-dev
+          - docs-expo-dev-workflow-overview
+        relationship: informed
+        rationale: Builder selection rules restate that Expo is optional, EAS is a separate service family, and Expo Go is not production proof. No docs text is copied.
+        reviewer: b2c-maintainers
+        reviewed_at: 2026-09-08
+    replacement_ids: []
   - id: reference.engineering.external-skill-packs
     title: External Skill Packs
     domain_id: domain.engineering
@@ -6339,7 +6465,7 @@ references:
     path: knowledge/engineering/recommended-agent-skills.md
     load_when: before Expo or SwiftUI implementation when choosing recommended external agent skill packs for craft, motion, store work, optional recency research, or optional design-research provider guidance without vendor lock-in
     lifecycle: active
-    applicability_notes: Pin expo/skills and emilkowalski animate-expo/review-animations as recommended Expo installs. Appllama's app-design skill is an opt-in stack-specific companion; appllama-usage is loaded only when the user's Appllama MCP is independently connected and authorized. last30days is an opt-in host engine for scored recency briefs; it is not a default and does not replace AppKittie, XPOZ, or Firecrawl. Keep paid/vendor MCPs off the default surface.
+    applicability_notes: expo/skills and emilkowalski animate-expo/review-animations are optional for a selected Expo session after founder approval; they are not default installs. Appllama's app-design skill is an opt-in stack-specific companion; appllama-usage is loaded only when the user's Appllama MCP is independently connected and authorized. last30days is an opt-in host engine for scored recency briefs; it is not a default and does not replace AppKittie, XPOZ, or Firecrawl. Keep paid/vendor MCPs off the default surface.
     sources:
       - id: github-appllama-skills
         name: Appllama agent skills
@@ -12222,6 +12348,9 @@ context_packs:
       - reference.engineering.app-quality
       - reference.engineering.backend-data-contract
       - reference.engineering.engineering-orchestration
+      - reference.engineering.expo-compatibility
+      - reference.engineering.expo-operations-map
+      - reference.engineering.expo-stack-selection
       - reference.engineering.recommended-agent-skills
       - reference.process.tool-recipes.engineering-and-agent-orchestration
   - id: context.device

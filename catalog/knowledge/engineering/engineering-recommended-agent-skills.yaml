@@ -15,11 +15,11 @@ bindings:
   context_pack_ids:
     - context.engineering
     - context.design
-applicability_notes: Pin expo/skills and emilkowalski animate-expo/review-animations as recommended
-  Expo installs. Appllama's app-design skill is an opt-in stack-specific companion; appllama-usage is loaded only
-  when the user's Appllama MCP is independently connected and authorized. last30days is an opt-in host engine for
-  scored recency briefs; it is not a default and does not replace AppKittie, XPOZ, or Firecrawl. Keep paid/vendor MCPs
-  off the default surface.
+applicability_notes: expo/skills and emilkowalski animate-expo/review-animations are optional for a selected
+  Expo session after founder approval; they are not default installs. Appllama's app-design skill is an opt-in
+  stack-specific companion; appllama-usage is loaded only when the user's Appllama MCP is independently connected
+  and authorized. last30days is an opt-in host engine for scored recency briefs; it is not a default and does not
+  replace AppKittie, XPOZ, or Firecrawl. Keep paid/vendor MCPs off the default surface.
 sources:
   - id: github-appllama-skills
     name: Appllama agent skills

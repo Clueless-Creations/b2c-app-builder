@@ -1,0 +1,64 @@
+schema_version: 1.0.0
+id: reference.engineering.expo-operations-map
+title: Expo Operations Map
+domain_id: domain.engineering
+document_path: knowledge/engineering/expo-operations-map.md
+load_when: when building iOS and Android with Expo, adopting an existing Expo app without EAS, adding a native
+  module, or shipping Expo web only
+lifecycle: active
+bindings:
+  workflow_ids:
+    - workflow.engineering.engineering-orchestration-ce-production-readiness
+    - workflow.engineering.native-ios-proof-route-ladder
+    - workflow.engineering.app-quality-and-vitals
+  context_pack_ids:
+    - context.engineering
+applicability_notes: Routes selected Expo work to child issues without claiming their execution. Unselected
+  EAS, MCP, and RevenueCat stay idle. Native purchases are not the RevenueCat CLI.
+sources:
+  - id: docs-expo-dev-eas
+    name: Expo Application Services
+    source_type: official_docs
+    url: https://docs.expo.dev/eas/
+    review_cadence_days: 7
+    claim_scope: EAS is a family of optional hosted services (Build, Submit, Update, Hosting, Workflows,
+      Observe), not a bundled obligation of selecting Expo.
+    last_review_date: 2026-09-08
+    reviewer: b2c-maintainers
+    publisher: Expo
+  - id: docs-expo-dev-mcp
+    name: Expo MCP
+    source_type: official_docs
+    url: https://docs.expo.dev/mcp/
+    review_cadence_days: 7
+    claim_scope: Expo MCP is an optional agent connection with local and remote tool boundaries. Discovery is
+      not authorization.
+    last_review_date: 2026-09-08
+    reviewer: b2c-maintainers
+    publisher: Expo
+  - id: github-com-expo-skills
+    name: Official Expo skills
+    source_type: agent_skill_pack
+    url: https://github.com/expo/skills
+    review_cadence_days: 7
+    claim_scope: >-
+      Official Expo skill pack named as an optional selected-session install. Intake does not vendor
+      or install it. Rights and exact commit review belong to issue 87.
+    last_review_date: 2026-09-08
+    reviewer: b2c-maintainers
+    publisher: Expo
+    rights:
+      status: unknown
+      notes: >-
+        Named as a citation only. No skill text is copied. Issue 87 completes rights review before any
+        adapt or vendor disposition.
+derivations:
+  - source_ids:
+      - docs-expo-dev-eas
+      - docs-expo-dev-mcp
+      - github-com-expo-skills
+    relationship: informed
+    rationale: Operation routing treats EAS services, MCP, and official skills as separate optional selections
+      with explicit gaps until child packages land.
+    reviewer: b2c-maintainers
+    reviewed_at: 2026-09-08

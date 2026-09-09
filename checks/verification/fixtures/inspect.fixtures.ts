@@ -237,6 +237,37 @@ export function register(harness: Harness): void {
     },
   );
 
+  harness.check("inspect: an expo dependency is a consumer-app signal and does not execute app.config.ts or plugins", () => {
+    const dir = harness.makeTempDir("inspect-expo-detection");
+    writeFileSync(
+      path.join(dir, "package.json"),
+      JSON.stringify({
+        name: "detected-expo-app",
+        description: "A consumer mobile app",
+        dependencies: { expo: "57.0.17" },
+      }),
+    );
+    writeFileSync(
+      path.join(dir, "app.config.ts"),
+      "throw new Error('app.config.ts must not be executed during inspect');\nexport default { plugins: [() => { throw new Error('plugin'); }] };\n",
+    );
+    const home = harness.makeTempDir("inspect-expo-detection-home");
+    withIsolatedHome(home, () => {
+      const result = inspectWorkspace(dir);
+      assert(result.ok, `expected ok:true, got ${JSON.stringify(result)}`);
+      if (!result.ok) return;
+      assert(result.productKind === "consumer-app", `expected consumer-app for an expo dependency, got ${result.productKind}`);
+      assert(
+        result.evidence.some((signal) => signal.source === "package.json" && signal.excerpt.includes("expo")),
+        `expected an expo dependency excerpt, got ${JSON.stringify(result.evidence)}`,
+      );
+      assert(
+        !result.evidence.some((signal) => signal.excerpt.includes("app.config")),
+        "inspect must not read or execute app.config.ts",
+      );
+    });
+  });
+
   // --- 8. half-scaffolded folder: phase reflects prior engagement -------------------------------
 
   harness.check("inspect: a half-scaffolded, unregistered folder (run/run-state.json present) reports an engaged phase, not no-engagement", () => {

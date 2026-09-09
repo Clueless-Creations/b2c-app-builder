@@ -696,6 +696,62 @@ sources:
     locations:
       - examples/workspace/business/trust/secrets/SECRETS.md
     notes: Auto-discovered from recently added repository content.
+  - id: docs-expo-dev
+    name: Expo documentation
+    source_type: official_docs
+    url: https://docs.expo.dev/
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-selection.ts
+      - catalog/knowledge/engineering/engineering-expo-stack-selection.yaml
+      - knowledge/engineering/expo-stack-selection.md
+    notes: Research starting point for Expo as a selectable app stack. Citation only; not a version pin or
+      corpus vendor.
+  - id: docs-expo-dev-eas
+    name: Expo Application Services
+    source_type: official_docs
+    url: https://docs.expo.dev/eas/
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-selection.ts
+      - catalog/knowledge/engineering/engineering-expo-operations-map.yaml
+      - knowledge/engineering/expo-operations-map.md
+    notes: EAS services are optional and separately selected. Not a bundled Expo obligation.
+  - id: docs-expo-dev-mcp
+    name: Expo MCP
+    source_type: official_docs
+    url: https://docs.expo.dev/mcp/
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-selection.ts
+      - catalog/knowledge/engineering/engineering-expo-operations-map.yaml
+      - knowledge/engineering/expo-operations-map.md
+    notes: Optional Expo MCP route. Discovery is not authorization. Issue 87 owns integration.
+  - id: docs-expo-dev-workflow-continuous-native-generation
+    name: Continuous Native Generation
+    source_type: official_docs
+    url: https://docs.expo.dev/workflow/continuous-native-generation/
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-selection.ts
+      - catalog/knowledge/engineering/engineering-expo-compatibility.yaml
+      - knowledge/engineering/expo-compatibility.md
+    notes: CNG overview informing native-directory ownership. Do not run prebuild during passive discovery.
+  - id: docs-expo-dev-workflow-overview
+    name: Expo development workflow
+    source_type: official_docs
+    url: https://docs.expo.dev/workflow/overview/
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-selection.ts
+      - catalog/knowledge/engineering/engineering-expo-stack-selection.yaml
+      - knowledge/engineering/expo-stack-selection.md
+    notes: Distinguishes the Expo framework from optional EAS and development builds from Expo Go.
   - id: docs-langchain-com-oss-javascript-langgraph-functional-api
     name: docs.langchain.com
     source_type: docs
@@ -805,6 +861,18 @@ sources:
       - knowledge/research/distribution-offer-signal.md
     notes: Primary corpus-compression and portable-publishing example. Treat business claims as personal hypotheses.
       Reject deceptive, unsafe, copied, or platform-circumvention tactics.
+  - id: expo-dev-changelog-sdk-57
+    name: Expo SDK 57 changelog
+    source_type: official_docs
+    url: https://expo.dev/changelog/sdk-57
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-selection.ts
+      - catalog/knowledge/engineering/engineering-expo-compatibility.yaml
+      - knowledge/engineering/expo-compatibility.md
+    notes: Candidate reviewed baseline for SDK 57 / React Native 0.86 / React 19.2. Not an executed CLI or
+      workspace pin.
   - id: github-clueless-creations-site
     name: Clueless Creations website repository
     source_type: github
@@ -2207,6 +2275,18 @@ sources:
       - knowledge/engineering/xcodebuildmcp-testing.md
       - knowledge/process/tool-recipes/device-capture-and-proof.md
     notes: Reviewed source and derivation mapping for selected screenshot or capture guidance.
+  - id: github-com-expo-skills
+    name: Official Expo skills
+    source_type: github
+    url: https://github.com/expo/skills
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-selection.ts
+      - catalog/knowledge/engineering/engineering-expo-operations-map.yaml
+      - knowledge/engineering/expo-operations-map.md
+    notes: Named citation for optional selected-session Expo skills. No skill text is copied. Issue 87 owns
+      rights review before adapt or vendor.
   - id: parth-app-store-screenshots-license
     name: App Store Screenshots reviewed license
     source_type: github

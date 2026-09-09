@@ -64,9 +64,9 @@ Do not downgrade the bar because CE is missing: the engineering lane stays `part
 
 ## 1c. Recommended External Agent Skills
 
-Load [`recommended-agent-skills.md`](./recommended-agent-skills.md) before an Expo session that needs an external craft, motion, or store skill pack.
+Load [`expo-stack-selection.md`](./expo-stack-selection.md) when choosing whether Expo is the app stack. Load [`recommended-agent-skills.md`](./recommended-agent-skills.md) only when a **selected** Expo or SwiftUI session needs an external craft, motion, or store skill pack.
 
-Default recommended installs are `expo/skills` and Emil Kowalski `animate-expo` plus `review-animations`. Do not add Appeeky MCP or Appllama Pro MCP as B2C App Builder defaults.
+`expo/skills` and Emil Kowalski `animate-expo` plus `review-animations` are optional for a selected Expo session after founder approval. They are not default installs. Do not add Appeeky MCP or Appllama Pro MCP as B2C App Builder defaults.
 
 ## 2. Autonomy And Project State
 

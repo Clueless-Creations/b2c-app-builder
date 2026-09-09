@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.24",
+  "version": "0.219.25",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Plan RevenueCat catalog repairs as entity-specific create, attach, no-op, hold, or conflict.",
-    "Keep the mutating reconcileCatalog route unwired; unknown coverage cannot report complete."
+    "Decode EAS CLI responses by command-specific envelopes instead of assuming one JSON object.",
+    "Keep paid-job identity, artifacts, and uncertainty command-specific so a matching build is never taken from array[0]."
   ]
 }

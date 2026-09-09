@@ -10,7 +10,7 @@ Do not install a vendor MCP as a B2C App Builder default. Do not vendor a pack w
 
 ## Contents
 
-- 1. Default Expo Path
+- 1. Selected Expo Path
 - 2. Opt-In Packs
 - 3. Skip List
 - 4. Install Commands
@@ -18,14 +18,16 @@ Do not install a vendor MCP as a B2C App Builder default. Do not vendor a pack w
 - 6. MCP Server Evaluation
 - 7. Periodic Audit
 
-## 1. Default Expo Path
+## 1. Selected Expo Path
 
-Install these packs for Expo businesses after founder approval:
+Expo is a selectable app stack, not the default. Load [`expo-stack-selection.md`](./expo-stack-selection.md) before treating a business as Expo.
 
-- `expo/skills` — Expo Router, native UI, EAS, and store guidance from Expo.
+When the composition target is `{ platform: ios|android|web, runtime: expo }` and the founder approved an external pack for that session, these packs are optional:
+
+- `expo/skills` — Expo Router, native UI, EAS, and store guidance from Expo. #87 owns rights review and MCP boundaries. Do not install during intake or as a global default.
 - `emilkowalski/skills` — use `animate-expo` and `review-animations` before motion evidence is accepted.
 
-Do not install the whole Emil Kowalski pack as a hard catalog provider. Load the two named skills for polish.
+Do not install the whole Emil Kowalski pack as a hard catalog provider. Load the two named skills for polish. An `expo` dependency is not permission to install these packs.
 
 ## 2. Opt-In Packs
 

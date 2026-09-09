@@ -1,11 +1,11 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.8",
+  "version": "0.219.9",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Project public business.plan holds, ready briefs, and founder questions as additive fields without changing historical held reason text.",
-    "Sanitize lastFailure at the public plan boundary so secret-like attempt text is withheld instead of copied through.",
-    "Keep ADR-0011 proposed; this increment does not update the north-star or close the steward review."
+    "Add Expo as a selectable, non-default stack mapping with source-backed knowledge.",
+    "Keep framework, shipping platform, CLI, EAS services, and billing as separate selections with evidence tiers.",
+    "Do not claim Expo support; cng-prebuild and official Expo skills stay blocked until later program issues."
   ]
 }

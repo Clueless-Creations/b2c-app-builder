@@ -1,0 +1,46 @@
+schema_version: 1.0.0
+id: reference.engineering.expo-stack-selection
+title: Expo Stack Selection
+domain_id: domain.engineering
+document_path: knowledge/engineering/expo-stack-selection.md
+load_when: when selecting Expo as the app stack rather than SwiftUI or Flutter, including iOS Android or web
+  shipping
+lifecycle: active
+bindings:
+  workflow_ids: []
+  context_pack_ids:
+    - context.engineering
+applicability_notes: Expo is a selectable app stack, not the default. Detection of an expo dependency is not
+  consent to select EAS or claim native proof. Consume catalog/stacks/expo-selection.ts.
+sources:
+  - id: docs-expo-dev
+    name: Expo documentation
+    source_type: official_docs
+    url: https://docs.expo.dev/
+    review_cadence_days: 7
+    claim_scope: Official Expo documentation home used as the research starting point for stack selection. Not a
+      version pin and not redistribution of the docs corpus.
+    last_review_date: 2026-09-08
+    reviewer: b2c-maintainers
+    publisher: Expo
+    selectors:
+      - /
+  - id: docs-expo-dev-workflow-overview
+    name: Expo development workflow
+    source_type: official_docs
+    url: https://docs.expo.dev/workflow/overview/
+    review_cadence_days: 7
+    claim_scope: Distinguishes the open-source app framework from optional Expo Application Services and
+      development builds from Expo Go.
+    last_review_date: 2026-09-08
+    reviewer: b2c-maintainers
+    publisher: Expo
+derivations:
+  - source_ids:
+      - docs-expo-dev
+      - docs-expo-dev-workflow-overview
+    relationship: informed
+    rationale: Builder selection rules restate that Expo is optional, EAS is a separate service family, and Expo
+      Go is not production proof. No docs text is copied.
+    reviewer: b2c-maintainers
+    reviewed_at: 2026-09-08

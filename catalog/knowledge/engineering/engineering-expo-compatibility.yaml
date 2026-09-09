@@ -1,0 +1,44 @@
+schema_version: 1.0.0
+id: reference.engineering.expo-compatibility
+title: Expo Compatibility And CNG
+domain_id: domain.engineering
+document_path: knowledge/engineering/expo-compatibility.md
+load_when: when checking Expo SDK, React Native, Router, CLI, or CNG compatibility, or upgrading without losing
+  native customizations
+lifecycle: active
+bindings:
+  workflow_ids: []
+  context_pack_ids:
+    - context.engineering
+applicability_notes: Keep observed latest, reviewed baseline, supported range, workspace pin, and executed
+  version distinct. Missing or mismatched pins are incompatibilities, not automatic upgrades.
+sources:
+  - id: expo-dev-changelog-sdk-57
+    name: Expo SDK 57 changelog
+    source_type: official_docs
+    url: https://expo.dev/changelog/sdk-57
+    review_cadence_days: 7
+    claim_scope: Candidate SDK 57 pairing with React Native 0.86.x, React 19.2, prebuild regeneration default,
+      and known patch notes. Not an executed CLI or workspace pin.
+    last_review_date: 2026-09-08
+    reviewer: b2c-maintainers
+    publisher: Expo
+  - id: docs-expo-dev-workflow-continuous-native-generation
+    name: Continuous Native Generation
+    source_type: official_docs
+    url: https://docs.expo.dev/workflow/continuous-native-generation/
+    review_cadence_days: 7
+    claim_scope: CNG generates native projects from declared configuration. Custom native modules can remain on
+      Expo. Not permission to run prebuild during discovery.
+    last_review_date: 2026-09-08
+    reviewer: b2c-maintainers
+    publisher: Expo
+derivations:
+  - source_ids:
+      - expo-dev-changelog-sdk-57
+      - docs-expo-dev-workflow-continuous-native-generation
+    relationship: informed
+    rationale: Version-fact separation and CNG ownership rules are builder contracts informed by the changelog
+      and CNG overview. Exact CLI flags must be rechecked against the selected executable.
+    reviewer: b2c-maintainers
+    reviewed_at: 2026-09-08

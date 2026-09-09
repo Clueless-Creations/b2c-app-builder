@@ -2,7 +2,7 @@
 
 Generated from active, bound knowledge source declarations and catalog/upstreams. This is a maintainer review queue, not a second registry. A cited repository may be an example, optional tool, adapted method or runtime dependency; the report does not infer adoption or permission from a URL. Only an explicit reviewed contribution changes support or acknowledgments.
 
-Scope: 38 referenced repositories, 90 source bindings, 64 bindings needing review or linkage.
+Scope: 39 referenced repositories, 91 source bindings, 65 bindings needing review or linkage.
 
 The scan excludes inactive/unbound knowledge, self-references, non-GitHub sources, undeclared prose URLs, package-manager dependencies and resources outside knowledge manifests. An empty queue is not proof that every dependency is tracked. Inspect those other surfaces during contribution review. Repository aliases are matched only when declared in an upstream manifest.
 
@@ -19,6 +19,7 @@ Use b2c contribute plan for an untracked source. For a maintained project, inspe
 | coreyhaines31/marketingskills | `knowledge/growth/cro-landing.md` | github-com-coreyhaines31-marketingskills | none | untracked | Referenced repository has no maintained upstream identity. Review use and rights before adopting or crediting it. |
 | coreyhaines31/marketingskills | `knowledge/words/conversion-copy.md` | github-com-coreyhaines31-marketingskills | none | untracked | Referenced repository has no maintained upstream identity. Review use and rights before adopting or crediting it. |
 | everyinc/compound-engineering-plugin | `knowledge/orchestration/compound-engineering-routing.md` | github-com-everyinc-compound-engineering-plugin-releases | none | untracked | Referenced repository has no maintained upstream identity. Review use and rights before adopting or crediting it. |
+| expo/skills | `knowledge/engineering/expo-operations-map.md` | github-com-expo-skills | none | untracked | Referenced repository has no maintained upstream identity. Review use and rights before adopting or crediting it. |
 | florianbruniaux/claude-code-ultimate-guide | `knowledge/engineering/engineering-orchestration.md` | github-com-florianbruniaux-claude-code-ultimate-guide-ai-unit-economics | none | untracked | Referenced repository has no maintained upstream identity. Review use and rights before adopting or crediting it. |
 | florianbruniaux/claude-code-ultimate-guide | `knowledge/engineering/engineering-orchestration.md` | github-com-florianbruniaux-claude-code-ultimate-guide-claude-code-releases | none | untracked | Referenced repository has no maintained upstream identity. Review use and rights before adopting or crediting it. |
 | florianbruniaux/claude-code-ultimate-guide | `knowledge/orchestration/dynamic-workflows.md` | github-com-florianbruniaux-claude-code-ultimate-guide-known-issues | none | untracked | Referenced repository has no maintained upstream identity. Review use and rights before adopting or crediting it. |

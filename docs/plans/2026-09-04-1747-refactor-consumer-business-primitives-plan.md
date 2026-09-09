@@ -1207,6 +1207,8 @@ release remains a separate user-owned action after review and required CI.
 
 **Entry-path decision:** [ADR-0008](../decisions/0008-agent-onboarding-entry-path.md) distinguishes greenfield creation from existing-scaffold adoption.
 
+**Plan projection:** [ADR-0011](../decisions/0011-additive-public-business-plan-projection.md) keeps public `business.plan` additive and passive.
+
 **Goal:** Extend the stable interface to business creation, inspection, planning,
 execution, and evidence while keeping consumers independent of runtime internals.
 

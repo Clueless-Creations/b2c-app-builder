@@ -752,6 +752,105 @@ sources:
       - catalog/knowledge/engineering/engineering-expo-stack-selection.yaml
       - knowledge/engineering/expo-stack-selection.md
     notes: Distinguishes the Expo framework from optional EAS and development builds from Expo Go.
+  - id: docs-expo-dev-eas-cli
+    name: EAS CLI reference
+    source_type: official_docs
+    url: https://docs.expo.dev/eas/cli/
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-eas-commands.ts
+    notes: Documented EAS CLI 23.2.0 command and flag list retrieved 2026-09-09. Not an executed binary.
+  - id: docs-expo-dev-more-expo-cli
+    name: Expo CLI
+    source_type: official_docs
+    url: https://docs.expo.dev/more/expo-cli/
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-eas-commands.ts
+    notes: Expo CLI command page. Ships with the expo package; not a global install.
+  - id: docs-expo-dev-build-reference-local-builds
+    name: EAS local builds
+    source_type: official_docs
+    url: https://docs.expo.dev/build-reference/local-builds/
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-eas-commands.ts
+    notes: EAS local mode still authenticates and checks the project. Not identical to expo run.
+  - id: docs-expo-dev-eas-workflows-introduction
+    name: EAS Workflows
+    source_type: official_docs
+    url: https://docs.expo.dev/eas/workflows/introduction/
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-eas-commands.ts
+    notes: Workflow jobs may submit, publish an update, or deploy. Gate the aggregate effect.
+  - id: docs-expo-dev-build-eas-json
+    name: eas.json build profiles
+    source_type: official_docs
+    url: https://docs.expo.dev/build/eas-json/
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-eas-commands.ts
+    notes: Profile, environment, and distribution are explicit. Production is not inferred.
+  - id: docs-expo-dev-submit-ios
+    name: Submit to Apple
+    source_type: official_docs
+    url: https://docs.expo.dev/submit/ios/
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-eas-commands.ts
+    notes: EAS Submit is not TestFlight availability, review, approval, or release.
+  - id: docs-expo-dev-submit-android
+    name: Submit to Google Play
+    source_type: official_docs
+    url: https://docs.expo.dev/submit/android/
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-eas-commands.ts
+    notes: Play track and first-upload prerequisites stay with existing store owners.
+  - id: docs-expo-dev-eas-environment-variables
+    name: EAS environment variables
+    source_type: official_docs
+    url: https://docs.expo.dev/eas/environment-variables/
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-eas-commands.ts
+    notes: env:exec is excluded because it takes a bash command. EXPO_UNSTABLE_DEPLOY_SERVER is a deploy effect.
+  - id: docs-expo-dev-build-reference-easignore
+    name: Ignore files via .easignore
+    source_type: official_docs
+    url: https://docs.expo.dev/build-reference/easignore/
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-eas-commands.ts
+    notes: Cloud builds upload source. Inspect .easignore before a remote effect.
+  - id: docs-expo-dev-build-reference-npm-hooks
+    name: EAS Build lifecycle hooks
+    source_type: official_docs
+    url: https://docs.expo.dev/build-reference/npm-hooks/
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-eas-commands.ts
+    notes: npm hooks on a build are extra local/cloud code execution.
+  - id: docs-expo-dev-build-automate-submissions
+    name: Automate submissions
+    source_type: official_docs
+    url: https://docs.expo.dev/build/automate-submissions/
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-eas-commands.ts
+    notes: --auto-submit is a nested store effect. Neither --non-interactive nor eas.json grants it.
   - id: docs-langchain-com-oss-javascript-langgraph-functional-api
     name: docs.langchain.com
     source_type: docs
@@ -2414,7 +2513,7 @@ sources:
     refresh_cadence_days: 90
     owner: design
     locations:
-    - catalog/knowledge/design/design-audience-derived-identity.yaml
+      - catalog/knowledge/design/design-audience-derived-identity.yaml
     notes: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source
       expression imported.
   - id: video-shapes-layout
@@ -2424,7 +2523,7 @@ sources:
     refresh_cadence_days: 90
     owner: design
     locations:
-    - catalog/knowledge/design/design-audience-derived-identity.yaml
+      - catalog/knowledge/design/design-audience-derived-identity.yaml
     notes: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source
       expression imported.
   - id: video-futur-great-design
@@ -2434,7 +2533,7 @@ sources:
     refresh_cadence_days: 90
     owner: design
     locations:
-    - catalog/knowledge/design/design-audience-derived-identity.yaml
+      - catalog/knowledge/design/design-audience-derived-identity.yaml
     notes: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source
       expression imported.
   - id: video-satori-think-like
@@ -2444,7 +2543,7 @@ sources:
     refresh_cadence_days: 90
     owner: design
     locations:
-    - catalog/knowledge/design/design-audience-derived-identity.yaml
+      - catalog/knowledge/design/design-audience-derived-identity.yaml
     notes: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source
       expression imported.
   - id: video-omar-premium-branding
@@ -2454,17 +2553,17 @@ sources:
     refresh_cadence_days: 90
     owner: design
     locations:
-    - catalog/knowledge/design/design-audience-derived-identity.yaml
+      - catalog/knowledge/design/design-audience-derived-identity.yaml
     notes: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source
       expression imported.
   - id: video-netflix-paula-scher
-    name: 'Abstract: The Art of Design, Paula Scher: Graphic Design'
+    name: "Abstract: The Art of Design, Paula Scher: Graphic Design"
     source_type: video
     url: https://www.youtube.com/watch?v=LCfBYE97rFk
     refresh_cadence_days: 90
     owner: design
     locations:
-    - catalog/knowledge/design/design-audience-derived-identity.yaml
+      - catalog/knowledge/design/design-audience-derived-identity.yaml
     notes: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source
       expression imported.
   - id: video-designspo-typography
@@ -2474,7 +2573,7 @@ sources:
     refresh_cadence_days: 90
     owner: design
     locations:
-    - catalog/knowledge/design/design-design-visual-system.yaml
+      - catalog/knowledge/design/design-design-visual-system.yaml
     notes: Original synthesis of transcript ideas; visual demonstrations uninspected. No efficacy claim or source
       expression imported.
   - id: amir-cinematic-scroll-prompt-kit
@@ -2484,7 +2583,7 @@ sources:
     refresh_cadence_days: 30
     owner: design
     locations:
-    - catalog/knowledge/design/design-editorial-scrollytelling.yaml
+      - catalog/knowledge/design/design-editorial-scrollytelling.yaml
     notes: MIT selected layer-planning and checkpoint method; no source prompt or assets copied.
   - id: w3c-css-values-4
     name: W3C CSS Values and Units Level 4

@@ -1,11 +1,11 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.9",
+  "version": "0.219.10",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Add Expo as a selectable, non-default stack mapping with source-backed knowledge.",
-    "Keep framework, shipping platform, CLI, EAS services, and billing as separate selections with evidence tiers.",
-    "Do not claim Expo support; cng-prebuild and official Expo skills stay blocked until later program issues."
+    "Add an Expo/EAS command-effect matrix and injectable process layer so cloud credits, auto-submit, OTA, hosting, and hooks cannot hide inside a build-looking command.",
+    "Fixture-test selected Expo/EAS process holds without unblocking CNG, official Expo skills, or live EAS.",
+    "Hold unread EAS job ids as mutation-uncertain instead of inventing a paid replay."
   ]
 }

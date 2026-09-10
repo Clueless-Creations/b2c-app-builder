@@ -2,7 +2,7 @@ import { cpSync, mkdirSync, realpathSync, symlinkSync, writeFileSync } from "nod
 import path from "node:path";
 import { createRequire } from "node:module";
 import { spawnSync } from "node:child_process";
-import { resolveTsxCommand } from "../../../tooling/lib/tsx-bin.js";
+import { resolveRuntimeCommand, resolveTsxCommand } from "../../../tooling/lib/tsx-bin.js";
 import { assert, skillRoot, type Harness } from "./_harness.js";
 
 function fixturePackage(h: Harness, name: string, dependency: boolean): string {
@@ -94,5 +94,24 @@ export function register(h: Harness): void {
     const observed = JSON.parse(result.stdout) as { compiled?: boolean; args?: string[] };
     assert(observed.compiled === true, "launcher must exec dist/ when it exists");
     assert(observed.args?.join(" ") === "business-status --workspace example", "compiled CLI arguments changed");
+  });
+  h.check("runtime-launchers: packed onboard spawn prefers compiled dist without tsx", () => {
+    const root = fixturePackage(h, "launcher-compiled-onboard", false);
+    mkdirSync(path.join(root, "kernel", "session"), { recursive: true });
+    mkdirSync(path.join(root, "dist", "kernel", "session"), { recursive: true });
+    writeFileSync(
+      path.join(root, "dist", "kernel", "session", "onboard.js"),
+      "console.log(JSON.stringify({ compiled: true, args: process.argv.slice(2) }));",
+    );
+    writeFileSync(path.join(root, "kernel/session/onboard.ts"), 'console.error("source ts fallback should not run"); process.exit(9);');
+    const command = resolveRuntimeCommand(root, [path.join(root, "kernel/session/onboard.ts"), "--workspace", "example"]);
+    assert(
+      command.executable === process.execPath && command.args[0] === path.join(root, "dist", "kernel", "session", "onboard.js"),
+      "packed onboard must exec dist/kernel/session/onboard.js, not bare tsx",
+    );
+    const result = spawnSync(command.executable, command.args, { env: { ...process.env, PATH: "" }, encoding: "utf8" });
+    assert(result.status === 0, `compiled onboard launch failed: ${result.stderr}`);
+    const observed = JSON.parse(result.stdout) as { compiled?: boolean; args?: string[] };
+    assert(observed.compiled === true && observed.args?.join(" ") === "--workspace example", "compiled onboard arguments changed");
   });
 }

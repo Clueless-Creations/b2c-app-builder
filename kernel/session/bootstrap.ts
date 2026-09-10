@@ -22,7 +22,7 @@ import { loadControlFile, resolveWorkspacePaths, type WorkspacePaths } from "./r
 import { buildBudgetBalances, buildGrantsPatch, buildWaivers, loadAnswers, type OnboardingAnswers } from "./onboard.js";
 import { validateBudgetLedger, validateBusinessState, validateControl, validateGrants, validateWaivers } from "../schema/index.js";
 import { laneKeys, type BudgetLedgerDocument, type BusinessStateV2, type ControlFile, type LanesMap } from "../schema/types.js";
-import { describeTsxSpawnFailure, resolveTsxCommand } from "../../tooling/lib/tsx-bin.js";
+import { describeTsxSpawnFailure, resolveRuntimeCommand } from "../../tooling/lib/tsx-bin.js";
 import { loadWorkspaceCatalogIfPresent, renderCatalogRefusal } from "./catalog-contract.js";
 import { resolveCliWorkspace } from "./status.js";
 
@@ -40,7 +40,7 @@ function report(entries: StepReport[], step: string, action: StepReport["action"
 }
 
 function runSkillCli(relativePath: string, cliArgs: string[]): { code: number; output: string } {
-  const command = resolveTsxCommand(skillRoot(), [path.join(skillRoot(), relativePath), ...cliArgs]);
+  const command = resolveRuntimeCommand(skillRoot(), [path.join(skillRoot(), relativePath), ...cliArgs]);
   const result = spawnSync(command.executable, command.args, {
     cwd: skillRoot(),
     encoding: "utf8",

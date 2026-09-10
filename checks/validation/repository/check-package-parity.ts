@@ -230,6 +230,7 @@ function checkPackStandalone(runtimePkg: PackageJson): void {
     "dist/kernel/session/doctor.js",
     "dist/kernel/session/setup.js",
     "dist/kernel/session/run.js",
+    "dist/kernel/session/onboard.js",
     "SKILL.md",
     "skill-version.json",
     "tsconfig.json",

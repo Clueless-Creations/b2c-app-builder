@@ -379,9 +379,7 @@ export function register(harness: Harness): void {
     const ledger = new EasJobLedger({ now: () => "2026-09-09T00:00:00.000Z" });
     const transport = createFakeEasJobTransport({ jobs: { build_paid: { state: "finished", artifactUrl: "artifact:fake-ipa" } } });
     const { run, calls } = recordingRunner(() => ({
-      stdout: JSON.stringify([
-        { id: "build_paid", status: "IN_QUEUE", platform: "IOS", buildProfile: "preview", app: { id: "proj_approved" } },
-      ]),
+      stdout: JSON.stringify([{ id: "build_paid", status: "IN_QUEUE", platform: "IOS", buildProfile: "preview", app: { id: "proj_approved" } }]),
       stderr: "",
       status: null,
       timedOut: true,
@@ -438,9 +436,7 @@ export function register(harness: Harness): void {
     const ledger = new EasJobLedger({ now: () => "2026-09-09T00:00:00.000Z" });
     const transport = createFakeEasJobTransport();
     const { run, calls } = recordingRunner(() => ({
-      stdout: JSON.stringify([
-        { id: "build_paid", status: "IN_QUEUE", platform: "IOS", buildProfile: "preview", app: { id: "proj_approved" } },
-      ]),
+      stdout: JSON.stringify([{ id: "build_paid", status: "IN_QUEUE", platform: "IOS", buildProfile: "preview", app: { id: "proj_approved" } }]),
       stderr: "",
       status: null,
       timedOut: true,
@@ -715,9 +711,9 @@ export function register(harness: Harness): void {
     assert(existsSync(path.join(skillRoot, EXPO_EAS_COMMAND_MATRIX_PATH)), "matrix path is the handoff artifact");
   });
 
-  harness.check("expo-eas: #81 CNG and official-skills stay blocked; #84 rows become fixture-tested only when selected", () => {
+  harness.check("expo-eas: #82 CNG is fixture-tested when selected; official-skills stay blocked; #84 rows become fixture-tested only when selected", () => {
     const selected = resolveExpoSelection({ compositionTarget: { platform: "ios", runtime: EXPO_APP_RUNTIME } });
-    assert(operationFor(selected, "cng-prebuild").evidenceTier === "blocked", "CNG stays blocked for #82");
+    assert(operationFor(selected, "cng-prebuild").evidenceTier === "fixture-tested", "selected CNG classification is fixture-tested for #82");
     assert(operationFor(selected, "official-skills").evidenceTier === "blocked", "official skills stay blocked for #87");
     assert(operationFor(selected, "eas-update").evidenceTier === "blocked", "OTA stays blocked for #85");
     assert(operationFor(selected, "eas-cloud-build").evidenceTier === "blocked", "unselected EAS cloud stays blocked");
@@ -732,7 +728,7 @@ export function register(harness: Harness): void {
     assert(operationFor(withEas, "store-handoff").evidenceTier === "fixture-tested", "store stage boundary is fixture-tested");
     assert(operationFor(withEas, "expo-cli-process").evidenceTier === "fixture-tested", "typed Expo CLI argv is fixture-tested");
     assert(operationFor(withEas, "direct-local-compile").evidenceTier === "fixture-tested", "host-mode compile classification is fixture-tested");
-    assert(operationFor(withEas, "cng-prebuild").evidenceTier === "blocked", "rebase must keep CNG blocked");
+    assert(operationFor(withEas, "cng-prebuild").evidenceTier === "fixture-tested", "rebase keeps selected CNG fixture-tested");
   });
 }
 

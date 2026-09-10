@@ -742,6 +742,12 @@ export function register(harness: Harness): void {
       !runtimeComposition.some((issue) => issue.code === "catalog_graph.workflow.read_unresolvable"),
       "initialization-owned composition must resolve without a template file",
     );
+    catalog.workflows = [baseWorkflow({ reads: ["operations/FOUNDER_BRIEF.md"] })];
+    const runtimeBrief = validateCatalog(catalog, skillRoot);
+    assert(
+      !runtimeBrief.some((issue) => issue.code === "catalog_graph.workflow.read_unresolvable"),
+      "create-time founder brief must resolve without a template file",
+    );
   });
 
   harness.check("validate: a spend workflow without costEstimate is surfaced as a WARNING — the fail-closed park is the designed control, not a defect", () => {

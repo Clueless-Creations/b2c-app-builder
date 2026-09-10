@@ -11,11 +11,7 @@
  * Consumes `catalog/stacks/expo-selection.ts`. Does not invent `product.monetization.mode`.
  */
 
-import {
-  operationFor,
-  type ExpoSelectionResolution,
-  type ShippingPlatform,
-} from "./expo-selection.js";
+import { operationFor, type ExpoSelectionResolution, type ShippingPlatform } from "./expo-selection.js";
 
 export const EXPO_CAPABILITY_PROTOCOL_PATH = "catalog/stacks/expo-capability-protocol.ts" as const;
 
@@ -29,45 +25,23 @@ export const EXPO_CAPABILITY_SOURCES = {
   developmentBuilds: "https://docs.expo.dev/develop/development-builds/introduction/",
 } as const;
 
-export const EXPO_CAPABILITY_OPERATION_IDS = [
-  "authentication",
-  "offline-data",
-  "device-capabilities",
-  "native-purchases",
-] as const;
+export const EXPO_CAPABILITY_OPERATION_IDS = ["authentication", "offline-data", "device-capabilities", "native-purchases"] as const;
 
 export type ExpoCapabilityId = (typeof EXPO_CAPABILITY_OPERATION_IDS)[number];
 
-export type ExpoCapabilityProofScope =
-  | "test-store"
-  | "apple-sandbox"
-  | "play-sandbox"
-  | "production"
-  | "browser-mock"
-  | "web-checkout";
+export type ExpoCapabilityProofScope = "test-store" | "apple-sandbox" | "play-sandbox" | "production" | "browser-mock" | "web-checkout";
 
 export type ExpoPurchaseTransportKind = "fake-in-app" | "live-store" | "revenuecat-cli";
 
 export type ExpoPurchaseAction = "purchase" | "restore" | "simulate-purchase";
 
-export type ExpoPurchaseOutcome =
-  | "purchased"
-  | "restored"
-  | "pending"
-  | "error"
-  | "expired"
-  | "account-isolated";
+export type ExpoPurchaseOutcome = "purchased" | "restored" | "pending" | "error" | "expired" | "account-isolated";
 
 export type ExpoRuntimeClient = "expo-go" | "development-build" | "release-build" | "web-browser";
 
 export type ExpoIdentityClaim = "auth-implies-entitlement" | "rc-identity-implies-entitlement" | "separated";
 
-export type ExpoSecretClass =
-  | "expo-public-client"
-  | "management-key"
-  | "signing-secret"
-  | "refresh-token"
-  | "ai-provider-key";
+export type ExpoSecretClass = "expo-public-client" | "management-key" | "signing-secret" | "refresh-token" | "ai-provider-key";
 
 export type ExpoOfflineStoreKind = "sqlite" | "secure-store" | "web-storage" | "remote-backend";
 
@@ -228,8 +202,7 @@ export function classifyPurchaseOperation(input: {
       code,
       liveStoreMutation: false,
       nativeStoreProof: false,
-      reason:
-        "RevenueCat CLI Test Store is catalog management (#79). It is not react-native-purchases purchase or restore.",
+      reason: "RevenueCat CLI Test Store is catalog management (#79). It is not react-native-purchases purchase or restore.",
     };
   }
   if (input.platform === "web" || input.client === "web-browser") {
@@ -308,12 +281,11 @@ export function runFakeInAppTransport(request: FakeInAppTransportRequest): FakeI
   };
 }
 
-export function evaluateIdentityBoundary(input: {
-  claim: ExpoIdentityClaim;
-  signedIn: boolean;
-  revenueCatIdentified: boolean;
-  entitled: boolean;
-}): { ok: boolean; code?: "identity-kinds-collapsed"; reason: string } {
+export function evaluateIdentityBoundary(input: { claim: ExpoIdentityClaim; signedIn: boolean; revenueCatIdentified: boolean; entitled: boolean }): {
+  ok: boolean;
+  code?: "identity-kinds-collapsed";
+  reason: string;
+} {
   switch (input.claim) {
     case "auth-implies-entitlement":
     case "rc-identity-implies-entitlement":
@@ -370,11 +342,11 @@ export function scanClientArtifacts(artifacts: readonly ClientArtifact[], canari
   return { action: "pass", leaks };
 }
 
-export function classifyOfflineClaim(input: {
-  store: ExpoOfflineStoreKind;
-  claim: ExpoOfflineClaim;
-  platform: ShippingPlatform;
-}): { action: "accept-classification" | "refuse"; code?: ExpoCapabilityRefusalCode; reason: string } {
+export function classifyOfflineClaim(input: { store: ExpoOfflineStoreKind; claim: ExpoOfflineClaim; platform: ShippingPlatform }): {
+  action: "accept-classification" | "refuse";
+  code?: ExpoCapabilityRefusalCode;
+  reason: string;
+} {
   if (input.store === "sqlite" && input.claim === "backend-of-record") {
     return {
       action: "refuse",
@@ -402,11 +374,11 @@ export function classifyOfflineClaim(input: {
   };
 }
 
-export function classifyDeviceCapability(input: {
-  capability: ExpoDeviceCapability;
-  platform: ShippingPlatform;
-  claimedNativeSuccess: boolean;
-}): { action: "accept-classification" | "refuse"; code?: "web-fakes-native-permission"; reason: string } {
+export function classifyDeviceCapability(input: { capability: ExpoDeviceCapability; platform: ShippingPlatform; claimedNativeSuccess: boolean }): {
+  action: "accept-classification" | "refuse";
+  code?: "web-fakes-native-permission";
+  reason: string;
+} {
   if (input.platform === "web" && input.claimedNativeSuccess) {
     return {
       action: "refuse",
@@ -420,10 +392,11 @@ export function classifyDeviceCapability(input: {
   };
 }
 
-export function classifyProtectedRoute(input: {
-  surface: "client-router" | "server-authorizer";
-  claim: "server-authorization" | "client-gate-only";
-}): { action: "accept-classification" | "refuse"; code?: "client-route-is-not-server-authorization"; reason: string } {
+export function classifyProtectedRoute(input: { surface: "client-router" | "server-authorizer"; claim: "server-authorization" | "client-gate-only" }): {
+  action: "accept-classification" | "refuse";
+  code?: "client-route-is-not-server-authorization";
+  reason: string;
+} {
   if (input.surface === "client-router" && input.claim === "server-authorization") {
     return {
       action: "refuse",
@@ -437,11 +410,11 @@ export function classifyProtectedRoute(input: {
   };
 }
 
-export function classifyInstalledIntegration(input: {
-  packageName: string;
-  selected: boolean;
-  claimedAcceptedFeature: boolean;
-}): { action: "absent" | "selected" | "refuse"; code?: ExpoCapabilityRefusalCode; reason: string } {
+export function classifyInstalledIntegration(input: { packageName: string; selected: boolean; claimedAcceptedFeature: boolean }): {
+  action: "absent" | "selected" | "refuse";
+  code?: ExpoCapabilityRefusalCode;
+  reason: string;
+} {
   if (!input.selected && input.claimedAcceptedFeature) {
     return {
       action: "refuse",

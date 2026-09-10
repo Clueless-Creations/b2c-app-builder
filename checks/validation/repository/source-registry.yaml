@@ -761,6 +761,106 @@ sources:
     locations:
       - catalog/stacks/expo-starter-fixture/modules/b2c-native-capability/package.json
     notes: Citation for the isolated Expo native-capability fixture homepage. Not a live module or workspace pin.
+  - id: docs-expo-dev-develop-development-builds-introduction
+    name: Expo development builds
+    source_type: official_docs
+    url: https://docs.expo.dev/develop/development-builds/introduction
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-capability-protocol.ts
+    notes: Citation for development-build vs Expo Go classification. Not a live build or device pin.
+  - id: docs-expo-dev-guides-authentication
+    name: Expo authentication
+    source_type: official_docs
+    url: https://docs.expo.dev/guides/authentication
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-capability-protocol.ts
+    notes: Citation for the #83 authentication protocol. Does not select a provider or spawn AuthSession.
+  - id: docs-expo-dev-guides-environment-variables
+    name: Expo environment variables
+    source_type: official_docs
+    url: https://docs.expo.dev/guides/environment-variables
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-capability-protocol.ts
+      - catalog/stacks/expo-web-static.ts
+    notes: Citation for public vs secret client-bundle scanning. Not a live project env or EAS secret.
+  - id: docs-expo-dev-guides-in-app-purchases
+    name: Expo in-app purchases
+    source_type: official_docs
+    url: https://docs.expo.dev/guides/in-app-purchases
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-capability-protocol.ts
+    notes: Citation for native-purchase transport classification. A fake in-app transport is not store proof.
+  - id: docs-expo-dev-router-advanced-authentication
+    name: Expo Router authentication
+    source_type: official_docs
+    url: https://docs.expo.dev/router/advanced/authentication
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-capability-protocol.ts
+    notes: Citation for router-protected routes. Not an identity provider or session implementation.
+  - id: docs-expo-dev-versions-latest-sdk-securestore
+    name: Expo SecureStore
+    source_type: official_docs
+    url: https://docs.expo.dev/versions/latest/sdk/securestore
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-capability-protocol.ts
+    notes: Citation for encrypted local store classification. Not a live keychain write.
+  - id: docs-expo-dev-versions-latest-sdk-sqlite
+    name: Expo SQLite
+    source_type: official_docs
+    url: https://docs.expo.dev/versions/latest/sdk/sqlite
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-capability-protocol.ts
+    notes: Citation for offline-store classification. Not a live database or backend of record.
+  - id: docs-expo-dev-eas-hosting-introduction
+    name: EAS Hosting
+    source_type: official_docs
+    url: https://docs.expo.dev/eas/hosting/introduction
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-web-static.ts
+    notes: Citation for remote-host refusal. This module does not deploy or run EAS Hosting.
+  - id: docs-expo-dev-guides-publishing-websites
+    name: Expo web deployments
+    source_type: official_docs
+    url: https://docs.expo.dev/guides/publishing-websites
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-web-static.ts
+    notes: Citation for local/static web output modes. Not a production host or publish step.
+  - id: docs-expo-dev-router-web-api-routes
+    name: Expo Router API routes
+    source_type: official_docs
+    url: https://docs.expo.dev/router/web/api-routes
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-web-static.ts
+    notes: Citation for server-output refusal on local static export. Does not add an API route.
+  - id: docs-expo-dev-router-web-server-rendering
+    name: Expo Router server rendering
+    source_type: official_docs
+    url: https://docs.expo.dev/router/web/server-rendering
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-web-static.ts
+    notes: Citation for SSR as an explicit alpha selection. Silence does not select server rendering.
   - id: docs-expo-dev-eas-cli
     name: EAS CLI reference
     source_type: official_docs

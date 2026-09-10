@@ -22,12 +22,6 @@ If `b2c_catalog` and `b2c_knowledge_search` are unavailable:
 
 Do not edit an agent configuration or install software unless the user requested setup.
 
-## Compose
-
-Discover capabilities, providers, and recipes with `b2c_discover` or `b2c catalog --json`. Preview a `b2c/v1` composition with `b2c_compose` or `b2c compose --config b2c.yaml --json`. Both share one versioned result contract. Read `canApply`, blockers, configuration, authority, and verification as separate facts. This declaration preview does not activate a workspace. For an installed runtime, import a local extension with `b2c package-import --workspace ID --source PATH`, inspect `b2c_packages`, then use `b2c_composition_plan` with exact package digests. Apply the returned preview through `b2c composition-activate`; local writes stay CLI-only. Fresh bootstrap activates the complete-business default after canonical product acceptance. Change an installed recipe only through composition activation. Imported package declarations do not install an execution route or prove provider readiness.
-
-`contracts/public-api/REFERENCE.md` holds the supported schema. Use this consumer contract across internal changes. The lifecycle and knowledge tools below use the shared runtime.
-
 ## Build a business
 
 For a new business, create and register its planning workspace in one command:
@@ -58,10 +52,6 @@ public reference defines exact command fields and recovery errors. After reconci
 an interrupted session and uncertain effects, use `business-recover` to close its
 pending request without dispatch. A new request uses the current revision.
 
-## Mobile app operation
-
-For app exploration, flow walks, functional or design checks, screenshots, and recordings, discover `b2c/mobile-app-operation`. Honor explicit provider bindings. Otherwise prefer native tools the current host already exposes when they cover the target and operations. Choose MobAI or another provider for uncovered requirements. Never infer availability from the agent name or shrink the evidence scope. Use the existing native Route Ladder for compatible execution. Raw captures feed independent review or marketing composition. They do not prove acceptance on their own. The public mobile-capture recipe previews selection only. It cannot run a device.
-
 ## Route
 
 Classify the start before catalog search. A complete-business request takes
@@ -88,6 +78,16 @@ For a focused existing-app change, stop after the relevant workflow and normal a
 A complete design mandate inspects the required reference, asset, browser, and native tooling connections up front. Load detailed provider procedures when their work is ready. Do not treat a provisional research slug or name as an accepted brand.
 
 If MCP is unavailable but the CLI works, use `catalog/generated/routing.md` to locate a workflow. Open only the references that workflow names.
+
+## Customize composition
+
+Discover capabilities, providers, and recipes with `b2c_discover` or `b2c catalog --json`. Preview a `b2c/v1` composition with `b2c_compose` or `b2c compose --config b2c.yaml --json`. Both share one versioned result contract. Read `canApply`, blockers, configuration, authority, and verification as separate facts. This declaration preview does not activate a workspace. For an installed runtime, import a local extension with `b2c package-import --workspace ID --source PATH`, inspect `b2c_packages`, then use `b2c_composition_plan` with exact package digests. Apply the returned preview through `b2c composition-activate`; local writes stay CLI-only. Fresh bootstrap activates the complete-business default after canonical product acceptance. Change an installed recipe only through composition activation. Imported package declarations do not install an execution route or prove provider readiness.
+
+`contracts/public-api/REFERENCE.md` holds the supported schema. Use this consumer contract across internal changes. Load this section when the task is changing packages or providers. It is not a prerequisite for creating or resuming a business.
+
+## Mobile app operation
+
+For app exploration, flow walks, functional or design checks, screenshots, and recordings, discover `b2c/mobile-app-operation`. Honor explicit provider bindings. Otherwise prefer native tools the current host already exposes when they cover the target and operations. Choose MobAI or another provider for uncovered requirements. Never infer availability from the agent name or shrink the evidence scope. Use the existing native Route Ladder for compatible execution. Raw captures feed independent review or marketing composition. They do not prove acceptance on their own. The public mobile-capture recipe previews selection only. It cannot run a device.
 
 ## Boundaries
 

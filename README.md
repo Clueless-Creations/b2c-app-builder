@@ -73,22 +73,8 @@ npm run setup
 ```
 
 From a checkout, setup runs `npm link`, so `b2c` resolves to that checkout.
-Either way, the first commands are the same:
-
-```bash
-# List the public capabilities, providers, and recipes.
-b2c catalog --json
-
-# Preview a composition. This creates and changes nothing.
-b2c compose --config contracts/public-api/examples/subscription-app.json --json
-```
-
-The preview resolves each operation to a provider and lists any blockers.
-This declaration preview reports `canApply: false`. To activate an installed
-package recipe, use the separate revision-checked
-[composition plan and activation commands](docs/guides/composition-activation.md).
-The [`b2c-app-builder` skill](SKILL.md) routes broad consumer-app work to the
-right workflow.
+Either way, start with the ordinary business path. The [`b2c-app-builder` skill](SKILL.md)
+routes that work. Catalog discovery and composition preview are optional later.
 
 For a new business, create and register its planning workspace in one command:
 
@@ -115,6 +101,18 @@ product with the 99-workflow complete-business recipe, plans eligible work, and
 runs bounded sessions through the existing executor. Evidence reports separate
 current acceptance from missing or stale proof. Interrupted requests close through revision-checked recovery after uncertain effects are reconciled. See the [lifecycle contract](docs/public-interface.md#business-lifecycle)
 for commands, revisions, request replay, and recovery.
+
+To inspect the catalog or preview a composition without creating a workspace:
+
+```bash
+b2c catalog --json
+b2c compose --config contracts/public-api/examples/subscription-app.json --json
+```
+
+The preview resolves each operation to a provider and lists any blockers.
+This declaration preview reports `canApply: false`. To activate an installed
+package recipe, use the separate revision-checked
+[composition plan and activation commands](docs/guides/composition-activation.md).
 
 ## What it covers
 

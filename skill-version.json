@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.60",
+  "version": "0.219.61",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Drop the After Credits currentBytes tautology and keep count, deferredLoadCount, and later-horizon path locks.",
-    "Require setup-help catalog and compose to appear after plan, matching cli and connection-and-packet."
+    "Restore the autopilot SKILL term Load the matching workflow with b2c_workflow so the run contract matches the gate.",
+    "Wrap generated b2c help at 80 columns and register authored lint-only house-style scenarios."
   ]
 }

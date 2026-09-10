@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.46",
+  "version": "0.219.47",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Serialize EAS dispatch claims so two empty ledgers cannot both start a paid effect.",
-    "Record host eas and expo CLI identity in doctor without spawning live EAS."
+    "Classify Expo capability protocol and local static web without live stores or hosting.",
+    "Keep native purchase and SSR rows blocked; fake in-app transport only."
   ]
 }

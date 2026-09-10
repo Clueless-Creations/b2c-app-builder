@@ -1,0 +1,89 @@
+{
+  "metadata": {
+    "issue": 75,
+    "stage": "A",
+    "purpose": "Reviewed Stage A case split. Held-out store paraphrases stay frozen and are not used to choose ranks, weights, or synonyms.",
+    "builderPinNote": "A measured run records its own commit, package version, and package digest. This file is the case list, not a live-worker report.",
+    "heldOutUtteranceIds": ["store-001", "store-002"],
+    "actualModelUsage": "unknown"
+  },
+  "cases": [
+    {
+      "id": "sa-apple-store",
+      "class": "explicit_apple_store",
+      "workflowId": "workflow.store.store-screenshots-production",
+      "query": "App Store Connect screenshots",
+      "needs": ["workflow.store.store-screenshots-production"],
+      "irrelevant": ["workflow.store.google-play-release"],
+      "note": "Necessary Apple route stays discoverable; Android-only release is not required."
+    },
+    {
+      "id": "sa-no-quiz-journey",
+      "class": "accepted_no_quiz_journey",
+      "workflowId": "workflow.experience.onboarding-system.onb-16-journey-graph",
+      "needs": ["workflow.experience.onboarding-system.onb-16-journey-graph"],
+      "irrelevant": [],
+      "note": "Retrieval must keep the #67 applicability language and must not reintroduce an unconditional quiz."
+    },
+    {
+      "id": "sa-artifact-spec",
+      "class": "artifact_specification",
+      "workflowId": "workflow.design.design-room",
+      "outputPath": "DESIGN.md",
+      "requiredReferenceId": "reference.process.artifact-contracts",
+      "sectionTitle": "DESIGN.md",
+      "needs": ["workflow.design.design-room"],
+      "irrelevant": [],
+      "note": "get() must deliver the artifact-contract DESIGN.md heading, not the first DESIGN.md specifier in catalog order."
+    },
+    {
+      "id": "sa-binding-not-unscoped",
+      "class": "binding_not_unscoped_query",
+      "workflowId": "workflow.design.design-room",
+      "query": "vibecoded tells",
+      "requiredReferenceId": "reference.process.artifact-contracts",
+      "needs": ["workflow.design.design-room"],
+      "irrelevant": [],
+      "note": "A query that misses artifact-contracts lexically must still receive it as workflow_binding. Unscoped search must not return that reference or grow workflowCoverage."
+    },
+    {
+      "id": "sa-tight-bundle",
+      "class": "tight_optional_bundle",
+      "workflowId": "workflow.store.asc-cli-automation",
+      "tokenBudget": 256,
+      "needs": ["workflow.store.asc-cli-automation"],
+      "irrelevant": [],
+      "note": "A tight optional bundle stays incomplete; omitted or truncated entries stay visible."
+    },
+    {
+      "id": "sa-stale-revision",
+      "class": "stale_revision",
+      "workflowId": "workflow.design.design-room",
+      "outputPath": "DESIGN.md",
+      "requiredReferenceId": "reference.process.artifact-contracts",
+      "sectionTitle": "DESIGN.md",
+      "needs": ["workflow.design.design-room"],
+      "irrelevant": [],
+      "note": "A stale expectedContentSha256 must refuse. A matching hash must re-deliver the pinned artifact-contract DESIGN.md heading."
+    },
+    {
+      "id": "sa-hosted-only",
+      "class": "hosted_only_caller",
+      "workflowId": "workflow.store.asc-cli-automation",
+      "needs": ["workflow.store.asc-cli-automation"],
+      "irrelevant": [],
+      "note": "Hosted route-only callers do not receive a worker brief or a workspace-plan execution claim."
+    },
+    {
+      "id": "sa-repeated-read",
+      "class": "repeated_read",
+      "workflowId": "workflow.design.design-room",
+      "outputPath": "DESIGN.md",
+      "requiredReferenceId": "reference.process.artifact-contracts",
+      "sectionTitle": "DESIGN.md",
+      "needs": ["workflow.design.design-room"],
+      "irrelevant": [],
+      "note": "A second get of the pinned artifact-contract DESIGN.md heading is duplicated delivery, not a second unique required section."
+    }
+  ]
+}

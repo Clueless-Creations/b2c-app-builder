@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.30",
+  "version": "0.219.31",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Route mutating catalog reconcile through the landed desired-state planner instead of ID-presence and offering create.",
-    "Consume encoded lookup-key writes, decoded observations, and persist-before-spawn so missing products, entitlements, and packages repair through their own operations."
+    "Record local RevenueCat CLI identity through b2c doctor beside ASC without installing, logging in, or claiming live catalog proof.",
+    "Fail selected-target checks closed without host authority and never spawn authenticated RevenueCat commands."
   ]
 }

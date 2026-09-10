@@ -107,7 +107,7 @@ export async function checkSkillVersion(argv: string[], httpOptions: SourceHttpO
   }
 
   if (args.allRuntimes && latest.manifest) {
-    const inspections = inspectRuntimePins(latest.manifest.version, defaultRuntimeInstallRoots(args.runtimesRoot ?? homedir()));
+    const inspections = inspectRuntimePins(latest.manifest.version, defaultRuntimeInstallRoots(args.runtimesRoot ?? homedir()), args.source);
     for (const item of inspections) {
       switch (item.relation) {
         case "missing":

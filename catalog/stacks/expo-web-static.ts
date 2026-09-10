@@ -54,7 +54,8 @@ export type ExpoWebRefusalCode =
   | "export-missing-bundle"
   | "classification-is-not-export"
   | "spa-not-static-export"
-  | "export-missing-route";
+  | "export-missing-route"
+  | "export-missing-not-found";
 
 export interface ExpoWebSurfaceDecision {
   action: "classify-local-static" | "refuse";
@@ -415,12 +416,134 @@ export function bindStaticExportRoutes(input: { exportDir: string; requiredHrefs
       reason: `Static export is missing HTML for ${missingHrefs.join(", ")}. Classification is not a served route.`,
     };
   }
+  if (!notFoundPresent) {
+    return {
+      action: "refuse",
+      foundHrefs,
+      missingHrefs,
+      notFoundPresent,
+      ...blocked,
+      code: "export-missing-not-found",
+      reason: "Static export is missing +not-found or 404 HTML. A production host must not hide that 404 behind Metro.",
+    };
+  }
   return {
     action: "observe-static-routes",
     foundHrefs,
     missingHrefs,
     notFoundPresent,
     ...blocked,
-    reason: "Static HTML exists for the required local routes. Not EAS Hosting, not SSR, not a production host.",
+    reason: "Static HTML exists for the required local routes and not-found. Not EAS Hosting, not SSR, not a production host.",
+  };
+}
+
+export type StaticNavigationKind = "direct-entry" | "refresh" | "deep-route" | "back" | "unknown";
+
+export interface StaticNavigationStep {
+  kind: StaticNavigationKind;
+  href: string;
+}
+
+export interface StaticNavigationStepObservation {
+  kind: StaticNavigationKind;
+  href: string;
+  htmlPresent: boolean;
+  outcome: "recoverable" | "recoverable-not-found" | "missing";
+}
+
+export interface ExpoStaticNavigationObservation {
+  action: "observe-static-navigation" | "refuse";
+  steps: readonly StaticNavigationStepObservation[];
+  notFoundPresent: boolean;
+  runtimeVerified: false;
+  browser: false;
+  productionHost: false;
+  easHosting: false;
+  ssr: false;
+  labeledLive: false;
+  code?: ExpoWebRefusalCode;
+  reason: string;
+}
+
+function hrefHtmlPresent(exportDir: string, files: readonly string[], href: string): boolean {
+  return hrefFileCandidates(href).some((candidate) => files.includes(candidate) || existsSync(path.join(exportDir, candidate)));
+}
+
+function observeNavigationStep(
+  exportDir: string,
+  files: readonly string[],
+  notFoundPresent: boolean,
+  step: StaticNavigationStep,
+): StaticNavigationStepObservation {
+  const htmlPresent = hrefHtmlPresent(exportDir, files, step.href);
+  switch (step.kind) {
+    case "direct-entry":
+    case "refresh":
+    case "deep-route":
+    case "back":
+      return {
+        kind: step.kind,
+        href: step.href,
+        htmlPresent,
+        outcome: htmlPresent ? "recoverable" : "missing",
+      };
+    case "unknown":
+      return {
+        kind: step.kind,
+        href: step.href,
+        htmlPresent,
+        outcome: htmlPresent ? "recoverable" : notFoundPresent ? "recoverable-not-found" : "missing",
+      };
+    default: {
+      const exhaustive: never = step.kind;
+      throw new Error(`unhandled static navigation kind: ${String(exhaustive)}`);
+    }
+  }
+}
+
+/**
+ * Classify direct-entry, refresh, deep route, back, and unknown against observed HTML.
+ * File presence is not a live browser, not history API proof, and not EAS Hosting.
+ */
+export function classifyStaticExportNavigation(input: { exportDir: string; steps: readonly StaticNavigationStep[] }): ExpoStaticNavigationObservation {
+  const files = listRelativeFiles(input.exportDir);
+  const notFoundPresent = files.some((file) => file.includes("+not-found") || file === "404.html" || file.endsWith("/404.html"));
+  const steps = input.steps.map((step) => observeNavigationStep(input.exportDir, files, notFoundPresent, step));
+  const blocked = {
+    runtimeVerified: false as const,
+    browser: false as const,
+    productionHost: false as const,
+    easHosting: false as const,
+    ssr: false as const,
+    labeledLive: false as const,
+  };
+  const missingKnown = steps.find((step) => step.kind !== "unknown" && step.outcome === "missing");
+  if (missingKnown) {
+    return {
+      action: "refuse",
+      steps,
+      notFoundPresent,
+      ...blocked,
+      code: "export-missing-route",
+      reason: `Static export is missing HTML for ${missingKnown.href} (${missingKnown.kind}). Direct entry and refresh would 404 on a static host.`,
+    };
+  }
+  const unknownMissing = steps.find((step) => step.kind === "unknown" && step.outcome === "missing");
+  if (unknownMissing) {
+    return {
+      action: "refuse",
+      steps,
+      notFoundPresent,
+      ...blocked,
+      code: "export-missing-not-found",
+      reason: "Unknown static href has no +not-found or 404 HTML. A production host must not hide that 404 behind Metro.",
+    };
+  }
+  return {
+    action: "observe-static-navigation",
+    steps,
+    notFoundPresent,
+    ...blocked,
+    reason: "Direct-entry, refresh, deep route, back, and unknown/not-found are classified from static HTML. Not a browser, not EAS Hosting, not SSR.",
   };
 }

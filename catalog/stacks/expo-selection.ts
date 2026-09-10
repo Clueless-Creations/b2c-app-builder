@@ -495,7 +495,7 @@ function operationSupport(): ExpoOperationSupport[] {
       evidenceTier: "fixture-tested",
       queuedIssue: 86,
       notes:
-        "Disposable Metro static export (`expo export --platform web`) is fixture-tested. It cannot satisfy iOS or Android. Alpha SSR, API routes, and EAS Hosting stay blocked. The Expo/EAS executor still labels expo.export unavailable.",
+        "Disposable Metro static export (`expo export --platform web`) is fixture-tested. Direct-entry, refresh, deep `/detail/1`, back, and unknown/not-found are classified from observed HTML. It cannot satisfy iOS or Android. Alpha SSR, API routes, and EAS Hosting stay blocked. The Expo/EAS executor still labels expo.export unavailable. Not a live browser.",
     },
     {
       id: "eas-hosting",

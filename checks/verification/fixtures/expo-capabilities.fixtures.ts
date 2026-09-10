@@ -4,6 +4,8 @@
  * Local session/cache/permission fixtures plus fake in-app purchase transport.
  * Live App Store, Play, RevenueCat mutations, paid EAS, and production hosting stay not-run.
  */
+import { mkdirSync, writeFileSync } from "node:fs";
+import path from "node:path";
 import {
   EMPTY_AUTH_SESSION,
   EXPO_CAPABILITY_OPERATION_IDS,
@@ -37,6 +39,8 @@ import {
   EXPO_WEB_OPERATION_IDS,
   EXPO_WEB_STATIC_SOURCES,
   bindLocalStaticExport,
+  bindStaticExportRoutes,
+  classifyStaticExportNavigation,
   classifyWebNativeModule,
   decideExpoWebSurface,
   defaultWebSurfaceMode,
@@ -549,10 +553,63 @@ export function register(harness: Harness): void {
     );
   });
 
+  harness.check("expo web static: direct-entry, refresh, deep route, back, and unknown classify from HTML", () => {
+    const exportDir = harness.makeTempDir("expo-static-navigation");
+    writeFileSync(path.join(exportDir, "index.html"), "<html></html>\n");
+    writeFileSync(path.join(exportDir, "settings.html"), "<html></html>\n");
+    writeFileSync(path.join(exportDir, "sign-in.html"), "<html></html>\n");
+    writeFileSync(path.join(exportDir, "modal.html"), "<html></html>\n");
+    mkdirSync(path.join(exportDir, "detail"), { recursive: true });
+    writeFileSync(path.join(exportDir, "detail/1.html"), "<html></html>\n");
+    writeFileSync(path.join(exportDir, "+not-found.html"), "<html></html>\n");
+
+    const routes = bindStaticExportRoutes({
+      exportDir,
+      requiredHrefs: [ROUTE_HREFS.home, ROUTE_HREFS.settings, ROUTE_HREFS.signIn, ROUTE_HREFS.modal, ROUTE_HREFS.detail("1")],
+    });
+    assert(routes.action === "observe-static-routes" && routes.notFoundPresent, routes.reason);
+
+    const observed = classifyStaticExportNavigation({
+      exportDir,
+      steps: [
+        { kind: "direct-entry", href: ROUTE_HREFS.home },
+        { kind: "refresh", href: ROUTE_HREFS.settings },
+        { kind: "deep-route", href: ROUTE_HREFS.detail("1") },
+        { kind: "back", href: ROUTE_HREFS.home },
+        { kind: "unknown", href: "/missing-static-route" },
+      ],
+    });
+    assert(observed.action === "observe-static-navigation", observed.reason);
+    assert(observed.browser === false && observed.runtimeVerified === false && observed.easHosting === false, observed.reason);
+    assert(
+      observed.steps.every((step) => (step.kind === "unknown" ? step.outcome === "recoverable-not-found" : step.outcome === "recoverable")),
+      "known hrefs recover from HTML; unknown recovers through not-found",
+    );
+
+    const missingDeep = classifyStaticExportNavigation({
+      exportDir,
+      steps: [{ kind: "deep-route", href: ROUTE_HREFS.detail("99") }],
+    });
+    assert(missingDeep.action === "refuse" && missingDeep.code === "export-missing-route", missingDeep.reason);
+
+    const noNotFoundDir = harness.makeTempDir("expo-static-missing-not-found");
+    writeFileSync(path.join(noNotFoundDir, "index.html"), "<html></html>\n");
+    const missingNotFound = bindStaticExportRoutes({ exportDir: noNotFoundDir, requiredHrefs: [ROUTE_HREFS.home] });
+    assert(missingNotFound.action === "refuse" && missingNotFound.code === "export-missing-not-found", missingNotFound.reason);
+    const unknownHidden = classifyStaticExportNavigation({
+      exportDir: noNotFoundDir,
+      steps: [{ kind: "unknown", href: "/missing-static-route" }],
+    });
+    assert(unknownHidden.action === "refuse" && unknownHidden.code === "export-missing-not-found", unknownHidden.reason);
+  });
+
   harness.check("expo capabilities: disposable SQLite session and cache survive reopen without leaking accounts", () => {
     const journey = runLocalCapabilityJourney(harness.makeTempDir("expo-local-capabilities"));
     assert(journey.signedIn.action === "accept" && journey.signedIn.snapshot.session.appUserId === "user-a", journey.signedIn.reason);
-    assert(journey.signedIn.snapshot.session.entitled === false && journey.signedIn.snapshot.secureStore === false, "local session is not SecureStore or paid access");
+    assert(
+      journey.signedIn.snapshot.session.entitled === false && journey.signedIn.snapshot.secureStore === false,
+      "local session is not SecureStore or paid access",
+    );
     assert(journey.persistedNote.action === "accept" && journey.restarted.snapshot.notes.some((note) => note.id === "note-1"), journey.restarted.reason);
     assert(journey.expired.snapshot.session.signedIn === false, "expired session clears the current user");
     assert(journey.switched.snapshot.session.appUserId === "user-b" && journey.isolated, "account switch isolates prior-user notes");

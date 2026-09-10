@@ -9,6 +9,17 @@ export const ROUTE_HREFS = {
   detail: (id: string) => `/detail/${id}` as const,
 } as const;
 
+/** Known static-export params. Notification restore uses id `1`. Not a CMS. */
+export const STATIC_DETAIL_IDS = ["1"] as const;
+
+export const STATIC_EXPORT_REQUIRED_HREFS = [
+  ROUTE_HREFS.home,
+  ROUTE_HREFS.settings,
+  ROUTE_HREFS.signIn,
+  ROUTE_HREFS.modal,
+  ...STATIC_DETAIL_IDS.map((id) => ROUTE_HREFS.detail(id)),
+] as const;
+
 export const rootStackLayout = {
   kind: "stack" as const,
   screens: ROOT_STACK_SCREENS,

@@ -20,7 +20,7 @@ This map routes selected Expo work to truthful declarations and explicit gaps. I
 
 `catalog/stacks/expo-selection.ts` is the inventory. First-party monetization and mobile-app-operation declarations still target `ios` / `swiftui`. Do not append `expo` to those operations until their implementations exist. A missing target is `binding.target_mismatch`, not a silent alias.
 
-#81 fixture-tests selection, knowledge routing, and passive detection. #82 fixture-tests the isolated starter, React Native adapter source, disposable Metro web export, classified CNG generate, and a bound local-cache persistence seam. #83 fixture-tests local session, SQLite cache reopen, permission safe-states, and notification route restore in a disposable directory. Native purchases stay blocked. #86 fixture-tests local static export and required static HTML routes. Device install, EAS Hosting, OTA, and store submit stay separate.
+#81 fixture-tests selection, knowledge routing, and passive detection. #82 fixture-tests the isolated starter, React Native adapter source, disposable Metro web export, classified CNG generate, and a bound local-cache persistence seam. #83 fixture-tests local session, SQLite cache reopen, permission safe-states, and notification route restore in a disposable directory. Native purchases stay blocked. #86 fixture-tests local static export, required static HTML routes including `/detail/1`, and classified direct-entry, refresh, back, and unknown/not-found. Device install, EAS Hosting, OTA, and store submit stay separate.
 
 ## 2. Building iOS And Android With Expo
 
@@ -42,7 +42,7 @@ A missing native module in an old binary is a rebuild requirement, not a JavaScr
 
 ## 5. Expo Web Only
 
-`{ platform: web, runtime: expo }` selects a browser surface. It cannot satisfy iOS or Android requirements. Local static Metro export (`expo export --platform web`) is fixture-tested in a disposable copy. That is not EAS Hosting, not SSR, and not a production host. Server rendering is labeled alpha in current Expo Router docs: do not enable it silently. API routes need a real server for production clients. Static hosting cannot execute them.
+`{ platform: web, runtime: expo }` selects a browser surface. It cannot satisfy iOS or Android requirements. Local static Metro export (`expo export --platform web`) is fixture-tested in a disposable copy. Direct-entry, refresh, deep `/detail/1`, back, and unknown/not-found are classified from observed HTML. That is not a live browser, not EAS Hosting, not SSR, and not a production host. Server rendering is labeled alpha in current Expo Router docs: do not enable it silently. API routes need a real server for production clients. Static hosting cannot execute them.
 
 Existing Next.js or Astro marketing sites stay put unless the accepted design says otherwise. #86 owns web/hosting semantics. #84 owns the shared process executor.
 

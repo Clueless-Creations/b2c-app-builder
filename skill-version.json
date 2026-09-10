@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.72",
+  "version": "0.219.73",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Say completion.deliveryAccepted is current closeout evidence, not store submission or release.",
-    "Keep liveLaunchProven false unless separately granted provider-native proof exists."
+    "Serialize RevenueCat CLI mutations with an exclusive per-request claim so two empty ledgers cannot both spawn.",
+    "Prove Test Store from CLI apps show readback, and refuse simulate-purchase when the caller only supplied a store label."
   ]
 }

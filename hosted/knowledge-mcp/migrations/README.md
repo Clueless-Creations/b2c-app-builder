@@ -2,18 +2,12 @@
 
 The Cloudflare D1 schema for the Clueless Creations platform. Milestone M1.
 
-Applied. The `clueless-creations` database exists and carries this schema.
+Apply migrations `0001`–`0008` to the D1 database named in `wrangler.jsonc`. The binding and
+placeholder database id live there. This file does not record which migrations a remote
+database has already applied.
 
-|          |                                                                                  |
-| -------- | -------------------------------------------------------------------------------- |
-| Database | `clueless-creations`                                                             |
-| ID       | `00000000-0000-0000-0000-000000000000`                                           |
-| Region   | ENAM                                                                             |
-| Applied  | migrations 0001-0007, local and remote; 0008 written and tested, not yet applied |
-| Verified | 10 tables, 11 triggers, 12 indexes; zero rows                                    |
-
-The binding is in `wrangler.jsonc` and the Worker reads it. See "Two credential sources"
-below for what that changes and, more importantly, what it does not.
+The Worker reads the binding. Credential authority stays in `access.ts` and the schema
+invariants below; this file does not describe a live deployment.
 
 ## Files
 
@@ -119,14 +113,6 @@ cd hosted/knowledge-mcp && ./node_modules/.bin/wrangler d1 execute clueless-crea
 
 Do not probe the remote database with throwaway rows. `audit_events` is append-only and
 refuses DELETE, so a test row written there cannot be removed. Probe locally instead.
-
-## A second waitlist now exists
-
-The account also holds a `clueless-waitlist` database with `waitlist` and `checkout_intent`
-tables, predating this work. `interest_signals` here is deliberately separate: the
-architecture puts the collector beside `accounts` so a later Checkout release can convert a
-signal without a cross-database migration. Before the collector ships, decide which one is
-authoritative, or the same address can sit in both with different intent text.
 
 ## Verify without a database
 

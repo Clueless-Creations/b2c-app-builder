@@ -972,16 +972,6 @@ sources:
       - knowledge/engineering/expo-compatibility.md
     notes: Candidate reviewed baseline for SDK 57 / React Native 0.86 / React 19.2. Not an executed CLI or
       workspace pin.
-  - id: github-clueless-creations-site
-    name: Clueless Creations website repository
-    source_type: github
-    url: https://github.com/Clueless-Creations/clueless-creations-site
-    refresh_cadence_days: 90
-    owner: design
-    locations:
-      - catalog/knowledge/design/design-editorial-scrollytelling.yaml
-    notes: Practice evidence for semantic story anchors and code-native visual states. The catalog manifest pins the
-      audited commit; future refreshes must transfer mechanics only.
   - id: github-com-clueless-creations-b2c-app-builder-actions-workflows-ci-yml
     name: github.com
     source_type: github

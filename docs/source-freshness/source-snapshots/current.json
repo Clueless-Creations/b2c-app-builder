@@ -18,7 +18,7 @@
     },
     {
       "id": "api-revenuecat-com",
-      "name": "RevenueCat REST API v2 \u2014 API host",
+      "name": "RevenueCat REST API v2 — API host",
       "url": "https://api.revenuecat.com",
       "source_type": "api",
       "owner": "source-freshness",
@@ -32,7 +32,7 @@
     },
     {
       "id": "app-posthog-com",
-      "name": "PostHog Cloud \u2014 app host",
+      "name": "PostHog Cloud — app host",
       "url": "https://app.posthog.com",
       "source_type": "api",
       "owner": "source-freshness",
@@ -98,7 +98,7 @@
       "hash": "7a553f962977212fdf69389c33d67d91db1320d352a17f9cc56e14b230bed134",
       "previous_hash": "728751b4c653899bf003c798a1a643b8f37e22112d3b3d73ef41fe9ac871a2ea",
       "changed": true,
-      "title": "Design Spells \u00b7 Design details that feel like magic"
+      "title": "Design Spells · Design details that feel like magic"
     },
     {
       "id": "developer-apple-com-app-store-app-privacy-details",
@@ -470,19 +470,6 @@
       "changed": false
     },
     {
-      "id": "github-clueless-creations-site",
-      "name": "Clueless Creations website repository",
-      "url": "https://github.com/Clueless-Creations/clueless-creations-site",
-      "source_type": "github",
-      "owner": "design",
-      "status": "fresh",
-      "http_status": 404,
-      "checked_at": "2026-08-22T04:21:32.882Z",
-      "hash": "2fcc1727008356f9695edb29a4226b2b6cfa119f791b707e5101263d95d831fc",
-      "changed": false,
-      "title": "Page not found \u00b7 GitHub \u00b7 GitHub"
-    },
-    {
       "id": "github-com-general-legal-legal-templates",
       "name": "General Legal template collection",
       "url": "https://github.com/General-Legal/legal-templates",
@@ -494,7 +481,7 @@
       "hash": "f6048a068f4e9077524ad40c32dd74b8591703d023068ac778504a89df24c30d",
       "previous_hash": "cb2525d99559ebd786bc8a13d482b36f6a5be7c1c2040f14ec5f65034e86a924",
       "changed": true,
-      "title": "GitHub - General-Legal/legal-templates: Public collection of high-quality templates created by General Legal attorneys with CC0 license \u00b7 GitHub"
+      "title": "GitHub - General-Legal/legal-templates: Public collection of high-quality templates created by General Legal attorneys with CC0 license · GitHub"
     },
     {
       "id": "github-com-glitch-cat-club-graph-memory-starter-blob-3254a8da41699def6abfa399166",
@@ -508,7 +495,7 @@
       "hash": "6f63634dfb275fbe651e423102f6bb21cf4266ab05cd5b334f45cb2e3a7db223",
       "previous_hash": "988fef64ca87e5d6171e34c3b2e91be5d02adaabd8890ec56b57367afef7ffbe",
       "changed": true,
-      "title": "graph-memory-starter/src/recall.py at 3254a8da41699def6abfa399166122fb04e6ddbd \u00b7 Glitch-Cat-Club/graph-memory-starter \u00b7 GitHub"
+      "title": "graph-memory-starter/src/recall.py at 3254a8da41699def6abfa399166122fb04e6ddbd · Glitch-Cat-Club/graph-memory-starter · GitHub"
     },
     {
       "id": "github-com-glitch-cat-club-graph-memory-starter-blob-3254a8da41699def6abfa399166-2",
@@ -522,7 +509,7 @@
       "hash": "0f8de91020bcf3079a2ef57ce0a7dab0d21fc67024ccf04ca4610a5ac16bdadc",
       "previous_hash": "881d0b76d09b948224605299ad2ec2a8037aa71a00d342f8942aedfc573162a9",
       "changed": true,
-      "title": "graph-memory-starter/src/schema.sql at 3254a8da41699def6abfa399166122fb04e6ddbd \u00b7 Glitch-Cat-Club/graph-memory-starter \u00b7 GitHub"
+      "title": "graph-memory-starter/src/schema.sql at 3254a8da41699def6abfa399166122fb04e6ddbd · Glitch-Cat-Club/graph-memory-starter · GitHub"
     },
     {
       "id": "github-com-glitch-cat-club-graph-memory-starter-tree-3254a8da41699def6abfa399166",
@@ -536,7 +523,7 @@
       "hash": "85a1cf431a4ce9d5638dc62cc18ec334d004d2af2709980c2246c874b2aa397d",
       "previous_hash": "a1769772de56b12cfa6afc5b7bfef0e6d58a1b6a9afc1bc39d24df09579f06a5",
       "changed": true,
-      "title": "GitHub - Glitch-Cat-Club/graph-memory-starter at 3254a8da41699def6abfa399166122fb04e6ddbd \u00b7 GitHub"
+      "title": "GitHub - Glitch-Cat-Club/graph-memory-starter at 3254a8da41699def6abfa399166122fb04e6ddbd · GitHub"
     },
     {
       "id": "github-com-glitch-cat-club-prompt-router-starter-blob-067b089fb36dfd73f22a417939",
@@ -550,7 +537,7 @@
       "hash": "3aabf33aae82eeaf1c936d8de5b526936ee2903ea9dd852e4970e7dd5df9d1ac",
       "previous_hash": "735c8b6f6439c5a01b034e4e9db2190133ecb891b8ff79de67935c65ca93e32e",
       "changed": true,
-      "title": "prompt-router-starter/algorithm/rules.json at 067b089fb36dfd73f22a4179390722cad2231e20 \u00b7 Glitch-Cat-Club/prompt-router-starter \u00b7 GitHub"
+      "title": "prompt-router-starter/algorithm/rules.json at 067b089fb36dfd73f22a4179390722cad2231e20 · Glitch-Cat-Club/prompt-router-starter · GitHub"
     },
     {
       "id": "github-com-glitch-cat-club-prompt-router-starter-tree-067b089fb36dfd73f22a417939",
@@ -564,7 +551,7 @@
       "hash": "99d39adb864f9a71e0f90999d3427d81ece5dee08795be6161ef8199544a16bf",
       "previous_hash": "d47320ba5507966ef90f9c1d436b230d8dc66734e83cdad460c71d8cbfe09b96",
       "changed": true,
-      "title": "GitHub - Glitch-Cat-Club/prompt-router-starter at 067b089fb36dfd73f22a4179390722cad2231e20 \u00b7 GitHub"
+      "title": "GitHub - Glitch-Cat-Club/prompt-router-starter at 067b089fb36dfd73f22a4179390722cad2231e20 · GitHub"
     },
     {
       "id": "github-com-glitch-cat-club-trendingai-blob-51233873060a8835f9ac8055a710f65aa21d0",
@@ -578,7 +565,7 @@
       "hash": "ba198951ad5b8656d5c94485877b38e05261f8aebe7e4f72951d8c7041c78481",
       "previous_hash": "c0635ec22c42d1a9a38bc569921705b7463a464152d50848e7e1cf834e1fbcd7",
       "changed": true,
-      "title": "TrendingAI/src/harvesters/orchestrator.ts at 51233873060a8835f9ac8055a710f65aa21d0b54 \u00b7 Glitch-Cat-Club/TrendingAI \u00b7 GitHub"
+      "title": "TrendingAI/src/harvesters/orchestrator.ts at 51233873060a8835f9ac8055a710f65aa21d0b54 · Glitch-Cat-Club/TrendingAI · GitHub"
     },
     {
       "id": "github-com-glitch-cat-club-trendingai-tree-51233873060a8835f9ac8055a710f65aa21d0",
@@ -592,7 +579,7 @@
       "hash": "0266d0dbc84377c1c08b5b813185c78af6405c932ca13c7bda33af17fa0af460",
       "previous_hash": "4dbbb378cdb0adc6ea4f017cbff4b91556ead0459e2a30a596097d35d098ae1e",
       "changed": true,
-      "title": "GitHub - Glitch-Cat-Club/TrendingAI at 51233873060a8835f9ac8055a710f65aa21d0b54 \u00b7 GitHub"
+      "title": "GitHub - Glitch-Cat-Club/TrendingAI at 51233873060a8835f9ac8055a710f65aa21d0b54 · GitHub"
     },
     {
       "id": "github-com-parthjadhav-app-store-screenshots",
@@ -606,21 +593,7 @@
       "hash": "0676447b24d34e7c1f589cfa040990b72bac057745570130fd4e4e1346ffcbf8",
       "previous_hash": "7bc580f555284f8e7a2763496348d6bc22ad5f87ff7b8b578c0b520898741406",
       "changed": true,
-      "title": "GitHub - ParthJadhav/app-store-screenshots: end to end app store screenshot creation using AI \u00b7 GitHub"
-    },
-    {
-      "id": "github-com-peter-evans-create-pull-request",
-      "name": "github.com",
-      "url": "https://github.com/peter-evans/create-pull-request",
-      "source_type": "github",
-      "owner": "source-freshness",
-      "status": "changed",
-      "http_status": 200,
-      "checked_at": "2026-08-22T04:21:32.882Z",
-      "hash": "1110bf567baaac8b070df2d4477349893a663a186914d33592e5f1e1992e0c71",
-      "previous_hash": "bed2b9faca6fb81bff16d8dcf1c708d0469e7df39bc09b359d8fad2e1ce029bf",
-      "changed": true,
-      "title": "GitHub - peter-evans/create-pull-request: A GitHub action to create a pull request for changes to your repository in the actions workspace \u00b7 GitHub"
+      "title": "GitHub - ParthJadhav/app-store-screenshots: end to end app store screenshot creation using AI · GitHub"
     },
     {
       "id": "github-com-remotion-dev-remotion",
@@ -634,7 +607,7 @@
       "hash": "75a4617fce3f724018fde8ad044ef09128caa890f8a45f51b4a84a63ee684d05",
       "previous_hash": "636c127dda44c7247c48babd01f1cff691b72d248286437d9831266c60cd5a6d",
       "changed": true,
-      "title": "GitHub - remotion-dev/remotion: \ud83c\udfa5 Make videos programmatically with React \u00b7 GitHub"
+      "title": "GitHub - remotion-dev/remotion: 🎥 Make videos programmatically with React · GitHub"
     },
     {
       "id": "github-com-remotion-dev-skills",
@@ -648,7 +621,7 @@
       "hash": "c208ce2eb8165750f3476af2db63539d3ded04176bba581935695adb486283db",
       "previous_hash": "4b99776373b788c37dc52e55e6596bf6103f774d5cc5b915b7f6094c793216e3",
       "changed": true,
-      "title": "GitHub - remotion-dev/skills: Agent Skills \u00b7 GitHub"
+      "title": "GitHub - remotion-dev/skills: Agent Skills · GitHub"
     },
     {
       "id": "github-com-rindig-content-agent-routing-promptbase-blob-fc41a3d718bcd16a9e0db9e7",
@@ -662,7 +635,7 @@
       "hash": "586f079f00f0820f5de2483a6d62bffef33878317a4079a6dd9b945f4fa8d8d9",
       "previous_hash": "1e49314fdac2d1cf70c8dd0c685fae843adbfb232c9a0dbd084780a1941215c6",
       "changed": true,
-      "title": "Content-Agent-Routing-Promptbase/SYSTEM-ARCHITECTURE.md at fc41a3d718bcd16a9e0db9e7e6176a8063d7d2c9 \u00b7 RinDig/Content-Agent-Routing-Promptbase \u00b7 GitHub"
+      "title": "Content-Agent-Routing-Promptbase/SYSTEM-ARCHITECTURE.md at fc41a3d718bcd16a9e0db9e7e6176a8063d7d2c9 · RinDig/Content-Agent-Routing-Promptbase · GitHub"
     },
     {
       "id": "github-com-rindig-content-agent-routing-promptbase-tree-fc41a3d718bcd16a9e0db9e7",
@@ -676,7 +649,7 @@
       "hash": "01a276f986a3c64c46e7f5e28726d58ec6b42531d3161dbab18ca514978a33c1",
       "previous_hash": "22b810347334120e47a546e6283c998abadb9c2e67d90e4ca3a750a5d8497030",
       "changed": true,
-      "title": "GitHub - RinDig/Content-Agent-Routing-Promptbase at fc41a3d718bcd16a9e0db9e7e6176a8063d7d2c9 \u00b7 GitHub"
+      "title": "GitHub - RinDig/Content-Agent-Routing-Promptbase at fc41a3d718bcd16a9e0db9e7e6176a8063d7d2c9 · GitHub"
     },
     {
       "id": "github-com-rindig-icm-architect-blob-b20fb45063a564cf607b03526e206f519d174def-sk",
@@ -690,7 +663,7 @@
       "hash": "830c5783514bb2aad8ba5dd9dbc578264dd1d79c19da3783ca5628b587b159fa",
       "previous_hash": "f49d301a4c1fe6f200ecc8d7b2404e1544a65b30b62529581c39ffad2eba9722",
       "changed": true,
-      "title": "icm-architect/SKILL.md at b20fb45063a564cf607b03526e206f519d174def \u00b7 RinDig/icm-architect \u00b7 GitHub"
+      "title": "icm-architect/SKILL.md at b20fb45063a564cf607b03526e206f519d174def · RinDig/icm-architect · GitHub"
     },
     {
       "id": "github-com-rindig-icm-architect-tree-b20fb45063a564cf607b03526e206f519d174def",
@@ -704,7 +677,7 @@
       "hash": "921eb05b29bcbc4a5fa0c68ed4bb9af67fd643e0594c74b22d7fdc48fa4e122c",
       "previous_hash": "2085880f4ab15dd16a4c3c607200dd1de24d0a0e9446781a9ced4fe85626cd26",
       "changed": true,
-      "title": "GitHub - RinDig/icm-architect at b20fb45063a564cf607b03526e206f519d174def \u00b7 GitHub"
+      "title": "GitHub - RinDig/icm-architect at b20fb45063a564cf607b03526e206f519d174def · GitHub"
     },
     {
       "id": "github-com-rindig-interpretable-context-methodology-blob-02ba5d85c7871b75c7c702a",
@@ -718,7 +691,7 @@
       "hash": "563d42885183dc8d6e2bac51b3f654c62494b85222b0af4b9f680dd76d8c0ac1",
       "previous_hash": "bc81e169f2f1c24fc54c7aa8f010420a05064c78e5765b859606358643353359",
       "changed": true,
-      "title": "Interpretable-Context-Methodology/_core/CONVENTIONS.md at 02ba5d85c7871b75c7c702a2d8da6524723d53d4 \u00b7 RinDig/Interpretable-Context-Methodology \u00b7 GitHub"
+      "title": "Interpretable-Context-Methodology/_core/CONVENTIONS.md at 02ba5d85c7871b75c7c702a2d8da6524723d53d4 · RinDig/Interpretable-Context-Methodology · GitHub"
     },
     {
       "id": "github-com-rindig-interpretable-context-methodology-tree-02ba5d85c7871b75c7c702a",
@@ -732,20 +705,7 @@
       "hash": "eb40c1ce28c09b249884bead547b8066c6d0a477b9db6315051361bc36cfacce",
       "previous_hash": "a2409b470f1eb7e44986b49ea530e7d8656610b0affdf2bbdba11d89ae27c9a6",
       "changed": true,
-      "title": "GitHub - RinDig/Interpretable-Context-Methodology at 02ba5d85c7871b75c7c702a2d8da6524723d53d4 \u00b7 GitHub"
-    },
-    {
-      "id": "github-eduardomuth-site",
-      "name": "Eduardo Martinez portfolio website repository",
-      "url": "https://github.com/Emuthmartinez/eduardomuth-site",
-      "source_type": "github",
-      "owner": "design",
-      "status": "fresh",
-      "http_status": 404,
-      "checked_at": "2026-08-22T04:21:32.882Z",
-      "hash": "e5f23fcabc11acdafb527944bc52552f78ab62fb194a48f74f9284722bf69462",
-      "changed": false,
-      "title": "Page not found \u00b7 GitHub \u00b7 GitHub"
+      "title": "GitHub - RinDig/Interpretable-Context-Methodology at 02ba5d85c7871b75c7c702a2d8da6524723d53d4 · GitHub"
     },
     {
       "id": "instagram-aj-on-ai-vibecoded-checklist",
@@ -759,7 +719,7 @@
       "hash": "4a2a04ae0540eda641a318dabfc21f77e84af6b252ea491a95d8b8526eb11049",
       "previous_hash": "f4520594f1b273114662113379d534072010b8ab90eab52dedc84c5f61083ee3",
       "changed": true,
-      "title": "AJ (&#064;aj.on.ai) \u2022 Instagram photos and videos"
+      "title": "AJ (&#064;aj.on.ai) • Instagram photos and videos"
     },
     {
       "id": "jakubantalik-border-beam",
@@ -773,7 +733,7 @@
       "hash": "c32ceb0c120e34568e809a54f8cfe7b6dbdb7a6f9bce7953eda2f89ffd9dc24b",
       "previous_hash": "c32ceb0c120e34568e809a54f8cfe7b6dbdb7a6f9bce7953eda2f89ffd9dc24b",
       "changed": false,
-      "title": "Border Beam \u2013 Animated border beam component for React"
+      "title": "Border Beam – Animated border beam component for React"
     },
     {
       "id": "jakubantalik-liquid-gooey",
@@ -787,7 +747,7 @@
       "hash": "3fa21a8fd74bde79c2ab792a12ce10b0dffc06228bdaf5c67919a0b886acd6e9",
       "previous_hash": "3fa21a8fd74bde79c2ab792a12ce10b0dffc06228bdaf5c67919a0b886acd6e9",
       "changed": false,
-      "title": "Liquid Gooey \u2014 liquid UI for React"
+      "title": "Liquid Gooey — liquid UI for React"
     },
     {
       "id": "jakubantalik-metal-fx",
@@ -801,7 +761,7 @@
       "hash": "b9432601d09875b0d46ed3bd6a32ca0350525fdaf055797b9a525d3d0fef05f5",
       "previous_hash": "b9432601d09875b0d46ed3bd6a32ca0350525fdaf055797b9a525d3d0fef05f5",
       "changed": false,
-      "title": "Liquid metal \u2014 Animated metal shader effect"
+      "title": "Liquid metal — Animated metal shader effect"
     },
     {
       "id": "jakubantalik-thinking-orbs",
@@ -815,7 +775,7 @@
       "hash": "9abb8f2cabdefa48de55e7f02af9882fbe2c8750ca207abb19120aa7676aaf7f",
       "previous_hash": "9abb8f2cabdefa48de55e7f02af9882fbe2c8750ca207abb19120aa7676aaf7f",
       "changed": false,
-      "title": "Thinking orbs \u2014 Animated thinking orb component"
+      "title": "Thinking orbs — Animated thinking orb component"
     },
     {
       "id": "json-schema-org-draft-2020-12-schema",
@@ -842,7 +802,7 @@
       "hash": "94c11d0b9922304cb77680bc93b90528186146f3ef091c1309bb2af3a5b30840",
       "previous_hash": "f98d7de85ef803d720abc05dbaf562f9a0e279f9c6fc5f56c226135020f5614d",
       "changed": true,
-      "title": "MotionSites AI \u2014 Official Premium AI Website Prompts"
+      "title": "MotionSites AI — Official Premium AI Website Prompts"
     },
     {
       "id": "openai-com-index-harness-engineering",
@@ -860,7 +820,7 @@
     },
     {
       "id": "posthog-com-docs-api-events",
-      "name": "PostHog \u2014 Events REST API",
+      "name": "PostHog — Events REST API",
       "url": "https://posthog.com/docs/api/events",
       "source_type": "official_docs",
       "owner": "source-freshness",
@@ -874,7 +834,7 @@
     },
     {
       "id": "posthog-com-docs-api-query",
-      "name": "PostHog \u2014 Query REST API (HogQL)",
+      "name": "PostHog — Query REST API (HogQL)",
       "url": "https://posthog.com/docs/api/query",
       "source_type": "official_docs",
       "owner": "source-freshness",
@@ -1062,7 +1022,7 @@
       "hash": "d84c363c16334dde0057a3090df4a4c739b0de6faec84c7b8bcc4c0033b5d953",
       "previous_hash": "d84c363c16334dde0057a3090df4a4c739b0de6faec84c7b8bcc4c0033b5d953",
       "changed": false,
-      "title": "RevenueCat API v1 | In-App Subscriptions Made Easy \u2013 RevenueCat"
+      "title": "RevenueCat API v1 | In-App Subscriptions Made Easy – RevenueCat"
     }
   ]
 }

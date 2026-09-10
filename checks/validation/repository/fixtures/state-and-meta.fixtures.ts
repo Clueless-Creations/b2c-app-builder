@@ -204,6 +204,83 @@ export function register(h: Harness): void {
   );
   runFixture("source registry duplicate url fails after normalizeUrl", sourceRegistryDuplicateUrl, "check-source-freshness.ts", 1, "source_freshness.sources.duplicate_url");
 
+  const sourceBoundaryClean = makeEmptyFixture("source-public-boundary-clean");
+  writeSourceRegistryFixture(sourceBoundaryClean);
+  writeFileSync(
+    path.join(sourceBoundaryClean, "README.md"),
+    [
+      "# Source Fixture",
+      "Use current docs from https://docs.doppler.com/docs/cli before setup.",
+      "Stand-in home: /Users/founder/myapp.env",
+      "License hash: 2fcc1727008356f9695edb29a4226b2b6cfa119f791b707e5101263d95d831fc",
+    ].join("\n"),
+    "utf8",
+  );
+  runFixture("public-boundary stand-ins and hashes pass", sourceBoundaryClean, "check-source-freshness.ts", 0);
+
+  const sourceBoundaryHome = makeEmptyFixture("source-public-boundary-home");
+  writeSourceRegistryFixture(sourceBoundaryHome);
+  writeFileSync(
+    path.join(sourceBoundaryHome, "README.md"),
+    ["# Source Fixture", "Use current docs from https://docs.doppler.com/docs/cli before setup.", "Notes: /Users/canary-home/notes.md"].join("\n"),
+    "utf8",
+  );
+  runFixture("operator home path fails public-boundary", sourceBoundaryHome, "check-source-freshness.ts", 1, "source_freshness.public_boundary.operator_path");
+
+  const sourceBoundarySecretManager = makeEmptyFixture("source-public-boundary-secret-manager");
+  writeSourceRegistryFixture(sourceBoundarySecretManager);
+  writeFileSync(
+    path.join(sourceBoundarySecretManager, "README.md"),
+    [
+      "# Source Fixture",
+      "Use current docs from https://docs.doppler.com/docs/cli before setup.",
+      "Copied from Doppler `canary-proj/canary-cfg`.",
+    ].join("\n"),
+    "utf8",
+  );
+  runFixture(
+    "secret-manager project/config pair fails public-boundary",
+    sourceBoundarySecretManager,
+    "check-source-freshness.ts",
+    1,
+    "source_freshness.public_boundary.secret_manager_config",
+  );
+
+  const sourceBoundarySibling = makeEmptyFixture("source-public-boundary-sibling");
+  writeSourceRegistryFixture(sourceBoundarySibling, false);
+  writeFileSync(path.join(sourceBoundarySibling, "README.md"), "# Source Fixture\n", "utf8");
+  writeFileSync(
+    path.join(sourceBoundarySibling, "checks/validation/repository/source-registry.yaml"),
+    JSON.stringify({
+      schema_version: 1,
+      sources: [
+        {
+          id: "private-sibling-canary",
+          name: "Private sibling canary",
+          source_type: "github",
+          url: "https://github.com/example-org/private-sibling-canary",
+          refresh_cadence_days: 90,
+          owner: "source-freshness",
+        },
+      ],
+    }),
+    "utf8",
+  );
+  runFixture("private sibling source fails public-boundary", sourceBoundarySibling, "check-source-freshness.ts", 1, "source_freshness.sources.private_sibling");
+
+  const sourceBoundaryOrphan = makeEmptyFixture("source-public-boundary-orphan-snapshot");
+  writeSourceRegistryFixture(sourceBoundaryOrphan);
+  mkdirSync(path.join(sourceBoundaryOrphan, "docs/source-freshness/source-snapshots"), { recursive: true });
+  writeFileSync(
+    path.join(sourceBoundaryOrphan, "docs/source-freshness/source-snapshots/current.json"),
+    JSON.stringify({
+      generated_at: "2026-01-01T00:00:00Z",
+      sources: [{ id: "orphan-canary", url: "https://docs.doppler.com/docs/cli", checked_at: "2026-01-01T00:00:00Z" }],
+    }),
+    "utf8",
+  );
+  runFixture("unregistered snapshot row fails public-boundary", sourceBoundaryOrphan, "check-source-freshness.ts", 1, "source_freshness.snapshot.unregistered");
+
   const sourceRegistryBrackets = makeEmptyFixture("source-registry-bracket-urls");
   writeSourceRegistryFixture(sourceRegistryBrackets, false);
   const bracketUrls = [

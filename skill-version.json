@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.43",
+  "version": "0.219.44",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Name workflow coverage as this-response delivery instead of a hosted workspace plan.",
-    "Keep the business-completion guardrail and the same not_requested coverage entries."
+    "Strip operator deployment narration from public Worker docs and freshness snapshots.",
+    "Fail source-freshness on operator home paths, secret-manager pairs, and private-sibling rows."
   ]
 }

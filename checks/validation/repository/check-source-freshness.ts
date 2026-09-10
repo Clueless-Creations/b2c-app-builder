@@ -35,6 +35,10 @@ const reservedTopLevelDomains = [".test", ".example", ".invalid", ".localhost"];
 // docs next to the tests are still scanned in full.
 const testPathSegments = new Set(["test", "tests", "__tests__"]);
 const testFilePattern = /\.(test|spec|fixtures)\.[cm]?[jt]sx?$/;
+const syntheticHomeUsers = new Set(["fixture-operator", "someone", "founder"]);
+const homePathPattern = /(?:^|[^A-Za-z0-9])\/Users\/([A-Za-z][A-Za-z0-9._-]{1,40})(?=\/|$)/g;
+const secretManagerConfigPattern = /\bDoppler\s+`([a-z][a-z0-9_-]{1,32}\/[a-z][a-z0-9_-]{1,32})`/g;
+const nonpublicGithubRepos = new Set(["/example-org/private-sibling-canary"]);
 
 function parseArgs(argv: string[]): Args {
   const flags = parseFlags(argv, [
@@ -252,6 +256,17 @@ function recentAddedUrls(args: Args): Set<string> {
   return urls;
 }
 
+function isNonpublicSiblingSource(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname.toLowerCase() !== "github.com") return false;
+    const parts = parsed.pathname.toLowerCase().replace(/\/+$/u, "").split("/");
+    return parts.length >= 3 && nonpublicGithubRepos.has(`/${parts[1]}/${parts[2]}`);
+  } catch {
+    return false;
+  }
+}
+
 function classifySource(url: string): string {
   const parsed = new URL(url);
   if (parsed.hostname === "github.com") {
@@ -361,10 +376,13 @@ if (missing.length > 0 && args.writeDiscovered) {
 // reviewed; a feature PR must not go red solely because the calendar moved.
 const snapshotPath = path.join(args.root, "docs/source-freshness/source-snapshots/current.json");
 const snapshotByUrl = new Map<string, { checkedAt?: string }>();
+const snapshotIds = new Set<string>();
 if (existsSync(snapshotPath)) {
   try {
     const parsed = JSON.parse(readFileSync(snapshotPath, "utf8"));
     for (const item of (Array.isArray(parsed.sources) ? parsed.sources : []).filter(isRecord)) {
+      const snapshotId = typeof item.id === "string" ? item.id.trim() : "";
+      if (snapshotId) snapshotIds.add(snapshotId);
       const url = normalizeUrl(String(item.url ?? ""));
       const checkedAt = trustedSourceCheckTime(item);
       if (url) snapshotByUrl.set(url, { checkedAt });
@@ -418,8 +436,70 @@ for (const [index, source] of sourceRecords(registry).entries()) {
   }
 }
 
+const registeredIds = new Set(
+  sourceRecords(registry)
+    .map((source) => (typeof source.id === "string" ? source.id.trim() : ""))
+    .filter(Boolean),
+);
+if (snapshotIds.size > 0) {
+  for (const snapshotId of snapshotIds) {
+    if (!registeredIds.has(snapshotId)) {
+      issues.push(
+        issue(
+          "error",
+          "source_freshness.snapshot.unregistered",
+          "A source-snapshot row is not in the source registry.",
+          path.relative(args.root, snapshotPath),
+        ),
+      );
+      break;
+    }
+  }
+}
+
+for (const file of collectAllFiles(args.root, 20000)) {
+  if (!shouldScan(file, args.root, args.registryPath)) continue;
+  const relative = path.relative(args.root, file);
+  const text = readFileSync(file, "utf8");
+  homePathPattern.lastIndex = 0;
+  for (const match of text.matchAll(homePathPattern)) {
+    const user = match[1] ?? "";
+    if (syntheticHomeUsers.has(user)) continue;
+    issues.push(
+      issue(
+        "error",
+        "source_freshness.public_boundary.operator_path",
+        "An authored file contains an operator home path.",
+        relative,
+      ),
+    );
+    break;
+  }
+  secretManagerConfigPattern.lastIndex = 0;
+  if (secretManagerConfigPattern.test(text)) {
+    issues.push(
+      issue(
+        "error",
+        "source_freshness.public_boundary.secret_manager_config",
+        "An authored file names a secret-manager project/config pair.",
+        relative,
+      ),
+    );
+  }
+}
+
 for (const [index, source] of sourceRecords(registry).entries()) {
   const prefix = `sources.${index}`;
+  if (isNonpublicSiblingSource(String(source.url ?? ""))) {
+    issues.push(
+      issue(
+        "error",
+        "source_freshness.sources.private_sibling",
+        "A registered source points at a private sibling repository.",
+        path.relative(args.root, args.registryPath),
+      ),
+    );
+  }
   if (snapshotByUrl.size > 0) {
     const url = normalizeUrl(String(source.url ?? ""));
     const cadence = typeof source.refresh_cadence_days === "number" ? source.refresh_cadence_days : undefined;

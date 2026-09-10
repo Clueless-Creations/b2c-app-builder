@@ -403,7 +403,7 @@ const API_URL = "https://mcp.clueless-creations.com/api/v1";
 const CONNECT_SNIPPETS: readonly { readonly name: string; readonly code: string; readonly note: string }[] = [
   {
     name: "Claude Code",
-    code: `claude mcp add --transport http b2c-app-builder ${MCP_URL}`,
+    code: `claude mcp add --transport http b2c-hosted ${MCP_URL}`,
     note: "Then run /mcp inside Claude Code and choose the server to authorize. The authorization page asks for your key once and gives Claude Code a separate connection you can revoke.",
   },
   {
@@ -413,7 +413,7 @@ const CONNECT_SNIPPETS: readonly { readonly name: string; readonly code: string;
   },
   {
     name: "Cursor",
-    code: `{ "mcpServers": { "b2c-app-builder": { "url": "${MCP_URL}" } } }`,
+    code: `{ "mcpServers": { "b2c-hosted": { "url": "${MCP_URL}" } } }`,
     note: "Add that to ~/.cursor/mcp.json, or the project’s .cursor/mcp.json, then approve the connection from Cursor’s settings when it asks.",
   },
   {
@@ -425,6 +425,7 @@ const CONNECT_SNIPPETS: readonly { readonly name: string; readonly code: string;
 
 function connectBlock(): string {
   return `<h2>Connect an agent</h2>
+<p>These snippets register hosted knowledge as <code>b2c-hosted</code>. That connection cannot see or run a local workspace. Use the local builder as <code>b2c-local</code> for planning and execution.</p>
 <p>Pick the client you use and copy its snippet. Agent clients authorize once, then keep their own connection so you can revoke it separately.</p>
 ${CONNECT_SNIPPETS.map((snippet) => `<h3 class="eyebrow" style="margin:22px 0 8px">${escapeHtml(snippet.name)}</h3><pre><code>${escapeHtml(snippet.code)}</code></pre><p class="help">${escapeHtml(snippet.note)}</p>`).join("")}`;
 }

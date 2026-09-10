@@ -259,6 +259,13 @@
                     ],
                     "additionalProperties": true
                   },
+                  "effectBoundary": {
+                    "type": "string",
+                    "enum": [
+                      "read_and_produce",
+                      "founder_approval_required"
+                    ]
+                  },
                   "brief": {
                     "type": "object",
                     "properties": {
@@ -399,6 +406,53 @@
                           "characterCount",
                           "slice",
                           "truncated"
+                        ],
+                        "additionalProperties": true
+                      },
+                      "readyWhy": {
+                        "type": "string",
+                        "maxLength": 400
+                      },
+                      "continuation": {
+                        "type": "string",
+                        "maxLength": 400
+                      },
+                      "effectBoundary": {
+                        "type": "string",
+                        "enum": [
+                          "read_and_produce",
+                          "founder_approval_required"
+                        ]
+                      },
+                      "context": {
+                        "type": "object",
+                        "properties": {
+                          "instructionChars": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "loadCount": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "deferredLoadCount": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "openCount": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          }
+                        },
+                        "required": [
+                          "instructionChars",
+                          "loadCount",
+                          "deferredLoadCount",
+                          "openCount"
                         ],
                         "additionalProperties": true
                       }
@@ -495,6 +549,13 @@
                     ],
                     "additionalProperties": true
                   },
+                  "effectBoundary": {
+                    "type": "string",
+                    "enum": [
+                      "read_and_produce",
+                      "founder_approval_required"
+                    ]
+                  },
                   "brief": {
                     "type": "object",
                     "properties": {
@@ -635,6 +696,53 @@
                           "characterCount",
                           "slice",
                           "truncated"
+                        ],
+                        "additionalProperties": true
+                      },
+                      "readyWhy": {
+                        "type": "string",
+                        "maxLength": 400
+                      },
+                      "continuation": {
+                        "type": "string",
+                        "maxLength": 400
+                      },
+                      "effectBoundary": {
+                        "type": "string",
+                        "enum": [
+                          "read_and_produce",
+                          "founder_approval_required"
+                        ]
+                      },
+                      "context": {
+                        "type": "object",
+                        "properties": {
+                          "instructionChars": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "loadCount": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "deferredLoadCount": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "openCount": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          }
+                        },
+                        "required": [
+                          "instructionChars",
+                          "loadCount",
+                          "deferredLoadCount",
+                          "openCount"
                         ],
                         "additionalProperties": true
                       }

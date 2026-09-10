@@ -108,6 +108,13 @@ const client = new Client({ name: "unavailable-knowledge-fixture", version: "0.0
 try {
   await client.connect(transport);
   if (client.getServerVersion()?.name !== "b2c-app-builder") throw new Error("local server initialization failed");
+  const receiptLine = (client.getInstructions() ?? "").split("Connection receipt: ")[1];
+  if (!receiptLine) throw new Error("unavailable-knowledge handshake omitted connection receipt");
+  const receipt = JSON.parse(receiptLine);
+  if (receipt.mode !== "local_execution" || receipt.identity.recommended !== "b2c-local") throw new Error("unavailable-knowledge receipt identity");
+  if (!receipt.identity.legacy?.includes("b2c-app-builder")) throw new Error("legacy local name missing from unavailable-knowledge receipt");
+  if (receipt.observed?.knowledge !== "unavailable") throw new Error("unavailable-knowledge receipt must observe knowledge unavailable");
+  if (receipt.observed?.writes !== "mcp_write_enabled") throw new Error("unavailable-knowledge receipt must observe write flag");
   const names = (await client.listTools()).tools.map((tool) => tool.name).sort();
   const expected = ["b2c_research_lookup", "b2c_discover", "b2c_compose", "b2c_business_status", "b2c_packages", "b2c_composition_plan", "b2c_market_report", "b2c_business_plan", "b2c_business_evidence", "b2c_bootstrap", "b2c_plan", "b2c_run", "b2c_approvals", "b2c_verify", "b2c_schedule", "b2c_status", "b2c_operate"].sort();
   if (JSON.stringify(names) !== JSON.stringify(expected)) throw new Error("local tools changed: " + names.join(", "));
@@ -185,6 +192,11 @@ async function main() {
     clientInfo: { name: "fixture-driver", version: "0.0.0" },
   });
   if (init.result?.serverInfo?.name !== "b2c-app-builder") throw new Error("handshake: wrong server name: " + JSON.stringify(init.result?.serverInfo));
+  const handshakeReceipt = JSON.parse(String(init.result?.instructions ?? "").split("Connection receipt: ")[1] ?? "null");
+  if (handshakeReceipt?.mode !== "local_execution" || handshakeReceipt.identity?.recommended !== "b2c-local") throw new Error("handshake receipt identity");
+  if (!handshakeReceipt.identity?.legacy?.includes("b2c-app-builder")) throw new Error("handshake omitted leftover local name");
+  if (handshakeReceipt.observed?.knowledge !== "available") throw new Error("handshake must observe loaded knowledge");
+  if (handshakeReceipt.observed?.writes !== "mcp_write_enabled") throw new Error("handshake must observe write-enabled MCP");
   server.stdin.write(JSON.stringify({ jsonrpc: "2.0", method: "notifications/initialized" }) + "\\n");
 
   const list = await request("tools/list", {});
@@ -409,6 +421,9 @@ async function main() {
     clientInfo: { name: "plan-route-driver", version: "0.0.0" },
   });
   if (init.result?.serverInfo?.name !== "b2c-app-builder") throw new Error("handshake failed: " + JSON.stringify(init.result?.serverInfo));
+  const readonlyReceipt = JSON.parse(String(init.result?.instructions ?? "").split("Connection receipt: ")[1] ?? "null");
+  if (readonlyReceipt?.observed?.writes !== "mcp_readonly") throw new Error("read-only handshake must observe mcp_readonly, got " + readonlyReceipt?.observed?.writes);
+  if (readonlyReceipt?.declares?.writes !== "cli_default") throw new Error("read-only handshake must still declare CLI writes");
   server.stdin.write(JSON.stringify({ jsonrpc: "2.0", method: "notifications/initialized" }) + "\\n");
 
   // A default (no B2C_APP_BUILDER_MCP_WRITE) server never registers a write tool at all (R2/R20)

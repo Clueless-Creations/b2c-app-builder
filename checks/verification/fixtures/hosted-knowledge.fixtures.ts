@@ -6,6 +6,7 @@ import { z } from "zod";
 import { toCatalogInput } from "../../../catalog/bridge.js";
 import type { Catalog, CatalogKnowledgePackage } from "../../../catalog/types.js";
 import { compilePlan } from "../../../kernel/engine/compile.js";
+import { composeNodeBrief, renderNodeBrief } from "../../../kernel/engine/node-brief.js";
 import { MAX_HOSTED_RESPONSE_BYTES, queryInput } from "../../../hosted/knowledge-mcp/http.js";
 import { codePointPrefix, createKnowledgeService, KnowledgeServiceError } from "../../../kernel/knowledge-service/service.js";
 import { callKnowledgeTool, KNOWLEDGE_TOOL_DEFINITIONS, toCallToolResult } from "../../../kernel/knowledge-service/tools.js";
@@ -644,7 +645,10 @@ export function register(harness: Harness): void {
       content.coverage.requiredReferenceIds.join(",") === response.knowledge.map((entry) => entry.referenceId).join(","),
       "coverage was derived from the funded prefix instead of all authored bindings",
     );
-    assert(response.dispatchBrief?.load.length === 2, "a low bundle budget removed required worker inputs");
+    assert(
+      response.dispatchBrief?.load.length === 1 && response.dispatchBrief.load[0]?.path === "knowledge/research/interviews.md",
+      "later-horizon bound refs stay deferred; a low bundle budget must not drop current-task worker inputs",
+    );
 
     for (const missing of content.coverage.incomplete) {
       const entry = content.references.find((reference) => reference.referenceId === missing.referenceId)!;
@@ -797,6 +801,78 @@ export function register(harness: Harness): void {
       );
     },
   );
+
+  harness.check("hosted knowledge: a full-launch-program packet defers later-horizon catalog loads", () => {
+    const bundle = buildHostedKnowledgeBundle(skillRoot);
+    const service = createKnowledgeService(bundle);
+    const workflow = bundle.catalog.workflows.find((entry) => entry.id === "workflow.orchestration.full-launch-program");
+    assert(workflow, "the real catalog must still ship workflow.orchestration.full-launch-program");
+    const brief = service.workflow({ workflowId: workflow.id, brief: true }).dispatchBrief!;
+    const route = service.workflow({ workflowId: workflow.id }).route;
+    assert(brief.load.length < workflow.referenceIds.length, "dispatchBrief must defer at least one real later-horizon binding");
+    assert(
+      brief.load.some((entry) => entry.path.includes("full-launch-program") || /opening, resuming, or closing|at workflow start/i.test(entry.loadWhen)),
+      "program-open guidance must remain current reading",
+    );
+    assert(route.references.length === brief.load.length, "route mode must not dump later-horizon refs as current reading");
+    assert(route.coverage.requiredCount === brief.load.length, "route coverage must count current-task refs only");
+    assert(
+      route.warnings.some((warning) => /later-horizon references remain discoverable/i.test(warning)),
+      "later-horizon refs must stay discoverable without becoming current obligations",
+    );
+  });
+
+  harness.check("hosted knowledge: specialist dispatchBriefs keep their own current books", () => {
+    const bundle = buildHostedKnowledgeBundle(skillRoot);
+    const service = createKnowledgeService(bundle);
+    const accessibility = service.workflow({ workflowId: "workflow.engineering.accessibility-common-task-proof", brief: true }).dispatchBrief!;
+    assert(accessibility.load.length === 1 && accessibility.load[0]!.path.includes("accessibility-readiness"), "accessibility-common-task-proof lost its current load");
+    for (const workflowId of ["workflow.design.design-room", "workflow.design.premium-mobile-craft"] as const) {
+      const brief = service.workflow({ workflowId, brief: true }).dispatchBrief!;
+      assert(
+        brief.load.some((entry) => entry.path.includes("design-evidence-stack")) && brief.load.some((entry) => entry.path.includes("mobile-flow-craft")),
+        `${workflowId} dropped current craft books`,
+      );
+    }
+    const crossDomainCurrent = [
+      { workflowId: "workflow.experience.onboarding-system.onb-16-journey-graph", keep: ["design-evidence-stack"] },
+      { workflowId: "workflow.experience.onboarding-system.onb-17-screen-control-paywall-contract", keep: ["design-evidence-stack", "mobile-flow-craft"] },
+      { workflowId: "workflow.experience.onboarding-system.onb-18-visual-design-prototype", keep: ["design-evidence-stack", "mobile-flow-craft"] },
+      { workflowId: "workflow.store.store-screenshots-production", keep: ["design-evidence-stack", "mobile-flow-craft"] },
+      { workflowId: "workflow.growth.pre-launch-funnel-landing-waitlist", keep: ["design-evidence-stack"] },
+      { workflowId: "workflow.experience.emotional-experience-design-producer", keep: ["design-evidence-stack"] },
+    ] as const;
+    const compiled = compilePlan(toCatalogInput(bundle.catalog));
+    const compiledByWorkflowId = new Map(compiled.nodes.map((node) => [node.workflowId, node]));
+    for (const { workflowId, keep } of crossDomainCurrent) {
+      const brief = service.workflow({ workflowId, brief: true }).dispatchBrief!;
+      for (const needle of keep) {
+        assert(brief.load.some((entry) => entry.path.includes(needle)), `dispatchBrief ${workflowId} dropped current ${needle}`);
+      }
+      const node = compiledByWorkflowId.get(workflowId);
+      assert(node, `${workflowId} missing from the compiled runtime plan`);
+      const composed = composeNodeBrief(node, compiled);
+      const rendered = renderNodeBrief(composed);
+      for (const needle of keep) {
+        assert(composed.load.some((entry) => entry.path.includes(needle)), `composeNodeBrief ${workflowId} dropped current ${needle}`);
+        assert(rendered.includes(needle), `text plan Load: for ${workflowId} omitted current ${needle}`);
+      }
+    }
+    const fastlane = service.workflow({ workflowId: "workflow.growth.fastlane-growth-ops", brief: true }).dispatchBrief!;
+    assert(
+      fastlane.load.some((entry) => entry.referenceId === "reference.growth.fastlane-growth-ops"),
+      "fastlane-growth-ops omitted its own book identity",
+    );
+    const remediate = service.workflow({ workflowId: "workflow.store.app-review-remediate", brief: true }).dispatchBrief!;
+    assert(remediate.load.some((entry) => entry.path.includes("app-review-remediate")), "app-review-remediate omitted its own book");
+    const program = service.workflow({ workflowId: "workflow.orchestration.full-launch-program", brief: true }).dispatchBrief!;
+    assert(!program.load.some((entry) => /design-evidence-stack|mobile-flow-craft/.test(entry.path)), "program packet must still defer specialist later-horizon books");
+    assert((program.deferredLoad?.length ?? 0) > 0, "live program dispatchBrief must carry deferred later-horizon binds");
+    const programNode = compiledByWorkflowId.get("workflow.orchestration.full-launch-program");
+    assert(programNode, "full-launch-program missing from the compiled runtime plan");
+    const programText = renderNodeBrief(composeNodeBrief(programNode, compiled));
+    assert(!/design-evidence-stack|mobile-flow-craft/.test(programText.split("\n").find((line) => line.startsWith("Load:")) ?? ""), "program text plan Load: still listed later-horizon craft books");
+  });
 
   harness.check("hosted knowledge: a gated auditor requires independent review outside judgment domains", () => {
     const bundle = fixtureBundle();

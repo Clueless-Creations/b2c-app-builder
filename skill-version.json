@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.52",
+  "version": "0.219.53",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Refresh generated first-party copies of the leftover-proof checkers after the 0.219.51 squash.",
-    "Keep Design Worthiness native-flow and undeclared-color scoring aligned with the packaged tree."
+    "Give workers a bounded packet and distinct local versus hosted connection identities.",
+    "Keep live current-versus-later load counts, including a workflow's own books."
   ]
 }

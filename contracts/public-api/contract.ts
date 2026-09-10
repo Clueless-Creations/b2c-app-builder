@@ -1,5 +1,14 @@
 import { researchQuerySchema, researchObservationInputSchema, savedResearchObservationSchema } from "../research/observation.js";
 import { z } from "zod";
+export {
+  connectionReceipt,
+  connectionReceiptSchema,
+  formatConnectionReceipt,
+  hostedMcpInstructionsSuffix,
+  localMcpInstructions,
+  parseConnectionReceipt,
+} from "./connection-receipt.js";
+export type { ConnectionReceipt } from "./connection-receipt.js";
 
 /** Public compatibility is independent of engine and provider SDK versions. */
 export const API_VERSION = "b2c/v1" as const;
@@ -339,6 +348,17 @@ export const publicReadyBriefSchema = z.strictObject({
   approvals: z.array(z.string().max(400)).max(PUBLIC_PLAN_BOUNDS.approvals),
   truncated: z.boolean(),
   founderIntent: founderIntentSliceSchema.optional(),
+  readyWhy: z.string().max(PUBLIC_PLAN_BOUNDS.detail).optional(),
+  continuation: z.string().max(PUBLIC_PLAN_BOUNDS.detail).optional(),
+  effectBoundary: z.enum(["read_and_produce", "founder_approval_required"]).optional(),
+  context: z
+    .strictObject({
+      instructionChars: z.number().int().nonnegative(),
+      loadCount: z.number().int().nonnegative(),
+      deferredLoadCount: z.number().int().nonnegative(),
+      openCount: z.number().int().nonnegative(),
+    })
+    .optional(),
 });
 export const publicFounderQuestionSchema = z.strictObject({
   phase: z.string().max(160),
@@ -402,6 +422,7 @@ const lifecycleWorkSchema = z.strictObject({
   detail: z.string().max(PUBLIC_PLAN_BOUNDS.detail).optional(),
   detailTruncated: z.boolean().optional(),
   lastFailure: publicPlanLastFailureSchema.optional(),
+  effectBoundary: z.enum(["read_and_produce", "founder_approval_required"]).optional(),
   brief: publicReadyBriefSchema.optional(),
 });
 export const businessCompletionSchema = z.strictObject({

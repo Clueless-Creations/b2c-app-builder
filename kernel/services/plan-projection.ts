@@ -12,6 +12,9 @@ import {
 import { validateFounderQuestion, type FounderQuestion } from "../session/founder-gate.js";
 import { redactSensitiveText } from "../session/attempt-failure.js";
 import type { HeldNode, HeldReason, PlanReport } from "../session/plan.js";
+import { classifiedBriefLoads, laterGuidanceContext } from "../lib/later-guidance.js";
+
+export { classifiedBriefLoads, isLaterGuidance, laterGuidanceContext, partitionLoadWhen } from "../lib/later-guidance.js";
 
 /** Historical `reason` text. New clients must read `holdKind` and `detail`. */
 export const PUBLIC_HELD_REASON =
@@ -69,6 +72,7 @@ export function projectHeldWork(node: HeldNode): BusinessPlan["held"][number] {
     ...(bounded.truncated ? { detailTruncated: true } : {}),
     ...(node.reasonCode ? { reasonCode: node.reasonCode } : {}),
     ...(lastFailure ? { lastFailure } : {}),
+    ...(node.reason === "founder_approval" ? { effectBoundary: "founder_approval_required" as const } : {}),
   };
 }
 
@@ -91,8 +95,10 @@ export function projectReadyBrief(brief: NodeBrief, founderIntent?: FounderInten
   const open = projectPaths(brief.open);
   const consult = projectPaths(brief.consult);
   const produce = projectPaths(brief.produce);
-  const loadSource = brief.load.slice(0, PUBLIC_PLAN_BOUNDS.loadEntries);
-  let loadFieldsTruncated = brief.load.length !== loadSource.length;
+  const { current: currentLoad, later } = classifiedBriefLoads(brief.load, laterGuidanceContext(brief.workflowId), brief.deferredLoad);
+  const deferredLoadCount = later.length;
+  const loadSource = currentLoad.slice(0, PUBLIC_PLAN_BOUNDS.loadEntries);
+  let loadFieldsTruncated = currentLoad.length !== loadSource.length;
   const load = loadSource.flatMap((entry) => {
     if (!isSafeWorkspacePath(entry.path)) {
       loadFieldsTruncated = true;
@@ -145,6 +151,15 @@ export function projectReadyBrief(brief: NodeBrief, founderIntent?: FounderInten
     approvals: approvals.map((approval) => approval.text),
     truncated,
     ...(founderIntent ? { founderIntent } : {}),
+    readyWhy: "This workflow is ready because its current prerequisites are satisfied.",
+    continuation: "After this bounded task, return to business-plan. Do not load later launch, design, or provider guidance until that plan lists it.",
+    effectBoundary: "read_and_produce",
+    context: {
+      instructionChars: instructions.text.length,
+      loadCount: load.length,
+      deferredLoadCount,
+      openCount: open.paths.length,
+    },
   };
 }
 

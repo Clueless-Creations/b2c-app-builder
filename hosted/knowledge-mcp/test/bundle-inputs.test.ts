@@ -15,6 +15,7 @@ import { test } from "node:test";
  */
 const EXPECTED_EXTERNAL_IMPORTS = [
   "../../catalog/generated/hosted-knowledge.json",
+  "../../contracts/public-api/connection-receipt.js",
   "../builder-console/analytics/capture.js",
   "../builder-console/analytics/events.js",
   "../../kernel/knowledge-service/service.js",

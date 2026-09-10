@@ -332,6 +332,20 @@ test("public plan projects distinct hold kinds, ready briefs, and a revision-bou
     const holdKinds = new Set(plan.held.map((item: { holdKind?: string }) => item.holdKind));
     assert(holdKinds.size >= 2, `expected at least two hold kinds, got ${JSON.stringify([...holdKinds])}`);
     assert(holdKinds.has("founder_approval") && holdKinds.has("upstream"), JSON.stringify([...holdKinds]));
+    assert(
+      plan.held
+        .filter((item: { holdKind?: string }) => item.holdKind === "founder_approval")
+        .every((item: { effectBoundary?: string }) => item.effectBoundary === "founder_approval_required"),
+      "held founder-approval work must carry founder_approval_required",
+    );
+    const leftoverReady = plan.ready.find((item: { brief?: { approvals?: string[] } }) => (item.brief?.approvals?.length ?? 0) > 0);
+    if (leftoverReady) {
+      assert.equal(
+        leftoverReady.brief?.effectBoundary,
+        "read_and_produce",
+        "a dispatchable ready brief with leftover approval descriptions is granted, not held",
+      );
+    }
     assert(plan.held.every((item: { reason?: string }) => item.reason === PUBLIC_HELD_REASON));
     const details = new Set(plan.held.map((item: { detail?: string }) => item.detail));
     assert(details.size >= 2, "held detail must distinguish planner facts instead of one generic sentence");
@@ -493,6 +507,34 @@ test("public plan schema stays additive and bounds unsafe planner text", () => {
   assert.deepEqual(brief.open, ["operations/LAUNCH_PROGRAM.md"]);
   assert.deepEqual(brief.produce, ["PRODUCT.md"]);
   assert.deepEqual(brief.verify.gateCommands, ["check:catalog"]);
+  assert.equal(brief.effectBoundary, "read_and_produce");
+  assert.equal(brief.context?.openCount, 1);
+  const leftover = projectReadyBrief({
+    workflowId: "workflow.fixture.leftover",
+    title: "Leftover approvals",
+    contractFiles: [],
+    instructions: "Inspect only.",
+    open: [],
+    consult: [],
+    load: [],
+    route: [],
+    skills: [],
+    tools: [],
+    produce: [],
+    verify: { kind: "none", gateCommands: [], failClosed: true },
+    approvals: ["Approve spend"],
+    tokenBudget: 8_000,
+  } satisfies NodeBrief);
+  assert.equal(leftover.effectBoundary, "read_and_produce");
+  const approvalHeld = projectHeldWork({
+    nodeId: "run.fixture.approval",
+    workflowId: "workflow.fixture.approval",
+    title: "Approval hold",
+    domainId: "domain.research",
+    reason: "founder_approval",
+    detail: "Waiting on a current founder hold.",
+  });
+  assert.equal(approvalHeld.effectBoundary, "founder_approval_required");
   const slicedBrief = projectReadyBrief({
     workflowId: "workflow.fixture.sliced",
     title: "Sliced fixture",

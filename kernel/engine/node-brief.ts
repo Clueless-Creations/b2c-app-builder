@@ -4,6 +4,7 @@ import type { SourceAccess } from "../../contracts/source-access.js";
 import type { ContextCapsule } from "../context/receipt.js";
 import type { CompiledPlan, CompiledRunNode } from "./compile.js";
 import { requiresIndependentReview } from "./verification-policy.js";
+import { domainIdFromKnowledgePath, laterGuidanceContext, partitionLoadWhen } from "../lib/later-guidance.js";
 
 /**
  * Composes the per-node worker brief from a compiled node's authored contract — the one place
@@ -30,14 +31,9 @@ export interface NodeBrief {
   /** Open-if-present references — consulted when they exist, never a readiness gate. */
   consult: string[];
   /** Knowledge to load before working: path plus the authored load condition. */
-  load: Array<{
-    path: string;
-    title: string;
-    loadWhen: string;
-    sectionId?: string;
-    revision?: string;
-    resource?: { path: string; sha256: string; origin: "skill" | "workspace" };
-  }>;
+  load: NodeBriefLoad[];
+  /** Later-horizon binds kept off `load` so packet surfaces can still account for them. */
+  deferredLoad?: NodeBriefLoad[];
   /** Exact context selectors compiled after a selected route, when a capsule is supplied. */
   contextSelectors?: string[];
   /** Conditional role knowledge resolved from executable context packs. */
@@ -74,7 +70,37 @@ export interface NodeBrief {
   review?: { reviewOf: string[]; reviewedBy: string[] };
 }
 
+export interface NodeBriefLoad {
+  path: string;
+  title: string;
+  loadWhen: string;
+  referenceId?: string;
+  sectionId?: string;
+  revision?: string;
+  resource?: { path: string; sha256: string; origin: "skill" | "workspace" };
+}
+
 export { reviewFacet } from "./review-facet.js";
+
+function toBriefLoad(entry: {
+  path: string;
+  title: string;
+  loadWhen: string;
+  referenceId?: string;
+  sectionId?: string;
+  revision?: string;
+  resource?: { path: string; sha256: string; origin: "skill" | "workspace" };
+}): NodeBriefLoad {
+  return {
+    path: entry.path,
+    title: entry.title,
+    loadWhen: entry.loadWhen,
+    ...(entry.referenceId ? { referenceId: entry.referenceId } : {}),
+    ...(entry.resource ? { resource: entry.resource } : {}),
+    ...(entry.sectionId ? { sectionId: entry.sectionId } : {}),
+    ...(entry.revision ? { revision: entry.revision } : {}),
+  };
+}
 
 /** Task artifacts the worker may rewrite. Receipt hashes for these paths are taken after writes. */
 export function mutableTaskArtifactPaths(brief: Pick<NodeBrief, "open" | "produce">): readonly string[] {
@@ -102,17 +128,24 @@ export function composeNodeBrief(node: CompiledRunNode, plan: CompiledPlan, caps
       if (!entry.sectionId) return true;
       return !sectionId || sectionId === entry.sectionId;
     });
-  const load = (node.references ?? [])
-    .map((reference) => ({
+  const laterContext = laterGuidanceContext(node.workflowId, node.domainId);
+  const bound = (node.references ?? []).map((reference) => {
+    const domainId = domainIdFromKnowledgePath(reference.path);
+    return {
       path: reference.path,
       ...(reference.resource ? { resource: reference.resource } : {}),
       title: reference.title,
       loadWhen: reference.loadWhen,
+      referenceId: reference.id,
+      ...(domainId ? { domainId } : {}),
       ...(reference.sectionId ? { sectionId: reference.sectionId } : {}),
       ...(reference.revision ? { revision: reference.revision } : {}),
-    }))
-    .filter((entry) => !capsule || matchesCapsule(entry, capsule.sourceIds));
-  const seenKnowledgePaths = new Set(load.map((reference) => reference.path));
+    };
+  });
+  const { current, later } = partitionLoadWhen(bound, laterContext);
+  const load = current.filter((entry) => !capsule || matchesCapsule(entry, capsule.sourceIds)).map(toBriefLoad);
+  const deferredLoad = later.map(toBriefLoad);
+  const seenKnowledgePaths = new Set(bound.map((reference) => reference.path));
   const route =
     node.role?.contextPacks.flatMap((pack) =>
       pack.references.flatMap((reference) => {
@@ -141,6 +174,7 @@ export function composeNodeBrief(node: CompiledRunNode, plan: CompiledPlan, caps
     ...(node.sourceAccess?.length ? { sourceAccess: node.sourceAccess } : {}),
     consult: node.consults ?? [],
     load,
+    ...(deferredLoad.length ? { deferredLoad } : {}),
     ...(capsule ? { contextSelectors: capsule.sourceIds } : {}),
     route,
     skills: node.role?.skillRoutes ?? [],

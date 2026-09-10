@@ -21,6 +21,8 @@ export type RevenueCatCliJsonOutcome =
   | { readonly ok: true; readonly data: unknown; readonly schemaVersion: string | null; readonly extraFields: readonly string[]; readonly wrapped: boolean }
   | { readonly ok: false; readonly code: "invalid-json" | "invalid-envelope" | "command-error"; readonly message: string; readonly issues?: unknown };
 
+export type RevenueCatObservedStoreKind = "test-store" | "app-store" | "play-store" | "web-billing" | "unresolved";
+
 export type RevenueCatRemoteResource =
   | "offering"
   | "product"
@@ -109,7 +111,7 @@ export type RevenueCatCliObservation = RevenueCatCliObservationBase &
         readonly ids: readonly string[];
         readonly lookupKeys: readonly string[];
       }
-    | { readonly kind: "resource"; readonly objectType: string | null; readonly remoteId: string | null; readonly lookupKey: string | null }
+    | { readonly kind: "resource"; readonly objectType: string | null; readonly remoteId: string | null; readonly lookupKey: string | null; readonly storeKind?: RevenueCatObservedStoreKind }
     | {
         readonly kind: "simulate-purchase";
         readonly appRemoteId: string | null;
@@ -581,6 +583,7 @@ function decodeResource(operationId: string, data: unknown): RevenueCatCliObserv
   const remoteId = record && isSafeId(record.id) ? record.id : null;
   const lookupKey = record && isSafeId(record.lookup_key) ? record.lookup_key : null;
   const protocolValid = record !== null && remoteId !== null;
+  const storeKind = operationId === "rc.apps.show" ? classifyRevenueCatAppStoreKind(data) : undefined;
   return {
     kind: "resource",
     operationId,
@@ -594,7 +597,52 @@ function decodeResource(operationId: string, data: unknown): RevenueCatCliObserv
     objectType,
     remoteId,
     lookupKey,
+    ...(storeKind ? { storeKind } : {}),
   };
+}
+
+function normalizeStoreToken(value: unknown): string {
+  return typeof value === "string" ? value.trim().toLowerCase().replace(/-/g, "_") : "";
+}
+
+/**
+ * Store kind from a CLI-read app payload. Caller labels and profile names are not this proof.
+ * `test_store` is Test Store. App Store, Play, and web/billing types are not.
+ */
+export function classifyRevenueCatAppStoreKind(data: unknown): RevenueCatObservedStoreKind {
+  if (!isRecord(data)) return "unresolved";
+  const tokens = [data.type, data.app_type, data.store, data.store_type, data.app_store]
+    .map(normalizeStoreToken)
+    .filter((token) => token.length > 0);
+  for (const token of tokens) {
+    switch (token) {
+      case "test_store":
+      case "teststore":
+        return "test-store";
+      case "app_store":
+      case "appstore":
+      case "mac_app_store":
+      case "apple_app_store":
+      case "ios":
+        return "app-store";
+      case "play_store":
+      case "playstore":
+      case "google_play":
+      case "play":
+      case "android":
+        return "play-store";
+      case "web":
+      case "web_billing":
+      case "stripe":
+      case "stripe_test":
+      case "rc_billing":
+      case "paddle":
+        return "web-billing";
+      default:
+        break;
+    }
+  }
+  return "unresolved";
 }
 
 function resourceForObject(objectType: string | null, operationId: string): RevenueCatRemoteResource {

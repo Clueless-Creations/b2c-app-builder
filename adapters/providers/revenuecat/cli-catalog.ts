@@ -6,6 +6,7 @@
 
 import { CLI_PROOF_COLLECTOR, getRevenueCatCliOperation, isMutationEffect, type RevenueCatChartName } from "./cli-operations.js";
 import {
+  classifyRevenueCatAppStoreKind,
   extractEntitlementIds,
   extractResourceIds,
   interpretOfferingPreview,
@@ -14,6 +15,7 @@ import {
   type RevenueCatCliRunRequest,
   type RevenueCatCliRunResult,
 } from "./cli-execute.js";
+import type { RevenueCatObservedStoreKind } from "./cli-decode.js";
 import type { RevenueCatCliDiscovery } from "./cli-discovery.js";
 import type { RevenueCatCliHoldCode, RevenueCatCliPreflight, RevenueCatCliTarget } from "./cli-preflight.js";
 import type { CliProcessRunner } from "./cli-process.js";
@@ -107,11 +109,12 @@ export interface RevenueCatCliCatalogEvidence {
   readonly collector: typeof CLI_PROOF_COLLECTOR;
   readonly kind: "revenuecat-cli-catalog";
   readonly synthetic: boolean;
-  readonly live: false;
+  readonly live: boolean;
   readonly cli_executable: string;
   readonly cli_version: string | null;
   readonly project_id: string;
   readonly app_id: string;
+  readonly observed_store_kind?: RevenueCatObservedStoreKind;
   readonly catalog: {
     readonly project_ids: readonly string[];
     readonly app_ids: readonly string[];
@@ -220,7 +223,7 @@ function emptyEvidence(request: CatalogSessionRequest): RevenueCatCliCatalogEvid
     collector: CLI_PROOF_COLLECTOR,
     kind: "revenuecat-cli-catalog",
     synthetic: request.synthetic !== false,
-    live: false,
+    live: request.synthetic === false,
     cli_executable: request.discovery.selected?.path ?? request.executable,
     cli_version: request.discovery.selected?.version ?? null,
     project_id: request.expected.projectId,
@@ -350,9 +353,11 @@ function inspectProjectApp(request: CatalogSessionRequest): CatalogSessionResult
   const projectIds = extractResourceIds(projects.json.data);
   const appRecord = app.json.data && typeof app.json.data === "object" ? (app.json.data as { id?: unknown }) : {};
   const appId = typeof appRecord.id === "string" ? appRecord.id : request.expected.appId;
+  const observedStoreKind = classifyRevenueCatAppStoreKind(app.json.data);
   const evidence = emptyEvidence(request);
   const next: RevenueCatCliCatalogEvidence = {
     ...evidence,
+    observed_store_kind: observedStoreKind,
     catalog: {
       ...evidence.catalog,
       project_ids: projectIds.ids,
@@ -933,17 +938,40 @@ function inspectPaywalls(request: CatalogSessionRequest): CatalogSessionResult {
 }
 
 function testStorePurchase(request: CatalogSessionRequest): CatalogSessionResult {
+  const app = runStep(request, "rc.apps.show", { appId: request.expected.appId });
+  if (!app.invoked) return refused(request, app.preflight, [app]);
+  if (app.uncertainMutation) {
+    return { disposition: "uncertain", invoked: [app], evidence: emptyEvidence(request), replaySafe: false };
+  }
+  if (!app.json?.ok) {
+    return { disposition: "incomplete", invoked: [app], evidence: emptyEvidence(request), replaySafe: true };
+  }
+  const observedStoreKind = classifyRevenueCatAppStoreKind(app.json.data);
+  if (observedStoreKind !== "test-store") {
+    const refusedResult = refused(
+      request,
+      {
+        status: "hold",
+        code: "production-test-store-refused",
+        message:
+          "customers simulate-purchase is refused until the CLI-read app is a Test Store. Caller labels and profile names are not that proof.",
+        blocksUnrelatedWork: false,
+      },
+      [app],
+    );
+    return { ...refusedResult, evidence: { ...refusedResult.evidence, observed_store_kind: observedStoreKind } };
+  }
   const purchase = runStep(request, "rc.customers.simulate-purchase", {
     appId: request.expected.appId,
     productId: request.productId,
     appUserId: request.appUserId,
   });
-  if (!purchase.invoked && purchase.resumed !== true) return refused(request, purchase.preflight, [purchase]);
+  if (!purchase.invoked && purchase.resumed !== true) return refused(request, purchase.preflight, [app, purchase]);
   if (purchase.uncertainMutation) {
     return {
       disposition: "uncertain",
-      invoked: [purchase],
-      evidence: emptyEvidence(request),
+      invoked: [app, purchase],
+      evidence: { ...emptyEvidence(request), observed_store_kind: observedStoreKind },
       replaySafe: false,
       nextAction: "hold-uncertain",
       effectProgress: "dispatched-unconfirmed",
@@ -952,8 +980,8 @@ function testStorePurchase(request: CatalogSessionRequest): CatalogSessionResult
   if (!purchase.json?.ok) {
     return {
       disposition: "uncertain",
-      invoked: [purchase],
-      evidence: emptyEvidence(request),
+      invoked: [app, purchase],
+      evidence: { ...emptyEvidence(request), observed_store_kind: observedStoreKind },
       replaySafe: false,
       nextAction: "hold-uncertain",
       effectProgress: "dispatched-unconfirmed",
@@ -966,6 +994,7 @@ function testStorePurchase(request: CatalogSessionRequest): CatalogSessionResult
     const evidence = emptyEvidence(request);
     return {
       ...evidence,
+      observed_store_kind: observedStoreKind,
       test_store: {
         executed: true,
         product_id: requestedProduct ?? observedProductId,
@@ -977,7 +1006,7 @@ function testStorePurchase(request: CatalogSessionRequest): CatalogSessionResult
     };
   };
   const readback = runStep(request, "rc.customers.show", { customerId });
-  const invoked = [purchase, readback];
+  const invoked = [app, purchase, readback];
   if (!readback.invoked) return refused(request, readback.preflight, invoked);
   if (!readback.json?.ok) {
     return {

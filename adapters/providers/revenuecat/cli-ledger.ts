@@ -15,9 +15,23 @@
  * the observation. Unknown remote acceptance is not "no effect".
  */
 
-import { closeSync, existsSync, fsyncSync, lstatSync, mkdirSync, openSync, readFileSync, renameSync, writeFileSync } from "node:fs";
+import {
+  closeSync,
+  existsSync,
+  fstatSync,
+  fsyncSync,
+  linkSync,
+  lstatSync,
+  mkdirSync,
+  openSync,
+  readFileSync,
+  renameSync,
+  unlinkSync,
+  writeFileSync,
+  writeSync,
+} from "node:fs";
 import path from "node:path";
-import { createHash } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 import { isSafeRevenueCatResourceId, type CliArgvRequest } from "./cli-operations.js";
 
 export const CLI_NEXT_ACTIONS = ["dispatch", "observe", "hold-uncertain", "complete", "none"] as const;
@@ -340,4 +354,135 @@ export class RevenueCatCliLedger {
 
 export function revenueCatCliLedgerPath(workspaceRoot: string): string {
   return path.join(workspaceRoot, ".b2c", "revenuecat-cli-effects.json");
+}
+
+export const REVENUECAT_CLI_CLAIM_SCHEMA = "b2c.revenuecat-cli-claim/v1" as const;
+
+export interface RevenueCatCliClaim {
+  readonly schemaVersion: typeof REVENUECAT_CLI_CLAIM_SCHEMA;
+  readonly pid: number;
+  readonly idempotencyKey: string;
+  readonly at: string;
+}
+
+/** Per-request exclusive claim beside the ledger. Serializes bind+persist+spawn across processes. */
+export function revenueCatCliClaimPath(ledgerFile: string, idempotencyKey: string): string {
+  const digest = createHash("sha256").update(idempotencyKey).digest("hex").slice(0, 16);
+  return `${ledgerFile}.${digest}.claim`;
+}
+
+export function revenueCatCliClaimOwnerAlive(pid: number): boolean {
+  if (!Number.isInteger(pid) || pid <= 0) return false;
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** True only while `fd` still names the inode at `claimPath`. A peer unlink during write loses the claim. */
+export function revenueCatCliClaimFdOwnsPath(fd: number, claimPath: string): boolean {
+  try {
+    const opened = fstatSync(fd);
+    const onDisk = lstatSync(claimPath);
+    return opened.dev === onDisk.dev && opened.ino === onDisk.ino && !onDisk.isSymbolicLink();
+  } catch {
+    return false;
+  }
+}
+
+function writeRevenueCatCliClaim(claimPath: string, idempotencyKey: string, at: string): boolean {
+  assertNoSymlink(claimPath);
+  mkdirSync(path.dirname(claimPath), { recursive: true });
+  const temporary = `${claimPath}.${process.pid}.${randomBytes(8).toString("hex")}.tmp`;
+  const fd = openSync(temporary, "wx", 0o600);
+  try {
+    const document: RevenueCatCliClaim = {
+      schemaVersion: REVENUECAT_CLI_CLAIM_SCHEMA,
+      pid: process.pid,
+      idempotencyKey,
+      at,
+    };
+    writeSync(fd, `${JSON.stringify(document)}\n`);
+    fsyncSync(fd);
+  } finally {
+    closeSync(fd);
+  }
+  try {
+    linkSync(temporary, claimPath);
+  } catch (error) {
+    try {
+      unlinkSync(temporary);
+    } catch {
+      // Temporary already gone.
+    }
+    if ((error as NodeJS.ErrnoException).code === "EEXIST") return false;
+    throw error;
+  }
+  try {
+    unlinkSync(temporary);
+  } catch {
+    // Linked name is the claim; leftover tmp is harmless.
+  }
+  const published = readRevenueCatCliClaim(claimPath);
+  return published?.pid === process.pid && published.idempotencyKey === idempotencyKey;
+}
+
+function readRevenueCatCliClaim(claimPath: string): RevenueCatCliClaim | undefined {
+  if (!existsSync(claimPath)) return undefined;
+  try {
+    const parsed = JSON.parse(readFileSync(claimPath, "utf8")) as Partial<RevenueCatCliClaim>;
+    if (parsed.schemaVersion !== REVENUECAT_CLI_CLAIM_SCHEMA) return undefined;
+    if (typeof parsed.pid !== "number" || typeof parsed.idempotencyKey !== "string" || typeof parsed.at !== "string") {
+      return undefined;
+    }
+    return { schemaVersion: REVENUECAT_CLI_CLAIM_SCHEMA, pid: parsed.pid, idempotencyKey: parsed.idempotencyKey, at: parsed.at };
+  } catch {
+    return undefined;
+  }
+}
+
+function stealRevenueCatCliClaim(claimPath: string, idempotencyKey: string, at: string): boolean {
+  try {
+    unlinkSync(claimPath);
+  } catch {
+    return false;
+  }
+  return writeRevenueCatCliClaim(claimPath, idempotencyKey, at);
+}
+
+/**
+ * Exclusive create of the claim file. Nested same-process re-entry and a live foreign
+ * pid are `held` (no wait — that would deadlock a nested fixture). A claim whose pid is
+ * dead, or whose file is empty/truncated/wrong-schema, is stolen once. The claim
+ * path is published with `link` from a complete tmp file so an empty `wx` inode is
+ * never the exclusive name. This is RevenueCat CLI ledger durability, not a kernel scheduler.
+ */
+export function tryAcquireRevenueCatCliClaim(
+  claimPath: string,
+  idempotencyKey: string,
+  now: () => string = () => new Date().toISOString(),
+): { readonly ok: true } | { readonly ok: false; readonly reason: "held" } {
+  if (writeRevenueCatCliClaim(claimPath, idempotencyKey, now())) return { ok: true };
+  const existing = readRevenueCatCliClaim(claimPath);
+  if (!existing) {
+    if (stealRevenueCatCliClaim(claimPath, idempotencyKey, now())) return { ok: true };
+    return { ok: false, reason: "held" };
+  }
+  if (existing.pid === process.pid) return { ok: false, reason: "held" };
+  if (revenueCatCliClaimOwnerAlive(existing.pid)) return { ok: false, reason: "held" };
+  if (stealRevenueCatCliClaim(claimPath, idempotencyKey, now())) return { ok: true };
+  return { ok: false, reason: "held" };
+}
+
+export function releaseRevenueCatCliClaim(claimPath: string): void {
+  const existing = readRevenueCatCliClaim(claimPath);
+  if (!existing) return;
+  if (existing.pid !== process.pid) return;
+  try {
+    unlinkSync(claimPath);
+  } catch {
+    // Claim already gone.
+  }
 }

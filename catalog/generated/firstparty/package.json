@@ -218,6 +218,8 @@
     "plan:frontier": "tsx kernel/session/plan.ts",
     "probe:posthog": "tsx tooling/probe-posthog.ts",
     "probe:revenuecat": "tsx tooling/probe-revenuecat.ts",
+    "probe:revenuecat-cli": "tsx tooling/probe-revenuecat-cli.ts",
+    "probe:eas": "tsx tooling/probe-eas.ts",
     "promote:design-tokens": "tsx tooling/promote-design-tokens.ts",
     "refresh:source-freshness": "tsx checks/validation/repository/check-source-freshness.ts --write-discovered && tsx checks/validation/repository/refresh-source-freshness.ts --knowledge-pin-root .",
     "render:all": "npm run catalog:render-routing && npm run hosted:bundle && npm run render:public-api && npm run render:credits",

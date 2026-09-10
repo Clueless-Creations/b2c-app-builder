@@ -85,7 +85,10 @@ The later source head is not the installed release. Do not run
 Discovery uses a trusted absolute path, `--version`, and `commands --json` with
 `--no-input --no-color`. It does not install, log in, refresh OAuth, or change
 profiles. An unrelated binary named `rc` is not RevenueCat. A profile named
-`staging` is not a Test Store.
+`staging` is not a Test Store. Test Store proof is the CLI-read `apps show`
+type (for example `test_store`), not a caller `appStoreKind` label. `customers
+simulate-purchase` is refused when that readback is App Store, Play, web
+billing, or unresolved.
 
 `b2c inspect` records the winning local `rc`/`revenuecat` identity in the
 engine-home doctor snapshot. `b2c doctor` is a supported equivalent. Status
@@ -134,7 +137,7 @@ Protocol validity is not business completeness. Catalog repair planning is a lat
 | List/show catalog | `rc --project-id <id> offerings\|apps\|products\|entitlements list\|show --json --no-input --no-color` | authenticated read | argv and preflight tested; live auth not run |
 | Offering verify | `rc --project-id <id> offerings verify <offering-id> --json --no-input --no-color` | authenticated read; inspect `issues` even on exit 0 | argv and result schema tested |
 | Offering preview | `rc --project-id <id> offerings preview <app-id> --app-user-id <id> --json --no-input --no-color` | authenticated read that may touch a user | argv tested; not assumed effect-free |
-| Test Store purchase | `rc --project-id <id> customers simulate-purchase --app-id <test-store-app> --product <id> --app-user-id <id> --yes --json --no-input --no-color` | remote mutation | refused unless app is a verified Test Store and host authority is granted; complete only when the expected product and entitlements match the readback; not native IAP proof |
+| Test Store purchase | `rc --project-id <id> customers simulate-purchase --app-id <test-store-app> --product <id> --app-user-id <id> --yes --json --no-input --no-color` | remote mutation | refused unless `apps show` reads a Test Store and host authority is granted; caller labels are not that proof; complete only when the expected product and entitlements match the readback; not native IAP proof |
 | Catalog create | `rc --project-id <id> offerings create --lookup-key <key> --display-name <name> --json --no-input --no-color` | catalog mutation | refused without host authority and pinned lookup-key/display-name flags; a positional server id is not a create operand; existing catalog is read back instead of duplicated |
 | Product create | `rc --project-id <id> products create --store-id <sku> --type <type> --app-id <app> [--title <title>] [--duration P1M] --json --no-input --no-color` | catalog mutation | refused without host authority and the pinned store-id/type/app-id flags; a product id positional is not a create operand |
 | Entitlement create | `rc --project-id <id> entitlements create --lookup-key <key> --display-name <name> --json --no-input --no-color` | catalog mutation | refused without host authority and pinned lookup-key/display-name flags |

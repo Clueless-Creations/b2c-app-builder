@@ -146,6 +146,64 @@ export function register(h: Harness): void {
   writeSourceRegistryFixture(sourceRegistryClean);
   runFixture("source registry with registered URL passes", sourceRegistryClean, "check-source-freshness.ts", 0);
 
+  const sourceRegistryDuplicateId = makeEmptyFixture("source-registry-duplicate-id");
+  writeSourceRegistryFixture(sourceRegistryDuplicateId, false);
+  writeFileSync(
+    path.join(sourceRegistryDuplicateId, "checks/validation/repository/source-registry.yaml"),
+    JSON.stringify({
+      schema_version: 1,
+      sources: [
+        {
+          id: "same-source",
+          name: "First row",
+          source_type: "docs",
+          url: "https://docs.doppler.com/docs/cli",
+          refresh_cadence_days: 7,
+          owner: "source-freshness",
+        },
+        {
+          id: "same-source",
+          name: "Second row",
+          source_type: "docs",
+          url: "https://docs.doppler.com/docs/getting-started",
+          refresh_cadence_days: 7,
+          owner: "source-freshness",
+        },
+      ],
+    }),
+    "utf8",
+  );
+  runFixture("source registry duplicate id fails", sourceRegistryDuplicateId, "check-source-freshness.ts", 1, "source_freshness.sources.duplicate_id");
+
+  const sourceRegistryDuplicateUrl = makeEmptyFixture("source-registry-duplicate-url");
+  writeSourceRegistryFixture(sourceRegistryDuplicateUrl, false);
+  writeFileSync(
+    path.join(sourceRegistryDuplicateUrl, "checks/validation/repository/source-registry.yaml"),
+    JSON.stringify({
+      schema_version: 1,
+      sources: [
+        {
+          id: "source-a",
+          name: "Trailing-slash variant",
+          source_type: "docs",
+          url: "https://docs.doppler.com/docs/cli",
+          refresh_cadence_days: 7,
+          owner: "source-freshness",
+        },
+        {
+          id: "source-b",
+          name: "Normalized to the same URL",
+          source_type: "docs",
+          url: "https://docs.doppler.com/docs/cli/",
+          refresh_cadence_days: 7,
+          owner: "source-freshness",
+        },
+      ],
+    }),
+    "utf8",
+  );
+  runFixture("source registry duplicate url fails after normalizeUrl", sourceRegistryDuplicateUrl, "check-source-freshness.ts", 1, "source_freshness.sources.duplicate_url");
+
   const sourceRegistryBrackets = makeEmptyFixture("source-registry-bracket-urls");
   writeSourceRegistryFixture(sourceRegistryBrackets, false);
   const bracketUrls = [

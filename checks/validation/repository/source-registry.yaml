@@ -1000,15 +1000,6 @@ sources:
     locations:
       - README.md
     notes: Auto-discovered from recently added repository content.
-  - id: github-com-emuthmartinez-b2c-planes
-    name: github.com
-    source_type: github
-    url: https://github.com/Emuthmartinez/b2c-planes
-    refresh_cadence_days: 7
-    owner: source-freshness
-    locations:
-      - docs/timeouts/planes.md
-    notes: Auto-discovered from recently added repository content.
   - id: github-com-general-legal-legal-templates
     name: General Legal template collection
     source_type: attorney_template_repository
@@ -1379,27 +1370,15 @@ sources:
     locations:
       - examples/tuck/shared/fonts/Fraunces-OFL.txt
     notes: Auto-discovered from recently added repository content.
-  - id: github-eduardomuth-site
-    name: Eduardo Martinez portfolio website repository
-    source_type: github
-    url: https://github.com/Emuthmartinez/eduardomuth-site
-    refresh_cadence_days: 90
-    owner: design
-    locations:
-      - catalog/knowledge/design/design-editorial-scrollytelling.yaml
-    notes: First-party practice evidence for measured step-center control and responsive scrollytelling. The catalog
-      manifest pins the audited commit; future refreshes must transfer mechanics only.
   - id: github-raw-b2c-launch-skill-version-main
     name: b2c skill version manifest
     source_type: raw_manifest
-    url: https://raw.githubusercontent.com/Emuthmartinez/b2c-app-builder/main/skill-version.json
+    url: https://raw.githubusercontent.com/Clueless-Creations/b2c-app-builder/main/skill-version.json
     refresh_cadence_days: 7
     owner: source-freshness
     locations:
       - checks/validation/repository/skill-versioning.md
-    notes: Remote manifest used when comparing installed runtime freshness against the pushed main branch. The repo
-      was renamed to B2C App Builder on 2026-08-05; the skill's path inside it moved from
-      skill/b2c-mobile-business-launch/ to skill/b2c-app-builder/ on 2026-08-18.
+    notes: Remote manifest used when comparing installed runtime freshness against the public main branch.
   - id: github-repo-b2c-launch-skill
     name: This repository on GitHub
     source_type: repository

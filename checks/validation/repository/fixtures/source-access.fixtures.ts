@@ -11,7 +11,7 @@ import { knowledgeFreshnessPinPath, loadKnowledgeFreshnessPin } from "../../../.
 import { skillRoot, type Harness } from "./_harness.js";
 
 const fixtureDir = path.dirname(fileURLToPath(import.meta.url));
-const privateUrl = "https://raw.githubusercontent.com/Emuthmartinez/b2c-app-builder/main/skill-version.json";
+const publicRawUrl = "https://raw.githubusercontent.com/Clueless-Creations/b2c-app-builder/main/skill-version.json";
 const manifest = JSON.stringify({ skill: "b2c-app-builder", version: "0.0.1", sourcePath: "." });
 const primaryToken = "fixture-primary-token";
 const secondaryToken = "fixture-secondary-token";
@@ -73,7 +73,7 @@ export function register(harness: Harness): void {
   symlinkSync(path.join(skillRoot, "checks/validation/repository"), scriptAlias, "dir");
   for (const [args, code] of [
     [["--remote"], "remote_url_invalid"],
-    [["--remote", privateUrl], "remote_unavailable"],
+    [["--remote-url", "http://content.example.test/version.json"], "remote_unavailable"],
   ] as const) {
     check(`version CLI runs through a client symlink and fails closed: ${code}`, () => {
       const result = invoke(path.join(scriptAlias, "check-skill-version.ts"), ["--source", source, "--installed", installed, ...args]);
@@ -84,40 +84,38 @@ export function register(harness: Harness): void {
   }
 
   for (const status of [401, 404]) {
-    check(`private remote HTTP ${status} is an error even with plausible manifest JSON`, () => {
-      const result = version(["--remote-url", privateUrl], { status }, { GH_TOKEN: primaryToken, GITHUB_TOKEN: secondaryToken });
+    check(`remote HTTP ${status} is an error even with plausible manifest JSON`, () => {
+      const result = version(["--remote-url", publicRawUrl], { status }, { GH_TOKEN: primaryToken, GITHUB_TOKEN: secondaryToken });
       assert.equal(result.status, 1, result.output);
       assert.match(result.output, /ERROR skill_version\.remote_unavailable/u);
       assert.equal(result.requests.length, 1, "A denied request must not retry anonymously.");
+      assert.equal(result.requests[0]!.authorization, null, "A GitHub URL must not receive an authorization header.");
       assert.equal(result.records.filter((record) => record.kind === "body").length, 0, "A denied body must not be read.");
       assert.doesNotMatch(result.output, /skill_version\.stale/u);
     });
   }
   check("remote redirects cannot turn denied JSON into a successful version comparison", () => {
-    const result = version(["--remote", privateUrl], { statuses: [302, 401] }, { GH_TOKEN: primaryToken, GITHUB_TOKEN: "" });
+    const result = version(["--remote", publicRawUrl], { statuses: [302, 401] }, { GH_TOKEN: primaryToken, GITHUB_TOKEN: "" });
     assert.equal(result.status, 1, result.output);
     assert.match(result.output, /ERROR skill_version\.remote_unavailable/u);
     assert.equal(result.requests.length, 1, "A redirect must not send another request.");
     assert.equal(result.records.filter((record) => record.kind === "body").length, 0);
   });
-  check("private raw version reads use the contents API and GH_TOKEN precedence", () => {
-    const result = version(["--remote", privateUrl], {}, { GH_TOKEN: primaryToken, GITHUB_TOKEN: secondaryToken });
+  check("GitHub raw version reads never attach an authorization header", () => {
+    const result = version(["--remote", publicRawUrl], {}, { GH_TOKEN: primaryToken, GITHUB_TOKEN: secondaryToken });
     assert.equal(result.status, 0, result.output);
     assert.equal(result.requests.length, 1);
     const request = result.requests[0]!;
     const target = new URL(request.url!);
-    assert.equal(target.hostname, "api.github.com");
-    assert.equal(target.pathname, "/repos/Emuthmartinez/b2c-app-builder/contents/skill-version.json");
-    assert.equal(target.searchParams.get("ref"), "main");
-    assert.equal(request.authorization, `Bearer ${primaryToken}`);
-    assert.equal(request.accept, "application/vnd.github.raw+json");
+    assert.equal(target.href, publicRawUrl);
+    assert.equal(request.authorization, null);
     assert.equal(request.redirect, "error");
   });
-  check("a missing private-source token fails before any network request", () => {
-    const result = version(["--remote", privateUrl]);
-    assert.equal(result.status, 1, result.output);
-    assert.match(result.output, /skill_version\.remote_unavailable/u);
-    assert.equal(result.requests.length, 0);
+  check("a GitHub raw version read without tokens still fetches and sends no authorization", () => {
+    const result = version(["--remote", publicRawUrl]);
+    assert.equal(result.status, 0, result.output);
+    assert.equal(result.requests.length, 1);
+    assert.equal(result.requests[0]!.authorization, null);
   });
   for (const args of [["--remote"], ["--remote-url", ""], ["--remote-url", "--all-runtimes"]]) {
     check(`malformed remote arguments fail without self-comparison: ${JSON.stringify(args)}`, () => {
@@ -145,7 +143,7 @@ export function register(harness: Harness): void {
     assert.equal(result.records.filter((record) => record.kind === "body").length, 0);
   });
   check("URL userinfo and token-bearing diagnostics cannot leak", () => {
-    const url = new URL(privateUrl);
+    const url = new URL(publicRawUrl);
     url.username = "fixture-userinfo";
     url.password = primaryToken;
     const result = version(
@@ -173,7 +171,7 @@ export function register(harness: Harness): void {
   writeFileSync(
     registry,
     JSON.stringify({
-      sources: [{ id: "private-source", name: "Private source", source_type: "raw_manifest", url: privateUrl, refresh_cadence_days: 7, owner: "fixture" }],
+      sources: [{ id: "public-source", name: "Public source", source_type: "raw_manifest", url: publicRawUrl, refresh_cadence_days: 7, owner: "fixture" }],
     }),
   );
   const refresh = (status: number, body = "same authorized bytes") =>
@@ -218,6 +216,7 @@ export function register(harness: Harness): void {
       );
       assert.equal(result.status, 0, result.output);
       assert.equal(result.requests.length, 1);
+      assert.equal(result.requests[0]!.authorization, null);
       const target = path.join(pinRoot, knowledgeFreshnessPinPath);
       assert.ok(existsSync(target), "refresh must produce the packaged knowledge pin");
       const currentSnapshot = path.join(outputRoot, "source-snapshots/current.json");
@@ -258,15 +257,16 @@ export function register(harness: Harness): void {
     ]);
     assert.equal(result.status, 1, result.output);
   });
-  check("source refresh CLI runs through a client symlink and records missing-token blockage", () => {
+  check("source refresh CLI runs through a client symlink without attaching authorization", () => {
     const aliasReport = path.join(fixture, "alias-refresh");
     const result = invoke(path.join(scriptAlias, "refresh-source-freshness.ts"), ["--root", fixture, "--registry", registry, "--out-dir", aliasReport]);
     assert.equal(result.status, 0, result.output);
-    assert.match(result.output, /sources=1 changed=0 blocked=1/u);
-    assert.equal(result.requests.length, 0);
+    assert.match(result.output, /sources=1/u);
+    assert.doesNotMatch(result.output, /blocked=1/u);
+    assert.equal(result.requests.length, 1);
+    assert.equal(result.requests[0]!.authorization, null);
     const report = JSON.parse(readFileSync(path.join(aliasReport, "source-snapshots/current.json"), "utf8"));
-    assert.equal(report.sources[0].status, "blocked");
-    assert.equal(report.sources[0].hash, undefined);
+    assert.equal(report.sources[0].status, "fresh");
   });
   check("freshness preserves trusted hash through 200, 401, 404, and the same 200 bytes", () => {
     assert.equal(refresh(200).status, 0);
@@ -284,7 +284,7 @@ export function register(harness: Harness): void {
         version: "1.0.0",
         kind: "billing",
         title: "Fixture",
-        source_ids: ["private-source"],
+        source_ids: ["public-source"],
         features: [{ id: "read", required: true, notes: "Read the source." }],
         deprecations: [],
         machine_readable_feeds: [],
@@ -299,7 +299,7 @@ export function register(harness: Harness): void {
         entries: [
           {
             provider_id: "fixture",
-            source_id: "private-source",
+            source_id: "public-source",
             from_hash: "unsnapped",
             to_hash: original.hash,
             classification: "docs",
@@ -405,13 +405,13 @@ export function register(harness: Harness): void {
   const ageSnapshot = path.join(checkRoot, "docs/source-freshness/source-snapshots/current.json");
   mkdirSync(path.dirname(ageSnapshot), { recursive: true });
   const ageCheck = (entry: Record<string, unknown>) => {
-    writeFileSync(ageSnapshot, JSON.stringify({ sources: [{ url: privateUrl, ...entry }] }));
+    writeFileSync(ageSnapshot, JSON.stringify({ sources: [{ url: publicRawUrl, ...entry }] }));
     return invoke("check-source-freshness.ts", ["--root", checkRoot, "--registry", registry], { offline: true });
   };
   check("invalid retrieval configuration fails rather than using the source identifier", () => {
     const invalidRegistry = path.join(fixture, "invalid-retrieval.json");
     const sourceEntry = JSON.parse(readFileSync(registry, "utf8")).sources[0];
-    for (const fetchUrl of [42, privateUrl.replace("https:", "http:")]) {
+    for (const fetchUrl of [42, publicRawUrl.replace("https:", "http:")]) {
       writeFileSync(invalidRegistry, JSON.stringify({ sources: [{ ...sourceEntry, fetch_url: fetchUrl }] }));
       const checked = invoke("check-source-freshness.ts", ["--root", checkRoot, "--registry", invalidRegistry], { offline: true });
       assert.equal(checked.status, 1, checked.output);

@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { DELIBERATELY_UNDECLARED_PROVIDER_IDS, findProvisioningProvider, PROVISIONING_MANIFEST } from "../adapters/provisioning/requirements.js";
 import { accessRouteValues } from "../kernel/schema/types.js";
 import { isMainModule } from "../tooling/lib/cli-entrypoint.js";
+import { resolveSkillRoot } from "../tooling/lib/skill-root.js";
 import {
   knowledgeFreshnessPinFromSnapshot,
   knowledgeFreshnessPinPath,
@@ -354,8 +354,7 @@ export function renderGeneratedFiles(catalog: Catalog): Record<string, string> {
 
 if (isMainModule(import.meta.url)) {
   const args = parseArgs(process.argv.slice(2));
-  const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-  const defaultSkillRoot = path.resolve(scriptDir, "..");
+  const defaultSkillRoot = resolveSkillRoot(import.meta.url);
   const skillRoot = args.skillRoot ?? defaultSkillRoot;
   let freshnessPin: string;
   try {

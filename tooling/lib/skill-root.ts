@@ -30,7 +30,6 @@ export function packageFile(fromMetaUrl: string, relativePath: string): string {
 /** Packed installs launch these without tsx. A checkout may have neither until `npm run build`. */
 export function compiledRuntimePresent(skillRoot: string): boolean {
   return (
-    existsSync(path.join(skillRoot, "dist", "entrypoints", "mcp", "server.js")) &&
-    existsSync(path.join(skillRoot, "dist", "kernel", "session", "doctor.js"))
+    existsSync(path.join(skillRoot, "dist", "entrypoints", "mcp", "server.js")) && existsSync(path.join(skillRoot, "dist", "kernel", "session", "doctor.js"))
   );
 }

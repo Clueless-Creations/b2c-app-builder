@@ -11,7 +11,11 @@ measured interval exists.
 
 - `onb-12-state-identity-contract`
 - `onb-13-analytics-experiments`
-- `onb-16-journey-graph` through `onb-20-adversarial-qa`
+- `onb-16-journey-graph`
+- `onb-17-screen-control-paywall-contract`
+- `onb-18-visual-design-prototype`
+- `onb-19-implementation-cutover-contract`
+- `onb-20-adversarial-qa`
 - `workflow.design.design-room` and `workflow.design.design-system-audit`
 - `workflow.store.apple-store-media-standing-envelope`
 
@@ -26,7 +30,7 @@ Do not merge to reduce workflow count.
 | `workflow.design.design-room` vs `workflow.design.design-system-audit` | `DESIGN.md` / Design Room vs `design/reviews/DESIGN_SYSTEM_REVIEW.md` | Both `role.design-guru` | DESIGN.md is design authority | Catalog `reviewOf` is design-room → design-system-audit. Not ONB-18 vs design-system-audit. | Isolated-review pair. The producer cannot accept its own direction. | unknown | keep |
 | `onb-18-visual-design-prototype` / `onb-19-implementation-cutover-contract` vs `onb-20-adversarial-qa` | ONB-18 prototype packet and ONB-19 cutover plan vs `ONB-20-adversarial-qa.md` | All three `role.product-leader` | ONB-20 reviews ONB-17, ONB-18, and ONB-19 | ONB-20 `reviewOf` those three. It `reads` their files and does not read ONB-16. ONB-18 `depends on` design-room plus ONB-16/17. | Isolated review of the delivery chain. ONB-19 stays in the selected set because ONB-20 reviews it. | unknown | keep |
 | `onb-12-state-identity-contract` vs `onb-13-analytics-experiments` | `ONB-12-state-identity-contract.md` vs `ONB-13-analytics-experiments.md` | Both `role.product-leader` | Distinct artifacts | Sequential: ONB-13 `depends on` ONB-12 (and ONB-10 / ONB-14). Not parallel ownership. | Keep as distinct artifacts and invalidation, not a specialist-role split. | unknown | keep |
-| `workflow.store.apple-store-media-standing-envelope` | `store/proof/apple-store-media-apply.json` | Store media apply | Live Apple mutation | Readback of the media set | #38 independent-effect boundary. Distinct grant, distinct live side effect. Not an onboarding node. | unknown | keep |
+| `workflow.store.apple-store-media-standing-envelope` | `store/proof/apple-store-media-apply.json` | `role.marketing-guru` | Live Apple mutation | No `reviewOf` on this node. Readback of the media set. | #38 independent-effect boundary. Distinct grant, distinct live side effect. Not an onboarding node. Not in Product experience. | unknown | keep |
 
 ## Keep/change
 

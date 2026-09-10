@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.70",
+  "version": "0.219.71",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Author the Apple store-media standing envelope so SCREENSHOTS.md has a distinct App Store Connect reader.",
-    "Fail closed when dual-store SCREENSHOTS.md has no distinct reader whose dependencies include the producer."
+    "Say completion.deliveryAccepted is current closeout evidence, not store submission or release.",
+    "Keep liveLaunchProven false unless separately granted provider-native proof exists."
   ]
 }

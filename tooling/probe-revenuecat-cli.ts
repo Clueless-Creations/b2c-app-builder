@@ -73,6 +73,39 @@ function listItems(data: unknown): readonly Record<string, unknown>[] {
   return record.items.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === "object" && !Array.isArray(item));
 }
 
+function nestedRecord(value: unknown): Record<string, unknown> | undefined {
+  return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : undefined;
+}
+
+function entitlementLookupKeys(items: readonly Record<string, unknown>[]): readonly string[] {
+  const keys: string[] = [];
+  const seen = new Set<string>();
+  for (const item of items) {
+    const nested = nestedRecord(item.entitlement) ?? item;
+    const key = typeof nested.lookup_key === "string" ? nested.lookup_key : typeof nested.id === "string" ? nested.id : "";
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    keys.push(key);
+  }
+  return keys;
+}
+
+function attachedProductIds(items: readonly Record<string, unknown>[]): ReadonlySet<string> {
+  const ids = new Set<string>();
+  for (const item of items) {
+    const products = Array.isArray(item.products) ? item.products : [];
+    for (const product of products) {
+      const rec = nestedRecord(product);
+      if (!rec) continue;
+      const nested = nestedRecord(rec.product) ?? rec;
+      for (const value of [nested.id, rec.product_id, nested.store_identifier, rec.store_identifier]) {
+        if (typeof value === "string" && value) ids.add(value);
+      }
+    }
+  }
+  return ids;
+}
+
 function resolvePinnedPath(): string | undefined {
   if (!pinnedCli.trim()) return undefined;
   if (!path.isAbsolute(pinnedCli)) {
@@ -187,6 +220,51 @@ function run(): void {
     process.exit(0);
   }
 
+  const entitlements = runRevenueCatCli({
+    operationId: "rc.entitlements.list",
+    projectId,
+    hostAuthorityGranted: false,
+    executable,
+    cwd: workspace,
+    isolatedHome,
+    pathEnv,
+    apiKey,
+    run: defaultCliProcessRunner,
+    discovery,
+    target: { ...targetBase, approvedAppId: selectedAppId, appStoreKind: "test-store" },
+  });
+  if (!entitlements.invoked || !entitlements.json?.ok) {
+    writeSanitized({
+      workspace,
+      discovery,
+      inspectDisposition: inspect.disposition,
+      observedKinds: [observedKind],
+      appCount: apps.length,
+      testStoreCount: testStoreApps.length,
+      purchaseDisposition: "skipped",
+      purchaseHold: "entitlements-list-unread",
+    });
+    console.log("  Test Store observed. entitlements list did not return a readable document. No simulate-purchase.");
+    process.exit(0);
+  }
+  const entitlementItems = listItems(entitlements.json.data);
+  const expectedEntitlementIds = entitlementLookupKeys(entitlementItems);
+  if (expectedEntitlementIds.length === 0) {
+    writeSanitized({
+      workspace,
+      discovery,
+      inspectDisposition: inspect.disposition,
+      observedKinds: [observedKind],
+      appCount: apps.length,
+      testStoreCount: testStoreApps.length,
+      expectedEntitlementCount: 0,
+      purchaseDisposition: "skipped",
+      purchaseHold: "missing-entitlement",
+    });
+    console.log("  Test Store observed. No entitlement lookup key on the CLI list. simulate-purchase not run.");
+    process.exit(0);
+  }
+
   let selectedProductId = requestedProductId;
   let productCount = 0;
   if (!selectedProductId) {
@@ -211,6 +289,7 @@ function run(): void {
         observedKinds: [observedKind],
         appCount: apps.length,
         testStoreCount: testStoreApps.length,
+        expectedEntitlementCount: expectedEntitlementIds.length,
         purchaseDisposition: "skipped",
         purchaseHold: "products-list-unread",
       });
@@ -219,8 +298,15 @@ function run(): void {
     }
     const productItems = listItems(products.json.data);
     productCount = productItems.length;
+    const attached = attachedProductIds(entitlementItems);
+    const attachedId = productItems.find((item) => {
+      const id = typeof item.id === "string" ? item.id : "";
+      const store = typeof item.store_identifier === "string" ? item.store_identifier : "";
+      return (id && attached.has(id)) || (store && attached.has(store));
+    })?.id;
     const firstId = productItems.find((item) => typeof item.id === "string")?.id;
-    if (typeof firstId === "string") selectedProductId = firstId;
+    if (typeof attachedId === "string") selectedProductId = attachedId;
+    else if (typeof firstId === "string") selectedProductId = firstId;
   }
   if (!selectedProductId) {
     writeSanitized({
@@ -231,6 +317,7 @@ function run(): void {
       appCount: apps.length,
       testStoreCount: testStoreApps.length,
       productCount,
+      expectedEntitlementCount: expectedEntitlementIds.length,
       purchaseDisposition: "skipped",
       purchaseHold: "missing-product",
     });
@@ -252,7 +339,7 @@ function run(): void {
       projectId,
       appId: selectedAppId,
       productIds: [selectedProductId],
-      entitlementIds: [],
+      entitlementIds: [...expectedEntitlementIds],
     },
     hostAuthorityGranted: true,
     synthetic: false,
@@ -272,6 +359,7 @@ function run(): void {
     testStoreCount: testStoreApps.length,
     productCount,
     productFingerprint: fingerprint(selectedProductId),
+    expectedEntitlementCount: expectedEntitlementIds.length,
     purchaseDisposition: purchase.disposition,
     purchaseHold: purchase.hold?.code,
     executed: purchase.evidence.test_store?.executed === true,
@@ -292,6 +380,7 @@ function writeSanitized(input: {
   readonly testStoreCount: number;
   readonly productCount?: number;
   readonly productFingerprint?: string;
+  readonly expectedEntitlementCount?: number;
   readonly purchaseDisposition: string;
   readonly purchaseHold?: string;
   readonly executed?: boolean;
@@ -312,6 +401,7 @@ function writeSanitized(input: {
     product_id_provided: Boolean(requestedProductId),
     product_count: input.productCount ?? null,
     product_id_fingerprint: input.productFingerprint ?? null,
+    expected_entitlement_count: input.expectedEntitlementCount ?? 0,
     inspect_disposition: input.inspectDisposition,
     observed_store_kinds: input.observedKinds,
     app_count: input.appCount,

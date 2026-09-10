@@ -2,6 +2,7 @@ import { assert, type Harness } from "./_harness.js";
 import {
   classifyRevenueCatAppStoreKind,
   decodeRevenueCatCliResponse,
+  extractEntitlementIds,
   extractResourceIds,
   interpretOfferingPreview,
   offeringVerifyIsComplete,
@@ -197,6 +198,23 @@ export function register(harness: Harness): void {
     assert(decoded.observation.kind === "simulate-purchase" && decoded.observation.storeIdentifier === "premium_monthly", JSON.stringify(decoded.observation));
     assert(decoded.observation.kind === "simulate-purchase" && decoded.observation.entitlementLookupKeys.includes("premium"), JSON.stringify(decoded.observation));
     assert(decoded.observation.kind === "simulate-purchase" && decoded.observation.testStoreToken === true, JSON.stringify(decoded.observation));
+  });
+
+  harness.check("revenuecat-cli-decode: entitlement ids come from purchase lookup keys and list-shaped customer show", () => {
+    const fromPurchase = extractEntitlementIds(UPSTREAM_SIMULATE_PURCHASE);
+    assert(fromPurchase.includes("premium"), JSON.stringify(fromPurchase));
+    const emptyShow = extractEntitlementIds({ id: "user_synth", object: "customer" });
+    assert(emptyShow.length === 0, JSON.stringify(emptyShow));
+    const listedShow = extractEntitlementIds({
+      object: "customer",
+      id: "user_synth",
+      active_entitlements: {
+        object: "list",
+        items: [{ id: "entl_fixture", lookup_key: "premium" }],
+      },
+    });
+    assert(listedShow.includes("premium") && listedShow.includes("entl_fixture"), JSON.stringify(listedShow));
+    assert(listedShow.includes("object") !== true && listedShow.includes("items") !== true, JSON.stringify(listedShow));
   });
 
   harness.check("revenuecat-cli-decode: malformed JSON, unknown envelope version, and wrong command shape fail closed", () => {

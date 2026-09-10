@@ -988,7 +988,12 @@ function testStorePurchase(request: CatalogSessionRequest): CatalogSessionResult
     };
   }
   const customerId = request.customerId ?? request.appUserId;
-  const observedProductId = observedSimulatePurchaseProductId(purchase.json && purchase.json.ok ? purchase.json.data : undefined);
+  const purchaseData = purchase.json && purchase.json.ok ? purchase.json.data : undefined;
+  const observedProductId = observedSimulatePurchaseProductId(purchaseData);
+  const observedStoreIdentifier =
+    purchase.observation?.kind === "simulate-purchase"
+      ? purchase.observation.storeIdentifier
+      : observedSimulatePurchaseStoreIdentifier(purchaseData);
   const requestedProduct = request.productId;
   const appliedEvidence = (entitlementIds: readonly string[]): RevenueCatCliCatalogEvidence => {
     const evidence = emptyEvidence(request);
@@ -1008,26 +1013,31 @@ function testStorePurchase(request: CatalogSessionRequest): CatalogSessionResult
   const readback = runStep(request, "rc.customers.show", { customerId });
   const invoked = [app, purchase, readback];
   if (!readback.invoked) return refused(request, readback.preflight, invoked);
-  if (!readback.json?.ok) {
-    return {
-      disposition: "incomplete",
-      invoked,
-      evidence: appliedEvidence([]),
-      replaySafe: false,
-      nextAction: "observe",
-      effectProgress: "applied-unverified",
-    };
-  }
-  const entitlementIds = extractEntitlementIds(readback.json.data);
+  const fromPurchase = observedPurchaseEntitlementIds(purchase);
+  const fromShow = readback.json?.ok ? extractEntitlementIds(readback.json.data) : [];
+  const entitlementIds = mergeIds(fromPurchase, fromShow);
   const expectedEntitlements = request.expected.entitlementIds ?? [];
   const expectedProducts = request.expected.productIds ?? [];
   const productMatches =
     typeof requestedProduct === "string" &&
     requestedProduct.length > 0 &&
     expectedProducts.includes(requestedProduct) &&
-    (observedProductId === null || observedProductId === requestedProduct);
-  const entitlementsMatch = expectedEntitlements.length > 0 && expectedEntitlements.every((id) => entitlementIds.includes(id));
+    (observedProductId === null ||
+      observedProductId === requestedProduct ||
+      observedStoreIdentifier === requestedProduct);
+  const entitlementsMatch =
+    expectedEntitlements.length > 0 && expectedEntitlements.every((id) => entitlementIds.includes(id));
   const complete = productMatches && entitlementsMatch;
+  if (!readback.json?.ok && !complete) {
+    return {
+      disposition: "incomplete",
+      invoked,
+      evidence: appliedEvidence(entitlementIds),
+      replaySafe: false,
+      nextAction: "observe",
+      effectProgress: "applied-unverified",
+    };
+  }
   if (complete && request.ledger && request.idempotencyKey) {
     const binding = request.ledger.get(request.idempotencyKey)?.binding;
     if (binding) {
@@ -1061,6 +1071,24 @@ function observedSimulatePurchaseProductId(data: unknown): string | null {
     if (typeof product.store_identifier === "string") return product.store_identifier;
   }
   return null;
+}
+
+function observedSimulatePurchaseStoreIdentifier(data: unknown): string | null {
+  if (!data || typeof data !== "object") return null;
+  const record = data as { store_identifier?: unknown; product?: unknown };
+  if (typeof record.store_identifier === "string") return record.store_identifier;
+  if (record.product && typeof record.product === "object") {
+    const product = record.product as { store_identifier?: unknown };
+    if (typeof product.store_identifier === "string") return product.store_identifier;
+  }
+  return null;
+}
+
+function observedPurchaseEntitlementIds(purchase: RevenueCatCliRunResult): readonly string[] {
+  const fromJson = purchase.json?.ok ? extractEntitlementIds(purchase.json.data) : [];
+  const fromObservation =
+    purchase.observation?.kind === "simulate-purchase" ? purchase.observation.entitlementLookupKeys : [];
+  return mergeIds(fromJson, fromObservation);
 }
 
 function observeRevenue(request: CatalogSessionRequest): CatalogSessionResult {

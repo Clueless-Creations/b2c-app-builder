@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.71",
+  "version": "0.219.72",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Keep a disposable Expo session and Node SQLite cache across reopen in the selected starter, and restore the notification detail route without granting paid or native-store access.",
-    "Export sign-in, not-found, and the required static HTML routes from the disposable Metro web export; EAS Hosting, OTA, device install, and Expo MCP stay unrun."
+    "Serialize RevenueCat CLI mutations with an exclusive per-request claim so two empty ledgers cannot both spawn.",
+    "Prove Test Store from CLI apps show readback, and refuse simulate-purchase when the caller only supplied a store label."
   ]
 }

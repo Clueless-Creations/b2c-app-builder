@@ -1,4 +1,4 @@
-/** Bounded source reads. Credentials are confined to first-party GitHub content. */
+/** Bounded source reads. Credentials are never attached to a source request. */
 export interface SourceHttpOptions {
   fetch?: typeof globalThis.fetch;
   env?: Partial<Pick<NodeJS.ProcessEnv, "GH_TOKEN" | "GITHUB_TOKEN">>;
@@ -8,8 +8,7 @@ export interface SourceHttpOptions {
 
 export class SourceHttpError extends Error {
   constructor(
-    readonly code:
-      "invalid_url" | "unsupported_private_source" | "token_required" | "request_failed" | "http_status" | "timeout" | "body_limit" | "invalid_text",
+    readonly code: "invalid_url" | "request_failed" | "http_status" | "timeout" | "body_limit" | "invalid_text",
     message: string,
     readonly httpStatus?: number,
   ) {
@@ -18,7 +17,6 @@ export class SourceHttpError extends Error {
   }
 }
 
-const PRIVATE_REPOSITORIES = new Set(["b2c-app-builder"]);
 const DEFAULT_TIMEOUT_MS = 15_000;
 const MAX_TIMEOUT_MS = 60_000;
 const DEFAULT_MAX_BYTES = 5 * 1024 * 1024;
@@ -28,7 +26,7 @@ function invalidUrl(): never {
   throw new SourceHttpError("invalid_url", "Source must use a valid HTTPS URL without credentials or an unexpected private-content path.");
 }
 
-function sourceDestination(input: string): { url: URL; authenticated: boolean } {
+function sourceDestination(input: string): URL {
   let url: URL;
   try {
     if (typeof input !== "string" || input.length > 8192 || input !== input.trim() || /[\\\u0000-\u0020\u007f]/u.test(input)) invalidUrl();
@@ -37,41 +35,7 @@ function sourceDestination(input: string): { url: URL; authenticated: boolean } 
     return invalidUrl();
   }
   if (url.protocol !== "https:" || url.username || url.password) invalidUrl();
-  const segments = url.pathname.slice(1).split("/");
-  const api = url.hostname === "api.github.com";
-  const ownerIndex = api ? 1 : 0;
-  const firstParty = segments[ownerIndex] === "Emuthmartinez" && PRIVATE_REPOSITORIES.has(segments[ownerIndex + 1] ?? "");
-  if (!["github.com", "raw.githubusercontent.com", "api.github.com"].includes(url.hostname) || !firstParty) {
-    return { url, authenticated: false };
-  }
-  if (url.port || url.hash) invalidUrl();
-  // URL parsing normalizes dot segments. Reject such an input before it can gain auth.
-  const rawPath = input.match(/^https:\/\/[^/?#]+([^?#]*)/u)?.[1] ?? "";
-  if (rawPath !== url.pathname) invalidUrl();
-  let file: string[];
-  if (url.hostname === "raw.githubusercontent.com" && segments[2] === "main" && !url.search) {
-    file = segments.slice(3);
-  } else if (url.hostname === "github.com" && segments[2] === "blob" && segments[3] === "main" && !url.search) {
-    file = segments.slice(4);
-  } else if (
-    api &&
-    segments[0] === "repos" &&
-    segments[3] === "contents" &&
-    (!url.search || (url.searchParams.size === 1 && url.searchParams.get("ref") === "main"))
-  ) {
-    file = segments.slice(4);
-  } else {
-    throw new SourceHttpError("unsupported_private_source", "This private repository link is not a supported main-branch content URL.");
-  }
-  // Authenticated content paths are canonical segments, not URLs, escapes, or traversals.
-  if (!file.length || file.some((segment) => !/^[A-Za-z0-9._~-]+$/u.test(segment) || segment === "." || segment === "..")) invalidUrl();
-  const repository = segments[ownerIndex + 1]!;
-  const destination = new URL(url.href);
-  destination.hostname = "api.github.com";
-  destination.pathname = `/repos/Emuthmartinez/${repository}/contents/${file.join("/")}`;
-  destination.search = "";
-  destination.searchParams.set("ref", "main");
-  return { url: destination, authenticated: true };
+  return url;
 }
 
 /** Do not print response errors or requested paths: either can contain credentials. */
@@ -121,16 +85,7 @@ function cancel(body: { cancel: () => Promise<unknown> } | undefined | null): vo
 
 export async function readSourceText(input: string, options: SourceHttpOptions = {}): Promise<{ text: string; httpStatus: 200 }> {
   const destination = sourceDestination(input);
-  const env = options.env ?? process.env;
   const headers: Record<string, string> = { "user-agent": "b2c-source-reader/1.0", accept: "text/html,application/json,text/plain,*/*" };
-  if (destination.authenticated) {
-    const token = env.GH_TOKEN?.trim() || env.GITHUB_TOKEN?.trim();
-    if (!token || /[^\x21-\x7e]/u.test(token)) {
-      throw new SourceHttpError("token_required", "Private source access requires GH_TOKEN or GITHUB_TOKEN.");
-    }
-    headers.authorization = `Bearer ${token}`;
-    headers.accept = "application/vnd.github.raw+json";
-  }
   const timeoutMs = bounded(options.timeoutMs, DEFAULT_TIMEOUT_MS, MAX_TIMEOUT_MS);
   const maxBytes = bounded(options.maxBytes, DEFAULT_MAX_BYTES, MAX_BYTES);
   const deadlineAt = Date.now() + timeoutMs;
@@ -149,7 +104,7 @@ export async function readSourceText(input: string, options: SourceHttpOptions =
     }, timeoutMs);
   });
   try {
-    const request = (options.fetch ?? globalThis.fetch)(destination.url.href, { headers, redirect: "error", signal: controller.signal });
+    const request = (options.fetch ?? globalThis.fetch)(destination.href, { headers, redirect: "error", signal: controller.signal });
     // A non-cooperative fetch can resolve after the deadline. Discard its body too.
     void request.then(
       (response) => {

@@ -30,26 +30,21 @@ npm run check:version-discipline -- --repo-root . --skill-root .
 Local checks, including `--all-runtimes`, are offline. Only `--remote` or `--remote-url` requests
 a remote comparison. The flag must have a non-empty URL value, not another flag.
 
-For an authorized comparison with the private repository, supply `GH_TOKEN` or `GITHUB_TOKEN`
-through the approved secret runtime. `GH_TOKEN` takes precedence. Do not put a token in the URL
-or extract one from `gh auth`. Then run:
+Remote comparison reads the public manifest over HTTPS and never attaches an authorization
+header. Do not put a token in the URL. Then run:
 
 ```bash
 npm run check:skill-version -- \
   --installed ~/.codex/skills/b2c-app-builder \
-  --remote-url https://raw.githubusercontent.com/Emuthmartinez/b2c-app-builder/main/skill-version.json
+  --remote-url https://raw.githubusercontent.com/Clueless-Creations/b2c-app-builder/main/skill-version.json
 ```
 
-Known first-party raw and blob URLs map to the GitHub contents API with the raw media type.
-Only exact allowlisted repository content paths receive the token. GitHub HTML, repository
-roots, issues, security pages, Shields, and foreign hosts do not receive it. Unsupported
-private links remain blocked. The reader refuses redirects and checks HTTP 200 before reading
-the body. A denied response never falls back to anonymous access.
+The reader refuses redirects and checks HTTP 200 before reading the body. A denied response
+never retries with credentials.
 
-Missing credentials, denial, timeout, and other fetch failures produce
-`ERROR skill_version.remote_unavailable` with exit status 1. They do not produce a current or
-stale comparison. Errors omit supplied URLs and response text. An invalid remote manifest
-also fails verification.
+Denial, timeout, and other fetch failures produce `ERROR skill_version.remote_unavailable`
+with exit status 1. They do not produce a current or stale comparison. Errors omit supplied
+URLs and response text. An invalid remote manifest also fails verification.
 
 From the installed runtime:
 

@@ -60,22 +60,10 @@ The plist DTD keeps its standard HTTP identifier and uses an explicit HTTPS `fet
 Snapshots retain both addresses. The reader applies the same HTTPS, credential, redirect,
 deadline, and byte-limit checks to the retrieval address. It does not follow public redirects.
 
-Private main-branch content in the B2C App Builder repositories uses the GitHub contents API and
-the raw media type. The reader uses `GH_TOKEN` before `GITHUB_TOKEN`. It sends authorization
-only to exact allowlisted first-party content paths, never to foreign hosts or GitHub HTML.
-Missing credentials fail before a network request. There is no anonymous retry after denial
-and no token extraction from Git tooling. Errors and report URLs remove credential values.
-
-The scheduled workflow uses `B2C_APP_BUILDER_SOURCE_READ_TOKEN` as `GH_TOKEN` for private source
-reads. Doppler is the system of record for this credential. Use the official Doppler GitHub
-integration to sync the value to the repository secret of the same name. Do not enter or rotate
-the value in the workflow. Give the credential read-only access to the required B2C App Builder source
-repositories. The job fails before refresh when the repository secret is absent.
-
-The refresh step also receives `${{ github.token }}` as `GITHUB_TOKEN`. The reader gives
-`GH_TOKEN` precedence, so the GitHub job token cannot hide a missing cross-repository credential.
-The job uses the GitHub token only for actions in this repository, including PR creation. Do not
-grant the cross-repository credential write access.
+Source reads never attach an `authorization` header, including GitHub raw, blob, and contents
+URLs. There is no first-party token branch and no credentialed retry after denial. Errors and
+report URLs still remove any credential values that appear in the supplied address or
+environment. The job token used to open a refresh pull request is not a source-read credential.
 
 ## Source Discovery Rules
 

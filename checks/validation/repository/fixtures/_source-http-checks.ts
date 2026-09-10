@@ -11,7 +11,7 @@ const test = async (label: string, run: () => Promise<void>): Promise<void> => {
     results.push({ label, ok: false, output: error instanceof Error ? error.message : String(error) });
   }
 };
-const privateUrl = "https://raw.githubusercontent.com/Emuthmartinez/b2c-app-builder/main/skill-version.json";
+const publicRawUrl = "https://raw.githubusercontent.com/Clueless-Creations/b2c-app-builder/main/skill-version.json";
 const token = "fixture-primary-token";
 const env = { GH_TOKEN: token, GITHUB_TOKEN: "fixture-secondary-token" };
 const publicUrl = "https://content.example.test/source";
@@ -28,53 +28,23 @@ const refuse =
 const fetcher = (implementation: (input: string, init: RequestInit) => Promise<Response>): typeof fetch =>
   ((input, init) => implementation(String(input), init ?? {})) as typeof fetch;
 
-await test("source HTTP maps configured private repositories to authenticated content requests", async () => {
-  for (const repository of ["b2c-app-builder"]) {
-    for (const [host, middle] of [
-      ["github.com", "blob/main"],
-      ["raw.githubusercontent.com", "main"],
-    ]) {
-      const url = sourceUrl(host!, `/Emuthmartinez/${repository}/${middle}/README.md`);
-      await readSourceText(url.href, {
-        env,
-        fetch: fetcher(async (target, init) => {
-          const request = new URL(target);
-          assert.equal(request.hostname, "api.github.com");
-          assert.equal(request.pathname, `/repos/Emuthmartinez/${repository}/contents/README.md`);
-          assert.equal(request.search, "?ref=main");
-          assert.equal(new Headers(init.headers).get("authorization"), `Bearer ${token}`);
-          assert.equal(init.redirect, "error");
-          return new Response("source");
-        }),
-      });
-    }
-  }
-  let calls = 0;
-  const blocked = fetcher(async () => {
-    calls++;
-    return new Response("must not read");
-  });
-  for (const suffix of ["", "/issues", "/security/advisories/new", "/blob/other/README.md"]) {
-    await assert.rejects(
-      readSourceText(sourceUrl("github.com", `/Emuthmartinez/b2c-app-builder${suffix}`).href, { env, fetch: blocked }),
-      refuse("unsupported_private_source"),
-    );
-  }
-  assert.equal(calls, 0);
-});
-
-await test("source HTTP sends no auth to foreign repositories, host suffixes, or Shields", async () => {
+await test("source HTTP never attaches authorization to any GitHub or foreign URL", async () => {
   const targets = [
     publicUrl,
+    publicRawUrl,
+    sourceUrl("github.com", "/Clueless-Creations/b2c-app-builder/blob/main/README.md").href,
+    sourceUrl("raw.githubusercontent.com", "/Clueless-Creations/b2c-app-builder/main/README.md").href,
+    sourceUrl("api.github.com", "/repos/Clueless-Creations/b2c-app-builder/contents/README.md").href,
     sourceUrl("api.github.com", "/repos/Other/b2c-app-builder/contents/README.md").href,
-    new URL("/Emuthmartinez/b2c-app-builder/main/README.md", "https://raw.githubusercontent.com.evil.test").href,
-    sourceUrl("img.shields.io", "/github/license/Emuthmartinez/b2c-app-builder").href,
+    new URL("/Clueless-Creations/b2c-app-builder/main/README.md", "https://raw.githubusercontent.com.evil.test").href,
+    sourceUrl("img.shields.io", "/github/license/Clueless-Creations/b2c-app-builder").href,
   ];
   for (const target of targets)
     await readSourceText(target, {
       env,
       fetch: fetcher(async (_url, init) => {
         assert.equal(new Headers(init.headers).get("authorization"), null);
+        assert.equal(init.redirect, "error");
         return new Response("source");
       }),
     });
@@ -86,29 +56,14 @@ await test("source HTTP refuses malformed authenticated destinations before fetc
     calls++;
     return new Response("must not read");
   });
-  const apiOrigin = sourceUrl("api.github.com").origin;
   for (const target of [
-    privateUrl.replace("https:", "http:"),
-    privateUrl.replace("https://", `https://user:${token}@`),
-    privateUrl.replace("raw.githubusercontent.com", "raw.githubusercontent.com:8443"),
-    `${apiOrigin}/repos/Emuthmartinez/b2c-app-builder/contents/../contents/README.md?ref=main`,
-    `${apiOrigin}/repos/Emuthmartinez/b2c-app-builder/contents/%2e%2e/README.md?ref=main`,
-    `${apiOrigin}/repos/Emuthmartinez/b2c-app-builder/contents/a%2fb.md?ref=main`,
-    `${apiOrigin}/repos/Emuthmartinez/b2c-app-builder/contents/README.md?ref=main&ref=other`,
-    `${apiOrigin}/repos/Emuthmartinez/b2c-app-builder/actions`,
+    publicRawUrl.replace("https:", "http:"),
+    publicRawUrl.replace("https://", `https://user:${token}@`),
+    "https://content.example.test/source\n",
+    `https://user:${token}@content.example.test/source`,
   ])
     await assert.rejects(readSourceText(target, { env, fetch }), (error: unknown) => error instanceof SourceHttpError);
   assert.equal(calls, 0);
-});
-
-await test("source HTTP uses GITHUB_TOKEN only when GH_TOKEN is empty", async () => {
-  await readSourceText(privateUrl, {
-    env: { GH_TOKEN: " ", GITHUB_TOKEN: env.GITHUB_TOKEN },
-    fetch: fetcher(async (_url, init) => {
-      assert.equal(new Headers(init.headers).get("authorization"), `Bearer ${env.GITHUB_TOKEN}`);
-      return new Response("source");
-    }),
-  });
 });
 
 await test("source HTTP rejects every non-200 status before taking a body reader", async () => {
@@ -128,7 +83,7 @@ await test("source HTTP rejects every non-200 status before taking a body reader
         },
       },
     } as unknown as Response;
-    await assert.rejects(readSourceText(privateUrl, { env, fetch: fetcher(async () => response) }), refuse("http_status"));
+    await assert.rejects(readSourceText(publicRawUrl, { env, fetch: fetcher(async () => response) }), refuse("http_status"));
     assert.equal(reads, 0);
     assert.equal(cancelled, 1);
   }
@@ -245,7 +200,7 @@ await test("source reports remove URL credentials, sensitive query values, and e
 });
 
 await test("refresh failures retain the trusted timestamp and hash across repeated denials", async () => {
-  const source = { id: "fixture", name: "fixture", url: privateUrl, source_type: "raw_manifest", refresh_cadence_days: 7, owner: "fixture" };
+  const source = { id: "fixture", name: "fixture", url: publicRawUrl, source_type: "raw_manifest", refresh_cadence_days: 7, owner: "fixture" };
   let status = 200;
   let reads = 0;
   const options: SourceHttpOptions = {

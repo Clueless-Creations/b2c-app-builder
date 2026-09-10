@@ -381,6 +381,43 @@ if (existsSync(snapshotPath)) {
   }
 }
 
+const seenIds = new Map<string, number>();
+const seenUrls = new Map<string, number>();
+for (const [index, source] of sourceRecords(registry).entries()) {
+  const id = typeof source.id === "string" ? source.id.trim() : "";
+  if (id) {
+    const first = seenIds.get(id);
+    if (first !== undefined) {
+      issues.push(
+        issue(
+          "error",
+          "source_freshness.sources.duplicate_id",
+          `sources.${index}.id duplicates sources.${first}.id (${id}).`,
+          path.relative(args.root, args.registryPath),
+        ),
+      );
+    } else {
+      seenIds.set(id, index);
+    }
+  }
+  const normalizedSourceUrl = normalizeUrl(String(source.url ?? ""));
+  if (normalizedSourceUrl) {
+    const first = seenUrls.get(normalizedSourceUrl);
+    if (first !== undefined) {
+      issues.push(
+        issue(
+          "error",
+          "source_freshness.sources.duplicate_url",
+          `sources.${index}.url duplicates sources.${first}.url after normalizeUrl (${normalizedSourceUrl}).`,
+          path.relative(args.root, args.registryPath),
+        ),
+      );
+    } else {
+      seenUrls.set(normalizedSourceUrl, index);
+    }
+  }
+}
+
 for (const [index, source] of sourceRecords(registry).entries()) {
   const prefix = `sources.${index}`;
   if (snapshotByUrl.size > 0) {

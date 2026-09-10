@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.37",
+  "version": "0.219.38",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Keep conversion purpose independent of scroll technique so cinematic signup keeps both CRO and motion proof.",
-    "Hold onboarding applicability until recipe and provider versions match a reviewed catalog."
+    "Stop attaching credentials to source reads and drop the unreachable private-source GitHub path.",
+    "Fail source-freshness when two registry rows share an id or a normalized URL."
   ]
 }

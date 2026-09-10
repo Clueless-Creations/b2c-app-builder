@@ -2,7 +2,7 @@
 
 Status: parked.
 Opened: 2026-09-04.
-Successor repository: [Emuthmartinez/b2c-planes](https://github.com/Emuthmartinez/b2c-planes)
+Successor work is parked privately and is not a public source.
 
 ## What this timeout is
 

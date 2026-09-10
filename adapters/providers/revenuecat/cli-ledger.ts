@@ -50,6 +50,10 @@ export interface RevenueCatCliEffectBinding {
   readonly paywallId: string;
   readonly subscriptionId: string;
   readonly createTitle: string;
+  readonly lookupKey: string;
+  readonly displayName: string;
+  readonly storeIdentifier: string;
+  readonly productType: string;
   readonly attachProductIds: string;
 }
 
@@ -97,7 +101,7 @@ function field(value: string | undefined): string {
   return value?.trim() ?? "";
 }
 
-export function buildRevenueCatCliBinding(input: Pick<CliArgvRequest, "operationId" | "projectId" | "appId" | "productId" | "appUserId" | "customerId" | "offeringId" | "entitlementId" | "packageId" | "paywallId" | "subscriptionId" | "createTitle" | "attachProductIds">): RevenueCatCliEffectBinding {
+export function buildRevenueCatCliBinding(input: Pick<CliArgvRequest, "operationId" | "projectId" | "appId" | "productId" | "appUserId" | "customerId" | "offeringId" | "entitlementId" | "packageId" | "paywallId" | "subscriptionId" | "createTitle" | "lookupKey" | "displayName" | "storeIdentifier" | "productType" | "attachProductIds">): RevenueCatCliEffectBinding {
   const attach = [...(input.attachProductIds ?? [])].map((id) => id.trim()).filter(Boolean).sort();
   return {
     operationId: field(input.operationId),
@@ -112,6 +116,10 @@ export function buildRevenueCatCliBinding(input: Pick<CliArgvRequest, "operation
     paywallId: field(input.paywallId),
     subscriptionId: field(input.subscriptionId),
     createTitle: field(input.createTitle),
+    lookupKey: field(input.lookupKey),
+    displayName: field(input.displayName),
+    storeIdentifier: field(input.storeIdentifier),
+    productType: field(input.productType),
     attachProductIds: attach.join(","),
   };
 }
@@ -179,8 +187,16 @@ export function jsonFromWriteSnapshot(snapshot: RevenueCatCliWriteSnapshot | und
   };
 }
 
+function coerceBinding(binding: RevenueCatCliEffectBinding): RevenueCatCliEffectBinding {
+  return buildRevenueCatCliBinding({
+    ...binding,
+    attachProductIds: binding.attachProductIds ? binding.attachProductIds.split(",") : [],
+  });
+}
+
 function withIdentity(entry: Omit<RevenueCatCliLedgerEntry, "requestIdentity"> & { requestIdentity?: string }): RevenueCatCliLedgerEntry {
-  return { ...entry, requestIdentity: canonicalRevenueCatCliRequestIdentity(entry.binding) };
+  const binding = coerceBinding(entry.binding);
+  return { ...entry, binding, requestIdentity: canonicalRevenueCatCliRequestIdentity(binding) };
 }
 
 export class RevenueCatCliLedger {

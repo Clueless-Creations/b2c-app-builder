@@ -80,6 +80,13 @@ function offeringsCreateCount(calls: readonly CliProcessRequest[]): number {
   return countArgv(calls, (argv) => argv.includes("offerings") && argv.includes("create"));
 }
 
+function isCatalogListArgv(argv: readonly string[]): boolean {
+  if (argv.includes("create") || argv.includes("attach") || argv.includes("verify") || argv.includes("show") || argv.includes("simulate-purchase")) {
+    return false;
+  }
+  return argv.includes("list") || argv.includes("packages");
+}
+
 function durableSession(
   harness: Harness,
   name: string,
@@ -158,20 +165,17 @@ export function register(harness: Harness): void {
     const { run, calls } = recordingRunner((request) => {
       if (request.argv[0] === "--version") return ok(`${REVENUECAT_CLI_RELEASE.version}\n`);
       if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
-      if (request.argv.includes("offerings") && request.argv.includes("create")) return ok(envelope({ id: "off_default" }));
-      if (request.argv.includes("list") || request.argv.includes("packages")) {
+      if (request.argv.includes("offerings") && request.argv.includes("create")) return ok(envelope({ id: "off_default", lookup_key: "default", object: "offering" }));
+      if (isCatalogListArgv(request.argv)) {
         lists += 1;
-        if (lists <= 4) return ok(envelope({ items: [], next_page: null }));
+        if (lists <= 4) return ok(envelope({ object: "list", items: [], next_page: null }));
         if (lists <= 8) return { stdout: "", stderr: "list-fail", status: 1, timedOut: false, truncated: false, cancelled: false, signal: null };
         return ok(
           envelope({
-            items: request.argv.includes("products")
-              ? [{ id: "prod_monthly" }]
-              : request.argv.includes("entitlements")
-                ? [{ id: "ent_premium" }]
-                : request.argv.includes("packages")
-                  ? [{ id: "pkg_monthly" }]
-                  : [{ id: "off_default" }],
+            object: "list",
+            items: request.argv.includes("offerings")
+              ? [{ id: "off_default", lookup_key: "default", object: "offering" }]
+              : [],
             next_page: null,
           }),
         );
@@ -183,6 +187,14 @@ export function register(harness: Harness): void {
       createIfMissing: true,
       idempotencyKey: "rc-create-k",
       offeringCreate: { lookupKey: "default", displayName: "Default" },
+      desired: {
+        projectId: "proj_approved",
+        appId: "app_test",
+        offering: { lookupKey: "default", displayName: "Default" },
+        products: [],
+        entitlements: [],
+        packages: [],
+      },
     });
     const first = runRevenueCatCatalogSession(request);
     assert(first.evidence.created === true, "create must be recorded");
@@ -340,6 +352,53 @@ export function register(harness: Harness): void {
       `user change must conflict, hold ${changedUser.hold?.code}`,
     );
     assert(simulatePurchaseCount(calls) === 1, `expected one purchase, got ${simulatePurchaseCount(calls)}`);
+  });
+
+  harness.check("revenuecat-cli-durability: same key with changed lookup key is request-identity-conflict", () => {
+    const ledger = new RevenueCatCliLedger({ now: () => "2026-09-09T00:00:00.000Z" });
+    const { run, calls } = recordingRunner((request) => {
+      if (request.argv[0] === "--version") return ok(`${REVENUECAT_CLI_RELEASE.version}\n`);
+      if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
+      return ok(envelope({ id: "ofrng", lookup_key: "default", object: "offering" }));
+    });
+    const home = isolatedConfigHome(harness.makeTempDir("rc-lookup-identity"), "ws-a");
+    const discovery = discoverTrusted(harness, "rc-lookup-identity-disc", run);
+    const first = runRevenueCatCli({
+      operationId: "rc.catalog.create",
+      projectId: "proj_approved",
+      lookupKey: "default",
+      displayName: "Default",
+      hostAuthorityGranted: true,
+      executable: "/opt/fake/bin/rc",
+      cwd: home,
+      isolatedHome: home,
+      pathEnv: "/opt/fake/bin",
+      run,
+      discovery,
+      target: selectedTarget(),
+      idempotencyKey: "rc-lookup-k",
+      ledger,
+    });
+    assert(first.invoked === true, "first lookup-key create must spawn");
+    const second = runRevenueCatCli({
+      operationId: "rc.catalog.create",
+      projectId: "proj_approved",
+      lookupKey: "other",
+      displayName: "Default",
+      hostAuthorityGranted: true,
+      executable: "/opt/fake/bin/rc",
+      cwd: home,
+      isolatedHome: home,
+      pathEnv: "/opt/fake/bin",
+      run,
+      discovery,
+      target: selectedTarget(),
+      idempotencyKey: "rc-lookup-k",
+      ledger,
+    });
+    assert(second.invoked === false, "changed lookup key must not spawn");
+    assert(second.preflight.code === "request-identity-conflict", second.preflight.code);
+    assert(offeringsCreateCount(calls) === 1, `expected one create, got ${offeringsCreateCount(calls)}`);
   });
 
   harness.check("revenuecat-cli-durability: crash after bind before spawn recovers without a second write", () => {

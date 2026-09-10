@@ -53,6 +53,7 @@ import { issuesFromRevenueCatCliCatalogArtifact } from "../../../adapters/provid
 import { REVENUECAT_PROVISIONING } from "../../../adapters/providers/revenuecat/provisioning.js";
 import { loadUpstreams } from "../../../kernel/contribution/upstreams-load.js";
 import { UPSTREAM_SDK_PREVIEW_MINIMAL } from "./revenuecat-cli-decode.samples.js";
+import { DESIRED_PREMIUM_MONTHLY, NATIVE_MATCHING_GRAPH } from "./revenuecat-cli-reconcile-plan.samples.js";
 
 const COMMANDS_JSON = JSON.stringify({
   schema_version: "1",
@@ -118,6 +119,57 @@ function envelope(data: unknown): string {
   return JSON.stringify({ data, schema_version: "1" });
 }
 
+function listEnvelope(items: readonly unknown[], nextPage: string | null = null): string {
+  return envelope({ object: "list", items, next_page: nextPage });
+}
+
+function isCatalogMutation(argv: readonly string[]): boolean {
+  return argv.includes("create") || argv.includes("attach");
+}
+
+function matchingNativeLists(request: { readonly argv: readonly string[] }): CliProcessResult | undefined {
+  if (isCatalogMutation(request.argv)) return undefined;
+  if (request.argv.includes("products") && request.argv.includes("list")) {
+    return ok(listEnvelope([...NATIVE_MATCHING_GRAPH.products]));
+  }
+  if (request.argv.includes("entitlements") && request.argv.includes("list")) {
+    return ok(
+      listEnvelope(
+        NATIVE_MATCHING_GRAPH.entitlements.map((entry) => ({
+          ...entry.entitlement,
+          products: entry.products,
+        })),
+      ),
+    );
+  }
+  if (request.argv.includes("offerings") && request.argv.includes("list")) {
+    return ok(listEnvelope([NATIVE_MATCHING_GRAPH.offering]));
+  }
+  if (request.argv.includes("packages")) {
+    return ok(
+      listEnvelope(
+        NATIVE_MATCHING_GRAPH.packages.map((entry) => ({
+          ...entry.package,
+          offering_id: entry.offering_id,
+          products: entry.products,
+        })),
+      ),
+    );
+  }
+  if (request.argv.includes("verify")) {
+    return ok(
+      envelope({
+        offering: NATIVE_MATCHING_GRAPH.offering,
+        packages: NATIVE_MATCHING_GRAPH.packages,
+        paywalls: [{ id: "pw", name: "Default", offering_id: "ofrng", published_at: 1, object: "paywall" }],
+        entitlements: NATIVE_MATCHING_GRAPH.entitlements,
+        issues: [],
+      }),
+    );
+  }
+  return undefined;
+}
+
 function catalogSession(
   harness: Harness,
   name: string,
@@ -147,6 +199,7 @@ function catalogSession(
     hostAuthorityGranted: false,
     synthetic: true,
     offeringCreate: { lookupKey: "default", displayName: "Default" },
+    desired: DESIRED_PREMIUM_MONTHLY,
     ...overrides,
   };
 }
@@ -728,20 +781,20 @@ export function register(harness: Harness): void {
     const { run, calls } = recordingRunner((request) => {
       if (request.argv[0] === "--version") return ok("revenuecat-cli 0.1.1\n");
       if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
-      if (request.argv.includes("products") && request.argv.includes("list")) return ok(envelope({ items: [{ id: "prod_monthly" }], next_page: null }));
-      if (request.argv.includes("entitlements") && request.argv.includes("list")) return ok(envelope({ items: [{ id: "ent_premium" }], next_page: null }));
-      if (request.argv.includes("offerings") && request.argv.includes("list")) return ok(envelope({ items: [{ id: "off_default" }], next_page: null }));
-      if (request.argv.includes("packages")) return ok(envelope({ items: [{ id: "pkg_monthly" }], next_page: null }));
+      const listed = matchingNativeLists(request);
+      if (listed) return listed;
       return ok(envelope({}));
     });
     const result = runRevenueCatCatalogSession(catalogSession(harness, "rc-reconcile-exists", run, { createIfMissing: true, hostAuthorityGranted: true, target: selectedTarget({ hostAuthorityGranted: true }) }));
     assert(result.disposition === "complete", `disposition ${result.disposition}`);
     assert(result.evidence.catalog.reconciled === true, "existing catalog must reconcile");
-    assert(result.evidence.created === false, "must not create when ids already exist");
+    assert(result.evidence.catalog.protocol_valid === true, "protocol-valid lists are not by themselves incomplete");
+    assert(result.evidence.created === false, "must not create when the selected catalog already matches");
     assert(
-      calls.every((call) => !call.argv.includes("create")),
+      calls.every((call) => !isCatalogMutation(call.argv)),
       "duplicate create must not spawn",
     );
+    assert(result.evidence.catalog.offering_ids.includes("ofrng"), "must reuse the opaque offering id");
   });
 
   harness.check("revenuecat-cli: offering create without products and entitlements is not reconciled", () => {
@@ -751,12 +804,15 @@ export function register(harness: Harness): void {
       if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
       if (request.argv.includes("offerings") && request.argv.includes("create")) {
         createdOffering = true;
-        return ok(envelope({ id: "off_default" }));
+        return ok(envelope({ id: "ofrng", lookup_key: "default", object: "offering" }));
       }
+      if (isCatalogMutation(request.argv)) return ok(envelope({}));
       if (request.argv.includes("offerings") && request.argv.includes("list")) {
-        return ok(envelope({ items: createdOffering ? [{ id: "off_default" }] : [], next_page: null }));
+        return ok(listEnvelope(createdOffering ? [{ ...NATIVE_MATCHING_GRAPH.offering }] : []));
       }
-      if (request.argv.includes("list") || request.argv.includes("packages")) return ok(envelope({ items: [], next_page: null }));
+      if (request.argv.includes("list") || request.argv.includes("packages") || request.argv.includes("verify")) {
+        return ok(listEnvelope([]));
+      }
       return ok(envelope({}));
     });
     const result = runRevenueCatCatalogSession(
@@ -768,31 +824,129 @@ export function register(harness: Harness): void {
     );
     assert(result.disposition === "incomplete", `disposition ${result.disposition}`);
     assert(result.evidence.catalog.reconciled === false, "creating one offering is not catalog reconciliation");
-    assert(result.evidence.created === true, "authorized offering create may still run");
-    assert(result.evidence.catalog.missing_ids.includes("prod_monthly"), `missing ${result.evidence.catalog.missing_ids.join(",")}`);
-    assert(result.evidence.catalog.missing_ids.includes("ent_premium"), `missing ${result.evidence.catalog.missing_ids.join(",")}`);
-    assert(result.evidence.catalog.missing_ids.includes("pkg_monthly"), `missing ${result.evidence.catalog.missing_ids.join(",")}`);
+    assert(result.evidence.created === true, "authorized entity creates may still run");
+    assert(result.evidence.catalog.missing_ids.some((id) => id === "monthly" || id.includes("monthly")), `missing ${result.evidence.catalog.missing_ids.join(",")}`);
+    assert(result.evidence.catalog.missing_ids.some((id) => id.includes("premium")), `missing ${result.evidence.catalog.missing_ids.join(",")}`);
+    assert(
+      calls.some((call) => call.argv.includes("products") && call.argv.includes("create") && call.argv.includes("--store-id") && call.argv.includes("monthly")),
+      "missing product must repair through products create",
+    );
     assert(
       calls.some((call) => call.argv.includes("offerings") && call.argv.includes("create") && call.argv.includes("--lookup-key") && call.argv.includes("default")),
-      "offering create should spawn with pinned --lookup-key",
+      "offering create should spawn with pinned --lookup-key when the offering is also missing",
     );
     const createArgv = calls.find((call) => call.argv.includes("offerings") && call.argv.includes("create"))!.argv;
-    assert(!argvContainsBareToken(createArgv, "off_default"), `server id must not be a create positional: ${JSON.stringify(createArgv)}`);
+    assert(!argvContainsBareToken(createArgv, "ofrng"), `server id must not be a create positional: ${JSON.stringify(createArgv)}`);
   });
 
   harness.check("revenuecat-cli: missing catalog without authority does not create", () => {
     const { run, calls } = recordingRunner((request) => {
       if (request.argv[0] === "--version") return ok("revenuecat-cli 0.1.1\n");
       if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
-      if (request.argv.includes("list") || request.argv.includes("packages")) return ok(envelope({ items: [], next_page: null }));
+      if (request.argv.includes("list") || request.argv.includes("packages") || request.argv.includes("verify")) {
+        return ok(listEnvelope([]));
+      }
       return ok(envelope({}));
     });
     const result = runRevenueCatCatalogSession(catalogSession(harness, "rc-reconcile-authz", run, { createIfMissing: true, hostAuthorityGranted: false }));
     assert(result.disposition === "refused", `disposition ${result.disposition}`);
     assert(result.hold?.code === "authority-missing", `hold ${result.hold?.code}`);
     assert(
-      calls.every((call) => !call.argv.includes("create")),
+      calls.every((call) => !isCatalogMutation(call.argv)),
       "create must not spawn without authority",
+    );
+  });
+
+  harness.check("revenuecat-cli: missing product repairs product not offering create", () => {
+    const { run, calls } = recordingRunner((request) => {
+      if (request.argv[0] === "--version") return ok("revenuecat-cli 0.1.1\n");
+      if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
+      if (request.argv.includes("products") && request.argv.includes("create")) {
+        return ok(envelope({ id: "prod", store_identifier: "monthly", type: "subscription", app_id: "app_test", object: "product" }));
+      }
+      if (request.argv.includes("products") && request.argv.includes("list")) return ok(listEnvelope([]));
+      const listed = matchingNativeLists(request);
+      if (listed) return listed;
+      if (request.argv.includes("attach")) return ok(envelope({ id: "ent", object: "entitlement" }));
+      return ok(envelope({}));
+    });
+    const result = runRevenueCatCatalogSession(
+      catalogSession(harness, "rc-reconcile-missing-product", run, {
+        createIfMissing: true,
+        hostAuthorityGranted: true,
+        target: selectedTarget({ hostAuthorityGranted: true }),
+      }),
+    );
+    assert(result.evidence.catalog.reconciled === false || result.disposition !== "complete" || calls.some((call) => call.argv.includes("products") && call.argv.includes("create")), `disposition ${result.disposition}`);
+    assert(
+      calls.some((call) => call.argv.includes("products") && call.argv.includes("create") && call.argv.includes("--store-id") && call.argv.includes("monthly")),
+      "product create must use --store-id",
+    );
+    assert(
+      calls.every((call) => !(call.argv.includes("offerings") && call.argv.includes("create"))),
+      "missing product must not collapse into offering create",
+    );
+  });
+
+  harness.check("revenuecat-cli: unknown list coverage is not complete and does not create", () => {
+    const { run, calls } = recordingRunner((request) => {
+      if (request.argv[0] === "--version") return ok("revenuecat-cli 0.1.1\n");
+      if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
+      if (request.argv.includes("list") || request.argv.includes("packages") || request.argv.includes("verify")) {
+        return ok(envelope({ object: "list" }));
+      }
+      return ok(envelope({}));
+    });
+    const result = runRevenueCatCatalogSession(
+      catalogSession(harness, "rc-reconcile-unknown", run, {
+        createIfMissing: true,
+        hostAuthorityGranted: true,
+        target: selectedTarget({ hostAuthorityGranted: true }),
+      }),
+    );
+    assert(result.disposition !== "complete", `disposition ${result.disposition}`);
+    assert(result.evidence.catalog.reconciled === false, "unknown coverage cannot reconcile");
+    assert(
+      calls.every((call) => !isCatalogMutation(call.argv)),
+      "unknown coverage must not create",
+    );
+  });
+
+  harness.check("revenuecat-cli: ids present on the wrong package are not reconciled", () => {
+    const { run, calls } = recordingRunner((request) => {
+      if (request.argv[0] === "--version") return ok("revenuecat-cli 0.1.1\n");
+      if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
+      if (request.argv.includes("packages") && !isCatalogMutation(request.argv)) {
+        return ok(
+          listEnvelope([
+            { id: "pkg", lookup_key: "$rc_monthly", display_name: "Monthly", object: "package", offering_id: "ofrng", products: [] },
+            {
+              id: "pkg_annual",
+              lookup_key: "$rc_annual",
+              display_name: "Annual",
+              object: "package",
+              offering_id: "ofrng",
+              products: [{ product: NATIVE_MATCHING_GRAPH.products[0], prices: [{ currency: "USD", amount_micros: 4_990_000 }] }],
+            },
+          ]),
+        );
+      }
+      const listed = matchingNativeLists(request);
+      if (listed) return listed;
+      return ok(envelope({}));
+    });
+    const result = runRevenueCatCatalogSession(
+      catalogSession(harness, "rc-reconcile-wrong-package", run, {
+        createIfMissing: true,
+        hostAuthorityGranted: true,
+        target: selectedTarget({ hostAuthorityGranted: true }),
+      }),
+    );
+    assert(result.disposition !== "complete", `disposition ${result.disposition}`);
+    assert(result.evidence.catalog.reconciled === false, "wrong attachment is not id-presence completeness");
+    assert(
+      calls.every((call) => !(call.argv.includes("offerings") && call.argv.includes("create"))),
+      "wrong package membership must not offering-create",
     );
   });
 

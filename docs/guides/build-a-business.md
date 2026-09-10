@@ -130,7 +130,8 @@ level (`review-first`, `run-with-guardrails`, or `full`) per business unit
 ## Worker runtime and failed attempts
 
 A session dispatches work to the first available agent CLI in the order `codex`,
-`claude`, `cursor-agent`. `b2c doctor` lists the CLIs it found. Set
+`claude`, `cursor-agent`. `b2c inspect` lists the CLIs it found. `b2c doctor`
+is a supported equivalent. Set
 `B2C_APP_BUILDER_WORKER_RUNTIME=claude` (or `codex`, `cursor`) to select one
 explicitly; an unknown value stops the session before dispatch. A CLI that
 starts but cannot authenticate or run its configured model fails every attempt

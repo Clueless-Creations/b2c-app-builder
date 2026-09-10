@@ -130,7 +130,7 @@ export function writeDoctorHostObservation(observation: DoctorHostObservation, h
 export function renderDoctorHostBlock(observation: DoctorHostObservation | null): string {
   const header = "Host ASC (last b2c doctor observation, not a live PATH probe";
   if (!observation) {
-    return `${header}):\ndoctor has not been run on this machine. Run \`b2c doctor\` to record the winning asc path and version.`;
+    return `${header}):\ndoctor has not been run on this machine. Run \`b2c inspect\` (or supported \`b2c doctor\`) to record the winning asc path and version.`;
   }
   const stamped = `${header}; compared-at ${observation.comparedAt}):`;
   const latest = observation.latestObserved ?? "(unknown)";
@@ -144,12 +144,12 @@ export function renderDoctorHostBlock(observation: DoctorHostObservation | null)
 export function renderRevenueCatCliHostBlock(observation: DoctorHostObservation | null): string {
   const header = "Host RevenueCat CLI (last b2c doctor observation, not a live PATH probe and not live catalog proof";
   if (!observation) {
-    return `${header}):\ndoctor has not been run on this machine. Run \`b2c doctor\` to record the winning rc/revenuecat path and version.`;
+    return `${header}):\ndoctor has not been run on this machine. Run \`b2c inspect\` (or supported \`b2c doctor\`) to record the winning rc/revenuecat path and version.`;
   }
   const stamped = `${header}; compared-at ${observation.comparedAt}):`;
   const recorded = observation.revenuecatCli;
   if (!recorded) {
-    return `${stamped}\ndoctor ran; this observation did not record RevenueCat CLI. Run \`b2c doctor\` again. This is not live catalog proof.`;
+    return `${stamped}\ndoctor ran; this observation did not record RevenueCat CLI. Run \`b2c inspect\` (or supported \`b2c doctor\`) again. This is not live catalog proof.`;
   }
   const latest = recorded.latestObserved ?? "(unknown)";
   switch (recorded.identity) {

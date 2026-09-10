@@ -118,9 +118,9 @@ package recipe, use the separate revision-checked
 
 | Area                    | Station                    | What the system helps an agent do                                                   |
 | ----------------------- | -------------------------- | ----------------------------------------------------------------------------------- |
-| Opportunity             | The kitchen, menu planning | Research users, competitors, demand, and a defensible product hypothesis            |
-| Product                 | The kitchen                | Define the promise, first value, core loop, complete scope, and success measures    |
-| Experience              | The kitchen                | Develop a distinct identity, onboarding, interaction, motion, and accessible states |
+| Opportunity             | Prep & design, menu planning | Research users, competitors, demand, and a defensible product hypothesis            |
+| Product                 | Prep & design               | Define the promise, first value, core loop, complete scope, and success measures    |
+| Experience              | Prep & design               | Develop a distinct identity, onboarding, interaction, motion, and accessible states |
 | Engineering             | The hot line               | Build native and web surfaces with explicit contracts and runtime verification      |
 | Revenue and growth      | Front of house             | Establish subscriptions, acquisition, funnels, attribution, and lifecycle work      |
 | Learning and operations | The pass and the office    | Inspect evidence, plan improvements, support users, and maintain the business       |

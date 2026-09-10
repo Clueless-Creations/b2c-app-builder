@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="600" viewBox="0 0 1000 600" role="img" aria-labelledby="title desc">
 <title id="title">Sheet 1. The kitchen layout for a consumer-app business.</title>
-<desc id="desc">A drawing sheet. A kitchen drawn in plan with six numbered stations. The office and upkeep sit at the left. The kitchen and the hot line fill the middle. The pass stands between the hot line and front of house, with a mandate hanging on it and the chef beside it. Front of house opens through a door on the right to the business, drawn as a phone and a web page. Blue arrows carry tickets from the pass into the kitchen, down to the hot line, back to the pass, and out through front of house to the door. A dashed inspection line returns evidence from the business to the pass. Below, section A-A shows the shared foundation in hatched section: capabilities, providers, recipes, knowledge, evidence. A title block records the project, sheet number, license, and that the drawing is made by the agent and checked by evidence.</desc>
+<desc id="desc">A drawing sheet. A kitchen drawn in plan with six numbered stations. The office and upkeep sit at the left. Prep & design and the hot line fill the middle. The pass stands between the hot line and front of house, with a mandate hanging on it and the chef beside it. Front of house opens through a door on the right to the business, drawn as a phone and a web page. Blue arrows carry tickets from the pass into Prep & design, down to the hot line, back to the pass, and out through front of house to the door. A dashed inspection line returns evidence from the business to the pass. Below, section A-A shows the shared foundation in hatched section: capabilities, providers, recipes, knowledge, evidence. A title block records the project, sheet number, license, and that the drawing is made by the agent and checked by evidence.</desc>
 <style>
 /* font-rationale: docs/assets/README.md, Identity derivation. Engineering lettering for annotation, a title-block serif for the sheet title. */
 .mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace}
@@ -55,9 +55,9 @@
 <text x="72" y="286" class="mono muted" font-size="9">Contributors keep</text>
 <text x="72" y="298" class="mono muted" font-size="9">the stations sharp</text>
 
-<!-- 2 the kitchen -->
+<!-- 2 prep & design -->
 <circle cx="208" cy="154" r="11" class="callout"/><text x="208" y="158" class="mono blue" font-size="10.5" font-weight="600" text-anchor="middle">2</text>
-<text x="224" y="158" class="mono ink" font-size="11.5">THE KITCHEN</text>
+<text x="224" y="158" class="mono ink" font-size="11.5">PREP &amp; DESIGN</text>
 <text x="202" y="176" class="mono muted" font-size="9">Menu planning, product, experience, design, words</text>
 <rect x="230" y="206" width="200" height="30" class="obj"/>
 <text x="330" y="224" class="mono muted" font-size="7.5" text-anchor="middle">PREP TABLE</text>

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * b2c doctor — is this machine able to run businesses? (layering plan R12)
+ * b2c inspect / b2c doctor — is this machine able to run businesses? (layering plan R12)
  *
- * Read-only. Reports, never repairs. The one honesty rule it exists to state: the engine
+ * Reports, never repairs. Writes a sanitized local host observation. The one honesty rule it exists to state: the engine
  * orchestrates the machine owner's OWN agent CLIs — their subscriptions, their spend. A machine
  * with no worker CLI can still bootstrap, plan, and run fixture sessions, so that is a warning,
  * not an error; a broken engine install (missing catalog, version drift between the compiled

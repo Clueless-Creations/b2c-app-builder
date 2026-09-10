@@ -71,7 +71,7 @@ Use Node.js 24. From npm:
 ```bash
 npm install -g b2c-app-builder
 b2c setup
-b2c doctor
+b2c inspect
 ```
 
 From a source checkout, at the repository root:
@@ -79,7 +79,7 @@ From a source checkout, at the repository root:
 ```bash
 npm ci
 npm run setup
-b2c doctor
+b2c inspect
 ```
 
 Setup creates `~/.b2c-app-builder/workspaces.json` and prints the MCP registration commands. It does not create an app workspace, add credentials, deploy a service, spend money, or submit an app.
@@ -90,10 +90,30 @@ A packed install launches compiled ESM from `dist/` and does not need `tsx`. A s
 
 ```bash
 b2c --help
-b2c doctor
+b2c inspect
 b2c business-create --workspace my-app --directory ./my-app --name "Working name" --hypothesis "A short product hypothesis" --mandate-file ./brief.md --json
 b2c business-plan --workspace my-app --json
 ```
+
+`b2c inspect` checks the builder installation and records a sanitized local host
+observation. `b2c doctor` is a supported equivalent. Neither installs tools or
+approves a release.
+
+## Find a command
+
+`b2c --help` groups commands by task. It is generated from the CLI command
+registry in `entrypoints/cli/help.mjs`. Do not keep a second command table here.
+
+- Prepare the kitchen: `setup`, `inspect`, `workspaces`, `list`. `doctor` stays
+  supported.
+- Build and run a business: `business-create` through `business-recover` are the
+  normal supported path. `new`, `bootstrap`, `status`, `plan`, `run`, and
+  `schedule` remain supported session controls. They are not aliases of the
+  `business-*` commands.
+- Review at the pass: evidence, named gates, device and browser proof, and
+  authority commands. The heading does not grant approval.
+- Maintain and extend: catalog, composition, and contribution. A declaration
+  preview is not activation.
 
 Create uses an absent or empty directory and registers it as part of the same
 operation. Do not pre-register it or write files into it. Use `--workspace` on

@@ -14,12 +14,13 @@ This reference adapts the rules from [`petergyang/no-ai-slop`](https://github.co
 - 6. Self-Check Before Shipping Copy — Adapted
 - 7. Channel-Specific Limits — Original
 - 8. What This Does Not Govern — Original
+- 9. Original: Builder House Style
 
 ## 1. Voice Preservation Rule (Read First)
 
 These rules remove slop. They do not remove character. Before cutting a single word, know the voice you are protecting:
 
-- For founder-facing copy, the voice is this skill's own: direct, concrete, no filler, no false cheer about a gate the founder still has to clear.
+- For founder-facing copy, the voice is this skill's own: direct, concrete, no filler, no false cheer about a gate the founder still has to clear. Repository documentation, CLI help, issues, pull requests, reviews, progress reports, and handoffs use section 9.
 - For marketing copy generated for a launched business, the voice comes from that business's `strategy/BRAND.md` and the tone set in `11_STAR_EXPERIENCE.md` — not from this file, and not from generic "clean marketing English." A playful app's onboarding copy should still sound playful after editing. A clinical, no-nonsense utility's paywall copy should still sound clinical. If `strategy/BRAND.md` calls for short punchy fragments, an occasional rhetorical question, or a specific slang register, that voice wins over the general preference for complete sentences below.
 
 Brand voice sets the target. This file's job is removing what an AI defaults to when nobody set a target: filler, hedging, importance-inflation, and formatting tics. Make the minimum effective edit — fix the slop, keep everything that sounds like the brand actually talking. A rewrite that reads as generically "clean" or "professional" instead of like the brand has over-corrected and needs to be walked back.
@@ -126,6 +127,45 @@ This file governs voice and slop, not content that has to say something precise 
 - **Legally required text** — privacy policy, terms, EULA, subscription-disclosure language mandated by App Review or Play policy. Edit these for clarity within what `privacy-terms.md` and platform policy require, but do not cut a clause because it reads as "empty phrasing" if removing it breaks the legal requirement. When in doubt, flag it for `privacy-terms.md` review rather than editing it here.
 - **Reviewer notes.** App Review / Play Console reviewer notes are functional instructions to a human reviewer, not marketing copy. Clarity and completeness matter more than voice; do not apply the brand-voice rule to them.
 - **Code comments.** Out of scope entirely. Use normal engineering documentation standards.
-- **Technical documentation.** Architecture docs, engineering specs, ADRs, runbooks, API/config references, and this skill's own `knowledge/*.md` files follow [`technical-documentation-ste100.md`](../engineering/technical-documentation-ste100.md) instead — a flat, literal, ASD-STE100-based standard, the opposite spirit of the voice-preservation rule above. That file's §1 also names the six root-level files this file alone still governs (the §2 "third surface"), so the two standards never both claim the same file.
+- **Technical documentation.** Architecture docs, engineering specs, ADRs, runbooks, API/config references, and this skill's own `knowledge/*.md` files follow [`technical-documentation-ste100.md`](../engineering/technical-documentation-ste100.md) instead — a flat, literal, ASD-STE100-based standard, the opposite spirit of the voice-preservation rule above. That file's §1 names the public front door this file governs, including mixed README documents: narrative stays here; technical examples keep exact commands and identifiers. Do not send the same sentence through both automatic rewrites.
+- **Builder house style.** Section 9 applies to repository agents writing docs, help, issues, pull requests, reviews, progress, and handoffs. It does not replace a customer's `strategy/BRAND.md`.
 
 If a piece of copy straddles both — for example, a paywall screen that includes both persuasive copy and a legally required subscription-terms line — apply this file to the persuasive part and leave the required-disclosure part to `privacy-terms.md`.
+
+## 9. Original: Builder House Style
+
+Repository-original. This section is not in `petergyang/no-ai-slop`. Kitchen meanings live in the repository ethos Kitchen-language boundary. Do not copy that table here. Packaged business work uses this section only; it must not depend on repository-only docs.
+
+Lead with the outcome, finding, or decision needed. Use short, active, concrete sentences. State what changed, what was checked, what remains uncertain, and the next action when relevant. Do not print an eight-state checklist after every small update. Use sentence-case headings. Prefer one established term to rotating synonyms for capability, operation, provider, implementation, binding, recipe, evidence, or acceptance.
+
+Preserve useful personality in explanatory copy. Avoid chef role-play, compulsory greetings, slogans in failure messages, inflated promises, repeated applause, and claims that the output is clear instead of demonstrating it. Do not cut a safety condition, legal disclosure, uncertainty, or technical distinction to satisfy a style rule.
+
+Allow the kitchen metaphor in explanatory prose, diagrams, and selected human-facing headings, with a literal description nearby when the heading would otherwise be ambiguous. Keep operation names, permission requests, errors, recovery, schemas, machine output, and approval or release actions literal. Do not rename an identifier because a new term sounds more thematic.
+
+Use the actual evidence state. A created issue is not implemented code. A fixture pass is not provider execution. A merged pull request is not a deployment. A blocker names the affected action, the known cause, the missing decision or evidence, and what independent work can continue. If a timed-out mutation has an uncertain effect, say that and name the safe reconciliation step.
+
+| Surface | Treatment |
+| --- | --- |
+| README narrative, ethos, product explanation | Preserve the builder's voice and useful kitchen metaphor |
+| CLI help and console utility text | Literal action descriptions; optional approved themed group heading; disclose actual side effects |
+| Errors, permissions, recovery, release decisions | Facts, consequence, next safe action |
+| ADR, spec, runbook, API documentation | Technical register; exact identifiers |
+| Agent progress, GitHub issue or pull request, review, handoff | Direct builder communication; evidence-backed status |
+| Customer app copy and marketing | Accepted business brand, not the builder's restaurant identity |
+| JSON, schemas, protocol payloads, code, verbatim notices | Do not rewrite; explain beside the literal material |
+
+The public README is a mixed document. Narrative stays with this file. Command examples, flags, and schemas keep exact technical meaning. `check:no-slop` scans the named front-door files; it does not prove every agent message followed this section.
+
+| Avoid | Prefer |
+| --- | --- |
+| `Your kitchen is ready to serve!` after installation checks | `Installation checks passed. Provider access and product acceptance have not been verified.` |
+| `The plate is stuck at the pass.` | `The purchase succeeded. Entitlement verification failed. Resume verification without repeating the purchase.` |
+| `RevenueCat integration is complete.` when only fixtures passed | `The adapter passed its fixture tests. An authorized RevenueCat test is still required.` |
+| `Shipped!` when the issue was only created | `Created the implementation issue. No code changed.` |
+| `Send it out` as a production approval button | `Approve production deployment` |
+| Repeated `Preparing / refining / completing` updates with no state change | Name the changed file, completed check, concrete finding, or hold |
+| Rewriting `doctor.node_too_old` to `inspection.oven_cold` | Keep the error identifier; explain it in plain prose |
+| Flattening `results vary; this is not medical advice` | Keep the uncertainty qualifier and the required legal line |
+| Replacing a playful onboarding line with kitchen brigade copy | Keep the accepted customer voice |
+
+`Let your agents cook.` may stay in product explanation when it serves that explanation. Do not ban kitchen words. Do not invent culinary synonyms for each new feature.

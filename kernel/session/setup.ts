@@ -3,7 +3,7 @@
  * b2c setup — the one-time machine preparation, idempotent.
  *
  * Creates the b2c home and an empty workspace registry when absent, runs the same health
- * checks as `b2c doctor`, and prints the next steps with real, copy-pasteable commands —
+ * checks as `b2c inspect` / `b2c doctor`, and prints the next steps with real, copy-pasteable commands —
  * including the MCP registration line with this install's absolute server path. It never touches
  * a workspace and never installs anything: worker CLIs are the machine owner's own tools
  * (doctor's R12 rule), so setup names what is missing rather than fetching it.
@@ -34,7 +34,7 @@ function main(): number {
         "Existing workspace registrations are preserved. Setup does not install software or create a business.",
         "",
         "--help, -h  Show this help without creating files or running health checks.",
-        "Run b2c doctor for a read-only health report.",
+        "Run b2c inspect for an installation diagnostic. b2c doctor is a supported equivalent.",
       ].join("\n"),
     );
     return 0;

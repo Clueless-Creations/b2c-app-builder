@@ -2057,18 +2057,23 @@ export function register(h: Harness): void {
     "WARNING ste100.sentence_too_long",
   );
 
-  // Both explicitly named in the reference's own trigger line — a real gap Codex caught: the
-  // governed-file discovery never enqueued either one, so an edit to either received no signal.
-  const ste100Readme = writeSte100Root("ste100-readme-scanned", {
+  // SKILL.md is the technical router named in the STE100 trigger. README is a mixed
+  // front-door document: no-slop owns narrative, so the 20-word scan must not cover it.
+  const ste100SkillMd = writeSte100Root("ste100-skill-scanned", {
+    extraSkillFile: {
+      relative: "SKILL.md",
+      content:
+        "# Skill\n\nThis sentence intentionally runs on for quite a long while with many extra words strung together well past the twenty word ceiling this rule enforces.\n",
+    },
     readmeContent:
       "# Package\n\nThis sentence intentionally runs on for quite a long while with many extra words strung together well past the twenty word ceiling this rule enforces.\n",
   });
   runScriptArgs(
-    "ste100 scans this skill's own README.md, named in the reference's trigger line",
+    "ste100 scans SKILL.md named in the reference trigger line",
     "check-technical-docs-ste100.ts",
-    ["--repo-root", ste100Readme.repoRoot, "--skill-root", ste100Readme.skillRoot],
+    ["--repo-root", ste100SkillMd.repoRoot, "--skill-root", ste100SkillMd.skillRoot],
     0,
-    "WARNING ste100.sentence_too_long [skill/pkg/README.md]",
+    "WARNING ste100.sentence_too_long [skill/pkg/SKILL.md]",
   );
 
   // A trailing prose paragraph with no terminal punctuation used to fall off the end of the

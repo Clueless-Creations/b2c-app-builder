@@ -2,6 +2,7 @@ import { writeProductFixture } from "./product-fixture.js";
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
+import { COMMANDS, HELP_SECTIONS, listedCommandNames } from "../../../entrypoints/cli/help.mjs";
 import { assert, skillRoot, type Harness } from "./_harness.js";
 import { compilePlan } from "../../../kernel/engine/compile.js";
 import { seedRunState } from "../../../kernel/engine/runstate.js";
@@ -72,6 +73,7 @@ export function register(harness: Harness): void {
     assert(help.code === 0, `--help must exit 0, got ${help.code}`);
     for (const command of [
       "setup",
+      "inspect",
       "doctor",
       "new",
       "render-product",
@@ -94,6 +96,43 @@ export function register(harness: Harness): void {
     }
     const bare = runBin([]);
     assert(bare.code === 1, `no arguments must exit 1, got ${bare.code}`);
+  });
+
+  harness.check("cli: grouped help covers every registered command exactly once", () => {
+    const listed = listedCommandNames(HELP_SECTIONS);
+    const registered = [...COMMANDS.keys()];
+    assert(listed.length === new Set(listed).size, "HELP_SECTIONS must not list a command twice");
+    assert(
+      listed.length === registered.length && listed.every((name) => COMMANDS.has(name)),
+      `grouped help and COMMANDS must match. listed=${listed.join(",")} registered=${registered.join(",")}`,
+    );
+    const help = runBin(["--help"]);
+    const dashH = runBin(["-h"]);
+    const named = runBin(["help"]);
+    assert(help.code === 0 && dashH.code === 0 && named.code === 0, "help flags must exit 0");
+    assert(help.output === dashH.output && help.output === named.output, "--help, -h, and help must print the same stdout");
+    for (const heading of [
+      "Prepare the kitchen — installation and workspaces",
+      "Build and run a business — product work and lifecycle",
+      "Review at the pass — evidence, verification, and authority",
+      "Maintain and extend — catalog, providers, and composition",
+    ]) {
+      assert(help.output.includes(heading), `help must include heading: ${heading}`);
+    }
+    assert(help.output.includes("Business lifecycle (normal supported path)"), "help must distinguish the normal business path");
+    assert(help.output.includes("not aliases of business-* commands"), "advanced session controls must not be described as business-* aliases");
+    assert(help.output.includes("Supported equivalent of inspect"), "doctor must be annotated as the inspect equivalent");
+    assert(help.output.includes("sanitized local host observation"), "help must disclose the host observation write");
+    assert(help.output.includes("command-specific --help flag"), "help must say inspect/doctor do not accept command-specific --help");
+    assert(!help.output.includes("inspect --json"), "help must not advertise inspect --json");
+    const addresses = [...help.output.matchAll(/^ {2,4}([a-z][a-z0-9-]*) {2,}/gm)].map((match) => match[1]!);
+    assert(
+      JSON.stringify(addresses) === JSON.stringify(listed),
+      `help address rows must match HELP_SECTIONS order. got=${addresses.join(",")} expected=${listed.join(",")}`,
+    );
+    const bare = runBin([]);
+    assert(bare.code === 1, `no arguments must exit 1, got ${bare.code}`);
+    assert(bare.output.includes("Prepare the kitchen"), "bare invocation must still print grouped usage on stderr");
   });
 
   harness.check("cli: an unknown command is refused with usage, never silently swallowed", () => {
@@ -486,7 +525,7 @@ export function register(harness: Harness): void {
     assert(direct.code === 0, `an existing direct path must remain usable when the unrelated registry is malformed: ${direct.output.slice(-400)}`);
   });
 
-  harness.check("cli: doctor reports health read-only and exits 0 with warnings allowed", () => {
+  harness.check("cli: doctor reports health and exits 0 with warnings allowed", () => {
     // A hermetic home: doctor must be runnable on a machine that has never run setup. Worker-CLI
     // absence is a WARNING by design (R12: sessions dispatch the owner's own agent CLIs), so the
     // exit code stays 0 wherever this fixture runs — including CI, which has no worker CLIs.
@@ -501,6 +540,19 @@ export function register(harness: Harness): void {
     assert(doctor.output.includes("doctor.eas_cli"), `doctor must report a doctor.eas_cli* finding: ${doctor.output.slice(-400)}`);
     assert(doctor.output.includes("doctor.expo_cli"), `doctor must report a doctor.expo_cli* finding: ${doctor.output.slice(-400)}`);
     assert(!doctor.output.includes("ERROR"), `a healthy repo checkout must produce no doctor errors: ${doctor.output.slice(-400)}`);
+  });
+
+  harness.check("cli: inspect matches doctor findings and exit status without becoming workspace inspection", () => {
+    const env = { B2C_APP_BUILDER_HOME: path.join(harness.makeTempDir("cli-inspect"), "b2c-home") };
+    const inspect = runBin(["inspect"], { env });
+    const doctor = runBin(["doctor"], { env: { B2C_APP_BUILDER_HOME: path.join(harness.makeTempDir("cli-inspect-doctor"), "b2c-home") } });
+    assert(inspect.code === 0, `inspect must exit 0 on a healthy install, got ${inspect.code}: ${inspect.output.slice(-400)}`);
+    assert(inspect.code === doctor.code, "inspect and doctor must share exit status");
+    const codes = (output: string): string[] =>
+      [...output.matchAll(/^[A-Z]+\s+(doctor\.[^\s]+)/gm)].map((match) => match[1]!).sort();
+    assert(JSON.stringify(codes(inspect.output)) === JSON.stringify(codes(doctor.output)), "inspect and doctor must report the same finding codes");
+    assert(inspect.output.includes("doctor.node"), "inspect must run the installation diagnostic, not workspace inspection");
+    assert(!inspect.output.includes("productKind"), "inspect must not route to kernel/session/inspect.ts");
   });
 
   harness.check("cli: setup creates the b2c home and registry, idempotently", () => {

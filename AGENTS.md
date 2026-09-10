@@ -112,6 +112,17 @@ Operator procedure belongs at the effect boundary. Do not load secret installati
 
 Technical documentation uses short sentences, active voice, and one term for one object. State a condition before its action.
 
+## Writing and kitchen language
+
+For documentation, human-readable help, issue and pull-request text, reviews, progress reports, and handoffs, use the matching owner. Do not copy these guides into host adapters or business workspaces.
+
+- Kitchen meanings and station display labels: [Kitchen-language boundary](docs/ethos.md#kitchen-language-boundary).
+- Builder-facing voice and claim examples: **Original: Builder house style** in `knowledge/words/no-slop-writing.md`.
+- Technical instructions, ADRs, and API/config explanations: `knowledge/engineering/technical-documentation-ste100.md`.
+- Public front-door narrative stays with no-slop. Technical examples in those files keep exact commands and identifiers.
+
+Kitchen language explains organization. Literal language describes actions, evidence, permissions, errors, and recovery. Brigade names coordinated agents in prose. It is not a new runtime entity and is not the shipped product name.
+
 ## Upstream rules
 
 External material enters through contribution intake. `docs/decisions/0007-upstream-lifecycle-and-agent-scopes.md` owns the detailed lifecycle.
@@ -128,7 +139,7 @@ Agent-facing files have three classes. Do not add a fourth.
 
 - **Canonical authored:** root `AGENTS.md`, `SKILL.md`, contributor/maintainer routers, and workspace `AGENTS.md` template.
 - **Thin host adapters:** root/template `CLAUDE.md`, Cursor rules, and future host-specific entrypoints. Each routes to the nearest applicable `AGENTS.md` first and contains only host-specific invocation/tool notes. Never restate architecture, lifecycle semantics, provider policy, or business requirements.
-- **Generated:** operation/tool lists, CLI help, public reference, workflow IDs, versions, credits, and support reports. Render them from owners.
+- **Generated:** operation/tool lists, CLI help from `entrypoints/cli/help.mjs` (command registry and grouped headings), public reference, workflow IDs, versions, credits, and support reports. Render them from owners.
 
 Nested `AGENTS.md` files may narrow guidance for a subtree. They inherit the root contract and cannot redefine repository-wide truth or authority. Prefer one scoped router over duplicated host instructions.
 
@@ -143,7 +154,7 @@ Run checks that match the change. Start with the relevant subset:
 ```bash
 npm ci
 node entrypoints/cli/b2c.mjs --help
-node entrypoints/cli/b2c.mjs doctor
+node entrypoints/cli/b2c.mjs inspect
 npm run validate:skill
 npm run check:agent-entrypoints
 npm run check:catalog

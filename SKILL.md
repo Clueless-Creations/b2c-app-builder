@@ -15,7 +15,7 @@ Use the registered `b2c-app-builder` MCP server from this repository. Do not rou
 
 If `b2c_catalog` and `b2c_knowledge_search` are unavailable:
 
-1. Run `b2c doctor` when the CLI exists.
+1. Run `b2c inspect` when the CLI exists. `b2c doctor` is a supported equivalent.
 2. When the user asked for setup, install this package's dependencies, link the package, and run `b2c setup`.
 3. Use the exact MCP registration command that setup prints.
 4. Keep the MCP read-only by default. Use the CLI for approved writes.

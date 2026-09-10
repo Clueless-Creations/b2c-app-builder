@@ -598,7 +598,7 @@ function main(): number {
     // A damaged address book must not block a direct path that is still usable. An ID-only
     // request cannot be resolved safely, so report the repair route without exposing parser data.
     if (!existsSync(directWorkspace)) {
-      console.error("plan.registry_invalid: the workspace registry is unreadable. Run `b2c doctor`, then repair or recreate the registry before using an ID.");
+      console.error("plan.registry_invalid: the workspace registry is unreadable. Run `b2c inspect` (or supported `b2c doctor`), then repair or recreate the registry before using an ID.");
       return 1;
     }
   }

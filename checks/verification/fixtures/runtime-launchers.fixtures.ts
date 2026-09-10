@@ -1,4 +1,4 @@
-import { cpSync, mkdirSync, realpathSync, symlinkSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, realpathSync, symlinkSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { createRequire } from "node:module";
 import { spawnSync } from "node:child_process";
@@ -9,7 +9,7 @@ function fixturePackage(h: Harness, name: string, dependency: boolean): string {
   const prefix = h.makeTempDir(name);
   const root = path.join(prefix, "node_modules", "b2c-app-builder");
   for (const dir of ["entrypoints/cli", "entrypoints/mcp", "tooling/lib"]) mkdirSync(path.join(root, dir), { recursive: true });
-  for (const file of ["entrypoints/cli/b2c.mjs", "entrypoints/mcp/b2c-app-builder-mcp.mjs", "tooling/lib/tsx-launcher.mjs"]) {
+  for (const file of ["entrypoints/cli/b2c.mjs", "entrypoints/cli/help.mjs", "entrypoints/mcp/b2c-app-builder-mcp.mjs", "tooling/lib/tsx-launcher.mjs"]) {
     cpSync(path.join(skillRoot, file), path.join(root, file));
   }
   writeFileSync(path.join(root, "package.json"), JSON.stringify({ name: "b2c-app-builder", type: "module" }));
@@ -113,5 +113,45 @@ export function register(h: Harness): void {
     assert(result.status === 0, `compiled onboard launch failed: ${result.stderr}`);
     const observed = JSON.parse(result.stdout) as { compiled?: boolean; args?: string[] };
     assert(observed.compiled === true && observed.args?.join(" ") === "--workspace example", "compiled onboard arguments changed");
+  });
+  h.check("runtime-launchers: inspect and doctor launch the same diagnostic script with identical argv and exit", () => {
+    const root = fixturePackage(h, "launcher-inspect-alias", true);
+    mkdirSync(path.join(root, "kernel", "session"), { recursive: true });
+    writeFileSync(
+      path.join(root, "kernel", "session", "doctor.ts"),
+      [
+        "console.log(`stdout:${process.argv.slice(2).join(' ')}`);",
+        "console.error(`stderr:${process.argv.slice(2).join(' ')}`);",
+        "process.exit(Number(process.env.B2C_FIXTURE_EXIT ?? 0));",
+      ].join("\n"),
+    );
+    const cwd = h.makeTempDir("launcher-inspect-cwd");
+    const run = (command: string, exit: string): { status: number | null; stdout: string; stderr: string } =>
+      spawnSync(process.execPath, [path.join(root, "entrypoints/cli/b2c.mjs"), command, "--probe", "alias"], {
+        cwd,
+        env: { ...process.env, PATH: "", B2C_FIXTURE_EXIT: exit },
+        encoding: "utf8",
+      });
+    const inspect = run("inspect", "0");
+    const doctor = run("doctor", "0");
+    assert(inspect.status === 0 && doctor.status === 0, `alias dispatch failed: ${inspect.stderr} ${doctor.stderr}`);
+    assert(inspect.stdout === doctor.stdout && inspect.stderr === doctor.stderr, "inspect and doctor must forward the same argv through the same script");
+    assert(inspect.stdout.includes("--probe alias"), `diagnostic argv missing: ${inspect.stdout}`);
+    const failed = run("inspect", "7");
+    const doctorFailed = run("doctor", "7");
+    assert(failed.status === 7 && doctorFailed.status === 7, "nonzero diagnostic exit must pass through for both spellings");
+  });
+  h.check("runtime-launchers: grouped help renders without tsx, providers, or host writes", () => {
+    const missing = fixturePackage(h, "launcher-help-no-dep", false);
+    const home = h.makeTempDir("launcher-help-home");
+    const result = spawnSync(process.execPath, [path.join(missing, "entrypoints/cli/b2c.mjs"), "--help"], {
+      cwd: h.makeTempDir("launcher-help-cwd"),
+      env: { ...process.env, PATH: "", B2C_APP_BUILDER_HOME: home },
+      encoding: "utf8",
+    });
+    assert(result.status === 0, `packaged help failed: ${result.stderr}`);
+    assert(result.stdout.includes("Prepare the kitchen"), `grouped help missing: ${result.stdout}`);
+    assert(result.stdout.includes("inspect") && result.stdout.includes("doctor"), "packaged help must list both diagnostic names");
+    assert(!existsSync(path.join(home, "doctor-host.json")), "help must not write a host observation");
   });
 }

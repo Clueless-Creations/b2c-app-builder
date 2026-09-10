@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.31",
+  "version": "0.219.32",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Record local RevenueCat CLI identity through b2c doctor beside ASC without installing, logging in, or claiming live catalog proof.",
-    "Fail selected-target checks closed without host authority and never spawn authenticated RevenueCat commands."
+    "Hash RevenueCat catalog mutation identity on lookup-key and display-name. Unused createTitle no longer looks like a new offerings create.",
+    "Lock catalog-session fixtures for uncertain-wave stop, mid-wave crash resume, and verify {issues:[]} without a graph as incomplete."
   ]
 }

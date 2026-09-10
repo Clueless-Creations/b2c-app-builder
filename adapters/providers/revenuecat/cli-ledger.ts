@@ -115,7 +115,9 @@ export function buildRevenueCatCliBinding(input: Pick<CliArgvRequest, "operation
     packageId: field(input.packageId),
     paywallId: field(input.paywallId),
     subscriptionId: field(input.subscriptionId),
-    createTitle: field(input.createTitle),
+    // Offerings/entitlements/packages identity is lookup-key + display-name, not --title.
+    // Only products create emits optional --title, so only that operation hashes it.
+    createTitle: input.operationId === "rc.products.create" ? field(input.createTitle) : "",
     lookupKey: field(input.lookupKey),
     displayName: field(input.displayName),
     storeIdentifier: field(input.storeIdentifier),

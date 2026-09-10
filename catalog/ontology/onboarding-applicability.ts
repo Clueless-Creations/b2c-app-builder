@@ -7,7 +7,7 @@
  * | -------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------- | ----------------------------------------------- |
  * | Commitment funnel                | product.yaml `class.feature` id `feature.commitment-funnel`           | `slot.feature.scope: required`                        | `excluded` or `non-goal`                          | instance absent                                 |
  * | Paywall Goal Headline            | product.yaml `class.feature` id `feature.paywall-goal-headline`       | `slot.feature.scope: required`                        | `excluded` or `non-goal`                          | instance absent                                 |
- * | Purchase / present-paywall owner | `b2c.yaml` operation bindings; recipe defaults when unbound           | exact `provider.id` on `b2c/monetization.*`           | recipe omits the operation and no override        | no parseable `b2c.yaml`, or unknown recipe      |
+ * | Purchase / present-paywall owner | `b2c.yaml` operation bindings; recipe defaults when unbound           | exact `provider.id`+`version` on `b2c/monetization.*` that the reviewed catalog implements for the selected target | recipe omits the operation and no override        | no parseable `b2c.yaml`, unknown recipe/version, or unsupported provider/target |
  *
  * `feature.paywall-goal-headline` is the RevenueCat offering-metadata / `customVariables` bind.
  * A Superwall presenter with that feature required is selected-but-unavailable, not a fake
@@ -17,8 +17,10 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { parseDocument } from "yaml";
+import type { Extension } from "../../contracts/extensions/contract.js";
 import { compositionSchema, type Composition } from "../../contracts/public-api/contract.js";
-import { firstpartyImplementations, firstpartyRecipes } from "../firstparty-declarations.js";
+import { firstpartyImplementations, firstpartyProviders, firstpartyRecipes } from "../firstparty-declarations.js";
+import { FIRSTPARTY_BUSINESS_RECIPE } from "../firstparty-recipes.js";
 import { loadProductInstanceDocument, productYamlPath } from "./instance-load.js";
 import type { ProductInstanceDocument } from "./instance-types.js";
 
@@ -35,6 +37,13 @@ export type FeatureApplicability = "selected" | "not_required" | "unresolved";
 export type HeadlineBindApplicability = FeatureApplicability | "unavailable";
 export type ProviderDecision = { status: "selected"; providerId: string } | { status: "not_required" } | { status: "unresolved" };
 
+/** Reviewed recipe/provider catalog used to verify a composition. Defaults are current first-party declarations. */
+export interface OnboardingProviderCatalog {
+  recipes: readonly Extension["recipes"][number][];
+  implementations: readonly Extension["implementations"][number][];
+  providers: readonly NonNullable<Extension["providers"]>[number][];
+}
+
 export interface OnboardingApplicability {
   commitmentFunnel: FeatureApplicability;
   paywallGoalHeadline: FeatureApplicability;
@@ -43,6 +52,12 @@ export interface OnboardingApplicability {
   entitlement: ProviderDecision;
   headlineBind: HeadlineBindApplicability;
 }
+
+const FIRSTPARTY_PROVIDER_CATALOG: OnboardingProviderCatalog = {
+  recipes: firstpartyRecipes,
+  implementations: firstpartyImplementations,
+  providers: firstpartyProviders,
+};
 
 const NOT_REQUIRED_SCOPES = new Set(["excluded", "non-goal"]);
 
@@ -55,26 +70,48 @@ function featureApplicability(doc: ProductInstanceDocument | undefined, featureI
   return "unresolved";
 }
 
-function recipeProviderDecision(recipeId: string, operation: string): ProviderDecision {
-  const recipe = firstpartyRecipes.find((entry) => entry.id === recipeId);
+function recipeProviderDecision(
+  recipeId: string,
+  recipeVersion: string,
+  operation: string,
+  catalog: OnboardingProviderCatalog,
+): ProviderDecision {
+  const recipe = catalog.recipes.find((entry) => entry.id === recipeId && entry.version === recipeVersion);
   if (!recipe) {
     // The complete-consumer-business recipe is generated from worker responsibilities and is
     // not listed in firstpartyRecipes. It does not default monetization operations.
-    if (recipeId === COMPLETE_CONSUMER_BUSINESS_RECIPE_ID) return { status: "not_required" };
+    if (recipeId === COMPLETE_CONSUMER_BUSINESS_RECIPE_ID && recipeVersion === FIRSTPARTY_BUSINESS_RECIPE.version) {
+      return { status: "not_required" };
+    }
     return { status: "unresolved" };
   }
   const operationEntry = recipe.operations.find((entry) => entry.operation === operation);
   if (!operationEntry) return { status: "not_required" };
-  const provider = firstpartyImplementations.find((entry) => entry.id === operationEntry.implementation)?.provider;
-  if (!provider) return { status: "unresolved" };
-  return { status: "selected", providerId: provider };
+  const implementation = catalog.implementations.find((entry) => entry.id === operationEntry.implementation);
+  if (!implementation?.provider) return { status: "unresolved" };
+  return { status: "selected", providerId: implementation.provider };
 }
 
-function providerForOperation(composition: Composition | undefined, operation: string): ProviderDecision {
+function providerForOperation(
+  composition: Composition | undefined,
+  operation: string,
+  catalog: OnboardingProviderCatalog,
+): ProviderDecision {
   if (!composition) return { status: "unresolved" };
-  const override = composition.bindings[operation]?.provider.id;
-  if (override) return { status: "selected", providerId: override };
-  return recipeProviderDecision(composition.recipe.id, operation);
+  const override = composition.bindings[operation]?.provider;
+  if (override) {
+    const provider = catalog.providers.find((entry) => entry.id === override.id && entry.version === override.version);
+    if (!provider) return { status: "unresolved" };
+    const implementation = catalog.implementations.find(
+      (entry) =>
+        entry.provider === override.id &&
+        entry.operation === operation &&
+        entry.targets.some((target) => target.platform === composition.target.platform && target.runtime === composition.target.runtime),
+    );
+    if (!implementation) return { status: "unresolved" };
+    return { status: "selected", providerId: override.id };
+  }
+  return recipeProviderDecision(composition.recipe.id, composition.recipe.version, operation, catalog);
 }
 
 function headlineBindApplicability(feature: FeatureApplicability, presentPaywall: ProviderDecision): HeadlineBindApplicability {
@@ -139,11 +176,15 @@ export function loadProductDecisions(workspaceRoot: string): ProductInstanceDocu
   }
 }
 
-export function projectOnboardingApplicability(doc: ProductInstanceDocument | undefined, composition: Composition | undefined): OnboardingApplicability {
+export function projectOnboardingApplicability(
+  doc: ProductInstanceDocument | undefined,
+  composition: Composition | undefined,
+  catalog: OnboardingProviderCatalog = FIRSTPARTY_PROVIDER_CATALOG,
+): OnboardingApplicability {
   const paywallGoalHeadline = featureApplicability(doc, PAYWALL_GOAL_HEADLINE_FEATURE_ID);
-  const presentPaywall = providerForOperation(composition, PRESENT_PAYWALL_OPERATION);
-  const purchase = providerForOperation(composition, PURCHASE_OPERATION);
-  const entitlement = providerForOperation(composition, ENTITLEMENT_OPERATION);
+  const presentPaywall = providerForOperation(composition, PRESENT_PAYWALL_OPERATION, catalog);
+  const purchase = providerForOperation(composition, PURCHASE_OPERATION, catalog);
+  const entitlement = providerForOperation(composition, ENTITLEMENT_OPERATION, catalog);
   return {
     commitmentFunnel: featureApplicability(doc, COMMITMENT_FUNNEL_FEATURE_ID),
     paywallGoalHeadline,

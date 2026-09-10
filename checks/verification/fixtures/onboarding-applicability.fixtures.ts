@@ -2,6 +2,7 @@ import { cpSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { firstpartyImplementations, firstpartyRecipes } from "../../../catalog/firstparty-declarations.js";
 import { FIRSTPARTY_BUSINESS_RECIPE } from "../../../catalog/firstparty-recipes.js";
+import { readFirstpartyPackage } from "../../../catalog/packs/installed-firstparty.js";
 import {
   COMMITMENT_FUNNEL_FEATURE_ID,
   COMPLETE_CONSUMER_BUSINESS_RECIPE_ID,
@@ -45,17 +46,37 @@ function featureDoc(features: ReadonlyArray<{ id: string; scope: string }>): Pro
   };
 }
 
-function composition(recipeId: string, presentPaywallProvider?: string): Composition {
+function composition(
+  recipeId: string,
+  presentPaywallProvider?: string,
+  options?: {
+    recipeVersion?: string;
+    providerVersion?: string;
+    platform?: "ios" | "android" | "web" | "host";
+    runtime?: string;
+  },
+): Composition {
   return {
     apiVersion: "b2c/v1",
-    recipe: { id: recipeId, version: "1.0.0" },
-    target: { platform: "ios", runtime: "swiftui" },
+    recipe: { id: recipeId, version: options?.recipeVersion ?? "1.0.0" },
+    target: { platform: options?.platform ?? "ios", runtime: options?.runtime ?? "swiftui" },
     bindings:
       presentPaywallProvider === undefined
         ? {}
         : {
-            [PRESENT_PAYWALL_OPERATION]: { provider: { id: presentPaywallProvider, version: "1.0.0" } },
+            [PRESENT_PAYWALL_OPERATION]: {
+              provider: { id: presentPaywallProvider, version: options?.providerVersion ?? "1.0.0" },
+            },
           },
+  };
+}
+
+function firstpartyPackageCatalog() {
+  const extension = readFirstpartyPackage(skillRoot).snapshot.extension;
+  return {
+    recipes: extension.recipes,
+    implementations: extension.implementations,
+    providers: extension.providers ?? [],
   };
 }
 
@@ -162,5 +183,55 @@ export function register(harness: Harness): void {
     );
     const after = loadOnboardingApplicability(root);
     assert(after.headlineBind === "unavailable", `after ${after.headlineBind}`);
+    writeFileSync(
+      path.join(root, "b2c.yaml"),
+      "apiVersion: b2c/v1\nrecipe: {id: b2c/subscription-app, version: 9.9.9}\ntarget: {platform: ios, runtime: swiftui}\nbindings: {}\n",
+      "utf8",
+    );
+    const unknownVersion = loadOnboardingApplicability(root);
+    assert(unknownVersion.presentPaywall.status === "unresolved", "unknown recipe version must not inherit today's presenter default");
+    assert(unknownVersion.headlineBind === "unresolved", `unknown-version headline ${unknownVersion.headlineBind}`);
+  });
+
+  harness.check("onboarding-applicability: unknown recipe version cannot inherit the current default presenter", () => {
+    const catalog = firstpartyPackageCatalog();
+    const projected = projectOnboardingApplicability(
+      requiredHeadline,
+      composition("b2c/subscription-app", undefined, { recipeVersion: "9.9.9" }),
+      catalog,
+    );
+    assert(projected.presentPaywall.status === "unresolved", `present-paywall ${projected.presentPaywall.status}`);
+    assert(projected.headlineBind === "unresolved", `headline ${projected.headlineBind}`);
+  });
+
+  harness.check("onboarding-applicability: explicit provider with an unavailable version is not selected", () => {
+    const catalog = firstpartyPackageCatalog();
+    const projected = projectOnboardingApplicability(
+      requiredHeadline,
+      composition("b2c/subscription-app", REVENUECAT_PROVIDER_ID, { providerVersion: "9.9.9" }),
+      catalog,
+    );
+    assert(projected.presentPaywall.status === "unresolved", `present-paywall ${projected.presentPaywall.status}`);
+    assert(projected.headlineBind === "unresolved", `headline ${projected.headlineBind}`);
+  });
+
+  harness.check("onboarding-applicability: explicit provider on an incompatible target is not selected", () => {
+    const catalog = firstpartyPackageCatalog();
+    const projected = projectOnboardingApplicability(
+      requiredHeadline,
+      composition("b2c/subscription-app", REVENUECAT_PROVIDER_ID, { platform: "android", runtime: "kotlin" }),
+      catalog,
+    );
+    assert(projected.presentPaywall.status === "unresolved", `present-paywall ${projected.presentPaywall.status}`);
+    assert(projected.headlineBind === "unresolved", `headline ${projected.headlineBind}`);
+  });
+
+  harness.check("onboarding-applicability: unknown complete-consumer-business version does not become a free default", () => {
+    const projected = projectOnboardingApplicability(
+      requiredHeadline,
+      composition(COMPLETE_CONSUMER_BUSINESS_RECIPE_ID, undefined, { recipeVersion: "9.9.9" }),
+    );
+    assert(projected.presentPaywall.status === "unresolved", `present-paywall ${projected.presentPaywall.status}`);
+    assert(projected.headlineBind === "unresolved", `headline ${projected.headlineBind}`);
   });
 }

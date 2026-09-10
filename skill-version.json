@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.77",
+  "version": "0.219.78",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Classify static-export navigation from observed HTML for direct-entry, refresh, deep /detail/1, back, and unknown.",
-    "Emit /detail/1 from generateStaticParams so Metro static export cannot hide a missing dynamic route."
+    "Name leftover host-observation status copy after the last b2c inspect observation.",
+    "Keep b2c doctor supported, and leave finding codes and doctor-host.json unchanged."
   ]
 }

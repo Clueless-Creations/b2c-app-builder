@@ -3,7 +3,7 @@ import { ROUTE_HREFS } from "./route-graph.js";
 export const NAVIGATION_RUNTIME_VERIFIED = false;
 
 export type TabHref = typeof ROUTE_HREFS.home | typeof ROUTE_HREFS.settings;
-export type RouteHref = TabHref | typeof ROUTE_HREFS.modal | `/detail/${string}`;
+export type RouteHref = TabHref | typeof ROUTE_HREFS.modal | typeof ROUTE_HREFS.signIn | `/detail/${string}`;
 
 export type NavigationEvent =
   | { type: "cold-start" }

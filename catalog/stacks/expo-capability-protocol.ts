@@ -2,8 +2,8 @@
  * Expo selected-capability protocol (#83).
  *
  * Classifies authentication, offline data, device capabilities, and native purchases.
- * Session, offline-event, permission, and notification-handoff rows are protocol only.
- * `catalog/stacks/expo-selection.ts` keeps those operations blocked. This module does not
+ * Session, offline-event, permission, and notification-handoff reducers are reused by the
+ * local disposable runtime. Native purchases stay blocked. This module does not
  * call App Store, Play, or RevenueCat, and does not spawn Expo CLI.
  *
  * A fake in-app transport is a fixture. It is not native-store proof. RevenueCat CLI Test
@@ -81,7 +81,7 @@ export type ExpoCapabilityRefusalCode =
 export interface ExpoCapabilityRow {
   id: ExpoCapabilityId;
   queuedIssue: 83;
-  evidenceTier: "blocked";
+  evidenceTier: "blocked" | "fixture-tested";
   nativeStoreProof: false;
   liveMutation: false;
 }
@@ -142,6 +142,13 @@ export function capabilityRow(id: ExpoCapabilityId): ExpoCapabilityRow {
     case "authentication":
     case "offline-data":
     case "device-capabilities":
+      return {
+        id,
+        queuedIssue: 83,
+        evidenceTier: "fixture-tested",
+        nativeStoreProof: false,
+        liveMutation: false,
+      };
     case "native-purchases":
       return {
         id,
@@ -158,10 +165,7 @@ export function capabilityRow(id: ExpoCapabilityId): ExpoCapabilityRow {
 }
 
 export function capabilityOperationsRemainBlocked(resolution: ExpoSelectionResolution): boolean {
-  return EXPO_CAPABILITY_OPERATION_IDS.every((id) => {
-    const operation = operationFor(resolution, id);
-    return operation.evidenceTier === "blocked" && operation.queuedIssue === 83;
-  });
+  return operationFor(resolution, "native-purchases").evidenceTier === "blocked" && operationFor(resolution, "native-purchases").queuedIssue === 83;
 }
 
 export function proofScopeIsNativeStore(scope: ExpoCapabilityProofScope): boolean {
@@ -382,7 +386,7 @@ export function classifyOfflineClaim(input: { store: ExpoOfflineStoreKind; claim
   }
   return {
     action: "accept-classification",
-    reason: "Local store classification only. The offline-data operation stays blocked.",
+    reason: "Local store classification only. Local cache fixtures may run. This is not a backend of record.",
   };
 }
 
@@ -400,7 +404,7 @@ export function classifyDeviceCapability(input: { capability: ExpoDeviceCapabili
   }
   return {
     action: "accept-classification",
-    reason: "Per-platform availability stays explicit. The device-capabilities operation stays blocked.",
+    reason: "Per-platform availability stays explicit. Permission and notification fixtures may run. This is not device runtime proof.",
   };
 }
 
@@ -442,7 +446,7 @@ export function classifyInstalledIntegration(input: { packageName: string; selec
   }
   return {
     action: "selected",
-    reason: "Selection is recorded. Capability operations still stay blocked until a later owner proves them.",
+    reason: "Selection is recorded. Local session, cache, and permission fixtures may run. Native purchases stay blocked.",
   };
 }
 
@@ -531,7 +535,7 @@ export function classifyUnauthenticatedBackendRequest(input: { authenticated: bo
   }
   return {
     action: "accept-classification",
-    reason: "Authenticated classification only. The authentication operation stays blocked.",
+    reason: "Authenticated classification only. Local session fixtures may run. This is not an identity provider.",
   };
 }
 
@@ -562,7 +566,7 @@ export function classifyOfflineEvent(input: { event: ExpoOfflineEvent; store: Ex
       }
       return {
         action: "accept-classification",
-        reason: "Migration failure stays an explicit hold. The offline-data operation stays blocked.",
+        reason: "Migration failure stays an explicit hold. Local cache is not a backend of record.",
       };
     case "interrupted-write":
       if (input.claimed === "write-complete" || input.claimed === "backend-success") {
@@ -574,7 +578,7 @@ export function classifyOfflineEvent(input: { event: ExpoOfflineEvent; store: Ex
       }
       return {
         action: "accept-classification",
-        reason: "Interrupted write stays incomplete. The offline-data operation stays blocked.",
+        reason: "Interrupted write stays incomplete. Local cache is not a backend of record.",
       };
     case "restart":
     case "reconnect":
@@ -588,7 +592,7 @@ export function classifyOfflineEvent(input: { event: ExpoOfflineEvent; store: Ex
       }
       return {
         action: "accept-classification",
-        reason: "Local cache semantics only. The offline-data operation stays blocked.",
+        reason: "Local cache semantics only. Not a backend of record.",
       };
     default: {
       const exhaustive: never = input.event;
@@ -635,7 +639,7 @@ export function classifyPermissionOutcome(input: {
         safeState: "proceed",
         action: "accept-classification",
         fakeSuccess: false,
-        reason: "Granted classification only. The device-capabilities operation stays blocked.",
+        reason: "Granted classification only. Not device runtime proof.",
       };
     case "denied":
     case "revoked":
@@ -653,7 +657,7 @@ export function classifyPermissionOutcome(input: {
         safeState: "unavailable-safe",
         action: "accept-classification",
         fakeSuccess: false,
-        reason: `${input.capability} ${input.outcome} stays a useful safe state. The device-capabilities operation stays blocked.`,
+        reason: `${input.capability} ${input.outcome} stays a useful safe state. Not device runtime proof.`,
       };
     default: {
       const exhaustive: never = input.outcome;
@@ -711,6 +715,6 @@ export function classifyNotificationHandoff(input: {
     deliveredToPerson: false,
     restoreRoute: input.deepLinkRoute && input.selectedRestoreRoute ? input.selectedRestoreRoute : undefined,
     action: "accept-classification",
-    reason: "Handoff classification only. Token and receipt success is not person-seen proof. The device-capabilities operation stays blocked.",
+    reason: "Handoff classification only. Token and receipt success is not person-seen proof.",
   };
 }

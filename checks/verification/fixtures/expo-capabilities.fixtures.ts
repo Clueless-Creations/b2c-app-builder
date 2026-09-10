@@ -1,8 +1,8 @@
 /**
  * #83 capability protocol and #86 local/static web fixtures.
  *
- * Fake in-app transport and static-export canaries only. Live App Store, Play,
- * RevenueCat mutations, paid EAS, and production hosting stay not-run.
+ * Local session/cache/permission fixtures plus fake in-app purchase transport.
+ * Live App Store, Play, RevenueCat mutations, paid EAS, and production hosting stay not-run.
  */
 import {
   EMPTY_AUTH_SESSION,
@@ -28,6 +28,12 @@ import {
 } from "../../../catalog/stacks/expo-capability-protocol.js";
 import { EXPO_APP_RUNTIME, HOST_AGENT_RUNTIME, operationFor, resolveExpoSelection } from "../../../catalog/stacks/expo-selection.js";
 import {
+  localSelectedCapabilitiesAreFixtureTested,
+  nativePurchasesRemainBlocked,
+  runLocalCapabilityJourney,
+} from "../../../catalog/stacks/expo-local-capabilities.js";
+import { ROUTE_HREFS } from "../../../catalog/stacks/expo-starter-fixture/src/navigation/route-graph.js";
+import {
   EXPO_WEB_OPERATION_IDS,
   EXPO_WEB_STATIC_SOURCES,
   bindLocalStaticExport,
@@ -49,17 +55,24 @@ const CANARIES = [
 ] as const;
 
 export function register(harness: Harness): void {
-  harness.check("expo capabilities: #83 operations stay blocked and are not live-store proof", () => {
+  harness.check("expo capabilities: local session, cache, and permissions are fixture-tested; native purchases stay blocked", () => {
     const resolution = resolveExpoSelection({ compositionTarget: { platform: "ios", runtime: EXPO_APP_RUNTIME } });
-    assert(capabilityOperationsRemainBlocked(resolution), "capability operations must stay blocked");
+    assert(localSelectedCapabilitiesAreFixtureTested(resolution), "selected local capabilities must be fixture-tested");
+    assert(nativePurchasesRemainBlocked(resolution), "native purchases stay blocked");
+    assert(capabilityOperationsRemainBlocked(resolution), "native purchases remain the blocked #83 row");
     for (const id of EXPO_CAPABILITY_OPERATION_IDS) {
       const row = capabilityRow(id);
       const operation = operationFor(resolution, id);
-      assert(row.evidenceTier === "blocked" && row.liveMutation === false, `${id} protocol row must stay blocked`);
-      assert(row.nativeStoreProof === false, `${id} must not claim native-store proof`);
-      assert(operation.evidenceTier === "blocked" && operation.queuedIssue === 83, `${id} selection row must stay #83 blocked`);
+      assert(row.liveMutation === false && row.nativeStoreProof === false, `${id} must not claim native-store proof`);
+      assert(operation.queuedIssue === 83, `${id} stays #83`);
+      if (id === "native-purchases") {
+        assert(row.evidenceTier === "blocked" && operation.evidenceTier === "blocked", "native purchases stay blocked");
+      } else {
+        assert(row.evidenceTier === "fixture-tested" && operation.evidenceTier === "fixture-tested", `${id} is fixture-tested locally`);
+      }
     }
-    assert(operationFor(resolution, "native-purchases").queuedIssue === 83, "native purchases stay #83, not #79");
+    const unselected = resolveExpoSelection({ compositionTarget: { platform: "host", runtime: HOST_AGENT_RUNTIME } });
+    assert(operationFor(unselected, "authentication").evidenceTier === "blocked", "unselected Expo must not inherit local session");
     assert(
       Object.values(EXPO_CAPABILITY_SOURCES).every((url) => url.startsWith("https://")),
       "capability sources must be https citations",
@@ -534,5 +547,18 @@ export function register(harness: Harness): void {
       observed.easHosting === false && observed.nativeProof === false && observed.runtimeVerified === false,
       "observation is not hosting or runtime proof",
     );
+  });
+
+  harness.check("expo capabilities: disposable SQLite session and cache survive reopen without leaking accounts", () => {
+    const journey = runLocalCapabilityJourney(harness.makeTempDir("expo-local-capabilities"));
+    assert(journey.signedIn.action === "accept" && journey.signedIn.snapshot.session.appUserId === "user-a", journey.signedIn.reason);
+    assert(journey.signedIn.snapshot.session.entitled === false && journey.signedIn.snapshot.secureStore === false, "local session is not SecureStore or paid access");
+    assert(journey.persistedNote.action === "accept" && journey.restarted.snapshot.notes.some((note) => note.id === "note-1"), journey.restarted.reason);
+    assert(journey.expired.snapshot.session.signedIn === false, "expired session clears the current user");
+    assert(journey.switched.snapshot.session.appUserId === "user-b" && journey.isolated, "account switch isolates prior-user notes");
+    assert(journey.interrupted.action === "refuse", "interrupted write is not completion");
+    assert(journey.denied.snapshot.permission?.outcome === "denied", journey.denied.reason);
+    assert(journey.restored.snapshot.restoreRoute === ROUTE_HREFS.detail("1"), journey.restored.reason);
+    assert(journey.labeledLive === false && journey.restarted.snapshot.backendOfRecord === false, "local journey is not live or backend proof");
   });
 }

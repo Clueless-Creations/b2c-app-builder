@@ -13,14 +13,14 @@ This skill is a router. It routes consumer-business work. Capabilities define re
 
 Use the local `b2c-local` MCP server from this repository for workspace planning and execution. Hosted knowledge registers as `b2c-hosted` and cannot see or run a local business. A leftover `b2c-app-builder` registration is the legacy local name. Do not route consumer-app work through Planes.
 
-If `b2c_catalog` and `b2c_knowledge_search` are unavailable:
+This section is a connectivity gate, not the business start path. If the local MCP is unavailable:
 
 1. Run `b2c inspect` when the CLI exists. `b2c doctor` is a supported equivalent.
 2. When the user asked for setup, install this package's dependencies, link the package, and run `b2c setup`.
 3. Use the exact MCP registration command that setup prints.
 4. Keep the MCP read-only by default. Use the CLI for approved writes.
 
-Do not edit an agent configuration or install software unless the user requested setup.
+Do not edit an agent configuration or install software unless the user requested setup. The ordinary start is in Build a business: create or resume, then status, then plan.
 
 ## Build a business
 
@@ -32,7 +32,7 @@ b2c business-create --workspace my-app --directory ./my-app --name "Working name
 
 Choose an absent or empty target directory. Do not add files or register it first.
 The CLI flag is `--workspace`; `workspaceId` is the JSON field. Resume an existing
-registered workspace with `business-plan`. Register an existing scaffold only
+registered workspace with `business-status` then `business-plan`. Register an existing scaffold only
 with `b2c workspaces register <id> <path>`. Direct `--mandate` records a short
 request (8,000 characters). `--mandate-file` preserves a complete founder brief
 verbatim in `operations/FOUNDER_BRIEF.md`. `operations/LAUNCH_PROGRAM.md` is
@@ -41,8 +41,8 @@ brief by hand. A provisional workspace ID is
 not the final product name. Do not hand-author runtime state during planning. Research and author
 `product.yaml`, then render `PRODUCT.md` with `b2c render-product --workspace ID`.
 After explicit product acceptance,
-`business-initialize` activates the complete-business default. Use
-`b2c_business_plan` to inspect eligible work, hold classification, bounded briefs, and the
+`business-initialize` activates the complete-business default. Read
+`b2c_business_status`, then `b2c_business_plan` to inspect eligible work, hold classification, bounded briefs, and the
 current founder question, then `business-run` with
 the returned revision and a unique request ID for authorized execution. Read
 `b2c_business_evidence` for current acceptance and gaps. A successful bounded session

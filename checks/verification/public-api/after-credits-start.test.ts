@@ -52,6 +52,22 @@ function codePoints(text: string): number {
   return Array.from(text).length;
 }
 
+function assertCreateStatusPlanBeforeCatalog(text: string, label: string): void {
+  const createAt = text.indexOf("business-create");
+  const statusAt = text.indexOf("business-status");
+  const planAt = text.indexOf("business-plan");
+  const catalogAt = Math.min(
+    ...["b2c catalog", "b2c_catalog", "only for a specific goal"].map((needle) => {
+      const at = text.indexOf(needle);
+      return at < 0 ? Number.POSITIVE_INFINITY : at;
+    }),
+  );
+  assert(createAt >= 0, `${label} omitted create`);
+  assert(statusAt > createAt, `${label} lost status after create`);
+  assert(planAt > statusAt, `${label} lost plan after status`);
+  assert(catalogAt > planAt, `${label} still leads with catalog`);
+}
+
 test("After Credits start reaches status/plan without a maintainer tour or whole-program dump", () => {
   const env = setup();
   try {
@@ -99,14 +115,27 @@ test("After Credits start reaches status/plan without a maintainer tour or whole
 
     const agents = readFileSync(path.join(root, "AGENTS.md"), "utf8");
     const skill = readFileSync(path.join(root, "SKILL.md"), "utf8");
+    const guide = readFileSync(path.join(root, "docs/guides/build-a-business.md"), "utf8");
+    const connect = headingSlice(skill, "## Connect", "## Build a business");
+    const skillStart = headingSlice(skill, "## Build a business", "## Customize composition");
+    const guideCreate = headingSlice(guide, "## Create a planning workspace", "## Knowledge tools");
     const startPath = [
       headingSlice(agents, "# B2C App Builder Agent Guide", "### Contribution"),
-      headingSlice(skill, "## Build a business", "## Customize composition"),
+      connect,
+      skillStart,
+      guideCreate,
     ].join("\n");
     assert(startPath.includes("Business is an early exit"));
     assert(startPath.includes("b2c_business_status"));
     assert(!/docs\/north-star-architecture|docs\/architecture-conformance|docs\/decisions|ARCH-\d+/.test(startPath), "ordinary start path still names maintainer architecture");
-    assert(startPath.indexOf("b2c_business_status") < startPath.indexOf("only for a specific goal"), "start path still ranks catalog above status");
+    assert(!/b2c_catalog|b2c_knowledge_search/.test(connect), "Connect still presents catalog/search as the start path");
+    assertCreateStatusPlanBeforeCatalog(skillStart, "SKILL Build a business");
+    assertCreateStatusPlanBeforeCatalog(guideCreate, "build-a-business create example");
+    assert(
+      startPath.indexOf("business-status") < startPath.indexOf("business-plan") &&
+        startPath.indexOf("only for a specific goal") > startPath.indexOf("business-plan"),
+      "start path still ranks catalog above status then plan",
+    );
 
     const service = createKnowledgeService(buildHostedKnowledgeBundle(root));
     const dispatched = service.workflow({ workflowId: PROGRAM_ID, brief: true }).dispatchBrief!;
@@ -116,10 +145,12 @@ test("After Credits start reaches status/plan without a maintainer tour or whole
     const deferredPaths = (dispatched.deferredLoad ?? []).map((entry) => entry.path);
     const currentBytes = Buffer.byteLength(JSON.stringify(dispatched.load), "utf8");
     const deferredBytes = Buffer.byteLength(JSON.stringify(dispatched.deferredLoad ?? []), "utf8");
+    const planning = plan as { nextAction?: string; resume?: { workflowId?: string; nextAction?: string } };
     const accounting = {
       startPathCodePoints: codePoints(startPath),
       startPathBytes: Buffer.byteLength(startPath, "utf8"),
-      firstUsefulAction: "research_from_plan",
+      firstUsefulAction: planning.nextAction,
+      resumeWorkflowId: planning.resume?.workflowId,
       programIfOpened: {
         bound,
         current: currentPaths.length,
@@ -129,8 +160,11 @@ test("After Credits start reaches status/plan without a maintainer tour or whole
         deferredLoadCount: projected.context?.deferredLoadCount ?? 0,
       },
     };
-    assert(accounting.startPathCodePoints > 0);
-    assert.equal(accounting.firstUsefulAction, "research_from_plan");
+    assert.equal(accounting.firstUsefulAction, planning.nextAction);
+    assert.equal(accounting.firstUsefulAction, planning.resume?.nextAction);
+    assert.match(String(accounting.firstUsefulAction), /FOUNDER_BRIEF/);
+    assert.equal(accounting.resumeWorkflowId, planning.resume?.workflowId);
+    assert.equal(accounting.resumeWorkflowId, "workflow.research.research-backed-spec");
     assert(accounting.programIfOpened.current < accounting.programIfOpened.bound, "opened program packet still treats every bind as current reading");
     assert(accounting.programIfOpened.deferred > 0, "opened program packet lost deferred later-horizon accounting");
     assert.equal(accounting.programIfOpened.deferredLoadCount, accounting.programIfOpened.deferred);

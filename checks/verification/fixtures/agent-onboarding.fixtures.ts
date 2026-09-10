@@ -339,12 +339,20 @@ export function register(h: Harness): void {
 
   h.check("onboarding: business entry reaches create/status/plan before composition and maintainer architecture", () => {
     const skill = readFileSync(path.join(skillRoot, "SKILL.md"), "utf8");
+    const connectAt = skill.indexOf("## Connect");
     const buildAt = skill.indexOf("## Build a business");
     const composeAt = skill.indexOf("## Customize composition");
     const mobileAt = skill.indexOf("## Mobile app operation");
     assert(buildAt >= 0 && composeAt > buildAt, "skill teaches composition before the ordinary business path");
     assert(mobileAt > composeAt, "mobile capture precedes composition customization");
     assert(!/docs\/north-star-architecture|ARCH-\d+|docs\/architecture-conformance/.test(skill), "business skill requires maintainer architecture");
+    const connect = connectAt >= 0 && buildAt > connectAt ? skill.slice(connectAt, buildAt) : "";
+    assert(!/b2c_catalog|b2c_knowledge_search/.test(connect), "Connect still presents catalog/search as the start path");
+    const build = skill.slice(buildAt, composeAt);
+    const createAt = build.indexOf("business-create");
+    const statusCommandAt = build.indexOf("business-status");
+    const planCommandAt = build.indexOf("business-plan");
+    assert(createAt >= 0 && statusCommandAt > createAt && planCommandAt > statusCommandAt, "skill still resumes with plan and skips status");
     const statusAt = skill.indexOf("b2c_business_status");
     const catalogAt = skill.indexOf("only for a specific goal");
     assert(statusAt >= 0 && catalogAt > statusAt, "skill still sends a registered business through catalog before status/plan");
@@ -354,13 +362,31 @@ export function register(h: Harness): void {
     const contributionAt = agents.indexOf("### Contribution");
     const businessSlice = contributionAt >= 0 ? agents.slice(0, contributionAt) : agents;
     assert(!/docs\/north-star-architecture|docs\/architecture-conformance|docs\/decisions/.test(businessSlice), "business start path still names maintainer architecture");
+    assert(
+      businessSlice.includes("business-status") && businessSlice.indexOf("business-status") < businessSlice.indexOf("business-plan"),
+      "root guide still resumes with plan and skips status",
+    );
     const readme = readFileSync(path.join(skillRoot, "README.md"), "utf8");
     const startedAt = readme.indexOf("## Get started");
     const nextAt = readme.indexOf("\n## ", startedAt + 1);
     const started = readme.slice(startedAt, nextAt < 0 ? undefined : nextAt);
-    const createAt = started.indexOf("b2c business-create");
+    const readmeCreateAt = started.indexOf("b2c business-create");
+    const statusStartedAt = started.indexOf("b2c business-status");
+    const planStartedAt = started.indexOf("b2c business-plan");
     const catalogCommandAt = started.indexOf("b2c catalog --json");
-    assert(createAt >= 0 && catalogCommandAt > createAt, "README Get started still leads with catalog discovery");
+    assert(
+      readmeCreateAt >= 0 && statusStartedAt > readmeCreateAt && planStartedAt > statusStartedAt,
+      "README Get started still skips status between create and plan",
+    );
+    assert(catalogCommandAt < 0 || catalogCommandAt > planStartedAt, "README Get started still leads with catalog discovery");
+    const guide = readFileSync(path.join(skillRoot, "docs/guides/build-a-business.md"), "utf8");
+    const guideCreate = guide.slice(guide.indexOf("## Create a planning workspace"), guide.indexOf("## Knowledge tools"));
+    assert(
+      guideCreate.indexOf("business-create") >= 0 &&
+        guideCreate.indexOf("business-status") > guideCreate.indexOf("business-create") &&
+        guideCreate.indexOf("business-plan") > guideCreate.indexOf("business-status"),
+      "build-a-business create example still skips status",
+    );
     const workspace = readFileSync(path.join(skillRoot, "surfaces/workspace-template/repo-agent-entrypoints/AGENTS.md"), "utf8");
     const startAt = workspace.indexOf("## Start");
     const workspaceComposeAt = workspace.indexOf("## Customize composition");

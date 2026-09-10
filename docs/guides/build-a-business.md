@@ -67,27 +67,13 @@ decisions, public actions, destructive work, store submission, and production re
 - `b2c_plan`: compute the next bounded work for a registered workspace.
 - `b2c_operate`: preview or replay an operation. It commits only in explicit write mode after its gates pass.
 
-## Knowledge tools
-
-- `b2c_catalog`: browse the consumer-app workflows.
-- `b2c_workflow`: load one workflow and its reference list.
-- `b2c_knowledge_search`: search the expert library.
-- `b2c_knowledge_get`: retrieve one versioned reference with provenance.
-
-The local MCP and the hosted service both expose these tools. The hosted service
-never resolves or changes local workspaces. Use them after status and plan name
-the current task. Do not start a registered business by dumping a whole-workflow
-bundle.
-
-MCP resolves workspaces through the local registry only. The CLI may take an
-explicit path. Registration gives a workspace a stable ID and makes it visible to MCP.
-
 ## Create a planning workspace
 
 For a new complete business, create and register the planning workspace together:
 
 ```bash
 b2c business-create --workspace my-app --directory ./my-app --name "Working name" --hypothesis "A short product hypothesis" --mandate-file ./brief.md --json
+b2c business-status --workspace my-app --json
 b2c business-plan --workspace my-app --json
 ```
 
@@ -109,12 +95,12 @@ b2c business-initialize --workspace my-app --revision <revision-from-plan> --jso
 
 Initialization grants no work authority. Use
 `b2c onboard --workspace my-app --answers answers.json`
-to record approved authority, then inspect `business-plan`
+to record approved authority, then inspect `business-status` then `business-plan`
 again before a bounded `business-run`. The plan names why work is held (`holdKind` and
 bounded `detail`), includes a bounded brief on each ready item, and may include one
 founder question bound to that revision. It does not grant authority.
 
-For an existing registered workspace, resume with `business-plan`. For an existing
+For an existing registered workspace, resume with `business-status` then `business-plan`. For an existing
 unregistered scaffold, use `b2c workspaces register <id> <path>`; registration does
 not create its product or runtime files. Inspect an existing app before installing
 workspace files and preserve its implementation. Focused changes need no runtime.
@@ -128,6 +114,21 @@ The answers file names the business slug, a founder contact email, and a grant
 level (`review-first`, `run-with-guardrails`, or `full`) per business unit
 (`Product`, `Design`, `Engineering`, `Growth`, `Analytics`, `Revenue`, `Store`,
 `Trust`, `Operations`). Invalid answers list the accepted values.
+
+## Knowledge tools
+
+- `b2c_catalog`: browse the consumer-app workflows.
+- `b2c_workflow`: load one workflow and its reference list.
+- `b2c_knowledge_search`: search the expert library.
+- `b2c_knowledge_get`: retrieve one versioned reference with provenance.
+
+The local MCP and the hosted service both expose these tools. The hosted service
+never resolves or changes local workspaces. Use them after status and plan name
+the current task. Do not start a registered business by dumping a whole-workflow
+bundle.
+
+MCP resolves workspaces through the local registry only. The CLI may take an
+explicit path. Registration gives a workspace a stable ID and makes it visible to MCP.
 
 ## Worker runtime and failed attempts
 

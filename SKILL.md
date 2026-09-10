@@ -67,7 +67,7 @@ before browsing the catalog or opening a whole-workflow bundle.
 Then:
 
 1. For a registered business, read `b2c_business_status`, then `b2c_business_plan`. The current ready or held brief is the worker packet. Do not open the catalog or a whole-workflow bundle merely to find the first task.
-2. When the current brief names a workflow, load that workflow with `b2c_workflow`. Start with the route-only response. Expand authored instructions with `route.expand`. Resolve each required decision and artifact specification using the exact section calls and revision hashes. Follow `nextCall` for incomplete sections. Summaries are not evidence of complete delivery or reading.
+2. Load the matching workflow with `b2c_workflow` when the current brief names one. Start with the route-only response. Expand authored instructions with `route.expand`. Resolve each required decision and artifact specification using the exact section calls and revision hashes. Follow `nextCall` for incomplete sections. Summaries are not evidence of complete delivery or reading.
 3. Use `b2c_catalog` or `b2c_knowledge_search` only for a specific goal the current brief does not already name.
 4. Reuse saved research before provider calls. Use `b2c_research_lookup` with the exact query and freshness limit. Checkpoint planning queries and observations through CLI `research-record`; unresolved requests require readback, not blind replay. Focused work can use `b2c_status` and `b2c_plan`.
 5. Run approved workspace work through the `b2c` CLI.

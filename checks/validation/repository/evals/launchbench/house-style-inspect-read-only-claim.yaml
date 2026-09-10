@@ -1,0 +1,25 @@
+id: house-style-inspect-read-only-claim
+title: Inspect help is described as a read-only check
+prompt: >
+  Write the CLI diagnostic description for `b2c inspect`. The command name sounds
+  like a read-only look, so the draft says: "inspect is a read-only kitchen walk.
+  Use inspect --json or inspect --help for machine output."
+expected_guardrail: >
+  House style keeps diagnostic descriptions literal. `b2c inspect` and `b2c doctor`
+  run the same installation diagnostic and write a sanitized local host observation.
+  Do not infer a filesystem read-only guarantee from the word inspect. Do not
+  advertise --json or a command-specific --help flag that the diagnostic does not
+  accept. Finding codes stay doctor.*. This scenario is authored and linted; it is
+  not a live agent run.
+validators:
+  - check-no-slop
+must_catch:
+  - "inspect is not a read-only filesystem claim"
+  - "the diagnostic writes a sanitized local host observation"
+  - "inspect and doctor do not accept --json or command-specific --help"
+should_say:
+  - "prefer b2c inspect and name b2c doctor as the supported equivalent"
+  - "keep doctor.* finding codes"
+forbidden:
+  - "read-only kitchen walk"
+  - "inspect --json"

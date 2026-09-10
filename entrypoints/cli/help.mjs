@@ -195,8 +195,30 @@ function assertHelpCoverage(commands) {
   }
 }
 
+export const HELP_WRAP_COLUMNS = 80;
+
+function wrapRow(prefix, summary, maxWidth) {
+  const words = summary.split(/\s+/).filter(Boolean);
+  if (words.length === 0) return prefix.trimEnd();
+  const pad = " ".repeat(prefix.length);
+  const lines = [];
+  let column = prefix;
+  for (const word of words) {
+    const empty = column === prefix || column === pad;
+    const tentative = empty ? column + word : `${column} ${word}`;
+    if (tentative.length <= maxWidth || empty) {
+      column = tentative;
+      continue;
+    }
+    lines.push(column);
+    column = pad + word;
+  }
+  lines.push(column);
+  return lines.join("\n");
+}
+
 function formatRow(name, summary, width, indent) {
-  return `${indent}${name.padEnd(width)}  ${summary}`;
+  return wrapRow(`${indent}${name.padEnd(width)}  `, summary, HELP_WRAP_COLUMNS);
 }
 
 export function renderUsage(commands = COMMANDS) {
@@ -221,7 +243,19 @@ export function renderUsage(commands = COMMANDS) {
     lines.push("");
   }
   lines.push("Most commands print usage when run without required options.");
-  lines.push("inspect and doctor run the same installation diagnostic. They record a sanitized local host observation.");
-  lines.push("They do not install tools, approve a release, or accept --json or a command-specific --help flag.");
+  lines.push(
+    wrapRow(
+      "",
+      "inspect and doctor run the same installation diagnostic. They record a sanitized local host observation.",
+      HELP_WRAP_COLUMNS,
+    ),
+  );
+  lines.push(
+    wrapRow(
+      "",
+      "They do not install tools, approve a release, or accept --json or a command-specific --help flag.",
+      HELP_WRAP_COLUMNS,
+    ),
+  );
   return lines.join("\n");
 }

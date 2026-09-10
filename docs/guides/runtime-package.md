@@ -103,6 +103,7 @@ approves a release.
 
 `b2c --help` groups commands by task. It is generated from the CLI command
 registry in `entrypoints/cli/help.mjs`. Do not keep a second command table here.
+Summaries wrap at 80 columns. Command names stay complete and searchable.
 
 - Prepare the kitchen: `setup`, `inspect`, `workspaces`, `list`. `doctor` stays
   supported.

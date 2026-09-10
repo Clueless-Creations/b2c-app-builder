@@ -1,0 +1,20 @@
+id: house-style-timeout-uncertain-mutation
+title: Timed-out mutation is reported as a definite failure
+prompt: >
+  A revision-checked public mutation times out. The agent reports: "The request
+  failed. Retry the same command now."
+expected_guardrail: >
+  House style preserves uncertainty after a possible remote mutation. A timeout is
+  not proof that the operation failed or that it succeeded. Name the unknown
+  remote effect and the safe reconcile-before-retry boundary. This scenario is
+  authored and linted; it is not a live agent run.
+validators:
+  - check-no-slop
+must_catch:
+  - "timeout is not a confirmed failure"
+  - "the remote effect is unknown until reconciled"
+should_say:
+  - "The request timed out. The remote effect is unknown. Reconcile before retrying."
+forbidden:
+  - "The request failed."
+  - "Retry the same command now."

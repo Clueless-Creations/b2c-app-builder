@@ -2,7 +2,7 @@ import { writeProductFixture } from "./product-fixture.js";
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
-import { COMMANDS, HELP_SECTIONS, listedCommandNames } from "../../../entrypoints/cli/help.mjs";
+import { COMMANDS, HELP_SECTIONS, HELP_WRAP_COLUMNS, listedCommandNames } from "../../../entrypoints/cli/help.mjs";
 import { assert, skillRoot, type Harness } from "./_harness.js";
 import { compilePlan } from "../../../kernel/engine/compile.js";
 import { seedRunState } from "../../../kernel/engine/runstate.js";
@@ -130,6 +130,16 @@ export function register(harness: Harness): void {
       JSON.stringify(addresses) === JSON.stringify(listed),
       `help address rows must match HELP_SECTIONS order. got=${addresses.join(",")} expected=${listed.join(",")}`,
     );
+    for (const line of help.output.split("\n")) {
+      const overflowingToken = line.length > HELP_WRAP_COLUMNS && !line.slice(0, HELP_WRAP_COLUMNS + 1).includes(" ");
+      assert(
+        line.length <= HELP_WRAP_COLUMNS || overflowingToken,
+        `help line must wrap at ${HELP_WRAP_COLUMNS} columns unless one token is longer: ${line}`,
+      );
+    }
+    for (const name of listed) {
+      assert(help.output.includes(name), `help must keep the full command name ${name}`);
+    }
     const bare = runBin([]);
     assert(bare.code === 1, `no arguments must exit 1, got ${bare.code}`);
     assert(bare.output.includes("Prepare the kitchen"), "bare invocation must still print grouped usage on stderr");

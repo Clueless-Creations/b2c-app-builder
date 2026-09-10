@@ -140,7 +140,8 @@ This command changes the configured Worker. Run it only with authority for that 
 There is no automatic production deployment in CI. The CI hosted job checks types, tests,
 and the packaged Worker without provider credentials.
 
-After deployment, check the Cloudflare deployment version and the `/health` bundle hash.
+After deployment, print the pair this checkout would ship (`npm run hosted:version`) and
+compare it to `/health`. Check the Cloudflare deployment version as well.
 Verify unauthenticated requests fail, an entitled API key works on both transports, OAuth S256
 authorization works, and local execution tool names fail. A successful build alone does not
 prove a deployment. Keep raw credentials and OAuth responses out of logs and reports.
@@ -230,12 +231,31 @@ Reverse it with `wrangler kv key delete --binding FLAGS_KV "analytics:optout:<ac
 hosted/builder-console/wrangler.jsonc`. From inside `hosted/builder-console/` itself, drop `--config hosted/builder-console/wrangler.jsonc` —
 that directory's own `wrangler.jsonc` is picked up the same way `hosted/knowledge-mcp/`'s is above.
 
+## Deployed identity
+
+`GET /health` on this Worker reports `engineVersion` and `bundleSha256` from
+`catalog/generated/hosted-knowledge.json`. The console Worker reports the same
+`engineVersion` from `skill-version.json`. It has no knowledge bundle, so it does
+not invent a hash.
+
+`engineVersion` lives inside the hashed catalog. Every skill-version bump moves
+`bundleSha256`, even when no knowledge document changed. Do not hardcode the pair
+in a runbook. Print it from the artifact the Worker ships:
+
+```bash
+npm run hosted:version
+```
+
+That command reads `catalog/generated/hosted-knowledge.json`. It does not rebuild
+or re-hash the bundle. After a version stamp, re-run `npm run hosted:bundle` (or
+`npm run render:all`) so the generated file matches the pin, then print the pair.
+
 ## Monitoring and recovery
 
 After each release, the deploying maintainer owns a 15-minute validation window. Compare
 Cloudflare request/error counts and CPU metrics with the `/health` engine version and bundle
-hash. Run positive and negative MCP/API checks. Inspect deployment status in Cloudflare;
-do not search raw authorization request logs.
+hash printed by `npm run hosted:version`. Run positive and negative MCP/API checks. Inspect
+deployment status in Cloudflare; do not search raw authorization request logs.
 
 Healthy: the expected hash is live, anonymous calls fail, authorized calls return the same
 knowledge on both transports, and OAuth refresh works. Failure: unexpected 5xx errors,

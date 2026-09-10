@@ -23,3 +23,11 @@ test("the hosted README documents the exact analytics opt-out command", () => {
     "hosted/knowledge-mcp/README.md is missing the literal opt-out command operators need to run",
   );
 });
+
+test("the hosted README tells operators to print the live pair instead of hardcoding it", () => {
+  assert.ok(hostedReadme.includes("npm run hosted:version"), "hosted/knowledge-mcp/README.md must name npm run hosted:version");
+  assert.ok(
+    hostedReadme.includes("Every skill-version bump moves\n`bundleSha256`"),
+    "hosted/knowledge-mcp/README.md must state that a version bump changes the bundle hash",
+  );
+});

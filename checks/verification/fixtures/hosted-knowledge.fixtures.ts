@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import path from "node:path";
@@ -21,6 +22,8 @@ import {
   HOSTED_BUNDLE_RELATIVE_PATH,
   serializeHostedKnowledgeBundle,
 } from "../../../tooling/render-hosted-bundle.js";
+import { HOSTED_VERSION_BUNDLE_PATH, readHostedVersionPair } from "../../../tooling/print-hosted-version.js";
+import { resolveTsxBin } from "../../../tooling/lib/tsx-bin.js";
 import { assert, skillRoot, type Harness } from "./_harness.js";
 
 const digest = (value: string): string => createHash("sha256").update(value).digest("hex");
@@ -858,5 +861,23 @@ export function register(harness: Harness): void {
     const tampered = fixtureBundle();
     tampered.documents[0]!.summary = "not a real prefix of the markdown below";
     expectError(() => createKnowledgeService(tampered), "Invalid hosted knowledge bundle");
+  });
+
+  harness.check("hosted knowledge: hosted:version prints the generated pair without recomputing the hash", () => {
+    assert(HOSTED_VERSION_BUNDLE_PATH === HOSTED_BUNDLE_RELATIVE_PATH, "the version printer must read the same artifact the Worker hashes");
+    const onDisk = JSON.parse(readFileSync(path.join(skillRoot, HOSTED_BUNDLE_RELATIVE_PATH), "utf8")) as {
+      engineVersion: string;
+      bundleSha256: string;
+    };
+    const pin = JSON.parse(readFileSync(path.join(skillRoot, "skill-version.json"), "utf8")) as { version: string };
+    const pair = readHostedVersionPair(skillRoot);
+    assert(pair.engineVersion === onDisk.engineVersion && pair.bundleSha256 === onDisk.bundleSha256, "the printer must echo the generated fields");
+    assert(pair.engineVersion === pin.version, "engineVersion on the generated bundle must match skill-version.json");
+    const printed = spawnSync(resolveTsxBin(skillRoot), [path.join(skillRoot, "tooling/print-hosted-version.ts")], {
+      cwd: skillRoot,
+      encoding: "utf8",
+    });
+    assert(printed.status === 0, `hosted:version exited ${printed.status}: ${printed.stderr}`);
+    assert(printed.stdout === `${onDisk.engineVersion} ${onDisk.bundleSha256}\n`, "hosted:version must print the on-disk pair, not a recomputed hash");
   });
 }

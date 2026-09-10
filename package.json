@@ -199,6 +199,7 @@
     "grade:design": "tsx tooling/grade-design-surface.ts",
     "grade:screenshots": "tsx tooling/grade-screenshots.ts",
     "hosted:bundle": "tsx tooling/render-hosted-bundle.ts",
+    "hosted:version": "tsx tooling/print-hosted-version.ts",
     "hosted:check": "npm --prefix hosted/knowledge-mcp run check",
     "hosted:deploy": "npm --prefix hosted/knowledge-mcp run deploy",
     "hosted:deploy:prod": "npm --prefix hosted/knowledge-mcp run deploy -- --config wrangler.production.jsonc",

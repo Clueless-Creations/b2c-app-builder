@@ -37,6 +37,7 @@ import { syncSubscriptionsFromStripe } from "./billing/checkout.js";
 import { PAST_DUE_GRACE_MS, pickCurrentSubscription, resolveEntitlement } from "./billing/entitlement-policy.js";
 import { PLAN_IDS, PLANS } from "./billing/plans.js";
 import packageJson from "./package.json" with { type: "json" };
+import skillVersion from "../../skill-version.json" with { type: "json" };
 
 // --- M5: API-key management console — one import line. ---------------------------------------
 import { handleConsoleKeysRequest, isConsoleKeysPath, type ConsoleSession } from "./console/keys.js";
@@ -580,8 +581,12 @@ export default {
     if (isRelayPath(url.pathname)) return securityHeaders(await handleRelay(request));
 
     if (url.pathname === "/health") {
+      // Same pin as skill-version.json / the MCP Worker's engineVersion. No bundleSha256: this
+      // Worker does not ship the knowledge bundle, and inventing a second hash would lie.
       return securityHeaders(
-        new Response(JSON.stringify({ status: "ok", service: "clueless-creations-app" }), { headers: { "Content-Type": "application/json" } }),
+        new Response(JSON.stringify({ status: "ok", service: "clueless-creations-app", engineVersion: skillVersion.version }), {
+          headers: { "Content-Type": "application/json" },
+        }),
       );
     }
 

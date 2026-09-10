@@ -194,15 +194,17 @@ export function register(harness: Harness): void {
     assert(!findings.some((item) => item.severity === "error" && item.code.startsWith("doctor.asc")), "host write failure must not fail the install");
   });
 
-  harness.check("doctor-asc: status sibling with no host file says doctor has not been run", () => {
+  harness.check("doctor-asc: status sibling with no host file says inspect has not been run", () => {
     const home = harness.makeTempDir("doctor-asc-status-not-run");
     const block = appendDoctorHostBlock("No durable run yet — bootstrap the workspace and run a session first.", home);
     assert(block.includes("not a live PATH probe"), `status block must say it is not a live PATH probe: ${block}`);
-    assert(block.includes("doctor has not been run"), `missing file means doctor not run: ${block}`);
+    assert(block.includes("last b2c inspect observation"), `status header must prefer inspect: ${block}`);
+    assert(block.includes("inspect has not been run"), `missing file means inspect not run: ${block}`);
+    assert(block.includes("supported `b2c doctor`"), `missing file must keep doctor supported: ${block}`);
     assert(!block.includes("no asc on PATH"), `missing file must not be reported as a negative observation: ${block}`);
   });
 
-  harness.check("doctor-asc: present host file with null path is doctor ran, no asc — not doctor not run", () => {
+  harness.check("doctor-asc: present host file with null path is inspect ran, no asc — not inspect not run", () => {
     const home = harness.makeTempDir("doctor-asc-status-negative");
     writeDoctorHostObservation(
       { schemaVersion: "b2c.doctor-host/v1", comparedAt: COMPARED_AT, latestObserved: LATEST, path: null, version: null },
@@ -211,8 +213,8 @@ export function register(harness: Harness): void {
     const block = renderDoctorHostBlock(readDoctorHostObservation(home));
     assert(block.includes(COMPARED_AT), `dated observation must print compared-at: ${block}`);
     assert(block.includes("not a live PATH probe"), `dated observation must say it is not a live PATH probe: ${block}`);
-    assert(block.includes("doctor ran; no asc on PATH"), `null path is a negative observation: ${block}`);
-    assert(!block.includes("doctor has not been run"), "a present negative file is not 'doctor not run'");
+    assert(block.includes("inspect ran; no asc on PATH"), `null path is a negative observation: ${block}`);
+    assert(!block.includes("inspect has not been run"), "a present negative file is not 'inspect not run'");
   });
 
   harness.check("doctor-asc: dated host file names winner, latest, and compared-at without spawning asc", () => {

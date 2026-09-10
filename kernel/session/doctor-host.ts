@@ -128,41 +128,41 @@ export function writeDoctorHostObservation(observation: DoctorHostObservation, h
 }
 
 export function renderDoctorHostBlock(observation: DoctorHostObservation | null): string {
-  const header = "Host ASC (last b2c doctor observation, not a live PATH probe";
+  const header = "Host ASC (last b2c inspect observation, not a live PATH probe";
   if (!observation) {
-    return `${header}):\ndoctor has not been run on this machine. Run \`b2c inspect\` (or supported \`b2c doctor\`) to record the winning asc path and version.`;
+    return `${header}):\ninspect has not been run on this machine. Run \`b2c inspect\` (or supported \`b2c doctor\`) to record the winning asc path and version.`;
   }
   const stamped = `${header}; compared-at ${observation.comparedAt}):`;
   const latest = observation.latestObserved ?? "(unknown)";
   if (!observation.path) {
-    return `${stamped}\ndoctor ran; no asc on PATH. Latest observed ${latest}. This is not proof Apple is unavailable.`;
+    return `${stamped}\ninspect ran; no asc on PATH. Latest observed ${latest}. This is not proof Apple is unavailable.`;
   }
   const version = observation.version ?? "(unparseable)";
   return `${stamped}\nwinning ${observation.path} ${version} (latest observed ${latest})`;
 }
 
 export function renderRevenueCatCliHostBlock(observation: DoctorHostObservation | null): string {
-  const header = "Host RevenueCat CLI (last b2c doctor observation, not a live PATH probe and not live catalog proof";
+  const header = "Host RevenueCat CLI (last b2c inspect observation, not a live PATH probe and not live catalog proof";
   if (!observation) {
-    return `${header}):\ndoctor has not been run on this machine. Run \`b2c inspect\` (or supported \`b2c doctor\`) to record the winning rc/revenuecat path and version.`;
+    return `${header}):\ninspect has not been run on this machine. Run \`b2c inspect\` (or supported \`b2c doctor\`) to record the winning rc/revenuecat path and version.`;
   }
   const stamped = `${header}; compared-at ${observation.comparedAt}):`;
   const recorded = observation.revenuecatCli;
   if (!recorded) {
-    return `${stamped}\ndoctor ran; this observation did not record RevenueCat CLI. Run \`b2c inspect\` (or supported \`b2c doctor\`) again. This is not live catalog proof.`;
+    return `${stamped}\ninspect ran; this observation did not record RevenueCat CLI. Run \`b2c inspect\` (or supported \`b2c doctor\`) again. This is not live catalog proof.`;
   }
   const latest = recorded.latestObserved ?? "(unknown)";
   switch (recorded.identity) {
     case "missing":
-      return `${stamped}\ndoctor ran; no RevenueCat CLI on PATH. Latest observed ${latest}. This is not live catalog proof.`;
+      return `${stamped}\ninspect ran; no RevenueCat CLI on PATH. Latest observed ${latest}. This is not live catalog proof.`;
     case "unrelated-executable":
-      return `${stamped}\ndoctor ran; PATH rc/revenuecat did not identify as RevenueCat CLI. Latest observed ${latest}. This is not live catalog proof.`;
+      return `${stamped}\ninspect ran; PATH rc/revenuecat did not identify as RevenueCat CLI. Latest observed ${latest}. This is not live catalog proof.`;
     case "unsupported-version":
     case "unsupported-schema":
       return `${stamped}\nwinning ${recorded.path ?? "(unknown)"} ${recorded.version ?? "(unparseable)"} is not the reviewed RevenueCat CLI ${latest}. This is not live catalog proof.`;
     case "trusted": {
       if (!recorded.path) {
-        return `${stamped}\ndoctor ran; trusted identity lacked a path. Latest observed ${latest}. This is not live catalog proof.`;
+        return `${stamped}\ninspect ran; trusted identity lacked a path. Latest observed ${latest}. This is not live catalog proof.`;
       }
       const version = recorded.version ?? "(unparseable)";
       return `${stamped}\nwinning ${recorded.path} ${version} (reviewed executable ${latest}). Live catalog is unproven.`;
@@ -184,24 +184,24 @@ export function renderExpoCliHostBlock(observation: DoctorHostObservation | null
 
 function renderExpoEasCliKindBlock(observation: DoctorHostObservation | null, kind: "eas" | "expo"): string {
   const tool = kind === "eas" ? "EAS CLI" : "Expo CLI";
-  const header = `Host ${tool} (last b2c doctor observation, not a live PATH probe and not live EAS proof`;
+  const header = `Host ${tool} (last b2c inspect observation, not a live PATH probe and not live EAS proof`;
   if (!observation) {
-    return `${header}):\ndoctor has not been run on this machine. Run \`b2c inspect\` (or supported \`b2c doctor\`) to record the winning ${kind === "eas" ? "eas" : "expo"} path and version.`;
+    return `${header}):\ninspect has not been run on this machine. Run \`b2c inspect\` (or supported \`b2c doctor\`) to record the winning ${kind === "eas" ? "eas" : "expo"} path and version.`;
   }
   const stamped = `${header}; compared-at ${observation.comparedAt}):`;
   const recorded = kind === "eas" ? observation.easCli : observation.expoCli;
   if (!recorded) {
-    return `${stamped}\ndoctor ran; this observation did not record ${tool}. Run \`b2c inspect\` (or supported \`b2c doctor\`) again. This is not live EAS proof.`;
+    return `${stamped}\ninspect ran; this observation did not record ${tool}. Run \`b2c inspect\` (or supported \`b2c doctor\`) again. This is not live EAS proof.`;
   }
   const latest = recorded.latestObserved ?? "(unknown)";
   switch (recorded.identity) {
     case "missing":
-      return `${stamped}\ndoctor ran; no ${tool} on PATH. Latest observed ${latest}. This is not live EAS proof.`;
+      return `${stamped}\ninspect ran; no ${tool} on PATH. Latest observed ${latest}. This is not live EAS proof.`;
     case "unrelated-executable":
-      return `${stamped}\ndoctor ran; PATH ${kind === "eas" ? "eas/eas-cli" : "expo"} did not identify as ${tool}. Latest observed ${latest}. This is not live EAS proof.`;
+      return `${stamped}\ninspect ran; PATH ${kind === "eas" ? "eas/eas-cli" : "expo"} did not identify as ${tool}. Latest observed ${latest}. This is not live EAS proof.`;
     case "trusted": {
       if (!recorded.path) {
-        return `${stamped}\ndoctor ran; trusted identity lacked a path. Latest observed ${latest}. This is not live EAS proof.`;
+        return `${stamped}\ninspect ran; trusted identity lacked a path. Latest observed ${latest}. This is not live EAS proof.`;
       }
       const version = recorded.version ?? "(unparseable)";
       return `${stamped}\nwinning ${recorded.path} ${version} (documented ${latest} is a docs page). Live EAS is unproven.`;

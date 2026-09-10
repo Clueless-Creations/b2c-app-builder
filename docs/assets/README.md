@@ -43,6 +43,11 @@ Render with headless Chrome at the sheet's own size. QuickLook thumbnails crop a
 ```bash
 "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --window-size=1000,600 \
   --screenshot=/tmp/sheet-1.png "file://$PWD/docs/assets/business-primitives.svg"
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --window-size=500,300 \
+  --screenshot=/tmp/sheet-1-half.png "file://$PWD/docs/assets/business-primitives.svg"
 ```
 
-Sheet 2 renders at `1000,660` and Sheet 3 at `1000,460`.
+Sheet 2 renders at `1000,660` and Sheet 3 at `1000,460`. Native and half-width
+previews check that `PREP & DESIGN` stays in the station 2 band. GitHub light and
+dark page chrome is a separate visual review; these commands do not prove it.
+

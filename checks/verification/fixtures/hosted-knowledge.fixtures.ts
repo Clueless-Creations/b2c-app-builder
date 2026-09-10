@@ -811,8 +811,12 @@ export function register(harness: Harness): void {
     const route = service.workflow({ workflowId: workflow.id }).route;
     assert(brief.load.length < workflow.referenceIds.length, "dispatchBrief must defer at least one real later-horizon binding");
     assert(
-      brief.load.some((entry) => entry.path.includes("full-launch-program") || /opening, resuming, or closing|at workflow start/i.test(entry.loadWhen)),
+      brief.load.some((entry) => entry.path.includes("full-launch-program")),
       "program-open guidance must remain current reading",
+    );
+    assert(
+      !brief.load.some((entry) => /paid-tool-routing|security-release-hardening|doppler-organization|founder-zero-operator|secrets-management/.test(entry.path)),
+      "operator and security procedures must stay deferred until that action is current",
     );
     assert(route.references.length === brief.load.length, "route mode must not dump later-horizon refs as current reading");
     assert(route.coverage.requiredCount === brief.load.length, "route coverage must count current-task refs only");

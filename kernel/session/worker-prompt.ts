@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { mutableTaskArtifactPaths, type NodeBrief } from "../engine/node-brief.js";
 import type { DesignTasteDelegationAuthority } from "../engine/design-taste-authority.js";
+import { partitionLoadWhen } from "../lib/later-guidance.js";
 
 export const KNOWLEDGE_RECEIPT_BEGIN = "BEGIN_KNOWLEDGE_RECEIPT";
 export const KNOWLEDGE_RECEIPT_END = "END_KNOWLEDGE_RECEIPT";
@@ -80,6 +81,7 @@ export function buildWorkerPrompt(brief: NodeBrief, workspaceDir: string, skillR
   const mutableTaskArtifacts = new Set(mutableTaskArtifactPaths(brief));
   const digest = (filePath: string): string => (mutableTaskArtifacts.has(filePath) ? "<compute sha256 after all writes>" : "<compute sha256 after opening>");
   const authorityDigest = authorizationDigest(expectations.authorization);
+  const { current: mandatoryLoad, later: deferredLoad } = partitionLoadWhen(brief.load);
   return [
     "You are one fresh-context specialist worker inside the b2c operating graph.",
     `Workspace: ${workspaceDir}`,
@@ -110,9 +112,15 @@ export function buildWorkerPrompt(brief: NodeBrief, workspaceDir: string, skillR
     "CONSULT WHEN PRESENT:",
     ...(brief.consult.length ? brief.consult.map((p) => `- ${p}`) : ["- none"]),
     "MANDATORY TASK KNOWLEDGE — open from the stated root before acting:",
-    ...(brief.load.length
-      ? brief.load.map((r) => `- ${r.path} root=${r.resource?.origin ?? "skill"} sha256=${digest(r.path)} (${r.title}; ${r.loadWhen})`)
+    ...(mandatoryLoad.length
+      ? mandatoryLoad.map((r) => `- ${r.path} root=${r.resource?.origin ?? "skill"} sha256=${digest(r.path)} (${r.title}; ${r.loadWhen})`)
       : ["- none"]),
+    ...(deferredLoad.length
+      ? [
+          "DEFERRED LATER KNOWLEDGE — discoverable, not current reading:",
+          ...deferredLoad.map((r) => `- ${r.path} (${r.title}; ${r.loadWhen})`),
+        ]
+      : []),
     ...(brief.contextSelectors
       ? [
           "CONTEXT SELECTORS — exact compiled sources; open only these and do not load other catalog knowledge for this dispatch:",
@@ -150,7 +158,7 @@ export function buildWorkerPrompt(brief: NodeBrief, workspaceDir: string, skillR
       authorizationDigest: authorityDigest,
       contractFiles: brief.contractFiles.map((p) => ({ path: p, sha256: digest(p) })),
       taskArtifacts: brief.open.map((p) => ({ path: p, sha256: digest(p) })),
-      mandatoryKnowledge: brief.load.map((r) => ({ path: r.path, sha256: digest(r.path) })),
+      mandatoryKnowledge: mandatoryLoad.map((r) => ({ path: r.path, sha256: digest(r.path) })),
       conditionalKnowledge: brief.route.map((r) => ({
         id: `${r.packId}:${r.path}`,
         decision: "not_applicable",
@@ -461,17 +469,18 @@ export function validateKnowledgeReceipt(output: string, brief: NodeBrief, expec
   };
   validateFiles("contractFiles", receipt.contractFiles, brief.contractFiles);
   validateFiles("taskArtifacts", receipt.taskArtifacts, brief.open);
+  const mandatoryLoad = partitionLoadWhen(brief.load).current;
   validateFiles(
     "mandatoryKnowledge",
     receipt.mandatoryKnowledge,
-    brief.load.map((r) => r.path),
+    mandatoryLoad.map((r) => r.path),
   );
 
   const routeIds = brief.route.map((r) => `${r.packId}:${r.path}`);
   const conditional = exactSection<RouteDecision & Record<string, unknown>>(issues, "conditionalKnowledge", receipt.conditionalKnowledge, routeIds, (entry) =>
     String(entry.id),
   );
-  const usedKnowledge = new Set(brief.load.map((r) => r.path));
+  const usedKnowledge = new Set(mandatoryLoad.map((r) => r.path));
   for (const entry of conditional) {
     if (entry.decision !== "used" && entry.decision !== "not_applicable") issues.push(`conditionalKnowledge ${entry.id} has invalid decision`);
     if (!entry.reason || entry.reason.trim().length < 8) issues.push(`conditionalKnowledge ${entry.id} needs a specific reason`);

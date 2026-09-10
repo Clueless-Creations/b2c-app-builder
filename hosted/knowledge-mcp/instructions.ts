@@ -27,7 +27,4 @@ export const HOSTED_INSTRUCTIONS =
   "These tools do not access local files, plan a workspace, approve actions, or execute applications. " +
   "They also observe nothing about this founder: whether a prerequisite workflow was ever run, whether an artifact exists, " +
   "and whether a provider account is connected are unknown here, not done and not undone. " +
-  "Report such a prerequisite as unverified through this connection, and name where it can be checked. " +
-  "This connection is hosted knowledge (b2c-hosted). It cannot access local files or run a local business. " +
-  "Connect the local builder as b2c-local for workspace planning and execution. " +
-  "A leftover b2c-app-builder client name is ambiguous until the handshake is read.";
+  "Report such a prerequisite as unverified through this connection, and name where it can be checked.";

@@ -259,6 +259,13 @@
                     ],
                     "additionalProperties": true
                   },
+                  "effectBoundary": {
+                    "type": "string",
+                    "enum": [
+                      "read_and_produce",
+                      "founder_approval_required"
+                    ]
+                  },
                   "brief": {
                     "type": "object",
                     "properties": {
@@ -541,6 +548,13 @@
                       "truncated"
                     ],
                     "additionalProperties": true
+                  },
+                  "effectBoundary": {
+                    "type": "string",
+                    "enum": [
+                      "read_and_produce",
+                      "founder_approval_required"
+                    ]
                   },
                   "brief": {
                     "type": "object",

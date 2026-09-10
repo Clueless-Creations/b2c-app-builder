@@ -6,6 +6,7 @@ export {
   formatConnectionReceipt,
   hostedMcpInstructionsSuffix,
   localMcpInstructions,
+  parseConnectionReceipt,
 } from "./connection-receipt.js";
 export type { ConnectionReceipt } from "./connection-receipt.js";
 
@@ -421,6 +422,7 @@ const lifecycleWorkSchema = z.strictObject({
   detail: z.string().max(PUBLIC_PLAN_BOUNDS.detail).optional(),
   detailTruncated: z.boolean().optional(),
   lastFailure: publicPlanLastFailureSchema.optional(),
+  effectBoundary: z.enum(["read_and_produce", "founder_approval_required"]).optional(),
   brief: publicReadyBriefSchema.optional(),
 });
 export const businessCompletionSchema = z.strictObject({

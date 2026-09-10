@@ -5,6 +5,7 @@ import { createHash } from "node:crypto";
 import { Miniflare, Log, LogLevel, convertV4MiniflareOptions, type V4WorkerOptions } from "miniflare";
 import { attachD1, seedAccountInto, revokeSeedKey } from "./support/d1.js";
 import { sha256 } from "../auth.js";
+import { hostedMcpInstructionsSuffix, parseConnectionReceipt } from "../../../contracts/public-api/connection-receipt.js";
 import { HOSTED_INSTRUCTIONS } from "../instructions.js";
 import type { HostedCatalogResult, HostedKnowledgeGetResult, HostedKnowledgeSearchResult } from "../../../kernel/knowledge-service/types.js";
 import hostedKnowledge from "../../../catalog/generated/hosted-knowledge.json" with { type: "json" };
@@ -191,13 +192,21 @@ test("real MCP initialization and tool discovery expose only the four read-only 
   assert.equal(handshake.result.serverInfo.name, "b2c-hosted");
   // The instructions string is the whole briefing for a client that installed nothing else, so it
   // is asserted rather than left to drift. Assert the route it must name, not the prose around it.
-  assert.equal(handshake.result.instructions, HOSTED_INSTRUCTIONS);
+  const hostedInstructions = `${HOSTED_INSTRUCTIONS}${hostedMcpInstructionsSuffix(hostedKnowledge.engineVersion)}`;
+  assert.equal(handshake.result.instructions, hostedInstructions);
   for (const required of ["b2c_catalog", "b2c_knowledge_search", "b2c_workflow", "route.expand", "b2c_knowledge_get"]) {
     assert.ok(HOSTED_INSTRUCTIONS.includes(required), `hosted instructions must name ${required}`);
   }
   assert.match(HOSTED_INSTRUCTIONS, /unknown here, not done and not undone/);
-  assert.match(HOSTED_INSTRUCTIONS, /b2c-hosted/);
-  assert.match(HOSTED_INSTRUCTIONS, /b2c-local/);
+  assert.match(handshake.result.instructions, /b2c-hosted/);
+  assert.match(handshake.result.instructions, /b2c-local/);
+  const hostedReceipt = parseConnectionReceipt(handshake.result.instructions);
+  assert.equal(hostedReceipt.mode, "hosted_knowledge");
+  assert.equal(hostedReceipt.identity.recommended, "b2c-hosted");
+  assert.equal(hostedReceipt.identity.legacy, undefined);
+  assert.equal(hostedReceipt.declares.knowledge, "bundled");
+  assert.equal(hostedReceipt.declares.writes, "none");
+  assert.equal(hostedReceipt.observed, undefined);
   const response = await fetchPath("/mcp", {
     method: "POST",
     headers: mcpHeaders,

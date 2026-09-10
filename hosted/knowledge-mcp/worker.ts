@@ -20,6 +20,7 @@ import {
   secureResponse,
   uniqueParams,
 } from "./http.js";
+import { hostedMcpInstructionsSuffix } from "../../contracts/public-api/connection-receipt.js";
 import { HOSTED_INSTRUCTIONS } from "./instructions.js";
 import { browserAuthorizationFailure, createOAuthProvider } from "./oauth.js";
 
@@ -68,7 +69,7 @@ async function mcpResponse(request: Request, env: Env, ctx: ExecutionContext): P
       // that installed nothing else ever receives, so it names the whole route rather than just
       // the first call, and it states what the service cannot observe — ARCH-11: a prerequisite
       // this service does not report is unknown, not satisfied and not absent.
-      instructions: HOSTED_INSTRUCTIONS,
+      instructions: `${HOSTED_INSTRUCTIONS}${hostedMcpInstructionsSuffix(service.metadata.engineVersion)}`,
     },
   );
   registerKnowledgeTools(server, service);

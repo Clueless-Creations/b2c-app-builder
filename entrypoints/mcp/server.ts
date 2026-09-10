@@ -126,6 +126,7 @@ const server = new McpServer(
     instructions: localMcpInstructions({
       knowledge: knowledgeService ? "available" : "unavailable",
       engineVersion: skillVersion(),
+      writes: readOnly ? "mcp_readonly" : "mcp_write_enabled",
     }),
   },
 );

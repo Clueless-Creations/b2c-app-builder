@@ -644,7 +644,10 @@ export function register(harness: Harness): void {
       content.coverage.requiredReferenceIds.join(",") === response.knowledge.map((entry) => entry.referenceId).join(","),
       "coverage was derived from the funded prefix instead of all authored bindings",
     );
-    assert(response.dispatchBrief?.load.length === 2, "a low bundle budget removed required worker inputs");
+    assert(
+      response.dispatchBrief?.load.length === 1 && response.dispatchBrief.load[0]?.path === "knowledge/research/interviews.md",
+      "later-horizon bound refs stay deferred; a low bundle budget must not drop current-task worker inputs",
+    );
 
     for (const missing of content.coverage.incomplete) {
       const entry = content.references.find((reference) => reference.referenceId === missing.referenceId)!;
@@ -797,6 +800,26 @@ export function register(harness: Harness): void {
       );
     },
   );
+
+  harness.check("hosted knowledge: a full-launch-program packet defers later-horizon catalog loads", () => {
+    const bundle = buildHostedKnowledgeBundle(skillRoot);
+    const service = createKnowledgeService(bundle);
+    const workflow = bundle.catalog.workflows.find((entry) => entry.id === "workflow.orchestration.full-launch-program");
+    assert(workflow, "the real catalog must still ship workflow.orchestration.full-launch-program");
+    const brief = service.workflow({ workflowId: workflow.id, brief: true }).dispatchBrief!;
+    const route = service.workflow({ workflowId: workflow.id }).route;
+    assert(brief.load.length < workflow.referenceIds.length, "dispatchBrief must defer at least one real later-horizon binding");
+    assert(
+      brief.load.some((entry) => entry.path.includes("full-launch-program") || /opening, resuming, or closing|at workflow start/i.test(entry.loadWhen)),
+      "program-open guidance must remain current reading",
+    );
+    assert(route.references.length === brief.load.length, "route mode must not dump later-horizon refs as current reading");
+    assert(route.coverage.requiredCount === brief.load.length, "route coverage must count current-task refs only");
+    assert(
+      route.warnings.some((warning) => /later-horizon references remain discoverable/i.test(warning)),
+      "later-horizon refs must stay discoverable without becoming current obligations",
+    );
+  });
 
   harness.check("hosted knowledge: a gated auditor requires independent review outside judgment domains", () => {
     const bundle = fixtureBundle();

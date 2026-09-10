@@ -62,7 +62,7 @@ function main(): number {
   } catch {
     engineVersion = "0.0.0";
   }
-  const receipt = connectionReceipt({ mode: "local_execution", knowledge: "available", engineVersion });
+  const receipt = connectionReceipt({ mode: "local_execution", engineVersion });
   // An npm tarball never carries .git; a source checkout always does. That one fact decides which
   // install advice applies: `npm link` only means something from a checkout, and the portable npx
   // form only resolves once the package is on the registry, which an npm install proves.

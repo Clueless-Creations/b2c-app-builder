@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { CatalogContextPack, CatalogReference, CatalogRole, CatalogWorkflowDef } from "../../catalog/types.js";
 import type { NodeBrief } from "../engine/node-brief.js";
 import { reviewFacet } from "../engine/review-facet.js";
+import { isLaterGuidance } from "../lib/later-guidance.js";
 import {
   DEFAULT_WORKFLOW_BUNDLE_TOKEN_BUDGET,
   HOSTED_KNOWLEDGE_SCHEMA_VERSION,
@@ -476,14 +477,20 @@ export function createKnowledgeService(bundle: HostedKnowledgeBundle): Knowledge
         validators: workflow.gateCommands.map((gate) => `b2c check ${gate.replace(/^check:/, "")} --workspace <registered-workspace> --json`),
       };
     });
-    const incomplete = bundle?.coverage.incomplete ?? workflow.referenceIds.map((id) => ({ referenceId: id, status: "not_requested" as const }));
-    const requiredCount = workflow.referenceIds.length;
+    const laterIds = new Set(workflow.referenceIds.filter((id) => isLaterGuidance(documents.get(id)!.reference.loadWhen)));
+    const currentIds = workflow.referenceIds.filter((id) => !laterIds.has(id));
+    const listedIds = mode === "route" ? currentIds : workflow.referenceIds;
+    const incomplete =
+      mode === "route"
+        ? currentIds.map((id) => ({ referenceId: id, status: "not_requested" as const }))
+        : (bundle?.coverage.incomplete ?? workflow.referenceIds.map((id) => ({ referenceId: id, status: "not_requested" as const })));
+    const requiredCount = mode === "route" ? currentIds.length : workflow.referenceIds.length;
     const requestedInThisResponse = requiredCount - incomplete.filter((entry) => entry.status === "not_requested").length;
     return {
       mode,
       instructionsIncluded: mode !== "route",
       expand: { workflowId: workflow.id, include: "instructions" },
-      references: workflow.referenceIds.map((id) => {
+      references: listedIds.map((id) => {
         const item = documents.get(id)!;
         // Artifact selectors take precedence; never dump a book's entire table of contents.
         const relevant = outputs
@@ -509,6 +516,9 @@ export function createKnowledgeService(bundle: HostedKnowledgeBundle): Knowledge
         incomplete,
       },
       warnings: [
+        ...(mode === "route" && laterIds.size
+          ? [`${String(laterIds.size)} later-horizon references remain discoverable. They are not current reading.`]
+          : []),
         ...(incomplete.length
           ? [
               mode === "route"
@@ -550,7 +560,7 @@ export function createKnowledgeService(bundle: HostedKnowledgeBundle): Knowledge
   function buildDispatchBrief(workflow: CatalogWorkflowDef): NodeBrief {
     const judgment = JUDGMENT_DOMAIN_IDS.includes(workflow.domainId);
     const gateIds = workflow.gateCommands;
-    const load = workflow.referenceIds.map((referenceId) => {
+    const bound = workflow.referenceIds.map((referenceId) => {
       const reference = references.get(referenceId)!;
       return {
         path: reference.path,
@@ -560,7 +570,8 @@ export function createKnowledgeService(bundle: HostedKnowledgeBundle): Knowledge
         ...(reference.revision ? { revision: reference.revision } : {}),
       };
     });
-    const seenPaths = new Set(load.map((entry) => entry.path));
+    const load = bound.filter((entry) => !isLaterGuidance(entry.loadWhen));
+    const seenPaths = new Set(bound.map((entry) => entry.path));
     const role = rolesById.get(workflow.roleId);
     const route = role
       ? role.contextPackIds.flatMap((packId) => {

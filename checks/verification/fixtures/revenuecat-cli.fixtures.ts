@@ -52,7 +52,7 @@ import { CLI_CATALOG_KIND, classifyRevenueCatCliCatalogEvidence, classifyRevenue
 import { issuesFromRevenueCatCliCatalogArtifact } from "../../../adapters/providers/revenuecat/revenue-validation.js";
 import { REVENUECAT_PROVISIONING } from "../../../adapters/providers/revenuecat/provisioning.js";
 import { loadUpstreams } from "../../../kernel/contribution/upstreams-load.js";
-import { UPSTREAM_SDK_PREVIEW_MINIMAL } from "./revenuecat-cli-decode.samples.js";
+import { UPSTREAM_SDK_PREVIEW_MINIMAL, UPSTREAM_SIMULATE_PURCHASE } from "./revenuecat-cli-decode.samples.js";
 import { DESIRED_PREMIUM_MONTHLY, NATIVE_MATCHING_GRAPH } from "./revenuecat-cli-reconcile-plan.samples.js";
 
 const COMMANDS_JSON = JSON.stringify({
@@ -1125,6 +1125,113 @@ export function register(harness: Harness): void {
     assert(result.evidence.test_store?.executed === true, "simulate-purchase may still run");
     assert(result.evidence.test_store?.entitlement_ids.includes("ent_other"), "wrong entitlement must be recorded");
     assert(result.evidence.test_store?.not_native_purchase_proof === true, "must remain non-native");
+  });
+
+  harness.check("revenuecat-cli: Test Store purchase completes from simulate-purchase entitlements when customers.show has none", () => {
+    const { run } = recordingRunner((request) => {
+      if (request.argv[0] === "--version") return ok("revenuecat-cli 0.1.1\n");
+      if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
+      if (isAppsShow(request.argv)) return ok(testStoreAppEnvelope());
+      if (request.argv.includes("simulate-purchase")) {
+        return ok(
+          envelope({
+            ...UPSTREAM_SIMULATE_PURCHASE,
+            app_user_id: "user_synth",
+            product: { ...UPSTREAM_SIMULATE_PURCHASE.product, id: "prod_monthly" },
+          }),
+        );
+      }
+      if (request.argv.includes("customers") && request.argv.includes("show")) {
+        return ok(envelope({ id: "user_synth", object: "customer" }));
+      }
+      return ok(envelope({}));
+    });
+    const result = runRevenueCatCatalogSession(
+      catalogSession(harness, "rc-test-store-purchase-entitlements", run, {
+        intent: "test-store-purchase",
+        hostAuthorityGranted: true,
+        target: selectedTarget({ hostAuthorityGranted: true }),
+        appUserId: "user_synth",
+        productId: "prod_monthly",
+        customerId: "user_synth",
+        expected: {
+          projectId: "proj_approved",
+          appId: "app_test",
+          productIds: ["prod_monthly"],
+          entitlementIds: ["premium"],
+        },
+      }),
+    );
+    assert(result.disposition === "complete", `disposition ${result.disposition}`);
+    assert(result.evidence.test_store?.executed === true, "simulate-purchase must run");
+    assert(result.evidence.test_store?.entitlement_ids.includes("premium"), "purchase lookup keys must be recorded");
+  });
+
+  harness.check("revenuecat-cli: Test Store purchase stays incomplete when expected entitlements are empty", () => {
+    const { run } = recordingRunner((request) => {
+      if (request.argv[0] === "--version") return ok("revenuecat-cli 0.1.1\n");
+      if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
+      if (isAppsShow(request.argv)) return ok(testStoreAppEnvelope());
+      if (request.argv.includes("simulate-purchase")) {
+        return ok(envelope({ app_user_id: "user_synth", product_id: "prod_monthly", active_entitlements: ["premium"] }));
+      }
+      if (request.argv.includes("customers") && request.argv.includes("show")) {
+        return ok(envelope({ id: "user_synth", object: "customer" }));
+      }
+      return ok(envelope({}));
+    });
+    const result = runRevenueCatCatalogSession(
+      catalogSession(harness, "rc-test-store-empty-expected", run, {
+        intent: "test-store-purchase",
+        hostAuthorityGranted: true,
+        target: selectedTarget({ hostAuthorityGranted: true }),
+        appUserId: "user_synth",
+        productId: "prod_monthly",
+        customerId: "user_synth",
+        expected: {
+          projectId: "proj_approved",
+          appId: "app_test",
+          productIds: ["prod_monthly"],
+          entitlementIds: [],
+        },
+      }),
+    );
+    assert(result.disposition === "incomplete", `disposition ${result.disposition}`);
+    assert(result.evidence.test_store?.entitlement_ids.includes("premium"), "observed lookup keys must still be recorded");
+  });
+
+  harness.check("revenuecat-cli: Test Store purchase stays incomplete when expected management id does not match lookup keys", () => {
+    const { run } = recordingRunner((request) => {
+      if (request.argv[0] === "--version") return ok("revenuecat-cli 0.1.1\n");
+      if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
+      if (isAppsShow(request.argv)) return ok(testStoreAppEnvelope());
+      if (request.argv.includes("simulate-purchase")) {
+        return ok(envelope({ app_user_id: "user_synth", product_id: "prod_monthly", active_entitlements: ["premium"] }));
+      }
+      if (request.argv.includes("customers") && request.argv.includes("show")) {
+        return ok(envelope({ id: "user_synth", object: "customer" }));
+      }
+      return ok(envelope({}));
+    });
+    const result = runRevenueCatCatalogSession(
+      catalogSession(harness, "rc-test-store-id-mismatch", run, {
+        intent: "test-store-purchase",
+        hostAuthorityGranted: true,
+        target: selectedTarget({ hostAuthorityGranted: true }),
+        appUserId: "user_synth",
+        productId: "prod_monthly",
+        customerId: "user_synth",
+        expected: {
+          projectId: "proj_approved",
+          appId: "app_test",
+          productIds: ["prod_monthly"],
+          entitlementIds: ["ent_premium"],
+        },
+      }),
+    );
+    assert(result.disposition === "incomplete", `disposition ${result.disposition}`);
+    assert(result.evidence.test_store?.entitlement_ids.includes("premium"), "lookup keys must be recorded");
+    assert(result.evidence.test_store?.entitlement_ids.includes("ent_premium") !== true, "management id must not be invented");
   });
 
   harness.check("revenuecat-cli: paywall inspect does not publish", () => {

@@ -205,29 +205,76 @@ export function extractResourceIds(data: unknown): {
   return { ids, lookupKeys, pagination, itemsPresent: true };
 }
 
+const ENTITLEMENT_MAP_SKIP_KEYS = new Set([
+  "data",
+  "items",
+  "next_page",
+  "object",
+  "request_id",
+  "schemaVersion",
+  "schema_version",
+  "url",
+]);
+
+function uniqueIds(ids: readonly string[]): readonly string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const id of ids) {
+    if (seen.has(id)) continue;
+    seen.add(id);
+    out.push(id);
+  }
+  return out;
+}
+
+function entitlementIdsFromRecordEntry(entry: Record<string, unknown>): string[] {
+  const ids: string[] = [];
+  for (const value of [entry.id, entry.entitlement_id, entry.lookup_key]) {
+    if (isSafeId(value) && !ids.includes(value)) ids.push(value);
+  }
+  return ids;
+}
+
 function entitlementIdsFromUnknown(raw: unknown): string[] {
   if (Array.isArray(raw)) {
     return raw.flatMap((entry) => {
       if (isSafeId(entry)) return [entry];
-      if (isRecord(entry)) {
-        const id = entry.id ?? entry.entitlement_id ?? entry.lookup_key;
-        return isSafeId(id) ? [id] : [];
-      }
+      if (isRecord(entry)) return entitlementIdsFromRecordEntry(entry);
       return [];
     });
   }
-  if (isRecord(raw)) return Object.keys(raw).filter((key) => isSafeId(key));
-  return [];
+  if (!isRecord(raw)) return [];
+  if (Array.isArray(raw.items)) return entitlementIdsFromUnknown(raw.items);
+  if (Array.isArray(raw.data)) return entitlementIdsFromUnknown(raw.data);
+  return Object.keys(raw).filter((key) => isSafeId(key) && !ENTITLEMENT_MAP_SKIP_KEYS.has(key));
+}
+
+function collectEntitlementIdsFromRoot(root: Record<string, unknown>): string[] {
+  const collected = [
+    ...entitlementIdsFromUnknown(root.active_entitlements),
+    ...entitlementIdsFromUnknown(root.entitlements),
+    ...entitlementIdsFromUnknown(root.entitlement_ids),
+  ];
+  const customerInfo = isRecord(root.customer_info) ? root.customer_info : undefined;
+  if (customerInfo) collected.push(...entitlementIdsFromUnknown(customerInfo.entitlements));
+  const subscriber = customerInfo && isRecord(customerInfo.subscriber)
+    ? customerInfo.subscriber
+    : isRecord(root.subscriber)
+      ? root.subscriber
+      : undefined;
+  if (subscriber) collected.push(...entitlementIdsFromUnknown(subscriber.entitlements));
+  return collected;
 }
 
 export function extractEntitlementIds(data: unknown): readonly string[] {
   if (!isRecord(data)) return [];
-  const fromActive = entitlementIdsFromUnknown(data.active_entitlements ?? data.entitlements ?? data.entitlement_ids);
-  if (fromActive.length > 0) return fromActive;
-  const customerInfo = isRecord(data.customer_info) ? data.customer_info : undefined;
-  const subscriber = customerInfo && isRecord(customerInfo.subscriber) ? customerInfo.subscriber : isRecord(data.subscriber) ? data.subscriber : undefined;
-  if (subscriber && "entitlements" in subscriber) return entitlementIdsFromUnknown(subscriber.entitlements);
-  return [];
+  const nestedCustomer = isRecord(data.customer) ? data.customer : undefined;
+  const nestedData = isRecord(data.data) ? data.data : undefined;
+  return uniqueIds([
+    ...collectEntitlementIdsFromRoot(data),
+    ...(nestedCustomer ? collectEntitlementIdsFromRoot(nestedCustomer) : []),
+    ...(nestedData ? collectEntitlementIdsFromRoot(nestedData) : []),
+  ]);
 }
 
 function mapLookupKey(lookupKey: string | null, records: readonly RevenueCatLookupRecord[] | undefined): {

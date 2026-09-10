@@ -6,6 +6,7 @@
  * and recover dispatched-but-unconfirmed writes from the RevenueCat CLI ledger in
  * a new process. Decode is owned by cli-decode.ts (`decodeRevenueCatCliResponse`).
  * Persistence owner is RevenueCatCliLedger (not a second kernel journal).
+ * Cross-process exclusive claim serializes bind+persist+spawn for one key.
  * Coordinate #106 for the same persist-before-effect / resume-observation
  * contract; do not extract a generic scheduler.
  */
@@ -38,8 +39,11 @@ import {
   buildRevenueCatCliBinding,
   extractRevenueCatCliRemoteId,
   jsonFromWriteSnapshot,
+  releaseRevenueCatCliClaim,
+  revenueCatCliClaimPath,
   revenueCatCliLedgerPath,
   snapshotWriteJson,
+  tryAcquireRevenueCatCliClaim,
 } from "./cli-ledger.js";
 import type {
   CliEffectProgress,
@@ -51,6 +55,7 @@ import type {
 } from "./cli-ledger.js";
 
 export {
+  classifyRevenueCatAppStoreKind,
   extractEntitlementIds,
   extractResourceIds,
   interpretOfferingPreview,
@@ -295,10 +300,30 @@ export function runRevenueCatCli(input: RevenueCatCliRunRequest): RevenueCatCliR
   const binding = durable ? buildRevenueCatCliBinding(input) : undefined;
   const expected = decodeExpected(input);
   let leased = false;
+  let claimed = false;
+  const claimPath =
+    durable && input.idempotencyKey ? revenueCatCliClaimPath(revenueCatCliLedgerFile(input), input.idempotencyKey) : undefined;
 
   try {
-    if (durable && input.ledger && input.idempotencyKey && binding) {
+    if (durable && input.ledger && input.idempotencyKey && binding && claimPath) {
       try {
+        const claim = tryAcquireRevenueCatCliClaim(claimPath, input.idempotencyKey);
+        if (!claim.ok) {
+          return {
+            invoked: false,
+            preflight: holdUncertain(
+              "Another process holds the RevenueCat CLI dispatch claim for this request. Holding mutation-uncertain. Absence of a local completion receipt is not permission to start a second write.",
+            ),
+            operation,
+            argv,
+            collector: CLI_PROOF_COLLECTOR,
+            uncertainMutation: true,
+            replaySafe: false,
+            nextAction: "hold-uncertain",
+            effectProgress: "dispatched-unconfirmed",
+          };
+        }
+        claimed = true;
         hydrateRevenueCatCliLedger(input);
         const prior = input.ledger.reconcile(input.idempotencyKey, binding);
         switch (prior.action) {
@@ -426,5 +451,6 @@ export function runRevenueCatCli(input: RevenueCatCliRunRequest): RevenueCatCliR
     };
   } finally {
     if (leased && input.idempotencyKey) input.ledger?.release(input.idempotencyKey);
+    if (claimed && claimPath) releaseRevenueCatCliClaim(claimPath);
   }
 }

@@ -129,7 +129,7 @@ export function classifyRevenueCatCliCatalogEvidence(value: unknown): {
       message: "CLI catalog evidence must declare it is not native Apple/Play or in-app purchase proof.",
     };
   }
-  if (record.live === true) {
+  if (record.live === true && record.synthetic !== false) {
     return { ok: false, refusal: "synthetic-labeled-live", message: "Fixture CLI catalog evidence cannot be labeled live." };
   }
   const preview = record.preview && typeof record.preview === "object" ? (record.preview as Record<string, unknown>) : undefined;

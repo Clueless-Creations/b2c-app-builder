@@ -1,5 +1,6 @@
 import { assert, type Harness } from "./_harness.js";
 import {
+  classifyRevenueCatAppStoreKind,
   decodeRevenueCatCliResponse,
   extractResourceIds,
   interpretOfferingPreview,
@@ -241,6 +242,21 @@ export function register(harness: Harness): void {
       status: 0,
     });
     assert(excluded.observation.kind === "invalid", JSON.stringify(excluded.observation));
+  });
+
+  harness.check("revenuecat-cli-decode: apps show type is Test Store only when CLI-read as test_store", () => {
+    assert(classifyRevenueCatAppStoreKind({ id: "app_test", object: "app", type: "test_store" }) === "test-store", "test_store");
+    assert(classifyRevenueCatAppStoreKind({ id: "app_ios", object: "app", type: "app_store" }) === "app-store", "app_store");
+    assert(classifyRevenueCatAppStoreKind({ id: "app_play", object: "app", type: "play_store" }) === "play-store", "play_store");
+    assert(classifyRevenueCatAppStoreKind({ id: "app_web", object: "app", type: "stripe" }) === "web-billing", "stripe");
+    assert(classifyRevenueCatAppStoreKind({ id: "app_x" }) === "unresolved", "missing type");
+    const decoded = decodeRevenueCatCliResponse({
+      operationId: "rc.apps.show",
+      stdout: wrapPinnedCliEnvelope({ id: "app_test", object: "app", type: "test_store" }),
+      stderr: "",
+      status: 0,
+    });
+    assert(decoded.observation.kind === "resource" && decoded.observation.storeKind === "test-store", JSON.stringify(decoded.observation));
   });
 }
 

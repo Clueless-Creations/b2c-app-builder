@@ -119,6 +119,14 @@ function envelope(data: unknown): string {
   return JSON.stringify({ data, schema_version: "1" });
 }
 
+function isAppsShow(argv: readonly string[]): boolean {
+  return argv.includes("apps") && argv.includes("show");
+}
+
+function testStoreAppEnvelope(id = "app_test"): string {
+  return envelope({ id, object: "app", type: "test_store" });
+}
+
 function listEnvelope(items: readonly unknown[], nextPage: string | null = null): string {
   return envelope({ object: "list", items, next_page: nextPage });
 }
@@ -962,6 +970,7 @@ export function register(harness: Harness): void {
     assert(result.disposition === "complete", `disposition ${result.disposition}`);
     assert(result.evidence.catalog.project_ids.includes("proj_approved"), "approved project must be present");
     assert(result.evidence.catalog.app_ids.includes("app_test"), "approved app must be present");
+    assert(result.evidence.observed_store_kind === "test-store", `observed ${result.evidence.observed_store_kind}`);
     assert(result.invoked.every((step) => !step.argv.includes("create")), "inspect must not create a project");
   });
 
@@ -1024,6 +1033,7 @@ export function register(harness: Harness): void {
     const { run } = recordingRunner((request) => {
       if (request.argv[0] === "--version") return ok("revenuecat-cli 0.1.1\n");
       if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
+      if (isAppsShow(request.argv)) return ok(testStoreAppEnvelope());
       if (request.argv.includes("simulate-purchase")) return ok(envelope({ app_user_id: "user_synth", product_id: "prod_monthly" }));
       if (request.argv.includes("customers") && request.argv.includes("show")) {
         return ok(envelope({ id: "user_synth", active_entitlements: [{ id: "ent_premium" }] }));
@@ -1049,10 +1059,52 @@ export function register(harness: Harness): void {
     assert(classified.ok, JSON.stringify(classified));
   });
 
+  harness.check("revenuecat-cli: Test Store purchase is refused when apps show is App Store", () => {
+    const { run, calls } = recordingRunner((request) => {
+      if (request.argv[0] === "--version") return ok("revenuecat-cli 0.1.1\n");
+      if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
+      if (isAppsShow(request.argv)) return ok(envelope({ id: "app_test", object: "app", type: "app_store" }));
+      if (request.argv.includes("simulate-purchase")) return ok(envelope({ app_user_id: "user_synth", product_id: "prod_monthly" }));
+      return ok(envelope({}));
+    });
+    const result = runRevenueCatCatalogSession(
+      catalogSession(harness, "rc-test-store-app-store", run, {
+        intent: "test-store-purchase",
+        hostAuthorityGranted: true,
+        target: selectedTarget({ hostAuthorityGranted: true }),
+        appUserId: "user_synth",
+        productId: "prod_monthly",
+        customerId: "user_synth",
+      }),
+    );
+    assert(result.disposition === "refused", `disposition ${result.disposition}`);
+    assert(result.hold?.code === "production-test-store-refused", `hold ${result.hold?.code}`);
+    assert(result.evidence.observed_store_kind === "app-store", `observed ${result.evidence.observed_store_kind}`);
+    assert(
+      calls.every((call) => !call.argv.includes("simulate-purchase")),
+      "App Store readback must not spawn simulate-purchase",
+    );
+  });
+
+  harness.check("revenuecat-cli: live non-synthetic catalog evidence is accepted", () => {
+    const liveDoc = {
+      collector: CLI_PROOF_COLLECTOR,
+      kind: CLI_CATALOG_KIND,
+      synthetic: false,
+      live: true,
+      not_native_purchase_proof: true,
+    };
+    const classified = classifyRevenueCatCliCatalogEvidence(liveDoc);
+    assert(classified.ok, JSON.stringify(classified));
+    const syntheticLive = classifyRevenueCatCliCatalogEvidence({ ...liveDoc, synthetic: true });
+    assert(syntheticLive.ok === false && syntheticLive.refusal === "synthetic-labeled-live", JSON.stringify(syntheticLive));
+  });
+
   harness.check("revenuecat-cli: Test Store readback with a different entitlement is incomplete", () => {
     const { run } = recordingRunner((request) => {
       if (request.argv[0] === "--version") return ok("revenuecat-cli 0.1.1\n");
       if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
+      if (isAppsShow(request.argv)) return ok(testStoreAppEnvelope());
       if (request.argv.includes("simulate-purchase")) return ok(envelope({ app_user_id: "user_synth", product_id: "prod_monthly" }));
       if (request.argv.includes("customers") && request.argv.includes("show")) {
         return ok(envelope({ id: "user_synth", active_entitlements: [{ id: "ent_other" }] }));

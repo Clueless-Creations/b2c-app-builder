@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { type Harness, skillRoot } from "./_harness.js";
 
@@ -344,6 +344,34 @@ export function register(harness: Harness): void {
     "skill version fails when a present client trails the source pin",
     "check-skill-version.ts",
     ["--source", skillRoot, "--installed", skillRoot, "--all-runtimes", "--runtimes-root", behindHome],
+    1,
+    "skill_version.runtime_behind_pin",
+  );
+
+  const symlinkHome = makeEmptyFixture("runtime-pins-source-symlink");
+  for (const id of ["codex", "claude", "agents", "cursor"] as const) {
+    const dest = path.join(symlinkHome, `.${id}`, "skills");
+    mkdirSync(dest, { recursive: true });
+    symlinkSync(skillRoot, path.join(dest, "b2c-app-builder"));
+  }
+  runScriptArgs(
+    "skill version treats a client runtime that resolves to this checkout as the pin",
+    "check-skill-version.ts",
+    ["--source", skillRoot, "--installed", skillRoot, "--all-runtimes", "--runtimes-root", symlinkHome],
+    0,
+  );
+
+  const mixedHome = makeEmptyFixture("runtime-pins-symlink-and-stale-copy");
+  const mixedCursor = path.join(mixedHome, ".cursor", "skills");
+  mkdirSync(mixedCursor, { recursive: true });
+  symlinkSync(skillRoot, path.join(mixedCursor, "b2c-app-builder"));
+  const mixedCodex = path.join(mixedHome, ".codex", "skills", "b2c-app-builder");
+  mkdirSync(mixedCodex, { recursive: true });
+  writeFileSync(path.join(mixedCodex, "skill-version.json"), `${JSON.stringify({ skill: "b2c-app-builder", version: "0.1.0" }, null, 2)}\n`);
+  runScriptArgs(
+    "skill version still fails a genuine stale copy when a sibling runtime is a symlink to this checkout",
+    "check-skill-version.ts",
+    ["--source", skillRoot, "--installed", skillRoot, "--all-runtimes", "--runtimes-root", mixedHome],
     1,
     "skill_version.runtime_behind_pin",
   );

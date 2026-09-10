@@ -527,6 +527,62 @@ export function register(h: Harness): void {
     "package_parity.launchbench_validator_unparseable",
   );
 
+  const templateFiles = [
+    ["surfaces/workspace-template/repo-agent-entrypoints/AGENTS.md", "# agents\n"],
+    ["surfaces/workspace-template/repo-agent-entrypoints/CLAUDE.md", "# claude\n"],
+    ["surfaces/workspace-template/repo-agent-entrypoints/.cursor/rules/agents.mdc", "# cursor\n"],
+    ["surfaces/workspace-template/repo-agent-entrypoints/.claude/settings.json", "{}\n"],
+  ] as const;
+  const writeTemplateEntrypoints = (repoRoot: string): void => {
+    for (const [relative, body] of templateFiles) {
+      mkdirSync(path.join(repoRoot, path.dirname(relative)), { recursive: true });
+      writeFileSync(path.join(repoRoot, relative), body, "utf8");
+    }
+  };
+
+  const trackedClean = makeEmptyFixture("package-parity-template-tracked");
+  const trackedCleanPair = writeParityPair(trackedClean, { rootVersion: "0.0.1", skillVersion: "0.0.1" });
+  writeTemplateEntrypoints(trackedCleanPair.repoRoot);
+  git(trackedCleanPair.repoRoot, ["init", "-q"]);
+  git(trackedCleanPair.repoRoot, ["config", "user.email", "fixture@example.test"]);
+  git(trackedCleanPair.repoRoot, ["config", "user.name", "Fixture"]);
+  git(trackedCleanPair.repoRoot, ["add", "-A"]);
+  git(trackedCleanPair.repoRoot, ["add", "-f", "surfaces/workspace-template/repo-agent-entrypoints/.claude/settings.json"]);
+  git(trackedCleanPair.repoRoot, ["commit", "-qm", "tracked templates"]);
+  runScriptArgs(
+    "package parity passes when every workspace-template entrypoint is tracked",
+    "check-package-parity.ts",
+    ["--repo-root", trackedCleanPair.repoRoot, "--skill-root", trackedCleanPair.parityScriptRoot],
+    0,
+  );
+
+  const untrackedSettings = makeEmptyFixture("package-parity-template-untracked");
+  const untrackedPair = writeParityPair(untrackedSettings, { rootVersion: "0.0.1", skillVersion: "0.0.1" });
+  writeTemplateEntrypoints(untrackedPair.repoRoot);
+  git(untrackedPair.repoRoot, ["init", "-q"]);
+  git(untrackedPair.repoRoot, ["config", "user.email", "fixture@example.test"]);
+  git(untrackedPair.repoRoot, ["config", "user.name", "Fixture"]);
+  git(untrackedPair.repoRoot, [
+    "add",
+    "-f",
+    "package.json",
+    "package-lock.json",
+    ".nvmrc",
+    ".node-version",
+    "skill",
+    "surfaces/workspace-template/repo-agent-entrypoints/AGENTS.md",
+    "surfaces/workspace-template/repo-agent-entrypoints/CLAUDE.md",
+    "surfaces/workspace-template/repo-agent-entrypoints/.cursor/rules/agents.mdc",
+  ]);
+  git(untrackedPair.repoRoot, ["commit", "-qm", "missing claude settings"]);
+  runScriptArgs(
+    "package parity names a workspace-template entrypoint that is on disk but not tracked",
+    "check-package-parity.ts",
+    ["--repo-root", untrackedPair.repoRoot, "--skill-root", untrackedPair.parityScriptRoot],
+    1,
+    "package_parity.template_untracked",
+  );
+
   // --- audit-skill-links ---
   const wireLinkRoot = (root: string): void => {
     mkdirSync(path.join(root, "knowledge"), { recursive: true });
@@ -2378,6 +2434,6 @@ export function register(h: Harness): void {
 }
 
 function git(root: string, args: string[]): void {
-  const result = spawnSync("git", ["-C", root, ...args], { encoding: "utf8" });
+  const result = spawnSync("git", ["-C", root, "-c", "core.excludesfile=", ...args], { encoding: "utf8" });
   if (result.status !== 0) throw new Error(`Git fixture setup failed: ${result.stderr}`);
 }

@@ -25,6 +25,16 @@ interface Args {
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const defaultSkillRoot = path.resolve(scriptDir, "../../..");
 const defaultRepoRoot = defaultSkillRoot;
+
+/** Workspace-template entrypoints the installer copies. Must be tracked, not merely on disk. */
+const TRACKED_TEMPLATE_ENTRYPOINTS = [
+  "surfaces/workspace-template/repo-agent-entrypoints/.cursor/rules/agents.mdc",
+  "surfaces/workspace-template/repo-agent-entrypoints/AGENTS.md",
+  "surfaces/workspace-template/repo-agent-entrypoints/CLAUDE.md",
+  // A global `.claude/` ignore dropped this at the public cutover. git ls-files, not the
+  // filesystem, is the authority — a local-only restore still fails.
+  "surfaces/workspace-template/repo-agent-entrypoints/.claude/settings.json",
+] as const;
 const args = parseArgs(process.argv.slice(2));
 const issues: Issue[] = [];
 
@@ -98,6 +108,7 @@ if (rootPackage.value && runtimePackage.value) {
 }
 
 if (runtimePackage.value) checkPackStandalone(runtimePackage.value);
+checkTrackedTemplateEntrypoints(args.repoRoot);
 
 issues.push(...rootPackage.issues, ...rootLock.issues, ...skillVersion.issues);
 reportAndExit("Package parity check", issues);
@@ -191,13 +202,7 @@ function checkPackStandalone(runtimePkg: PackageJson): void {
     "surfaces/workspace-template/new-business/PRODUCT.md",
     "surfaces/workspace-template/new-business/DESIGN.md",
     "surfaces/workspace-template/new-business/strategy/RESEARCH.md",
-    "surfaces/workspace-template/repo-agent-entrypoints/.cursor/rules/agents.mdc",
-    "surfaces/workspace-template/repo-agent-entrypoints/AGENTS.md",
-    "surfaces/workspace-template/repo-agent-entrypoints/CLAUDE.md",
-    // A global `.claude/` ignore rule dropped this file at the public cutover, and every fresh
-    // clone then failed workspace bootstrap. The pack sees the disk, so a checkout that lacks it
-    // fails here before it fails a consumer.
-    "surfaces/workspace-template/repo-agent-entrypoints/.claude/settings.json",
+    ...TRACKED_TEMPLATE_ENTRYPOINTS,
   ];
   const packedSet = new Set(packed);
   for (const file of required) {
@@ -242,6 +247,38 @@ function checkPackStandalone(runtimePkg: PackageJson): void {
   }
   if (packedSet.has("design-room.html")) {
     issues.push(issue("error", "package_parity.pack_dev_leak", "npm pack would ship design-room.html — tighten the files manifest.", "package.json"));
+  }
+}
+
+function checkTrackedTemplateEntrypoints(repoRoot: string): void {
+  if (!existsSync(path.join(repoRoot, ".git"))) return;
+  const listed = spawnSync("git", ["-C", repoRoot, "ls-files", "-z", "--", ...TRACKED_TEMPLATE_ENTRYPOINTS], {
+    encoding: "utf8",
+    timeout: 30_000,
+  });
+  if (listed.status !== 0) {
+    issues.push(
+      issue(
+        "error",
+        "package_parity.template_track_failed",
+        `git ls-files could not read the tracked workspace-template entrypoints: ${listed.stderr.trim() || "unknown error"}.`,
+        "surfaces/workspace-template/repo-agent-entrypoints",
+      ),
+    );
+    return;
+  }
+  const tracked = new Set(listed.stdout.split("\0").filter(Boolean));
+  for (const file of TRACKED_TEMPLATE_ENTRYPOINTS) {
+    if (!tracked.has(file)) {
+      issues.push(
+        issue(
+          "error",
+          "package_parity.template_untracked",
+          `${file} is not in the tracked tree. A global ignore can drop it from a fresh git add; git ls-files must list every workspace-template entrypoint the installer expects.`,
+          file,
+        ),
+      );
+    }
   }
 }
 

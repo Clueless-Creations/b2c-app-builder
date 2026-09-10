@@ -148,9 +148,27 @@ export function register(harness: Harness): void {
       platform: "ios",
       action: "purchase",
       client: "development-build",
-      claimNativeStoreProof: true,
     });
-    assert(fakeNativeClaim.action === "refuse", "fake transport cannot certify sandbox proof");
+    assert(fakeNativeClaim.action === "refuse" && fakeNativeClaim.code === "proof-scope-is-not-native-store", "fake transport cannot carry apple-sandbox");
+    assert(fakeNativeClaim.proofScope === "browser-mock", "fake IAP must not echo apple-sandbox");
+
+    const fakePlay = classifyPurchaseOperation({
+      transport: "fake-in-app",
+      proofScope: "play-sandbox",
+      platform: "android",
+      action: "purchase",
+      client: "development-build",
+    });
+    assert(fakePlay.proofScope === "browser-mock" && fakePlay.action === "refuse", "fake IAP must not echo play-sandbox");
+
+    const fakeProduction = classifyPurchaseOperation({
+      transport: "fake-in-app",
+      proofScope: "production",
+      platform: "ios",
+      action: "purchase",
+      client: "release-build",
+    });
+    assert(fakeProduction.proofScope === "browser-mock" && fakeProduction.action === "refuse", "fake IAP must not echo production");
 
     const allowed = classifyPurchaseOperation({
       transport: "fake-in-app",
@@ -213,6 +231,13 @@ export function register(harness: Harness): void {
       CANARIES,
     );
     assert(publicOnly.action === "pass" && publicOnly.leaks.length === 0, "EXPO_PUBLIC_ values may appear in the client bundle");
+
+    const unknown = scanClientArtifacts(
+      [{ path: "dist/_expo/static/js/web/index.js", contents: "const k = 'CANARY_MY_PROVIDER_SECRET_NOT_A_SECRET';" }],
+      [{ name: "MY_PROVIDER_SECRET", value: "CANARY_MY_PROVIDER_SECRET_NOT_A_SECRET" }],
+    );
+    assert(unknown.action === "refuse" && unknown.code === "secret-in-client-bundle", "unknown non-EXPO_PUBLIC canaries must refuse");
+    assert(unknown.leaks.some((leak) => leak.name === "MY_PROVIDER_SECRET" && leak.secretClass === "unknown"), "unknown canary must be reported");
   });
 
   harness.check("expo capabilities: SQLite is not a backend, SecureStore is not web storage, client routes are not authorization", () => {
@@ -296,10 +321,19 @@ export function register(harness: Harness): void {
     assert(staticSsr.action === "refuse" && staticSsr.code === "static-plus-ssr", "static cannot satisfy SSR");
 
     const ssr = decideExpoWebSurface({ compositionTarget: webTarget, requestedMode: "alpha-ssr" });
-    assert(ssr.action === "refuse" && ssr.code === "ssr-not-selected", "SSR stays unselected");
+    assert(ssr.action === "refuse" && ssr.code === "ssr-not-local-static", "SSR is not local/static");
+
+    const ssrSelected = decideExpoWebSurface({ compositionTarget: webTarget, requestedMode: "alpha-ssr", ssrSelected: true });
+    assert(ssrSelected.action === "refuse" && ssrSelected.code === "ssr-not-local-static", "selected SSR is still not local/static");
 
     const deploy = decideExpoWebSurface({ compositionTarget: webTarget, unstableDeployServer: true });
     assert(deploy.action === "refuse" && deploy.code === "unstable-deploy-server-unauthorized", "deploy-server needs authority");
+
+    const authorizedDeploy = decideExpoWebSurface({ compositionTarget: webTarget, unstableDeployServer: true, deployAuthorized: true });
+    assert(
+      authorizedDeploy.action === "refuse" && authorizedDeploy.code === "unstable-deploy-server-not-local-static",
+      "authorized deploy-server is still not local/static",
+    );
 
     const hosting = decideExpoWebSurface({ compositionTarget: webTarget, easHostingRequested: true });
     assert(hosting.action === "refuse" && hosting.code === "eas-hosting-not-authorized", "EAS Hosting stays a hold");

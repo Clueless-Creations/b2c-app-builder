@@ -51,6 +51,8 @@ export type ExpoWebRefusalCode =
   | "eas-hosting-not-authorized"
   | "production-host-not-authorized"
   | "server-output-not-local-static"
+  | "ssr-not-local-static"
+  | "unstable-deploy-server-not-local-static"
   | "operation-blocked";
 
 export interface ExpoWebSurfaceDecision {
@@ -153,14 +155,27 @@ export function decideExpoWebSurface(input: {
     };
   }
 
-  if (input.unstableDeployServer && !input.deployAuthorized) {
+  if (requested === "alpha-ssr") {
     return {
       action: "refuse",
       mode: requested,
       defaultedToStatic,
       ...blocked,
-      code: "unstable-deploy-server-unauthorized",
-      reason: "EXPO_UNSTABLE_DEPLOY_SERVER=1 is a remote deploy effect. Refuse it without explicit authority.",
+      code: "ssr-not-local-static",
+      reason: "Expo Router SSR is alpha and needs a deployed server. It is not local/static remaining work.",
+    };
+  }
+
+  if (input.unstableDeployServer) {
+    return {
+      action: "refuse",
+      mode: requested,
+      defaultedToStatic,
+      ...blocked,
+      code: input.deployAuthorized ? "unstable-deploy-server-not-local-static" : "unstable-deploy-server-unauthorized",
+      reason: input.deployAuthorized
+        ? "EXPO_UNSTABLE_DEPLOY_SERVER=1 is a remote EAS Hosting deploy during native build. It is not a local export."
+        : "EXPO_UNSTABLE_DEPLOY_SERVER=1 is a remote deploy effect. Refuse it without explicit authority.",
     };
   }
 
@@ -175,14 +190,14 @@ export function decideExpoWebSurface(input: {
     };
   }
 
-  if ((requested === "alpha-ssr" || input.ssrRequired) && !input.ssrSelected) {
+  if (input.ssrRequired) {
     return {
       action: "refuse",
       mode: requested,
       defaultedToStatic,
       ...blocked,
-      code: "ssr-not-selected",
-      reason: "Expo Router server rendering stays explicit alpha. It is not selected by default.",
+      code: "ssr-not-local-static",
+      reason: "A required SSR surface needs a deployed server. It is not local/static remaining work.",
     };
   }
 

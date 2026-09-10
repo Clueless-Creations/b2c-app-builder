@@ -142,7 +142,7 @@ export interface SecretCanary {
 export interface ClientSecretLeak {
   path: string;
   name: string;
-  secretClass: Exclude<ExpoSecretClass, "expo-public-client">;
+  secretClass: Exclude<ExpoSecretClass, "expo-public-client"> | "unknown";
 }
 
 export interface ClientSecretScan {
@@ -203,9 +203,11 @@ export function classifyPurchaseOperation(input: {
   client: ExpoRuntimeClient;
   claimNativeStoreProof?: boolean;
 }): ExpoPurchaseClassification {
+  const reportedScope: ExpoCapabilityProofScope =
+    input.transport === "fake-in-app" && proofScopeIsNativeStore(input.proofScope) ? "browser-mock" : input.proofScope;
   const base = {
     transport: input.transport,
-    proofScope: input.proofScope,
+    proofScope: reportedScope,
     labeledLive: false as const,
   };
   if (input.transport === "live-store") {
@@ -248,6 +250,16 @@ export function classifyPurchaseOperation(input: {
       liveStoreMutation: false,
       nativeStoreProof: false,
       reason: "react-native-purchases needs a development or release build. Expo Go cannot load that native module.",
+    };
+  }
+  if (input.transport === "fake-in-app" && proofScopeIsNativeStore(input.proofScope)) {
+    return {
+      ...base,
+      action: "refuse",
+      code: "proof-scope-is-not-native-store",
+      liveStoreMutation: false,
+      nativeStoreProof: false,
+      reason: "A fake in-app transport cannot carry Apple sandbox, Play sandbox, or production proofScope.",
     };
   }
   if (input.claimNativeStoreProof && !proofScopeIsNativeStore(input.proofScope)) {
@@ -342,29 +354,12 @@ export function classifyEnvName(name: string): ExpoSecretClass | "unknown" {
   }
 }
 
-function isNonPublicSecretClass(value: ExpoSecretClass | "unknown"): value is Exclude<ExpoSecretClass, "expo-public-client"> {
-  switch (value) {
-    case "management-key":
-    case "signing-secret":
-    case "refresh-token":
-    case "ai-provider-key":
-      return true;
-    case "expo-public-client":
-    case "unknown":
-      return false;
-    default: {
-      const exhaustive: never = value;
-      throw new Error(`unhandled secret class: ${String(exhaustive)}`);
-    }
-  }
-}
-
 export function scanClientArtifacts(artifacts: readonly ClientArtifact[], canaries: readonly SecretCanary[]): ClientSecretScan {
   const leaks: ClientSecretLeak[] = [];
   for (const artifact of artifacts) {
     for (const canary of canaries) {
       const secretClass = classifyEnvName(canary.name);
-      if (!isNonPublicSecretClass(secretClass)) continue;
+      if (secretClass === "expo-public-client") continue;
       if (!artifact.contents.includes(canary.value)) continue;
       leaks.push({ path: artifact.path, name: canary.name, secretClass });
     }

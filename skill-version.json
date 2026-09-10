@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.79",
+  "version": "0.219.80",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Record semantic=checked from accepted workspace review, not from packet shape-pass.",
-    "Keep runtime unknown unless an explicit workspace observation is supplied."
+    "Defer paid-tool-routing and other operator or security procedures from the program packet until that action is current.",
+    "Keep those books current on the owning specialist workflows; always and at-workflow-start phrases no longer override program-foreign deferral."
   ]
 }

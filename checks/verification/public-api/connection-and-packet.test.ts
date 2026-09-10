@@ -182,6 +182,57 @@ test("worker packet keeps current-task guidance and accounts deferred later load
     ),
     true,
   );
+  const paidToolRoutingWhen =
+    "at workflow start for the one tool-intake question, before using or replacing any paid/account-gated tool, before running a free fallback, or when a service is missing from the runtime";
+  assert.equal(
+    isLaterGuidance(paidToolRoutingWhen, { workflowId: "workflow.orchestration.full-launch-program" }, {
+      path: "knowledge/operations/paid-tool-routing.md",
+      referenceId: "reference.operations.paid-tool-routing",
+    }),
+    true,
+    "program packets must not load the operator tool-intake book because its loadWhen says at workflow start",
+  );
+  assert.equal(
+    isLaterGuidance(paidToolRoutingWhen, { workflowId: "workflow.operations.paid-tool-routing-and-fallback" }, {
+      path: "knowledge/operations/paid-tool-routing.md",
+      referenceId: "reference.operations.paid-tool-routing",
+    }),
+    false,
+    "paid-tool-routing stays current on its own action",
+  );
+  assert.equal(
+    isLaterGuidance(
+      "always for dispatched business workers; especially every broad launch start, account/social/Doppler bootstrap, founder uncertainty, or attempted checklist handoff",
+      { workflowId: "workflow.orchestration.full-launch-program" },
+      { path: "knowledge/operations/founder-zero-operator.md", referenceId: "reference.operations.founder-zero-operator" },
+    ),
+    true,
+    "always does not keep founder-zero-operator current on a program packet",
+  );
+  assert.equal(
+    isLaterGuidance(
+      "always for dispatched business workers; especially every broad launch start, account/social/Doppler bootstrap, founder uncertainty, or attempted checklist handoff",
+      { workflowId: "workflow.operations.founder-zero-operator-bootstrap" },
+      { path: "knowledge/operations/founder-zero-operator.md", referenceId: "reference.operations.founder-zero-operator" },
+    ),
+    false,
+  );
+  assert.equal(
+    isLaterGuidance(
+      "before threat modeling, hardening, scans, or any security-readiness claim",
+      { workflowId: "workflow.orchestration.full-launch-program" },
+      { path: "knowledge/trust/security-release-hardening.md", referenceId: "reference.trust.security-release-hardening" },
+    ),
+    true,
+  );
+  assert.equal(
+    isLaterGuidance(
+      "before threat modeling, hardening, scans, or any security-readiness claim",
+      { workflowId: "workflow.trust.security-architecture-and-release-gate" },
+      { path: "knowledge/trust/security-release-hardening.md", referenceId: "reference.trust.security-release-hardening" },
+    ),
+    false,
+  );
   const brief = projectReadyBrief(
     readyBrief({
       consult: ["operations/FOUNDER_BRIEF.md"],
@@ -274,7 +325,7 @@ function catalogProjection(workflowId: string) {
   const refs = new Map(catalog.references.map((entry) => [entry.id, entry]));
   const load = workflow.referenceIds.map((id) => {
     const reference = refs.get(id)!;
-    return { path: reference.path, title: reference.title, loadWhen: reference.loadWhen };
+    return { path: reference.path, title: reference.title, loadWhen: reference.loadWhen, referenceId: id };
   });
   return { workflow, load, projected: projectReadyBrief(readyBrief({ workflowId: workflow.id, title: workflow.title, instructions: workflow.instructions, approvals: [...workflow.founderOnlyActions], load })) };
 }
@@ -283,6 +334,10 @@ test("full-launch-program packet defers real catalog later-horizon loads", () =>
   const { workflow, load, projected } = catalogProjection("workflow.orchestration.full-launch-program");
   assert(projected.context && projected.context.deferredLoadCount > 0, "a real full-launch-program packet must defer later-horizon catalog loadWhen");
   assert(projected.load.some((entry) => /full-launch-program/.test(entry.path)), "program-open guidance must remain current");
+  assert(
+    !projected.load.some((entry) => /paid-tool-routing|security-release-hardening|doppler-organization|founder-zero-operator|secrets-management/.test(entry.path)),
+    "operator and security procedures must not be current reading on the program packet",
+  );
   assert.equal(projected.effectBoundary, "read_and_produce");
   const prompt = buildWorkerPrompt(
     readyBrief({
@@ -329,7 +384,21 @@ test("specialist workflows keep their own current books that a program packet de
   }
 
   const program = catalogProjection("workflow.orchestration.full-launch-program");
-  assert(!program.projected.load.some((entry) => /design-evidence-stack|mobile-flow-craft|accessibility-readiness/.test(entry.path)));
+  assert(!program.projected.load.some((entry) => /design-evidence-stack|mobile-flow-craft|accessibility-readiness|paid-tool-routing/.test(entry.path)));
+
+  const paidTools = catalogProjection("workflow.operations.paid-tool-routing-and-fallback");
+  assert(paidTools.projected.load.some((entry) => /paid-tool-routing/.test(entry.path)), "paid-tool-routing-and-fallback dropped its operator book");
+  assert.equal(paidTools.projected.context?.deferredLoadCount, 0);
+
+  const secrets = catalogProjection("workflow.operations.secrets-baseline-and-routing");
+  assert(secrets.projected.load.some((entry) => /doppler-organization/.test(entry.path)), "secrets-baseline-and-routing dropped doppler-organization");
+  assert(secrets.projected.load.some((entry) => /secrets-management/.test(entry.path)), "secrets-baseline-and-routing dropped secrets-management");
+
+  const security = catalogProjection("workflow.trust.security-architecture-and-release-gate");
+  assert(security.projected.load.some((entry) => /security-release-hardening/.test(entry.path)), "security-architecture-and-release-gate dropped its security book");
+
+  const founderZero = catalogProjection("workflow.operations.founder-zero-operator-bootstrap");
+  assert(founderZero.projected.load.some((entry) => /founder-zero-operator/.test(entry.path)), "founder-zero-operator-bootstrap dropped its operator book");
 });
 
 test("live compose and dispatch packets keep program deferred counts and fastlane's own book", () => {
@@ -345,7 +414,11 @@ test("live compose and dispatch packets keep program deferred counts and fastlan
   for (const packet of [composedProgram, dispatchedProgram]) {
     assert((packet.deferredLoad?.length ?? 0) > 0, `${packet.workflowId} live packet lost deferred later-horizon binds`);
     assert(packet.load.some((entry) => /full-launch-program/.test(entry.path)));
-    assert(!packet.load.some((entry) => /design-evidence-stack|mobile-flow-craft/.test(entry.path)));
+    assert(!packet.load.some((entry) => /design-evidence-stack|mobile-flow-craft|paid-tool-routing|security-release-hardening|doppler-organization|founder-zero-operator/.test(entry.path)));
+    assert(
+      (packet.deferredLoad ?? []).some((entry) => /paid-tool-routing/.test(entry.path)),
+      `${packet.workflowId} live packet must defer paid-tool-routing until that operator action is current`,
+    );
     const projected = projectReadyBrief(packet);
     assert((projected.context?.deferredLoadCount ?? 0) > 0, `${packet.workflowId} live projectReadyBrief deferredLoadCount is 0`);
     const prompt = buildWorkerPrompt(packet, "/tmp/business", "/tmp/skill");

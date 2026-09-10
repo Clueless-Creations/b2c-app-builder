@@ -4,9 +4,13 @@
  * stays current even when it lives in another domain. The same book is later
  * when a program packet binds it ahead of that work.
  *
+ * Operator and security procedures (`paid-tool-routing`, secrets, Doppler,
+ * founder-zero-operator, security-release-hardening) stay current only on the
+ * action that owns them. Phrases such as `always` or `at workflow start` do
+ * not keep those books current on a program packet.
+ *
  * Explicit later phrasing (`later, after launch`) still defers.
  */
-const CURRENT_TASK = /\b(this task|before this task|at workflow start|opening, resuming, or closing|always)\b/i;
 const EXPLICIT_LATER = /\b(later|after (this|dispatch|launch|acceptance)|once .{0,80}complete|future)\b/i;
 const PROGRAM_FOREIGN_HORIZON =
   /\b(before production|independent review|user-facing surface|native mobile screen|third-party skill pack|moving from planning|dispatching or coordinating subagents|launch readiness|store submission|public beta)\b/i;
@@ -93,11 +97,11 @@ export function isLaterGuidance(
 ): boolean {
   const text = loadWhen.trim();
   if (!text) return false;
-  if (CURRENT_TASK.test(text) || workflowIdMentioned(text, context.workflowId)) return false;
+  if (workflowIdMentioned(text, context.workflowId)) return false;
   if (isExactWorkflowBook(entry, context)) return false;
   if (EXPLICIT_LATER.test(text)) return true;
   if (isWorkflowOwnBook(entry, context)) return false;
-  return PROGRAM_FOREIGN_HORIZON.test(text);
+  return isProgramPacket(context) || PROGRAM_FOREIGN_HORIZON.test(text);
 }
 
 export function partitionLoadWhen<T extends LaterGuidanceEntry>(

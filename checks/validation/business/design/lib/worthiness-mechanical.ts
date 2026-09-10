@@ -6,11 +6,11 @@
  *
  * design-worthiness.md's own "Three tiers" section draws the line this file follows: Mechanical
  * rules are the ones "a validator may assert pass or fail" with no judgment call — the WCAG
- * contrast floor (rule 4) and the declared type/space scale (rule 3). Attested rules (one
- * primary emphasis, hierarchy) and the Taste tier (rule 10) need DESIGN.md section parsing and
- * project state, and stay inside check-design-worthiness.ts; extracting them would pull this
- * "pure functions only" module into the file-reading, Markdown-table-parsing machinery it is
- * deliberately kept out of.
+ * contrast floor (rule 4), the declared type/space scale (rule 3), and objective token-color
+ * drift (rule 11 where modeled). Attested rules (hierarchy, native-flow semantics / rule 10)
+ * and the Taste tier (rule 12) need DESIGN.md section parsing and project state, and stay
+ * inside check-design-worthiness.ts; extracting them would pull this "pure functions only"
+ * module into the file-reading, Markdown-table-parsing machinery it is deliberately kept out of.
  *
  * This is a pure move: check-design-worthiness.ts calls these functions in the exact place its
  * inline blocks used to sit, so its issue output is unchanged.
@@ -105,6 +105,69 @@ export function checkTokenScaleMechanical(root: string, tokens: unknown, proofsR
     }
   }
   return issues;
+}
+
+const SYSTEM_HEX = new Set(["#000", "#000000", "#fff", "#ffffff"]);
+
+/**
+ * design-worthiness.md rule 11, Mechanical anti-generic consistency, where color tokens exist.
+ * A proof hex that is not in the authored color token tree is objective drift, not taste.
+ */
+export function checkUndeclaredProofColors(root: string, tokens: unknown, proofsRoot: string): Issue[] {
+  const issues: Issue[] = [];
+  const allowed = tokenHexColors(tokens);
+  if (!existsSync(proofsRoot) || allowed.size === 0) return issues;
+  const proofFiles = collectFiles(proofsRoot, new Set([".html", ".css"]));
+  for (const filePath of proofFiles) {
+    const source = readFileSync(filePath, "utf8");
+    const found = [...source.matchAll(/#([0-9a-f]{3}|[0-9a-f]{6})\b/giu)].map((match) => match[0]!.toLowerCase());
+    const outsiders = [...new Set(found.filter((value) => !SYSTEM_HEX.has(value) && !allowed.has(value) && !allowed.has(expandHex(value))))];
+    if (outsiders.length > 0) {
+      issues.push(
+        issue(
+          "error",
+          "worthiness.anti_generic_undeclared_color",
+          `${rel(root, filePath)} uses color values outside the authored token tree: ${outsiders.join(", ")}.`,
+          rel(root, filePath),
+        ),
+      );
+    }
+  }
+  return issues;
+}
+
+function expandHex(value: string): string {
+  const hex = value.slice(1);
+  if (hex.length !== 3) return value.toLowerCase();
+  return `#${hex
+    .split("")
+    .map((part) => `${part}${part}`)
+    .join("")}`.toLowerCase();
+}
+
+function tokenHexColors(tokens: unknown): Set<string> {
+  const values = new Set<string>();
+  walkHex(tokens, values);
+  return values;
+}
+
+function walkHex(value: unknown, values: Set<string>): void {
+  if (typeof value === "string") {
+    const match = value.trim().match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+    if (match) {
+      const hex = match[0]!.toLowerCase();
+      values.add(hex);
+      values.add(expandHex(hex));
+    }
+    return;
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) walkHex(item, values);
+    return;
+  }
+  if (isRecord(value)) {
+    for (const item of Object.values(value)) walkHex(item, values);
+  }
 }
 
 /** Collects every declared px step from the space, font.size, and type token groups. */

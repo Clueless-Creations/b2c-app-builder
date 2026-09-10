@@ -1,7 +1,9 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { assert, type Harness } from "./_harness.js";
-import { runDoctor, type DoctorAscFacts, type DoctorFinding } from "../../../kernel/session/doctor.js";
+import { REVENUECAT_CLI_RELEASE } from "../../../adapters/providers/revenuecat/cli-operations.js";
+import type { RevenueCatCliDiscovery } from "../../../adapters/providers/revenuecat/cli-discovery.js";
+import { runDoctor, type DoctorAscFacts, type DoctorFinding, type DoctorRevenueCatFacts } from "../../../kernel/session/doctor.js";
 import {
   appendDoctorHostBlock,
   readDoctorHostObservation,
@@ -40,6 +42,21 @@ function fakeFacts(executables: ReadonlyArray<{ path: string; version: string | 
   };
 }
 
+function missingRevenueCatFacts(): DoctorRevenueCatFacts {
+  const discovery: RevenueCatCliDiscovery = {
+    code: "missing",
+    selected: null,
+    candidates: [],
+    requiredRelease: REVENUECAT_CLI_RELEASE,
+    schemaCommands: [],
+    message: "fixture: RevenueCat CLI absent",
+  };
+  return {
+    latestObserved: REVENUECAT_CLI_RELEASE.version,
+    discover: () => discovery,
+  };
+}
+
 function runIsolated(harness: Harness, name: string, facts: DoctorAscFacts | null): { findings: DoctorFinding[]; home: string } {
   const home = harness.makeTempDir(name);
   const findings = runDoctor({
@@ -47,6 +64,7 @@ function runIsolated(harness: Harness, name: string, facts: DoctorAscFacts | nul
     home: () => home,
     userHome: () => "/Users/fixture-operator",
     loadAscFacts: () => facts,
+    loadRevenueCatFacts: missingRevenueCatFacts,
     persistHost: writeDoctorHostObservation,
   });
   return { findings, home };
@@ -63,6 +81,7 @@ export function register(harness: Harness): void {
     assert(stored !== null, "doctor must persist doctor-host.json even when asc is missing");
     assert(stored.path === null && stored.version === null, `negative observation must null path and version, got ${JSON.stringify(stored)}`);
     assert(stored.latestObserved === LATEST && stored.comparedAt === COMPARED_AT, `negative observation must keep latest + compared-at, got ${JSON.stringify(stored)}`);
+    assert(stored.revenuecatCli?.identity === "missing", `ASC-only stub must still persist RevenueCat CLI identity, got ${JSON.stringify(stored.revenuecatCli)}`);
   });
 
   harness.check("doctor-asc: winner equal to latest observed is ok and names path plus version", () => {
@@ -140,6 +159,7 @@ export function register(harness: Harness): void {
       home: () => "/tmp/doctor-asc-unwritable-home",
       userHome: () => "/Users/fixture-operator",
       loadAscFacts: () => fakeFacts([{ path: "/opt/homebrew/bin/asc", version: LATEST }]),
+      loadRevenueCatFacts: missingRevenueCatFacts,
       persistHost: () => ({ ok: false, message: "disk full" }),
     });
     const writeFailed = finding(findings, "doctor.asc_host_write_failed");

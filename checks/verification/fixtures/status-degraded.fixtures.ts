@@ -6,7 +6,7 @@ import { assert, skillRoot, type Harness } from "./_harness.js";
 import { resolveTsxBin } from "../../../tooling/lib/tsx-bin.js";
 import { registerWorkspace } from "../../../adapters/registry.js";
 import { inspectWorkspace } from "../../../kernel/session/inspect.js";
-import { appendDoctorHostBlock, renderDoctorHostBlock, writeDoctorHostObservation } from "../../../kernel/session/doctor-host.js";
+import { appendDoctorHostBlock, renderDoctorHostBlock, renderRevenueCatCliHostBlock, writeDoctorHostObservation } from "../../../kernel/session/doctor-host.js";
 import { readWorkspaceStatus, renderWorkspaceStatus } from "../../../kernel/session/status.js";
 import { validateFounderQuestion, type FounderQuestion } from "../../../kernel/session/founder-gate.js";
 
@@ -256,7 +256,7 @@ export function register(harness: Harness): void {
   // The MCP `workspace` branch now appends a sibling doctor-host block after that untouched
   // render. The pin below is the stable no_run sentence plus the doctor-not-run suffix.
   const REGISTERED_NO_RUN_BASELINE_TEXT = "No durable run yet — bootstrap the workspace and run a session first.";
-  const DOCTOR_NOT_RUN_SUFFIX = `\n\n${renderDoctorHostBlock(null)}`;
+  const DOCTOR_NOT_RUN_SUFFIX = `\n\n${renderDoctorHostBlock(null)}\n\n${renderRevenueCatCliHostBlock(null)}`;
 
   harness.check(
     "status: a registered workspace via `workspace` stays byte-for-byte identical to the pre-change reader, with no structuredContent added (R7)",

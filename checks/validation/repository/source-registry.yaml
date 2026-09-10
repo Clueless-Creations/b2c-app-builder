@@ -752,6 +752,15 @@ sources:
       - catalog/knowledge/engineering/engineering-expo-stack-selection.yaml
       - knowledge/engineering/expo-stack-selection.md
     notes: Distinguishes the Expo framework from optional EAS and development builds from Expo Go.
+  - id: docs-expo-dev-modules-overview
+    name: Expo native modules overview
+    source_type: official_docs
+    url: https://docs.expo.dev/modules/overview
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-starter-fixture/modules/b2c-native-capability/package.json
+    notes: Citation for the isolated Expo native-capability fixture homepage. Not a live module or workspace pin.
   - id: docs-expo-dev-eas-cli
     name: EAS CLI reference
     source_type: official_docs

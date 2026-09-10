@@ -259,11 +259,7 @@ function pruneUnregisteredSnapshots(args: Args): void {
   }
   const before = parsed.sources.filter(isRecord);
   const kept = before.filter((item) => registered.has(String(item.id ?? "")));
-  writeFileSync(
-    snapshotPath,
-    `${JSON.stringify({ ...parsed, sources: kept }, null, 2)}\n`,
-    "utf8",
-  );
+  writeFileSync(snapshotPath, `${JSON.stringify({ ...parsed, sources: kept }, null, 2)}\n`, "utf8");
   writeKnowledgeFreshnessPin(args.knowledgePinRoot ?? args.root, snapshotPath);
   console.log("Source freshness prune");
   console.log(`pruned=${before.length - kept.length} kept=${kept.length}`);

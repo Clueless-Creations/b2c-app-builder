@@ -1589,6 +1589,57 @@ Uncertainty: sample is US-only.
     ["--node", "ONB-05", "--path", "product/onboarding/graph/ONB-05-onbo-hub-atlas.md"],
   );
 
+  const evidencePacketQuotedSourceTbd = makeFixture("onboarding-evidence-packet-quoted-source-tbd");
+  writeEvidencePacket(
+    evidencePacketQuotedSourceTbd,
+    "product/onboarding/graph/ONB-05-onbo-hub-atlas.md",
+    `${conciseStructuredPacket.replace(
+      "Source: App Store review sample 2026-09-01 (n=40).",
+      'Source: App Store review sample 2026-09-01 quotes "TBD" as the current empty-state label.',
+    )}`,
+  );
+  runFixture(
+    "ONB-05's gate does not treat a quoted TBD inside source evidence as an author placeholder",
+    evidencePacketQuotedSourceTbd,
+    evidenceScript,
+    0,
+    undefined,
+    ["--node", "ONB-05", "--path", "product/onboarding/graph/ONB-05-onbo-hub-atlas.md"],
+  );
+
+  const evidencePacketApostropheAuthorTodo = makeFixture("onboarding-evidence-packet-apostrophe-author-todo");
+  writeEvidencePacket(
+    evidencePacketApostropheAuthorTodo,
+    "product/onboarding/graph/ONB-05-onbo-hub-atlas.md",
+    `${conciseStructuredPacket}\n\nThe app's TODO is still the author field and we don't know the empty-state copy.\n`,
+  );
+  runFixture(
+    "ONB-05's gate still rejects an author TODO sitting between English apostrophes",
+    evidencePacketApostropheAuthorTodo,
+    evidenceScript,
+    1,
+    "onboarding_evidence.packet_placeholder",
+    ["--node", "ONB-05", "--path", "product/onboarding/graph/ONB-05-onbo-hub-atlas.md"],
+  );
+
+  const evidencePacketFluentUnsupported = makeFixture("onboarding-evidence-packet-fluent-unsupported");
+  writeEvidencePacket(
+    evidencePacketFluentUnsupported,
+    "product/onboarding/graph/ONB-04-competitor-reviews.md",
+    `${conciseStructuredPacket}
+
+This long fluent paragraph restates the same unsupported claim with more confidence and more padding. Structural completeness still cannot become semantic acceptance or runtime proof. Independent review and observed behavior stay separate obligations.
+`,
+  );
+  runFixture(
+    "ONB-04's gate may pass a fluent unsupported claim on shape without granting semantic acceptance",
+    evidencePacketFluentUnsupported,
+    evidenceScript,
+    0,
+    undefined,
+    ["--node", "ONB-04", "--path", "product/onboarding/graph/ONB-04-competitor-reviews.md"],
+  );
+
   const evidencePacketNoProse = makeFixture("onboarding-evidence-packet-no-prose");
   writeEvidencePacket(
     evidencePacketNoProse,

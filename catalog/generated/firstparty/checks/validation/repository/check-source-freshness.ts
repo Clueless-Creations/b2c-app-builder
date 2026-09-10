@@ -105,7 +105,35 @@ function extractUrls(text: string): string[] {
   return Array.from(urls).sort();
 }
 
-function shouldScan(filePath: string, root: string, registryPath: string): boolean {
+function isGeneratedCopy(relative: string): boolean {
+  const normalized = relative.split(path.sep).join("/");
+  return normalized.startsWith("catalog/generated/firstparty/") || normalized === "catalog/generated/hosted-knowledge.json";
+}
+
+function collectPublicBoundaryResidue(text: string): { homeUsers: Set<string>; secretConfigs: Set<string>; siblingUrls: boolean } {
+  const homeUsers = new Set<string>();
+  homePathPattern.lastIndex = 0;
+  for (const match of text.matchAll(homePathPattern)) {
+    const user = match[1] ?? "";
+    if (user && !syntheticHomeUsers.has(user)) homeUsers.add(user);
+  }
+  const secretConfigs = new Set<string>();
+  secretManagerConfigPattern.lastIndex = 0;
+  for (const match of text.matchAll(secretManagerConfigPattern)) {
+    const config = match[1] ?? "";
+    if (config) secretConfigs.add(config);
+  }
+  let siblingUrls = false;
+  for (const url of extractUrls(text)) {
+    if (isNonpublicSiblingSource(url)) {
+      siblingUrls = true;
+      break;
+    }
+  }
+  return { homeUsers, secretConfigs, siblingUrls };
+}
+
+function shouldScan(filePath: string, root: string, registryPath: string, scanGeneratedCopies = false): boolean {
   const relative = path.relative(root, filePath);
   if (path.resolve(filePath) === path.resolve(registryPath)) {
     return false;
@@ -124,8 +152,10 @@ function shouldScan(filePath: string, root: string, registryPath: string): boole
   }
   const segments = relative.split(path.sep);
   const normalized = segments.join("/");
-  // Snapshot parity verifies these copied resources; scan their authored inputs once.
-  if (normalized.startsWith("catalog/generated/firstparty/")) return false;
+  // Snapshot parity verifies these copied resources; scan their authored inputs once for URL
+  // registration. Public-boundary residue still inspects the copies so a stale render cannot
+  // keep a leak after the authored source is cleaned.
+  if (!scanGeneratedCopies && normalized.startsWith("catalog/generated/firstparty/")) return false;
   // These projections have dedicated freshness checks. Their authored inputs are still scanned.
   // Escaped Markdown in JSON is not a second source; Wrangler runtime declarations are vendored
   // types. Matched by basename, not a per-package path: `wrangler types` regenerates this exact
@@ -133,7 +163,8 @@ function shouldScan(filePath: string, root: string, registryPath: string): boole
   // generated MDN-link-laden boilerplate the same way hosted/knowledge-mcp's already-excluded copy is —
   // hosted/builder-console grew one once it gained its own wrangler devDependency, and the next package to add
   // one should not have to rediscover this exclusion by going red first.
-  if (normalized.endsWith("catalog/generated/hosted-knowledge.json") || segments[segments.length - 1] === "worker-configuration.d.ts") return false;
+  if (segments[segments.length - 1] === "worker-configuration.d.ts") return false;
+  if (!scanGeneratedCopies && normalized.endsWith("catalog/generated/hosted-knowledge.json")) return false;
   if (normalized.includes("hosted/knowledge-mcp/.wrangler/") || normalized.includes("hosted/builder-console/.wrangler/")) return false;
   // Machine-local agent worktrees are concurrent checkouts of other branches,
   // not this checkout's content. A sibling agent's in-progress copy carrying a
@@ -457,21 +488,43 @@ if (snapshotIds.size > 0) {
   }
 }
 
+const authoredHomes = new Set<string>();
+const authoredSecrets = new Set<string>();
+let authoredSibling = false;
 for (const file of collectAllFiles(args.root, 20000)) {
   if (!shouldScan(file, args.root, args.registryPath)) continue;
   const relative = path.relative(args.root, file);
-  const text = readFileSync(file, "utf8");
-  homePathPattern.lastIndex = 0;
-  for (const match of text.matchAll(homePathPattern)) {
-    const user = match[1] ?? "";
-    if (syntheticHomeUsers.has(user)) continue;
+  const residue = collectPublicBoundaryResidue(readFileSync(file, "utf8"));
+  for (const user of residue.homeUsers) authoredHomes.add(user);
+  for (const config of residue.secretConfigs) authoredSecrets.add(config);
+  if (residue.siblingUrls) authoredSibling = true;
+  if (residue.homeUsers.size > 0) {
     issues.push(issue("error", "source_freshness.public_boundary.operator_path", "An authored file contains an operator home path.", relative));
-    break;
   }
-  secretManagerConfigPattern.lastIndex = 0;
-  if (secretManagerConfigPattern.test(text)) {
+  if (residue.secretConfigs.size > 0) {
     issues.push(
       issue("error", "source_freshness.public_boundary.secret_manager_config", "An authored file names a secret-manager project/config pair.", relative),
+    );
+  }
+}
+
+const registryHasSibling = sourceRecords(registry).some((source) => isNonpublicSiblingSource(String(source.url ?? "")));
+for (const file of collectAllFiles(args.root, 20000)) {
+  if (!shouldScan(file, args.root, args.registryPath, true)) continue;
+  const relative = path.relative(args.root, file);
+  if (!isGeneratedCopy(relative)) continue;
+  const residue = collectPublicBoundaryResidue(readFileSync(file, "utf8"));
+  const leftoverHome = Array.from(residue.homeUsers).some((user) => !authoredHomes.has(user));
+  const leftoverSecret = Array.from(residue.secretConfigs).some((config) => !authoredSecrets.has(config));
+  const leftoverSibling = residue.siblingUrls && !authoredSibling && !registryHasSibling;
+  if (leftoverHome || leftoverSecret || leftoverSibling) {
+    issues.push(
+      issue(
+        "error",
+        "source_freshness.public_boundary.generated_stale",
+        "A generated copy still contains public-boundary residue. Re-render from the authored source; do not edit the generated file.",
+        relative,
+      ),
     );
   }
 }

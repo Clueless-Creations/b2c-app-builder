@@ -3,7 +3,7 @@ import { z } from "zod";
 import type { CatalogContextPack, CatalogReference, CatalogRole, CatalogWorkflowDef } from "../../catalog/types.js";
 import type { NodeBrief } from "../engine/node-brief.js";
 import { reviewFacet } from "../engine/review-facet.js";
-import { isLaterGuidance } from "../lib/later-guidance.js";
+import { isLaterGuidance, laterGuidanceContext } from "../lib/later-guidance.js";
 import {
   DEFAULT_WORKFLOW_BUNDLE_TOKEN_BUDGET,
   HOSTED_KNOWLEDGE_SCHEMA_VERSION,
@@ -477,7 +477,17 @@ export function createKnowledgeService(bundle: HostedKnowledgeBundle): Knowledge
         validators: workflow.gateCommands.map((gate) => `b2c check ${gate.replace(/^check:/, "")} --workspace <registered-workspace> --json`),
       };
     });
-    const laterIds = new Set(workflow.referenceIds.filter((id) => isLaterGuidance(documents.get(id)!.reference.loadWhen)));
+    const laterContext = laterGuidanceContext(workflow.id, workflow.domainId);
+    const laterIds = new Set(
+      workflow.referenceIds.filter((id) => {
+        const reference = documents.get(id)!.reference;
+        return isLaterGuidance(reference.loadWhen, laterContext, {
+          referenceId: reference.id,
+          domainId: reference.domainId,
+          path: reference.path,
+        });
+      }),
+    );
     const currentIds = workflow.referenceIds.filter((id) => !laterIds.has(id));
     const listedIds = mode === "route" ? currentIds : workflow.referenceIds;
     const incomplete =
@@ -560,17 +570,28 @@ export function createKnowledgeService(bundle: HostedKnowledgeBundle): Knowledge
   function buildDispatchBrief(workflow: CatalogWorkflowDef): NodeBrief {
     const judgment = JUDGMENT_DOMAIN_IDS.includes(workflow.domainId);
     const gateIds = workflow.gateCommands;
-    const bound = workflow.referenceIds.map((referenceId) => {
-      const reference = references.get(referenceId)!;
-      return {
-        path: reference.path,
-        title: reference.title,
-        loadWhen: reference.loadWhen,
-        ...(reference.sectionId ? { sectionId: reference.sectionId } : {}),
-        ...(reference.revision ? { revision: reference.revision } : {}),
-      };
+    const laterContext = laterGuidanceContext(workflow.id, workflow.domainId);
+    const bound = workflow.referenceIds.map((referenceId) => references.get(referenceId)!);
+    const load = bound.flatMap((reference) => {
+      if (
+        isLaterGuidance(reference.loadWhen, laterContext, {
+          referenceId: reference.id,
+          domainId: reference.domainId,
+          path: reference.path,
+        })
+      ) {
+        return [];
+      }
+      return [
+        {
+          path: reference.path,
+          title: reference.title,
+          loadWhen: reference.loadWhen,
+          ...(reference.sectionId ? { sectionId: reference.sectionId } : {}),
+          ...(reference.revision ? { revision: reference.revision } : {}),
+        },
+      ];
     });
-    const load = bound.filter((entry) => !isLaterGuidance(entry.loadWhen));
     const seenPaths = new Set(bound.map((entry) => entry.path));
     const role = rolesById.get(workflow.roleId);
     const route = role

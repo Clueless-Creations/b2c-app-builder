@@ -12,9 +12,9 @@ import {
 import { validateFounderQuestion, type FounderQuestion } from "../session/founder-gate.js";
 import { redactSensitiveText } from "../session/attempt-failure.js";
 import type { HeldNode, HeldReason, PlanReport } from "../session/plan.js";
-import { partitionLoadWhen } from "../lib/later-guidance.js";
+import { laterGuidanceContext, partitionLoadWhen } from "../lib/later-guidance.js";
 
-export { isLaterGuidance, partitionLoadWhen } from "../lib/later-guidance.js";
+export { isLaterGuidance, laterGuidanceContext, partitionLoadWhen } from "../lib/later-guidance.js";
 
 /** Historical `reason` text. New clients must read `holdKind` and `detail`. */
 export const PUBLIC_HELD_REASON =
@@ -95,7 +95,7 @@ export function projectReadyBrief(brief: NodeBrief, founderIntent?: FounderInten
   const open = projectPaths(brief.open);
   const consult = projectPaths(brief.consult);
   const produce = projectPaths(brief.produce);
-  const { current: currentLoad, later } = partitionLoadWhen(brief.load);
+  const { current: currentLoad, later } = partitionLoadWhen(brief.load, laterGuidanceContext(brief.workflowId));
   const deferredLoadCount = later.length;
   const loadSource = currentLoad.slice(0, PUBLIC_PLAN_BOUNDS.loadEntries);
   let loadFieldsTruncated = currentLoad.length !== loadSource.length;

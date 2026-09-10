@@ -98,7 +98,18 @@ test("worker packet keeps current-task guidance and accounts deferred later load
   assert.equal(isLaterGuidance("before this task"), false);
   assert.equal(isLaterGuidance("later, after launch"), true);
   assert.equal(isLaterGuidance("After launch"), true);
-  assert.equal(isLaterGuidance("calibrating complete consumer-business mobile and landing craft against primary-source product examples before production and independent review"), true);
+  assert.equal(
+    isLaterGuidance("before accessibility declarations, beta readiness, or store submission", { workflowId: "workflow.engineering.accessibility-common-task-proof" }, { path: "knowledge/engineering/accessibility-readiness.md" }),
+    false,
+  );
+  assert.equal(
+    isLaterGuidance(
+      "calibrating complete consumer-business mobile and landing craft against primary-source product examples before production and independent review",
+      { workflowId: "workflow.orchestration.full-launch-program" },
+      { path: "knowledge/design/consumer-craft-benchmarks.md" },
+    ),
+    true,
+  );
   const brief = projectReadyBrief(
     readyBrief({
       consult: ["operations/FOUNDER_BRIEF.md"],
@@ -181,27 +192,23 @@ test("plan projection labels granted leftover approvals as read_and_produce and 
   assert.equal(plan.held[0]?.effectBoundary, "founder_approval_required");
 });
 
-test("full-launch-program packet defers real catalog later-horizon loads", () => {
+function catalogProjection(workflowId: string) {
   const catalog = JSON.parse(readFileSync(path.join(root, "catalog/generated/catalog.json"), "utf8")) as {
     references: Array<{ id: string; path: string; title: string; loadWhen: string }>;
     workflows: Array<{ id: string; title: string; instructions: string; referenceIds: string[]; founderOnlyActions: string[] }>;
   };
-  const workflow = catalog.workflows.find((entry) => entry.id === "workflow.orchestration.full-launch-program");
-  assert(workflow, "catalog lost workflow.orchestration.full-launch-program");
+  const workflow = catalog.workflows.find((entry) => entry.id === workflowId);
+  assert(workflow, `catalog lost ${workflowId}`);
   const refs = new Map(catalog.references.map((entry) => [entry.id, entry]));
   const load = workflow.referenceIds.map((id) => {
     const reference = refs.get(id)!;
     return { path: reference.path, title: reference.title, loadWhen: reference.loadWhen };
   });
-  const projected = projectReadyBrief(
-    readyBrief({
-      workflowId: workflow.id,
-      title: workflow.title,
-      instructions: workflow.instructions,
-      approvals: [...workflow.founderOnlyActions],
-      load,
-    }),
-  );
+  return { workflow, load, projected: projectReadyBrief(readyBrief({ workflowId: workflow.id, title: workflow.title, instructions: workflow.instructions, approvals: [...workflow.founderOnlyActions], load })) };
+}
+
+test("full-launch-program packet defers real catalog later-horizon loads", () => {
+  const { workflow, load, projected } = catalogProjection("workflow.orchestration.full-launch-program");
   assert(projected.context && projected.context.deferredLoadCount > 0, "a real full-launch-program packet must defer later-horizon catalog loadWhen");
   assert(projected.load.some((entry) => /full-launch-program/.test(entry.path)), "program-open guidance must remain current");
   assert.equal(projected.effectBoundary, "read_and_produce");
@@ -218,4 +225,22 @@ test("full-launch-program packet defers real catalog later-horizon loads", () =>
   assert.match(prompt, /DEFERRED LATER KNOWLEDGE/);
   assert.match(prompt, /not current reading/);
   assert.doesNotMatch(prompt.split("DEFERRED LATER KNOWLEDGE")[0] ?? "", /consumer-craft-benchmarks/);
+});
+
+test("specialist workflows keep their own current books that a program packet defers", () => {
+  const accessibility = catalogProjection("workflow.engineering.accessibility-common-task-proof");
+  assert.equal(accessibility.projected.load.length, 1, "accessibility-common-task-proof must keep its current load");
+  assert(accessibility.projected.load.some((entry) => /accessibility-readiness/.test(entry.path)));
+  assert.equal(accessibility.projected.context?.deferredLoadCount, 0);
+
+  const designRoom = catalogProjection("workflow.design.design-room");
+  assert(designRoom.projected.load.some((entry) => /design-evidence-stack/.test(entry.path)), "Design Room must keep design-evidence-stack");
+  assert(designRoom.projected.load.some((entry) => /mobile-flow-craft/.test(entry.path)), "Design Room must keep mobile-flow-craft");
+
+  const premium = catalogProjection("workflow.design.premium-mobile-craft");
+  assert(premium.projected.load.some((entry) => /design-evidence-stack/.test(entry.path)), "premium-mobile-craft must keep design-evidence-stack");
+  assert(premium.projected.load.some((entry) => /mobile-flow-craft/.test(entry.path)), "premium-mobile-craft must keep mobile-flow-craft");
+
+  const program = catalogProjection("workflow.orchestration.full-launch-program");
+  assert(!program.projected.load.some((entry) => /design-evidence-stack|mobile-flow-craft|accessibility-readiness/.test(entry.path)));
 });

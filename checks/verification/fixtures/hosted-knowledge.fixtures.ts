@@ -821,6 +821,26 @@ export function register(harness: Harness): void {
     );
   });
 
+  harness.check("hosted knowledge: specialist dispatchBriefs keep their own current books", () => {
+    const bundle = buildHostedKnowledgeBundle(skillRoot);
+    const service = createKnowledgeService(bundle);
+    const accessibility = service.workflow({ workflowId: "workflow.engineering.accessibility-common-task-proof", brief: true }).dispatchBrief!;
+    assert(accessibility.load.length === 1 && accessibility.load[0]!.path.includes("accessibility-readiness"), "accessibility-common-task-proof lost its current load");
+    for (const workflowId of ["workflow.design.design-room", "workflow.design.premium-mobile-craft"] as const) {
+      const brief = service.workflow({ workflowId, brief: true }).dispatchBrief!;
+      assert(
+        brief.load.some((entry) => entry.path.includes("design-evidence-stack")) && brief.load.some((entry) => entry.path.includes("mobile-flow-craft")),
+        `${workflowId} dropped current craft books`,
+      );
+    }
+    const fastlane = service.workflow({ workflowId: "workflow.growth.fastlane-growth-ops", brief: true }).dispatchBrief!;
+    assert(fastlane.load.some((entry) => entry.path.includes("fastlane-growth-ops")), "fastlane-growth-ops omitted its own book");
+    const remediate = service.workflow({ workflowId: "workflow.store.app-review-remediate", brief: true }).dispatchBrief!;
+    assert(remediate.load.some((entry) => entry.path.includes("app-review-remediate")), "app-review-remediate omitted its own book");
+    const program = service.workflow({ workflowId: "workflow.orchestration.full-launch-program", brief: true }).dispatchBrief!;
+    assert(!program.load.some((entry) => /design-evidence-stack|mobile-flow-craft/.test(entry.path)), "program packet must still defer specialist later-horizon books");
+  });
+
   harness.check("hosted knowledge: a gated auditor requires independent review outside judgment domains", () => {
     const bundle = fixtureBundle();
     const workflow = bundle.catalog.workflows[0]!;

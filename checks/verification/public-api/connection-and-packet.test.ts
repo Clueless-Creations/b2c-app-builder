@@ -379,7 +379,7 @@ test("specialist workflows keep their own current books that a program packet de
   for (const { workflowId, keep } of crossDomainCurrent) {
     const { projected } = catalogProjection(workflowId);
     for (const needle of keep) {
-      assert(projected.load.some((entry) => entry.path.includes(needle)), `${workflowId} dropped current ${needle}`);
+      assert(projected.load.some((entry) => entry.path.includes(needle)), `${workflowId} must keep current ${needle}`);
     }
   }
 
@@ -387,18 +387,18 @@ test("specialist workflows keep their own current books that a program packet de
   assert(!program.projected.load.some((entry) => /design-evidence-stack|mobile-flow-craft|accessibility-readiness|paid-tool-routing/.test(entry.path)));
 
   const paidTools = catalogProjection("workflow.operations.paid-tool-routing-and-fallback");
-  assert(paidTools.projected.load.some((entry) => /paid-tool-routing/.test(entry.path)), "paid-tool-routing-and-fallback dropped its operator book");
+  assert(paidTools.projected.load.some((entry) => /paid-tool-routing/.test(entry.path)), "paid-tool-routing-and-fallback must keep its operator book");
   assert.equal(paidTools.projected.context?.deferredLoadCount, 0);
 
   const secrets = catalogProjection("workflow.operations.secrets-baseline-and-routing");
-  assert(secrets.projected.load.some((entry) => /doppler-organization/.test(entry.path)), "secrets-baseline-and-routing dropped doppler-organization");
-  assert(secrets.projected.load.some((entry) => /secrets-management/.test(entry.path)), "secrets-baseline-and-routing dropped secrets-management");
+  assert(secrets.projected.load.some((entry) => /doppler-organization/.test(entry.path)), "secrets-baseline-and-routing must keep doppler-organization");
+  assert(secrets.projected.load.some((entry) => /secrets-management/.test(entry.path)), "secrets-baseline-and-routing must keep secrets-management");
 
   const security = catalogProjection("workflow.trust.security-architecture-and-release-gate");
-  assert(security.projected.load.some((entry) => /security-release-hardening/.test(entry.path)), "security-architecture-and-release-gate dropped its security book");
+  assert(security.projected.load.some((entry) => /security-release-hardening/.test(entry.path)), "security-architecture-and-release-gate must keep its security book");
 
   const founderZero = catalogProjection("workflow.operations.founder-zero-operator-bootstrap");
-  assert(founderZero.projected.load.some((entry) => /founder-zero-operator/.test(entry.path)), "founder-zero-operator-bootstrap dropped its operator book");
+  assert(founderZero.projected.load.some((entry) => /founder-zero-operator/.test(entry.path)), "founder-zero-operator-bootstrap must keep its operator book");
 });
 
 test("live compose and dispatch packets keep program deferred counts and fastlane's own book", () => {
@@ -434,11 +434,11 @@ test("live compose and dispatch packets keep program deferred counts and fastlan
   for (const packet of [composedFastlane, dispatchedFastlane]) {
     assert(
       packet.load.some((entry) => entry.referenceId === "reference.growth.fastlane-growth-ops"),
-      `${packet.workflowId} live packet dropped own-book referenceId`,
+      `${packet.workflowId} live packet must keep own-book referenceId`,
     );
     assert(!(packet.deferredLoad ?? []).some((entry) => entry.referenceId === "reference.growth.fastlane-growth-ops"));
     const projected = projectReadyBrief(packet);
-    assert(projected.load.some((entry) => /fastlane-growth-ops/.test(entry.path)), `${packet.workflowId} live worker packet dropped its own book`);
+    assert(projected.load.some((entry) => /fastlane-growth-ops/.test(entry.path)), `${packet.workflowId} live worker packet must keep its own book`);
     const prompt = buildWorkerPrompt(packet, "/tmp/business", "/tmp/skill");
     const mandatory = prompt.split("DEFERRED LATER KNOWLEDGE")[0] ?? prompt;
     assert.match(mandatory, /fastlane-growth-ops/);

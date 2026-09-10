@@ -171,8 +171,9 @@ test("After Credits start reaches status/plan without a maintainer tour or whole
     assert(accounting.programIfOpened.deferred > 0, "opened program packet lost deferred later-horizon accounting");
     assert.equal(accounting.programIfOpened.deferredLoadCount, accounting.programIfOpened.deferred);
     assert(currentPaths.some((entry) => /full-launch-program/.test(entry)));
-    assert(!currentPaths.some((entry) => /design-evidence-stack|mobile-flow-craft|consumer-craft-benchmarks/.test(entry)));
+    assert(!currentPaths.some((entry) => /design-evidence-stack|mobile-flow-craft|consumer-craft-benchmarks|paid-tool-routing/.test(entry)));
     assert(deferredPaths.some((entry) => /design-evidence-stack|mobile-flow-craft|consumer-craft-benchmarks/.test(entry)));
+    assert(deferredPaths.some((entry) => /paid-tool-routing/.test(entry)), "opened program packet must defer paid-tool-routing");
   } finally {
     rmSync(env.temp, { recursive: true, force: true });
   }

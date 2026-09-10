@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.57",
+  "version": "0.219.58",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Keep onboarding packet placeholders on author fields; treat Source-line and quotation TBD as cited evidence, not an unresolved author marker.",
-    "Reopen only the changed import review when a product.yaml import promise changes, and leave unrelated local proof accepted."
+    "Fail leftover public-boundary residue in generated first-party and hosted-knowledge copies after authored sources are clean.",
+    "When the same leak is still in an authored file, fail that file only so the fix is scrub-and-re-render, not a generated-file edit."
   ]
 }

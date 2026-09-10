@@ -283,6 +283,78 @@ export function register(h: Harness): void {
   );
   runFixture("unregistered snapshot row fails public-boundary", sourceBoundaryOrphan, "check-source-freshness.ts", 1, "source_freshness.snapshot.unregistered");
 
+  const cleanBoundaryReadme = [
+    "# Source Fixture",
+    "Use current docs from https://docs.doppler.com/docs/cli before setup.",
+    "Stand-in home: /Users/founder/myapp.env",
+    "License hash: 2fcc1727008356f9695edb29a4226b2b6cfa119f791b707e5101263d95d831fc",
+  ].join("\n");
+  const sourceBoundaryGeneratedClean = makeEmptyFixture("source-public-boundary-generated-clean");
+  writeSourceRegistryFixture(sourceBoundaryGeneratedClean);
+  writeFileSync(path.join(sourceBoundaryGeneratedClean, "README.md"), cleanBoundaryReadme, "utf8");
+  mkdirSync(path.join(sourceBoundaryGeneratedClean, "catalog/generated/firstparty"), { recursive: true });
+  writeFileSync(path.join(sourceBoundaryGeneratedClean, "catalog/generated/firstparty/README.md"), cleanBoundaryReadme, "utf8");
+  runFixture("generated copies of stand-ins and hashes pass public-boundary", sourceBoundaryGeneratedClean, "check-source-freshness.ts", 0);
+
+  const sourceBoundaryGeneratedStale = makeEmptyFixture("source-public-boundary-generated-stale");
+  writeSourceRegistryFixture(sourceBoundaryGeneratedStale);
+  writeFileSync(path.join(sourceBoundaryGeneratedStale, "README.md"), cleanBoundaryReadme, "utf8");
+  mkdirSync(path.join(sourceBoundaryGeneratedStale, "catalog/generated/firstparty"), { recursive: true });
+  writeFileSync(
+    path.join(sourceBoundaryGeneratedStale, "catalog/generated/firstparty/README.md"),
+    ["# Source Fixture", "Use current docs from https://docs.doppler.com/docs/cli before setup.", "Notes: /Users/canary-home/notes.md"].join("\n"),
+    "utf8",
+  );
+  runFixture(
+    "stale generated copy fails public-boundary until re-render",
+    sourceBoundaryGeneratedStale,
+    "check-source-freshness.ts",
+    1,
+    "source_freshness.public_boundary.generated_stale",
+    [],
+    undefined,
+    "/Users/canary-home",
+  );
+
+  const sourceBoundaryGeneratedHosted = makeEmptyFixture("source-public-boundary-generated-hosted");
+  writeSourceRegistryFixture(sourceBoundaryGeneratedHosted);
+  writeFileSync(path.join(sourceBoundaryGeneratedHosted, "README.md"), cleanBoundaryReadme, "utf8");
+  mkdirSync(path.join(sourceBoundaryGeneratedHosted, "catalog/generated"), { recursive: true });
+  writeFileSync(
+    path.join(sourceBoundaryGeneratedHosted, "catalog/generated/hosted-knowledge.json"),
+    `${JSON.stringify({ documents: [{ body: "Copied from Doppler `canary-proj/canary-cfg`." }] })}\n`,
+    "utf8",
+  );
+  runFixture(
+    "stale hosted knowledge copy fails public-boundary until re-render",
+    sourceBoundaryGeneratedHosted,
+    "check-source-freshness.ts",
+    1,
+    "source_freshness.public_boundary.generated_stale",
+    [],
+    undefined,
+    "canary-proj/canary-cfg",
+  );
+
+  const sourceBoundaryGeneratedFromAuthored = makeEmptyFixture("source-public-boundary-generated-from-authored");
+  writeSourceRegistryFixture(sourceBoundaryGeneratedFromAuthored);
+  const authoredLeak = ["# Source Fixture", "Use current docs from https://docs.doppler.com/docs/cli before setup.", "Notes: /Users/canary-home/notes.md"].join(
+    "\n",
+  );
+  writeFileSync(path.join(sourceBoundaryGeneratedFromAuthored, "README.md"), authoredLeak, "utf8");
+  mkdirSync(path.join(sourceBoundaryGeneratedFromAuthored, "catalog/generated/firstparty"), { recursive: true });
+  writeFileSync(path.join(sourceBoundaryGeneratedFromAuthored, "catalog/generated/firstparty/README.md"), authoredLeak, "utf8");
+  runFixture(
+    "authored leak with a matching generated copy fails the authored file only",
+    sourceBoundaryGeneratedFromAuthored,
+    "check-source-freshness.ts",
+    1,
+    "source_freshness.public_boundary.operator_path",
+    [],
+    undefined,
+    "source_freshness.public_boundary.generated_stale",
+  );
+
   const sourceRegistryBrackets = makeEmptyFixture("source-registry-bracket-urls");
   writeSourceRegistryFixture(sourceRegistryBrackets, false);
   const bracketUrls = [

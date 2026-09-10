@@ -1,9 +1,11 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.54",
+  "version": "0.219.55",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Repair leftover 0.219.52 audit reds: Expo stack format, registered docs URLs, founder-brief catalog reads, CLI help declarations, and Design Room adapter copy."
+    "Record the 0.219.54 leftover-audit repair: Expo stack format, registered docs URLs, and founder-brief catalog reads.",
+    "Record the rest of that repair: CLI help declarations and Design Room adapter copy.",
+    "Align the package-parity fixture with compiled-runtime wording so typescript stays a checkout tool, not a packed-bin import."
   ]
 }

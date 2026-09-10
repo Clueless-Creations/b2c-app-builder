@@ -9,10 +9,12 @@ import { assert, repoCheckoutPresent, repoRoot, skillRoot, type Harness } from "
 export function register(harness: Harness): void {
   harness.check("house-style: no-slop marks Original builder house style and isolates customer voice", () => {
     const writing = readFileSync(path.join(skillRoot, "knowledge", "words", "no-slop-writing.md"), "utf8");
-    assert(writing.includes("## 9. Original: Builder House Style"), "no-slop-writing.md must include Original: Builder house style");
+    assert(writing.includes("## 9. Original: Builder house style"), "no-slop-writing.md must include Original: Builder house style");
+    assert(!writing.includes("## 9. Original: Builder House Style"), "house-style heading must stay sentence case");
     assert(writing.includes("Repository-original"), "house style must be marked Original");
     assert(writing.includes("Keep the accepted customer voice"), "house style must preserve customer app voice");
     assert(writing.includes("doctor.node_too_old"), "house style must preserve literal error identifiers");
+    assert(writing.includes("The remote effect is unknown. Reconcile before retrying."), "house style must keep a timeout-uncertainty example");
     assert(!writing.includes("../../docs/ethos.md"), "packaged house style must not depend on a repository-only ethos path");
   });
 
@@ -36,5 +38,20 @@ export function register(harness: Harness): void {
     assert(template.includes("kitchen-language boundary"), "PR template must include the house-style checklist item");
     assert(ste100.includes("does not scan README"), "STE100 must not claim a blanket README word-count scan");
     assert(!workspace.includes("Prep & design"), "business workspace AGENTS must not receive builder kitchen station labels");
+  });
+
+  harness.check("house-style: authored LaunchBench scenarios stay lint-only", () => {
+    const scenarioDir = path.join(skillRoot, "checks", "validation", "repository", "evals", "launchbench");
+    const required = [
+      "house-style-inspect-read-only-claim.yaml",
+      "house-style-fixture-as-provider-ready.yaml",
+      "house-style-timeout-uncertain-mutation.yaml",
+      "house-style-customer-voice.yaml",
+    ];
+    for (const file of required) {
+      const text = readFileSync(path.join(scenarioDir, file), "utf8");
+      assert(!/^behavioral:\s*true\s*$/m.test(text), `${file} is authored/linted only; do not mark it live behavioral`);
+      assert(text.includes("expected_guardrail:"), `${file} must keep the LaunchBench authored format`);
+    }
   });
 }

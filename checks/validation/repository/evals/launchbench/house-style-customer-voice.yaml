@@ -1,0 +1,22 @@
+id: house-style-customer-voice
+title: Playful customer onboarding is rewritten in kitchen brigade voice
+prompt: >
+  A customer app's accepted onboarding line is "Tap the star. That's your night
+  light." The agent rewrites it to "Plate the mise at the pass so the brigade can
+  fire."
+expected_guardrail: >
+  Customer app copy keeps the accepted business brand. Builder kitchen language
+  belongs in repository explanation, not in consumer-app voice. Do not introduce
+  brigade, pass, or mise terms into playful customer copy. This scenario is
+  authored and linted; it is not a live agent run.
+validators:
+  - check-no-slop
+  - check-app-copy
+must_catch:
+  - "customer voice is not the builder restaurant identity"
+  - "do not introduce kitchen brigade terms into accepted app copy"
+should_say:
+  - "Keep the accepted customer voice"
+forbidden:
+  - "Plate the mise at the pass"
+  - "brigade can fire"

@@ -14,7 +14,7 @@ This reference adapts the rules from [`petergyang/no-ai-slop`](https://github.co
 - 6. Self-Check Before Shipping Copy — Adapted
 - 7. Channel-Specific Limits — Original
 - 8. What This Does Not Govern — Original
-- 9. Original: Builder House Style
+- 9. Original: Builder house style
 
 ## 1. Voice Preservation Rule (Read First)
 
@@ -132,7 +132,7 @@ This file governs voice and slop, not content that has to say something precise 
 
 If a piece of copy straddles both — for example, a paywall screen that includes both persuasive copy and a legally required subscription-terms line — apply this file to the persuasive part and leave the required-disclosure part to `privacy-terms.md`.
 
-## 9. Original: Builder House Style
+## 9. Original: Builder house style
 
 Repository-original. This section is not in `petergyang/no-ai-slop`. Kitchen meanings live in the repository ethos Kitchen-language boundary. Do not copy that table here. Packaged business work uses this section only; it must not depend on repository-only docs.
 
@@ -165,6 +165,7 @@ The public README is a mixed document. Narrative stays with this file. Command e
 | `Send it out` as a production approval button | `Approve production deployment` |
 | Repeated `Preparing / refining / completing` updates with no state change | Name the changed file, completed check, concrete finding, or hold |
 | Rewriting `doctor.node_too_old` to `inspection.oven_cold` | Keep the error identifier; explain it in plain prose |
+| `The request failed.` after a timed-out mutation | `The request timed out. The remote effect is unknown. Reconcile before retrying.` |
 | Flattening `results vary; this is not medical advice` | Keep the uncertainty qualifier and the required legal line |
 | Replacing a playful onboarding line with kitchen brigade copy | Keep the accepted customer voice |
 

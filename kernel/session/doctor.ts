@@ -14,8 +14,9 @@
  * the host `asc`. RevenueCat CLI identity uses trusted discovery (`--version` and `commands --json`)
  * because a generic `rc --version` probe cannot distinguish an unrelated binary. Expo/EAS CLI
  * identity uses `--version` only and never claims a live EAS job. A missing or stale
- * winner is a warning, same as a missing worker CLI. Doctor never authenticates, never mutates,
- * and never claims live catalog or live EAS proof.
+ * winner is a warning, same as a missing worker CLI. Doctor never authenticates or mutates
+ * host CLIs, and never claims live catalog or live EAS proof. The diagnostic itself writes a
+ * sanitized host observation under engine home.
  */
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";

@@ -342,6 +342,32 @@ export function register(harness: Harness): void {
     assert(legacy.includes("not live catalog proof"), `legacy file must not claim live catalog: ${legacy}`);
   });
 
+  harness.check("revenuecat-cli-doctor: leftover adaptation copy prefers inspect", () => {
+    const manifest = readFileSync(path.join(skillRoot, "catalog/upstreams/revenuecat-cli.yaml"), "utf8");
+    const report = readFileSync(path.join(skillRoot, "docs/upstreams/support-report.md"), "utf8");
+    assert(manifest.includes("id: doctor-is-not-live-catalog"), "adaptation id stays doctor-is-not-live-catalog");
+    assert(
+      manifest.includes(
+        "b2c inspect records local CLI identity only. b2c doctor is a supported equivalent.",
+      ),
+      "manifest must prefer inspect and keep doctor supported",
+    );
+    assert(
+      !manifest.includes("b2c doctor records local CLI identity only"),
+      "manifest must not claim only doctor records local CLI identity",
+    );
+    assert(
+      report.includes(
+        "doctor-is-not-live-catalog: b2c inspect records local CLI identity only. b2c doctor is a supported equivalent.",
+      ),
+      "support-report must re-render the inspect-prefer adaptation from the manifest",
+    );
+    assert(
+      !report.includes("b2c doctor records local CLI identity only"),
+      "support-report must not keep the retired doctor-only identity sentence",
+    );
+  });
+
   harness.check("revenuecat-cli-doctor: doctor adapter and hosted knowledge do not import mutating execute", () => {
     const doctorSource = readFileSync(path.join(skillRoot, "adapters/providers/revenuecat/cli-doctor.ts"), "utf8");
     assert(!doctorSource.includes("cli-execute"), "cli-doctor must not import the mutating execute adapter");

@@ -170,14 +170,18 @@ CI jobs (see [`.github/workflows/ci.yml`](.github/workflows/ci.yml)):
 
 - `presubmit`: measured allow-list (typecheck, lint, catalog/public-API/boundary
   gates, generation consistency, version discipline with enough git history).
-  Extra domain checks join this job when the change reaches them (`test:boundaries`
-  on kernel/contracts/adapters, `test:public-api` on contracts/entrypoints, security
-  gates on the trust validators).
+  First GitHub Actions Presubmit job wall clock: **50s** on run
+  `34436428238` (checkout, `npm ci`, CLI `--help`, `--lane presubmit`; that
+  sample also ran `test:boundaries`). Extra domain checks join this job when
+  the change reaches them (`test:boundaries` on kernel/contracts/adapters,
+  `test:public-api` on contracts/entrypoints, security gates on the trust
+  validators).
 - `audit-fast` / `audit-heavy`: full verification only, or when the Scope job
   fails so coverage cannot be deferred safely.
-- `hosted-check` / `app-check`: when the change reaches that Worker or a file it
-  actually imports (generated catalog, knowledge bundles, shared contracts,
-  root lockfile). Unknown scope expands these jobs.
+- `hosted-check` / `app-check`: when the change matches fail-closed path
+  prefixes in `tooling/ci-lane.mjs` (Worker trees plus `catalog/`, `knowledge/`,
+  shared contracts, root lockfile). This is prefix matching, not a live import
+  graph. Unknown scope expands these jobs.
 - `ci-complete`: requires selected jobs. Intentionally deferred jobs are
   skipped, not green. Cancelled or unexpectedly missing jobs fail. The log
   says when the run was presubmit-only.

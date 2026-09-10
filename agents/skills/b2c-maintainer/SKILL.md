@@ -62,11 +62,12 @@ scheduled upstream check exists; CI is disabled by the founder, so run it by han
 
 ## Repository CI
 
-Ordinary PRs and `main` pushes run presubmit. That is not the full audit. At a
-checkpoint and before merge, dispatch `ci.yml` with `verification=full` (or run
-`npm run audit:ci`, `hosted:check`, and `app:check` locally). The map lives in
-`CONTRIBUTING.md`. Do not teach agents that every merge needs a full Actions
-run on every intermediate push.
+Ordinary PRs and `main` pushes run presubmit. That is not the full audit. The
+first GitHub Actions Presubmit job wall clock was **50s** (run `34436428238`).
+At a checkpoint and before merge, dispatch `ci.yml` with `verification=full`
+(or run `npm run audit:ci`, `hosted:check`, and `app:check` locally). The map
+lives in `CONTRIBUTING.md`. Do not teach agents that every merge needs a full
+Actions run on every intermediate push.
 
 ## Source adoption
 

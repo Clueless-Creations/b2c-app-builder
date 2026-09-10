@@ -1,4 +1,4 @@
-import { existsSync, lstatSync, readFileSync, realpathSync } from "node:fs";
+import { existsSync, readFileSync, realpathSync } from "node:fs";
 import { homedir } from "node:os";
 import path from "node:path";
 
@@ -66,12 +66,23 @@ export function readRuntimeVersion(root: string): string | undefined {
   }
 }
 
-export function inspectRuntimePins(sourceVersion: string, roots: readonly RuntimeInstallRoot[]): RuntimePinInspection[] {
+export function inspectRuntimePins(
+  sourceVersion: string,
+  roots: readonly RuntimeInstallRoot[],
+  sourceRoot?: string,
+): RuntimePinInspection[] {
+  const resolvedSource = sourceRoot ? resolveExisting(sourceRoot) : undefined;
   return roots.map((entry) => {
     if (!existsSync(entry.root)) {
       return { id: entry.id, root: entry.root, exists: false, relation: "missing" };
     }
     const resolved = resolveExisting(entry.root);
+    // A client runtime that resolves to this checkout is the pin, not a stale copy.
+    // Its skill-version.json is the same file; comparing versions after a bump is a false alarm.
+    if (resolvedSource && resolved === resolvedSource) {
+      const version = readRuntimeVersion(resolved) ?? sourceVersion;
+      return { id: entry.id, root: entry.root, exists: true, version, relation: "equal" };
+    }
     const version = readRuntimeVersion(resolved);
     if (!version) {
       return { id: entry.id, root: entry.root, exists: true, relation: "invalid" };
@@ -88,11 +99,10 @@ export function inspectRuntimePins(sourceVersion: string, roots: readonly Runtim
 
 function resolveExisting(root: string): string {
   try {
-    if (lstatSync(root).isSymbolicLink()) return realpathSync(root);
+    return realpathSync(root);
   } catch {
-    return root;
+    return path.resolve(root);
   }
-  return root;
 }
 
 function parseSemver(value: string): { major: number; minor: number; patch: number } | undefined {

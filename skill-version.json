@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.33",
+  "version": "0.219.34",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Console /health reports engineVersion from the skill pin and does not invent a knowledge-bundle hash.",
-    "npm run hosted:version prints engineVersion and bundleSha256 from the generated hosted-knowledge artifact."
+    "Fail package-parity when a workspace-template entrypoint is on disk but missing from git ls-files.",
+    "Treat a client runtime whose realpath is this checkout as the pin; a genuine stale copy still fails."
   ]
 }

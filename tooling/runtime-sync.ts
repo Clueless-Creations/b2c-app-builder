@@ -368,7 +368,7 @@ function main(): void {
 function reportClientPins(options: Options): boolean {
   if (!options.allClients) return true;
   const pinVersion = sourceVersion(options.sourceRoot);
-  const inspections = inspectRuntimePins(pinVersion, defaultRuntimeInstallRoots(clientHome(options)));
+  const inspections = inspectRuntimePins(pinVersion, defaultRuntimeInstallRoots(clientHome(options)), options.sourceRoot);
   console.log("\nClient pins:");
   let ok = true;
   for (const item of inspections) {

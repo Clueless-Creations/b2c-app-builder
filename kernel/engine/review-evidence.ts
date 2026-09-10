@@ -73,10 +73,13 @@ export function classifyProofStrengthIssues(
 
 export type ProofStrengthLevel = "checked" | "failed" | "unknown";
 
+export type ProofStrengthReviewOrigin = IndependentVerificationReceipt["mode"] | "none";
+
 export interface ComposedProofStrength {
   readonly structural: ProofStrengthLevel;
   readonly semantic: ProofStrengthLevel;
   readonly runtime: ProofStrengthLevel;
+  readonly reviewOrigin: ProofStrengthReviewOrigin;
 }
 
 /**
@@ -106,17 +109,37 @@ export function composeProofStrength(input: {
     input.review.verdict === "accepted"
       ? "checked"
       : "unknown";
-  return { structural: input.structural, semantic, runtime };
+  return { structural: input.structural, semantic, runtime, reviewOrigin: input.review?.mode ?? "none" };
 }
 
 export function formatProofStrength(strength: ComposedProofStrength): string {
-  const note =
-    strength.semantic === "unknown" && strength.runtime === "unknown"
-      ? "A complete record is not independent review or device observation."
-      : strength.runtime === "unknown"
-        ? "Independent workspace review accepted; runtime remains unobserved."
-        : "Independent workspace review and workspace runtime observation recorded.";
-  return `Proof strength: structural=${strength.structural} semantic=${strength.semantic} runtime=${strength.runtime}. ${note}`;
+  return `Proof strength: structural=${strength.structural} semantic=${strength.semantic} runtime=${strength.runtime}. ${proofStrengthNote(strength)}`;
+}
+
+function proofStrengthNote(strength: ComposedProofStrength): string {
+  if (strength.semantic === "checked" && strength.runtime === "checked") {
+    return "Independent workspace review and workspace runtime observation recorded.";
+  }
+  if (strength.semantic === "checked") {
+    return "Independent workspace review accepted; runtime remains unobserved.";
+  }
+  if (strength.semantic === "failed") {
+    return "Independent workspace review rejected; runtime remains unobserved.";
+  }
+  switch (strength.reviewOrigin) {
+    case "graph":
+      return "Graph review is not workspace semantic proof; runtime remains unobserved.";
+    case "synthetic":
+      return "Synthetic review is not workspace semantic proof; runtime remains unobserved.";
+    case "workspace":
+      return "Workspace review did not produce semantic proof; runtime remains unobserved.";
+    case "none":
+      return "A complete record is not independent review or device observation.";
+    default: {
+      const exhaustive: never = strength.reviewOrigin;
+      throw new Error(`Unhandled proof-strength review origin ${String(exhaustive)}`);
+    }
+  }
 }
 
 function subjectIds(plan: CompiledPlan, node: CompiledRunNode): string[] {

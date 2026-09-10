@@ -152,6 +152,11 @@ export function register(harness: Harness): void {
       `graph review must not invent semantic proof, got ${produced ?? "none"}`,
     );
     assert(!produced?.includes("semantic=checked"), "graph mode cannot become workspace semantic proof");
+    assert(
+      Boolean(produced?.includes("Graph review is not workspace semantic proof")),
+      `graph accept must not reuse the packet sentence, got ${produced ?? "none"}`,
+    );
+    assert(!produced?.includes("A complete record is not independent review"), "packet shape-pass wording is not a graph-review result");
   });
 
   harness.check("proof-strength: workspace review produces semantic=checked and leaves runtime unknown", () => {
@@ -217,5 +222,30 @@ export function register(harness: Harness): void {
       }).runtime === "unknown",
       "synthetic origin cannot produce runtime proof",
     );
+  });
+
+  harness.check("proof-strength: rejected workspace review is formatted as rejected, not accepted", () => {
+    const produced = formatProofStrength(
+      composeProofStrength({
+        structural: "checked",
+        review: { mode: "workspace", verdict: "rejected", evidence: ["fresh-context reviewer rejected the claim"] },
+        attempt: { proofSource: "workspace" },
+      }),
+    );
+    assert(produced.includes("semantic=failed"), `rejected workspace review must produce semantic=failed, got ${produced}`);
+    assert(produced.includes("Independent workspace review rejected"), `rejected review must say rejected, got ${produced}`);
+    assert(!produced.includes("review accepted"), "a rejected review cannot be formatted as accepted");
+  });
+
+  harness.check("proof-strength: synthetic accept does not reuse the packet no-review sentence", () => {
+    const produced = formatProofStrength(
+      composeProofStrength({
+        structural: "checked",
+        review: { mode: "synthetic", verdict: "accepted", evidence: ["fresh-context reviewer signed off"] },
+        attempt: { proofSource: "synthetic" },
+      }),
+    );
+    assert(produced.includes("semantic=unknown") && produced.includes("Synthetic review is not workspace semantic proof"), `got ${produced}`);
+    assert(!produced.includes("A complete record is not independent review"), "packet shape-pass wording is not a synthetic-review result");
   });
 }

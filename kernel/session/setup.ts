@@ -12,7 +12,7 @@
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { connectionReceipt, formatConnectionReceipt } from "../../contracts/public-api/connection-receipt.js";
+import { connectionCapabilityGuidance, connectionReceipt, formatConnectionReceipt } from "../../contracts/public-api/connection-receipt.js";
 import { b2cAppBuilderHome, registryPath } from "../../adapters/registry.js";
 import { resolveSkillRoot } from "../../tooling/lib/skill-root.js";
 import { printFindings, runDoctor } from "./doctor.js";
@@ -114,6 +114,7 @@ function main(): number {
       "The MCP is read-only by default: public discovery/composition preview plus compatibility knowledge, status, plan, and operating preview.",
       "Use the b2c CLI for approved writes. B2C_APP_BUILDER_MCP_WRITE=1 enables the local write tools",
       "when a user deliberately chooses that wider surface.",
+      connectionCapabilityGuidance(receipt),
       formatConnectionReceipt(receipt),
     ].join("\n"),
   );

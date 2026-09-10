@@ -1,16 +1,25 @@
 import { journeyWorkflowIds } from "../../../kernel/knowledge-service/journey.js";
 import type { HostedKnowledgeBundle } from "../../../kernel/knowledge-service/types.js";
-import { mkdirSync, readFileSync, writeFileSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync, rmSync } from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { parse, stringify } from "yaml";
 import { routeUtterance } from "../../../kernel/session/route-utterance.js";
 import { createBusiness, initializeBusiness, planBusiness } from "../../../kernel/services/lifecycle.js";
+import { lookupResearch, recordResearch } from "../../../kernel/services/research.js";
 import { readWorkspaceStatus } from "../../../kernel/session/status.js";
 import { workspaceRevision } from "../../../kernel/session/workspace-revision.js";
 import { loadProductInstanceDocument, productYamlPath } from "../../../catalog/ontology/instance-load.js";
 import { renderProductMarkdown } from "../../../catalog/ontology/render-product.js";
 import { assert, skillRoot, type Harness } from "./_harness.js";
+
+const researchQuery = {
+  provider: "fixture/research",
+  providerVersion: "1.0.0",
+  connectionRef: "connection:research",
+  operation: "category-estimates",
+  parameters: { category: "parcel-trackers", country: "US" },
+};
 
 export function register(h: Harness): void {
   h.check("Porchwatch F1: closeout closure uses existing dependencies rather than all future operating work", () => {
@@ -131,13 +140,15 @@ export function register(h: Harness): void {
       const product = before.resume?.artifacts.find((entry) => entry.path === "product.yaml");
       assert(before.status === "not_initialized" && product?.present && product.acceptance === "not_evaluated", "product presence became acceptance");
       assert(before.nextAction.includes("product.yaml"), "planning resume omitted the product document");
-      let refused = false;
+      assert(before.completion.deliveryAccepted === false, "planning claimed closeout delivery");
+      assert(!String(before.completion.nextAction).includes("Store submission"), "planning treated delivery as store submission");
+      let refused = "";
       try {
         initializeBusiness({ workspaceId: "accept-001", expectedRevision: before.revision });
-      } catch {
-        refused = true;
+      } catch (error) {
+        refused = String(error);
       }
-      assert(refused, "unaccepted product initialized the runtime");
+      assert(refused.includes("accepted_product_required"), `unaccepted product initialized the runtime: ${refused}`);
       const file = productYamlPath(root),
         doc = parse(readFileSync(file, "utf8"));
       doc.meta.status = "accepted";
@@ -154,6 +165,43 @@ export function register(h: Harness): void {
       assert(readFileSync(file).equals(productBytes), "initialize rewrote accepted product.yaml");
       assert(readFileSync(path.join(root, "PRODUCT.md")).equals(rendered), "initialize rewrote PRODUCT.md");
       assert(workspaceRevision(root) !== accepted.revision, "initialize left the planning revision in place");
+    } finally {
+      if (previous === undefined) delete process.env.B2C_APP_BUILDER_HOME;
+      else process.env.B2C_APP_BUILDER_HOME = previous;
+    }
+  });
+  h.check("Porchwatch: uncertain research resumes from saved observations without fabricated runtime", () => {
+    const home = h.makeTempDir("porchwatch-research-home"),
+      root = path.join(h.makeTempDir("porchwatch-research-business"), "research-002");
+    const previous = process.env.B2C_APP_BUILDER_HOME;
+    process.env.B2C_APP_BUILDER_HOME = home;
+    try {
+      createBusiness({ workspaceId: "research-002", directory: root, name: "Research resume", hypothesis: "A complete consumer utility" });
+      const missing = lookupResearch({ workspaceId: "research-002", query: researchQuery, maxAgeSeconds: 3600 });
+      const pending = recordResearch({
+        workspaceId: "research-002",
+        expectedRevision: missing.revision,
+        observation: { query: researchQuery, outcome: "pending", summary: "One approved fixture request is being dispatched." },
+      });
+      recordResearch({
+        workspaceId: "research-002",
+        expectedRevision: pending.revision,
+        observation: {
+          query: researchQuery,
+          outcome: "uncertain",
+          summary: "The caller stopped before receiving the result.",
+          providerRequestId: "fixture-request-1",
+        },
+      });
+      const plan = planBusiness({ workspaceId: "research-002", maxConcurrency: 1 });
+      assert(plan.status === "not_initialized", "research recording initialized the runtime");
+      assert(plan.resume?.workflowId === "workflow.research.research-backed-spec", "planning resume lost the research workflow");
+      assert(
+        plan.resume?.researchQueries.some((entry) => entry.outcome === "uncertain"),
+        "planning resume omitted the uncertain charged call",
+      );
+      assert(lookupResearch({ workspaceId: "research-002", query: researchQuery, maxAgeSeconds: 3600 }).status === "needs_reconciliation", "uncertain request would be repeated");
+      assert(!existsSync(path.join(root, "catalog.json")) && !existsSync(path.join(root, "state/business-state.json")), "research resume fabricated runtime state");
     } finally {
       if (previous === undefined) delete process.env.B2C_APP_BUILDER_HOME;
       else process.env.B2C_APP_BUILDER_HOME = previous;

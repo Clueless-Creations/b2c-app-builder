@@ -77,6 +77,10 @@ test("setup next steps name status and plan before catalog or compose", () => {
     });
     assert.equal(result.status, 0, result.stderr);
     assertSetupLeadsWithStatusBeforeCatalog(result.stdout);
+    assert.match(result.stdout, /claude mcp add --scope user b2c-local/);
+    assert.match(result.stdout, /\[mcp_servers\.b2c-local\]/);
+    assert.match(result.stdout, /Provider readiness is not implied by this receipt/);
+    assert.doesNotMatch(result.stdout, /claude mcp add --scope user b2c-app-builder(?:\s|$)/);
   } finally {
     rmSync(temp, { recursive: true, force: true });
   }

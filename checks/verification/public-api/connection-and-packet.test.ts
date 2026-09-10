@@ -6,6 +6,8 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import {
   connectionCapabilityGuidance,
   connectionReceipt,
@@ -73,6 +75,10 @@ test("setup prints a local connection receipt and distinct b2c-local registratio
     assert.equal(parsed.declares.writes, "cli_default");
     assert.equal(parsed.providerObservation, "not_tested");
     assert.equal(parsed.observed, undefined);
+    assert.match(result.stdout, /Provider readiness is not implied by this receipt/);
+    assert.match(result.stdout, /claude mcp add --scope user b2c-local/);
+    assert.match(result.stdout, /\[mcp_servers\.b2c-local\]/);
+    assert.doesNotMatch(result.stdout, /claude mcp add --scope user b2c-app-builder(?:\s|$)/);
     const next = result.stdout.slice(Math.max(0, result.stdout.indexOf("Next steps:")));
     assert(next.includes("business-status"), "setup receipt path still omits business-status");
     assert(next.includes("business-plan"), "setup receipt path still omits business-plan");
@@ -81,6 +87,29 @@ test("setup prints a local connection receipt and distinct b2c-local registratio
     assert.doesNotMatch(result.stdout, /first call is almost always b2c_catalog|first call is almost always b2c_knowledge_search/);
   } finally {
     rmSync(temp, { recursive: true, force: true });
+  }
+});
+
+test("local MCP handshake name is b2c-local and leftover names stay on the receipt", async () => {
+  const client = new Client({ name: "connection-identity", version: "1.0.0" });
+  await client.connect(
+    new StdioClientTransport({
+      command: process.execPath,
+      args: ["--import", "tsx", path.join(root, "entrypoints/mcp/server.ts")],
+      cwd: root,
+      env: { ...process.env, B2C_APP_BUILDER_MCP_READONLY: "1" },
+      stderr: "pipe",
+    }),
+  );
+  try {
+    assert.equal(client.getServerVersion()?.name, "b2c-local");
+    const receipt = parseConnectionReceipt(client.getInstructions() ?? "");
+    assert.equal(receipt.identity.recommended, "b2c-local");
+    assert.deepEqual(receipt.identity.legacy, ["b2c-app-builder"]);
+    assert.equal(receipt.providerObservation, "not_tested");
+    assert.notEqual(receipt.observed?.knowledge, undefined);
+  } finally {
+    await client.close();
   }
 });
 

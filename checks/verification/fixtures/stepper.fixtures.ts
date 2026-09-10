@@ -200,7 +200,7 @@ async function main() {
     capabilities: {},
     clientInfo: { name: "stepper-status-fixture", version: "0.0.0" },
   });
-  if (init.result?.serverInfo?.name !== "b2c-app-builder") throw new Error("handshake failed: " + JSON.stringify(init.result));
+  if (init.result?.serverInfo?.name !== "b2c-local") throw new Error("handshake failed: " + JSON.stringify(init.result));
   server.stdin.write(JSON.stringify({ jsonrpc: "2.0", method: "notifications/initialized" }) + "\\n");
   const call = await request("tools/call", { name: "b2c_status", arguments: ${JSON.stringify(args)} });
   console.log(JSON.stringify(call.error ? { __protocolError: call.error } : (call.result ?? {})));

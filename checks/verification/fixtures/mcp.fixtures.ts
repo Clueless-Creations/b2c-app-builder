@@ -107,7 +107,7 @@ transport.stderr.on("data", (chunk) => { stderr += chunk.toString(); });
 const client = new Client({ name: "unavailable-knowledge-fixture", version: "0.0.0" });
 try {
   await client.connect(transport);
-  if (client.getServerVersion()?.name !== "b2c-app-builder") throw new Error("local server initialization failed");
+  if (client.getServerVersion()?.name !== "b2c-local") throw new Error("local server initialization failed");
   const receiptLine = (client.getInstructions() ?? "").split("Connection receipt: ")[1];
   if (!receiptLine) throw new Error("unavailable-knowledge handshake omitted connection receipt");
   const receipt = JSON.parse(receiptLine);
@@ -191,7 +191,7 @@ async function main() {
     capabilities: {},
     clientInfo: { name: "fixture-driver", version: "0.0.0" },
   });
-  if (init.result?.serverInfo?.name !== "b2c-app-builder") throw new Error("handshake: wrong server name: " + JSON.stringify(init.result?.serverInfo));
+  if (init.result?.serverInfo?.name !== "b2c-local") throw new Error("handshake: wrong server name: " + JSON.stringify(init.result?.serverInfo));
   const handshakeReceipt = JSON.parse(String(init.result?.instructions ?? "").split("Connection receipt: ")[1] ?? "null");
   if (handshakeReceipt?.mode !== "local_execution" || handshakeReceipt.identity?.recommended !== "b2c-local") throw new Error("handshake receipt identity");
   if (!handshakeReceipt.identity?.legacy?.includes("b2c-app-builder")) throw new Error("handshake omitted leftover local name");
@@ -420,7 +420,7 @@ async function main() {
     capabilities: {},
     clientInfo: { name: "plan-route-driver", version: "0.0.0" },
   });
-  if (init.result?.serverInfo?.name !== "b2c-app-builder") throw new Error("handshake failed: " + JSON.stringify(init.result?.serverInfo));
+  if (init.result?.serverInfo?.name !== "b2c-local") throw new Error("handshake failed: " + JSON.stringify(init.result?.serverInfo));
   const readonlyReceipt = JSON.parse(String(init.result?.instructions ?? "").split("Connection receipt: ")[1] ?? "null");
   if (readonlyReceipt?.observed?.writes !== "mcp_readonly") throw new Error("read-only handshake must observe mcp_readonly, got " + readonlyReceipt?.observed?.writes);
   if (readonlyReceipt?.declares?.writes !== "cli_default") throw new Error("read-only handshake must still declare CLI writes");
@@ -627,7 +627,7 @@ async function main() {
     capabilities: {},
     clientInfo: { name: "run-proof-driver", version: "0.0.0" },
   });
-  if (init.result?.serverInfo?.name !== "b2c-app-builder") throw new Error("handshake failed: " + JSON.stringify(init.result?.serverInfo));
+  if (init.result?.serverInfo?.name !== "b2c-local") throw new Error("handshake failed: " + JSON.stringify(init.result?.serverInfo));
   server.stdin.write(JSON.stringify({ jsonrpc: "2.0", method: "notifications/initialized" }) + "\\n");
 
   const listedTools = (await request("tools/list", {})).result?.tools ?? [];
@@ -790,7 +790,7 @@ async function main() {
     capabilities: {},
     clientInfo: { name: "workflow-workspace-driver", version: "0.0.0" },
   });
-  if (init.result?.serverInfo?.name !== "b2c-app-builder") throw new Error("handshake failed: " + JSON.stringify(init.result?.serverInfo));
+  if (init.result?.serverInfo?.name !== "b2c-local") throw new Error("handshake failed: " + JSON.stringify(init.result?.serverInfo));
   server.stdin.write(JSON.stringify({ jsonrpc: "2.0", method: "notifications/initialized" }) + "\\n");
 
   // tools/list must still show exactly one b2c_workflow — the local-only registration replaces
@@ -927,7 +927,7 @@ async function main() {
     capabilities: {},
     clientInfo: { name: "status-check-driver", version: "0.0.0" },
   });
-  if (init.result?.serverInfo?.name !== "b2c-app-builder") throw new Error("handshake failed: " + JSON.stringify(init.result?.serverInfo));
+  if (init.result?.serverInfo?.name !== "b2c-local") throw new Error("handshake failed: " + JSON.stringify(init.result?.serverInfo));
   server.stdin.write(JSON.stringify({ jsonrpc: "2.0", method: "notifications/initialized" }) + "\\n");
 
   // --- 1. {workspace, check} returns structuredContent.kind "check", matching the CLI's own

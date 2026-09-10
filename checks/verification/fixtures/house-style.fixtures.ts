@@ -62,5 +62,11 @@ export function register(harness: Harness): void {
       assert(!/^behavioral:\s*true\s*$/m.test(text), `${file} is authored/linted only; do not mark it live behavioral`);
       assert(text.includes("expected_guardrail:"), `${file} must keep the LaunchBench authored format`);
     }
+    const harnessDoc = readFileSync(
+      path.join(skillRoot, "checks", "validation", "repository", "launchbench-evals.md"),
+      "utf8",
+    );
+    assert(harnessDoc.includes("house-style-*.yaml"), "launchbench-evals.md must name the authored house-style examples");
+    assert(harnessDoc.includes("must omit `behavioral: true`"), "launchbench-evals.md must keep house-style examples lint-only");
   });
 }

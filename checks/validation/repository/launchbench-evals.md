@@ -84,6 +84,10 @@ npm run test:validators
 
 Be precise about what executes: `npm run launchbench` is a scenario **definition lint** plus the deterministic validator-fixture suite. It checks that every scenario YAML has the required fields and references known validators, then runs positive/negative fixtures against the validators themselves. **Scenario `prompt`s are never executed against a live agent by this harness**, and `run-agent-evals.ts` likewise validates eval definitions only. Do not describe LaunchBench output as behavioral coverage. For live agent behavior, use the Behavioral Eval Harness below (or run a scenario prompt against a fresh agent manually and compare to `must_catch`/`should_say`).
 
+`evals/launchbench/house-style-*.yaml` are authored house-style routing examples.
+They must omit `behavioral: true`. A green lint is not proof that an agent followed
+the style, and it is not a fresh-context review of representative outputs.
+
 ## Behavioral Eval Harness (manual, not PR-gating)
 
 The harness submits all scenario repeats as one Message Batch, then submits

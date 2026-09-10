@@ -44,4 +44,22 @@ export function register(harness: Harness): void {
     assert(!consolePages.includes("Send it out"), "console must not theme authority as kitchen slang");
     assert(!consolePages.includes("the pass"), "console utility copy must not use the pass as a control label");
   });
+
+  kitchenCase("kitchen-vocabulary: Sheet 1 Prep & design fits the station 2 band", () => {
+    const svg = readFileSync(path.join(repoRoot, "docs", "assets", "business-primitives.svg"), "utf8");
+    const label = svg.match(
+      /<text x="(\d+(?:\.\d+)?)" y="(\d+(?:\.\d+)?)" class="mono ink" font-size="(\d+(?:\.\d+)?)">PREP &amp; DESIGN<\/text>/,
+    );
+    assert(label !== null, "Sheet 1 must keep a single PREP &amp; DESIGN station-2 label");
+    const x = Number(label[1]);
+    const y = Number(label[2]);
+    const fontSize = Number(label[3]);
+    const estimatedWidth = "PREP & DESIGN".length * fontSize * 0.62;
+    assert(x >= 200 && x <= 280, `station 2 label x must stay in the prep band, got ${x}`);
+    assert(y >= 140 && y <= 180, `station 2 label y must stay above the prep table, got ${y}`);
+    assert(x + estimatedWidth < 500, `station 2 label must not reach the walk-in, estimated right edge ${x + estimatedWidth}`);
+    assert(!/PREP &amp; DESIGN[\s\S]{0,80}textLength=/.test(svg), "station 2 label must not be squeezed with textLength");
+    assert(svg.includes("Menu planning, product, experience, design, words"), "station 2 caption must keep the catalog responsibilities");
+    assert(svg.includes('viewBox="0 0 1000 600"'), "Sheet 1 viewBox stays 1000x600 so half-width preview is a scale, not a crop");
+  });
 }

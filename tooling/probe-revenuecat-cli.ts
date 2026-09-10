@@ -41,7 +41,7 @@ import { probeExecutablesOnPath } from "../kernel/contribution/host-observe.js";
 const apiKey = process.env.REVENUECAT_SECRET_API_KEY ?? "";
 const projectId = process.env.REVENUECAT_PROJECT_ID ?? "";
 const requestedAppId = process.env.REVENUECAT_APP_ID ?? "";
-const productId = process.env.REVENUECAT_PRODUCT_ID ?? "";
+const requestedProductId = process.env.REVENUECAT_PRODUCT_ID ?? "";
 const appUserId = process.env.REVENUECAT_APP_USER_ID || "b2c-cli-probe-user";
 const pinnedCli = process.env.B2C_REVENUECAT_CLI ?? "";
 
@@ -187,7 +187,42 @@ function run(): void {
     process.exit(0);
   }
 
-  if (!productId) {
+  let selectedProductId = requestedProductId;
+  let productCount = 0;
+  if (!selectedProductId) {
+    const products = runRevenueCatCli({
+      operationId: "rc.products.list",
+      projectId,
+      hostAuthorityGranted: false,
+      executable,
+      cwd: workspace,
+      isolatedHome,
+      pathEnv,
+      apiKey,
+      run: defaultCliProcessRunner,
+      discovery,
+      target: { ...targetBase, approvedAppId: selectedAppId, appStoreKind: "test-store" },
+    });
+    if (!products.invoked || !products.json?.ok) {
+      writeSanitized({
+        workspace,
+        discovery,
+        inspectDisposition: inspect.disposition,
+        observedKinds: [observedKind],
+        appCount: apps.length,
+        testStoreCount: testStoreApps.length,
+        purchaseDisposition: "skipped",
+        purchaseHold: "products-list-unread",
+      });
+      console.log("  Test Store observed. products list did not return a readable document. No simulate-purchase.");
+      process.exit(0);
+    }
+    const productItems = listItems(products.json.data);
+    productCount = productItems.length;
+    const firstId = productItems.find((item) => typeof item.id === "string")?.id;
+    if (typeof firstId === "string") selectedProductId = firstId;
+  }
+  if (!selectedProductId) {
     writeSanitized({
       workspace,
       discovery,
@@ -195,10 +230,11 @@ function run(): void {
       observedKinds: [observedKind],
       appCount: apps.length,
       testStoreCount: testStoreApps.length,
+      productCount,
       purchaseDisposition: "skipped",
       purchaseHold: "missing-product",
     });
-    console.log("  Test Store observed. REVENUECAT_PRODUCT_ID unset; simulate-purchase not run.");
+    console.log("  Test Store observed. No product id on the CLI list. simulate-purchase not run.");
     process.exit(0);
   }
 
@@ -215,15 +251,15 @@ function run(): void {
     expected: {
       projectId,
       appId: selectedAppId,
-      productIds: productId ? [productId] : [],
+      productIds: [selectedProductId],
       entitlementIds: [],
     },
     hostAuthorityGranted: true,
     synthetic: false,
     appUserId,
-    productId: productId || undefined,
+    productId: selectedProductId,
     customerId: appUserId,
-    idempotencyKey: `rc-cli-probe:${fingerprint(projectId)}:${fingerprint(selectedAppId)}`,
+    idempotencyKey: `rc-cli-probe:${fingerprint(projectId)}:${fingerprint(selectedAppId)}:${fingerprint(selectedProductId)}`,
     ledger,
   });
 
@@ -234,9 +270,12 @@ function run(): void {
     observedKinds: [observedKind],
     appCount: apps.length,
     testStoreCount: testStoreApps.length,
+    productCount,
+    productFingerprint: fingerprint(selectedProductId),
     purchaseDisposition: purchase.disposition,
     purchaseHold: purchase.hold?.code,
     executed: purchase.evidence.test_store?.executed === true,
+    entitlementCount: purchase.evidence.test_store?.entitlement_ids.length ?? 0,
   });
   console.log(
     `  Test Store catalog session disposition=${purchase.disposition} executed=${purchase.evidence.test_store?.executed === true}. Not native IAP.`,
@@ -251,9 +290,12 @@ function writeSanitized(input: {
   readonly observedKinds: readonly RevenueCatObservedStoreKind[];
   readonly appCount: number;
   readonly testStoreCount: number;
+  readonly productCount?: number;
+  readonly productFingerprint?: string;
   readonly purchaseDisposition: string;
   readonly purchaseHold?: string;
   readonly executed?: boolean;
+  readonly entitlementCount?: number;
 }): void {
   const artifact = {
     probe: CLI_PROOF_COLLECTOR,
@@ -267,7 +309,9 @@ function writeSanitized(input: {
     reviewed_release: REVENUECAT_CLI_RELEASE.version,
     project_id_fingerprint: fingerprint(projectId),
     app_id_provided: Boolean(requestedAppId),
-    product_id_provided: Boolean(productId),
+    product_id_provided: Boolean(requestedProductId),
+    product_count: input.productCount ?? null,
+    product_id_fingerprint: input.productFingerprint ?? null,
     inspect_disposition: input.inspectDisposition,
     observed_store_kinds: input.observedKinds,
     app_count: input.appCount,
@@ -275,6 +319,7 @@ function writeSanitized(input: {
     purchase_disposition: input.purchaseDisposition,
     purchase_hold: input.purchaseHold ?? null,
     test_store_executed: input.executed === true,
+    entitlement_count: input.entitlementCount ?? 0,
   };
   const artifactPath = path.join(input.workspace, "revenuecat-cli-probe.json");
   writeFileSync(artifactPath, `${JSON.stringify(artifact, null, 2)}\n`);

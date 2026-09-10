@@ -70,6 +70,14 @@ const ASC_NATIVE_MAPPING: readonly AscNativeMappingRow[] = [
     owner: "catalog/providers/apple-asc.yaml",
   },
   {
+    nativeCapability: "asc metadata push",
+    canonicalOperation: "workflow.store.apple-store-metadata-standing-envelope",
+    semanticFit: "partial",
+    effects: "mutation",
+    disposition: "implement",
+    owner: "catalog/workflows/build-release.ts",
+  },
+  {
     nativeCapability: "asc web agreements status",
     canonicalOperation: "workflow.store.app-review-observe",
     semanticFit: "exact",
@@ -195,7 +203,7 @@ export function register(harness: Harness): void {
     const implemented = ASC_NATIVE_MAPPING.filter((row) => mappingDisposition(row) === "implement");
     const deferred = ASC_NATIVE_MAPPING.filter((row) => mappingDisposition(row) === "defer");
     const rejected = ASC_NATIVE_MAPPING.filter((row) => mappingDisposition(row) === "reject");
-    assert(implemented.length === 7, `observe/remediate/media implement rows: ${implemented.length}`);
+    assert(implemented.length === 8, `observe/remediate/media/metadata implement rows: ${implemented.length}`);
     assert(
       deferred.some((row) => row.nativeCapability === "asc review submit" && row.canonicalOperation === APP_REVIEW_RESUBMIT_WORKFLOW_ID),
       "review submit maps to the existing resubmit workflow and stays deferred",
@@ -208,6 +216,15 @@ export function register(harness: Harness): void {
           row.owner === "catalog/workflows/build-release.ts",
       ),
       "screenshot upload maps to the Apple store-media standing envelope",
+    );
+    assert(
+      implemented.some(
+        (row) =>
+          row.nativeCapability === "asc metadata push" &&
+          row.canonicalOperation === "workflow.store.apple-store-metadata-standing-envelope" &&
+          row.owner === "catalog/workflows/build-release.ts",
+      ),
+      "live metadata push maps to the Apple store-metadata standing envelope",
     );
     assert(
       deferred.some((row) => row.nativeCapability === "asc testflight feedback list" && row.canonicalOperation === "none"),
@@ -261,6 +278,20 @@ export function register(harness: Harness): void {
       coverageLimits: "Cookbook argv stem from local --help on 2026-09-08. No live screenshot-upload JSON and no live App Store Connect.",
       sample: 'asc screenshots upload --version-localization "LOC_ID" --path "./screenshots/final/en-US/<device-well>" --device-type "<ASC_DEVICE_TYPE>" --output json',
     });
+    const metadataPush = provenance({
+      provider: "apple-asc",
+      transport: "cli",
+      reviewedVersion: RORK_REVIEWED_VERSION,
+      reviewedRevision: "unknown",
+      sourceSelector: COOKBOOK_SOURCE,
+      nativeOperation: "asc metadata push",
+      canonicalOperation: "workflow.store.apple-store-metadata-standing-envelope",
+      evidenceKind: "official-example",
+      establishes: ["request-shape"],
+      coverageLimits:
+        "Cookbook records only the dry-run form from local --help on 2026-09-08. No live metadata-apply JSON and no live App Store Connect.",
+      sample: 'asc metadata push --app "123456789" --version "1.2.3" --platform IOS --dir "./metadata" --dry-run --output table',
+    });
     const submit = provenance({
       provider: "apple-asc",
       transport: "cli",
@@ -289,9 +320,11 @@ export function register(harness: Harness): void {
     };
     assert(isIndependentEvidence(observeStatus.evidenceKind), describeConformanceCoverage(observeStatus));
     assert(isIndependentEvidence(screenshotUpload.evidenceKind), describeConformanceCoverage(screenshotUpload));
+    assert(isIndependentEvidence(metadataPush.evidenceKind), describeConformanceCoverage(metadataPush));
     assert(isIndependentEvidence(submit.evidenceKind), describeConformanceCoverage(submit));
     assert(isIndependentEvidence(generated.evidenceKind) === false, describeConformanceCoverage(generated));
     assert(cookbook.includes(String(observeStatus.sample)), "observe sample must be the cookbook line");
     assert(cookbook.includes(String(screenshotUpload.sample)), "screenshot upload sample must be the cookbook line");
+    assert(cookbook.includes(String(metadataPush.sample)), "metadata push sample must be the cookbook dry-run line");
   });
 }

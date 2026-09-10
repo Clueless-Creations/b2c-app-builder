@@ -922,7 +922,7 @@ export function register(harness: Harness): void {
     );
     const firstparty = composition!.deltas["business-pack.consumer-business"]!;
     assert(firstparty.domains === 15, `expected 15 firstparty domains, got ${firstparty.domains}`);
-    assert(firstparty.workflows === 113, `expected 113 firstparty workflows, got ${firstparty.workflows}`);
+    assert(firstparty.workflows === 114, `expected 114 firstparty workflows, got ${firstparty.workflows}`);
     assert(firstparty.references === 145, `expected 145 firstparty references, got ${firstparty.references}`);
     const deltaWorkflows = Object.values(composition!.deltas).reduce((sum, delta) => sum + delta.workflows, 0);
     const deltaDomains = Object.values(composition!.deltas).reduce((sum, delta) => sum + delta.domains, 0);
@@ -1028,6 +1028,37 @@ export function register(harness: Harness): void {
       "Apple media must read SCREENSHOTS.md and write the media apply proof",
     );
     assert(appleMedia!.actionClass === "mutate" && appleMedia!.protectedCategory === "credentials_access", "Apple media stays a credentialed mutate");
+    const appleMetadata = catalog.workflows.find((wf) => wf.id === "workflow.store.apple-store-metadata-standing-envelope");
+    const playMetadata = catalog.workflows.find((wf) => wf.id === "workflow.store.google-play-metadata-standing-envelope");
+    assert(Boolean(appleMetadata), "expected Apple store-metadata standing envelope");
+    assert(Boolean(playMetadata), "expected Google Play metadata standing envelope");
+    assert(
+      appleMetadata!.dependencies.includes("workflow.store.store-console-workflow") &&
+        !appleMetadata!.dependencies.includes("workflow.store.asc-cli-automation") &&
+        !appleMetadata!.dependencies.includes("workflow.store.apple-store-media-standing-envelope"),
+      "Apple metadata must depend on store console and must not depend on ASC automation or Apple media",
+    );
+    assert(
+      appleMetadata!.gateCommands.includes("check:store-console") &&
+        appleMetadata!.gateCommands.includes("check:provider-proof") &&
+        !appleMetadata!.gateCommands.includes("check:asc-command-contract"),
+      "Apple metadata must fail closed on store-console and provider-proof — ASC command contract is not this node's trigger",
+    );
+    assert(
+      appleMetadata!.providerIds.includes("provider.app-store-connect") && !appleMetadata!.providerIds.includes("provider.google-play"),
+      "Apple metadata is the App Store Connect reader, not a dual-store node",
+    );
+    assert(
+      appleMetadata!.reads.includes("store/app-store-listing/APP_STORE_LISTING.md") &&
+        appleMetadata!.outputPaths.includes("store/proof/apple-store-metadata-apply.json"),
+      "Apple metadata must read APP_STORE_LISTING.md and write the metadata apply proof",
+    );
+    assert(appleMetadata!.actionClass === "mutate" && appleMetadata!.protectedCategory === "credentials_access", "Apple metadata stays a credentialed mutate");
+    assert(
+      playMetadata!.reads.includes("store/app-store-listing/APP_STORE_LISTING.md") &&
+        playMetadata!.dependencies.includes("workflow.store.store-console-workflow"),
+      "Play metadata remains the Google Play reader of APP_STORE_LISTING.md",
+    );
     assert(
       playMedia!.reads.includes("store/app-store-listing/SCREENSHOTS.md") &&
         playMedia!.dependencies.includes("workflow.store.store-screenshots-production"),

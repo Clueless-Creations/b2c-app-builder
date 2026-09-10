@@ -4,7 +4,7 @@
     "purpose": "Hosted discovery gate for App Store, screenshot, and release work (issue #32). Measures b2c_catalog against the shipped bundle: whether a needed workflow is reachable at all, and where it ranks. Authored because the router corpora under this directory are structurally blind to this class — no entry contains \"screenshot\" and neither Apple nor Play media workflow is any entry's target. Grades retrieval only; it never chooses a constant.",
     "frozenOn": "2026-09-07",
     "sampleSize": 50,
-    "neededWorkflowSlots": 90,
+    "neededWorkflowSlots": 89,
     "shapes": {
       "terse": 10,
       "single": 16,
@@ -154,8 +154,7 @@
       "utterance": "push metadata to App Store Connect",
       "shape": "single",
       "needs": [
-        "workflow.store.asc-cli-automation",
-        "workflow.store.store-console-workflow"
+        "workflow.store.apple-store-metadata-standing-envelope"
       ]
     },
     {

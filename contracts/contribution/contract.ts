@@ -426,6 +426,74 @@ export const upstreamCheckInputSchema = z.strictObject({
 });
 export const upgradePlanInputSchema = z.strictObject({ upstreamId: slug, candidate: shortText.optional(), target: shortText.optional() });
 
+/** Additive upgrade-plan output. Historical inputs stay `upgradePlanInputSchema`. */
+export const PROVIDER_DELTA_REVIEW_STATUSES = ["changed", "unchanged", "unknown"] as const;
+export type ProviderDeltaReviewStatus = (typeof PROVIDER_DELTA_REVIEW_STATUSES)[number];
+export const PROVIDER_DELTA_TRANSPORTS = ["cli", "api", "mcp", "sdk", "service", "unknown"] as const;
+export const SOURCE_PAGE_DELTA_OWNER = "catalog/providers/capability-delta.yaml" as const;
+
+const providerDeltaReviewField = z.strictObject({
+  status: z.enum(PROVIDER_DELTA_REVIEW_STATUSES),
+  items: z.array(shortText).max(32),
+  evidence: shortText.optional(),
+});
+
+export const providerCapabilityDeltaSchema = z.strictObject({
+  applicable: z.boolean(),
+  reason: shortText.optional(),
+  provider: slug.optional(),
+  transport: z.enum(PROVIDER_DELTA_TRANSPORTS).optional(),
+  fromReviewed: shortText.optional(),
+  toCandidate: shortText.optional(),
+  nativeChanges: z
+    .strictObject({
+      added: providerDeltaReviewField,
+      removed: providerDeltaReviewField,
+      inputs: providerDeltaReviewField,
+      outputs: providerDeltaReviewField,
+      errors: providerDeltaReviewField,
+      pagination: providerDeltaReviewField,
+      authentication: providerDeltaReviewField,
+      effects: providerDeltaReviewField,
+      idempotencyOrRecovery: providerDeltaReviewField,
+      costOrQuota: providerDeltaReviewField,
+      experimentalOrDeprecated: providerDeltaReviewField,
+    })
+    .optional(),
+  mappingImpact: z
+    .strictObject({
+      adapterEncoder: z.enum(PROVIDER_DELTA_REVIEW_STATUSES),
+      adapterTransport: z.enum(PROVIDER_DELTA_REVIEW_STATUSES),
+      adapterDecoder: z.enum(PROVIDER_DELTA_REVIEW_STATUSES),
+      reconciler: z.enum(PROVIDER_DELTA_REVIEW_STATUSES),
+      supportDeclaration: z.enum(PROVIDER_DELTA_REVIEW_STATUSES),
+      canonicalContractChange: z.enum(PROVIDER_DELTA_REVIEW_STATUSES),
+      workflowOrKernelChange: z.enum(PROVIDER_DELTA_REVIEW_STATUSES),
+      canonicalContractJustification: shortText.optional(),
+      workflowOrKernelJustification: shortText.optional(),
+    })
+    .optional(),
+  versionFacts: z
+    .strictObject({
+      latestObservation: shortText,
+      reviewedBaseline: shortText,
+      supportedRange: shortText,
+      workspacePin: z.literal("unchanged"),
+      observedExecutable: shortText,
+    })
+    .optional(),
+  sourcePageDelta: z
+    .strictObject({
+      owner: z.literal(SOURCE_PAGE_DELTA_OWNER),
+      classification: shortText.nullable(),
+      migration: shortText.nullable(),
+      note: shortText,
+    })
+    .optional(),
+  notes: z.array(shortText).max(12).optional(),
+});
+export type ProviderCapabilityDelta = z.infer<typeof providerCapabilityDeltaSchema>;
+
 /** `mcp: null` keeps an operation CLI-only. Concrete schema types stay visible so MCP registration types check. */
 export const CONTRIBUTION_OPERATIONS = [
   {
@@ -494,7 +562,7 @@ export const CONTRIBUTION_OPERATIONS = [
     mcp: "b2c_contribute_upgrade_plan",
     title: "Prepare an upgrade contribution",
     description:
-      "Produce a bounded upgrade plan for one upstream: candidate revision and digests, releases since the baseline, retained adaptations, expected local diff, affected operations, required verification, and adoption notes. It changes no active business pin.",
+      "Produce a bounded upgrade plan for one upstream: candidate revision and digests, releases since the baseline, retained adaptations, expected local diff, affected operations, required verification, adoption notes, and an optional Provider Capability Delta. It changes no active business pin.",
     inputSchema: upgradePlanInputSchema,
     writes: true,
   },

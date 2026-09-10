@@ -243,6 +243,8 @@ npm run render:credits
 npm run check:credits
 ```
 
+`upgrade-plan` may attach an optional Provider Capability Delta when the upstream has an `external-executable` or `remote-service` relationship. Uninspected native dimensions stay `unknown`. The plan does not overwrite `catalog/providers/capability-delta.yaml`. That file remains the source-page hash ledger. Historical inputs are unchanged.
+
 Network intake needs `--network`. Writes happen only under `--target` or
 `--write`. `evaluate` is CLI-only. `B2C_APP_BUILDER_MCP_CONTRIBUTOR=1` registers
 `b2c_contribute_plan`, `b2c_contribute_check`, `b2c_contribute_preview`,

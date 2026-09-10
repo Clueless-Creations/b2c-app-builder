@@ -12,7 +12,7 @@ One manifest per external project the builder relies on, with its notice, its ob
 
 - `b2c contribute upstreams` prints the inventory. It joins each manifest with source-registry rows, freshness snapshots, knowledge packages, provider contracts, the lockfile, and the recorded observation.
 - `b2c contribute upstream-check --upstream <id> [--fetch] [--observe-host] [--write]` compares the baseline, the support claim, the latest release, the license, and the host executable. Fetching, probing, and writing happen only with the flag.
-- `b2c contribute upgrade-plan --upstream <id> [--candidate <tag>] [--target <dir>]` writes a bounded upgrade plan and a contribution manifest. It changes no support claim and no workspace pin.
+- `b2c contribute upgrade-plan --upstream <id> [--candidate <tag>] [--target <dir>]` writes a bounded upgrade plan and a contribution manifest. It changes no support claim and no workspace pin. When the upstream is an executable or remote service, the plan includes an optional Provider Capability Delta. Uninspected native dimensions stay unknown. The source-page hash ledger stays `catalog/providers/capability-delta.yaml`.
 - `npm run check:upstreams` validates manifests, notices, owner paths, deferrals, and observation age.
 
 ## Rules

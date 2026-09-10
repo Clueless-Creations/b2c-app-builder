@@ -1,4 +1,4 @@
-import type { ContributionManifest, ContributionScope, UpstreamObservation } from "../../contracts/contribution/contract.js";
+import type { ContributionManifest, ContributionScope, ProviderCapabilityDelta, UpstreamObservation } from "../../contracts/contribution/contract.js";
 
 /**
  * Result data shapes for the contribution service. The CLI and the contributor MCP surface
@@ -172,6 +172,8 @@ export interface UpgradePlanData {
   readonly adoptionNotes: string[];
   /** A dependency bump activates no new effects; the support contract stays as authored until reviewed. */
   readonly effectsUnchanged: true;
+  /** Optional additive native-contract delta. Absent never means reviewed-and-unchanged. */
+  readonly providerCapabilityDelta: ProviderCapabilityDelta;
   readonly contributionManifest: ContributionManifest;
   readonly written: string | null;
   readonly unknowns: string[];

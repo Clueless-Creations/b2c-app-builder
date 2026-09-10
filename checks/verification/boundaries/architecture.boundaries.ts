@@ -4,6 +4,7 @@ import { readFirstpartyPackage } from "../../../catalog/packs/installed-firstpar
 import { composeCatalog } from "../../../catalog/index.js";
 import { validateExecutableCatalog } from "../../../kernel/session/catalog-contract.js";
 import { ARCH02_RULE, classifyToolingValidationImport, collectArchitectureIssues } from "../../validation/repository/check-architecture.js";
+import { PROVIDER_BOUNDARY_RULE } from "../../validation/repository/check-provider-boundary.js";
 import { assert, skillRoot, type Harness } from "../fixtures/_harness.js";
 
 export function register(harness: Harness): void {
@@ -67,5 +68,21 @@ export function register(harness: Harness): void {
       `expected the new adapter edge, got ${files.join(",")}`,
     );
     assert(!files.some((file) => file.includes("kernel/session/executor.ts:1")), "the scoped exception must not re-report the allowed executor edge");
+  });
+
+  harness.check("architecture: kernel must not import a provider-native DTO module", () => {
+    const root = harness.makeTempDir("architecture-boundary-provider");
+    mkdirSync(path.join(root, "kernel/engine"), { recursive: true });
+    mkdirSync(path.join(root, "adapters/providers/revenuecat"), { recursive: true });
+    writeFileSync(path.join(root, "adapters/providers/revenuecat/cli-operations.ts"), "export type NativeArgv = string[];\n");
+    writeFileSync(
+      path.join(root, "kernel/engine/policy.ts"),
+      'import type { NativeArgv } from "../../adapters/providers/revenuecat/cli-operations.js";\nexport type Leaked = NativeArgv;\n',
+    );
+    const issues = collectArchitectureIssues({ repoRoot: root });
+    assert(
+      issues.some((item) => item.code === PROVIDER_BOUNDARY_RULE),
+      `expected ${PROVIDER_BOUNDARY_RULE}, got ${issues.map((item) => item.code).join(",")}`,
+    );
   });
 }

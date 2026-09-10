@@ -21,6 +21,7 @@ import { githubIdentity, readGithubUpstream, summarizeReleaseBody, type FetchTex
 import { hashExecutable, observeHost, probeExecutablesOnPath, runVersionProbe, type HashFile, type ProbeExecutables, type RunVersion } from "./host-observe.js";
 import { inferScope } from "./manifest-io.js";
 import { camelToSnake, loadUpstreams, upstreamObservationPath, type LoadedUpstream } from "./upstreams-load.js";
+import { buildUpgradePlanProviderDelta } from "./provider-capability-delta.js";
 import type { ChangeClassification, UpgradePlanData, UpstreamChangeItem, UpstreamCheckData, UpstreamInventoryData, UpstreamInventoryRow } from "./types.js";
 
 /**
@@ -871,6 +872,20 @@ function evaluationCommandFor(verification: string, skillRoot: string): string {
 
 function renderAdoptionMap(plan: Omit<UpgradePlanData, "written">): string {
   const manifest = plan.contributionManifest;
+  const delta = plan.providerCapabilityDelta;
+  const deltaLines = delta.applicable
+    ? [
+        "## Provider Capability Delta",
+        "",
+        `Applicable. Transport ${delta.transport ?? "unknown"}. From ${delta.fromReviewed ?? "unknown"} to ${delta.toCandidate ?? "unknown"}.`,
+        delta.sourcePageDelta
+          ? `Source-page ledger ${delta.sourcePageDelta.owner}: classification ${delta.sourcePageDelta.classification ?? "none"}; ${delta.sourcePageDelta.note}`
+          : "No source-page classification is attached.",
+        "Native-contract dimensions that were not inspected stay unknown.",
+        `Workspace pin: ${delta.versionFacts?.workspacePin ?? "unchanged"}. Observed executable: ${delta.versionFacts?.observedExecutable ?? "not-observed-by-this-plan"}.`,
+        "",
+      ]
+    : ["## Provider Capability Delta", "", delta.reason ?? "Not a provider upgrade.", ""];
   const lines = [
     `# Adoption map: ${manifest.id}`,
     "",
@@ -891,6 +906,7 @@ function renderAdoptionMap(plan: Omit<UpgradePlanData, "written">): string {
     "",
     ...plan.adoptionNotes.map((note) => `- ${note}`),
     "",
+    ...deltaLines,
   ];
   if (plan.unknowns.length) lines.push("## Unknowns", "", ...plan.unknowns.map((item) => `- ${item}`), "");
   return lines.join("\n");
@@ -1145,12 +1161,25 @@ export function upgradePlan(deps: UpstreamDependencies, input: { upstreamId: str
     notices,
   } satisfies ContributionManifest);
 
+  const reviewedSource = manifest.baselines.reviewedSource?.revision ?? "unknown";
+  const reviewedGuidance = manifest.baselines.reviewedGuidance?.revision ?? "unknown";
+  const supportedRange =
+    manifest.support.versions.map((version) => `${version.range} (${version.status})`).join("; ") || "unknown";
+  const providerCapabilityDelta = buildUpgradePlanProviderDelta({
+    skillRoot: deps.skillRoot,
+    manifest,
+    candidateRevision,
+    reviewedSource,
+    reviewedGuidance,
+    supportedRange,
+  });
+
   const plan: Omit<UpgradePlanData, "written"> = {
     upstreamId: manifest.id,
     candidate: candidateRevision ? { revision: candidateRevision, publishedAt, digests } : null,
     baseline: {
-      reviewedSource: manifest.baselines.reviewedSource?.revision ?? "unknown",
-      reviewedGuidance: manifest.baselines.reviewedGuidance?.revision ?? "unknown",
+      reviewedSource,
+      reviewedGuidance,
     },
     changeSummary,
     retainedAdaptations: manifest.adaptations.map((adaptation) => ({ id: adaptation.id, description: adaptation.description, owner: adaptation.owner })),
@@ -1160,6 +1189,7 @@ export function upgradePlan(deps: UpstreamDependencies, input: { upstreamId: str
     requiredVerification,
     adoptionNotes: [...ADOPTION_NOTES],
     effectsUnchanged: true,
+    providerCapabilityDelta,
     contributionManifest,
     unknowns: unique(unknowns),
   };

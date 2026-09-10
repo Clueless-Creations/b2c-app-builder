@@ -245,6 +245,25 @@ function renderText(id: string, data: unknown): string {
         "Adoption notes:",
         ...plan.adoptionNotes.map((entry) => `  - ${entry}`),
       ];
+      const delta = plan.providerCapabilityDelta;
+      if (delta.applicable) {
+        lines.push(
+          `Provider Capability Delta: applicable; transport ${delta.transport ?? "unknown"}; from ${delta.fromReviewed ?? "unknown"} to ${delta.toCandidate ?? "unknown"}`,
+        );
+        if (delta.sourcePageDelta) {
+          lines.push(
+            `  source-page ${delta.sourcePageDelta.owner}: ${delta.sourcePageDelta.classification ?? "none"} (${delta.sourcePageDelta.note})`,
+          );
+        }
+        if (delta.mappingImpact) {
+          lines.push(
+            `  mapping encoder=${delta.mappingImpact.adapterEncoder} decoder=${delta.mappingImpact.adapterDecoder} canonical=${delta.mappingImpact.canonicalContractChange} kernel=${delta.mappingImpact.workflowOrKernelChange}`,
+          );
+        }
+        lines.push(`  workspace pin ${delta.versionFacts?.workspacePin ?? "unchanged"}`);
+      } else {
+        lines.push(`Provider Capability Delta: not applicable (${delta.reason ?? "not a provider upgrade"})`);
+      }
       for (const unknown of plan.unknowns) lines.push(`unknown: ${unknown}`);
       if (plan.written) lines.push(`Written: ${plan.written}`);
       return lines.join("\n");

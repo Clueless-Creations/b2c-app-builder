@@ -10,6 +10,7 @@ import {
   EXPO_PROCESS_DISCOVERY_TIMEOUT_MS,
   assertTrustedExpoProcessRequest,
   buildExpoProcessEnv,
+  defaultExpoProcessRunner,
   type ExpoProcessRequest,
   type ExpoProcessResult,
   type ExpoProcessRunner,
@@ -123,4 +124,22 @@ export function discoverExpoCli(input: DiscoverExpoCliInput): ExpoCliDiscovery {
         ? `Trusted ${commandName} at ${selected.path}. Version output was not a semver; documented EAS CLI ${EAS_CLI_DOCUMENTED_VERSION} is not this binary.`
         : `Trusted ${commandName} ${selected.version} at ${selected.path}. Documented EAS CLI ${EAS_CLI_DOCUMENTED_VERSION} is a docs page, not this host observation.`,
   };
+}
+
+/** Isolated `--version` lookup for `b2c doctor`. Never authenticates or mutates. */
+export const defaultDiscoverRunner: ExpoProcessRunner = defaultExpoProcessRunner;
+
+export function discoverExpoCliForDoctor(input: {
+  readonly kind: ExpoCliKind;
+  readonly isolatedHome: string;
+  readonly cwd: string;
+  readonly pathEnv?: string;
+}): ExpoCliDiscovery {
+  return discoverExpoCli({
+    kind: input.kind,
+    isolatedHome: input.isolatedHome,
+    cwd: input.cwd,
+    pathEnv: input.pathEnv ?? process.env.PATH ?? "",
+    run: defaultDiscoverRunner,
+  });
 }

@@ -15,11 +15,22 @@ export const REVENUECAT_CLI_HOST_IDENTITIES = [
 ] as const;
 export type DoctorHostRevenueCatCliIdentity = (typeof REVENUECAT_CLI_HOST_IDENTITIES)[number];
 
+export const EXPO_EAS_CLI_HOST_IDENTITIES = ["trusted", "missing", "unrelated-executable"] as const;
+export type DoctorHostExpoEasCliIdentity = (typeof EXPO_EAS_CLI_HOST_IDENTITIES)[number];
+
 export interface DoctorHostRevenueCatCliObservation {
   readonly latestObserved: string | null;
   readonly path: string | null;
   readonly version: string | null;
   readonly identity: DoctorHostRevenueCatCliIdentity;
+}
+
+export interface DoctorHostExpoEasCliObservation {
+  readonly latestObserved: string | null;
+  readonly path: string | null;
+  readonly version: string | null;
+  readonly identity: DoctorHostExpoEasCliIdentity;
+  readonly kind: "eas" | "expo";
 }
 
 export interface DoctorHostObservation {
@@ -29,6 +40,8 @@ export interface DoctorHostObservation {
   readonly path: string | null;
   readonly version: string | null;
   readonly revenuecatCli?: DoctorHostRevenueCatCliObservation;
+  readonly easCli?: DoctorHostExpoEasCliObservation;
+  readonly expoCli?: DoctorHostExpoEasCliObservation;
 }
 
 export function doctorHostPath(home = b2cAppBuilderHome()): string {
@@ -53,6 +66,8 @@ export function readDoctorHostObservation(home = b2cAppBuilderHome()): DoctorHos
     if (parsed.schemaVersion !== DOCTOR_HOST_SCHEMA) return null;
     if (typeof parsed.comparedAt !== "string" || !parsed.comparedAt) return null;
     const revenuecatCli = parseRevenueCatCliObservation(parsed.revenuecatCli);
+    const easCli = parseExpoEasCliObservation(parsed.easCli, "eas");
+    const expoCli = parseExpoEasCliObservation(parsed.expoCli, "expo");
     return {
       schemaVersion: DOCTOR_HOST_SCHEMA,
       comparedAt: parsed.comparedAt,
@@ -60,6 +75,8 @@ export function readDoctorHostObservation(home = b2cAppBuilderHome()): DoctorHos
       path: typeof parsed.path === "string" ? parsed.path : null,
       version: typeof parsed.version === "string" ? parsed.version : null,
       ...(revenuecatCli ? { revenuecatCli } : {}),
+      ...(easCli ? { easCli } : {}),
+      ...(expoCli ? { expoCli } : {}),
     };
   } catch {
     return null;
@@ -79,6 +96,24 @@ function parseRevenueCatCliObservation(value: unknown): DoctorHostRevenueCatCliO
     path: typeof record.path === "string" ? record.path : null,
     version: typeof record.version === "string" ? record.version : null,
     identity: record.identity,
+  };
+}
+
+function isExpoEasCliIdentity(value: unknown): value is DoctorHostExpoEasCliIdentity {
+  return typeof value === "string" && (EXPO_EAS_CLI_HOST_IDENTITIES as readonly string[]).includes(value);
+}
+
+function parseExpoEasCliObservation(value: unknown, expectedKind: "eas" | "expo"): DoctorHostExpoEasCliObservation | undefined {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
+  const record = value as Record<string, unknown>;
+  if (!isExpoEasCliIdentity(record.identity)) return undefined;
+  if (record.kind !== expectedKind) return undefined;
+  return {
+    latestObserved: typeof record.latestObserved === "string" ? record.latestObserved : null,
+    path: typeof record.path === "string" ? record.path : null,
+    version: typeof record.version === "string" ? record.version : null,
+    identity: record.identity,
+    kind: expectedKind,
   };
 }
 
@@ -139,7 +174,46 @@ export function renderRevenueCatCliHostBlock(observation: DoctorHostObservation 
   }
 }
 
+export function renderEasCliHostBlock(observation: DoctorHostObservation | null): string {
+  return renderExpoEasCliKindBlock(observation, "eas");
+}
+
+export function renderExpoCliHostBlock(observation: DoctorHostObservation | null): string {
+  return renderExpoEasCliKindBlock(observation, "expo");
+}
+
+function renderExpoEasCliKindBlock(observation: DoctorHostObservation | null, kind: "eas" | "expo"): string {
+  const tool = kind === "eas" ? "EAS CLI" : "Expo CLI";
+  const header = `Host ${tool} (last b2c doctor observation, not a live PATH probe and not live EAS proof`;
+  if (!observation) {
+    return `${header}):\ndoctor has not been run on this machine. Run \`b2c doctor\` to record the winning ${kind === "eas" ? "eas" : "expo"} path and version.`;
+  }
+  const stamped = `${header}; compared-at ${observation.comparedAt}):`;
+  const recorded = kind === "eas" ? observation.easCli : observation.expoCli;
+  if (!recorded) {
+    return `${stamped}\ndoctor ran; this observation did not record ${tool}. Run \`b2c doctor\` again. This is not live EAS proof.`;
+  }
+  const latest = recorded.latestObserved ?? "(unknown)";
+  switch (recorded.identity) {
+    case "missing":
+      return `${stamped}\ndoctor ran; no ${tool} on PATH. Latest observed ${latest}. This is not live EAS proof.`;
+    case "unrelated-executable":
+      return `${stamped}\ndoctor ran; PATH ${kind === "eas" ? "eas/eas-cli" : "expo"} did not identify as ${tool}. Latest observed ${latest}. This is not live EAS proof.`;
+    case "trusted": {
+      if (!recorded.path) {
+        return `${stamped}\ndoctor ran; trusted identity lacked a path. Latest observed ${latest}. This is not live EAS proof.`;
+      }
+      const version = recorded.version ?? "(unparseable)";
+      return `${stamped}\nwinning ${recorded.path} ${version} (documented ${latest} is a docs page). Live EAS is unproven.`;
+    }
+    default: {
+      const exhaustive: never = recorded.identity;
+      return exhaustive;
+    }
+  }
+}
+
 export function appendDoctorHostBlock(text: string, home = b2cAppBuilderHome()): string {
   const observation = readDoctorHostObservation(home);
-  return `${text}\n\n${renderDoctorHostBlock(observation)}\n\n${renderRevenueCatCliHostBlock(observation)}`;
+  return `${text}\n\n${renderDoctorHostBlock(observation)}\n\n${renderRevenueCatCliHostBlock(observation)}\n\n${renderEasCliHostBlock(observation)}\n\n${renderExpoCliHostBlock(observation)}`;
 }

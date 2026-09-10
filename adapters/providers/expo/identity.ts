@@ -84,6 +84,11 @@ export function fingerprintEasUploadInputs(cwd: string): string {
   return fingerprintAppSource(cwd, EAS_UPLOAD_SOURCE_ROOTS, { excludedPaths: easExcludedPaths(cwd) });
 }
 
+/** Digest a caller-chosen subset of upload roots with the same ignore rules. */
+export function fingerprintEasRoots(cwd: string, roots: readonly string[]): string {
+  return fingerprintAppSource(cwd, roots, { excludedPaths: easExcludedPaths(cwd) });
+}
+
 export function buildEasJobBinding(input: {
   readonly cwd: string;
   readonly operationId: ExpoEasCommandId;

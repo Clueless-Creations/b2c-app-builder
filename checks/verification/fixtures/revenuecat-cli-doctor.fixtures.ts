@@ -7,9 +7,10 @@ import {
   probeRevenueCatCliSelectedTarget,
 } from "../../../adapters/providers/revenuecat/cli-doctor.js";
 import { REVENUECAT_CLI_RELEASE } from "../../../adapters/providers/revenuecat/cli-operations.js";
+import { EAS_CLI_DOCUMENTED_VERSION } from "../../../catalog/stacks/expo-eas-commands.js";
 import type { RevenueCatCliTarget } from "../../../adapters/providers/revenuecat/cli-preflight.js";
 import type { CliProcessRequest, CliProcessResult, CliProcessRunner } from "../../../adapters/providers/revenuecat/cli-process.js";
-import { runDoctor, type DoctorAscFacts, type DoctorFinding } from "../../../kernel/session/doctor.js";
+import { runDoctor, type DoctorAscFacts, type DoctorFinding, type DoctorExpoEasFacts } from "../../../kernel/session/doctor.js";
 import {
   readDoctorHostObservation,
   renderRevenueCatCliHostBlock,
@@ -81,6 +82,28 @@ function missingAscFacts(): DoctorAscFacts {
     observe: () => ({
       host: { observedAt: COMPARED_AT, selected: null, executables: [] },
       unknowns: [],
+    }),
+  };
+}
+
+function missingExpoEasFacts(): DoctorExpoEasFacts {
+  return {
+    latestObserved: EAS_CLI_DOCUMENTED_VERSION,
+    discoverEas: () => ({
+      code: "missing",
+      kind: "eas",
+      selected: null,
+      candidates: [],
+      documentedEasVersion: EAS_CLI_DOCUMENTED_VERSION,
+      message: "fixture missing eas",
+    }),
+    discoverExpo: () => ({
+      code: "missing",
+      kind: "expo",
+      selected: null,
+      candidates: [],
+      documentedEasVersion: EAS_CLI_DOCUMENTED_VERSION,
+      message: "fixture missing expo",
     }),
   };
 }
@@ -181,6 +204,7 @@ export function register(harness: Harness): void {
         latestObserved: REVIEWED,
         discover: () => identity("/Users/fixture-operator/.local/bin/rc", REVIEWED),
       }),
+      loadExpoEasFacts: missingExpoEasFacts,
       persistHost: writeDoctorHostObservation,
     });
     assert(finding(findings, "doctor.revenuecat_cli")?.severity === "ok", `expected trusted ok through runDoctor, got ${JSON.stringify(findings.filter((item) => item.code.startsWith("doctor.revenuecat_cli")))}`);
@@ -194,6 +218,7 @@ export function register(harness: Harness): void {
       userHome: () => "/Users/fixture-operator",
       loadAscFacts: missingAscFacts,
       loadRevenueCatFacts: () => ({ latestObserved: REVIEWED, discover: () => discovery("missing") }),
+      loadExpoEasFacts: missingExpoEasFacts,
       persistHost: () => ({ ok: false, message: "disk full" }),
     });
     assert(finding(failed, "doctor.revenuecat_cli_host_write_failed")?.severity === "warn", `expected RC write-failure warn, got ${JSON.stringify(finding(failed, "doctor.revenuecat_cli_host_write_failed"))}`);
@@ -223,6 +248,7 @@ export function register(harness: Harness): void {
             run: recorded.run,
           }),
       }),
+      loadExpoEasFacts: missingExpoEasFacts,
       persistHost: writeDoctorHostObservation,
     });
     assert(recorded.calls.length > 0, "doctor must invoke discovery");

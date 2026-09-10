@@ -12,9 +12,10 @@
  * Exit codes: 0 = healthy (warnings allowed); 1 = the install itself is broken.
  * App Store Connect CLI findings prefer the latest observed release and never install or upgrade
  * the host `asc`. RevenueCat CLI identity uses trusted discovery (`--version` and `commands --json`)
- * because a generic `rc --version` probe cannot distinguish an unrelated binary. A missing or stale
+ * because a generic `rc --version` probe cannot distinguish an unrelated binary. Expo/EAS CLI
+ * identity uses `--version` only and never claims a live EAS job. A missing or stale
  * winner is a warning, same as a missing worker CLI. Doctor never authenticates, never mutates,
- * and never claims live catalog proof.
+ * and never claims live catalog or live EAS proof.
  */
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
@@ -27,6 +28,12 @@ import {
   REVENUECAT_CLI_DOCTOR_REVIEWED_VERSION,
   type RevenueCatCliDiscovery,
 } from "../../adapters/providers/revenuecat/cli-doctor.js";
+import {
+  assessExpoEasHostDoctor,
+  discoverExpoCliKindForDoctor,
+  EAS_CLI_DOCTOR_DOCUMENTED_VERSION,
+  type ExpoCliDiscovery,
+} from "../../adapters/providers/expo/doctor.js";
 import { b2cAppBuilderHome, loadRegistry, registryPath } from "../../adapters/registry.js";
 import { observeHost, probeExecutablesOnPath, runVersionProbe, type HostObserveDependencies, type HostObservationResult } from "../contribution/host-observe.js";
 import { compareSemver, parseSemver, semverSatisfies } from "../contribution/upstreams.js";
@@ -37,6 +44,7 @@ import {
   writeDoctorHostObservation,
   type DoctorHostObservation,
   type DoctorHostRevenueCatCliObservation,
+  type DoctorHostExpoEasCliObservation,
 } from "./doctor-host.js";
 
 const skillRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -60,12 +68,19 @@ export interface DoctorRevenueCatFacts {
   readonly discover: (input: { isolatedHome: string; cwd: string }) => RevenueCatCliDiscovery;
 }
 
+export interface DoctorExpoEasFacts {
+  readonly latestObserved: string;
+  readonly discoverEas: (input: { isolatedHome: string; cwd: string }) => ExpoCliDiscovery;
+  readonly discoverExpo: (input: { isolatedHome: string; cwd: string }) => ExpoCliDiscovery;
+}
+
 export interface DoctorDependencies {
   readonly now: () => Date;
   readonly home: () => string;
   readonly userHome: () => string;
   readonly loadAscFacts: () => DoctorAscFacts | null;
   readonly loadRevenueCatFacts: () => DoctorRevenueCatFacts;
+  readonly loadExpoEasFacts: () => DoctorExpoEasFacts;
   readonly persistHost: (observation: DoctorHostObservation, home: string) => { ok: true } | { ok: false; message: string };
 }
 
@@ -103,6 +118,14 @@ function defaultRevenueCatFacts(): DoctorRevenueCatFacts {
   };
 }
 
+function defaultExpoEasFacts(): DoctorExpoEasFacts {
+  return {
+    latestObserved: EAS_CLI_DOCTOR_DOCUMENTED_VERSION,
+    discoverEas: ({ isolatedHome, cwd }) => discoverExpoCliKindForDoctor({ kind: "eas", isolatedHome, cwd }),
+    discoverExpo: ({ isolatedHome, cwd }) => discoverExpoCliKindForDoctor({ kind: "expo", isolatedHome, cwd }),
+  };
+}
+
 function defaultDoctorDependencies(): DoctorDependencies {
   return {
     now: () => new Date(),
@@ -110,6 +133,7 @@ function defaultDoctorDependencies(): DoctorDependencies {
     userHome: () => process.env.HOME ?? "",
     loadAscFacts: defaultAscFacts,
     loadRevenueCatFacts: defaultRevenueCatFacts,
+    loadExpoEasFacts: defaultExpoEasFacts,
     persistHost: writeDoctorHostObservation,
   };
 }
@@ -194,7 +218,8 @@ export function runDoctor(overrides: Partial<DoctorDependencies> = {}): DoctorFi
   const comparedAt = deps.now().toISOString();
   const asc = probeAsc(finding, deps);
   const revenuecatCli = probeRevenueCatCli(finding, deps);
-  persistDoctorHost(finding, deps, comparedAt, asc, revenuecatCli);
+  const expoEas = probeExpoEasCli(finding, deps);
+  persistDoctorHost(finding, deps, comparedAt, asc, revenuecatCli, expoEas);
 
   return findings;
 }
@@ -205,6 +230,7 @@ function persistDoctorHost(
   comparedAt: string,
   asc: { readonly latestObserved: string | null; readonly path: string | null; readonly version: string | null },
   revenuecatCli: DoctorHostRevenueCatCliObservation,
+  expoEas: { readonly easCli: DoctorHostExpoEasCliObservation; readonly expoCli: DoctorHostExpoEasCliObservation },
 ): void {
   const written = deps.persistHost(
     {
@@ -214,13 +240,39 @@ function persistDoctorHost(
       path: asc.path,
       version: asc.version,
       revenuecatCli,
+      easCli: expoEas.easCli,
+      expoCli: expoEas.expoCli,
     },
     deps.home(),
   );
   if (!written.ok) {
     finding("warn", "doctor.asc_host_write_failed", `could not write doctor-host.json: ${written.message}`);
     finding("warn", "doctor.revenuecat_cli_host_write_failed", `could not write doctor-host.json: ${written.message}`);
+    finding("warn", "doctor.eas_cli_host_write_failed", `could not write doctor-host.json: ${written.message}`);
+    finding("warn", "doctor.expo_cli_host_write_failed", `could not write doctor-host.json: ${written.message}`);
   }
+}
+
+function probeExpoEasCli(
+  finding: (severity: DoctorFinding["severity"], code: string, message: string) => void,
+  deps: DoctorDependencies,
+): { readonly easCli: DoctorHostExpoEasCliObservation; readonly expoCli: DoctorHostExpoEasCliObservation } {
+  const facts = deps.loadExpoEasFacts();
+  const isolatedHome = path.join(deps.home(), "expo-eas-doctor");
+  const sanitizePath = (executablePath: string) => sanitizeExecutablePath(executablePath, deps.userHome());
+  const easAssessed = assessExpoEasHostDoctor({
+    discovery: facts.discoverEas({ isolatedHome, cwd: isolatedHome }),
+    latestObserved: facts.latestObserved,
+    sanitizePath,
+  });
+  const expoAssessed = assessExpoEasHostDoctor({
+    discovery: facts.discoverExpo({ isolatedHome, cwd: isolatedHome }),
+    latestObserved: facts.latestObserved,
+    sanitizePath,
+  });
+  for (const item of easAssessed.findings) finding(item.severity, item.code, item.message);
+  for (const item of expoAssessed.findings) finding(item.severity, item.code, item.message);
+  return { easCli: easAssessed.observation, expoCli: expoAssessed.observation };
 }
 
 function probeRevenueCatCli(

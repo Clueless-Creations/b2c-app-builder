@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.81",
+  "version": "0.219.82",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Union Test Store entitlement completeness from simulate-purchase lookup keys with customers.show.",
-    "Keep empty expected entitlements incomplete, and do not invent management ids from lookup keys."
+    "Author the Apple sibling of Play metadata apply as a standing envelope for live asc metadata push.",
+    "Retarget store-016 onto that envelope; mixed screenshot-plus-metadata rows, store-048, TestFlight, and review submit stay deferred."
   ]
 }

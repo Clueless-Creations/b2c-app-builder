@@ -6668,7 +6668,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/orchestration/full-launch-program.md",
-        "sha256": "sha256:e5a93f8315be29f08de0428720580d4a8382aa6b2f63ec215e44bfc3bcda0d3b",
+        "sha256": "sha256:c30f7a9899e86c2bdb25469b1647ca5dfe832f033a7a0a1756ea787fa53078c2",
         "origin": "skill"
       }
     },
@@ -14318,6 +14318,62 @@
       }
     },
     {
+      "id": "workflow.store.apple-store-media-standing-envelope",
+      "title": "Apple store media standing envelope",
+      "domainId": "domain.store",
+      "areaIds": [
+        "area.build-release"
+      ],
+      "trigger": "App Store screenshots or app previews are ready and a matching media standing envelope is current",
+      "founderPhrasings": [
+        "upload the approved app store screenshots and previews",
+        "push the app store screenshot wells and app previews live",
+        "publish the media assets we already approved for app store connect"
+      ],
+      "instructions": "Upload only the locale, device-well, screenshot, and app-preview assets covered by the exact current standing envelope. Verify every file digest, App Store Connect version-localization ID, and device type from SCREENSHOTS.md immediately before upload. Use `asc screenshots sizes`, `asc screenshots validate`, and `asc screenshots upload` as the selected-provider cookbook forms; probe `--help` before the first live call. Capture before-state and read back the resulting media set. Write store/proof/apple-store-media-apply.json with approval ID, per-file digest, locale, device well, version-localization ID, provider operation IDs, readback state, and timestamps. Do not apply listing text, products, TestFlight, review submission, or release state.",
+      "reads": [
+        "store/STORE_CONSOLE.md",
+        "store/app-store-listing/SCREENSHOTS.md",
+        "state/business-state.json"
+      ],
+      "consults": [],
+      "referenceIds": [
+        "reference.store.app-store-connect-cli",
+        "reference.store.aso-store-ops"
+      ],
+      "roleId": "role.marketing-guru",
+      "laneIds": [
+        "store_console",
+        "content_assets"
+      ],
+      "phaseIds": [
+        "phase.3"
+      ],
+      "dependencies": [
+        "workflow.store.store-screenshots-production",
+        "workflow.store.store-console-workflow",
+        "workflow.operations.agent-operations-ledger"
+      ],
+      "outputPaths": [
+        "store/proof/apple-store-media-apply.json"
+      ],
+      "gateCommands": [
+        "check:store-screenshots"
+      ],
+      "providerIds": [
+        "provider.app-store-connect"
+      ],
+      "founderOnlyActions": [
+        "approve App Store Connect media upload when no exact standing envelope exists"
+      ],
+      "actionClass": "mutate",
+      "protectedCategory": "credentials_access",
+      "idempotent": false,
+      "applicability": {
+        "mode": "always"
+      }
+    },
+    {
       "id": "workflow.store.google-play-testing-track-standing-envelope",
       "title": "Google Play testing-track standing envelope",
       "domainId": "domain.store",
@@ -17075,6 +17131,16 @@
       "generated": false
     },
     {
+      "id": "artifact.store-proof-apple-store-media-apply-json",
+      "path": "store/proof/apple-store-media-apply.json",
+      "ownerDomainId": "domain.store",
+      "laneIds": [
+        "store_console",
+        "content_assets"
+      ],
+      "generated": false
+    },
+    {
       "id": "artifact.store-proof-google-play-media-apply-json",
       "path": "store/proof/google-play-media-apply.json",
       "ownerDomainId": "domain.store",
@@ -18606,14 +18672,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "1043ed8e5e19f833d0397607bd68a934adca0e182d9ed712f49d1bebbbe8654c",
+    "fingerprint": "68e4964a8ee09079256c48f64146c36f6c78f5702dadc411c7d14fe4c1f11d8a",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
         "version": "0.219.68",
         "revision": "0.219.68",
-        "contentDigest": "d791ce44c63bceba55d7071aaeb0a6e857256a64512c5e92b6bc89d420e50214"
+        "contentDigest": "95901d7408420327ccffacc0471401dffdca64ac16aea336833c40429c6391be"
       }
     ],
     "base": {
@@ -18624,7 +18690,7 @@
     "deltas": {
       "business-pack.consumer-business": {
         "domains": 15,
-        "workflows": 112,
+        "workflows": 113,
         "references": 145
       }
     }

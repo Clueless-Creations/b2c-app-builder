@@ -17,6 +17,10 @@ import { validateDefinitionOverlays } from "./overlays.js";
 // Runtime writes these at create or init; the example template does not ship them.
 const RUNTIME_OWNED_READS = new Set(["state/business-state.json", "b2c.yaml", "b2c.json", "operations/FOUNDER_BRIEF.md"]);
 
+/** Dual-store screenshot table. Play already reads it; Apple media must too when both providers exist. */
+const STORE_SCREENSHOTS_PATH = "store/app-store-listing/SCREENSHOTS.md";
+const DUAL_STORE_MEDIA_PROVIDERS = ["provider.app-store-connect", "provider.google-play"] as const;
+
 /**
  * The provider registry workflow providerIds are validated against. Injectable so fixture
  * catalogs stay one-defect-per-case (a fixture registry can bless `provider.fixture`); real
@@ -427,6 +431,8 @@ export function validateCatalog(catalog: Catalog, skillRoot: string, providerReg
       );
   }
 
+  checkStoreScreenshotProducerReaders(catalog, issues);
+
   // A founderPhrasing that names two workflows (verbatim, case-insensitive) is worse than one that
   // names none: the router (issue #58 stage 3) scores it at trigger weight for BOTH, manufacturing
   // exactly the false-tie/false-primary risk authoring this field exists to reduce rather than add.
@@ -815,6 +821,46 @@ function detectCycles<T extends CatalogId>(nodes: Array<{ id: T; dependencies: r
     settled.add(id);
   };
   for (const id of edges.keys()) visit(id);
+}
+
+/**
+ * Inverse of read_unresolvable for one dual-store artifact. SCREENSHOTS.md is produced once and
+ * Play media already reads it; without a distinct App Store Connect reader that depends on the
+ * producer, ledger ancestry makes the two store nodes look related with no directed path.
+ * Fixture catalogs that do not produce this path, or that use only one of the two store
+ * providers, skip. This is not a global unread-output ban and does not treat shared ledger
+ * ancestry as a reader→producer edge.
+ */
+function checkStoreScreenshotProducerReaders(catalog: Catalog, issues: CatalogIssue[]): void {
+  const producers = catalog.workflows.filter((workflow) => workflow.outputPaths.includes(STORE_SCREENSHOTS_PATH));
+  if (producers.length === 0) return;
+
+  const used = new Set(catalog.workflows.flatMap((workflow) => workflow.providerIds));
+  if (!DUAL_STORE_MEDIA_PROVIDERS.every((providerId) => used.has(providerId))) return;
+
+  for (const producer of producers) {
+    const claimed = new Set<string>();
+    for (const providerId of DUAL_STORE_MEDIA_PROVIDERS) {
+      const reader = catalog.workflows.find(
+        (workflow) =>
+          workflow.id !== producer.id &&
+          !claimed.has(workflow.id) &&
+          workflow.providerIds.includes(providerId) &&
+          workflow.reads.includes(STORE_SCREENSHOTS_PATH) &&
+          workflow.dependencies.includes(producer.id),
+      );
+      if (!reader) {
+        issues.push(
+          error(
+            "catalog_graph.workflow.producer_without_reader",
+            `${producer.id} produces ${STORE_SCREENSHOTS_PATH}, but no ${providerId} workflow both reads that path and depends on the producer (shared ledger ancestry is not a directed path).`,
+          ),
+        );
+        continue;
+      }
+      claimed.add(reader.id);
+    }
+  }
 }
 
 function error(code: string, message: string, issuePath?: string): CatalogIssue {

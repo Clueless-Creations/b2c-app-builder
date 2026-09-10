@@ -345,12 +345,26 @@ export function register(h: Harness): void {
     assert(buildAt >= 0 && composeAt > buildAt, "skill teaches composition before the ordinary business path");
     assert(mobileAt > composeAt, "mobile capture precedes composition customization");
     assert(!/docs\/north-star-architecture|ARCH-\d+|docs\/architecture-conformance/.test(skill), "business skill requires maintainer architecture");
+    const statusAt = skill.indexOf("b2c_business_status");
+    const catalogAt = skill.indexOf("only for a specific goal");
+    assert(statusAt >= 0 && catalogAt > statusAt, "skill still sends a registered business through catalog before status/plan");
+    assert(!skill.includes("Load `workflow.orchestration.full-launch-program` first"), "skill still opens the complete-business path on the whole program packet");
+    const agents = readFileSync(path.join(skillRoot, "AGENTS.md"), "utf8");
+    assert(agents.includes("Business is an early exit"), "root guide lost the business early-exit");
+    const contributionAt = agents.indexOf("### Contribution");
+    const businessSlice = contributionAt >= 0 ? agents.slice(0, contributionAt) : agents;
+    assert(!/docs\/north-star-architecture|docs\/architecture-conformance|docs\/decisions/.test(businessSlice), "business start path still names maintainer architecture");
     const readme = readFileSync(path.join(skillRoot, "README.md"), "utf8");
     const startedAt = readme.indexOf("## Get started");
     const nextAt = readme.indexOf("\n## ", startedAt + 1);
     const started = readme.slice(startedAt, nextAt < 0 ? undefined : nextAt);
     const createAt = started.indexOf("b2c business-create");
-    const catalogAt = started.indexOf("b2c catalog --json");
-    assert(createAt >= 0 && catalogAt > createAt, "README Get started still leads with catalog discovery");
+    const catalogCommandAt = started.indexOf("b2c catalog --json");
+    assert(createAt >= 0 && catalogCommandAt > createAt, "README Get started still leads with catalog discovery");
+    const workspace = readFileSync(path.join(skillRoot, "surfaces/workspace-template/repo-agent-entrypoints/AGENTS.md"), "utf8");
+    const startAt = workspace.indexOf("## Start");
+    const workspaceComposeAt = workspace.indexOf("## Customize composition");
+    const workAt = workspace.indexOf("## Work");
+    assert(startAt >= 0 && workAt > startAt && workspaceComposeAt > workAt, "workspace template still teaches composition before ordinary work");
   });
 }

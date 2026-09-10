@@ -20,8 +20,6 @@ Classify the target before reading broadly. Route by what is being changed, not 
 
 Contribution and maintenance may load repository architecture because changing the builder is their task. A business worker never receives contributor tools, maintainer provenance, or `ARCH-xx` policy.
 
-See [ADR-0012](docs/decisions/0012-context-first-agent-routing.md).
-
 ## Repository scope
 
 This repository owns the `b2c-app-builder` skill, MCP server, `b2c` CLI, runtime, contracts, catalog, knowledge, and supported consumer-app business surfaces. Do not turn it into a generic agent framework, B2B playbook, or internal-tool builder. Planes remains parked under `docs/timeouts/planes.md`.
@@ -65,7 +63,7 @@ Do not continue into maintenance reading unless the task changes the builder its
 
 `docs/north-star-architecture.md` owns target architecture and stable `ARCH-xx` rules. `docs/architecture.md` describes current mechanisms. A target rule is not evidence that its refactor is implemented.
 
-Use `docs/architecture-conformance.md` for bounded architecture work. Keep one logical owner per responsibility. Replace owners behind stable contracts when justified. Do not add competing routers, catalogs, knowledge stores, planners, reducers, task stores, summary stores, agent graphs, or workspace state stores.
+Use `docs/architecture-conformance.md` for bounded architecture work. Keep one logical owner per responsibility. Replace owners behind stable contracts when justified. Do not add competing routers, catalogs, knowledge stores, planners, reducers, task stores, summary stores, agent graphs, or workspace state stores. Context-first routing is [ADR-0012](docs/decisions/0012-context-first-agent-routing.md).
 
 Changes to public contracts, truth ownership, dependency direction, authority, or migration guarantees require an architecture decision with evidence and migration treatment. Compatible internal choices remain implementation decisions.
 

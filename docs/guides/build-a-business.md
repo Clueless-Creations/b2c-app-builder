@@ -55,11 +55,17 @@ catalog or prepare a state file first.
 | Existing app, overhaul       | Inventory the working app. Define the target in `product.yaml` and `DESIGN.md`, render `PRODUCT.md`, then rebuild in verified slices.                                                                  | Use it when the overhaul needs multi-session planning or approvals. |
 | Idea supplied                | Record the hypothesis, research it, and ask for Go, Pivot, or Kill before product and design harden.                                                                                                   | Optional after the direction is accepted.                           |
 | No idea, delegated build     | Research several opportunities, choose the strongest safe candidate under the opening mandate, then build and test it locally.                                                                         | Optional after opportunity selection.                               |
-| Full launch program          | Load `workflow.orchestration.full-launch-program`. It records the mandate. The graph then sequences reference packs, producers, fresh-context auditors, and closeout gates to Submit-for-Review ready. | Required.                                                           |
+| Full launch program          | Create or resume the registered workspace, then read status and plan. Research and product acceptance precede initialize. `workflow.orchestration.full-launch-program` sequences later packs and gates; do not open its entire bound list as the first reading obligation. | Required after initialize.                                          |
 
 A delegated build may choose the working name, product scope, stack, design, and
 local implementation. It still pauses for credentials, spend, legal or pricing
 decisions, public actions, destructive work, store submission, and production release.
+
+## Local workspace tools
+
+- `b2c_status`: inspect a registered workspace.
+- `b2c_plan`: compute the next bounded work for a registered workspace.
+- `b2c_operate`: preview or replay an operation. It commits only in explicit write mode after its gates pass.
 
 ## Knowledge tools
 
@@ -69,13 +75,9 @@ decisions, public actions, destructive work, store submission, and production re
 - `b2c_knowledge_get`: retrieve one versioned reference with provenance.
 
 The local MCP and the hosted service both expose these tools. The hosted service
-never resolves or changes local workspaces.
-
-## Local workspace tools
-
-- `b2c_status`: inspect a registered workspace.
-- `b2c_plan`: compute the next bounded work for a registered workspace.
-- `b2c_operate`: preview or replay an operation. It commits only in explicit write mode after its gates pass.
+never resolves or changes local workspaces. Use them after status and plan name
+the current task. Do not start a registered business by dumping a whole-workflow
+bundle.
 
 MCP resolves workspaces through the local registry only. The CLI may take an
 explicit path. Registration gives a workspace a stable ID and makes it visible to MCP.

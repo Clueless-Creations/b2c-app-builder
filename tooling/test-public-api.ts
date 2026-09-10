@@ -13,6 +13,7 @@ const suites = [
   "business-help",
   "founder-brief-intake",
   "connection-and-packet",
+  "after-credits-start",
 ];
 let failed = false;
 

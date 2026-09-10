@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.74",
+  "version": "0.219.75",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Refuse packet-gate strength stdout as independent review, including shape-pass semantic=unknown runtime=unknown.",
-    "Keep a synthetic or graph receipt from turning a live-device sentence into runtime observation."
+    "Freeze store-010 first rank as the non-needed live App Store portfolio workflow so hosted catalog() cannot silently take the router scorer.",
+    "Keep createKnowledgeService().catalog() on matchRank and keep route-utterance out of the Worker bundle."
   ]
 }

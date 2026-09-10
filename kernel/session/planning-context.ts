@@ -12,7 +12,8 @@ import { assertCompositionActivationComplete } from "../composition/activation.j
 import { founderConstraintSlice } from "./founder-brief.js";
 
 export const RESEARCH_ARTIFACTS = ["strategy/RESEARCH.md", "strategy/SIGNAL_CORPUS.md", "strategy/OFFER_TEST.md", "strategy/RED_TEAM_FINDINGS.md"] as const;
-const PLANNING_RESUME_ARTIFACTS = [FOUNDER_BRIEF_ARTIFACT, ...RESEARCH_ARTIFACTS] as const;
+export const PRODUCT_ARTIFACT = "product.yaml" as const;
+const PLANNING_RESUME_ARTIFACTS = [FOUNDER_BRIEF_ARTIFACT, PRODUCT_ARTIFACT, ...RESEARCH_ARTIFACTS] as const;
 const RUNTIME_MARKERS = [
   "catalog.json",
   ".b2c-launch/runtime.json",
@@ -28,9 +29,9 @@ export function isPlanningWorkspace(root: string): boolean {
   assertNoPendingErasure(root);
   assertCompositionActivationComplete(root);
   if (RUNTIME_MARKERS.some((relative) => existsSync(path.join(root, relative)))) return false;
-  const product = readPlanningArtifact(root, "product.yaml");
+  const product = readPlanningArtifact(root, PRODUCT_ARTIFACT);
   if (!product) return false;
-  loadProductInstanceDocument(path.join(root, "product.yaml"));
+  loadProductInstanceDocument(path.join(root, PRODUCT_ARTIFACT));
   return true;
 }
 
@@ -86,6 +87,6 @@ export function readPlanningResume(root: string) {
     artifacts,
     businessComplete: false as const,
     nextAction:
-      "Read operations/FOUNDER_BRIEF.md as the canonical founder brief, then the saved research, signal corpus, offer test and review findings before collecting new evidence. Reuse matching current observations; reconcile uncertain charged calls before replay. Validate the authored outputs, then perform independent research review and initialize the accepted product. Research completion is not business completion.",
+      "Read operations/FOUNDER_BRIEF.md as the canonical founder brief, then product.yaml. File presence is not product acceptance. Then read the saved research, signal corpus, offer test and review findings before collecting new evidence. Reuse matching current observations; reconcile uncertain charged calls before replay. Validate the authored outputs, then perform independent research review and initialize the accepted product. Research completion is not business completion.",
   };
 }

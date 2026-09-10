@@ -121,7 +121,7 @@ try {
   );
 }
 const server = new McpServer(
-  { name: "b2c-app-builder", version: skillVersion() },
+  { name: "b2c-local", version: skillVersion() },
   {
     instructions: localMcpInstructions({
       knowledge: knowledgeService ? "available" : "unavailable",

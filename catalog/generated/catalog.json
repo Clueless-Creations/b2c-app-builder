@@ -1,6 +1,6 @@
 {
   "schemaVersion": "2.0.0",
-  "skillVersion": "0.219.41",
+  "skillVersion": "0.219.42",
   "areas": [
     {
       "id": "area.operating-system",
@@ -6662,13 +6662,13 @@
       "title": "Full Launch Program",
       "loadWhen": "a founder asks for a complete end-to-end consumer delivery (app, full web funnel, store packet, analytics, trust, revenue, growth) carried to Submit-for-Review ready; when opening, resuming, or closing workflow.orchestration.full-launch-program; when checking the definition of done",
       "lifecycle": "active",
-      "applicabilityNotes": "The program is the loadable replacement for a pasted launch prompt. It adds a mandate record, the isolated-review edges, the reference-pack edge, and the closeout gates on top of the existing catalog nodes. It adds no second router, catalog, planner, or state store. Workspace identities belong in operations/LAUNCH_PROGRAM.md and reducer-owned state, never in this reference. CRO, scrollytelling, and 60fps shot-ID audits apply per selected or implemented surface, not to every public URL.",
+      "applicabilityNotes": "The program is the loadable replacement for a pasted launch prompt. It adds a mandate record, the isolated-review edges, the reference-pack edge, and the closeout gates on top of the existing catalog nodes. It adds no second router, catalog, planner, or state store. Workspace identities belong in operations/FOUNDER_BRIEF.md (canonical), the derived operations/LAUNCH_PROGRAM.md slice, and reducer-owned state, never in this reference. CRO, scrollytelling, and 60fps shot-ID audits apply per selected or implemented surface, not to every public URL.",
       "sourceExemption": "This package contains internal operating guidance that sequences existing catalog nodes and gates. It makes no factual claim about a third-party product.",
       "sources": [],
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/orchestration/full-launch-program.md",
-        "sha256": "sha256:c9bfcfc09b6c6aaece63d2fbe7c7a5569b6543627530396535b3c8e85b91795c",
+        "sha256": "sha256:e5a93f8315be29f08de0428720580d4a8382aa6b2f63ec215e44bfc3bcda0d3b",
         "origin": "skill"
       }
     },
@@ -10222,9 +10222,10 @@
         "ship the app, the website, and the store packet as one program",
         "every surface gets a fresh-context review before it counts as done"
       ],
-      "instructions": "Open the program. Write `operations/LAUNCH_PROGRAM.md` from the mandate record in `reference.orchestration.full-launch-program`: outcome, stop line, launch scope, start classification, workspace facts, craft references, spend ceiling, autonomy mode, founder-only actions, and the review policy. Record `project.launchScope: full` through the reducer with a dated founder reason when it changes an existing scope; never edit `state/business-state.json` by hand. Confirm the `## Review Ledger` section exists in `operations/ORCHESTRATION.md` before any broad dispatch. Present one start-of-workflow tool-intake AskUserQuestion for the account-gated tools on the research-backed-spec compiled graph; fold it into a pending readiness gate; do not open a second tool gate. Name App Store Connect API auth and the live apps-list receipt as required even when optional research tools are deferred. Record API-key health and web-session health as two proofs. Classify the start: a brownfield overhaul runs research in audit-and-gap-fill mode with keep, refresh, or redo per artifact. Do not dispatch research-backed-spec until live-app-store-portfolio has succeeded. Then let `b2c plan` sequence the existing nodes; this node adds the mandate, the isolated-review edges, the reference-pack edge, and the closeout gates, not a second graph. Hand off with the smallest founder-only ask.",
+      "instructions": "Open the program. Open `operations/FOUNDER_BRIEF.md` as the canonical founder brief. Write `operations/LAUNCH_PROGRAM.md` as the derived mandate record: quote the bounded founder-constraint slice (constraints, targets, authority, selected-app facts) with provenance (artifact and digest), then outcome, stop line, launch scope, start classification, workspace facts, craft references, spend ceiling, autonomy mode, founder-only actions, and the review policy from `reference.orchestration.full-launch-program`. Do not treat `LAUNCH_PROGRAM.md` as the source or the only mandate owner. Record `project.launchScope: full` through the reducer with a dated founder reason when it changes an existing scope; never edit `state/business-state.json` by hand. Confirm the `## Review Ledger` section exists in `operations/ORCHESTRATION.md` before any broad dispatch. Present one start-of-workflow tool-intake AskUserQuestion for the account-gated tools on the research-backed-spec compiled graph; fold it into a pending readiness gate; do not open a second tool gate. Name App Store Connect API auth and the live apps-list receipt as required even when optional research tools are deferred. Record API-key health and web-session health as two proofs. Classify the start: a brownfield overhaul runs research in audit-and-gap-fill mode with keep, refresh, or redo per artifact. Do not dispatch research-backed-spec until live-app-store-portfolio has succeeded. Then let `b2c plan` sequence the existing nodes; this node adds the mandate, the isolated-review edges, the reference-pack edge, and the closeout gates, not a second graph. Hand off with the smallest founder-only ask.",
       "reads": [
-        "state/business-state.json"
+        "state/business-state.json",
+        "operations/FOUNDER_BRIEF.md"
       ],
       "consults": [
         "PRODUCT.md",
@@ -10282,9 +10283,10 @@
         "show me the final checklist before I submit for review",
         "close out the launch and tell me the one thing left"
       ],
-      "instructions": "Close the program against the definition-of-done table in `reference.orchestration.full-launch-program`. Write `LAUNCH.md` as the launch dossier: the store-console click path ending at Submit for Review, pointers to the listing, screenshots, signing, console, email, and revenue artifacts, the launch calendar, the monetization thresholds, and the open founder decisions. Confirm every lane is done, blocked with a founder action, or deferred with a dated reason the founder accepted. Confirm the review ledger holds a passing row for every producer-to-auditor pair and that each findings artifact exists. Confirm `engineering/PRODUCTION_READINESS.md` carries physical-device evidence, not simulator-only proof. Run `check:lane-coverage`, `check:orchestration`, `check:readiness-coverage`, and `check:app-copy`; do not narrate readiness a gate contradicts. Hand off what the founder clicks, in order, and the one remaining founder action. You never click Submit for Review.",
+      "instructions": "Close the program against the definition-of-done table in `reference.orchestration.full-launch-program` and the canonical founder brief in `operations/FOUNDER_BRIEF.md`. `operations/LAUNCH_PROGRAM.md` is the derived mandate record, not the only mandate owner. Write `LAUNCH.md` as the launch dossier: the store-console click path ending at Submit for Review, pointers to the listing, screenshots, signing, console, email, and revenue artifacts, the launch calendar, the monetization thresholds, and the open founder decisions. Confirm every lane is done, blocked with a founder action, or deferred with a dated reason the founder accepted. Confirm the review ledger holds a passing row for every producer-to-auditor pair and that each findings artifact exists. Confirm `engineering/PRODUCTION_READINESS.md` carries physical-device evidence, not simulator-only proof. Run `check:lane-coverage`, `check:orchestration`, `check:readiness-coverage`, and `check:app-copy`; do not narrate readiness a gate contradicts. Hand off what the founder clicks, in order, and the one remaining founder action. You never click Submit for Review.",
       "reads": [
         "state/business-state.json",
+        "operations/FOUNDER_BRIEF.md",
         "operations/LAUNCH_PROGRAM.md",
         "operations/ORCHESTRATION.md",
         "engineering/PRODUCTION_READINESS.md",
@@ -18604,14 +18606,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "a965fe2d98af6be72e234cb22f92da2ad19bd900c9ed2356319529bcabc1631f",
+    "fingerprint": "7c032af3aab2e671586d42cdd6939b03cc717e6ba8195a6ce3e5acc8798f4e4d",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
-        "version": "0.219.41",
-        "revision": "0.219.41",
-        "contentDigest": "6fddcb014c418c8850cd6762711dfabcf7f623f5fa81f01728b25c300b45919c"
+        "version": "0.219.42",
+        "revision": "0.219.42",
+        "contentDigest": "672bea515ac12087a39bd8b7a4a69b1c0ef67cca4750e8a860ceccf54a2523fb"
       }
     ],
     "base": {

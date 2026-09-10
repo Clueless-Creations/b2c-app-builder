@@ -101,10 +101,19 @@ export function register(h: Harness): void {
       });
       assert(created.sourceIntent.derivedViewEmbedsSource === false, "derived launch program claimed to be the source");
       assert(readFileSync(path.join(root, "operations/FOUNDER_BRIEF.md"), "utf8") === mandate, "founder brief was rewritten");
-      assert(!readFileSync(path.join(root, "operations/LAUNCH_PROGRAM.md"), "utf8").includes("notification coverage"), "derived view embedded the source");
+      assert(
+        readFileSync(path.join(root, "operations/LAUNCH_PROGRAM.md"), "utf8").includes("notification coverage"),
+        "derived launch program dropped the founder constraint",
+      );
       const plan = planBusiness({ workspaceId: "after-credits", maxConcurrency: 1 });
       assert(plan.status === "not_initialized", "creation initialized the runtime");
-      assert(typeof plan.nextAction === "string" && plan.nextAction.length > 0, "planning resume missing after lossless creation");
+      assert(plan.nextAction.includes("operations/FOUNDER_BRIEF.md"), "planning resume must name the canonical brief");
+      assert(
+        plan.resume?.artifacts.some((entry) => entry.path === "operations/FOUNDER_BRIEF.md" && entry.present),
+        "planning resume omitted the founder brief",
+      );
+      assert(plan.founderIntent?.slice.includes("notification coverage"), "plan founderIntent dropped the founder constraint");
+      assert(plan.founderIntent?.slice.includes("performance-budget"), "plan founderIntent dropped the performance-budget target");
     } finally {
       if (previous === undefined) delete process.env.B2C_APP_BUILDER_HOME;
       else process.env.B2C_APP_BUILDER_HOME = previous;

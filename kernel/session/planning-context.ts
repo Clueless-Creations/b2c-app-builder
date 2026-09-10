@@ -3,13 +3,16 @@ import { readResearchObservations } from "./research-observations.js";
 import { createHash } from "node:crypto";
 import { existsSync, lstatSync } from "node:fs";
 import path from "node:path";
+import { FOUNDER_BRIEF_ARTIFACT, type FounderIntentSlice } from "../../contracts/public-api/contract.js";
 import { loadProductInstanceDocument } from "../../catalog/ontology/instance-load.js";
 import { boundedFileBytes } from "../lib/bounded-file.js";
 import { assertNoPendingInitialization } from "./initialization-guard.js";
 import { assertNoPendingErasure } from "../reducer/erasure-guard.js";
 import { assertCompositionActivationComplete } from "../composition/activation.js";
+import { founderConstraintSlice } from "./founder-brief.js";
 
 export const RESEARCH_ARTIFACTS = ["strategy/RESEARCH.md", "strategy/SIGNAL_CORPUS.md", "strategy/OFFER_TEST.md", "strategy/RED_TEAM_FINDINGS.md"] as const;
+const PLANNING_RESUME_ARTIFACTS = [FOUNDER_BRIEF_ARTIFACT, ...RESEARCH_ARTIFACTS] as const;
 const RUNTIME_MARKERS = [
   "catalog.json",
   ".b2c-launch/runtime.json",
@@ -44,8 +47,22 @@ export function readPlanningArtifact(root: string, relative: string): Buffer | u
 }
 
 /** References existing authored evidence; file presence never means accepted work. No provider calls. */
+export function readFounderIntent(root: string): FounderIntentSlice | undefined {
+  const bytes = readPlanningArtifact(root, FOUNDER_BRIEF_ARTIFACT);
+  if (!bytes) return undefined;
+  const text = bytes.toString("utf8");
+  const { slice, truncated } = founderConstraintSlice(text);
+  return {
+    artifact: FOUNDER_BRIEF_ARTIFACT,
+    digest: `sha256:${createHash("sha256").update(bytes).digest("hex")}`,
+    characterCount: text.length,
+    slice,
+    truncated,
+  };
+}
+
 export function readPlanningResume(root: string) {
-  const artifacts = RESEARCH_ARTIFACTS.map((relative) => {
+  const artifacts = PLANNING_RESUME_ARTIFACTS.map((relative) => {
     const bytes = readPlanningArtifact(root, relative);
     return {
       path: relative,
@@ -69,6 +86,6 @@ export function readPlanningResume(root: string) {
     artifacts,
     businessComplete: false as const,
     nextAction:
-      "Read the saved research, signal corpus, offer test and review findings before collecting new evidence. Reuse matching current observations; reconcile uncertain charged calls before replay. Validate the authored outputs, then perform independent research review and initialize the accepted product. Research completion is not business completion.",
+      "Read operations/FOUNDER_BRIEF.md as the canonical founder brief, then the saved research, signal corpus, offer test and review findings before collecting new evidence. Reuse matching current observations; reconcile uncertain charged calls before replay. Validate the authored outputs, then perform independent research review and initialize the accepted product. Research completion is not business completion.",
   };
 }

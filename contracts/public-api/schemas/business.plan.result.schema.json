@@ -368,6 +368,39 @@
                       },
                       "truncated": {
                         "type": "boolean"
+                      },
+                      "founderIntent": {
+                        "type": "object",
+                        "properties": {
+                          "artifact": {
+                            "type": "string",
+                            "const": "operations/FOUNDER_BRIEF.md"
+                          },
+                          "digest": {
+                            "type": "string",
+                            "pattern": "^sha256:[a-f0-9]{64}$"
+                          },
+                          "characterCount": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "slice": {
+                            "type": "string",
+                            "maxLength": 2000
+                          },
+                          "truncated": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "artifact",
+                          "digest",
+                          "characterCount",
+                          "slice",
+                          "truncated"
+                        ],
+                        "additionalProperties": true
                       }
                     },
                     "required": [
@@ -571,6 +604,39 @@
                       },
                       "truncated": {
                         "type": "boolean"
+                      },
+                      "founderIntent": {
+                        "type": "object",
+                        "properties": {
+                          "artifact": {
+                            "type": "string",
+                            "const": "operations/FOUNDER_BRIEF.md"
+                          },
+                          "digest": {
+                            "type": "string",
+                            "pattern": "^sha256:[a-f0-9]{64}$"
+                          },
+                          "characterCount": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "slice": {
+                            "type": "string",
+                            "maxLength": 2000
+                          },
+                          "truncated": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "artifact",
+                          "digest",
+                          "characterCount",
+                          "slice",
+                          "truncated"
+                        ],
+                        "additionalProperties": true
                       }
                     },
                     "required": [
@@ -694,6 +760,39 @@
             },
             "nextAction": {
               "type": "string"
+            },
+            "founderIntent": {
+              "type": "object",
+              "properties": {
+                "artifact": {
+                  "type": "string",
+                  "const": "operations/FOUNDER_BRIEF.md"
+                },
+                "digest": {
+                  "type": "string",
+                  "pattern": "^sha256:[a-f0-9]{64}$"
+                },
+                "characterCount": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "slice": {
+                  "type": "string",
+                  "maxLength": 2000
+                },
+                "truncated": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "artifact",
+                "digest",
+                "characterCount",
+                "slice",
+                "truncated"
+              ],
+              "additionalProperties": true
             }
           },
           "required": [

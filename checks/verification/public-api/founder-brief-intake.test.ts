@@ -6,10 +6,19 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { parse, stringify } from "yaml";
-import { DIRECT_MANDATE_MAX_CHARS, FOUNDER_BRIEF_ARTIFACT, FOUNDER_BRIEF_MAX_BYTES, LAUNCH_PROGRAM_ARTIFACT } from "../../../contracts/public-api/contract.js";
+import {
+  DIRECT_MANDATE_MAX_CHARS,
+  FOUNDER_BRIEF_ARTIFACT,
+  FOUNDER_BRIEF_MAX_BYTES,
+  FOUNDER_CONSTRAINT_SLICE_MAX,
+  LAUNCH_PROGRAM_ARTIFACT,
+} from "../../../contracts/public-api/contract.js";
 import { callPublicOperation } from "../../../kernel/services/business.js";
 import { loadProductInstanceDocument, productYamlPath } from "../../../catalog/ontology/instance-load.js";
 import { renderProductMarkdown } from "../../../catalog/ontology/render-product.js";
+import { loadWorkspaceCatalog } from "../../../kernel/session/catalog-contract.js";
+import { compilePlan } from "../../../kernel/engine/compile.js";
+import { composeNodeBrief } from "../../../kernel/engine/node-brief.js";
 import { workspaceRevision } from "../../../kernel/session/workspace-revision.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
@@ -88,7 +97,20 @@ test("short --mandate remains compatible and records provenance without rewritin
     assert.equal(readFileSync(path.join(env.directory, FOUNDER_BRIEF_ARTIFACT), "utf8"), mandate);
     assert.equal(created.data.sourceIntent.characterCount, mandate.length);
     assert.equal(created.data.sourceIntent.derivedViewEmbedsSource, false);
-    assert(!readFileSync(path.join(env.directory, LAUNCH_PROGRAM_ARTIFACT), "utf8").includes("Keep the selected-app constraint"));
+    const launch = readFileSync(path.join(env.directory, LAUNCH_PROGRAM_ARTIFACT), "utf8");
+    assert(launch.includes("Keep the selected-app constraint"), "derived launch program must carry the short constraint");
+    assert(launch.includes(FOUNDER_BRIEF_ARTIFACT));
+    assert(launch.includes(created.data.sourceIntent.digest));
+    const plan = withHome(env.home, () => callPublicOperation("business.plan", { workspaceId: "app" }));
+    assert(plan.ok, JSON.stringify(plan));
+    assert.equal(plan.data.status, "not_initialized");
+    assert(plan.data.nextAction.includes(FOUNDER_BRIEF_ARTIFACT));
+    assert(plan.data.resume, "planning resume missing after creation");
+    assert(plan.data.founderIntent, "plan founderIntent missing after creation");
+    assert(plan.data.resume.artifacts.some((entry: { path: string; present: boolean }) => entry.path === FOUNDER_BRIEF_ARTIFACT && entry.present));
+    assert.equal(plan.data.founderIntent.artifact, FOUNDER_BRIEF_ARTIFACT);
+    assert(plan.data.founderIntent.slice.includes("Keep the selected-app constraint"));
+    assert.equal(plan.data.founderIntent.truncated, false);
     assert(created.data.sourceIntent.digest.startsWith("sha256:"));
   } finally {
     rmSync(env.temp, { recursive: true, force: true });
@@ -139,8 +161,10 @@ test("After Credits-sized founder brief through --mandate-file is preserved exac
     assert.equal(parsed.data.sourceIntent.characterCount, AFTER_CREDITS_CHARS);
     assert.equal(parsed.data.sourceIntent.derivedViewEmbedsSource, false);
     const launch = readFileSync(path.join(env.directory, LAUNCH_PROGRAM_ARTIFACT), "utf8");
-    assert(!launch.includes(MARKER));
+    assert(launch.includes(MARKER), "bounded launch-program slice must carry the header constraint");
     assert(launch.includes(FOUNDER_BRIEF_ARTIFACT));
+    assert(launch.includes(parsed.data.sourceIntent.digest));
+    assert(launch.length < AFTER_CREDITS_CHARS, "launch program must not dump the full founder brief");
   } finally {
     rmSync(env.temp, { recursive: true, force: true });
   }
@@ -204,7 +228,7 @@ test("missing, empty, oversized, and conflicting mandate inputs refuse before mu
   }
 });
 
-test("file-backed creation does not inject the founder brief into derived worker briefs", () => {
+test("file-backed creation projects a bounded constraint slice onto launch-program, plan, and NodeBrief", () => {
   const env = setup();
   try {
     const brief = afterCreditsSizedBrief().slice(0, AFTER_CREDITS_CHARS);
@@ -221,8 +245,34 @@ test("file-backed creation does not inject the founder brief into derived worker
       assert(initialized.ok, JSON.stringify(initialized));
       const plan = callPublicOperation("business.plan", { workspaceId: "app" });
       assert(plan.ok, JSON.stringify(plan));
+      assert(plan.data.founderIntent, "plan founderIntent missing after initialize");
+      assert.equal(plan.data.founderIntent.artifact, FOUNDER_BRIEF_ARTIFACT);
+      assert(plan.data.founderIntent.slice.includes(MARKER), "plan founderIntent must carry the header constraint");
+      assert.equal(plan.data.founderIntent.truncated, true);
+      assert.equal(plan.data.founderIntent.characterCount, AFTER_CREDITS_CHARS);
+      assert(plan.data.founderIntent.slice.length <= FOUNDER_CONSTRAINT_SLICE_MAX);
       const encoded = JSON.stringify(plan.data);
-      assert(!encoded.includes(MARKER), "ready/held briefs must not carry the entire founder source");
+      assert(!encoded.includes(brief), "plan JSON must not dump the entire founder source");
+      const loaded = loadWorkspaceCatalog(env.directory);
+      assert(loaded.ok, "initialized catalog must load");
+      const compiled = compilePlan(loaded.catalog);
+      const node = compiled.nodes.find((entry) => entry.workflowId === "workflow.orchestration.full-launch-program");
+      assert(node, "full-launch-program node missing from compiled catalog");
+      assert(node.reads, "full-launch-program reads missing");
+      assert(node.instructions, "full-launch-program instructions missing");
+      assert(node.reads.includes(FOUNDER_BRIEF_ARTIFACT), "catalog workflow must read the canonical brief");
+      assert(node.instructions.includes(FOUNDER_BRIEF_ARTIFACT));
+      assert(node.instructions.includes("canonical founder brief"));
+      assert(node.instructions.includes("only mandate owner"));
+      const nodeBrief = composeNodeBrief(node, compiled);
+      assert(nodeBrief.open.includes(FOUNDER_BRIEF_ARTIFACT), "NodeBrief must open the canonical brief");
+      const publicProgram = [...plan.data.ready, ...plan.data.held].find(
+        (entry: { workflowId: string }) => entry.workflowId === "workflow.orchestration.full-launch-program",
+      );
+      if (publicProgram?.brief) {
+        assert(publicProgram.brief.open.includes(FOUNDER_BRIEF_ARTIFACT));
+        assert(publicProgram.brief.founderIntent?.slice.includes(MARKER));
+      }
       assert.equal(readFileSync(path.join(env.directory, FOUNDER_BRIEF_ARTIFACT), "utf8"), brief);
     });
   } finally {

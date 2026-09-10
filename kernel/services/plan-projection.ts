@@ -6,6 +6,7 @@ import {
   type BusinessPlan,
   type PublicFounderQuestion,
   type PublicHoldKind,
+  type FounderIntentSlice,
   type PublicReadyBrief,
 } from "../../contracts/public-api/contract.js";
 import { validateFounderQuestion, type FounderQuestion } from "../session/founder-gate.js";
@@ -85,7 +86,7 @@ function projectLastFailure(node: HeldNode): BusinessPlan["held"][number]["lastF
   };
 }
 
-export function projectReadyBrief(brief: NodeBrief): PublicReadyBrief {
+export function projectReadyBrief(brief: NodeBrief, founderIntent?: FounderIntentSlice): PublicReadyBrief {
   const instructions = boundText(brief.instructions, PUBLIC_PLAN_BOUNDS.instructions);
   const open = projectPaths(brief.open);
   const consult = projectPaths(brief.consult);
@@ -143,6 +144,7 @@ export function projectReadyBrief(brief: NodeBrief): PublicReadyBrief {
     },
     approvals: approvals.map((approval) => approval.text),
     truncated,
+    ...(founderIntent ? { founderIntent } : {}),
   };
 }
 
@@ -180,6 +182,7 @@ export function projectInitializedBusinessPlan(input: {
   revision: string;
   report: PlanReport;
   completion: BusinessPlan["completion"];
+  founderIntent?: FounderIntentSlice;
 }): BusinessPlan {
   const readyNodes = input.report.batches.flat();
   const ready = input.report.readyBriefs.map((brief, index) => {
@@ -188,7 +191,7 @@ export function projectInitializedBusinessPlan(input: {
       workflowId: brief.workflowId,
       title: node?.title ?? brief.title,
       status: "ready" as const,
-      brief: projectReadyBrief(brief),
+      brief: projectReadyBrief(brief, brief.workflowId === "workflow.orchestration.full-launch-program" ? input.founderIntent : undefined),
     };
   });
   const held = input.report.held.map(projectHeldWork);
@@ -207,5 +210,6 @@ export function projectInitializedBusinessPlan(input: {
     nextAction: ready.length
       ? "Run the bounded session against this exact revision using existing authority."
       : "Resolve the reported holds; this passive plan did not observe provider prerequisites.",
+    ...(input.founderIntent ? { founderIntent: input.founderIntent } : {}),
   };
 }

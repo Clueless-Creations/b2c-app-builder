@@ -32,7 +32,7 @@ The `full` launch profile parks no lane. Every lane ends `done`, `blocked` with 
 
 ## The Mandate Record
 
-Write `operations/LAUNCH_PROGRAM.md` at program start. It carries the facts a pasted prompt used to carry. Keep it short. Link the canonical founder brief in `operations/FOUNDER_BRIEF.md`; do not duplicate it.
+Open `operations/FOUNDER_BRIEF.md` at program start. That file is the canonical founder brief. Write `operations/LAUNCH_PROGRAM.md` as the derived mandate record: quote a bounded founder-constraint slice (constraints, targets, authority, selected-app facts) with provenance (artifact and digest), then the program fields below. Keep the derived record short. Do not dump the full brief into every worker. Do not treat `LAUNCH_PROGRAM.md` as the source or the only mandate owner.
 
 | Field                | Content                                                                                                                                                                                 |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

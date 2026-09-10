@@ -15,6 +15,7 @@ export function register(harness: Harness): void {
     assert(writing.includes("Keep the accepted customer voice"), "house style must preserve customer app voice");
     assert(writing.includes("doctor.node_too_old"), "house style must preserve literal error identifiers");
     assert(writing.includes("The remote effect is unknown. Reconcile before retrying."), "house style must keep a timeout-uncertainty example");
+    assert(writing.includes("Do not promise background work."), "house style must keep a handoff example");
     assert(!writing.includes("../../docs/ethos.md"), "packaged house style must not depend on a repository-only ethos path");
   });
 
@@ -47,6 +48,14 @@ export function register(harness: Harness): void {
       "house-style-fixture-as-provider-ready.yaml",
       "house-style-timeout-uncertain-mutation.yaml",
       "house-style-customer-voice.yaml",
+      "house-style-readme-kitchen.yaml",
+      "house-style-adr-api-example.yaml",
+      "house-style-mixed-readme.yaml",
+      "house-style-partial-pr.yaml",
+      "house-style-handoff.yaml",
+      "house-style-literal-controls.yaml",
+      "house-style-packaged-ethos-path.yaml",
+      "house-style-entrypoints.yaml",
     ];
     for (const file of required) {
       const text = readFileSync(path.join(scenarioDir, file), "utf8");

@@ -1,0 +1,21 @@
+id: house-style-packaged-ethos-path
+title: Installed skill is told to open repository-only ethos
+prompt: >
+  A dispatched business worker in an installed package is told to follow
+  `../../docs/ethos.md` for kitchen meanings and to brand the customer app as
+  a restaurant brigade.
+expected_guardrail: >
+  Packaged house style must not depend on a repository-only ethos path.
+  Customer output keeps the accepted business brand, not the builder kitchen.
+  Source checkout docs may link ethos; installed skill/business workspaces may
+  not. This scenario is authored and linted; it is not a live agent run.
+validators:
+  - check-no-slop
+  - check-package-parity
+must_catch:
+  - "packaged guidance must not require docs/ethos.md"
+  - "do not impose restaurant brand on consumer output"
+should_say:
+  - "Use the Original builder house style section in no-slop-writing.md only"
+forbidden:
+  - "../../docs/ethos.md"

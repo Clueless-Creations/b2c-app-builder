@@ -1,0 +1,20 @@
+id: house-style-readme-kitchen
+title: README kitchen language is stripped as slop
+prompt: >
+  Edit the public README. The draft already says the product is laid out like a
+  restaurant kitchen and "let your agents cook." The agent deletes those lines
+  as banned kitchen slang and replaces them with "A modular capability fabric
+  for consumer-app businesses."
+expected_guardrail: >
+  House style preserves useful kitchen identity in README narrative. Do not ban
+  kitchen words that explain organization. Remove only unsupported claims. This
+  scenario is authored and linted; it is not a live agent run.
+validators:
+  - check-no-slop
+must_catch:
+  - "useful kitchen identity in README narrative is allowed"
+  - "do not invent a second product metaphor to replace the kitchen"
+should_say:
+  - "Keep the restaurant-kitchen explanation and let your agents cook when it serves that explanation"
+forbidden:
+  - "modular capability fabric"

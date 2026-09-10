@@ -1,0 +1,20 @@
+id: house-style-literal-controls
+title: Legal line, upstream quote, and error code are restyled
+prompt: >
+  Surrounding prose is being tightened. The agent also rewrites
+  `results vary; this is not medical advice`, an exact upstream license quote,
+  and `doctor.node_too_old` so they sound more like house style.
+expected_guardrail: >
+  Style applies to surrounding prose only. Required legal wording, verbatim
+  upstream quotes, and literal error identifiers stay unchanged. This scenario
+  is authored and linted; it is not a live agent run.
+validators:
+  - check-no-slop
+  - check-privacy-terms
+must_catch:
+  - "required legal wording is not cut for style"
+  - "verbatim quotes and error identifiers stay literal"
+should_say:
+  - "Keep `results vary; this is not medical advice` and `doctor.node_too_old`"
+forbidden:
+  - "inspection.oven_cold"

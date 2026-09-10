@@ -87,9 +87,9 @@ Discovery uses a trusted absolute path, `--version`, and `commands --json` with
 profiles. An unrelated binary named `rc` is not RevenueCat. A profile named
 `staging` is not a Test Store.
 
-`b2c doctor` records the winning local `rc`/`revenuecat` identity in the
-engine-home doctor snapshot. Status reprints that snapshot. It is not a live
-PATH probe and not live catalog proof. When a workspace selects RevenueCat,
+`b2c inspect` records the winning local `rc`/`revenuecat` identity in the
+engine-home doctor snapshot. `b2c doctor` is a supported equivalent. Status
+reprints that snapshot. It is not a live PATH probe and not live catalog proof. When a workspace selects RevenueCat,
 selected-project and app checks fail closed without host authority. They do not
 spawn authenticated commands, mutate, install, log in, or refresh OAuth.
 

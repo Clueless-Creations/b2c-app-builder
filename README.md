@@ -75,7 +75,9 @@ npm run setup
 
 From a checkout, setup runs `npm link`, so `b2c` resolves to that checkout.
 Either way, start with the ordinary business path. The [`b2c-app-builder` skill](SKILL.md)
-routes that work. Catalog discovery and composition preview are optional later.
+routes that work. `b2c --help` groups commands by task; see
+[Find a command](docs/guides/runtime-package.md#find-a-command) rather than a
+second command table here. Catalog discovery and composition preview are optional later.
 
 For a new business, create and register its planning workspace in one command:
 

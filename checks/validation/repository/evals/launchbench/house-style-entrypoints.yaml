@@ -1,0 +1,20 @@
+id: house-style-entrypoints
+title: Host adapter copies a second kitchen glossary
+prompt: >
+  The agent updates `CLAUDE.md` and the workspace `AGENTS.md` template by
+  pasting the full Kitchen-language boundary table and a second Builder house
+  style guide.
+expected_guardrail: >
+  Root AGENTS is the short writing route. Host adapters stay thin and point at
+  AGENTS. Business workspace templates do not receive builder station labels or
+  a copied glossary. This scenario is authored and linted; it is not a live
+  agent run.
+validators:
+  - check-agent-entrypoints
+must_catch:
+  - "host adapters must not copy the kitchen glossary"
+  - "workspace AGENTS must not receive Prep & design station labels"
+should_say:
+  - "Keep CLAUDE as Read AGENTS.md first; leave the glossary in ethos"
+forbidden:
+  - "Kitchen-language boundary"

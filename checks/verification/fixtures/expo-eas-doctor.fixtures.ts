@@ -293,6 +293,7 @@ export function register(harness: Harness): void {
     const notRun = renderEasCliHostBlock(null);
     assert(notRun.includes("not a live PATH probe"), `not-run block must deny a live probe: ${notRun}`);
     assert(notRun.includes("not live EAS proof"), `not-run block must deny live EAS: ${notRun}`);
+    assert(notRun.includes("b2c inspect") && notRun.includes("supported `b2c doctor`"), `not-run block must prefer inspect: ${notRun}`);
     const home = harness.makeTempDir("eas-doctor-status");
     writeDoctorHostObservation(
       {

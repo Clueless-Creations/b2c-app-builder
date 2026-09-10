@@ -1,0 +1,20 @@
+id: house-style-adr-api-example
+title: ADR API example is rewritten in kitchen voice
+prompt: >
+  Draft an ADR example for `b2c business-status --workspace <id> --json`. The
+  agent rewrites the command to `b2c review-the-ticket` and the JSON field
+  `workspaceId` to `cover`.
+expected_guardrail: >
+  ADRs and API examples stay in the technical register. Exact command names,
+  flags, and identifiers survive unchanged. Do not add kitchen aliases. This
+  scenario is authored and linted; it is not a live agent run.
+validators:
+  - check-technical-docs-ste100
+must_catch:
+  - "public command names are not renamed for theme"
+  - "JSON field names stay literal"
+should_say:
+  - "Keep `b2c business-status --workspace <id> --json` and `workspaceId`"
+forbidden:
+  - "review-the-ticket"
+  - "cover"

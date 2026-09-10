@@ -381,6 +381,26 @@ export function register(harness: Harness): void {
     assert(stepSkippedByLane(validators, "heavy") === undefined, "heavy lane must run test:validators");
     assert(stepSkippedByLane(lint, "heavy") === "fast lane (--lane heavy)", "heavy lane must skip launchbench:lint");
     assert(stepSkippedByLane(e2e, "all") === undefined, "lane all skips nothing");
+    assert(
+      stepSkippedByLane(validators, "presubmit") === "deferred until full verification (--lane presubmit)",
+      "presubmit must not run test:validators",
+    );
+    assert(stepSkippedByLane(tsc, "presubmit") === undefined, "presubmit still typechecks");
+    assert(stepSkippedByLane(lint, "presubmit") === undefined, "presubmit runs launchbench:lint");
+    const catalog = plan.find((step) => step.id === "check:catalog")!;
+    assert(stepSkippedByLane(catalog, "presubmit") === undefined, "presubmit runs check:catalog");
+    const boundaries = plan.find((step) => step.id === "test:boundaries")!;
+    assert(
+      stepSkippedByLane(boundaries, "presubmit") === "deferred until full verification (--lane presubmit)",
+      "test:boundaries stays deferred on a docs-only presubmit",
+    );
+    assert(stepSkippedByLane(boundaries, "presubmit", ["boundaries"]) === undefined, "boundaries scope adds test:boundaries to presubmit");
+    const publicApi = plan.find((step) => step.id === "test:public-api")!;
+    assert(
+      stepSkippedByLane(publicApi, "presubmit") === "deferred until full verification (--lane presubmit)",
+      "test:public-api stays off the measured core path",
+    );
+    assert(stepSkippedByLane(publicApi, "presubmit", ["public-api"]) === undefined, "public-api scope adds test:public-api to presubmit");
   });
 
   harness.check("ci-lane: knowledge and docs stay on the fast lane; engine paths select heavy; dispatch fail-closes to heavy", () => {

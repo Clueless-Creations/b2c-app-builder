@@ -60,6 +60,14 @@ npm run check:credits
 Never upgrade a host binary or repin a business as part of the check. No
 scheduled upstream check exists; CI is disabled by the founder, so run it by hand.
 
+## Repository CI
+
+Ordinary PRs and `main` pushes run presubmit. That is not the full audit. At a
+checkpoint and before merge, dispatch `ci.yml` with `verification=full` (or run
+`npm run audit:ci`, `hosted:check`, and `app:check` locally). The map lives in
+`CONTRIBUTING.md`. Do not teach agents that every merge needs a full Actions
+run on every intermediate push.
+
 ## Source adoption
 
 Route a new source to `workflow.machine.source-adoption-contributor` and the

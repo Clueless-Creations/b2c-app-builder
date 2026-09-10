@@ -88,51 +88,76 @@ function skillPathspecs(gitRoot: string, skillRoot: string): string[] {
   return [".", ...REPOSITORY_ONLY_PATHS.map((entry) => `:(exclude)${entry}`)];
 }
 
+/** True when a missing merge-base must fail instead of looking like a pass. */
+function historyRequired(): boolean {
+  return process.env.B2C_REQUIRE_GIT_HISTORY === "1" || process.env.GITHUB_ACTIONS === "true";
+}
+
+function gitIsShallow(gitRoot: string): boolean {
+  const result = git(["rev-parse", "--is-shallow-repository"], gitRoot);
+  return result.status === 0 && result.stdout.trim() === "true";
+}
+
+function isNullSha(value: string | undefined): boolean {
+  return !value || /^0+$/.test(value);
+}
+
 const gitRoot = findGitRoot(args.repoRoot);
 if (gitRoot) {
   const skillSpecs = skillPathspecs(gitRoot, args.skillRoot);
   const relativeManifest = path.relative(realPath(gitRoot), realPath(manifestPath));
-  const gitOutput = (argv: string[]): string => {
-    const result = git(argv, gitRoot);
-    if (result.status !== 0) {
-      issues.push(issue("error", "version_discipline.git_failed", `git ${argv.slice(0, 2).join(" ")} failed: ${result.stderr.trim()}`, relativeManifest));
-      return "";
+  if (gitIsShallow(gitRoot)) {
+    issues.push(
+      issue(
+        "error",
+        "version_discipline.history_insufficient",
+        "Git history is too shallow to compare skill-version.json with earlier commits. Fetch the merge-base (origin/main or GITHUB_BASE_SHA) before this check; a fetch-depth 1 clone must not pass as if the version moved.",
+        relativeManifest,
+      ),
+    );
+  } else {
+    const gitOutput = (argv: string[]): string => {
+      const result = git(argv, gitRoot);
+      if (result.status !== 0) {
+        issues.push(issue("error", "version_discipline.git_failed", `git ${argv.slice(0, 2).join(" ")} failed: ${result.stderr.trim()}`, relativeManifest));
+        return "";
+      }
+      return result.stdout.trim();
+    };
+    const changed = new Set(
+      [
+        ...gitOutput(["diff", "--name-only", "--", ...skillSpecs]).split(/\r?\n/),
+        ...gitOutput(["diff", "--cached", "--name-only", "--", ...skillSpecs]).split(/\r?\n/),
+      ].filter(Boolean),
+    );
+    const pendingManifestChanged = changed.has(relativeManifest);
+    const latestSkillCommit = gitOutput(["log", "-1", "--format=%H", "--", ...skillSpecs]);
+    const latestManifestCommit = gitOutput(["log", "-1", "--format=%H", "--", relativeManifest]);
+
+    if (latestSkillCommit && latestManifestCommit && latestSkillCommit !== latestManifestCommit && !pendingManifestChanged) {
+      issues.push(
+        issue(
+          "error",
+          "version_discipline.manifest_not_latest",
+          "The latest commit touching the skill did not also touch skill-version.json. Bump the version/release notes in the same commit as skill behavior changes.",
+          relativeManifest,
+        ),
+      );
     }
-    return result.stdout.trim();
-  };
-  const changed = new Set(
-    [
-      ...gitOutput(["diff", "--name-only", "--", ...skillSpecs]).split(/\r?\n/),
-      ...gitOutput(["diff", "--cached", "--name-only", "--", ...skillSpecs]).split(/\r?\n/),
-    ].filter(Boolean),
-  );
-  const pendingManifestChanged = changed.has(relativeManifest);
-  const latestSkillCommit = gitOutput(["log", "-1", "--format=%H", "--", ...skillSpecs]);
-  const latestManifestCommit = gitOutput(["log", "-1", "--format=%H", "--", relativeManifest]);
 
-  if (latestSkillCommit && latestManifestCommit && latestSkillCommit !== latestManifestCommit && !pendingManifestChanged) {
-    issues.push(
-      issue(
-        "error",
-        "version_discipline.manifest_not_latest",
-        "The latest commit touching the skill did not also touch skill-version.json. Bump the version/release notes in the same commit as skill behavior changes.",
-        relativeManifest,
-      ),
-    );
-  }
+    monotonicityCheck(gitRoot, relativeManifest, manifest?.version, changed.size > 0, skillSpecs);
 
-  monotonicityCheck(gitRoot, relativeManifest, manifest?.version, changed.size > 0, skillSpecs);
-
-  const meaningfulChanges = Array.from(changed).filter((file) => !file.endsWith("skill-version.json") && !file.includes("/node_modules/"));
-  if (meaningfulChanges.length > 0 && !changed.has(relativeManifest)) {
-    issues.push(
-      issue(
-        "error",
-        "version_discipline.pending_manifest_update_missing",
-        `Pending skill changes require a matching skill-version.json update. Changed examples: ${meaningfulChanges.slice(0, 5).join(", ")}`,
-        relativeManifest,
-      ),
-    );
+    const meaningfulChanges = Array.from(changed).filter((file) => !file.endsWith("skill-version.json") && !file.includes("/node_modules/"));
+    if (meaningfulChanges.length > 0 && !changed.has(relativeManifest)) {
+      issues.push(
+        issue(
+          "error",
+          "version_discipline.pending_manifest_update_missing",
+          `Pending skill changes require a matching skill-version.json update. Changed examples: ${meaningfulChanges.slice(0, 5).join(", ")}`,
+          relativeManifest,
+        ),
+      );
+    }
   }
 }
 
@@ -191,9 +216,9 @@ function git(argv: string[], cwd: string): { status: number | null; stdout: stri
  * manual `git show origin/main:skill-version.json` caught it. Merging it would have moved main
  * backwards with every gate green.
  *
- * Unresolvable base is a WARNING, never an error: a fixture repository, a shallow clone, a fork with
- * no upstream remote and the initial commit itself all legitimately have nothing to compare against,
- * and this check must not turn those into failures.
+ * Unresolvable base is a WARNING on a complete fixture repository or a fork with no upstream.
+ * A shallow clone is an error (`history_insufficient`): fetch-depth 1 used to skip
+ * manifest_not_latest and version_not_ahead_of_base and report green.
  */
 function monotonicityCheck(
   gitRoot: string,
@@ -206,11 +231,16 @@ function monotonicityCheck(
 
   const base = resolveComparisonBase(gitRoot);
   if (!base) {
+    const envBase = process.env.GITHUB_BASE_SHA;
+    const missingFetchedBase = Boolean(envBase) && !isNullSha(envBase);
+    const insufficient = historyRequired() && missingFetchedBase;
     issues.push(
       issue(
-        "warning",
-        "version_discipline.base_unresolvable",
-        "No upstream base commit to compare the version against; monotonicity was not checked. Expected in a fixture repository, a shallow clone, or before the first upstream commit.",
+        insufficient ? "error" : "warning",
+        insufficient ? "version_discipline.history_insufficient" : "version_discipline.base_unresolvable",
+        insufficient
+          ? "Git history is too shallow to compare skill-version.json with the merge base. Fetch origin/main (or GITHUB_BASE_SHA) before running this check; a shallow clone must not pass as if the version moved."
+          : "No upstream base commit to compare the version against; monotonicity was not checked. Expected in a fixture repository or before the first upstream commit.",
         relativeManifest,
       ),
     );
@@ -253,6 +283,11 @@ function monotonicityCheck(
 
 /** The merge base with the upstream trunk, or undefined when there is nothing to compare against. */
 function resolveComparisonBase(gitRoot: string): string | undefined {
+  const envBase = process.env.GITHUB_BASE_SHA ?? "";
+  if (!isNullSha(envBase)) {
+    const mergeBase = git(["merge-base", "HEAD", envBase], gitRoot);
+    if (mergeBase.status === 0 && mergeBase.stdout.trim()) return mergeBase.stdout.trim();
+  }
   for (const ref of ["origin/main", "main", "origin/HEAD"]) {
     const verified = git(["rev-parse", "--verify", "--quiet", `${ref}^{commit}`], gitRoot);
     if (verified.status !== 0 || !verified.stdout.trim()) continue;

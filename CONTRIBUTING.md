@@ -128,31 +128,65 @@ under the package settings: owner `Clueless-Creations`, repository
 
 ## Checks
 
-Run the checks that match the change. Common focused checks:
+GitHub Actions on ordinary pull requests and pushes to `main` runs **presubmit**,
+not the full audit. A green presubmit is not a full-audit pass. Full
+verification still exists; it is explicit.
 
-```bash
-npm run validate:skill
-npm run check:catalog
-npm run check:package-parity
-npm run check:no-slop
-npm run test:fixtures
+```text
+Every change:
+  npm ci
+  npm run audit:ci -- --lane presubmit
+
+Matches the change (focused, while iterating):
+  npm run validate:skill          # local only; paste on the PR
+  npm run check:catalog           # catalog / knowledge
+  b2c contribute check --target … # contribution drafts
+  npm run hosted:check            # hosted/knowledge-mcp, or files it bundles
+  npm run app:check              # hosted/builder-console
+
+Checkpoint and final verification (same as workflow_dispatch verification=full):
+  npm run audit:ci               # every audit-plan step except validate:skill
+  npm run hosted:check
+  npm run app:check
 ```
 
-`npm run audit:ci -- --lane fast` is the gate for every pull request. Run the
-full `npm run audit:ci` when the change affects the runtime, reducer, catalog
-graph, security boundary, provider behavior, or release behavior.
+`npm run audit:ci -- --lane fast` is the historical cheap pool (every non-serial
+gate). It is not the ordinary PR gate. CI runs it only during full verification,
+together with the heavy shards (`test:validators`, `test:fixtures`,
+`test:boundaries`, `test:parity`, `check:engine-e2e`).
 
-CI runs these jobs on pull requests, pushes to `main`, and manual dispatch (see
-[`.github/workflows/ci.yml`](.github/workflows/ci.yml)):
+Trigger full CI with:
 
-- `audit-fast`: the fast lane.
-- `audit-heavy`: fixture suites and engine e2e, only when kernel, catalog, checks, or CI paths change. Manual dispatch always runs it.
-- `hosted-check`: installs `hosted/knowledge-mcp` and runs `npm run hosted:check`, the Worker's lint, typecheck, unit, tenant, build, and integration suite.
-- `app-check`: installs `hosted/builder-console` and runs `npm run app:check`, the console's typecheck and unit suite.
-- `ci-complete`: aggregates the jobs so a skipped heavy lane still counts as green.
+```bash
+gh workflow run ci.yml --ref "$(git branch --show-current)" -f verification=full
+```
+
+Ordinary pushes cancel the previous ordinary run for the same pull request or
+`main` branch. An explicit full run uses a separate concurrency group so a later
+ordinary push cannot cancel it. `publish.yml` stays release-gated and does not
+cancel in progress.
+
+CI jobs (see [`.github/workflows/ci.yml`](.github/workflows/ci.yml)):
+
+- `presubmit`: measured allow-list (typecheck, lint, catalog/public-API/boundary
+  gates, generation consistency, version discipline with enough git history).
+  Extra domain checks join this job when the change reaches them (`test:boundaries`
+  on kernel/contracts/adapters, `test:public-api` on contracts/entrypoints, security
+  gates on the trust validators).
+- `audit-fast` / `audit-heavy`: full verification only, or when the Scope job
+  fails so coverage cannot be deferred safely.
+- `hosted-check` / `app-check`: when the change reaches that Worker or a file it
+  actually imports (generated catalog, knowledge bundles, shared contracts,
+  root lockfile). Unknown scope expands these jobs.
+- `ci-complete`: requires selected jobs. Intentionally deferred jobs are
+  skipped, not green. Cancelled or unexpectedly missing jobs fail. The log
+  says when the run was presubmit-only.
 
 CI never runs `validate:skill`. It needs a local Python tool the runner lacks.
 Record that result, and anything else CI does not reach, in the pull request.
+
+Do not use `[skip ci]`, `continue-on-error`, or an admin merge switch to hide a
+failed or deferred suite.
 
 ## Pull requests
 

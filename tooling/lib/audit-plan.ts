@@ -12,19 +12,75 @@
 
 export type AuditLayout = "repo" | "skill";
 
-/** CI and local audit subsets. `all` is the full plan; GitHub splits fast vs heavy. */
-export type AuditLane = "all" | "fast" | "heavy";
+/**
+ * CI and local audit subsets.
+ *
+ * - `all`: every plan step (local `npm run audit:ci` and GitHub full verification).
+ * - `presubmit`: the measured cheap set on ordinary PRs and main pushes, plus named extras.
+ * - `fast`: every non-serial step (the historical cheap pool). Full verification still runs it.
+ * - `heavy`: serial fixture / e2e suites only.
+ *
+ * Do not treat `presubmit` as a rename of `fast`. A presubmit pass is not a full-audit pass.
+ */
+export type AuditLane = "all" | "presubmit" | "fast" | "heavy";
 
-export const AUDIT_LANES: readonly AuditLane[] = ["all", "fast", "heavy"];
+export const AUDIT_LANES: readonly AuditLane[] = ["all", "presubmit", "fast", "heavy"];
+
+/**
+ * Cheap, deterministic steps that run on every ordinary PR and main push.
+ * Kept as an explicit allow-list so adding a validator to the plan cannot silently
+ * re-inflate the 8-minute historical fast pool onto the common path.
+ */
+export const PRESUBMIT_CORE_IDS: ReadonlySet<string> = new Set([
+  "tsc",
+  "lint:format",
+  "audit:links",
+  "check:catalog",
+  "catalog:render-routing",
+  "check:hosted-bundle",
+  "check:evidence-schema-drift",
+  "check:public-api",
+  "check:package-parity",
+  "check:repository-boundary",
+  "check:agent-entrypoints",
+  "check:architecture",
+  "check:version-discipline",
+  "launchbench:lint",
+]);
+
+/** Extra presubmit steps when `tooling/ci-lane.mjs` selects that scope. */
+export const PRESUBMIT_SCOPE_IDS: Readonly<Record<string, readonly string[]>> = {
+  "test:boundaries": ["boundaries"],
+  "test:public-api": ["public-api"],
+  "check:security": ["security"],
+  "check:privacy": ["security"],
+  "check:secrets": ["security"],
+};
+
+export function parseAuditScopes(value: string | undefined): string[] {
+  if (!value) return [];
+  return value
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+function stepSelectedForPresubmit(step: AuditStep, scopes: readonly string[]): boolean {
+  if (step.kind === "tsc" || step.presubmit) return true;
+  return Boolean(step.presubmitScopes?.some((scope) => scopes.includes(scope)));
+}
 
 /**
  * Why a step is skipped on a CI lane. Typecheck still runs on every lane (the compile barrier).
- * Serial suites (validator fixtures, engine fixtures, e2e) belong on `heavy` only.
+ * Serial suites (validator fixtures, engine fixtures, e2e) belong on `heavy` only, except
+ * `test:boundaries` which may join presubmit when the boundaries scope is selected.
  */
-export function stepSkippedByLane(step: AuditStep, lane: AuditLane): string | undefined {
+export function stepSkippedByLane(step: AuditStep, lane: AuditLane, scopes: readonly string[] = []): string | undefined {
   switch (lane) {
     case "all":
       return undefined;
+    case "presubmit":
+      return stepSelectedForPresubmit(step, scopes) ? undefined : "deferred until full verification (--lane presubmit)";
     case "fast":
       return step.serial ? "heavy lane (--lane fast)" : undefined;
     case "heavy":
@@ -104,6 +160,10 @@ export interface AuditStep {
    * tree, e.g. test:validators / test:fixtures / check:engine-e2e).
    */
   serial?: boolean;
+  /** Always part of `--lane presubmit` (the measured ordinary-PR set). */
+  presubmit?: boolean;
+  /** Also part of `--lane presubmit` when ci-lane selects one of these scopes. */
+  presubmitScopes?: readonly string[];
 }
 
 /**
@@ -418,5 +478,13 @@ export function buildAuditPlan(layout: AuditLayout, roots?: { businessRoot?: str
     },
   ];
 
-  return layout === "repo" ? steps : steps.filter((step) => !step.repoOnly);
+  const cadenced = steps.map((step) => {
+    const presubmitScopes = PRESUBMIT_SCOPE_IDS[step.id];
+    return {
+      ...step,
+      presubmit: step.kind === "tsc" || PRESUBMIT_CORE_IDS.has(step.id),
+      ...(presubmitScopes ? { presubmitScopes } : {}),
+    };
+  });
+  return layout === "repo" ? cadenced : cadenced.filter((step) => !step.repoOnly);
 }

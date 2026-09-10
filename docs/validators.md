@@ -10,8 +10,9 @@ Every validator the B2C App Builder repository ships, what it checks, and how to
 npm install
 npm run audit                       # full local pipeline
 npm run audit:ci                    # full CI-equivalent locally (fast + heavy)
-npm run audit:ci -- --lane fast     # cheap validators; every pull request
-npm run audit:ci -- --lane heavy    # fixture suites and engine e2e
+npm run audit:ci -- --lane presubmit  # ordinary PR / main-push gate
+npm run audit:ci -- --lane fast        # historical cheap pool; full verification
+npm run audit:ci -- --lane heavy       # fixture suites and engine e2e
 npm run audit -- --list             # print the resolved plan without running it
 npm run audit -- --only check:secrets
 npm run audit -- --serial
@@ -23,11 +24,11 @@ Two properties keep the plan honest:
 - `check:package-parity` fails when a `check:*` or `validate:*` script is neither an audit step nor explicitly excluded with a reason, so a gate cannot be quietly dropped.
 - `npm run test:validators` runs positive and negative fixtures, so a validator that silently stops catching its failure mode becomes an audit failure rather than a green build.
 
-Steps marked `[ci-skip]` in `--list` are maintainer-only and skip automatically when their tooling is absent. `[repo-only]` steps run against this repo rather than a target app. `[heavy-lane]` / `[fast-lane]` mark steps the other CI lane skips.
+Steps marked `[ci-skip]` in `--list` are maintainer-only and skip automatically when their tooling is absent. `[repo-only]` steps run against this repo rather than a target app. `[presubmit]` marks the ordinary-PR allow-list. `[deferred]` / `[heavy-lane]` / `[fast-lane]` mark steps the other cadence skips.
 
-[`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs the fast audit lane, `hosted:check`, and `app:check` on every pull request, push to `main`, and manual dispatch. The heavy lane (validator fixtures, engine fixtures, boundaries, parity, `check:engine-e2e`) runs when engine, catalog, validation, verification, or CI paths change, see [`tooling/ci-lane.mjs`](../tooling/ci-lane.mjs). Docs, knowledge, and lockfile-only Dependabot PRs stay on the fast lane. Manual dispatch always runs heavy.
+[`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs **presubmit** on every pull request and push to `main`. Full verification (the historical fast pool, heavy shards, hosted worker, and builder console) runs on `workflow_dispatch` with `verification=full`, and when the Scope job fails so coverage cannot be deferred. Hosted and app jobs also run on ordinary PRs when the change reaches those Workers or a file they actually import. See [`tooling/ci-lane.mjs`](../tooling/ci-lane.mjs). A green presubmit is not a full-audit pass; [`tooling/ci-aggregate.mjs`](../tooling/ci-aggregate.mjs) says so.
 
-`main` carries no branch protection today. A live check on 2026-09-02 found the protection API returns 404, and no rulesets exist. A pull request can merge over a failing job. If you enable required checks, require `CI complete` (always runs; treats a skipped heavy lane as success) rather than `Audit (heavy)` alone, a skipped required job blocks merge.
+The `main` ruleset requires a pull request, blocks deletion, and blocks force-push. It does not require a status check, so renaming jobs does not need a ruleset bypass. If you later require a check, require `CI complete` (always runs; treats intentionally deferred jobs as skipped, not green) rather than `Audit (heavy)` or `Presubmit` alone.
 
 ## Running a gate against your app
 

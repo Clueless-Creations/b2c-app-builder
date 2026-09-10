@@ -210,6 +210,13 @@ Keep one concern per pull request. Explain:
 Open a draft when feedback will help. Mark it ready when the focused evidence
 supports the change.
 
+When the change includes documentation, CLI help, issue or pull-request
+prose, or a status claim, follow the builder house style in
+`knowledge/words/no-slop-writing.md` and the
+[kitchen-language boundary](docs/ethos.md#kitchen-language-boundary). Keep
+technical identifiers and evidence claims exact. A checklist box is not
+independent review.
+
 ## Generated files
 
 Do not hand-edit generated catalog projections. Use the owning renderer and

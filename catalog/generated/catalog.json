@@ -1,6 +1,6 @@
 {
   "schemaVersion": "2.0.0",
-  "skillVersion": "0.219.49",
+  "skillVersion": "0.219.50",
   "areas": [
     {
       "id": "area.operating-system",
@@ -4293,7 +4293,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/engineering/technical-documentation-ste100.md",
-        "sha256": "sha256:3044d92ded449d6d0e4c14d050bb15b5c7ea40207c1e50da7d2be545ed6920d3",
+        "sha256": "sha256:c245da19e5d73f97962eed2e679374c1c1b695236e383336f956a91b46bcbcea",
         "origin": "skill"
       }
     },
@@ -10104,7 +10104,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/words/no-slop-writing.md",
-        "sha256": "sha256:43a82efe1c0e03ba7315fded03a971f83777e1d7092eb5c6c97bb3eb28f171a8",
+        "sha256": "sha256:e6e0ef0f77593f956ba40e1c0a6c3ef51b8b31767ee3e517e4482abf5b4577ed",
         "origin": "skill"
       }
     }
@@ -18606,14 +18606,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "8b1e91dbdcca68a5ab4af1d9dbdbf826134843a95f0d280db1df6b28c42fa5c9",
+    "fingerprint": "7ec48054c83f9be592c71ebcbaeab9fa1c3e2cc0fd6eeec812e404569eb4753b",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
-        "version": "0.219.49",
-        "revision": "0.219.49",
-        "contentDigest": "a7d688fdf1fe1b556a0d39f0e55c4d02a1ce3bfc0afa24f05d4010252ff4a33a"
+        "version": "0.219.50",
+        "revision": "0.219.50",
+        "contentDigest": "79e2d85a59cfa6b1bf16e0840da9a73849c46554616017c33cc1028ab2a1c837"
       }
     ],
     "base": {

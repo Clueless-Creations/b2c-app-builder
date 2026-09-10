@@ -19,7 +19,7 @@ There are six stations and fourteen responsibilities between them. The pass belo
 | Station            | In the catalog                | What it owns                                                                                                                               |
 | ------------------ | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | **The pass**       | Operating System              | Running the launch. Driving the work. Tickets in, plates out, nothing leaves unchecked.                                                    |
-| **The kitchen**    | Product and Experience        | Market research. What you're building. How the app feels. Look and feel. Every word a user reads. From menu planning to the plate.         |
+| **Prep & design**  | Product and Experience        | Market research. What you're building. How the app feels. Look and feel. Every word a user reads. From menu planning to the plate.         |
 | **The hot line**   | Build and Release             | Building the app. App Store and Google Play. Build, prove, sign, package, submit.                                                          |
 | **Front of house** | Growth and Revenue            | Pricing and getting paid. Marketing and growth. Analytics and tracking. The register, the door, the covers count.                          |
 | **The office**     | Business Operations and Trust | Running the business. Privacy, security, and legal. Founder access, accounts, licenses, the health-code binder. Menu planning starts here. |
@@ -46,7 +46,7 @@ Everything else, the agents cook. Each agent owns a station and works from mise 
 
 ## Bring your own way to run a station
 
-This is open source because one kitchen layout, run by many chefs, produces better technique than any single chef could, and the chefs who run it are the ones who should shape it. Contributors build the kitchen and the way it operates: the stations, the equipment, the pass, and the bar a plate has to clear. Most contributions do not add a station, because the stations are the things that are always true. They add ways to run them: a different purveyor at the register, a different creation loop, sharper knowledge in the kitchen, a stricter check at the pass. Same stations, different service.
+This is open source because one kitchen layout, run by many chefs, produces better technique than any single chef could, and the chefs who run it are the ones who should shape it. Contributors build the kitchen and the way it operates: the stations, the equipment, the pass, and the bar a plate has to clear. Most contributions do not add a station, because the stations are the things that are always true. They add ways to run them: a different purveyor at the register, a different creation loop, sharper knowledge at Prep & design, a stricter check at the pass. Same stations, different service.
 
 A contribution earns its place by making a station more useful for the job. It passes the same contracts and the same tests as the first-party version, and it carries its provenance, so the next chef knows where the technique came from.
 
@@ -70,7 +70,7 @@ The path to stars is already half built. Today, every required piece of work sta
 | The people who build the kitchen         | Contributors                                                     |
 | A station                                | An area. Six today.                                              |
 | What a station owns                      | A domain. Fourteen today.                                        |
-| Menu planning                            | Market research. Starts in the office, finishes in the kitchen.  |
+| Menu planning                            | Market research. Starts in the office, finishes in Prep & design. |
 | The equipment at a station               | A capability, with operation semantics and acceptance criteria   |
 | A purveyor                               | A provider: RevenueCat, PostHog, App Store Connect, Resend       |
 | How you run service                      | A recipe: a configurable creation or operating loop              |
@@ -85,3 +85,27 @@ The path to stars is already half built. Today, every required piece of work sta
 | The restaurant                           | A business workspace                                             |
 | A second concept on the same stations    | The sibling business                                             |
 | The guide                                | Stars for businesses built here. Not yet.                        |
+
+## Kitchen-language boundary
+
+Kitchen language explains how the product is organized. It is not a second ontology, a command family, or a way to grant authority.
+
+| Term | Approved use | Boundary |
+| --- | --- | --- |
+| Kitchen | The overall system and layout in explanatory copy | Not the name of the Product and Experience station |
+| Prep & design | Display label for the existing Product and Experience station | Does not rename its catalog ID or shrink research, product, copy, or design responsibilities |
+| Station | Human explanation of an existing stable area of responsibility | Not a newly modeled worker, workflow, or every individual feature |
+| Recipe | Existing selected arrangement of creation and operating work | Not another name for product truth, provider binding, or arbitrary source code |
+| Brigade | Coordinated agents in prose | Not a new runtime entity, role hierarchy, or shipped product name |
+| The pass | Explanation of coordination and acceptance | Not a new command, permission, universal success state, or claim that the founder reviews every artifact |
+| Mise en place / purveyor / ticket | Optional supporting illustration with the literal term nearby | Technical surfaces continue to say knowledge, provider, and work order |
+
+Actions such as approve, verify, publish, deploy, submit, release, revoke, delete, and recover stay literal. Credentials, permission, provider, operation, and evidence stay literal on technical surfaces. A metaphor never grants authority, performs acceptance, or hides an uncertain effect.
+
+Good: `Review at the pass — evidence and approvals`. Bad: `Send it out` as the sole label for production deployment.
+
+Good: `Purchase succeeded; entitlement verification failed. Resume verification without repeating the purchase.` Bad: `The plate got stuck at the pass.`
+
+Good: a labeled station illustrating its existing capability. Bad: a new ontology class added solely to support a label.
+
+Historical ADRs, quoted upstream notices, and recorded evidence are not rewritten to erase older wording.

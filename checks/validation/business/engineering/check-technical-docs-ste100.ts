@@ -142,10 +142,10 @@ for (const relative of [
   governed.push({ displayPath: relative, absolute, tier: "warning" });
 }
 
-// The trigger line in knowledge/engineering/technical-documentation-ste100.md names this
-// skill's own README.md and SKILL.md as governed — include them explicitly, since neither
-// lives under knowledge/ where the walk below would otherwise find them.
-for (const relative of ["README.md", "SKILL.md"]) {
+// SKILL.md is a technical router named by this reference's trigger paragraph.
+// README.md is a mixed front-door document: no-slop owns narrative, and this
+// file's mechanical 20-word scan must not cover the whole README.
+for (const relative of ["SKILL.md"]) {
   const absolute = path.join(skillRoot, relative);
   if (!existsSync(absolute)) continue;
   const displayPath = path.relative(repoRoot, absolute).split(path.sep).join("/");

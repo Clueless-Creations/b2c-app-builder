@@ -371,7 +371,7 @@ export function resolveCliWorkspace(reference: string): { ok: true; path: string
       ? { ok: true, path: direct }
       : {
           ok: false,
-          message: "status.registry_invalid: the workspace registry is unreadable. Run `b2c doctor`, then repair or recreate the registry before using an ID.",
+          message: "status.registry_invalid: the workspace registry is unreadable. Run `b2c inspect` (or supported `b2c doctor`), then repair or recreate the registry before using an ID.",
         };
   }
 }

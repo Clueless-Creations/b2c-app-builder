@@ -224,6 +224,7 @@ function checkPackStandalone(runtimePkg: PackageJson): void {
   // The artifact's load-bearing files: one representative per shipped layer, plus every address.
   const required = [
     "entrypoints/cli/b2c.mjs",
+    "entrypoints/cli/help.mjs",
     "entrypoints/mcp/b2c-app-builder-mcp.mjs",
     "dist/entrypoints/mcp/server.js",
     "dist/entrypoints/cli/business.js",

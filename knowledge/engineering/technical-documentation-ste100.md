@@ -3,8 +3,10 @@
 Use this register before you write or edit any of these files:
 
 - `docs/architecture.md` or `docs/validators.md`
-- This skill's own `README.md` or `SKILL.md`
-- Any `knowledge/*.md` reference file
+- This skill's own `SKILL.md`
+- Technical instruction blocks inside the public `README.md` (commands, flags, schemas)
+- Narrative README copy stays with `no-slop-writing.md`
+- Any `knowledge/*.md` reference file except `knowledge/words/`
 - A maintainer-authored engineering spec inside this repository
 - An ADR or a runbook
 - An API or config reference inside this repository
@@ -19,8 +21,9 @@ This repo already has one writing-quality standard: [`no-slop-writing.md`](../wo
 
 To avoid that collision, the two files split the repo's documentation by file, never by a vague genre label:
 
-- `no-slop-writing.md` alone governs the repo's public front door: root `README.md`, `CONTRIBUTING.md`, `.github/SECURITY.md`, `.github/CODE_OF_CONDUCT.md`, root `AGENTS.md`, and root `CLAUDE.md`. `no-slop-writing.md` §2 calls this set the "third surface," and `check:no-slop` enforces it. Do not apply ASD-STE100 to these six files.
-- This file alone governs the technical documentation named in the trigger paragraph above.
+- `no-slop-writing.md` alone governs the repo's public front door: root `README.md`, `CONTRIBUTING.md`, `.github/SECURITY.md`, `.github/CODE_OF_CONDUCT.md`, root `AGENTS.md`, and root `CLAUDE.md`. `no-slop-writing.md` §2 calls this set the "third surface," and `check:no-slop` enforces it. Do not apply ASD-STE100 as a blanket rewrite of these six files.
+- This file alone governs the technical documentation named in the trigger paragraph above, including `SKILL.md`.
+- The public README is mixed. Apply `no-slop-writing.md` to narrative. Apply this file by judgment to technical examples. `check:documentation-ste100` does not scan README. Do not expand a 20-word ceiling across the whole front door.
 - Founder-facing copy, marketing copy, and brand voice stay with `no-slop-writing.md` and its channel-specific sections. Never apply ASD-STE100 there: it does not cover text where voice, nuance, or persuasion is the point.
 
 Some documents straddle both standards — for example, a `README.md` with a narrative introduction and a technical API section. Apply `no-slop-writing.md` to the narrative part and this file to the technical part. `no-slop-writing.md` §8 uses the same split for legally required text inside persuasive copy.
@@ -66,7 +69,7 @@ A rewrite can drop required precision: a safety condition, a scope qualifier, a 
 ## 5. What This Does Not Govern
 
 - Founder-facing copy, marketing copy, and brand voice — `no-slop-writing.md`.
-- The repo's public front door (root `README.md`/`CONTRIBUTING.md`/`.github/SECURITY.md`/`.github/CODE_OF_CONDUCT.md`/`AGENTS.md`/`CLAUDE.md`) — `no-slop-writing.md` §2.
+- The repo's public front door (root `README.md`/`CONTRIBUTING.md`/`.github/SECURITY.md`/`.github/CODE_OF_CONDUCT.md`/`AGENTS.md`/`CLAUDE.md`) — `no-slop-writing.md` §2. README technical examples keep exact commands. Do not run this file's 20-word scan on the whole README.
 - Code comments — normal engineering documentation standards, per `no-slop-writing.md` §8.
 - Legally required text (privacy policy, terms, disclosures) — `privacy-terms.md`.
 

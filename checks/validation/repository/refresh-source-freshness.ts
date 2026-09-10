@@ -264,6 +264,7 @@ function pruneUnregisteredSnapshots(args: Args): void {
     `${JSON.stringify({ ...parsed, sources: kept }, null, 2)}\n`,
     "utf8",
   );
+  writeKnowledgeFreshnessPin(args.knowledgePinRoot ?? args.root, snapshotPath);
   console.log("Source freshness prune");
   console.log(`pruned=${before.length - kept.length} kept=${kept.length}`);
 }

@@ -227,6 +227,40 @@ export function register(harness: Harness): void {
       assert.ok(existsSync(path.join(outputRoot, "SOURCE_REFRESH_REPORT.md")), "custom report output must remain supported");
     });
   }
+  check("source refresh prune updates the packaged knowledge pin", () => {
+    const pinRoot = path.join(fixture, "prune-pin");
+    const outputRoot = path.join(fixture, "prune-report");
+    const seeded = invoke(
+      "refresh-source-freshness.ts",
+      ["--root", fixture, "--registry", registry, "--knowledge-pin-root", pinRoot, "--out-dir", outputRoot],
+      { body: "reviewed fixture source bytes" },
+    );
+    assert.equal(seeded.status, 0, seeded.output);
+    const currentSnapshot = path.join(outputRoot, "source-snapshots/current.json");
+    const snapshotData = JSON.parse(readFileSync(currentSnapshot, "utf8")) as { generated_at: string; sources: Array<Record<string, unknown>> };
+    snapshotData.sources.push({ id: "orphan-canary", url: publicRawUrl, status: "fresh" });
+    writeFileSync(currentSnapshot, `${JSON.stringify(snapshotData, null, 2)}\n`);
+    const pruned = invoke("refresh-source-freshness.ts", [
+      "--root",
+      fixture,
+      "--registry",
+      registry,
+      "--knowledge-pin-root",
+      pinRoot,
+      "--out-dir",
+      outputRoot,
+      "--prune-unregistered",
+    ]);
+    assert.equal(pruned.status, 0, pruned.output);
+    assert.equal(pruned.requests.length, 0, "prune must not fetch");
+    const prunedSnapshot = JSON.parse(readFileSync(currentSnapshot, "utf8")) as { sources: Array<{ id?: string }> };
+    assert.equal(
+      prunedSnapshot.sources.some((item) => item.id === "orphan-canary"),
+      false,
+    );
+    const pin = loadKnowledgeFreshnessPin(pinRoot, currentSnapshot);
+    assert.equal(pin.generatedAt, snapshotData.generated_at);
+  });
   check("source refresh rejects a missing knowledge pin target before any request", () => {
     for (const args of [["--knowledge-pin-root"], ["--knowledge-pin-root", ""], ["--knowledge-pin-root", "--timeout-ms", "250"]]) {
       const result = invoke("refresh-source-freshness.ts", [

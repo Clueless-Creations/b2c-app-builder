@@ -6,7 +6,7 @@
  * screen and control contracts, provider and policy research, typed analytics, compliant review timing, visual design requirements, and replacement-mode deletion plan.
  */
 import { loadDesignSurfaceApplicability } from "../../../../catalog/ontology/design-surface-applicability.js";
-import { loadOnboardingApplicability } from "../../../../catalog/ontology/onboarding-applicability.js";
+import { loadVerifiedOnboardingApplicability } from "../../../../kernel/composition/onboarding-selection.js";
 import {
   asArray,
   asString,
@@ -164,7 +164,7 @@ if (!skip && artifact) {
   // found and accepted as present.
   const liveText = stripNonRenderedMarkdown(text);
   const relativePath = artifact.relativePath;
-  const applicability = loadOnboardingApplicability(args.root);
+  const applicability = loadVerifiedOnboardingApplicability(args.root);
   const designApplicability = loadDesignSurfaceApplicability(args.root);
   const requiredSections = [
     "Execution Mode",

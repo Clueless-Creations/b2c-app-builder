@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.51",
+  "version": "0.219.52",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Keep onboarding presenter selection on the activated pin, not a pending journal.",
-    "Score leftover proof by a complete evidence record instead of a 400-character packet proxy."
+    "Refresh generated first-party copies of the leftover-proof checkers after the 0.219.51 squash.",
+    "Keep Design Worthiness native-flow and undeclared-color scoring aligned with the packaged tree."
   ]
 }

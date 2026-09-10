@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.73",
+  "version": "0.219.74",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Serialize RevenueCat CLI mutations with an exclusive per-request claim so two empty ledgers cannot both spawn.",
-    "Prove Test Store from CLI apps show readback, and refuse simulate-purchase when the caller only supplied a store label."
+    "Refuse packet-gate strength stdout as independent review, including shape-pass semantic=unknown runtime=unknown.",
+    "Keep a synthetic or graph receipt from turning a live-device sentence into runtime observation."
   ]
 }

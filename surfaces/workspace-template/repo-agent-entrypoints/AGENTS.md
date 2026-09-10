@@ -19,16 +19,6 @@ contract.
 
 Do not rely on chat memory. Use the current repository and CLI output.
 
-## Composition
-
-When `b2c.yaml` exists, it is proposed capability/provider/recipe composition.
-Use `b2c compose --config b2c.yaml --json` to validate and preview it. The current
-public v1 interface does not apply composition or execute provider bindings.
-`bootstrap --apply` installs the compatibility runtime; it does not activate this
-file. Read explicit blockers and do not infer provider readiness from a declaration.
-Keep product meaning, design, credentials, grants, and runtime state in their own
-owners. New integrations must preserve the public consumer contract.
-
 ## Sources
 
 - `product.yaml` owns durable product meaning. `PRODUCT.md` is its rendered index and routes to detailed product files.
@@ -89,6 +79,16 @@ and final verification.
 3. Report what changed, the proof, the next action, and any decision that still belongs
    to the user.
 
+## Customize composition
+
+When `b2c.yaml` exists, it is proposed capability/provider/recipe composition.
+Use `b2c compose --config b2c.yaml --json` to validate and preview it. The current
+public v1 interface does not apply composition or execute provider bindings.
+`bootstrap --apply` installs the compatibility runtime; it does not activate this
+file. Read explicit blockers and do not infer provider readiness from a declaration.
+Keep product meaning, design, credentials, grants, and runtime state in their own
+owners. New integrations must preserve the public consumer contract. Load this
+section only when changing packages or providers.
 
 ## Mobile app operation
 

@@ -70,6 +70,12 @@ test("setup prints a local connection receipt and distinct b2c-local registratio
     assert.equal(parsed.declares.workspaceExecution, "local_cli");
     assert.equal(parsed.declares.writes, "cli_default");
     assert.equal(parsed.observed, undefined);
+    const next = result.stdout.slice(Math.max(0, result.stdout.indexOf("Next steps:")));
+    assert(next.includes("business-status"), "setup receipt path still omits business-status");
+    assert(next.includes("business-plan"), "setup receipt path still omits business-plan");
+    assert(next.indexOf("business-status") < next.indexOf("business-plan"), "setup receipt path lost status before plan");
+    assert(next.indexOf("business-plan") < next.indexOf("b2c catalog --json"), "setup still leads with catalog before plan");
+    assert.doesNotMatch(result.stdout, /first call is almost always b2c_catalog|first call is almost always b2c_knowledge_search/);
   } finally {
     rmSync(temp, { recursive: true, force: true });
   }

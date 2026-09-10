@@ -48,3 +48,36 @@ require("node:module").syncBuiltinESMExports();
     }
   });
 }
+
+function assertSetupLeadsWithStatusBeforeCatalog(stdout: string): void {
+  const next = stdout.slice(Math.max(0, stdout.indexOf("Next steps:")));
+  const createAt = next.indexOf("business-create");
+  const statusAt = next.indexOf("business-status");
+  const planAt = next.indexOf("business-plan");
+  const catalogAt = next.indexOf("b2c catalog --json");
+  const composeAt = next.indexOf("b2c compose");
+  assert(createAt >= 0, "setup next steps omitted business-create");
+  assert(statusAt >= 0, "setup next steps omitted business-status");
+  assert(planAt >= 0, "setup next steps omitted business-plan");
+  assert(statusAt > createAt && planAt > statusAt, "setup next steps must name create, then status, then plan");
+  assert(catalogAt < 0 || catalogAt > planAt, "setup still leads with catalog before plan");
+  assert(composeAt < 0 || composeAt > planAt, "setup still leads with compose before plan");
+  assert.doesNotMatch(stdout, /first call is almost always b2c_catalog|first call is almost always b2c_knowledge_search/);
+}
+
+test("setup next steps name status and plan before catalog or compose", () => {
+  const temp = mkdtempSync(path.join(tmpdir(), "b2c-setup-ordinary-"));
+  const home = path.join(temp, "builder-home");
+  try {
+    const result = spawnSync(process.execPath, [path.join(root, "entrypoints/cli/b2c.mjs"), "setup"], {
+      cwd: temp,
+      env: { ...process.env, B2C_APP_BUILDER_HOME: home },
+      encoding: "utf8",
+      timeout: 30_000,
+    });
+    assert.equal(result.status, 0, result.stderr);
+    assertSetupLeadsWithStatusBeforeCatalog(result.stdout);
+  } finally {
+    rmSync(temp, { recursive: true, force: true });
+  }
+});

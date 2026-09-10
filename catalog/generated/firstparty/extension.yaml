@@ -1,7 +1,7 @@
 apiVersion: b2c.extension/v1
 hostApiVersion: b2c/v1
 id: b2c/consumer-business
-version: 0.219.58
+version: 0.219.59
 title: Consumer business
 dependencies: []
 imports: []

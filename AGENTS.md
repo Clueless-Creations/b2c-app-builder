@@ -12,15 +12,13 @@ Classify the target before reading broadly. Route by what is being changed, not 
 
 | Target | Scope | Canonical router | Default next context |
 | --- | --- | --- | --- |
-| One consumer business: product, design, code, launch, growth, operation | business | [`SKILL.md`](SKILL.md) | supported lifecycle, current `business-plan`, then only its bounded task guidance |
+| One consumer business: product, design, code, launch, growth, operation | business | [`SKILL.md`](SKILL.md) | supported lifecycle, current `business-status` then `business-plan`, then only its bounded task guidance |
 | Reusable knowledge, provider implementation, recipe, example | contribution | [`agents/skills/b2c-contributor/SKILL.md`](agents/skills/b2c-contributor/SKILL.md) | contribution contract and selected unit/source |
 | Builder contracts, runtime, architecture, agent guidance, maintained upstreams | maintenance | [`agents/skills/b2c-maintainer/SKILL.md`](agents/skills/b2c-maintainer/SKILL.md) | public/current architecture and affected owner/tests |
 
-**Business is an early exit.** A business worker does not read maintainer architecture, migration plans, repository source maps, contribution machinery, unrelated providers, or operator procedures merely to start work. Follow the business router and current plan/brief. Load deeper contracts only when the current bounded task requires them.
+**Business is an early exit.** A business worker does not read maintainer architecture, migration plans, repository source maps, contribution machinery, unrelated providers, or operator procedures merely to start work. Follow the business router and current status, then plan/brief. Load deeper contracts only when the current bounded task requires them.
 
 Contribution and maintenance may load repository architecture because changing the builder is their task. A business worker never receives contributor tools, maintainer provenance, or `ARCH-xx` policy.
-
-See [ADR-0012](docs/decisions/0012-context-first-agent-routing.md).
 
 ## Repository scope
 
@@ -36,9 +34,9 @@ This repository is public. Keep secret values, live provider/operator identifier
 
 1. Read this file only far enough to classify scope.
 2. Read `SKILL.md`.
-3. Create/resume through the supported business lifecycle and inspect current `business-plan`.
+3. Create/resume through the supported business lifecycle and inspect current `business-status` then `business-plan`.
 4. Load only the current ready/held brief, relevant accepted product/design/source requirements, knowledge selectors, selected provider facts, authority boundary, outputs, and verification.
-5. Execute/verify the bounded work and return to `business-plan`.
+5. Execute/verify the bounded work and return to `business-status` then `business-plan`.
 
 Do not continue into maintenance reading unless the task changes the builder itself.
 
@@ -65,7 +63,7 @@ Do not continue into maintenance reading unless the task changes the builder its
 
 `docs/north-star-architecture.md` owns target architecture and stable `ARCH-xx` rules. `docs/architecture.md` describes current mechanisms. A target rule is not evidence that its refactor is implemented.
 
-Use `docs/architecture-conformance.md` for bounded architecture work. Keep one logical owner per responsibility. Replace owners behind stable contracts when justified. Do not add competing routers, catalogs, knowledge stores, planners, reducers, task stores, summary stores, agent graphs, or workspace state stores.
+Use `docs/architecture-conformance.md` for bounded architecture work. Keep one logical owner per responsibility. Replace owners behind stable contracts when justified. Do not add competing routers, catalogs, knowledge stores, planners, reducers, task stores, summary stores, agent graphs, or workspace state stores. Context-first routing is [ADR-0012](docs/decisions/0012-context-first-agent-routing.md).
 
 Changes to public contracts, truth ownership, dependency direction, authority, or migration guarantees require an architecture decision with evidence and migration treatment. Compatible internal choices remain implementation decisions.
 
@@ -82,7 +80,7 @@ Durable truth and active worker context are different.
 - Git owns code and authored design history.
 - The local registry owns workspace identity/address.
 
-A business worker receives a bounded projection of those owners for the current task. Prefer existing `business-plan`, ready briefs, knowledge selectors, and accepted artifacts. Do not add another truth store to make prompting easier.
+A business worker receives a bounded projection of those owners for the current task. Prefer existing `business-status`, `business-plan`, ready briefs, knowledge selectors, and accepted artifacts. Do not add another truth store to make prompting easier.
 
 Current guidance differs from future guidance. A future dependency may remain in the graph without entering the current prompt. Required current guidance must be delivered or explicitly unresolved before dispatch. Context reduction may never turn unknown applicability into assumed non-applicability.
 

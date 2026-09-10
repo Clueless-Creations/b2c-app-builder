@@ -12,12 +12,15 @@
  */
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { b2cAppBuilderHome, registryPath } from "../../adapters/registry.js";
+import { resolveSkillRoot } from "../../tooling/lib/skill-root.js";
 import { printFindings, runDoctor } from "./doctor.js";
 import { isMainModule } from "../lib/cli.js";
 
-const skillRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+const skillRoot = resolveSkillRoot(import.meta.url);
+
+/** Portable MCP registration after the package is on the registry (`npx -y <name>` runs this bin). */
+export const PORTABLE_MCP_COMMAND = "npx -y b2c-app-builder";
 
 function main(): number {
   if (process.argv.slice(2).some((arg) => arg === "--help" || arg === "-h")) {
@@ -83,8 +86,8 @@ function main(): number {
       ...(fromCheckout
         ? []
         : [
-            "    Portable form, no machine paths (any client: command npx, args -y -p b2c-app-builder b2c-app-builder-mcp):",
-            "    claude mcp add --scope user b2c-app-builder -- npx -y -p b2c-app-builder b2c-app-builder-mcp",
+            `    Portable form, no machine paths (any client: command npx, args -y b2c-app-builder):`,
+            `    claude mcp add --scope user b2c-app-builder -- ${PORTABLE_MCP_COMMAND}`,
           ]),
       `    Then set "alwaysLoad": true on this entry in ~/.claude.json — the router's first call is almost always b2c_catalog or b2c_knowledge_search, so deferral costs a wasted round trip.`,
       "",

@@ -1,7 +1,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { Ajv2020, type AnySchema, type ErrorObject, type ValidateFunction } from "ajv/dist/2020.js";
+import { resolveSkillRoot } from "../../tooling/lib/skill-root.js";
 
 import { validateOperatingModel } from "../operating-model/validate.js";
 import { isValidNonFutureRfc3339Instant, isValidPastIsoDate, validateSignalSupersessionGraph } from "./evidence-grammar.js";
@@ -17,7 +17,7 @@ import type {
   WaiversDocument,
 } from "./types.js";
 
-const schemaDir = path.dirname(fileURLToPath(import.meta.url));
+const schemaDir = path.join(resolveSkillRoot(import.meta.url), "kernel", "schema");
 
 export interface SchemaIssue {
   severity: "error" | "warning";

@@ -1,4 +1,4 @@
-import { resolveTsxCli } from "./tsx-launcher.mjs";
+import { resolveCompiledScript, resolveTsxCli } from "./tsx-launcher.mjs";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { describeSpawnFailure, spawnErrorCode, type SpawnOutcome } from "./spawn.js";
@@ -25,6 +25,14 @@ export function resolveTsxCommand(skillRoot: string, args: string[]): { executab
   } catch {
     return { executable: resolveTsxBin(skillRoot), args };
   }
+}
+
+/** Prefer `dist/` when present so a production install does not need tsx. */
+export function resolveRuntimeCommand(skillRoot: string, args: string[]): { executable: string; args: string[] } {
+  const script = args[0];
+  const compiled = script === undefined ? undefined : resolveCompiledScript(skillRoot, script);
+  if (compiled) return { executable: process.execPath, args: [compiled, ...args.slice(1)] };
+  return resolveTsxCommand(skillRoot, args);
 }
 
 /**

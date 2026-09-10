@@ -77,4 +77,22 @@ export function register(h: Harness): void {
       "script refusal mislabeled as installation failure",
     );
   });
+  h.check("runtime-launchers: compiled dist wins over tsx and does not need the tsx dependency", () => {
+    const root = fixturePackage(h, "launcher-compiled-dist", false);
+    mkdirSync(path.join(root, "dist", "entrypoints", "cli"), { recursive: true });
+    writeFileSync(
+      path.join(root, "dist", "entrypoints", "cli", "business.js"),
+      "console.log(JSON.stringify({ node: process.execPath, cwd: process.cwd(), compiled: true, args: process.argv.slice(2) }));",
+    );
+    writeFileSync(path.join(root, "entrypoints/cli/business.ts"), 'console.error("source ts fallback should not run"); process.exit(9);');
+    const result = spawnSync(process.execPath, [path.join(root, "entrypoints/cli/b2c.mjs"), "business-status", "--workspace", "example"], {
+      cwd: h.makeTempDir("launcher-compiled-cwd"),
+      env: { ...process.env, PATH: "" },
+      encoding: "utf8",
+    });
+    assert(result.status === 0, `compiled CLI launch failed: ${result.stderr}`);
+    const observed = JSON.parse(result.stdout) as { compiled?: boolean; args?: string[] };
+    assert(observed.compiled === true, "launcher must exec dist/ when it exists");
+    assert(observed.args?.join(" ") === "business-status --workspace example", "compiled CLI arguments changed");
+  });
 }

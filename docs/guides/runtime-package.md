@@ -84,6 +84,8 @@ b2c doctor
 
 Setup creates `~/.b2c-app-builder/workspaces.json` and prints the MCP registration commands. It does not create an app workspace, add credentials, deploy a service, spend money, or submit an app.
 
+A packed install launches compiled ESM from `dist/` and does not need `tsx`. A source checkout runs `npm run build` (also via `prepack`) or falls back to `tsx` until that build exists.
+
 ## CLI
 
 ```bash
@@ -160,7 +162,7 @@ The input is canonical unpadded base64url SPKI DER text for an Ed25519 public ke
 
 ## MCP
 
-Register the absolute Node command and the `entrypoints/mcp/b2c-app-builder-mcp.mjs` path that `b2c setup` prints, under the name `b2c-app-builder`. Without a local install, register the portable form instead: command `npx`, arguments `-y -p b2c-app-builder b2c-app-builder-mcp`. The transport is stdio.
+Register the absolute Node command and the `entrypoints/mcp/b2c-app-builder-mcp.mjs` path that `b2c setup` prints, under the name `b2c-app-builder`. Without a local install, register the portable form instead: command `npx`, arguments `-y b2c-app-builder`. The transport is stdio.
 
 The default server exposes public discovery and composition preview plus workspace catalog, workflow, knowledge, status, plan, and operation preview and replay tools. Registered-workspace planning can run read-only provider prerequisite probes. The server resolves workspaces only through `~/.b2c-app-builder/workspaces.json`.
 

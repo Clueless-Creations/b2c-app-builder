@@ -18,15 +18,15 @@
  */
 import { cpSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { loadProductInstanceDocument, productYamlPath } from "../../catalog/ontology/instance-load.js";
 import { renderProductMarkdown } from "../../catalog/ontology/render-product.js";
 import { isMainModule } from "../lib/cli.js";
 import { writeFounderIntake } from "./founder-brief.js";
 import type { FounderBriefSourceIntent } from "../../contracts/public-api/contract.js";
 import { loadDesignSystem, validateDesignMd } from "../../tooling/lib/design-md.js";
+import { resolveSkillRoot } from "../../tooling/lib/skill-root.js";
 
-const skillRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+const skillRoot = resolveSkillRoot(import.meta.url);
 const SLUG_RULE = /^[a-z0-9][a-z0-9-]*$/;
 const IDEA_DESCRIPTION = "{{IDEA_DESCRIPTION}}";
 const IDEA_HYPOTHESIS = "{{IDEA_HYPOTHESIS}}";

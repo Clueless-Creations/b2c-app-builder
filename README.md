@@ -59,7 +59,7 @@ command for Claude Code, Cursor, and Codex. The portable form needs no install
 at all:
 
 ```bash
-claude mcp add --scope user b2c-app-builder -- npx -y -p b2c-app-builder b2c-app-builder-mcp
+claude mcp add --scope user b2c-app-builder -- npx -y b2c-app-builder
 ```
 
 To work from source, or if the package is unavailable from npm, clone the

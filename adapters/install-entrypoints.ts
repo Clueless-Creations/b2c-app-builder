@@ -20,17 +20,16 @@ import { boundedFileBytes } from "../kernel/lib/bounded-file.js";
 import { atomicFile } from "../kernel/lib/atomic-file.js";
 import { existsSync, lstatSync, mkdirSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { toCatalogInput } from "../catalog/bridge.js";
 import { composeCatalog } from "../catalog/index.js";
 import { type RuntimeCompositionPin } from "../catalog/packs/isolation.js";
 import { loadDesignSystem, validateDesignMd } from "../tooling/lib/design-md.js";
 import { expandHome, flagBoolean, flagString, parseFlags } from "../tooling/lib/launch-state.js";
+import { resolveSkillRoot } from "../tooling/lib/skill-root.js";
 import { isMainModule } from "../kernel/lib/cli.js";
 import { loadWorkspaceCatalogIfPresent, renderCatalogRefusal } from "../kernel/session/catalog-contract.js";
 
-const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-const defaultSkillRoot = path.resolve(scriptDir, "..");
+const defaultSkillRoot = resolveSkillRoot(import.meta.url);
 
 const MANAGED_MARKERS = ["b2c-app-builder"] as const;
 const MANAGED_COMMAND_PATHS = [".codex/skills/b2c-app-builder/"] as const;

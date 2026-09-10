@@ -17,14 +17,14 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import { spawnSync } from "node:child_process";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { pathToFileURL } from "node:url";
 import { expandHome, flagBoolean, flagNumber, flagString, parseFlags } from "../tooling/lib/launch-state.js";
+import { resolveSkillRoot } from "../tooling/lib/skill-root.js";
 import { isMainModule } from "../kernel/lib/cli.js";
 import { founderFacingRuntimeIds, type RuntimeId } from "./profile.js";
 import { loadWorkspaceCatalog, renderCatalogRefusal } from "../kernel/session/catalog-contract.js";
 
-const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-const defaultSkillRoot = path.resolve(scriptDir, "..");
+const defaultSkillRoot = resolveSkillRoot(import.meta.url);
 
 export type ScheduleMechanism = "cron" | "launchd";
 

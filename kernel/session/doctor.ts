@@ -6,7 +6,7 @@
  * orchestrates the machine owner's OWN agent CLIs — their subscriptions, their spend. A machine
  * with no worker CLI can still bootstrap, plan, and run fixture sessions, so that is a warning,
  * not an error; a broken engine install (missing catalog, version drift between the compiled
- * catalog and skill-version.json, unusable tsx) is an error, because every address misbehaves
+ * catalog and skill-version.json, missing compiled entrypoints with no tsx fallback) is an error, because every address misbehaves
  * from there.
  *
  * Exit codes: 0 = healthy (warnings allowed); 1 = the install itself is broken.
@@ -19,8 +19,8 @@
  */
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { resolveTsxCommand, tsxBinResolves } from "../../tooling/lib/tsx-bin.js";
+import { compiledRuntimePresent, resolveSkillRoot } from "../../tooling/lib/skill-root.js";
 import { detectWorkerRuntimes } from "./executor.js";
 import {
   assessRevenueCatCliHostDoctor,
@@ -47,7 +47,7 @@ import {
   type DoctorHostExpoEasCliObservation,
 } from "./doctor-host.js";
 
-const skillRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+const skillRoot = resolveSkillRoot(import.meta.url);
 
 export interface DoctorFinding {
   readonly severity: "ok" | "warn" | "error";
@@ -150,9 +150,12 @@ export function runDoctor(overrides: Partial<DoctorDependencies> = {}): DoctorFi
   if (Number.isFinite(nodeMajor) && nodeMajor >= requiredMajor) finding("ok", "doctor.node", `node ${process.versions.node}`);
   else finding("error", "doctor.node_too_old", `node ${process.versions.node} — the engine needs node ${requiredMajor} or newer`);
 
+  const compiled = compiledRuntimePresent(skillRoot);
+  if (compiled) finding("ok", "doctor.compiled", "compiled entrypoints present under dist/");
   const command = resolveTsxCommand(skillRoot, []);
   const tsxBin = command.executable === process.execPath ? command.args[0]! : command.executable;
   if (tsxBinResolves(tsxBin)) finding("ok", "doctor.tsx", `tsx at ${tsxBin}`);
+  else if (compiled) finding("ok", "doctor.tsx", "tsx not required; compiled entrypoints are present");
   else
     finding(
       "error",

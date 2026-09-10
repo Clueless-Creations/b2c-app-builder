@@ -1,8 +1,8 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { Ajv2020, type AnySchema } from "ajv/dist/2020.js";
 import YAML from "yaml";
+import { packageFile } from "../../tooling/lib/skill-root.js";
 import {
   isOntologyCardinality,
   isOntologyClassId,
@@ -22,7 +22,7 @@ import {
   type WorldOntology,
 } from "./types.js";
 
-const schemaPath = fileURLToPath(new URL("./world.schema.json", import.meta.url));
+const schemaPath = packageFile(import.meta.url, "catalog/ontology/world.schema.json");
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);

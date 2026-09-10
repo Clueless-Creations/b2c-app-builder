@@ -1,10 +1,9 @@
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import type { Binding, Entity } from "../contracts/public-api/contract.js";
 import type { PackageDependency } from "../kernel/composition/resources.js";
+import { resolveSkillRoot } from "../tooling/lib/skill-root.js";
 import { readFirstpartyPackage } from "./packs/installed-firstparty.js";
 export { MOBILE_OPERATION_IDS as MOBILE_OPERATIONS } from "../contracts/mobile-operation.js";
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const root = resolveSkillRoot(import.meta.url);
 const unique = <T>(values: T[]): T[] => [...new Map(values.map((value) => [JSON.stringify(value), value])).values()];
 
 /** Public declarations are projections of the same verified package used by composition. */

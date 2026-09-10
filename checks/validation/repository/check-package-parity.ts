@@ -11,6 +11,7 @@ interface PackageJson {
   name?: string;
   version?: string;
   files?: string[];
+  bin?: Record<string, string>;
   scripts?: Record<string, string>;
   dependencies?: Record<string, string>;
   devDependencies?: Record<string, string>;
@@ -142,7 +143,7 @@ function checkPackStandalone(runtimePkg: PackageJson): void {
 
   // Every package the shipped runtime imports must survive a production install.
   const runtimeDeps = runtimePkg.dependencies ?? {};
-  for (const dep of ["@google/design.md", "@mdx-js/mdx", "tsx", "typescript", "yaml", "@modelcontextprotocol/sdk", "zod"]) {
+  for (const dep of ["@google/design.md", "@mdx-js/mdx", "yaml", "@modelcontextprotocol/sdk", "zod"]) {
     if (!runtimeDeps[dep]) {
       issues.push(
         issue(
@@ -154,8 +155,52 @@ function checkPackStandalone(runtimePkg: PackageJson): void {
       );
     }
   }
+  const buildDeps = runtimePkg.devDependencies ?? {};
+  for (const dep of ["tsx", "typescript"]) {
+    if (!buildDeps[dep]) {
+      issues.push(
+        issue(
+          "error",
+          "package_parity.pack_build_dep_misfiled",
+          `${dep} is a checkout/build tool and must live in devDependencies — packed production installs launch compiled dist/ without it.`,
+          "package.json",
+        ),
+      );
+    }
+    if (runtimeDeps[dep]) {
+      issues.push(
+        issue(
+          "error",
+          "package_parity.pack_runtime_dep_misfiled",
+          `${dep} must not stay in dependencies after the compiled runtime — a standalone install would carry an unused compiler.`,
+          "package.json",
+        ),
+      );
+    }
+  }
+  const bins = runtimePkg.bin ?? {};
+  if (bins["b2c-app-builder"] !== "entrypoints/mcp/b2c-app-builder-mcp.mjs") {
+    issues.push(
+      issue(
+        "error",
+        "package_parity.mcp_package_bin_missing",
+        'package.json bin["b2c-app-builder"] must alias entrypoints/mcp/b2c-app-builder-mcp.mjs so `npx -y b2c-app-builder` starts the MCP server.',
+        "package.json",
+      ),
+    );
+  }
+  if (bins["b2c-app-builder-mcp"] !== "entrypoints/mcp/b2c-app-builder-mcp.mjs") {
+    issues.push(
+      issue(
+        "error",
+        "package_parity.mcp_bin_missing",
+        'package.json bin["b2c-app-builder-mcp"] must point at entrypoints/mcp/b2c-app-builder-mcp.mjs.',
+        "package.json",
+      ),
+    );
+  }
 
-  const pack = spawnSync("npm", ["pack", "--dry-run", "--json"], { cwd: args.skillRoot, encoding: "utf8", timeout: 120_000 });
+  const pack = spawnSync("npm", ["pack", "--dry-run", "--json"], { cwd: args.skillRoot, encoding: "utf8", timeout: 180_000 });
   if (pack.status !== 0) {
     issues.push(
       issue(
@@ -180,6 +225,11 @@ function checkPackStandalone(runtimePkg: PackageJson): void {
   const required = [
     "entrypoints/cli/b2c.mjs",
     "entrypoints/mcp/b2c-app-builder-mcp.mjs",
+    "dist/entrypoints/mcp/server.js",
+    "dist/entrypoints/cli/business.js",
+    "dist/kernel/session/doctor.js",
+    "dist/kernel/session/setup.js",
+    "dist/kernel/session/run.js",
     "SKILL.md",
     "skill-version.json",
     "tsconfig.json",
@@ -213,7 +263,7 @@ function checkPackStandalone(runtimePkg: PackageJson): void {
       );
     }
   }
-  for (const prefix of ["knowledge/", "checks/validation/", "surfaces/starters/"]) {
+  for (const prefix of ["knowledge/", "checks/validation/", "surfaces/starters/", "dist/"]) {
     if (!packed.some((file) => file.startsWith(prefix))) {
       issues.push(
         issue(
@@ -227,7 +277,7 @@ function checkPackStandalone(runtimePkg: PackageJson): void {
   }
 
   // Development-only surfaces must never ride along.
-  for (const prefix of ["checks/verification/", "content/", "business/", "agents/", "dist/", "node_modules/"]) {
+  for (const prefix of ["checks/verification/", "content/", "business/", "agents/", "node_modules/"]) {
     const leaked = packed.find((file) => file.startsWith(prefix));
     if (leaked) {
       issues.push(

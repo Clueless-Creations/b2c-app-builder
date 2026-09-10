@@ -7,6 +7,7 @@ import { compilePlan } from "../../../kernel/engine/compile.js";
 import { seedRunState } from "../../../kernel/engine/runstate.js";
 import { loadBusinessStateFile, resolveWorkspacePaths } from "../../../kernel/session/run.js";
 import { loadWorkspaceCatalog } from "../../../kernel/session/catalog-contract.js";
+import { PORTABLE_MCP_COMMAND } from "../../../kernel/session/setup.js";
 
 /**
  * The packaged `b2c` bin (entrypoints/cli/b2c.mjs): the engine's one installable command-line
@@ -49,6 +50,21 @@ export function register(harness: Harness): void {
     assert(existsSync(binPath), `entrypoints/cli/b2c.mjs is missing at ${binPath}`);
     const manifest = JSON.parse(readFileSync(path.join(skillRoot, "package.json"), "utf8")) as { bin?: Record<string, string> };
     assert(manifest.bin?.b2c === "entrypoints/cli/b2c.mjs", "package.json bin.b2c must point at entrypoints/cli/b2c.mjs");
+  });
+
+  harness.check("cli: the package-name bin aliases the MCP launcher", () => {
+    const mcpBin = path.join(skillRoot, "entrypoints", "mcp", "b2c-app-builder-mcp.mjs");
+    assert(existsSync(mcpBin), `entrypoints/mcp/b2c-app-builder-mcp.mjs is missing at ${mcpBin}`);
+    const manifest = JSON.parse(readFileSync(path.join(skillRoot, "package.json"), "utf8")) as { bin?: Record<string, string> };
+    assert(
+      manifest.bin?.["b2c-app-builder-mcp"] === "entrypoints/mcp/b2c-app-builder-mcp.mjs",
+      "package.json bin.b2c-app-builder-mcp must point at entrypoints/mcp/b2c-app-builder-mcp.mjs",
+    );
+    assert(
+      manifest.bin?.["b2c-app-builder"] === "entrypoints/mcp/b2c-app-builder-mcp.mjs",
+      "package.json bin.b2c-app-builder must alias the MCP launcher so npx -y b2c-app-builder starts the server",
+    );
+    assert(PORTABLE_MCP_COMMAND === "npx -y b2c-app-builder", "portable MCP registration must be the package-name npx form");
   });
 
   harness.check("cli: --help lists every command and exits 0; no arguments exits 1", () => {

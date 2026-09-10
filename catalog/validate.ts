@@ -2,6 +2,7 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { resolveSkillRoot } from "../tooling/lib/skill-root.js";
 import { DELIBERATELY_UNDECLARED_PROVIDER_IDS, provisioningProviderIds } from "../adapters/provisioning/requirements.js";
 import { businessUnitCoversAllGrantableDomains } from "./business-units.js";
 import { resolveDomainAuthority } from "./domain-authority.js";
@@ -828,8 +829,7 @@ const isMain = (() => {
 })();
 
 if (isMain) {
-  const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-  const defaultSkillRoot = path.resolve(scriptDir, "..");
+  const defaultSkillRoot = resolveSkillRoot(import.meta.url);
   const skillRoot = parseSkillRoot(process.argv.slice(2), defaultSkillRoot);
   const catalog = composeCatalog(skillRoot);
   const issues = [...validateCatalog(catalog, skillRoot), ...validateDefinitionOverlays(catalog, skillRoot)];

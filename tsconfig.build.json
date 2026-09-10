@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "dist",
+    "rootDir": ".",
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
+    "resolveJsonModule": true,
+    "types": ["node"]
+  },
+  "include": ["tooling/**/*.ts", "kernel/**/*.ts", "contracts/**/*.ts", "adapters/**/*.ts", "entrypoints/**/*.ts", "catalog/**/*.ts"],
+  "exclude": [
+    "catalog/generated/firstparty/**",
+    "catalog/stacks/expo-starter-fixture/modules/b2c-native-capability/src/index.ts",
+    "hosted/knowledge-mcp/**",
+    "hosted/builder-console/**",
+    "surfaces/**",
+    "examples/**",
+    "node_modules/**",
+    "dist/**",
+    "checks/**"
+  ]
+}

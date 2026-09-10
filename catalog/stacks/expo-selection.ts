@@ -385,29 +385,32 @@ function operationSupport(): ExpoOperationSupport[] {
     {
       id: "authentication",
       title: "App authentication",
-      selection: "authentication",
+      selection: "app-framework",
       platforms: ["ios", "android", "web"],
-      evidenceTier: "blocked",
+      evidenceTier: "fixture-tested",
       queuedIssue: 83,
-      notes: "Separate from Expo framework selection and from RevenueCat identity.",
+      notes:
+        "Local session persist, cancel, expire, revoke, and account-switch run in a disposable file-backed fixture. Not an identity provider. Sign-in does not grant a paid entitlement. RevenueCat identity stays separate.",
     },
     {
       id: "offline-data",
       title: "Local and server data",
       selection: "app-framework",
       platforms: ["ios", "android", "web"],
-      evidenceTier: "blocked",
+      evidenceTier: "fixture-tested",
       queuedIssue: 83,
-      notes: "SQLite/SecureStore semantics are not web storage and not a backend.",
+      notes:
+        "Node SQLite local cache survives a reopen in a disposable directory. Restart, duplicate, and interrupted writes keep cache semantics. Not a backend of record. Not SecureStore.",
     },
     {
       id: "device-capabilities",
       title: "Permissions, media, notifications",
       selection: "app-framework",
       platforms: ["ios", "android", "web"],
-      evidenceTier: "blocked",
+      evidenceTier: "fixture-tested",
       queuedIssue: 83,
-      notes: "Per-platform availability. Web must not fake native success.",
+      notes:
+        "Denied permissions stay unavailable-safe. Notification handoff restores a starter route. Token and receipt success is not person-seen or live push delivery. Web must not fake native success.",
     },
     {
       id: "native-purchases",

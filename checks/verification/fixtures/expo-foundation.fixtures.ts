@@ -48,7 +48,8 @@ import {
   localBootDoesNotUseExpoGo,
   runExpoStarterLocalBoot,
 } from "../../../catalog/stacks/expo-local-boot.js";
-import { bindLocalStaticExport, decideExpoWebSurface } from "../../../catalog/stacks/expo-web-static.js";
+import { bindLocalStaticExport, bindStaticExportRoutes, decideExpoWebSurface } from "../../../catalog/stacks/expo-web-static.js";
+import { runLocalCapabilityJourney } from "../../../catalog/stacks/expo-local-capabilities.js";
 import { invokeNativeCapability } from "../../../catalog/stacks/expo-starter-fixture/modules/b2c-native-capability/src/invoke.js";
 import { invokeNativeCapability as invokeWebCapability } from "../../../catalog/stacks/expo-starter-fixture/modules/b2c-native-capability/src/index.web.js";
 import {
@@ -62,7 +63,7 @@ import {
   reviewedExpoFixturePins,
 } from "../../../catalog/stacks/expo-starter.js";
 import { SURFACE_STATES } from "../../../catalog/stacks/expo-starter-fixture/src/states/surface-state.js";
-import { PERSISTENCE_SEAM_BOUND } from "../../../catalog/stacks/expo-starter-fixture/src/persistence/seam.js";
+import { PERSISTENCE_SEAM_BOUND, PERSISTENCE_STORE_KIND } from "../../../catalog/stacks/expo-starter-fixture/src/persistence/seam.js";
 import { deepLinkRecovery } from "../../../catalog/stacks/expo-starter-fixture/src/navigation/deep-link.js";
 import { NAVIGATION_RUNTIME_VERIFIED, reduceNavigation } from "../../../catalog/stacks/expo-starter-fixture/src/navigation/journeys.js";
 import { ROUTE_HREFS } from "../../../catalog/stacks/expo-starter-fixture/src/navigation/route-graph.js";
@@ -121,6 +122,10 @@ export function register(harness: Harness): void {
     assert(operationFor(selected, "starter-scaffold").evidenceTier === "fixture-tested", "selected Expo starter fixture must be fixture-tested");
     assert(operationFor(selected, "cng-prebuild").evidenceTier === "fixture-tested", "CNG prebuild is fixture-tested in a disposable copy");
     assert(operationFor(selected, "expo-web-export").evidenceTier === "fixture-tested", "local static Metro export is fixture-tested");
+    assert(operationFor(selected, "authentication").evidenceTier === "fixture-tested", "local session is fixture-tested");
+    assert(operationFor(selected, "offline-data").evidenceTier === "fixture-tested", "local SQLite cache is fixture-tested");
+    assert(operationFor(selected, "device-capabilities").evidenceTier === "fixture-tested", "permission and notification restore are fixture-tested");
+    assert(operationFor(selected, "native-purchases").evidenceTier === "blocked", "native purchases stay blocked");
     assert(operationFor(selected, "eas-hosting").evidenceTier === "blocked", "EAS Hosting stays blocked");
     assert(operationFor(selected, "official-skills").evidenceTier === "blocked", "official Expo skills stay blocked until authorized");
     assert(
@@ -189,7 +194,7 @@ export function register(harness: Harness): void {
     assert(SURFACE_STATES.includes("empty") && SURFACE_STATES.includes("retry"), "empty and retry states are required");
     assert(deepLinkRecovery.runtimeVerified === false, "deep-link recovery is a contract, not runtime proof");
     assert(NAVIGATION_RUNTIME_VERIFIED === false, "navigation journeys are not Expo Router runtime");
-    assert(PERSISTENCE_SEAM_BOUND === false, "persistence seam must stay unbound until a store is selected");
+    assert(PERSISTENCE_SEAM_BOUND === true && PERSISTENCE_STORE_KIND === "local-cache", "local-cache persistence seam is selected");
     const cold = reduceNavigation([{ type: "cold-start" }]);
     assert(cold.href === ROUTE_HREFS.home && cold.restoredFrom === "cold", "cold start must land on the home tab");
     const warm = reduceNavigation([{ type: "cold-start" }, { type: "warm-link", href: ROUTE_HREFS.detail("42") }]);
@@ -459,6 +464,22 @@ export function register(harness: Harness): void {
     assert(bound.action === "observe-local-static" && bound.exportEvidenceTier === "fixture-tested", bound.reason);
     assert(bound.easHosting === false && bound.nativeProof === false && bound.labeledLive === false, "local static export is not hosting or native proof");
     assert(!shippingSatisfiesRequirement("web", "ios"), "web export still cannot satisfy iOS");
+    const journey = runLocalCapabilityJourney(target);
+    assert(journey.signedIn.snapshot.session.signedIn && journey.signedIn.snapshot.session.appUserId === "user-a", journey.signedIn.reason);
+    assert(journey.signedIn.snapshot.session.entitled === false, "local sign-in must not grant paid access");
+    assert(journey.restarted.snapshot.notes.some((note) => note.id === "note-1" && note.owner === "user-a"), "SQLite cache must survive reopen");
+    assert(journey.expired.snapshot.session.signedIn === false && journey.expired.snapshot.notes.length === 0, "expiry clears the current user");
+    assert(journey.isolated, "account switch must not leak the prior user's notes");
+    assert(journey.interrupted.action === "refuse", journey.interrupted.reason);
+    assert(journey.denied.action === "accept" && journey.denied.snapshot.permission?.outcome === "denied", journey.denied.reason);
+    assert(journey.restored.snapshot.restoreRoute === ROUTE_HREFS.detail("1"), journey.restored.reason);
+    assert(journey.labeledLive === false && journey.restarted.snapshot.backendOfRecord === false, "local journey is not live or backend proof");
+    const routes = bindStaticExportRoutes({
+      exportDir: booted.webExport.outputDir ?? path.join(target, "dist-web"),
+      requiredHrefs: [ROUTE_HREFS.home, ROUTE_HREFS.settings, ROUTE_HREFS.signIn, ROUTE_HREFS.modal],
+    });
+    assert(routes.action === "observe-static-routes", routes.reason);
+    assert(routes.easHosting === false && routes.ssr === false && routes.labeledLive === false, "static routes are not hosting or SSR");
   });
 
   harness.check("expo foundation: empty authorized target scaffolds only the selected platform and preserves product.yaml", () => {

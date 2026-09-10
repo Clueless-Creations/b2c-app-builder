@@ -15,6 +15,8 @@
  * Consumes `catalog/stacks/expo-selection.ts` and the #83 secret canary scanner.
  */
 
+import { existsSync, readdirSync } from "node:fs";
+import path from "node:path";
 import { scanClientArtifacts, type ClientArtifact, type ClientSecretScan, type SecretCanary } from "./expo-capability-protocol.js";
 import { operationFor, shippingSatisfiesRequirement, type CompositionTarget, type ExpoSelectionResolution, type ShippingPlatform } from "./expo-selection.js";
 
@@ -51,7 +53,8 @@ export type ExpoWebRefusalCode =
   | "operation-blocked"
   | "export-missing-bundle"
   | "classification-is-not-export"
-  | "spa-not-static-export";
+  | "spa-not-static-export"
+  | "export-missing-route";
 
 export interface ExpoWebSurfaceDecision {
   action: "classify-local-static" | "refuse";
@@ -351,5 +354,73 @@ export function bindLocalStaticExport(input: {
     nativeProof: false,
     labeledLive: false,
     reason: "Local static export artifacts observed. Not EAS Hosting, not SSR, not iOS or Android proof.",
+  };
+}
+
+export interface ExpoStaticRouteObservation {
+  action: "observe-static-routes" | "refuse";
+  foundHrefs: readonly string[];
+  missingHrefs: readonly string[];
+  notFoundPresent: boolean;
+  productionHost: false;
+  easHosting: false;
+  ssr: false;
+  labeledLive: false;
+  code?: ExpoWebRefusalCode;
+  reason: string;
+}
+
+function listRelativeFiles(root: string, relative = "", out: string[] = []): string[] {
+  let entries;
+  try {
+    entries = readdirSync(path.join(root, relative), { withFileTypes: true });
+  } catch {
+    return out;
+  }
+  for (const entry of entries) {
+    const child = relative ? `${relative}/${entry.name}` : entry.name;
+    if (entry.isDirectory()) listRelativeFiles(root, child, out);
+    else if (entry.isFile()) out.push(child);
+  }
+  return out;
+}
+
+function hrefFileCandidates(href: string): readonly string[] {
+  const trimmed = href.replace(/^\//, "");
+  if (!trimmed) return ["index.html", "(tabs)/index.html"];
+  return [`${trimmed}.html`, `${trimmed}/index.html`, `(tabs)/${trimmed}.html`, `(tabs)/${trimmed}/index.html`];
+}
+
+export function bindStaticExportRoutes(input: { exportDir: string; requiredHrefs: readonly string[] }): ExpoStaticRouteObservation {
+  const files = listRelativeFiles(input.exportDir);
+  const foundHrefs = input.requiredHrefs.filter((href) =>
+    hrefFileCandidates(href).some((candidate) => files.includes(candidate) || existsSync(path.join(input.exportDir, candidate))),
+  );
+  const missingHrefs = input.requiredHrefs.filter((href) => !foundHrefs.includes(href));
+  const notFoundPresent = files.some((file) => file.includes("+not-found") || file === "404.html" || file.endsWith("/404.html"));
+  const blocked = {
+    productionHost: false as const,
+    easHosting: false as const,
+    ssr: false as const,
+    labeledLive: false as const,
+  };
+  if (missingHrefs.length > 0) {
+    return {
+      action: "refuse",
+      foundHrefs,
+      missingHrefs,
+      notFoundPresent,
+      ...blocked,
+      code: "export-missing-route",
+      reason: `Static export is missing HTML for ${missingHrefs.join(", ")}. Classification is not a served route.`,
+    };
+  }
+  return {
+    action: "observe-static-routes",
+    foundHrefs,
+    missingHrefs,
+    notFoundPresent,
+    ...blocked,
+    reason: "Static HTML exists for the required local routes. Not EAS Hosting, not SSR, not a production host.",
   };
 }

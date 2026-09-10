@@ -15713,7 +15713,7 @@
     "checks/validation/business/engineering/check-native-ios-proof.ts": "d70475d16d7748b23bafd9202274afdb1a420b9b15c69202c40a3639443574fb",
     "checks/validation/business/words/check-no-slop.ts": "d67efd5d36be1ccbb41f6c14aa6227faf6757b0b80437588c921af0858118c71",
     "checks/validation/business/experience/check-onboarding-cutover-repository.ts": "27e584499baa64046e0258a9940e40bbd590be5c25b8939b1a297fc788c320fe",
-    "checks/validation/business/experience/check-onboarding-evidence-packet.ts": "3cf117aba4dfbcb02f658f4f18acfe05bdc1f2bbbaa8b070f849cf2f7e0de3a0",
+    "checks/validation/business/experience/check-onboarding-evidence-packet.ts": "022ebfc341513d7f350638d5a736bd1d57bc0a8f2fec3097dac8f6c28947830c",
     "checks/validation/business/experience/check-onboarding-foundations.ts": "d549271f29dacdbdbaf1d232ca1223232749a02c8fa15254c5f11ba71ce01e21",
     "checks/validation/business/experience/check-onboarding-graph.ts": "f60c484e8426b7c5beba22bb32c54c1b38d0ecfbe651aee2051de72161d9d7c7",
     "checks/validation/repository/check-operating-graph.ts": "0ef4abde62b8754069ee764766f5145c3e1a2f4872f9412dd9b0bc8f6639333e",
@@ -15965,5 +15965,5 @@
     "catalog/upstreams/notices/parth-app-store-screenshots.txt": "a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a"
   },
   "dependencies": [],
-  "digest": "sha256:1efd027798c649147f94b9dc8482b0f2bbba399d5aefc2a66252e671ac42105f"
+  "digest": "sha256:cd2a7dc7bdea9ffaea4a3ce90e8ef9b2b0d6afab209cd17c3720cb063028693a"
 }

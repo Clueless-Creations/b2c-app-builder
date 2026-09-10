@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.63",
+  "version": "0.219.64",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Pin the leftover combined DESIGN.md nextCall walk to the artifact-contracts heading, not specifications[0] Communication Brief.",
-    "Refuse a controlled changed-bundle stale hash with revision_mismatch instead of a zero hash."
+    "Launch packed b2c check credits from compiled dist/tooling/render-credits.js so omit-dev installs do not need tsx for that gate.",
+    "Leave the remaining check scripts on the fixture-backed tsx inventory; the checks graph is not compiled in this stamp."
   ]
 }

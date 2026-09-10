@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.64",
+  "version": "0.219.65",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Launch packed b2c check credits from compiled dist/tooling/render-credits.js so omit-dev installs do not need tsx for that gate.",
-    "Leave the remaining check scripts on the fixture-backed tsx inventory; the checks graph is not compiled in this stamp."
+    "Name connection receipts providerObservation as not_tested so handshake success and leftover names cannot parse as provider readiness.",
+    "Give the local MCP handshake the b2c-local identity so leftover b2c-app-builder stays documented, not the live server name."
   ]
 }

@@ -3,10 +3,17 @@
  *
  * Authorized local checks only. No live providers, devices, paid batches, or dispatch.
  */
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { createKnowledgeService } from "../../../kernel/knowledge-service/service.js";
-import type { HostedKnowledgeBundle, KnowledgeService } from "../../../kernel/knowledge-service/types.js";
+import { codePointPrefix, createKnowledgeService, KnowledgeServiceError } from "../../../kernel/knowledge-service/service.js";
+import {
+  MAX_HOSTED_REFERENCE_SUMMARY_LENGTH,
+  type HostedKnowledgeBundle,
+  type HostedKnowledgeGetResult,
+  type KnowledgeResolver,
+  type KnowledgeService,
+} from "../../../kernel/knowledge-service/types.js";
 import { matchWorkflows, type RoutableWorkflow } from "../../../kernel/session/route-utterance.js";
 import { composeCatalog } from "../../../catalog/index.js";
 import { loadAgentGraph } from "../../../catalog/agent-graph/load.js";
@@ -129,6 +136,37 @@ function searchHits(service: KnowledgeService, query: string, workflowId?: strin
   }
 }
 
+function digest(value: string): string {
+  return createHash("sha256").update(value).digest("hex");
+}
+
+function refuseChangedRevision(original: HostedKnowledgeBundle, spec: KnowledgeResolver, prior: HostedKnowledgeGetResult): void {
+  const clone = structuredClone(original);
+  const document = clone.documents.find((item) => item.referenceId === spec.referenceId);
+  assert(document !== undefined, `${spec.referenceId} must exist on the controlled clone`);
+  const priorHash = prior.reference.contentSha256;
+  assert(priorHash === document.contentSha256, "controlled clone must start at the delivered revision");
+  const heading = "## `DESIGN.md`";
+  assert(document.markdown.includes(heading), "controlled change must edit the pinned artifact-contract heading");
+  document.markdown = document.markdown.replace(heading, `${heading}\n\nChanged Stage A revision.\n`);
+  document.contentSha256 = digest(document.markdown);
+  document.summary = codePointPrefix(document.markdown, MAX_HOSTED_REFERENCE_SUMMARY_LENGTH);
+  delete document.sections;
+  assert(document.contentSha256 !== priorHash, "changed bundle must have a new content hash");
+  const changed = createKnowledgeService(clone);
+  let code = "";
+  try {
+    changed.get({ ...spec, expectedContentSha256: priorHash, limit: 16384 });
+  } catch (error) {
+    code = error instanceof KnowledgeServiceError ? error.code : "";
+  }
+  assert(code === "revision_mismatch", `old hash must refuse the changed bundle, got ${code || "no error"}`);
+  const next = changed.get({ ...spec, expectedContentSha256: document.contentSha256, limit: 16384 });
+  assert(next.section?.title === prior.section?.title, "new hash must keep the pinned heading");
+  assert(next.markdown.includes("Changed Stage A revision."), "new hash must deliver the changed revision");
+  assert(next.markdown !== prior.markdown, "changed revision must not equal the prior section");
+}
+
 function boundSpec(
   service: KnowledgeService,
   workflowId: string,
@@ -146,7 +184,12 @@ function boundSpec(
   return { spec: pinned.get, delivered };
 }
 
-function runStageACase(service: KnowledgeService, workflows: readonly CatalogWorkflowRow[], item: StageACase): StageACaseReport {
+function runStageACase(
+  service: KnowledgeService,
+  workflows: readonly CatalogWorkflowRow[],
+  item: StageACase,
+  bundle: HostedKnowledgeBundle,
+): StageACaseReport {
   const base = {
     id: item.id,
     class: item.class,
@@ -231,13 +274,7 @@ function runStageACase(service: KnowledgeService, workflows: readonly CatalogWor
         const { spec, delivered: fresh } = boundSpec(service, item.workflowId, item.outputPath, item.requiredReferenceId, item.sectionTitle);
         const stable = service.get({ ...spec, expectedContentSha256: fresh.reference.contentSha256, limit: 16384 });
         assert(stable.markdown === fresh.markdown, `${item.id} matching hash changed the section`);
-        let stale = false;
-        try {
-          service.get({ ...spec, expectedContentSha256: "0".repeat(64) });
-        } catch {
-          stale = true;
-        }
-        assert(stale, `${item.id} stale hash served a different revision`);
+        refuseChangedRevision(bundle, spec, fresh);
         return { ...base, ...volume(fresh.markdown), uniqueRequiredSections: 1, ok: true, detail: item.note };
       }
       case "hosted_only_caller": {
@@ -397,10 +434,11 @@ export function register(harness: Harness): void {
     assert(design.dispatchBrief.workflowId === "workflow.design.design-room", design.dispatchBrief.workflowId);
     assert(design.dispatchBrief.instructions.length > 0, "worker brief must carry authored instructions");
     assert(design.dispatchBrief.load.length > 0, "worker brief must name load entries");
-    const spec = design.route.outputs.find((output) => output.path === "DESIGN.md")?.specifications[0]?.get;
-    assert(spec !== undefined, "artifact specification must be bound");
-    const whole = service.get({ ...spec, limit: 16384 });
-    assert((whole.section?.title ?? "").length > 0, "required section must be delivered");
+    const pin = stageA.cases.find((item) => item.class === "artifact_specification");
+    assert(pin?.requiredReferenceId !== undefined && pin.sectionTitle !== undefined && pin.outputPath !== undefined, "golden must pin the artifact heading");
+    const { spec, delivered: whole } = boundSpec(service, pin.workflowId, pin.outputPath, pin.requiredReferenceId, pin.sectionTitle);
+    assert(whole.reference.referenceId === "reference.process.artifact-contracts", "combined walk must not take Communication Brief");
+    assert(whole.section?.title === "DESIGN.md", "combined walk must stay on the artifact-contract heading");
     let page = service.get({ ...spec, limit: 96 });
     let assembled = page.markdown;
     let continuations = 0;
@@ -410,13 +448,7 @@ export function register(harness: Harness): void {
       assembled += page.markdown;
     }
     assert(assembled === whole.markdown, "nextCall walk must reassemble the delivered section");
-    let stale = false;
-    try {
-      service.get({ ...spec, expectedContentSha256: "0".repeat(64) });
-    } catch {
-      stale = true;
-    }
-    assert(stale, "stale hash must refuse");
+    refuseChangedRevision(bundle, spec, whole);
     const tight = service.workflow({
       workflowId: "workflow.store.asc-cli-automation",
       include: "full",
@@ -452,7 +484,7 @@ export function register(harness: Harness): void {
     const reports = stageA.cases.map((item) => {
       assert(!seen.has(item.id), `duplicate Stage A case id ${item.id}`);
       seen.add(item.id);
-      return runStageACase(service, workflows, item);
+      return runStageACase(service, workflows, item, bundle);
     });
     const failed = reports.filter((report) => !report.ok);
     assert(

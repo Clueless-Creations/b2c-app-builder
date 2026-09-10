@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.29",
+  "version": "0.219.30",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Persist prepared RevenueCat CLI mutation intent on the RC-local ledger before spawn so a fresh process resumes observation instead of repeating a Test Store or catalog write.",
-    "Compare the full request identity before reuse so a changed binding with the same key is refused."
+    "Route mutating catalog reconcile through the landed desired-state planner instead of ID-presence and offering create.",
+    "Consume encoded lookup-key writes, decoded observations, and persist-before-spawn so missing products, entitlements, and packages repair through their own operations."
   ]
 }

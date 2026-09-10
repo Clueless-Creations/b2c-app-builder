@@ -17,8 +17,26 @@ import {
 import type { RevenueCatCliDiscovery } from "./cli-discovery.js";
 import type { RevenueCatCliHoldCode, RevenueCatCliPreflight, RevenueCatCliTarget } from "./cli-preflight.js";
 import type { CliProcessRunner } from "./cli-process.js";
-import type { CliEffectProgress, CliNextAction, RevenueCatCliLedger } from "./cli-ledger.js";
+import type { CliEffectProgress, CliNextAction, RevenueCatCliLedger, RevenueCatCliLedgerEntry } from "./cli-ledger.js";
 import { revenueCatCliLedgerPath } from "./cli-ledger.js";
+import {
+  emptyObservedCollection,
+  idsFromObserved,
+  observedEntitlementsFromList,
+  observedOfferingsFromList,
+  observedPackagesFromList,
+  observedProductsFromList,
+  overlayVerifyGraph,
+} from "./cli-catalog-observe.js";
+import {
+  planRevenueCatCatalogRepair,
+  type DesiredRevenueCatCatalog,
+  type ObservedRevenueCatCatalog,
+  type RevenueCatCatalogRepairPlan,
+  type RevenueCatRepairAction,
+} from "./cli-reconcile-plan.js";
+
+export type { DesiredRevenueCatCatalog };
 
 export const CATALOG_INTENTS = [
   "inspect-project-app",
@@ -62,6 +80,7 @@ export interface CatalogSessionRequest {
   readonly target: RevenueCatCliTarget;
   readonly discovery: RevenueCatCliDiscovery;
   readonly expected: ExpectedCatalog;
+  readonly desired?: DesiredRevenueCatCatalog;
   readonly hostAuthorityGranted: boolean;
   readonly createIfMissing?: boolean;
   readonly appUserId?: string;
@@ -103,6 +122,7 @@ export interface RevenueCatCliCatalogEvidence {
     readonly reconciled: boolean;
     readonly missing_ids: readonly string[];
     readonly created: boolean;
+    readonly protocol_valid?: boolean;
   };
   readonly offering_verify?: { readonly complete: boolean; readonly protocol_valid?: boolean; readonly issues: unknown };
   readonly preview?: {
@@ -215,6 +235,7 @@ function emptyEvidence(request: CatalogSessionRequest): RevenueCatCliCatalogEvid
       reconciled: false,
       missing_ids: [],
       created: false,
+      protocol_valid: false,
     },
     pagination: "unknown",
     created: false,
@@ -239,8 +260,6 @@ function runStep(
     subscriptionId: request.subscriptionId,
     chartName: request.chartName,
     auditLimit: request.auditLimit,
-    lookupKey: request.offeringCreate?.lookupKey,
-    displayName: request.offeringCreate?.displayName,
     storeIdentifier: extra.storeIdentifier,
     productType: extra.productType,
     duration: extra.duration,
@@ -351,230 +370,492 @@ function inspectProjectApp(request: CatalogSessionRequest): CatalogSessionResult
   return { disposition: "complete", invoked, evidence: next, replaySafe: true };
 }
 
-function priorAppliedWrite(request: CatalogSessionRequest): { readonly remoteId?: string; readonly state: "applied-unverified" | "verified" } | undefined {
-  if (!request.ledger || !request.idempotencyKey) return undefined;
-  const entry = request.ledger.get(request.idempotencyKey);
-  if (!entry) return undefined;
-  if (entry.state === "applied-unverified" || entry.state === "verified") {
-    return { remoteId: entry.remoteId, state: entry.state };
+function mutationIdempotencyKey(request: CatalogSessionRequest, action: RevenueCatRepairAction): string | undefined {
+  if (!request.idempotencyKey?.trim()) return undefined;
+  return `${request.idempotencyKey}:${action.kind}:${action.entity}:${action.businessKey}`;
+}
+
+function repairActionKey(action: Pick<RevenueCatRepairAction, "kind" | "entity" | "businessKey">): string {
+  return `${action.kind}:${action.entity}:${action.businessKey}`;
+}
+
+function priorAppliedEntries(request: CatalogSessionRequest): readonly RevenueCatCliLedgerEntry[] {
+  if (!request.ledger || !request.idempotencyKey) return [];
+  const prefix = `${request.idempotencyKey}:`;
+  return request.ledger.entries().filter((entry) => {
+    if (entry.idempotencyKey !== request.idempotencyKey && !entry.idempotencyKey.startsWith(prefix)) return false;
+    return entry.state === "applied-unverified" || entry.state === "verified";
+  });
+}
+
+function preservedMutationEvidence(request: CatalogSessionRequest): RevenueCatCliCatalogEvidence {
+  const evidence = emptyEvidence(request);
+  const offeringIds: string[] = [];
+  const productIds: string[] = [];
+  const entitlementIds: string[] = [];
+  const packageIds: string[] = [];
+  for (const entry of priorAppliedEntries(request)) {
+    if (!entry.remoteId) continue;
+    switch (entry.binding.operationId) {
+      case "rc.catalog.create":
+        offeringIds.push(entry.remoteId);
+        break;
+      case "rc.products.create":
+        productIds.push(entry.remoteId);
+        break;
+      case "rc.entitlements.create":
+        entitlementIds.push(entry.remoteId);
+        break;
+      case "rc.packages.create":
+        packageIds.push(entry.remoteId);
+        break;
+      default:
+        break;
+    }
+  }
+  return {
+    ...evidence,
+    catalog: {
+      ...evidence.catalog,
+      offering_ids: offeringIds,
+      product_ids: productIds,
+      entitlement_ids: entitlementIds,
+      package_ids: packageIds,
+      created: true,
+    },
+    created: true,
+  };
+}
+
+function desiredCatalog(request: CatalogSessionRequest): DesiredRevenueCatCatalog {
+  if (request.desired) return request.desired;
+  const offeringLookup = request.offeringCreate?.lookupKey ?? request.expected.offeringId;
+  const productStoreIds = request.expected.productIds ?? [];
+  return {
+    projectId: request.expected.projectId,
+    appId: request.expected.appId,
+    offering: offeringLookup
+      ? { lookupKey: offeringLookup, displayName: request.offeringCreate?.displayName ?? offeringLookup }
+      : undefined,
+    products: productStoreIds.map((storeIdentifier) => ({
+      storeIdentifier,
+      type: "subscription",
+      appId: request.expected.appId,
+    })),
+    entitlements: (request.expected.entitlementIds ?? []).map((lookupKey) => ({
+      lookupKey,
+      displayName: lookupKey,
+      productStoreIdentifiers: productStoreIds,
+    })),
+    packages: (request.expected.packageIds ?? []).map((lookupKey) => ({
+      lookupKey,
+      displayName: lookupKey,
+      offeringLookupKey: offeringLookup ?? lookupKey,
+      productStoreIdentifiers: productStoreIds,
+    })),
+  };
+}
+
+function coverageToPagination(coverage: ObservedRevenueCatCatalog["offerings"]["coverage"]): "complete" | "partial" | "unknown" {
+  switch (coverage) {
+    case "complete":
+      return "complete";
+    case "partial":
+      return "partial";
+    case "unknown":
+    case "invalid":
+      return "unknown";
+    default: {
+      const exhaustive: never = coverage;
+      return exhaustive;
+    }
+  }
+}
+
+function missingFromPlan(
+  plan: RevenueCatCatalogRepairPlan,
+  expected: ExpectedCatalog,
+  observed: ObservedRevenueCatCatalog,
+): readonly string[] {
+  const planned = plan.actions
+    .filter((action) => action.kind === "create" || action.kind === "hold" || action.kind === "conflict" || action.kind === "attach")
+    .map((action) => action.businessKey);
+  return [...new Set([...planned, ...expectedCatalogMissing(expected, idsFromObserved(observed))])];
+}
+
+function seedRemotes(plan: RevenueCatCatalogRepairPlan, remotes: Map<string, string>): void {
+  for (const action of plan.actions) {
+    if (action.kind === "no-op" && action.remoteRef?.remoteId) {
+      remotes.set(`${action.entity}:${action.businessKey}`, action.remoteRef.remoteId);
+    }
+  }
+}
+
+function parentBusinessKey(action: RevenueCatRepairAction): string {
+  const separator = action.businessKey.indexOf(":");
+  return separator === -1 ? action.businessKey : action.businessKey.slice(0, separator);
+}
+
+function dependenciesMet(action: RevenueCatRepairAction, remotes: ReadonlyMap<string, string>): boolean {
+  for (const dependency of action.dependsOn) {
+    const parts = dependency.split(":");
+    if (parts[0] !== "create" || !parts[1]) continue;
+    const remoteKey = `${parts[1]}:${parts.slice(2).join(":")}`;
+    if (parts[1] === "offering" && action.createInputs?.offeringRemoteId) continue;
+    if (!remotes.has(remoteKey)) return false;
+  }
+  return true;
+}
+
+function seedObservedRemotes(observed: ObservedRevenueCatCatalog, remotes: Map<string, string>): void {
+  for (const item of observed.offerings.items) {
+    if (item.lookupKey && item.remoteId) remotes.set(`offering:${item.lookupKey}`, item.remoteId);
+  }
+  for (const item of observed.products.items) {
+    if (item.storeIdentifier && item.remoteId) remotes.set(`product:${item.storeIdentifier}`, item.remoteId);
+  }
+  for (const item of observed.entitlements.items) {
+    if (item.lookupKey && item.remoteId) remotes.set(`entitlement:${item.lookupKey}`, item.remoteId);
+  }
+  for (const item of observed.packages.items) {
+    if (item.lookupKey && item.remoteId) remotes.set(`package:${item.lookupKey}`, item.remoteId);
+  }
+}
+
+function extrasForRepairAction(
+  action: RevenueCatRepairAction,
+  remotes: ReadonlyMap<string, string>,
+  desired: DesiredRevenueCatCatalog,
+): Partial<Omit<RevenueCatCliRunRequest, "executable" | "cwd" | "isolatedHome" | "pathEnv" | "run" | "target" | "discovery" | "hostAuthorityGranted" | "operationId">> | undefined {
+  switch (action.operationId) {
+    case "rc.catalog.create":
+      return { lookupKey: action.createInputs?.lookupKey, displayName: action.createInputs?.displayName };
+    case "rc.products.create":
+      return {
+        storeIdentifier: action.createInputs?.storeIdentifier,
+        productType: action.createInputs?.productType,
+        appId: action.createInputs?.appId ?? desired.appId,
+        displayName: action.createInputs?.displayName,
+        duration: action.createInputs?.duration,
+      };
+    case "rc.entitlements.create":
+      return { lookupKey: action.createInputs?.lookupKey, displayName: action.createInputs?.displayName };
+    case "rc.packages.create": {
+      const offeringId =
+        action.createInputs?.offeringRemoteId ??
+        (desired.offering ? remotes.get(`offering:${desired.offering.lookupKey}`) : undefined);
+      if (!offeringId) return undefined;
+      return {
+        offeringId,
+        lookupKey: action.createInputs?.lookupKey,
+        displayName: action.createInputs?.displayName,
+      };
+    }
+    case "rc.entitlements.attach": {
+      const parentRemoteId =
+        action.attach?.parentRemoteId ?? remotes.get(`entitlement:${parentBusinessKey(action)}`);
+      const attachProductIds = (action.attach?.productRemoteIds ?? [])
+        .map((id, index) => id ?? remotes.get(`product:${action.attach?.productStoreIdentifiers[index] ?? ""}`))
+        .filter((id): id is string => Boolean(id));
+      if (!parentRemoteId || attachProductIds.length === 0) return undefined;
+      return { entitlementId: parentRemoteId, attachProductIds };
+    }
+    case "rc.packages.attach": {
+      const parentRemoteId = action.attach?.parentRemoteId ?? remotes.get(`package:${parentBusinessKey(action)}`);
+      const attachProductIds = (action.attach?.productRemoteIds ?? [])
+        .map((id, index) => id ?? remotes.get(`product:${action.attach?.productStoreIdentifiers[index] ?? ""}`))
+        .filter((id): id is string => Boolean(id));
+      if (!parentRemoteId || attachProductIds.length === 0) return undefined;
+      return { packageId: parentRemoteId, attachProductIds };
+    }
+    case null:
+      return undefined;
+    default: {
+      const exhaustive: never = action.operationId;
+      return exhaustive;
+    }
+  }
+}
+
+function offeringRemoteHint(
+  request: CatalogSessionRequest,
+  offerings: ObservedRevenueCatCatalog["offerings"],
+  desired: DesiredRevenueCatCatalog,
+): string | undefined {
+  const lookup = desired.offering?.lookupKey;
+  if (lookup) {
+    const match = offerings.items.find((item) => item.lookupKey === lookup && item.remoteId);
+    if (match?.remoteId) return match.remoteId;
+  }
+  for (const entry of priorAppliedEntries(request)) {
+    if (entry.binding.operationId === "rc.catalog.create" && entry.remoteId) return entry.remoteId;
+  }
+  if (request.expected.offeringId && offerings.items.some((item) => item.remoteId === request.expected.offeringId)) {
+    return request.expected.offeringId;
   }
   return undefined;
 }
 
-function preservedCreateEvidence(request: CatalogSessionRequest, remoteId: string | undefined): RevenueCatCliCatalogEvidence {
-  const evidence = emptyEvidence(request);
-  const offeringIds = remoteId && !evidence.catalog.offering_ids.includes(remoteId) ? [...evidence.catalog.offering_ids, remoteId] : evidence.catalog.offering_ids;
-  return {
-    ...evidence,
-    catalog: { ...evidence.catalog, offering_ids: offeringIds, created: true },
-    created: true,
+function readObservedCatalog(
+  request: CatalogSessionRequest,
+  invoked: RevenueCatCliRunResult[],
+  desired: DesiredRevenueCatCatalog,
+):
+  | { readonly ok: true; readonly observed: ObservedRevenueCatCatalog; readonly pagination: "complete" | "partial" | "unknown" }
+  | { readonly ok: false; readonly result: CatalogSessionResult } {
+  const failRead = (): { readonly ok: false; readonly result: CatalogSessionResult } => {
+    const prior = priorAppliedEntries(request);
+    if (prior.length > 0) {
+      return {
+        ok: false,
+        result: {
+          disposition: "incomplete",
+          invoked,
+          evidence: preservedMutationEvidence(request),
+          replaySafe: false,
+          nextAction: "observe",
+          effectProgress: prior.some((entry) => entry.state === "applied-unverified") ? "applied-unverified" : "verified",
+        },
+      };
+    }
+    return { ok: false, result: { disposition: "incomplete", invoked, evidence: emptyEvidence(request), replaySafe: true } };
   };
-}
 
-function reconcileCatalog(request: CatalogSessionRequest): CatalogSessionResult {
   const products = runStep(request, "rc.products.list");
   const entitlements = runStep(request, "rc.entitlements.list");
   const offerings = runStep(request, "rc.offerings.list");
-  const invoked: RevenueCatCliRunResult[] = [products, entitlements, offerings];
-  for (const step of invoked) {
-    if (!step.invoked) return refused(request, step.preflight, invoked);
-    if (step.uncertainMutation) return { disposition: "uncertain", invoked, evidence: emptyEvidence(request), replaySafe: false };
-    if (!step.json?.ok) {
-      const prior = priorAppliedWrite(request);
-      if (prior) {
-        return {
-          disposition: "incomplete",
+  invoked.push(products, entitlements, offerings);
+  for (const step of [products, entitlements, offerings]) {
+    if (!step.invoked) return { ok: false, result: refused(request, step.preflight, invoked) };
+    if (step.uncertainMutation) {
+      return {
+        ok: false,
+        result: {
+          disposition: "uncertain",
           invoked,
-          evidence: preservedCreateEvidence(request, prior.remoteId),
+          evidence: emptyEvidence(request),
           replaySafe: false,
-          nextAction: "observe",
-          effectProgress: prior.state,
-        };
-      }
-      return { disposition: "incomplete", invoked, evidence: emptyEvidence(request), replaySafe: true };
+          nextAction: "hold-uncertain",
+          effectProgress: "dispatched-unconfirmed",
+        },
+      };
+    }
+    if (!step.json?.ok) return failRead();
+  }
+
+  const observedOfferings = observedOfferingsFromList(offerings);
+  const offeringId = offeringRemoteHint(request, observedOfferings, desired);
+  let packagesStep: RevenueCatCliRunResult | undefined;
+  if (offeringId) {
+    packagesStep = runStep(request, "rc.offerings.packages", { offeringId });
+    invoked.push(packagesStep);
+    if (!packagesStep.invoked) return { ok: false, result: refused(request, packagesStep.preflight, invoked) };
+    if (!packagesStep.json?.ok) return failRead();
+  }
+
+  let observed: ObservedRevenueCatCatalog = {
+    projectId: request.expected.projectId,
+    appId: request.expected.appId,
+    offerings: observedOfferings,
+    products: observedProductsFromList(products),
+    entitlements: observedEntitlementsFromList(entitlements),
+    packages:
+      offeringId && packagesStep
+        ? observedPackagesFromList(packagesStep)
+        : emptyObservedCollection(
+            observedOfferings.protocolValid && observedOfferings.coverage === "complete" ? "complete" : "unknown",
+            observedOfferings.protocolValid,
+          ),
+  };
+
+  if (offeringId) {
+    const verify = runStep(request, "rc.offerings.verify", { offeringId });
+    invoked.push(verify);
+    if (verify.invoked && verify.json?.ok && verify.observation?.kind === "verify") {
+      observed = overlayVerifyGraph(observed, verify.json.data, verify.observation.protocolValid);
     }
   }
-  const productIds = extractResourceIds(products.json && products.json.ok ? products.json.data : undefined);
-  const entitlementIds = extractResourceIds(entitlements.json && entitlements.json.ok ? entitlements.json.data : undefined);
-  const offeringIds = extractResourceIds(offerings.json && offerings.json.ok ? offerings.json.data : undefined);
-  let packageIds: ReturnType<typeof extractResourceIds> = { ids: [], lookupKeys: [], pagination: "unknown", itemsPresent: false };
-  if (request.expected.offeringId) {
-    const packages = runStep(request, "rc.offerings.packages", { offeringId: request.expected.offeringId });
-    invoked.push(packages);
-    if (!packages.invoked) return refused(request, packages.preflight, invoked);
-    if (!packages.json?.ok) {
-      const prior = priorAppliedWrite(request);
-      if (prior) {
-        return {
-          disposition: "incomplete",
-          invoked,
-          evidence: preservedCreateEvidence(request, prior.remoteId),
-          replaySafe: false,
-          nextAction: "observe",
-          effectProgress: prior.state,
-        };
-      }
-      return { disposition: "incomplete", invoked, evidence: emptyEvidence(request), replaySafe: true };
-    }
-    packageIds = extractResourceIds(packages.json.data);
-  }
-  const pagination = worstPagination([productIds.pagination, entitlementIds.pagination, offeringIds.pagination, request.expected.offeringId ? packageIds.pagination : "complete"]);
-  const missing = expectedCatalogMissing(request.expected, {
-    productIds: productIds.ids,
-    entitlementIds: entitlementIds.ids,
-    offeringIds: offeringIds.ids,
-    packageIds: packageIds.ids,
-  });
+
+  return {
+    ok: true,
+    observed,
+    pagination: worstPagination([
+      coverageToPagination(observed.offerings.coverage),
+      coverageToPagination(observed.products.coverage),
+      coverageToPagination(observed.entitlements.coverage),
+      coverageToPagination(observed.packages.coverage),
+    ]),
+  };
+}
+
+function catalogAccepted(plan: RevenueCatCatalogRepairPlan): boolean {
+  return plan.complete && plan.reconciled && plan.protocolValid;
+}
+
+function mergeIds(left: readonly string[], right: readonly string[]): readonly string[] {
+  return [...new Set([...left, ...right])];
+}
+
+function evidenceFromPlan(
+  request: CatalogSessionRequest,
+  plan: RevenueCatCatalogRepairPlan,
+  observed: ObservedRevenueCatCatalog,
+  pagination: "complete" | "partial" | "unknown",
+  created: boolean,
+): RevenueCatCliCatalogEvidence {
   const evidence = emptyEvidence(request);
-  const catalog = {
-    ...evidence.catalog,
-    product_ids: productIds.ids,
-    entitlement_ids: entitlementIds.ids,
-    offering_ids: offeringIds.ids,
-    package_ids: packageIds.ids,
-    missing_ids: missing,
-    reconciled: missing.length === 0 && pagination !== "partial" && pagination !== "unknown",
-    created: false,
+  const ids = idsFromObserved(observed);
+  const preserved = created ? preservedMutationEvidence(request) : evidence;
+  const reconciled = catalogAccepted(plan);
+  return {
+    ...evidence,
+    catalog: {
+      ...evidence.catalog,
+      product_ids: mergeIds(ids.productIds, preserved.catalog.product_ids),
+      entitlement_ids: mergeIds(ids.entitlementIds, preserved.catalog.entitlement_ids),
+      offering_ids: mergeIds(ids.offeringIds, preserved.catalog.offering_ids),
+      package_ids: mergeIds(ids.packageIds, preserved.catalog.package_ids),
+      missing_ids: missingFromPlan(plan, request.expected, observed),
+      reconciled,
+      created,
+      protocol_valid: plan.protocolValid,
+    },
+    created,
+    pagination,
   };
-  if (pagination === "partial") {
+}
+
+function dispositionFromPlan(
+  plan: RevenueCatCatalogRepairPlan,
+  pagination: "complete" | "partial" | "unknown",
+): CatalogSessionDisposition {
+  if (catalogAccepted(plan)) return "complete";
+  if (pagination === "partial" || plan.collectionHolds.some((hold) => hold.coverage === "partial")) return "partial";
+  return "incomplete";
+}
+
+function plannedWrites(plan: RevenueCatCatalogRepairPlan): readonly RevenueCatRepairAction[] {
+  return plan.actions.filter((action) => (action.kind === "create" || action.kind === "attach") && action.operationId);
+}
+
+function reconcileCatalog(request: CatalogSessionRequest): CatalogSessionResult {
+  const desired = desiredCatalog(request);
+  const invoked: RevenueCatCliRunResult[] = [];
+  const firstRead = readObservedCatalog(request, invoked, desired);
+  if (!firstRead.ok) return firstRead.result;
+  let observed = firstRead.observed;
+  let pagination = firstRead.pagination;
+  let plan = planRevenueCatCatalogRepair(desired, observed);
+  const remotes = new Map<string, string>();
+  seedRemotes(plan, remotes);
+  seedObservedRemotes(observed, remotes);
+  for (const entry of priorAppliedEntries(request)) {
+    if (!entry.remoteId) continue;
+    if (entry.binding.storeIdentifier) remotes.set(`product:${entry.binding.storeIdentifier}`, entry.remoteId);
+    if (entry.binding.lookupKey && entry.binding.operationId === "rc.catalog.create") {
+      remotes.set(`offering:${entry.binding.lookupKey}`, entry.remoteId);
+    }
+    if (entry.binding.lookupKey && entry.binding.operationId === "rc.entitlements.create") {
+      remotes.set(`entitlement:${entry.binding.lookupKey}`, entry.remoteId);
+    }
+    if (entry.binding.lookupKey && entry.binding.operationId === "rc.packages.create") {
+      remotes.set(`package:${entry.binding.lookupKey}`, entry.remoteId);
+    }
+  }
+
+  const writes = plannedWrites(plan);
+  if (catalogAccepted(plan)) {
     return {
-      disposition: "partial",
+      disposition: "complete",
       invoked,
-      evidence: { ...evidence, catalog: { ...catalog, reconciled: false }, pagination },
+      evidence: evidenceFromPlan(request, plan, observed, pagination, false),
       replaySafe: true,
+      nextAction: "complete",
+      effectProgress: "no-effect",
     };
   }
-  if (missing.length === 0) {
-    return { disposition: "complete", invoked, evidence: { ...evidence, catalog, pagination }, replaySafe: true };
-  }
-  if (!request.createIfMissing) {
-    return { disposition: "incomplete", invoked, evidence: { ...evidence, catalog, pagination }, replaySafe: true };
-  }
-  if (!request.hostAuthorityGranted) {
-    return refused(request, {
-      status: "hold",
-      code: "authority-missing",
-      message: "Catalog objects are missing, but create is refused without host authority. Existing ids were read back; the process was not asked to duplicate or invent them.",
-      blocksUnrelatedWork: false,
-    }, invoked);
-  }
-  const create = runStep(request, "rc.catalog.create", {
-    lookupKey: request.offeringCreate?.lookupKey,
-    displayName: request.offeringCreate?.displayName,
-  });
-  invoked.push(create);
-  if (!create.invoked && create.resumed !== true) return refused(request, create.preflight, invoked);
-  if (create.uncertainMutation) {
-    return {
-      disposition: "uncertain",
+  if (writes.length > 0 && !request.hostAuthorityGranted) {
+    return refused(
+      request,
+      {
+        status: "hold",
+        code: "authority-missing",
+        message:
+          "Catalog repair writes are planned, but create/attach is refused without host authority. Existing ids were read back; the process was not asked to duplicate or invent them.",
+        blocksUnrelatedWork: false,
+      },
       invoked,
-      evidence: { ...evidence, catalog: { ...catalog, created: true }, created: true, pagination },
-      replaySafe: false,
-      nextAction: "hold-uncertain",
-      effectProgress: "dispatched-unconfirmed",
-    };
+    );
   }
-  if (!create.json?.ok) {
+  if (!request.createIfMissing || writes.length === 0) {
     return {
-      disposition: "uncertain",
+      disposition: dispositionFromPlan(plan, pagination),
       invoked,
-      evidence: { ...evidence, catalog, pagination },
-      replaySafe: false,
-      nextAction: "hold-uncertain",
-      effectProgress: "dispatched-unconfirmed",
+      evidence: evidenceFromPlan(request, plan, observed, pagination, priorAppliedEntries(request).length > 0),
+      replaySafe: priorAppliedEntries(request).length === 0,
+      nextAction: catalogAccepted(plan) ? "complete" : "observe",
+      effectProgress: priorAppliedEntries(request).length > 0 ? "applied-unverified" : "no-effect",
     };
   }
-  const createdId =
-    create.remoteId ??
-    (create.json.data && typeof create.json.data === "object" && typeof (create.json.data as { id?: unknown }).id === "string"
-      ? (create.json.data as { id: string }).id
-      : request.expected.offeringId);
-  const createdCatalog = {
-    ...catalog,
-    created: true,
-    offering_ids: createdId && !catalog.offering_ids.includes(createdId) ? [...catalog.offering_ids, createdId] : catalog.offering_ids,
-  };
-  const productsAfter = runStep(request, "rc.products.list");
-  const entitlementsAfter = runStep(request, "rc.entitlements.list");
-  const offeringsAfter = runStep(request, "rc.offerings.list");
-  invoked.push(productsAfter, entitlementsAfter, offeringsAfter);
-  for (const step of [productsAfter, entitlementsAfter, offeringsAfter]) {
-    if (!step.invoked) return refused(request, step.preflight, invoked);
+
+  const attempted = new Set<string>();
+  let created = priorAppliedEntries(request).length > 0;
+  for (let wave = 0; wave < 12; wave += 1) {
+    if (catalogAccepted(plan)) break;
+    const next = plannedWrites(plan).find((action) => {
+      if (attempted.has(repairActionKey(action)) || !dependenciesMet(action, remotes)) return false;
+      return extrasForRepairAction(action, remotes, desired) !== undefined;
+    });
+    if (!next || !next.operationId) break;
+    const extras = extrasForRepairAction(next, remotes, desired);
+    if (!extras) continue;
+    attempted.add(repairActionKey(next));
+    const key = mutationIdempotencyKey(request, next);
+    const step = runStep(request, next.operationId, {
+      ...extras,
+      ...(key ? { idempotencyKey: key } : {}),
+    });
+    invoked.push(step);
+    if (!step.invoked && step.resumed !== true) return refused(request, step.preflight, invoked);
     if (step.uncertainMutation) {
       return {
         disposition: "uncertain",
         invoked,
-        evidence: { ...evidence, catalog: createdCatalog, created: true, pagination },
+        evidence: { ...evidenceFromPlan(request, plan, observed, pagination, true), created: true },
         replaySafe: false,
         nextAction: "hold-uncertain",
-        effectProgress: "applied-unverified",
+        effectProgress: "dispatched-unconfirmed",
       };
     }
-    if (!step.json?.ok) {
+    if (!step.json?.ok && step.resumed !== true) {
       return {
-        disposition: "incomplete",
+        disposition: "uncertain",
         invoked,
-        evidence: { ...evidence, catalog: createdCatalog, created: true, pagination },
+        evidence: evidenceFromPlan(request, plan, observed, pagination, created),
         replaySafe: false,
-        nextAction: "observe",
-        effectProgress: "applied-unverified",
+        nextAction: "hold-uncertain",
+        effectProgress: "dispatched-unconfirmed",
       };
     }
+    created = true;
+    if (step.remoteId) remotes.set(`${next.entity}:${next.businessKey}`, step.remoteId);
+    const after = readObservedCatalog(request, invoked, desired);
+    if (!after.ok) return after.result;
+    observed = after.observed;
+    pagination = after.pagination;
+    plan = planRevenueCatCatalogRepair(desired, observed);
+    seedRemotes(plan, remotes);
+    seedObservedRemotes(observed, remotes);
   }
-  const productIdsAfter = extractResourceIds(productsAfter.json && productsAfter.json.ok ? productsAfter.json.data : undefined);
-  const entitlementIdsAfter = extractResourceIds(entitlementsAfter.json && entitlementsAfter.json.ok ? entitlementsAfter.json.data : undefined);
-  const offeringIdsAfter = extractResourceIds(offeringsAfter.json && offeringsAfter.json.ok ? offeringsAfter.json.data : undefined);
-  let packageIdsAfter: ReturnType<typeof extractResourceIds> = { ids: [], lookupKeys: [], pagination: "unknown", itemsPresent: false };
-  if (request.expected.offeringId) {
-    const packagesAfter = runStep(request, "rc.offerings.packages", { offeringId: request.expected.offeringId });
-    invoked.push(packagesAfter);
-    if (!packagesAfter.invoked) return refused(request, packagesAfter.preflight, invoked);
-    if (!packagesAfter.json?.ok) {
-      return {
-        disposition: "incomplete",
-        invoked,
-        evidence: { ...evidence, catalog: { ...createdCatalog, created: true }, created: true, pagination },
-        replaySafe: false,
-        nextAction: "observe",
-        effectProgress: "applied-unverified",
-      };
-    }
-    packageIdsAfter = extractResourceIds(packagesAfter.json.data);
-  }
-  const afterPagination = worstPagination([
-    productIdsAfter.pagination,
-    entitlementIdsAfter.pagination,
-    offeringIdsAfter.pagination,
-    request.expected.offeringId ? packageIdsAfter.pagination : "complete",
-  ]);
-  const missingAfter = expectedCatalogMissing(request.expected, {
-    productIds: productIdsAfter.ids,
-    entitlementIds: entitlementIdsAfter.ids,
-    offeringIds: offeringIdsAfter.ids,
-    packageIds: packageIdsAfter.ids,
-  });
-  const reconciled = missingAfter.length === 0 && afterPagination !== "partial" && afterPagination !== "unknown";
+
+  const accepted = catalogAccepted(plan);
   return {
-    disposition: reconciled ? "complete" : afterPagination === "partial" ? "partial" : "incomplete",
+    disposition: dispositionFromPlan(plan, pagination),
     invoked,
-    evidence: {
-      ...evidence,
-      catalog: {
-        ...catalog,
-        product_ids: productIdsAfter.ids,
-        entitlement_ids: entitlementIdsAfter.ids,
-        offering_ids: offeringIdsAfter.ids,
-        package_ids: packageIdsAfter.ids,
-        missing_ids: missingAfter,
-        created: true,
-        reconciled,
-      },
-      created: true,
-      pagination: afterPagination,
-    },
+    evidence: evidenceFromPlan(request, plan, observed, pagination, created),
     replaySafe: false,
-    nextAction: reconciled ? "complete" : "observe",
-    effectProgress: reconciled ? "verified" : "applied-unverified",
+    nextAction: accepted ? "complete" : "observe",
+    effectProgress: accepted ? "verified" : created ? "applied-unverified" : "no-effect",
   };
 }
 

@@ -13,10 +13,15 @@ import {
   localMcpInstructions,
   parseConnectionReceipt,
 } from "../../../contracts/public-api/connection-receipt.js";
+import { toCatalogInput } from "../../../catalog/bridge.js";
+import type { Catalog } from "../../../catalog/types.js";
+import { compilePlan } from "../../../kernel/engine/compile.js";
+import { composeNodeBrief, type NodeBrief } from "../../../kernel/engine/node-brief.js";
+import { createKnowledgeService } from "../../../kernel/knowledge-service/service.js";
 import { projectHeldWork, projectInitializedBusinessPlan, projectReadyBrief, isLaterGuidance } from "../../../kernel/services/plan-projection.js";
 import { buildWorkerPrompt } from "../../../kernel/session/worker-prompt.js";
-import type { NodeBrief } from "../../../kernel/engine/node-brief.js";
 import type { HeldNode, PlanReport } from "../../../kernel/session/plan.js";
+import { buildHostedKnowledgeBundle } from "../../../tooling/render-hosted-bundle.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 
@@ -258,4 +263,45 @@ test("specialist workflows keep their own current books that a program packet de
 
   const program = catalogProjection("workflow.orchestration.full-launch-program");
   assert(!program.projected.load.some((entry) => /design-evidence-stack|mobile-flow-craft|accessibility-readiness/.test(entry.path)));
+});
+
+test("live compose and dispatch packets keep program deferred counts and fastlane's own book", () => {
+  const catalog = JSON.parse(readFileSync(path.join(root, "catalog/generated/catalog.json"), "utf8")) as Catalog;
+  const compiled = compilePlan(toCatalogInput(catalog));
+  const byWorkflowId = new Map(compiled.nodes.map((node) => [node.workflowId, node]));
+  const service = createKnowledgeService(buildHostedKnowledgeBundle(root));
+
+  const programNode = byWorkflowId.get("workflow.orchestration.full-launch-program");
+  assert(programNode, "full-launch-program missing from the compiled runtime plan");
+  const composedProgram = composeNodeBrief(programNode, compiled);
+  const dispatchedProgram = service.workflow({ workflowId: programNode.workflowId, brief: true }).dispatchBrief!;
+  for (const packet of [composedProgram, dispatchedProgram]) {
+    assert((packet.deferredLoad?.length ?? 0) > 0, `${packet.workflowId} live packet lost deferred later-horizon binds`);
+    assert(packet.load.some((entry) => /full-launch-program/.test(entry.path)));
+    assert(!packet.load.some((entry) => /design-evidence-stack|mobile-flow-craft/.test(entry.path)));
+    const projected = projectReadyBrief(packet);
+    assert((projected.context?.deferredLoadCount ?? 0) > 0, `${packet.workflowId} live projectReadyBrief deferredLoadCount is 0`);
+    const prompt = buildWorkerPrompt(packet, "/tmp/business", "/tmp/skill");
+    assert.match(prompt, /DEFERRED LATER KNOWLEDGE/);
+    assert.match(prompt, /design-evidence-stack|mobile-flow-craft|consumer-craft-benchmarks/);
+    assert.doesNotMatch(prompt.split("DEFERRED LATER KNOWLEDGE")[0] ?? "", /consumer-craft-benchmarks/);
+  }
+
+  const fastlaneNode = byWorkflowId.get("workflow.growth.fastlane-growth-ops");
+  assert(fastlaneNode, "fastlane-growth-ops missing from the compiled runtime plan");
+  const composedFastlane = composeNodeBrief(fastlaneNode, compiled);
+  const dispatchedFastlane = service.workflow({ workflowId: fastlaneNode.workflowId, brief: true }).dispatchBrief!;
+  for (const packet of [composedFastlane, dispatchedFastlane]) {
+    assert(
+      packet.load.some((entry) => entry.referenceId === "reference.growth.fastlane-growth-ops"),
+      `${packet.workflowId} live packet dropped own-book referenceId`,
+    );
+    assert(!(packet.deferredLoad ?? []).some((entry) => entry.referenceId === "reference.growth.fastlane-growth-ops"));
+    const projected = projectReadyBrief(packet);
+    assert(projected.load.some((entry) => /fastlane-growth-ops/.test(entry.path)), `${packet.workflowId} live worker packet dropped its own book`);
+    const prompt = buildWorkerPrompt(packet, "/tmp/business", "/tmp/skill");
+    const mandatory = prompt.split("DEFERRED LATER KNOWLEDGE")[0] ?? prompt;
+    assert.match(mandatory, /fastlane-growth-ops/);
+    assert.doesNotMatch(prompt.split("DEFERRED LATER KNOWLEDGE")[1] ?? "", /fastlane-growth-ops/);
+  }
 });

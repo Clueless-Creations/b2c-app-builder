@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { mutableTaskArtifactPaths, type NodeBrief } from "../engine/node-brief.js";
 import type { DesignTasteDelegationAuthority } from "../engine/design-taste-authority.js";
-import { laterGuidanceContext, partitionLoadWhen } from "../lib/later-guidance.js";
+import { classifiedBriefLoads, laterGuidanceContext } from "../lib/later-guidance.js";
 
 export const KNOWLEDGE_RECEIPT_BEGIN = "BEGIN_KNOWLEDGE_RECEIPT";
 export const KNOWLEDGE_RECEIPT_END = "END_KNOWLEDGE_RECEIPT";
@@ -82,7 +82,7 @@ export function buildWorkerPrompt(brief: NodeBrief, workspaceDir: string, skillR
   const digest = (filePath: string): string => (mutableTaskArtifacts.has(filePath) ? "<compute sha256 after all writes>" : "<compute sha256 after opening>");
   const authorityDigest = authorizationDigest(expectations.authorization);
   const loadContext = laterGuidanceContext(brief.workflowId);
-  const { current: mandatoryLoad, later: deferredLoad } = partitionLoadWhen(brief.load, loadContext);
+  const { current: mandatoryLoad, later: deferredLoad } = classifiedBriefLoads(brief.load, loadContext, brief.deferredLoad);
   return [
     "You are one fresh-context specialist worker inside the b2c operating graph.",
     `Workspace: ${workspaceDir}`,
@@ -470,7 +470,7 @@ export function validateKnowledgeReceipt(output: string, brief: NodeBrief, expec
   };
   validateFiles("contractFiles", receipt.contractFiles, brief.contractFiles);
   validateFiles("taskArtifacts", receipt.taskArtifacts, brief.open);
-  const mandatoryLoad = partitionLoadWhen(brief.load, laterGuidanceContext(brief.workflowId)).current;
+  const mandatoryLoad = classifiedBriefLoads(brief.load, laterGuidanceContext(brief.workflowId), brief.deferredLoad).current;
   validateFiles(
     "mandatoryKnowledge",
     receipt.mandatoryKnowledge,

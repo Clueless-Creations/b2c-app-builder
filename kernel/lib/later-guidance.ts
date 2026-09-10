@@ -51,12 +51,22 @@ export function isProgramPacket(context: LaterGuidanceContext = {}): boolean {
   return workflowDomain(context) === "domain.orchestration" || /full-launch-program/i.test(workflowId);
 }
 
+function workflowBookTail(workflowId: string): string | undefined {
+  return /^workflow\.[a-z0-9-]+\.(.+)$/u.exec(workflowId)?.[1];
+}
+
 function isExactWorkflowBook(entry: Omit<LaterGuidanceEntry, "loadWhen">, context: LaterGuidanceContext): boolean {
   const workflowId = context.workflowId?.trim();
-  if (!workflowId || !entry.referenceId) return false;
+  if (!workflowId) return false;
   const workflowLeaf = workflowId.replace(/^workflow\./u, "");
-  const referenceLeaf = entry.referenceId.replace(/^reference\./u, "");
-  return Boolean(workflowLeaf && referenceLeaf === workflowLeaf);
+  if (entry.referenceId) {
+    const referenceLeaf = entry.referenceId.replace(/^reference\./u, "");
+    if (workflowLeaf && referenceLeaf === workflowLeaf) return true;
+  }
+  const tail = workflowBookTail(workflowId);
+  if (!tail) return false;
+  const basename = entry.path?.split("/").pop()?.replace(/\.[^.]+$/u, "");
+  return basename === tail;
 }
 
 function workflowIdMentioned(loadWhen: string, workflowId: string | undefined): boolean {
@@ -100,4 +110,15 @@ export function partitionLoadWhen<T extends LaterGuidanceEntry>(
     (isLaterGuidance(entry.loadWhen, context, entry) ? later : current).push(entry);
   }
   return { current, later };
+}
+
+/** Prefer compose/dispatch deferred refs; otherwise partition the remaining load list. */
+export function classifiedBriefLoads<T extends LaterGuidanceEntry>(
+  load: readonly T[],
+  context: LaterGuidanceContext,
+  deferredLoad?: readonly T[],
+): { current: T[]; later: T[] } {
+  const partitioned = partitionLoadWhen(load, context);
+  if (deferredLoad && deferredLoad.length > 0) return { current: partitioned.current, later: [...deferredLoad] };
+  return partitioned;
 }

@@ -3,7 +3,7 @@ import { z } from "zod";
 import type { CatalogContextPack, CatalogReference, CatalogRole, CatalogWorkflowDef } from "../../catalog/types.js";
 import type { NodeBrief } from "../engine/node-brief.js";
 import { reviewFacet } from "../engine/review-facet.js";
-import { isLaterGuidance, laterGuidanceContext } from "../lib/later-guidance.js";
+import { isLaterGuidance, laterGuidanceContext, partitionLoadWhen } from "../lib/later-guidance.js";
 import {
   DEFAULT_WORKFLOW_BUNDLE_TOKEN_BUDGET,
   HOSTED_KNOWLEDGE_SCHEMA_VERSION,
@@ -571,27 +571,29 @@ export function createKnowledgeService(bundle: HostedKnowledgeBundle): Knowledge
     const judgment = JUDGMENT_DOMAIN_IDS.includes(workflow.domainId);
     const gateIds = workflow.gateCommands;
     const laterContext = laterGuidanceContext(workflow.id, workflow.domainId);
-    const bound = workflow.referenceIds.map((referenceId) => references.get(referenceId)!);
-    const load = bound.flatMap((reference) => {
-      if (
-        isLaterGuidance(reference.loadWhen, laterContext, {
-          referenceId: reference.id,
-          domainId: reference.domainId,
-          path: reference.path,
-        })
-      ) {
-        return [];
-      }
-      return [
-        {
-          path: reference.path,
-          title: reference.title,
-          loadWhen: reference.loadWhen,
-          ...(reference.sectionId ? { sectionId: reference.sectionId } : {}),
-          ...(reference.revision ? { revision: reference.revision } : {}),
-        },
-      ];
+    const bound = workflow.referenceIds.map((referenceId) => {
+      const reference = references.get(referenceId)!;
+      return {
+        path: reference.path,
+        title: reference.title,
+        loadWhen: reference.loadWhen,
+        referenceId: reference.id,
+        domainId: reference.domainId,
+        ...(reference.sectionId ? { sectionId: reference.sectionId } : {}),
+        ...(reference.revision ? { revision: reference.revision } : {}),
+      };
     });
+    const { current, later } = partitionLoadWhen(bound, laterContext);
+    const toLoad = (entry: (typeof bound)[number]) => ({
+      path: entry.path,
+      title: entry.title,
+      loadWhen: entry.loadWhen,
+      referenceId: entry.referenceId,
+      ...(entry.sectionId ? { sectionId: entry.sectionId } : {}),
+      ...(entry.revision ? { revision: entry.revision } : {}),
+    });
+    const load = current.map(toLoad);
+    const deferredLoad = later.map(toLoad);
     const seenPaths = new Set(bound.map((entry) => entry.path));
     const role = rolesById.get(workflow.roleId);
     const route = role
@@ -619,6 +621,7 @@ export function createKnowledgeService(bundle: HostedKnowledgeBundle): Knowledge
       open: [...workflow.reads],
       consult: [...workflow.consults],
       load,
+      ...(deferredLoad.length ? { deferredLoad } : {}),
       route,
       skills: role ? [...role.skillRoutes] : [],
       tools: role ? [...role.toolRoutes] : [],

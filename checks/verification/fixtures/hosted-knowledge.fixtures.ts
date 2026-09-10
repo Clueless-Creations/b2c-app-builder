@@ -859,11 +859,15 @@ export function register(harness: Harness): void {
       }
     }
     const fastlane = service.workflow({ workflowId: "workflow.growth.fastlane-growth-ops", brief: true }).dispatchBrief!;
-    assert(fastlane.load.some((entry) => entry.path.includes("fastlane-growth-ops")), "fastlane-growth-ops omitted its own book");
+    assert(
+      fastlane.load.some((entry) => entry.referenceId === "reference.growth.fastlane-growth-ops"),
+      "fastlane-growth-ops omitted its own book identity",
+    );
     const remediate = service.workflow({ workflowId: "workflow.store.app-review-remediate", brief: true }).dispatchBrief!;
     assert(remediate.load.some((entry) => entry.path.includes("app-review-remediate")), "app-review-remediate omitted its own book");
     const program = service.workflow({ workflowId: "workflow.orchestration.full-launch-program", brief: true }).dispatchBrief!;
     assert(!program.load.some((entry) => /design-evidence-stack|mobile-flow-craft/.test(entry.path)), "program packet must still defer specialist later-horizon books");
+    assert((program.deferredLoad?.length ?? 0) > 0, "live program dispatchBrief must carry deferred later-horizon binds");
     const programNode = compiledByWorkflowId.get("workflow.orchestration.full-launch-program");
     assert(programNode, "full-launch-program missing from the compiled runtime plan");
     const programText = renderNodeBrief(composeNodeBrief(programNode, compiled));

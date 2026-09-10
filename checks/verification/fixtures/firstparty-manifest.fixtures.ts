@@ -41,7 +41,7 @@ export function register(harness: Harness): void {
     const installedInput = toCatalogInput(rebased);
     const recipe = extension.recipes.find((recipe) => recipe.id === "b2c/complete-consumer-business")!;
     assert.equal(recipe.maturity, "implemented");
-    assert.equal(recipe.workflows.length, 100);
+    assert.equal(recipe.workflows.length, 101);
     assert(recipe.workflows.every((id) => !id.startsWith("workflow.machine.")));
     for (const binding of recipe.operations) {
       assert.equal(binding.workflowIds.length, 1);

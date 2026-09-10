@@ -11,7 +11,7 @@ import { resolveCatalogAuthority } from "../../../catalog/domain-authority.js";
 import { readFirstpartyPackage } from "../../../catalog/packs/installed-firstparty.js";
 import { composeCatalog } from "../../../catalog/index.js";
 import { renderGeneratedFiles } from "../../../catalog/render-routing.js";
-import type { Catalog, CatalogDomain, CatalogWorkflowDef } from "../../../catalog/types.js";
+import type { Catalog, CatalogDomain, CatalogWorkflowDef, WorkflowId } from "../../../catalog/types.js";
 import { validateCatalog } from "../../../catalog/validate.js";
 import { domainBusinessUnit } from "../../../kernel/autonomy/budget.js";
 import { evaluateGrantCeiling } from "../../../kernel/autonomy/grants.js";
@@ -750,6 +750,91 @@ export function register(harness: Harness): void {
     );
   });
 
+  harness.check("validate: dual-store SCREENSHOTS.md needs a distinct reader per store provider that depends on the producer", () => {
+    const storeRegistry = { providerIds: ["provider.app-store-connect", "provider.google-play"], deliberatelyUndeclared: [] as string[] };
+    const storeScreenshotCatalog = (appleDependencies: WorkflowId[] | null): Catalog => {
+      const catalog = baseFixtureCatalog();
+      catalog.roles = catalog.roles.map((role) => ({
+        ...role,
+        capabilityIds: ["provider.app-store-connect", "provider.google-play"],
+        outputPathPrefixes: ["fixture/", "store/"],
+      }));
+      const workflows = [
+        baseWorkflow({
+          id: "workflow.research.fixture-screenshots",
+          outputPaths: ["store/app-store-listing/SCREENSHOTS.md"],
+        }),
+        baseWorkflow({
+          id: "workflow.research.fixture-play-media",
+          reads: ["store/app-store-listing/SCREENSHOTS.md"],
+          dependencies: ["workflow.research.fixture-screenshots"],
+          providerIds: ["provider.google-play"],
+          outputPaths: ["store/proof/play-media.json"],
+        }),
+        baseWorkflow({
+          id: "workflow.research.fixture-asc-observe",
+          providerIds: ["provider.app-store-connect"],
+          outputPaths: ["fixture/output.md"],
+        }),
+      ];
+      if (appleDependencies) {
+        workflows.push(
+          baseWorkflow({
+            id: "workflow.research.fixture-apple-media",
+            reads: ["store/app-store-listing/SCREENSHOTS.md"],
+            dependencies: appleDependencies,
+            providerIds: ["provider.app-store-connect"],
+            outputPaths: ["store/proof/apple-media.json"],
+          }),
+        );
+      }
+      catalog.workflows = workflows;
+      catalog.artifacts = [
+        ...catalog.artifacts,
+        {
+          id: "artifact.fixture.screenshots.md",
+          path: "store/app-store-listing/SCREENSHOTS.md",
+          ownerDomainId: "domain.research",
+          laneIds: [],
+          generated: false,
+        },
+        {
+          id: "artifact.fixture.play-media.json",
+          path: "store/proof/play-media.json",
+          ownerDomainId: "domain.research",
+          laneIds: [],
+          generated: false,
+        },
+        {
+          id: "artifact.fixture.apple-media.json",
+          path: "store/proof/apple-media.json",
+          ownerDomainId: "domain.research",
+          laneIds: [],
+          generated: false,
+        },
+      ];
+      return catalog;
+    };
+
+    const missing = validateCatalog(storeScreenshotCatalog(null), skillRoot, storeRegistry);
+    assert(
+      missing.some((issue) => issue.code === "catalog_graph.workflow.producer_without_reader"),
+      `expected catalog_graph.workflow.producer_without_reader, got: ${missing.map((issue) => issue.code).join(", ")}`,
+    );
+
+    const indirect = validateCatalog(storeScreenshotCatalog(["workflow.research.fixture-play-media"]), skillRoot, storeRegistry);
+    assert(
+      indirect.some((issue) => issue.code === "catalog_graph.workflow.producer_without_reader"),
+      `shared or indirect ancestry must not count as a reader→producer edge, got: ${indirect.map((issue) => issue.code).join(", ")}`,
+    );
+
+    const direct = validateCatalog(storeScreenshotCatalog(["workflow.research.fixture-screenshots"]), skillRoot, storeRegistry);
+    assert(
+      !direct.some((issue) => issue.code === "catalog_graph.workflow.producer_without_reader"),
+      "a distinct App Store Connect reader that reads SCREENSHOTS.md and depends on the producer must clear the issue",
+    );
+  });
+
   harness.check("validate: a spend workflow without costEstimate is surfaced as a WARNING — the fail-closed park is the designed control, not a defect", () => {
     const catalog = baseFixtureCatalog();
     catalog.workflows = [baseWorkflow({ actionClass: "spend", protectedCategory: "spend", founderOnlyActions: ["approve spend"] })];
@@ -837,7 +922,7 @@ export function register(harness: Harness): void {
     );
     const firstparty = composition!.deltas["business-pack.consumer-business"]!;
     assert(firstparty.domains === 15, `expected 15 firstparty domains, got ${firstparty.domains}`);
-    assert(firstparty.workflows === 112, `expected 112 firstparty workflows, got ${firstparty.workflows}`);
+    assert(firstparty.workflows === 113, `expected 113 firstparty workflows, got ${firstparty.workflows}`);
     assert(firstparty.references === 145, `expected 145 firstparty references, got ${firstparty.references}`);
     const deltaWorkflows = Object.values(composition!.deltas).reduce((sum, delta) => sum + delta.workflows, 0);
     const deltaDomains = Object.values(composition!.deltas).reduce((sum, delta) => sum + delta.domains, 0);
@@ -917,6 +1002,41 @@ export function register(harness: Harness): void {
     assert(
       landingPublish!.dependencies.includes("workflow.growth.pre-launch-funnel-landing-waitlist"),
       "the public landing workflow must depend on the local build",
+    );
+    const appleMedia = catalog.workflows.find((wf) => wf.id === "workflow.store.apple-store-media-standing-envelope");
+    const playMedia = catalog.workflows.find((wf) => wf.id === "workflow.store.google-play-media-standing-envelope");
+    const screenshotProduction = catalog.workflows.find((wf) => wf.id === "workflow.store.store-screenshots-production");
+    assert(Boolean(appleMedia), "expected Apple store-media standing envelope");
+    assert(Boolean(playMedia), "expected Google Play media standing envelope");
+    assert(Boolean(screenshotProduction), "expected store screenshots production");
+    assert(
+      appleMedia!.dependencies.includes("workflow.store.store-screenshots-production") &&
+        !appleMedia!.dependencies.includes("workflow.store.asc-cli-automation"),
+      "Apple media must depend on screenshot production and must not depend on ASC automation",
+    );
+    assert(
+      appleMedia!.gateCommands.length === 1 && appleMedia!.gateCommands[0] === "check:store-screenshots",
+      "Apple media must fail closed on the screenshot gate only — ASC command contract is not this node's trigger",
+    );
+    assert(
+      appleMedia!.providerIds.includes("provider.app-store-connect") && !appleMedia!.providerIds.includes("provider.google-play"),
+      "Apple media is the App Store Connect reader, not a dual-store node",
+    );
+    assert(
+      appleMedia!.reads.includes("store/app-store-listing/SCREENSHOTS.md") &&
+        appleMedia!.outputPaths.includes("store/proof/apple-store-media-apply.json"),
+      "Apple media must read SCREENSHOTS.md and write the media apply proof",
+    );
+    assert(appleMedia!.actionClass === "mutate" && appleMedia!.protectedCategory === "credentials_access", "Apple media stays a credentialed mutate");
+    assert(
+      playMedia!.reads.includes("store/app-store-listing/SCREENSHOTS.md") &&
+        playMedia!.dependencies.includes("workflow.store.store-screenshots-production"),
+      "Play media remains the Google Play reader of SCREENSHOTS.md",
+    );
+    assert(
+      screenshotProduction!.outputPaths.includes("store/app-store-listing/SCREENSHOTS.md") &&
+        !screenshotProduction!.gateCommands.includes("check:asc-command-contract"),
+      "screenshot production still authors SCREENSHOTS.md and does not take the ASC command gate",
     );
   });
 

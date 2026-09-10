@@ -79,11 +79,13 @@ prepare everything up to that point, never past it.
 creation, and metadata/media/build uploads, scoped to an exact account, team, project, and
 environment. This is `protectedCategory: "credentials_access"` at the waiver layer, plus a
 standing envelope in `agent-operations.json` naming the exact provider, account, and catalog
-workflow ids. `catalog/workflows/build-release.ts:279-315`'s
-`workflow.store.google-play-metadata-standing-envelope` and
-`workflow.store.google-play-media-standing-envelope` are the working pattern already shipped.
-Generalize their shape (exact resource prefixes, `founderOnlyActions` naming exactly what falls
-outside the envelope) to Apple's equivalent uploads rather than inventing a new pattern.
+workflow ids. `catalog/workflows/build-release.ts`'s
+`workflow.store.google-play-metadata-standing-envelope`,
+`workflow.store.google-play-media-standing-envelope`, and
+`workflow.store.apple-store-media-standing-envelope` are the working standing-envelope
+pattern. Apple media is scoped like Play media: locale, device-well, screenshot, and
+app-preview assets only. Listing text, products, TestFlight, and release state stay on
+other nodes.
 
 **Founder gates that no envelope can widen** (`knowledge/store/apple-signing-release.md:487-497`):
 Apple Developer Program enrollment/payment; creating or changing a team, app record, bundle ID,

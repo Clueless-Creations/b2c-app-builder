@@ -3,7 +3,8 @@
  *
  * Reuses the observe command list, apple-asc.yaml, rork unsupported operations, and the
  * verified command cookbook (local --help, 2026-09-08). Does not live-call `asc`.
- * Does not take Apple media (#38). Adapter-built resubmit argv is not independent evidence.
+ * Screenshot upload maps to the Apple store-media standing envelope (#38). Adapter-built
+ * resubmit argv is not independent evidence.
  */
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -109,12 +110,28 @@ const ASC_NATIVE_MAPPING: readonly AscNativeMappingRow[] = [
     owner: "adapters/app-review/mandate.ts",
   },
   {
-    nativeCapability: "asc screenshots upload",
-    canonicalOperation: "workflow.store.store-screenshots-production",
+    nativeCapability: "asc screenshots sizes",
+    canonicalOperation: "workflow.store.apple-store-media-standing-envelope",
     semanticFit: "partial",
-    effects: "publish",
-    disposition: "defer",
-    owner: "#38",
+    effects: "read",
+    disposition: "implement",
+    owner: "catalog/workflows/build-release.ts",
+  },
+  {
+    nativeCapability: "asc screenshots validate",
+    canonicalOperation: "workflow.store.apple-store-media-standing-envelope",
+    semanticFit: "partial",
+    effects: "read",
+    disposition: "implement",
+    owner: "catalog/workflows/build-release.ts",
+  },
+  {
+    nativeCapability: "asc screenshots upload",
+    canonicalOperation: "workflow.store.apple-store-media-standing-envelope",
+    semanticFit: "exact",
+    effects: "mutation",
+    disposition: "implement",
+    owner: "catalog/workflows/build-release.ts",
   },
   {
     nativeCapability: "asc testflight feedback list",
@@ -136,6 +153,8 @@ const INDEPENDENT_COOKBOOK_STEMS = [
   "asc web review list",
   "asc web review show",
   "asc review submit",
+  "asc screenshots sizes",
+  "asc screenshots validate",
   "asc screenshots upload",
   "asc testflight feedback list",
   "asc web agreements accept",
@@ -176,14 +195,19 @@ export function register(harness: Harness): void {
     const implemented = ASC_NATIVE_MAPPING.filter((row) => mappingDisposition(row) === "implement");
     const deferred = ASC_NATIVE_MAPPING.filter((row) => mappingDisposition(row) === "defer");
     const rejected = ASC_NATIVE_MAPPING.filter((row) => mappingDisposition(row) === "reject");
-    assert(implemented.length === 4, `observe/remediate implement rows: ${implemented.length}`);
+    assert(implemented.length === 7, `observe/remediate/media implement rows: ${implemented.length}`);
     assert(
       deferred.some((row) => row.nativeCapability === "asc review submit" && row.canonicalOperation === APP_REVIEW_RESUBMIT_WORKFLOW_ID),
       "review submit maps to the existing resubmit workflow and stays deferred",
     );
     assert(
-      deferred.some((row) => row.nativeCapability === "asc screenshots upload" && row.owner === "#38"),
-      "screenshot upload stays #38",
+      implemented.some(
+        (row) =>
+          row.nativeCapability === "asc screenshots upload" &&
+          row.canonicalOperation === "workflow.store.apple-store-media-standing-envelope" &&
+          row.owner === "catalog/workflows/build-release.ts",
+      ),
+      "screenshot upload maps to the Apple store-media standing envelope",
     );
     assert(
       deferred.some((row) => row.nativeCapability === "asc testflight feedback list" && row.canonicalOperation === "none"),
@@ -224,6 +248,19 @@ export function register(harness: Harness): void {
       coverageLimits: "Cookbook argv stem from local --help on 2026-09-08. No live review-status JSON and no live App Review.",
       sample: "asc review status --app \"123456789\" --output table",
     });
+    const screenshotUpload = provenance({
+      provider: "apple-asc",
+      transport: "cli",
+      reviewedVersion: RORK_REVIEWED_VERSION,
+      reviewedRevision: "unknown",
+      sourceSelector: COOKBOOK_SOURCE,
+      nativeOperation: "asc screenshots upload",
+      canonicalOperation: "workflow.store.apple-store-media-standing-envelope",
+      evidenceKind: "official-example",
+      establishes: ["request-shape"],
+      coverageLimits: "Cookbook argv stem from local --help on 2026-09-08. No live screenshot-upload JSON and no live App Store Connect.",
+      sample: 'asc screenshots upload --version-localization "LOC_ID" --path "./screenshots/final/en-US/<device-well>" --device-type "<ASC_DEVICE_TYPE>" --output json',
+    });
     const submit = provenance({
       provider: "apple-asc",
       transport: "cli",
@@ -251,8 +288,10 @@ export function register(harness: Harness): void {
       sample: "asc review submit --app ${envelope.appId} --version-id ${envelope.appStoreVersionId} --confirm",
     };
     assert(isIndependentEvidence(observeStatus.evidenceKind), describeConformanceCoverage(observeStatus));
+    assert(isIndependentEvidence(screenshotUpload.evidenceKind), describeConformanceCoverage(screenshotUpload));
     assert(isIndependentEvidence(submit.evidenceKind), describeConformanceCoverage(submit));
     assert(isIndependentEvidence(generated.evidenceKind) === false, describeConformanceCoverage(generated));
     assert(cookbook.includes(String(observeStatus.sample)), "observe sample must be the cookbook line");
+    assert(cookbook.includes(String(screenshotUpload.sample)), "screenshot upload sample must be the cookbook line");
   });
 }

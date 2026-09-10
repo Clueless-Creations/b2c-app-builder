@@ -268,6 +268,10 @@ export interface CatalogWorkflowDef {
    * pattern and is excluded; durable state files gate nothing). A file this node merely
    * cross-checks when it exists belongs in `consults`, not here. Each entry must resolve to a
    * declared artifact path or a workspace-template file (catalog_graph.workflow.read_unresolvable).
+   * When both store providers appear in the catalog and a node produces
+   * `store/app-store-listing/SCREENSHOTS.md`, each of those providers must have a distinct other
+   * workflow that reads that path and depends on the producer
+   * (`catalog_graph.workflow.producer_without_reader`). That is not a global unread-output ban.
    */
   reads: string[];
   /**

@@ -1093,6 +1093,19 @@ _Google Play screenshots, feature graphics, or promo video are ready and a match
 - **Gates:** `check:store-screenshots`
 - **Knowledge:** [ASO Store Ops](../../knowledge/store/aso-store-ops.md), [Google Play Release](../../knowledge/store/google-play-release.md)
 
+### Apple store media standing envelope
+
+_App Store screenshots or app previews are ready and a matching media standing envelope is current_
+
+- **Role:** Marketing guru
+- **Phases:** 3
+- **Providers:** `provider.app-store-connect` (cli, api, browser)
+- **Reads:** `store/STORE_CONSOLE.md`, `store/app-store-listing/SCREENSHOTS.md`, `state/business-state.json`
+- **Consults:** —
+- **Produces:** `store/proof/apple-store-media-apply.json`
+- **Gates:** `check:store-screenshots`
+- **Knowledge:** [App Store Connect CLI](../../knowledge/store/app-store-connect-cli.md), [ASO Store Ops](../../knowledge/store/aso-store-ops.md)
+
 ### Google Play testing-track standing envelope
 
 _An AAB is proven and an exact internal or closed-testing track standing envelope is current_

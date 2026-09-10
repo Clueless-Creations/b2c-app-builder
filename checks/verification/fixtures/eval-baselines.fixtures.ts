@@ -429,6 +429,7 @@ export function register(harness: Harness): void {
     assert(heldOut.length === stageA.metadata.heldOutUtteranceIds.length, "held-out set must stay reserved and unused for ranking");
     const apple = service.catalog({ query: "App Store Connect screenshots", offset: 0, limit: 10 }).workflows.map((workflow) => workflow.id);
     assert(apple.includes("workflow.store.store-screenshots-production"), apple.join(","));
+    assert(apple.includes("workflow.store.apple-store-media-standing-envelope"), apple.join(","));
     assert(!apple.includes("workflow.store.google-play-release") || apple[0] !== "workflow.store.google-play-release", "Android-only release is not the required Apple route");
     const journeyAuthored = workflows.find((workflow) => workflow.id === "workflow.experience.onboarding-system.onb-16-journey-graph");
     assert(journeyAuthored !== undefined, "onboarding journey workflow must exist");

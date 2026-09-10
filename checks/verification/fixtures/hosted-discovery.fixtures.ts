@@ -151,6 +151,10 @@ export function register(harness: Harness): void {
       ranked.includes("workflow.store.store-screenshots-production"),
       `an ask naming both the asset and its destination returned ${ranked.length} workflow(s) without the one that produces the asset: ${ranked.join(", ") || "none"}`,
     );
+    assert(
+      ranked.includes("workflow.store.apple-store-media-standing-envelope"),
+      `an ask naming the App Store Connect upload returned ${ranked.length} workflow(s) without the Apple media standing envelope: ${ranked.join(", ") || "none"}`,
+    );
   });
 
   harness.check("hosted discovery: the ASC command reference reaches the workflow whose outputs it uploads", () => {

@@ -393,6 +393,32 @@ export const workflows = [
     idempotent: false,
   }),
   workflow({
+    id: "workflow.store.apple-store-media-standing-envelope",
+    founderPhrasings: [
+      "upload the approved app store screenshots and previews",
+      "push the app store screenshot wells and app previews live",
+      "publish the media assets we already approved for app store connect",
+    ],
+    title: "Apple store media standing envelope",
+    domainId: "domain.store",
+    areaIds: ["area.build-release"],
+    trigger: "App Store screenshots or app previews are ready and a matching media standing envelope is current",
+    instructions:
+      "Upload only the locale, device-well, screenshot, and app-preview assets covered by the exact current standing envelope. Verify every file digest, App Store Connect version-localization ID, and device type from SCREENSHOTS.md immediately before upload. Use `asc screenshots sizes`, `asc screenshots validate`, and `asc screenshots upload` as the selected-provider cookbook forms; probe `--help` before the first live call. Capture before-state and read back the resulting media set. Write store/proof/apple-store-media-apply.json with approval ID, per-file digest, locale, device well, version-localization ID, provider operation IDs, readback state, and timestamps. Do not apply listing text, products, TestFlight, review submission, or release state.",
+    reads: ["store/STORE_CONSOLE.md", "store/app-store-listing/SCREENSHOTS.md", "state/business-state.json"],
+    roleId: "role.marketing-guru",
+    laneIds: ["store_console", "content_assets"],
+    phaseIds: ["phase.3"],
+    dependencies: ["workflow.store.store-screenshots-production", "workflow.store.store-console-workflow"],
+    gates: ["check:store-screenshots"],
+    outputPaths: ["store/proof/apple-store-media-apply.json"],
+    providers: ["provider.app-store-connect"],
+    founderOnlyActions: ["approve App Store Connect media upload when no exact standing envelope exists"],
+    actionClass: "mutate",
+    protectedCategory: "credentials_access",
+    idempotent: false,
+  }),
+  workflow({
     id: "workflow.store.google-play-testing-track-standing-envelope",
     founderPhrasings: [
       "roll the build out to our play store testing track",

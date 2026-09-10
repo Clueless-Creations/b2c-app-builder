@@ -2,19 +2,23 @@
 /**
  * Deterministic gate for a single ONB-03..ONB-08 evidence-research node's own output packet.
  *
- * These nodes are domain.experience. This gate is structural only: it rejects an empty,
- * hidden-only, author-unresolved, or incomplete evidence record. It does not judge whether the
+ * These nodes are domain.experience. The placeholder and record checks reject an empty,
+ * hidden-only, author-unresolved, or incomplete evidence record. They do not judge whether the
  * research is true, and a passing structural check is not independent review or runtime proof.
  * A concise record that names a finding, a source or observation, and a classification passes;
  * padding prose cannot upgrade an empty or unsupported packet.
  *
  * Two dimensions stay separate:
- * - Strength: this file checks structural completeness only. Semantic support and observed
- *   user/provider behavior stay with independent review and runtime proof.
- * - Origin: a synthetic fixture packet can pass here. That does not make it a live observation.
+ * - Strength: the placeholder and record checks are structural completeness only. ONB-17 still
+ *   binds Paywall Goal Headline from product.yaml / verified composition, and ONB-08 still binds
+ *   60fps research from studio interaction and strategy/TOOL_DECISIONS.md. Those applicability
+ *   binds are not packet shape and are not semantic or runtime proof.
+ * - Origin: a synthetic fixture packet can pass the structural checks. That does not make it a
+ *   live observation.
  *
- * A source line or quotation that mentions TODO/TBD is cited evidence, not the author's
- * unresolved field. A global word ban would reject legitimate source content.
+ * A Source: line, a markdown blockquote, or an actual quoted span that mentions TODO/TBD is
+ * cited evidence, not the author's unresolved field. An English apostrophe inside a word does
+ * not open a quotation and cannot hide an author marker.
  */
 import { loadDesignSurfaceApplicability } from "../../../../catalog/ontology/design-surface-applicability.js";
 import { loadVerifiedOnboardingApplicability } from "../../../../kernel/composition/onboarding-selection.js";
@@ -49,7 +53,7 @@ const SOURCE_DATE = /\b\d{4}-\d{2}-\d{2}\b/;
 const LABELED_FINDING = /\bFinding:\s+\S/i;
 
 function authorUnresolvedMarkers(stripped: string): boolean {
-  const withoutQuoted = stripped.replace(/"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/g, " ");
+  const withoutQuoted = stripped.replace(/"(?:[^"\\]|\\.)*"|(?<![A-Za-z0-9])'(?:[^'\\]|\\.)*'(?![A-Za-z0-9])/g, " ");
   const authorLines = withoutQuoted
     .split(/\r?\n/)
     .filter((line) => !/^\s*Source:\s+/i.test(line) && !/^\s*>/.test(line))

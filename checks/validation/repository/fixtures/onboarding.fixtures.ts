@@ -1607,6 +1607,21 @@ Uncertainty: sample is US-only.
     ["--node", "ONB-05", "--path", "product/onboarding/graph/ONB-05-onbo-hub-atlas.md"],
   );
 
+  const evidencePacketApostropheAuthorTodo = makeFixture("onboarding-evidence-packet-apostrophe-author-todo");
+  writeEvidencePacket(
+    evidencePacketApostropheAuthorTodo,
+    "product/onboarding/graph/ONB-05-onbo-hub-atlas.md",
+    `${conciseStructuredPacket}\n\nThe app's TODO is still the author field and we don't know the empty-state copy.\n`,
+  );
+  runFixture(
+    "ONB-05's gate still rejects an author TODO sitting between English apostrophes",
+    evidencePacketApostropheAuthorTodo,
+    evidenceScript,
+    1,
+    "onboarding_evidence.packet_placeholder",
+    ["--node", "ONB-05", "--path", "product/onboarding/graph/ONB-05-onbo-hub-atlas.md"],
+  );
+
   const evidencePacketFluentUnsupported = makeFixture("onboarding-evidence-packet-fluent-unsupported");
   writeEvidencePacket(
     evidencePacketFluentUnsupported,

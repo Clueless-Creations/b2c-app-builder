@@ -24,6 +24,7 @@
         "name": "Privacy",
         "status": "ready",
         "purpose": "Disclose what Quiet Receipt stores and how a person deletes it.",
+        "job": "legal-document",
         "interaction": "static-document",
         "decisions": [],
         "tokenReferences": []
@@ -33,6 +34,7 @@
         "name": "Waitlist",
         "status": "ready",
         "purpose": "Collect one waitlist email for the iOS app.",
+        "job": "conversion",
         "interaction": "conversion",
         "decisions": [],
         "tokenReferences": []
@@ -41,7 +43,8 @@
         "id": "cinematic",
         "name": "How a slip is filed",
         "status": "ready",
-        "purpose": "Show how an unowned paper slip becomes a filed receipt.",
+        "purpose": "Show how an unowned paper slip becomes a filed receipt, then join the waitlist.",
+        "job": "conversion",
         "interaction": "scroll-linked",
         "decisions": [],
         "tokenReferences": []

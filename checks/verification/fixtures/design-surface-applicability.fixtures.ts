@@ -5,11 +5,12 @@ import {
   parseSixtyFpsToolDecision,
   projectDesignSurfaceApplicability,
   type InteractionKind,
+  type SurfaceJob,
 } from "../../../catalog/ontology/design-surface-applicability.js";
-import { validateFrozenPageTechniqueGates } from "../../validation/business/design/surface-page-gates.js";
+import { surfaceRequiresMotionInteractionEvidence, validateFrozenPageTechniqueGates } from "../../validation/business/design/surface-page-gates.js";
 import { assert, skillRoot, type Harness } from "./_harness.js";
 
-function surfaceRecord(id: string, interaction?: InteractionKind | "omit"): Record<string, unknown> {
+function surfaceRecord(id: string, interaction?: InteractionKind | "omit", job?: SurfaceJob): Record<string, unknown> {
   const record: Record<string, unknown> = {
     id,
     name: id,
@@ -19,21 +20,22 @@ function surfaceRecord(id: string, interaction?: InteractionKind | "omit"): Reco
     tokenReferences: [],
   };
   if (interaction !== undefined && interaction !== "omit") record.interaction = interaction;
+  if (job !== undefined) record.job = job;
   return record;
 }
 
 function studioDoc(input: {
-  landingPages?: Array<{ id: string; interaction?: InteractionKind | "omit" }>;
-  screens?: Array<{ id: string; interaction?: InteractionKind | "omit" }>;
-  marketingAssets?: Array<{ id: string; interaction?: InteractionKind | "omit" }>;
+  landingPages?: Array<{ id: string; interaction?: InteractionKind | "omit"; job?: SurfaceJob }>;
+  screens?: Array<{ id: string; interaction?: InteractionKind | "omit"; job?: SurfaceJob }>;
+  marketingAssets?: Array<{ id: string; interaction?: InteractionKind | "omit"; job?: SurfaceJob }>;
 }): Record<string, unknown> {
   return {
     surfaces: {
-      landingPages: (input.landingPages ?? []).map((row) => surfaceRecord(row.id, row.interaction)),
+      landingPages: (input.landingPages ?? []).map((row) => surfaceRecord(row.id, row.interaction, row.job)),
       webFunnels: [],
-      marketingAssets: (input.marketingAssets ?? []).map((row) => surfaceRecord(row.id, row.interaction)),
+      marketingAssets: (input.marketingAssets ?? []).map((row) => surfaceRecord(row.id, row.interaction, row.job)),
       mobileApp: {
-        screens: (input.screens ?? []).map((row) => surfaceRecord(row.id, row.interaction)),
+        screens: (input.screens ?? []).map((row) => surfaceRecord(row.id, row.interaction, row.job)),
       },
     },
   };
@@ -344,13 +346,33 @@ export function register(harness: Harness): void {
     const byId = Object.fromEntries(projected.surfaces.map((surface) => [surface.id, surface]));
     assert(projected.inventory === "present", `inventory ${projected.inventory}`);
     assert(byId.privacy?.interaction === "static-document", `privacy ${byId.privacy?.interaction}`);
+    assert(byId.privacy?.job === "legal-document", `privacy job ${byId.privacy?.job}`);
     assert(byId.privacy?.scrollytelling === "not_required", `privacy scrolly ${byId.privacy?.scrollytelling}`);
     assert(byId.privacy?.conversionExperiments === "not_required", `privacy conversion ${byId.privacy?.conversionExperiments}`);
     assert(byId.conversion?.interaction === "conversion", `conversion ${byId.conversion?.interaction}`);
+    assert(byId.conversion?.job === "conversion", `conversion job ${byId.conversion?.job}`);
     assert(byId.conversion?.scrollytelling === "not_required", `conversion scrolly ${byId.conversion?.scrollytelling}`);
     assert(byId.conversion?.conversionExperiments === "selected", `conversion experiments ${byId.conversion?.conversionExperiments}`);
     assert(byId.cinematic?.interaction === "scroll-linked", `cinematic ${byId.cinematic?.interaction}`);
+    assert(byId.cinematic?.job === "conversion", `cinematic job ${byId.cinematic?.job}`);
     assert(byId.cinematic?.scrollytelling === "selected", `cinematic scrolly ${byId.cinematic?.scrollytelling}`);
+    assert(byId.cinematic?.conversionExperiments === "selected", `cinematic conversion ${byId.cinematic?.conversionExperiments}`);
+    assert(byId.cinematic?.implementedScrollytelling, "cinematic hooks must be attributed to cinematic");
+    assert(!byId.privacy?.implementedScrollytelling, "privacy must not inherit cinematic hooks");
+    assert(!byId.conversion?.implementedScrollytelling, "waitlist must not inherit cinematic hooks");
+    assert(!projected.implementedScrollytellingUnattributed, "cinematic.html is attributed by file stem");
+    assert(
+      !surfaceRequiresMotionInteractionEvidence("privacy", "landing", projected),
+      "privacy must not inherit workspace motion evidence",
+    );
+    assert(
+      !surfaceRequiresMotionInteractionEvidence("conversion", "landing", projected),
+      "conventional conversion must not inherit cinematic motion evidence",
+    );
+    assert(
+      surfaceRequiresMotionInteractionEvidence("cinematic", "landing", projected),
+      "cinematic must keep motion interaction evidence",
+    );
     assert(projected.scrollytelling === "selected", `rollup scrolly ${projected.scrollytelling}`);
     assert(projected.conversionExperiments === "selected", `rollup conversion ${projected.conversionExperiments}`);
     assert(projected.sixtyFpsRegister === "selected", `60fps ${projected.sixtyFpsRegister}`);
@@ -380,6 +402,138 @@ export function register(harness: Harness): void {
     assert(/data-scene-track/.test(cinematic), "cinematic must implement scroll-linked hooks");
   });
 
+  harness.check("design-surface-applicability: cinematic signup keeps conversion purpose and scroll-linked technique", () => {
+    const projected = projectDesignSurfaceApplicability({
+      studio: studioDoc({
+        landingPages: [
+          { id: "privacy", interaction: "static-document", job: "legal-document" },
+          { id: "home", interaction: "conversion", job: "conversion" },
+          { id: "story", interaction: "scroll-linked", job: "conversion" },
+        ],
+      }),
+      implementedScrollytelling: false,
+      contractApplicable: undefined,
+      sixtyFpsTool: parseSixtyFpsToolDecision(toolMarkdown("ready", "60fps MCP")),
+    });
+    assert(projected.surfaces.find((row) => row.id === "privacy")?.conversionExperiments === "not_required", "privacy has no conversion job");
+    assert(projected.surfaces.find((row) => row.id === "privacy")?.scrollytelling === "not_required", "privacy has no motion technique");
+    assert(projected.surfaces.find((row) => row.id === "home")?.conversionExperiments === "selected", "conventional signup keeps conversion");
+    assert(projected.surfaces.find((row) => row.id === "home")?.scrollytelling === "not_required", "conventional signup is not forced to invent motion");
+    assert(projected.surfaces.find((row) => row.id === "story")?.conversionExperiments === "selected", "cinematic signup keeps conversion");
+    assert(projected.surfaces.find((row) => row.id === "story")?.scrollytelling === "selected", "cinematic signup keeps scroll-linked");
+    assert(projected.conversionExperiments === "selected", `workspace conversion ${projected.conversionExperiments}`);
+    assert(projected.scrollytelling === "selected", `workspace scrolly ${projected.scrollytelling}`);
+  });
+
+  harness.check("design-surface-applicability: attributed implementation selects motion on that page only", () => {
+    const projected = projectDesignSurfaceApplicability({
+      studio: studioDoc({
+        landingPages: [
+          { id: "privacy", interaction: "static-document" },
+          { id: "home", interaction: "conversion" },
+        ],
+      }),
+      implementedScrollytelling: true,
+      implementedSurfaceIds: ["home"],
+      implementedUnattributed: false,
+      contractApplicable: false,
+      sixtyFpsTool: parseSixtyFpsToolDecision(toolMarkdown("connected", "60fps MCP")),
+    });
+    const privacy = projected.surfaces.find((row) => row.id === "privacy");
+    const home = projected.surfaces.find((row) => row.id === "home");
+    assert(home?.conversionExperiments === "selected", "implemented scroll does not drop conversion purpose");
+    assert(home?.scrollytelling === "selected", "the page that implements hooks cannot evade motion");
+    assert(privacy?.scrollytelling === "not_required", "the static page does not inherit another page's hooks");
+    assert(!surfaceRequiresMotionInteractionEvidence("privacy", "landing", projected), "privacy motion evidence stays off");
+    assert(surfaceRequiresMotionInteractionEvidence("home", "landing", projected), "home motion evidence is required");
+  });
+
+  harness.check("page-gates: cinematic conversion job without CRO evidence fails", () => {
+    const root = harness.makeTempDir("page-gates-cinematic-conversion");
+    mkdirSync(path.join(root, "studio/seed"), { recursive: true });
+    writeFileSync(
+      path.join(root, "studio/seed/business.json"),
+      JSON.stringify(studioDoc({ landingPages: [{ id: "story", interaction: "scroll-linked", job: "conversion" }] }), null, 2),
+      "utf8",
+    );
+    const issues = validateFrozenPageTechniqueGates(root, "page_gates");
+    assert(
+      issues.some((entry) => entry.code === "page_gates.conversion_evidence_missing"),
+      JSON.stringify(issues),
+    );
+  });
+
+  harness.check("page-gates: a static page that implements its own motion must be corrected", () => {
+    const root = harness.makeTempDir("page-gates-static-implemented");
+    mkdirSync(path.join(root, "studio/seed"), { recursive: true });
+    mkdirSync(path.join(root, "growth/landing"), { recursive: true });
+    writeFileSync(
+      path.join(root, "studio/seed/business.json"),
+      JSON.stringify(studioDoc({ landingPages: [{ id: "privacy", interaction: "static-document" }] }), null, 2),
+      "utf8",
+    );
+    writeFileSync(
+      path.join(root, "growth/landing/privacy.html"),
+      "<!doctype html><html lang=\"en\"><body><h1>Privacy</h1><section data-scene-track data-scene-id=\"legal\"></section></body></html>\n",
+      "utf8",
+    );
+    writeFileSync(
+      path.join(root, "growth/landing/surface-contract.json"),
+      JSON.stringify({ analytics_events: ["page_viewed"], scrollytelling: { applicable: false } }, null, 2),
+      "utf8",
+    );
+    const projected = loadDesignSurfaceApplicability(root);
+    assert(projected.surfaces[0]?.implementedScrollytelling, "hooks on privacy.html are attributed to privacy");
+    const issues = validateFrozenPageTechniqueGates(root, "page_gates");
+    assert(
+      issues.some((entry) => entry.code === "page_gates.static_document_implemented_motion"),
+      JSON.stringify(issues),
+    );
+  });
+
+  harness.check("page-gates: an unrelated scroll keyword cannot change a static page's technique", () => {
+    const root = harness.makeTempDir("page-gates-unattributed-keyword");
+    mkdirSync(path.join(root, "studio/seed"), { recursive: true });
+    mkdirSync(path.join(root, "growth/landing"), { recursive: true });
+    writeFileSync(
+      path.join(root, "studio/seed/business.json"),
+      JSON.stringify(studioDoc({ landingPages: [{ id: "privacy", interaction: "static-document" }] }), null, 2),
+      "utf8",
+    );
+    writeFileSync(
+      path.join(root, "growth/landing/privacy.html"),
+      "<!doctype html><html lang=\"en\"><body><h1>Privacy</h1><p>Static disclosures.</p></body></html>\n",
+      "utf8",
+    );
+    writeFileSync(
+      path.join(root, "growth/landing/vendor-notes.ts"),
+      "// Mentioning data-scene-track in an unrelated file is not proof every page animates.\n",
+      "utf8",
+    );
+    writeFileSync(
+      path.join(root, "growth/landing/surface-contract.json"),
+      JSON.stringify({ analytics_events: ["page_viewed"], scrollytelling: { applicable: false } }, null, 2),
+      "utf8",
+    );
+    const projected = loadDesignSurfaceApplicability(root);
+    assert(projected.implementedScrollytellingUnattributed, "the unrelated file is an inspection signal");
+    assert(projected.surfaces[0]?.scrollytelling === "not_required", "privacy technique stays not_required");
+    assert(!projected.surfaces[0]?.implementedScrollytelling, "privacy is not attributed");
+    assert(
+      !surfaceRequiresMotionInteractionEvidence("privacy", "landing", projected),
+      "unrelated keyword cannot impose motion evidence on privacy",
+    );
+    const issues = validateFrozenPageTechniqueGates(root, "page_gates");
+    assert(
+      issues.some((entry) => entry.code === "page_gates.implemented_motion_unattributed"),
+      JSON.stringify(issues),
+    );
+    assert(
+      !issues.some((entry) => entry.code === "page_gates.static_document_implemented_motion"),
+      JSON.stringify(issues),
+    );
+  });
+
   harness.check("residual guidance does not restore universal 60fps or scrollytelling procedure", () => {
     const evidenceStack = readFileSync(path.join(skillRoot, "knowledge/design/design-evidence-stack.md"), "utf8");
     assert(
@@ -394,8 +548,10 @@ export function register(harness: Harness): void {
       "landing producer must gate editorial-scrollytelling.md on selected or implemented scroll-linked",
     );
     assert(
-      /Do not follow editorial-scrollytelling\.md on static-document or conversion pages/.test(landingNode),
-      "landing producer must refuse editorial-scrollytelling.md on static and conversion pages",
+      /Do not follow editorial-scrollytelling\.md on static-document pages or on conversion pages that did not select or implement scroll-linked interaction/.test(
+        landingNode,
+      ),
+      "landing producer must refuse editorial-scrollytelling.md on static pages and conventional conversion pages",
     );
     const onboarding = readFileSync(path.join(skillRoot, "examples/workspace/business/product/ONBOARDING.md"), "utf8");
     assert(!/Record the shot ID/.test(onboarding), "example ONBOARDING must not restore a shot-ID placeholder row");

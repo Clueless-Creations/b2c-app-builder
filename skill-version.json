@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.36",
+  "version": "0.219.37",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Preserve complete founder briefs through CLI --mandate-file into operations/FOUNDER_BRIEF.md.",
-    "Lead the skill and README with create, status, and plan before composition customization."
+    "Keep conversion purpose independent of scroll technique so cinematic signup keeps both CRO and motion proof.",
+    "Hold onboarding applicability until recipe and provider versions match a reviewed catalog."
   ]
 }

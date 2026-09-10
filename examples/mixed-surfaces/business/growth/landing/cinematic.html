@@ -37,8 +37,15 @@
       .muted {
         color: var(--muted);
       }
+      nav[aria-label="Fixture pages"] a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 24px;
+        min-width: 24px;
+        padding: 0.35rem 0.4rem;
+      }
       nav a + a {
-        margin-left: 1rem;
+        margin-left: 0.35rem;
       }
       .layout {
         display: grid;
@@ -86,6 +93,18 @@
         max-width: 16rem;
         height: auto;
       }
+      [data-scene-lifecycle="active"] [data-scene-visual] svg {
+        max-width: 11rem;
+      }
+      [data-scene-lifecycle="active"] [data-scene-visual] p {
+        display: none;
+      }
+      figcaption {
+        position: relative;
+        z-index: 1;
+        background: var(--paper);
+        padding-top: 0.35rem;
+      }
       .steps {
         margin: 0;
         padding-left: 1.2rem;
@@ -129,7 +148,8 @@
       }
       [data-scene-lifecycle="active"] .stage {
         position: relative;
-        min-height: 13.5rem;
+        min-height: 16.5rem;
+        margin-bottom: 0.5rem;
       }
       [data-scene-lifecycle="active"] [data-scene-visual] {
         position: absolute;

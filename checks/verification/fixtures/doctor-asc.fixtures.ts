@@ -2,8 +2,9 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { assert, type Harness } from "./_harness.js";
 import { REVENUECAT_CLI_RELEASE } from "../../../adapters/providers/revenuecat/cli-operations.js";
+import { EAS_CLI_DOCUMENTED_VERSION } from "../../../catalog/stacks/expo-eas-commands.js";
 import type { RevenueCatCliDiscovery } from "../../../adapters/providers/revenuecat/cli-discovery.js";
-import { runDoctor, type DoctorAscFacts, type DoctorFinding, type DoctorRevenueCatFacts } from "../../../kernel/session/doctor.js";
+import { runDoctor, type DoctorAscFacts, type DoctorFinding, type DoctorRevenueCatFacts, type DoctorExpoEasFacts } from "../../../kernel/session/doctor.js";
 import {
   appendDoctorHostBlock,
   readDoctorHostObservation,
@@ -57,6 +58,28 @@ function missingRevenueCatFacts(): DoctorRevenueCatFacts {
   };
 }
 
+function missingExpoEasFacts(): DoctorExpoEasFacts {
+  return {
+    latestObserved: EAS_CLI_DOCUMENTED_VERSION,
+    discoverEas: () => ({
+      code: "missing",
+      kind: "eas",
+      selected: null,
+      candidates: [],
+      documentedEasVersion: EAS_CLI_DOCUMENTED_VERSION,
+      message: "fixture: EAS CLI absent",
+    }),
+    discoverExpo: () => ({
+      code: "missing",
+      kind: "expo",
+      selected: null,
+      candidates: [],
+      documentedEasVersion: EAS_CLI_DOCUMENTED_VERSION,
+      message: "fixture: Expo CLI absent",
+    }),
+  };
+}
+
 function runIsolated(harness: Harness, name: string, facts: DoctorAscFacts | null): { findings: DoctorFinding[]; home: string } {
   const home = harness.makeTempDir(name);
   const findings = runDoctor({
@@ -65,6 +88,7 @@ function runIsolated(harness: Harness, name: string, facts: DoctorAscFacts | nul
     userHome: () => "/Users/fixture-operator",
     loadAscFacts: () => facts,
     loadRevenueCatFacts: missingRevenueCatFacts,
+    loadExpoEasFacts: missingExpoEasFacts,
     persistHost: writeDoctorHostObservation,
   });
   return { findings, home };
@@ -82,6 +106,7 @@ export function register(harness: Harness): void {
     assert(stored.path === null && stored.version === null, `negative observation must null path and version, got ${JSON.stringify(stored)}`);
     assert(stored.latestObserved === LATEST && stored.comparedAt === COMPARED_AT, `negative observation must keep latest + compared-at, got ${JSON.stringify(stored)}`);
     assert(stored.revenuecatCli?.identity === "missing", `ASC-only stub must still persist RevenueCat CLI identity, got ${JSON.stringify(stored.revenuecatCli)}`);
+    assert(stored.easCli?.identity === "missing", `ASC-only stub must still persist EAS CLI identity, got ${JSON.stringify(stored.easCli)}`);
   });
 
   harness.check("doctor-asc: winner equal to latest observed is ok and names path plus version", () => {
@@ -160,6 +185,7 @@ export function register(harness: Harness): void {
       userHome: () => "/Users/fixture-operator",
       loadAscFacts: () => fakeFacts([{ path: "/opt/homebrew/bin/asc", version: LATEST }]),
       loadRevenueCatFacts: missingRevenueCatFacts,
+      loadExpoEasFacts: missingExpoEasFacts,
       persistHost: () => ({ ok: false, message: "disk full" }),
     });
     const writeFailed = finding(findings, "doctor.asc_host_write_failed");

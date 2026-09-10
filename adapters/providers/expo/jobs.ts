@@ -14,7 +14,7 @@
  * effects are never replayed.
  */
 
-import { closeSync, existsSync, fsyncSync, lstatSync, mkdirSync, openSync, readFileSync, renameSync, writeFileSync } from "node:fs";
+import { closeSync, existsSync, fsyncSync, lstatSync, mkdirSync, openSync, readFileSync, renameSync, unlinkSync, writeFileSync, writeSync } from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import type { ExpoEasCommandId } from "../../../catalog/stacks/expo-eas-commands.js";
@@ -326,6 +326,107 @@ export class EasJobLedger {
 
 export function easJobLedgerPath(workspaceRoot: string): string {
   return path.join(workspaceRoot, ".b2c", "expo-eas-jobs.json");
+}
+
+export const EAS_JOB_CLAIM_SCHEMA = "b2c.eas-job-claim/v1" as const;
+
+export interface EasJobClaim {
+  readonly schemaVersion: typeof EAS_JOB_CLAIM_SCHEMA;
+  readonly pid: number;
+  readonly idempotencyKey: string;
+  readonly at: string;
+}
+
+/** Per-request exclusive claim beside the ledger. Serializes bind+persist+spawn across processes. */
+export function easJobClaimPath(ledgerFile: string, idempotencyKey: string): string {
+  const digest = createHash("sha256").update(idempotencyKey).digest("hex").slice(0, 16);
+  return `${ledgerFile}.${digest}.claim`;
+}
+
+export function easClaimOwnerAlive(pid: number): boolean {
+  if (!Number.isInteger(pid) || pid <= 0) return false;
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function writeEasJobClaim(claimPath: string, idempotencyKey: string, at: string): boolean {
+  assertNoSymlink(claimPath);
+  mkdirSync(path.dirname(claimPath), { recursive: true });
+  let fd: number;
+  try {
+    fd = openSync(claimPath, "wx", 0o600);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "EEXIST") return false;
+    throw error;
+  }
+  try {
+    const document: EasJobClaim = {
+      schemaVersion: EAS_JOB_CLAIM_SCHEMA,
+      pid: process.pid,
+      idempotencyKey,
+      at,
+    };
+    writeSync(fd, `${JSON.stringify(document)}\n`);
+  } finally {
+    closeSync(fd);
+  }
+  return true;
+}
+
+function readEasJobClaim(claimPath: string): EasJobClaim | undefined {
+  if (!existsSync(claimPath)) return undefined;
+  try {
+    const parsed = JSON.parse(readFileSync(claimPath, "utf8")) as Partial<EasJobClaim>;
+    if (parsed.schemaVersion !== EAS_JOB_CLAIM_SCHEMA) return undefined;
+    if (typeof parsed.pid !== "number" || typeof parsed.idempotencyKey !== "string" || typeof parsed.at !== "string") {
+      return undefined;
+    }
+    return { schemaVersion: EAS_JOB_CLAIM_SCHEMA, pid: parsed.pid, idempotencyKey: parsed.idempotencyKey, at: parsed.at };
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Exclusive create of the claim file. Nested same-process re-entry and a live foreign
+ * pid are `held` (no wait — that would deadlock a nested fixture). A claim whose pid is
+ * dead is stolen once. This is EAS ledger durability, not a kernel scheduler.
+ */
+export function tryAcquireEasJobClaim(
+  claimPath: string,
+  idempotencyKey: string,
+  now: () => string = () => new Date().toISOString(),
+): { readonly ok: true } | { readonly ok: false; readonly reason: "held" } {
+  if (writeEasJobClaim(claimPath, idempotencyKey, now())) return { ok: true };
+  const existing = readEasJobClaim(claimPath);
+  if (!existing) {
+    if (writeEasJobClaim(claimPath, idempotencyKey, now())) return { ok: true };
+    return { ok: false, reason: "held" };
+  }
+  if (existing.pid === process.pid) return { ok: false, reason: "held" };
+  if (easClaimOwnerAlive(existing.pid)) return { ok: false, reason: "held" };
+  try {
+    unlinkSync(claimPath);
+  } catch {
+    return { ok: false, reason: "held" };
+  }
+  if (writeEasJobClaim(claimPath, idempotencyKey, now())) return { ok: true };
+  return { ok: false, reason: "held" };
+}
+
+export function releaseEasJobClaim(claimPath: string): void {
+  const existing = readEasJobClaim(claimPath);
+  if (!existing) return;
+  if (existing.pid !== process.pid) return;
+  try {
+    unlinkSync(claimPath);
+  } catch {
+    // Claim already gone.
+  }
 }
 
 export function isSuccessfulBuild(entry: EasJobEntry | undefined): boolean {

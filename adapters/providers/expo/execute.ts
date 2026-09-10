@@ -7,6 +7,9 @@
  * Decode stays in decode.ts; this file only consumes the observation. Persistence owner
  * is EasJobLedger (not a second kernel journal). Coordinate #104 for the same
  * persist-before-effect / resume-observation contract; do not extract a generic scheduler.
+ * Cross-process exclusive claim serializes bind+persist+spawn for one key. Remote ids
+ * are decoded after spawnSync returns; EAS `--json` prints at process end, so streaming
+ * capture before exit is not claimed.
  */
 
 import { existsSync } from "node:fs";
@@ -16,7 +19,18 @@ import { decodeExpoEasResponse, ledgerArtifactUrl, type EasDecodedObservation } 
 import type { ExpoCliDiscovery } from "./discovery.js";
 import { inspectCommandEffects } from "./effects.js";
 import { buildEasJobBinding } from "./identity.js";
-import { EasJobLedger, easJobLedgerPath, isSuccessfulBuild, type EasArtifactKind, type EasJobBinding, type EasJobEntry, type EasJobTransport } from "./jobs.js";
+import {
+  EasJobLedger,
+  easJobClaimPath,
+  easJobLedgerPath,
+  isSuccessfulBuild,
+  releaseEasJobClaim,
+  tryAcquireEasJobClaim,
+  type EasArtifactKind,
+  type EasJobBinding,
+  type EasJobEntry,
+  type EasJobTransport,
+} from "./jobs.js";
 import { assessExpoEasPreflight, type ExpoEasPreflight, type ExpoEasTarget } from "./preflight.js";
 import { inspectExpoProject } from "./project-config.js";
 import {
@@ -192,10 +206,23 @@ export function runExpoEasCommand(input: ExpoEasExecuteRequest): ExpoEasExecuteR
   });
   const paid = isRemotePaidOrPublicEffect(closure.vector);
   let leased = false;
+  let claimed = false;
+  const claimPath = easJobClaimPath(expoEasLedgerFile(input), input.idempotencyKey);
 
   try {
     if (paid) {
       try {
+        const claim = tryAcquireEasJobClaim(claimPath, input.idempotencyKey);
+        if (!claim.ok) {
+          return {
+            ...empty,
+            preflight: holdUncertain(
+              "Another process holds the EAS dispatch claim for this request. Holding mutation-uncertain. Absence of a local completion receipt is not permission to start a second paid or public effect.",
+            ),
+            uncertainRemote: true,
+          };
+        }
+        claimed = true;
         hydrateEasLedger(input);
         const prior = input.ledger.reconcile(input.jobTransport, input.idempotencyKey, binding);
         switch (prior.action) {
@@ -349,6 +376,7 @@ export function runExpoEasCommand(input: ExpoEasExecuteRequest): ExpoEasExecuteR
     };
   } finally {
     if (leased) input.ledger.release(input.idempotencyKey);
+    if (claimed) releaseEasJobClaim(claimPath);
   }
 }
 

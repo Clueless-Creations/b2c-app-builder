@@ -2,6 +2,7 @@
  * #106 EAS request identity and pre-dispatch durability. Fake processes only.
  * Fresh-process recovery loads a new ledger from disk. No live/paid EAS.
  */
+import { spawnSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { EXPO_APP_RUNTIME } from "../../../catalog/stacks/expo-selection.js";
@@ -9,7 +10,10 @@ import {
   EasJobLedger,
   createFakeEasJobTransport,
   discoverExpoCli,
+  easJobClaimPath,
   easJobLedgerPath,
+  releaseEasJobClaim,
+  tryAcquireEasJobClaim,
   fingerprintEasUploadInputs,
   isolatedConfigHome,
   runExpoEasCommand,
@@ -460,5 +464,104 @@ export function register(harness: Harness): void {
     assert(second.jobState === "finished", second.jobState ?? "");
     assert(calls.length === 1, `first instance spawned once, got ${calls.length}`);
     assert(secondCalls.length === 0, `second instance must not spawn, got ${secondCalls.length}`);
+  });
+
+  harness.check("expo-eas-durability: two empty ledgers racing under one key do not both spawn", () => {
+    const cwd = writeFakeApp(harness.makeTempDir("two-process-race"));
+    const isolatedHome = isolatedConfigHome(harness.makeTempDir("two-process-race-home"), "ws-a");
+    const discovery = trustedDiscovery(harness);
+    const file = easJobLedgerPath(cwd);
+    const firstLedger = new EasJobLedger({ now: () => "2026-09-09T00:00:00.000Z" });
+    const secondLedger = new EasJobLedger({ now: () => "2026-09-09T00:00:00.000Z" });
+    let nestedInvoked: boolean | undefined;
+    let nestedCode: string | undefined;
+    const { run, calls } = recordingRunner(() => {
+      const nested = runExpoEasCommand({
+        operationId: "eas.build.cloud",
+        executable: "/opt/fake/bin/eas",
+        cwd,
+        isolatedHome,
+        pathEnv: "/opt/fake/bin",
+        run: () => ok(queuedBuild("build_nested_race")),
+        discovery,
+        target: selectedTarget(),
+        platform: "ios",
+        profile: "preview",
+        idempotencyKey: "build-race",
+        ledger: secondLedger,
+        ledgerPath: file,
+        jobTransport: createFakeEasJobTransport(),
+      });
+      nestedInvoked = nested.invoked;
+      nestedCode = nested.preflight.code;
+      return ok(queuedBuild("build_race"));
+    });
+    const first = runExpoEasCommand({
+      operationId: "eas.build.cloud",
+      executable: "/opt/fake/bin/eas",
+      cwd,
+      isolatedHome,
+      pathEnv: "/opt/fake/bin",
+      run,
+      discovery,
+      target: selectedTarget(),
+      platform: "ios",
+      profile: "preview",
+      idempotencyKey: "build-race",
+      ledger: firstLedger,
+      ledgerPath: file,
+      jobTransport: createFakeEasJobTransport(),
+    });
+    assert(first.invoked, "winner may spawn");
+    assert(first.remoteId === "build_race", first.remoteId ?? "");
+    assert(nestedInvoked === false, "loser must not spawn");
+    assert(nestedCode === "mutation-uncertain", nestedCode ?? "");
+    assert(calls.length === 1, `expected one spawn, got ${calls.length}`);
+  });
+
+  harness.check("expo-eas-durability: dead-pid claim is stolen and does not permanently block dispatch", () => {
+    const cwd = writeFakeApp(harness.makeTempDir("stale-claim"));
+    const isolatedHome = isolatedConfigHome(harness.makeTempDir("stale-claim-home"), "ws-a");
+    const discovery = trustedDiscovery(harness);
+    const file = easJobLedgerPath(cwd);
+    const claimPath = easJobClaimPath(file, "stale-claim");
+    mkdirSync(path.dirname(claimPath), { recursive: true });
+    writeFileSync(
+      claimPath,
+      `${JSON.stringify({ schemaVersion: "b2c.eas-job-claim/v1", pid: 999999999, idempotencyKey: "stale-claim", at: "2026-09-09T00:00:00.000Z" })}\n`,
+    );
+    const { run, calls } = recordingRunner(() => ok(queuedBuild("build_stale")));
+    const result = runExpoEasCommand({
+      operationId: "eas.build.cloud",
+      executable: "/opt/fake/bin/eas",
+      cwd,
+      isolatedHome,
+      pathEnv: "/opt/fake/bin",
+      run,
+      discovery,
+      target: selectedTarget(),
+      platform: "ios",
+      profile: "preview",
+      idempotencyKey: "stale-claim",
+      ledger: new EasJobLedger({ now: () => "2026-09-09T00:00:01.000Z" }),
+      ledgerPath: file,
+      jobTransport: createFakeEasJobTransport(),
+    });
+    assert(result.invoked, "stale claim must not permanently block a first paid dispatch");
+    assert(result.remoteId === "build_stale", result.remoteId ?? "");
+    assert(calls.length === 1, `expected one spawn after stealing a dead claim, got ${calls.length}`);
+  });
+
+  harness.check("expo-eas-durability: a live foreign process cannot wx-create the same claim file", () => {
+    const cwd = writeFakeApp(harness.makeTempDir("foreign-claim"));
+    const file = easJobLedgerPath(cwd);
+    const claimPath = easJobClaimPath(file, "foreign-claim");
+    const acquired = tryAcquireEasJobClaim(claimPath, "foreign-claim", () => "2026-09-09T00:00:00.000Z");
+    assert(acquired.ok, "parent must hold the exclusive claim");
+    const child = spawnSync(process.execPath, ["-e", `const fs = require("fs"); try { fs.openSync(${JSON.stringify(claimPath)}, "wx"); process.exit(2); } catch (error) { process.exit(error && error.code === "EEXIST" ? 0 : 1); }`], {
+      encoding: "utf8",
+    });
+    assert(child.status === 0, `foreign process must see EEXIST, got status ${child.status} stderr=${child.stderr}`);
+    releaseEasJobClaim(claimPath);
   });
 }

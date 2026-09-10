@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.58",
+  "version": "0.219.59",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Fail leftover public-boundary residue in generated first-party and hosted-knowledge copies after authored sources are clean.",
-    "When the same leak is still in an authored file, fail that file only so the fix is scrub-and-re-render, not a generated-file edit."
+    "Send an ordinary business start to status and plan before catalog search or a whole-workflow bundle.",
+    "Name status then plan in generated creation recovery, lock start-path size, and require catalog after plan when setup lists it."
   ]
 }

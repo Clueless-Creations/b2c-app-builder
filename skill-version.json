@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.71",
+  "version": "0.219.72",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Keep a disposable Expo session and Node SQLite cache across reopen in the selected starter, and restore the notification detail route without granting paid or native-store access.",
-    "Export sign-in, not-found, and the required static HTML routes from the disposable Metro web export; EAS Hosting, OTA, device install, and Expo MCP stay unrun."
+    "Say completion.deliveryAccepted is current closeout evidence, not store submission or release.",
+    "Keep liveLaunchProven false unless separately granted provider-native proof exists."
   ]
 }

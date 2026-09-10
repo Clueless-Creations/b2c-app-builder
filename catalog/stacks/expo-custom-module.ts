@@ -19,7 +19,7 @@ import {
   isBuilderCheckoutPath,
   packageJsonHasExactDependency,
 } from "./expo-native-ownership.js";
-import { EXPO_STARTER_FIXTURE_DIR, MARKETING_OR_BACKEND_DEPENDENCIES } from "./expo-starter.js";
+import { EXPO_STARTER_FIXTURE_DIR, EXPO_STARTER_BOOT_FILES, MARKETING_OR_BACKEND_DEPENDENCIES } from "./expo-starter.js";
 
 export const EXPO_CUSTOM_MODULE_DIR = "modules/b2c-native-capability";
 export const EXPO_CUSTOM_MODULE_FILES = [
@@ -31,6 +31,9 @@ export const EXPO_CUSTOM_MODULE_FILES = [
   `${EXPO_CUSTOM_MODULE_DIR}/src/capability.ts`,
   `${EXPO_CUSTOM_MODULE_DIR}/src/invoke.ts`,
   `${EXPO_CUSTOM_MODULE_DIR}/ios/B2cNativeCapabilityModule.swift`,
+  `${EXPO_CUSTOM_MODULE_DIR}/ios/B2cNativeCapability.podspec`,
+  `${EXPO_CUSTOM_MODULE_DIR}/android/build.gradle`,
+  `${EXPO_CUSTOM_MODULE_DIR}/android/src/main/AndroidManifest.xml`,
   `${EXPO_CUSTOM_MODULE_DIR}/android/src/main/java/app/example/b2cnativecapability/B2cNativeCapabilityModule.kt`,
 ] as const;
 
@@ -247,7 +250,7 @@ export interface PackagedExpoStarterReport {
 export function inspectPackagedExpoStarter(skillRoot: string): PackagedExpoStarterReport {
   const fixtureRoot = path.join(skillRoot, "catalog/stacks/expo-starter-fixture");
   const lockfileInFixture = Boolean(lstatIfPresent(path.join(fixtureRoot, "package-lock.json")));
-  const required = EXPO_CUSTOM_MODULE_FILES.map((relative) => `catalog/stacks/expo-starter-fixture/${relative}`);
+  const required = requiredConsumerStarterFiles();
   const pack = spawnSync("npm", ["pack", "--dry-run", "--json"], { cwd: skillRoot, encoding: "utf8", timeout: 120_000 });
   let packed: string[] = [];
   if (pack.status === 0) {
@@ -282,7 +285,10 @@ export interface PackagedExpoConsumerInstall {
 }
 
 function requiredConsumerStarterFiles(): string[] {
-  return EXPO_CUSTOM_MODULE_FILES.map((relative) => `catalog/stacks/expo-starter-fixture/${relative}`);
+  return [
+    ...EXPO_CUSTOM_MODULE_FILES.map((relative) => `catalog/stacks/expo-starter-fixture/${relative}`),
+    ...EXPO_STARTER_BOOT_FILES.map((relative) => `catalog/stacks/expo-starter-fixture/${relative}`),
+  ];
 }
 
 function packTarballFilename(stdout: string): string | undefined {

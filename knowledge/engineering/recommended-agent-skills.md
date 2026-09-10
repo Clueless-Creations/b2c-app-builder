@@ -24,7 +24,7 @@ Expo is a selectable app stack, not the default. Load [`expo-stack-selection.md`
 
 When the composition target is `{ platform: ios|android|web, runtime: expo }` and the founder approved an external pack for that session, these packs are optional:
 
-- `expo/skills` — Expo Router, native UI, EAS, and store guidance from Expo. #87 owns rights review and MCP boundaries. Do not install during intake or as a global default.
+- `expo/skills` — Expo Router, native UI, EAS, and store guidance from Expo. Discover the mapped skill name from `catalog/stacks/expo-agent-tools.ts` first. Do not install during intake or as a global default. Do not run a blanket `npx skills add expo/skills --skill '*' --yes`.
 - `emilkowalski/skills` — use `animate-expo` and `review-animations` before motion evidence is accepted.
 
 Do not install the whole Emil Kowalski pack as a hard catalog provider. Load the two named skills for polish. An `expo` dependency is not permission to install these packs.
@@ -56,7 +56,7 @@ Do not add these to the default B2C App Builder surface:
 Run with founder approval. Do not treat install as a done gate.
 
 ```bash
-npx skills add expo/skills --skill '*' --yes
+npx skills add expo/skills --skill expo-overview
 npx skills add emilkowalski/skills --skill animate-expo --skill review-animations --yes
 ```
 

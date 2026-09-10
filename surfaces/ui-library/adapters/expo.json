@@ -1,0 +1,57 @@
+{
+  "$schema": "../schemas/adapter-manifest.schema.json",
+  "schemaVersion": "1.0.0",
+  "adapter": {
+    "id": "expo",
+    "stack": "expo",
+    "language": "typescript",
+    "displayName": "Expo React Native"
+  },
+  "implementations": [
+    {
+      "contractId": "feedback.empty-state",
+      "maturity": "implemented",
+      "source": {
+        "path": "catalog/stacks/expo-starter-fixture/src/ui/empty-state.tsx",
+        "symbols": ["EmptyState"]
+      },
+      "proof": []
+    },
+    {
+      "contractId": "feedback.skeleton",
+      "maturity": "implemented",
+      "source": {
+        "path": "catalog/stacks/expo-starter-fixture/src/ui/skeleton.tsx",
+        "symbols": ["Skeleton"]
+      },
+      "proof": []
+    },
+    {
+      "contractId": "feedback.haptics",
+      "maturity": "implemented",
+      "source": {
+        "path": "catalog/stacks/expo-starter-fixture/src/ui/haptics.tsx",
+        "symbols": ["playSemanticHaptic"]
+      },
+      "proof": []
+    },
+    {
+      "contractId": "input.keyboard-behavior",
+      "maturity": "implemented",
+      "source": {
+        "path": "catalog/stacks/expo-starter-fixture/src/ui/keyboard-behavior.tsx",
+        "symbols": ["KeyboardAvoidingScreen"]
+      },
+      "proof": []
+    },
+    {
+      "contractId": "interaction.press-feedback",
+      "maturity": "implemented",
+      "source": {
+        "path": "catalog/stacks/expo-starter-fixture/src/ui/press-feedback.tsx",
+        "symbols": ["PressFeedback"]
+      },
+      "proof": []
+    }
+  ]
+}

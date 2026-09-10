@@ -350,37 +350,37 @@ function operationSupport(): ExpoOperationSupport[] {
       evidenceTier: "fixture-tested",
       queuedIssue: 82,
       notes:
-        "Isolated TypeScript starter fixture and empty/dirty target policy are fixture-tested. A disposable Expo-starter consumer can generate a lockfile with local npm install; the fixture tree still ships none. Not a development client. Habit-tracker starter remains Next.js.",
+        "Isolated TypeScript starter copies into an authorized empty target. A disposable consumer can npm install and run Metro web export (`expo export --platform web`). The fixture tree still ships no lockfile. Habit-tracker starter remains Next.js. Device install is a recorded hold.",
     },
     {
       id: "router-native-ui",
       title: "Expo Router and native UI",
       selection: "app-framework",
       platforms: ["ios", "android", "web"],
-      evidenceTier: "blocked",
+      evidenceTier: "fixture-tested",
       queuedIssue: 82,
       notes:
-        "JSX Stack/Tabs routes and expo-router@57.0.17 (expo@57.0.17 bundled set) exist. Navigation graph journeys are fixture-tested. Operation stays blocked: Expo Router runtime was not executed, and SwiftUI remains the only UI adapter.",
+        "JSX Stack/Tabs routes, expo-router@57.0.17, and a source-backed React Native adapter exist. Disposable Metro web export is the local boot proof. Native device Router runtime was not executed. Web export is not iOS or Android proof.",
     },
     {
       id: "cng-prebuild",
       title: "Continuous native generation",
       selection: "app-framework",
       platforms: ["ios", "android"],
-      evidenceTier: "blocked",
+      evidenceTier: "fixture-tested",
       queuedIssue: 82,
       notes:
-        "Blocked until Expo CLI prebuild is executed in a disposable workspace. Ownership classification in expo-native-ownership.ts is fixture-tested; that is not CNG generation.",
+        "Disposable `expo prebuild --no-install` is the classified CNG path. Ownership still refuses dirty or maintained trees. Native compile stays not-run. SDK 57 regenerates native directories by default; `--no-clean` is not a merge.",
     },
     {
       id: "custom-native-module",
       title: "Custom Swift/Kotlin module",
       selection: "app-framework",
       platforms: ["ios", "android"],
-      evidenceTier: "blocked",
+      evidenceTier: "fixture-tested",
       queuedIssue: 82,
       notes:
-        "TypeScript requireNativeModule entry, Metro browser → index.web.ts, Swift/Kotlin sources, and web-unsupported are fixture-tested. Operation stays blocked: autolinking, native compile, and development-client rebuild were not run.",
+        "TypeScript requireNativeModule entry, Metro browser → index.web.ts, Swift/Kotlin sources, podspec/Gradle, and web-unsupported are present. Disposable prebuild plus `expo-modules-autolinking resolve` lists the local package. Native compile and development-client rebuild stay not-run. Missing binary is rebuild-required, not a JavaScript retry.",
     },
     {
       id: "authentication",
@@ -509,7 +509,8 @@ function operationSupport(): ExpoOperationSupport[] {
       platforms: ["host"],
       evidenceTier: "blocked",
       queuedIssue: 87,
-      notes: "Optional. Discovery is not authorization. Reuse mobile-operation routing.",
+      notes:
+        "Optional. Discovery is not authorization. Reuse mobile-operation routing. Do not add a fake Expo MobileOperationTransport. Host-native device tools stay preferred when they already cover the task.",
     },
     {
       id: "official-skills",
@@ -518,7 +519,8 @@ function operationSupport(): ExpoOperationSupport[] {
       platforms: ["host"],
       evidenceTier: "blocked",
       queuedIssue: 87,
-      notes: "Blocked until #87. Do not install expo/skills or treat a citation as a live #81 route.",
+      notes:
+        "Inventory of official skill names is fixture-tested against the inspected expo/skills README revision. Install and live MCP stay blocked until founder-approved for that session. Do not blanket-install expo/skills.",
     },
     {
       id: "quality-observability",

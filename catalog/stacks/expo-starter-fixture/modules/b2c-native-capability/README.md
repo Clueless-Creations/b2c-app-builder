@@ -1,1 +1,1 @@
-Local Expo module for issue 82. Native `main` / `react-native` load `src/index.ts` (`requireNativeModule`). Web loads `browser` → `src/index.web.ts` (unsupported). This is not autolink proof, not a development-client rebuild, and not a compiled binary.
+Local Expo module for issue 82. Native `main` / `react-native` load `src/index.ts` (`requireNativeModule`). Web loads `browser` → `src/index.web.ts` (unsupported). Autolinking can resolve this package after a disposable prebuild. That is not a development-client rebuild and not a compiled binary.

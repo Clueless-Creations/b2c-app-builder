@@ -62,7 +62,7 @@ Do not run dynamic `app.config.ts` or config plugins during passive discovery. T
 
 An upgrade that touches native directories needs an isolated copy, frozen before/after locks, and a plan for authored native changes. Broad deletion of `ios/` and `android/` is not upgrade proof. Changing `package.json` without a rebuild is not upgrade proof.
 
-#82 owns the safe CNG path. #88 owns upgrade proof against the frozen per-platform matrix.
+#82 owns the safe CNG path: classify ownership, generate only in a disposable copy, and refuse dirty or maintained trees. Native compile stays host-gated. #88 owns upgrade proof against the frozen per-platform matrix.
 
 ## 6. Expo Go Is Not Production Proof
 

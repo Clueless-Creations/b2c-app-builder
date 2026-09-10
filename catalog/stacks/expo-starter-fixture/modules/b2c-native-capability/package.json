@@ -2,8 +2,14 @@
   "name": "b2c-native-capability",
   "version": "0.0.0",
   "private": true,
+  "license": "MIT",
+  "author": "Clueless Creations",
+  "homepage": "https://docs.expo.dev/modules/overview/",
   "main": "src/index.ts",
   "react-native": "src/index.ts",
   "browser": "src/index.web.ts",
-  "description": "Local Expo native-capability boundary. Native entry uses requireNativeModule. Web uses browser → index.web.ts. Not a compiled binary."
+  "description": "Local Expo native-capability boundary. Native entry uses requireNativeModule. Web uses browser → index.web.ts. Not a compiled binary.",
+  "peerDependencies": {
+    "expo": "*"
+  }
 }

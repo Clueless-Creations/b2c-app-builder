@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.69",
+  "version": "0.219.70",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Keep authored agent-graph overlay order as a checked transcription of catalog phase order.",
-    "Record overlay ownership and fail closed on unknown phase ids and duplicate node ids."
+    "Say completion.deliveryAccepted is current closeout evidence, not store submission or release.",
+    "Keep liveLaunchProven false unless separately granted provider-native proof exists."
   ]
 }

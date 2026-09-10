@@ -350,6 +350,6 @@ export function bindLocalStaticExport(input: {
     runtimeVerified: false,
     nativeProof: false,
     labeledLive: false,
-    reason: "Disposable Metro static export observed. Not EAS Hosting, not SSR, not iOS or Android proof.",
+    reason: "Local static export artifacts observed. Not EAS Hosting, not SSR, not iOS or Android proof.",
   };
 }

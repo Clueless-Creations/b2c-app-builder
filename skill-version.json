@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.35",
+  "version": "0.219.36",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Record independent native-contract provenance so adapter-generated samples are not treated as upstream evidence.",
-    "Keep Provider Capability Delta optional on upgrade-plan, with uninspected dimensions unknown, without overwriting the source-page hash ledger."
+    "Preserve complete founder briefs through CLI --mandate-file into operations/FOUNDER_BRIEF.md.",
+    "Lead the skill and README with create, status, and plan before composition customization."
   ]
 }

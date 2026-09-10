@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.34",
+  "version": "0.219.35",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Fail package-parity when a workspace-template entrypoint is on disk but missing from git ls-files.",
-    "Treat a client runtime whose realpath is this checkout as the pin; a genuine stale copy still fails."
+    "Record independent native-contract provenance so adapter-generated samples are not treated as upstream evidence.",
+    "Keep Provider Capability Delta optional on upgrade-plan, with uninspected dimensions unknown, without overwriting the source-page hash ledger."
   ]
 }

@@ -2,6 +2,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { type Harness, skillRoot } from "./_harness.js";
 import { ARCH02_RULE } from "../check-architecture.js";
+import { PROVIDER_BOUNDARY_RULE } from "../check-provider-boundary.js";
 
 function seedRepo(harness: Harness, name: string): string {
   const root = path.join(harness.tempRoot, name);
@@ -92,5 +93,35 @@ export function register(harness: Harness): void {
     ["--repo-root", twoViolations, "--json"],
     1,
     ARCH02_RULE,
+  );
+
+  const vendorLeak = seedRepo(harness, "architecture-provider-native-kernel");
+  mkdirSync(path.join(vendorLeak, "kernel/engine"), { recursive: true });
+  mkdirSync(path.join(vendorLeak, "adapters/providers/revenuecat"), { recursive: true });
+  writeFileSync(path.join(vendorLeak, "adapters/providers/revenuecat/cli-operations.ts"), "export const argv: string[] = [];\n");
+  writeFileSync(
+    path.join(vendorLeak, "kernel/engine/reducer.ts"),
+    'import { argv } from "../../adapters/providers/revenuecat/cli-operations.js";\nexport const leaked = argv;\n',
+  );
+  harness.runScriptArgs(
+    "architecture check refuses a kernel import of a provider-native adapter module",
+    "check-architecture",
+    ["--repo-root", vendorLeak],
+    1,
+    PROVIDER_BOUNDARY_RULE,
+  );
+
+  const composition = seedRepo(harness, "architecture-provider-composition-root");
+  mkdirSync(path.join(composition, "adapters/providers/revenuecat"), { recursive: true });
+  writeFileSync(path.join(composition, "adapters/providers/revenuecat/cli-doctor.ts"), "export function assess(): void {}\n");
+  writeFileSync(
+    path.join(composition, "kernel/session/doctor.ts"),
+    'import { assess } from "../../adapters/providers/revenuecat/cli-doctor.js";\nexport const doctor = assess;\n',
+  );
+  harness.runScriptArgs(
+    "architecture check allows composition-root doctor to import the selected provider",
+    "check-architecture",
+    ["--repo-root", composition],
+    0,
   );
 }

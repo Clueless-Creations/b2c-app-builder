@@ -76,8 +76,12 @@ reviewed_version: <version>
 reviewed_revision: <immutable revision when available>
 source: <public URL or registered source selector>
 operation: <native operation>
+canonical_operation: <canonical id or none>
+evidence_kind: actual-capture | official-example | upstream-source-test | deliberately-altered-negative
 establishes: <request shape | response shape | error | pagination | effect>
 ```
+
+`adapter-generated` samples are wiring evidence. They are not independent native evidence.
 
 **Never generate the expected native fixture using the adapter under test.** A fake provider that accepts whatever our encoder emits proves wiring, not provider conformance.
 
@@ -174,29 +178,33 @@ from_reviewed: <version/revision>
 to_candidate: <version/revision>
 
 native_changes:
-  added: []
-  removed: []
-  changed_inputs: []
-  changed_outputs: []
-  changed_errors: []
-  changed_pagination: []
-  changed_auth: []
-  changed_effects: []
-  changed_idempotency_or_recovery: []
-  changed_cost_or_quota: []
-  experimental_or_deprecated: []
+  added: { status: unknown, items: [] }
+  removed: { status: unknown, items: [] }
+  changed_inputs: { status: unknown, items: [] }
+  changed_outputs: { status: unknown, items: [] }
+  changed_errors: { status: unknown, items: [] }
+  changed_pagination: { status: unknown, items: [] }
+  changed_auth: { status: unknown, items: [] }
+  changed_effects: { status: unknown, items: [] }
+  changed_idempotency_or_recovery: { status: unknown, items: [] }
+  changed_cost_or_quota: { status: unknown, items: [] }
+  experimental_or_deprecated: { status: unknown, items: [] }
 
 mapping_impact:
-  adapter_encoder: false
-  adapter_transport: false
-  adapter_decoder: false
-  reconciler: false
-  support_declaration: false
-  canonical_contract_change: false
-  workflow_or_kernel_change: false
+  adapter_encoder: unknown
+  adapter_transport: unknown
+  adapter_decoder: unknown
+  reconciler: unknown
+  support_declaration: unknown
+  canonical_contract_change: unknown
+  workflow_or_kernel_change: unknown
 ```
 
-If `canonical_contract_change` is true, explain the new business semantic. If `workflow_or_kernel_change` is true, explain that semantic or the shared security or recovery defect being repaired. Do not invent a new business semantic for a kernel security or recovery fix. Provider syntax or response churn is not enough. Route the change through architecture review before implementation.
+Each native dimension is `changed`, `unchanged`, or `unknown`. Do not use `false` to mean reviewed and unchanged when no review occurred.
+
+This object is optional additive output on `b2c contribute upgrade-plan`. It does not overwrite `catalog/providers/capability-delta.yaml`. That YAML classifies source-page hash drift only.
+
+If `canonical_contract_change` is `changed`, explain the new business semantic. If `workflow_or_kernel_change` is `changed`, explain that semantic or the shared security or recovery defect being repaired. Do not invent a new business semantic for a kernel security or recovery fix. Provider syntax or response churn is not enough. Route the change through architecture review before implementation.
 
 ## Upgrade decision tree
 
@@ -234,7 +242,7 @@ If #12 is no because the workflow names a provider command or native type, the p
 
 Prefer checks that prevent core workflow, capability, business-policy, and kernel modules from importing provider-native adapter types. Do not enforce a folder aesthetic. Enforce dependency direction and semantics.
 
-A provider implementation may depend on canonical contracts. Canonical contracts, workflows, recipes, and the kernel must not depend on provider-native command/request/response types. The composition root and generated app SDK for a selected provider may depend on that provider. That wiring is not a neutrality violation. Do not globally ban those imports.
+A provider implementation may depend on canonical contracts. Canonical contracts, workflows, recipes, and the kernel must not depend on provider-native command/request/response types. The composition root and generated app SDK for a selected provider may depend on that provider. That wiring is not a neutrality violation. Do not globally ban those imports. `check:architecture` includes this provider-native import guard.
 
 ## Handoff
 

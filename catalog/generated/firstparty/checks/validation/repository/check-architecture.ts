@@ -1,12 +1,16 @@
 #!/usr/bin/env node
 /**
- * Mechanical ARCH-02 dependency-direction check.
+ * Mechanical ARCH-02 dependency-direction check plus ARCH-03/04 provider-native import guard.
  *
  * Kernel, catalog, adapters, contracts, entrypoints, and hosted modules must
  * not import checks implementation modules. Validator code may import shared
  * runtime contracts from kernel/schema or contracts/. Tooling may consume
  * checks/validation/business helpers; that pattern is an explicit
  * classification, not a silent skip.
+ *
+ * Protected kernel, contracts, and catalog workflows must not import
+ * provider-native adapter modules or vendor SDK packages. Composition-root
+ * wiring and selected generated-app SDK imports remain allowed.
  *
  * This is a repository-only check. An installed skill does not contain the
  * repository root, so the runtime audit must not run this check.
@@ -25,6 +29,7 @@ import { fileURLToPath } from "node:url";
 import { parse } from "@babel/parser";
 import { isMainModule } from "../../../tooling/lib/cli-entrypoint.js";
 import { flagBoolean, flagString, issue, parseFlags, reportAndExit, type Issue } from "../../../tooling/lib/launch-state.js";
+import { collectProviderBoundaryIssues } from "./check-provider-boundary.js";
 
 export const ARCH02_RULE = "architecture.arch02.runtime_imports_validation";
 export const ARCH02_RECORDED_DEBT_ABSENT = "architecture.arch02.recorded_debt_absent";
@@ -247,6 +252,10 @@ function resolveRelativeImport(fromFile: string, specifier: string, repoRoot: st
   return toPosix(path.relative(repoRoot, normalized));
 }
 
+function isPackageSpecifier(specifier: string): boolean {
+  return specifier.length > 0 && !specifier.startsWith(".") && !specifier.startsWith("node:");
+}
+
 function matchesRecordedDebt(edge: ImportEdge): boolean {
   return RECORDED_ARCH02_EDGES.some((recorded) => recorded.from === edge.from && recorded.line === edge.line && recorded.specifier === edge.specifier);
 }
@@ -270,14 +279,25 @@ export function collectImportGraph(repoRoot: string): { readonly edges: ImportEd
     }
     for (const { specifier, line } of specifiers) {
       const resolved = resolveRelativeImport(absolute, specifier, repoRoot);
-      if (!resolved) continue;
+      if (resolved) {
+        edges.push({
+          from,
+          line,
+          specifier,
+          resolved,
+          fromLayer,
+          toLayer: classifyLayer(resolved),
+        });
+        continue;
+      }
+      if (!isPackageSpecifier(specifier)) continue;
       edges.push({
         from,
         line,
         specifier,
-        resolved,
+        resolved: specifier,
         fromLayer,
-        toLayer: classifyLayer(resolved),
+        toLayer: "other",
       });
     }
   }
@@ -329,6 +349,13 @@ export function collectArchitectureIssues(options: ArchitectureCheckOptions): Is
       );
     }
   }
+
+  issues.push(
+    ...collectProviderBoundaryIssues(edges, {
+      acceptRecordedDebt: options.acceptRecordedDebt,
+      allowEdges: options.allowEdges,
+    }),
+  );
 
   return issues;
 }

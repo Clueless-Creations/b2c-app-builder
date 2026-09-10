@@ -1,3 +1,6 @@
+# Source-page freshness hashes and ignore/docs/commands classifications.
+# This file is not the UPGRADE_PROVIDER native-contract delta. That optional
+# field lives on `b2c contribute upgrade-plan` output (ADR-0013 / #111).
 schema_version: 1
 reviewed_at: "2026-08-24"
 entries:

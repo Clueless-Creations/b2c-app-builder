@@ -75,7 +75,7 @@ const COMMANDS = new Map([
       summary: "install the protected founder Ed25519 public-key trust store (dry-run by default)",
     },
   ],
-  ["doctor", { script: "kernel/session/doctor.ts", summary: "read-only health report: node, tsx, compiled catalog, registry, and YOUR worker CLIs" }],
+  ["doctor", { script: "kernel/session/doctor.ts", summary: "read-only health report: node, tsx, compiled catalog, registry, host CLIs, and YOUR worker CLIs" }],
   ["new", { script: "kernel/session/new.ts", summary: "create a small planning workspace: b2c new <slug> [--dir <path>] [--idea <hypothesis>]" }],
   [
     "render-product",

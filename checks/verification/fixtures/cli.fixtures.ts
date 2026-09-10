@@ -481,6 +481,7 @@ export function register(harness: Harness): void {
       assert(doctor.output.includes(code), `doctor must report ${code}: ${doctor.output.slice(-400)}`);
     }
     assert(doctor.output.includes("doctor.asc"), `doctor must report a doctor.asc* finding: ${doctor.output.slice(-400)}`);
+    assert(doctor.output.includes("doctor.revenuecat_cli"), `doctor must report a doctor.revenuecat_cli* finding: ${doctor.output.slice(-400)}`);
     assert(!doctor.output.includes("ERROR"), `a healthy repo checkout must produce no doctor errors: ${doctor.output.slice(-400)}`);
   });
 

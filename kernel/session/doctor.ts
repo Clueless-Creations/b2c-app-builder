@@ -11,19 +11,33 @@
  *
  * Exit codes: 0 = healthy (warnings allowed); 1 = the install itself is broken.
  * App Store Connect CLI findings prefer the latest observed release and never install or upgrade
- * the host `asc`. A missing or stale winner is a warning, same as a missing worker CLI.
+ * the host `asc`. RevenueCat CLI identity uses trusted discovery (`--version` and `commands --json`)
+ * because a generic `rc --version` probe cannot distinguish an unrelated binary. A missing or stale
+ * winner is a warning, same as a missing worker CLI. Doctor never authenticates, never mutates,
+ * and never claims live catalog proof.
  */
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { resolveTsxCommand, tsxBinResolves } from "../../tooling/lib/tsx-bin.js";
 import { detectWorkerRuntimes } from "./executor.js";
+import {
+  assessRevenueCatCliHostDoctor,
+  discoverRevenueCatCliForDoctor,
+  REVENUECAT_CLI_DOCTOR_REVIEWED_VERSION,
+  type RevenueCatCliDiscovery,
+} from "../../adapters/providers/revenuecat/cli-doctor.js";
 import { b2cAppBuilderHome, loadRegistry, registryPath } from "../../adapters/registry.js";
 import { observeHost, probeExecutablesOnPath, runVersionProbe, type HostObserveDependencies, type HostObservationResult } from "../contribution/host-observe.js";
 import { compareSemver, parseSemver, semverSatisfies } from "../contribution/upstreams.js";
 import { loadUpstreams } from "../contribution/upstreams-load.js";
 import { isMainModule } from "../lib/cli.js";
-import { sanitizeExecutablePath, writeDoctorHostObservation, type DoctorHostObservation } from "./doctor-host.js";
+import {
+  sanitizeExecutablePath,
+  writeDoctorHostObservation,
+  type DoctorHostObservation,
+  type DoctorHostRevenueCatCliObservation,
+} from "./doctor-host.js";
 
 const skillRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 
@@ -41,11 +55,17 @@ export interface DoctorAscFacts {
   readonly observe: (deps: HostObserveDependencies) => HostObservationResult;
 }
 
+export interface DoctorRevenueCatFacts {
+  readonly latestObserved: string;
+  readonly discover: (input: { isolatedHome: string; cwd: string }) => RevenueCatCliDiscovery;
+}
+
 export interface DoctorDependencies {
   readonly now: () => Date;
   readonly home: () => string;
   readonly userHome: () => string;
   readonly loadAscFacts: () => DoctorAscFacts | null;
+  readonly loadRevenueCatFacts: () => DoctorRevenueCatFacts;
   readonly persistHost: (observation: DoctorHostObservation, home: string) => { ok: true } | { ok: false; message: string };
 }
 
@@ -76,12 +96,20 @@ function defaultAscFacts(): DoctorAscFacts | null {
   }
 }
 
+function defaultRevenueCatFacts(): DoctorRevenueCatFacts {
+  return {
+    latestObserved: REVENUECAT_CLI_DOCTOR_REVIEWED_VERSION,
+    discover: ({ isolatedHome, cwd }) => discoverRevenueCatCliForDoctor({ isolatedHome, cwd }),
+  };
+}
+
 function defaultDoctorDependencies(): DoctorDependencies {
   return {
     now: () => new Date(),
     home: b2cAppBuilderHome,
     userHome: () => process.env.HOME ?? "",
     loadAscFacts: defaultAscFacts,
+    loadRevenueCatFacts: defaultRevenueCatFacts,
     persistHost: writeDoctorHostObservation,
   };
 }
@@ -163,27 +191,64 @@ export function runDoctor(overrides: Partial<DoctorDependencies> = {}): DoctorFi
     );
   }
 
-  probeAsc(finding, deps);
+  const comparedAt = deps.now().toISOString();
+  const asc = probeAsc(finding, deps);
+  const revenuecatCli = probeRevenueCatCli(finding, deps);
+  persistDoctorHost(finding, deps, comparedAt, asc, revenuecatCli);
 
   return findings;
 }
 
-function probeAsc(finding: (severity: DoctorFinding["severity"], code: string, message: string) => void, deps: DoctorDependencies): void {
+function persistDoctorHost(
+  finding: (severity: DoctorFinding["severity"], code: string, message: string) => void,
+  deps: DoctorDependencies,
+  comparedAt: string,
+  asc: { readonly latestObserved: string | null; readonly path: string | null; readonly version: string | null },
+  revenuecatCli: DoctorHostRevenueCatCliObservation,
+): void {
+  const written = deps.persistHost(
+    {
+      schemaVersion: "b2c.doctor-host/v1",
+      comparedAt,
+      latestObserved: asc.latestObserved,
+      path: asc.path,
+      version: asc.version,
+      revenuecatCli,
+    },
+    deps.home(),
+  );
+  if (!written.ok) {
+    finding("warn", "doctor.asc_host_write_failed", `could not write doctor-host.json: ${written.message}`);
+    finding("warn", "doctor.revenuecat_cli_host_write_failed", `could not write doctor-host.json: ${written.message}`);
+  }
+}
+
+function probeRevenueCatCli(
+  finding: (severity: DoctorFinding["severity"], code: string, message: string) => void,
+  deps: DoctorDependencies,
+): DoctorHostRevenueCatCliObservation {
+  const facts = deps.loadRevenueCatFacts();
+  const isolatedHome = path.join(deps.home(), "revenuecat-cli-doctor");
+  const discovery = facts.discover({ isolatedHome, cwd: isolatedHome });
+  const assessed = assessRevenueCatCliHostDoctor({
+    discovery,
+    latestObserved: facts.latestObserved,
+    sanitizePath: (executablePath) => sanitizeExecutablePath(executablePath, deps.userHome()),
+  });
+  for (const item of assessed.findings) finding(item.severity, item.code, item.message);
+  return assessed.observation;
+}
+
+function probeAsc(
+  finding: (severity: DoctorFinding["severity"], code: string, message: string) => void,
+  deps: DoctorDependencies,
+): { readonly latestObserved: string | null; readonly path: string | null; readonly version: string | null } {
   const facts = deps.loadAscFacts();
   const latest = facts?.latestObserved ?? null;
-  const comparedAt = deps.now().toISOString();
-  const persist = (pathValue: string | null, version: string | null): void => {
-    const written = deps.persistHost(
-      { schemaVersion: "b2c.doctor-host/v1", comparedAt, latestObserved: latest, path: pathValue, version },
-      deps.home(),
-    );
-    if (!written.ok) finding("warn", "doctor.asc_host_write_failed", `could not write doctor-host.json: ${written.message}`);
-  };
 
   if (!facts) {
-    persist(null, null);
     finding("warn", "doctor.asc_observation_unreadable", "could not load the App Store Connect CLI upstream observation — doctor still did not install anything");
-    return;
+    return { latestObserved: latest, path: null, version: null };
   }
 
   const observed = facts.observe({
@@ -195,17 +260,15 @@ function probeAsc(finding: (severity: DoctorFinding["severity"], code: string, m
 
   const winner = observed.host.executables[0];
   if (!winner) {
-    persist(null, null);
     finding(
       "warn",
       "doctor.asc_missing",
       `no asc on PATH. Latest observed ${latest ?? "(unknown)"}. Store lanes need the App Store Connect CLI; doctor will not install it.`,
     );
-    return;
+    return { latestObserved: latest, path: null, version: null };
   }
 
   const winnerPath = sanitizeExecutablePath(winner.path, deps.userHome());
-  persist(winnerPath, winner.version);
   const extras = observed.host.executables.slice(1);
   if (extras.length > 0) {
     finding(
@@ -217,13 +280,13 @@ function probeAsc(finding: (severity: DoctorFinding["severity"], code: string, m
 
   if (!winner.version) {
     finding("warn", "doctor.asc_unparseable", `winning ${winnerPath} did not print a parseable version. Latest observed ${latest ?? "(unknown)"}.`);
-    return;
+    return { latestObserved: latest, path: winnerPath, version: null };
   }
 
   const parsed = parseSemver(winner.version);
   if (!parsed) {
     finding("warn", "doctor.asc_unparseable", `winning ${winnerPath} reports ${winner.version}, which is not semver. Latest observed ${latest ?? "(unknown)"}.`);
-    return;
+    return { latestObserved: latest, path: winnerPath, version: winner.version };
   }
 
   const unsupported = facts.supportRanges.find((range) => range.status === "unsupported" && semverSatisfies(parsed, range.range) === true);
@@ -233,7 +296,7 @@ function probeAsc(finding: (severity: DoctorFinding["severity"], code: string, m
       "doctor.asc_unsupported",
       `winning ${winnerPath} is ${winner.version}, which is outside the builder's supported range. Latest observed ${latest ?? "(unknown)"}. Doctor will not upgrade the host.`,
     );
-    return;
+    return { latestObserved: latest, path: winnerPath, version: winner.version };
   }
 
   if (latest) {
@@ -244,11 +307,12 @@ function probeAsc(finding: (severity: DoctorFinding["severity"], code: string, m
         "doctor.asc_stale",
         `winning ${winnerPath} is ${winner.version}; latest observed is ${latest}. Prefer the latest App Store Connect CLI. Doctor will not upgrade the host.`,
       );
-      return;
+      return { latestObserved: latest, path: winnerPath, version: winner.version };
     }
   }
 
   finding("ok", "doctor.asc", `winning ${winnerPath} ${winner.version}${latest ? ` (latest observed ${latest})` : ""}`);
+  return { latestObserved: latest, path: winnerPath, version: winner.version };
 }
 
 export function printFindings(findings: readonly DoctorFinding[]): number {

@@ -37,9 +37,11 @@ relationships:
       - adapters/providers/revenuecat/cli-execute.ts
       - adapters/providers/revenuecat/cli-proof.ts
       - adapters/providers/revenuecat/cli-catalog.ts
+      - adapters/providers/revenuecat/cli-doctor.ts
     tests:
       - checks/verification/fixtures/revenuecat-cli.fixtures.ts
       - checks/verification/fixtures/revenuecat-cli-decode.fixtures.ts
+      - checks/verification/fixtures/revenuecat-cli-doctor.fixtures.ts
       - checks/verification/fixtures/official-upstreams.fixtures.ts
     upstream_paths:
       - README.md
@@ -82,7 +84,7 @@ support:
     - id: rc.version
       title: Local executable identity and version
       keywords: [version, rc, revenuecat]
-      owners: [adapters/providers/revenuecat/cli-discovery.ts]
+      owners: [adapters/providers/revenuecat/cli-discovery.ts, adapters/providers/revenuecat/cli-doctor.ts]
     - id: rc.offerings.verify
       title: offerings verify (authenticated read)
       keywords: [offerings, verify]
@@ -143,6 +145,10 @@ adaptations:
   - id: collector-identity-distinct
     description: CLI results use collector revenuecat-cli@1. They must not reuse the REST probe marker revenuecat@1.
     owner: adapters/providers/revenuecat/cli-proof.ts
+    intentional: true
+  - id: doctor-is-not-live-catalog
+    description: b2c doctor records local CLI identity only. Selected-target checks fail closed without host authority and never spawn authenticated commands or claim live catalog proof.
+    owner: adapters/providers/revenuecat/cli-doctor.ts
     intentional: true
 host_probe:
   command: rc

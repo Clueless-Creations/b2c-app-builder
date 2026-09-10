@@ -93,7 +93,7 @@ right workflow.
 For a new business, create and register its planning workspace in one command:
 
 ```bash
-b2c business-create --workspace my-app --directory /absolute/path/to/my-app --name "My App" --hypothesis "The consumer problem to research" --mandate "Research a consumer problem in this market. Define a differentiated product. Design and build its native app and web funnel. Establish the evidence we need to improve it. Review, repair, and prove it is ready." --json
+b2c business-create --workspace my-app --directory /absolute/path/to/my-app --name "My App" --hypothesis "The consumer problem to research" --mandate-file ./brief.md --json
 b2c business-status --workspace my-app --json
 b2c business-plan --workspace my-app --json
 ```
@@ -101,13 +101,11 @@ b2c business-plan --workspace my-app --json
 The target must be empty or absent. For an existing planning or runtime workspace,
 use `b2c workspaces register` to adopt it, then resume through status and plan.
 Creation records a hypothesis; research and an explicit product decision precede
-initialization.
+initialization. Direct `--mandate` is for short requests. `--mandate-file` preserves
+the complete founder brief in `operations/FOUNDER_BRIEF.md`.
 
-Continue with the mandate saved in `operations/LAUNCH_PROGRAM.md`:
-
-> Research a consumer problem in this market. Define a differentiated product.
-> Design and build its native app and web funnel. Establish the evidence we
-> need to improve it. Review, repair, and prove it is ready.
+Continue from the canonical brief in `operations/FOUNDER_BRIEF.md`. `operations/LAUNCH_PROGRAM.md`
+is the derived program view and does not replace that source.
 
 The [business-building guide](docs/guides/build-a-business.md) walks through
 the product workflow, design decisions, and release boundaries.

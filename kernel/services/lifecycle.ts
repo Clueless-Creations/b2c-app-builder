@@ -7,6 +7,7 @@ import path from "node:path";
 import { loadRegistry, registerWorkspace } from "../../adapters/registry.js";
 import { registeredWorkspace, resolveWorkspaceRegistration } from "./installed-composition.js";
 import { createPlanningWorkspace } from "../session/new.js";
+import { FOUNDER_BRIEF_MAX_BYTES } from "../../contracts/public-api/contract.js";
 import { planWorkspace } from "../session/plan.js";
 import { projectInitializedBusinessPlan } from "./plan-projection.js";
 import { runSession, recoverPublicRequest, loadControlFile, resolveWorkspacePaths, type SessionHost } from "../session/run.js";
@@ -23,6 +24,8 @@ import { stableJson } from "../../tooling/lib/canonical-json.js";
 export function createBusiness(input: { workspaceId: string; directory: string; name: string; hypothesis: string; mandate?: string }) {
   const directory = path.resolve(input.directory),
     registry = loadRegistry();
+  const mandate = input.mandate ?? `Build a complete consumer business for this hypothesis: ${input.hypothesis}`;
+  if (Buffer.byteLength(mandate, "utf8") > FOUNDER_BRIEF_MAX_BYTES) throw new Error("business.founder_brief_oversized");
   if (registry.workspaces.some((entry) => entry.id === input.workspaceId || path.resolve(entry.path) === directory))
     throw new Error(
       "business.registration_conflict: The workspace ID or directory is already registered. " +
@@ -31,20 +34,22 @@ export function createBusiness(input: { workspaceId: string; directory: string; 
         "If the entry was registered by mistake, verify its ID and path before explicitly removing only the registration with b2c workspaces remove <id>, then retry business-create against an empty directory. " +
         "No workspace files or registry entries were changed.",
     );
-  createPlanningWorkspace({
+  const created = createPlanningWorkspace({
     directory,
     slug: input.workspaceId,
     name: input.name,
     hypothesis: input.hypothesis,
-    mandate: input.mandate ?? `Build a complete consumer business for this hypothesis: ${input.hypothesis}`,
+    mandate,
   });
+  if (!created.sourceIntent) throw new Error("business.founder_brief_missing");
   registerWorkspace(input.workspaceId, directory);
   return {
     workspaceId: input.workspaceId,
     status: "hypothesis" as const,
     revision: workspaceRevision(directory),
     nextAction:
-      "Preserve operations/LAUNCH_PROGRAM.md through research, design, implementation and closeout. Research the hypothesis and record an explicit Go, Pivot or Kill decision in the authored product before initialization.",
+      "Preserve operations/FOUNDER_BRIEF.md as the founder brief. operations/LAUNCH_PROGRAM.md is the derived program view and does not replace it. Research the hypothesis and record an explicit Go, Pivot or Kill decision in the authored product before initialization.",
+    sourceIntent: created.sourceIntent,
   };
 }
 export function initializeBusiness(input: { workspaceId: string; expectedRevision: string }) {

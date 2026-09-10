@@ -242,6 +242,21 @@ export const marketReportSchema = z.strictObject({
 });
 
 const lifecycleRevisionSchema = z.string().regex(/^sha256:[a-f0-9]{64}$/);
+/** Direct `--mandate` / JSON string bound. File-backed intake uses `FOUNDER_BRIEF_MAX_BYTES`. */
+export const DIRECT_MANDATE_MAX_CHARS = 8000;
+/** Storage/security cap for the canonical founder brief, not a model-context size. */
+export const FOUNDER_BRIEF_MAX_BYTES = 256 * 1024;
+export const FOUNDER_BRIEF_ARTIFACT = "operations/FOUNDER_BRIEF.md" as const;
+export const LAUNCH_PROGRAM_ARTIFACT = "operations/LAUNCH_PROGRAM.md" as const;
+export const founderBriefSourceIntentSchema = z.strictObject({
+  artifact: z.literal(FOUNDER_BRIEF_ARTIFACT),
+  characterCount: z.number().int().nonnegative(),
+  byteLength: z.number().int().nonnegative(),
+  digest: lifecycleRevisionSchema,
+  derivedView: z.literal(LAUNCH_PROGRAM_ARTIFACT),
+  derivedViewEmbedsSource: z.literal(false),
+});
+export type FounderBriefSourceIntent = z.infer<typeof founderBriefSourceIntentSchema>;
 /** Additive `business.plan` output bounds. Kernel projects into these limits; it does not import this module's types into planner state. */
 export const PUBLIC_PLAN_BOUNDS = {
   detail: 400,
@@ -337,7 +352,7 @@ export const businessCreateInputSchema = businessStatusInputSchema.extend({
   directory: z.string().min(1).max(4096),
   name: z.string().min(1).max(160),
   hypothesis: z.string().min(1).max(4000),
-  mandate: z.string().min(1).max(8000).optional(),
+  mandate: z.string().min(1).max(DIRECT_MANDATE_MAX_CHARS).optional(),
 });
 export const businessInitializeInputSchema = businessStatusInputSchema.extend({ expectedRevision: lifecycleRevisionSchema });
 export const businessPlanInputSchema = businessStatusInputSchema.extend({ maxConcurrency: z.number().int().min(1).max(8).default(4) });
@@ -358,6 +373,7 @@ export const businessCreatedSchema = z.strictObject({
   status: z.literal("hypothesis"),
   revision: lifecycleRevisionSchema,
   nextAction: z.string(),
+  sourceIntent: founderBriefSourceIntentSchema,
 });
 export const businessInitializedSchema = z.strictObject({
   workspaceId: z.string(),
@@ -598,7 +614,7 @@ export const PUBLIC_OPERATIONS = [
     description: "CLI-only scaffold and registration in an explicitly selected empty directory. Creates no grants, providers or accepted product decision.",
     inputSchema: businessCreateInputSchema,
     outputSchema: resultSchema(businessCreatedSchema),
-    flags: ["workspace", "directory", "name", "hypothesis", "mandate", "json"],
+    flags: ["workspace", "directory", "name", "hypothesis", "mandate", "mandate-file", "json"],
   },
   {
     id: "business.initialize",

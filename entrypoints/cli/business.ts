@@ -1,9 +1,10 @@
 import { boundedFileBytes } from "../../kernel/lib/bounded-file.js";
+import { readFounderBriefFile, type FounderBriefRead } from "../../kernel/session/founder-brief.js";
 import { readFileSync } from "node:fs";
 import { resolveCallerPath } from "../../kernel/lib/cli.js";
 import { z } from "zod";
-import { compositionSchema, PUBLIC_OPERATIONS } from "../../contracts/public-api/contract.js";
-import { compose, callPublicOperation, failure } from "../../kernel/services/business.js";
+import { compositionSchema, FOUNDER_BRIEF_MAX_BYTES, PUBLIC_OPERATIONS } from "../../contracts/public-api/contract.js";
+import { compose, callPublicOperation, createBusinessOperation, failure } from "../../kernel/services/business.js";
 
 const [command, ...argv] = process.argv.slice(2);
 const operation = PUBLIC_OPERATIONS.find((item) => item.cli === command);
@@ -43,6 +44,61 @@ const usage = () =>
           : "Usage: b2c compose --config <b2c.yaml|b2c.json> [--json] [--schema]",
     "JSON results use b2c/v1. Exit 0 means the request succeeded.",
   ].join("\n");
+function founderBriefFileFailure(read: Extract<FounderBriefRead, { ok: false }>) {
+  switch (read.code) {
+    case "missing":
+    case "unreadable":
+      return failure(
+        "INVALID_INPUT",
+        "mandate-file is missing or unreadable. No state changed.",
+        ["mandateFile"],
+        "Pass a readable UTF-8 file to --mandate-file. No state changed.",
+      );
+    case "oversized":
+      return failure(
+        "INVALID_INPUT",
+        `mandate-file is ${read.byteLength ?? FOUNDER_BRIEF_MAX_BYTES} bytes; file-backed intake supports ${FOUNDER_BRIEF_MAX_BYTES}. No state changed.`,
+        ["mandateFile"],
+        "Shorten the founder brief. Do not compress it by hand into --mandate.",
+      );
+    case "not_utf8":
+      return failure(
+        "INVALID_INPUT",
+        "mandate-file is not valid UTF-8 text. No state changed.",
+        ["mandateFile"],
+        "Save the founder brief as UTF-8 text and retry --mandate-file.",
+      );
+    case "empty":
+      return failure("INVALID_INPUT", "mandate-file is empty. No state changed.", ["mandateFile"], "Pass a non-empty founder brief to --mandate-file.");
+    default: {
+      const exhaustive: never = read.code;
+      throw new Error(String(exhaustive));
+    }
+  }
+}
+function createBusinessFromFlags(flags: Map<string, string | true>) {
+  if (flags.has("mandate") && flags.has("mandate-file"))
+    return failure(
+      "INVALID_INPUT",
+      "mandate and mandate-file were both supplied. No state changed.",
+      ["mandate", "mandateFile"],
+      "Supply exactly one of --mandate or --mandate-file.",
+    );
+  const identity = {
+    workspaceId: flags.get("workspace"),
+    directory: typeof flags.get("directory") === "string" ? resolveCallerPath(flags.get("directory") as string) : undefined,
+    name: flags.get("name"),
+    hypothesis: flags.get("hypothesis"),
+  };
+  if (flags.has("mandate-file")) {
+    const file = flags.get("mandate-file");
+    if (typeof file !== "string") throw new Error("value");
+    const loaded = readFounderBriefFile(resolveCallerPath(file));
+    if (!loaded.ok) return founderBriefFileFailure(loaded);
+    return createBusinessOperation({ ...identity, mandate: loaded.text }, { intake: "file" });
+  }
+  return createBusinessOperation({ ...identity, ...(flags.has("mandate") ? { mandate: flags.get("mandate") } : {}) });
+}
 if (argv.includes("--help") || argv.includes("-h")) {
   console.log(usage());
   process.exit(0);
@@ -88,13 +144,7 @@ try {
       });
       break;
     case "business.create":
-      result = callPublicOperation(operation.id, {
-        workspaceId: flags.get("workspace"),
-        directory: typeof flags.get("directory") === "string" ? resolveCallerPath(flags.get("directory") as string) : undefined,
-        name: flags.get("name"),
-        hypothesis: flags.get("hypothesis"),
-        ...(flags.has("mandate") ? { mandate: flags.get("mandate") } : {}),
-      });
+      result = createBusinessFromFlags(flags);
       break;
     case "business.initialize":
       result = callPublicOperation(operation.id, { workspaceId: flags.get("workspace"), expectedRevision: flags.get("revision") });

@@ -2,8 +2,10 @@
 
 ## Start the right scope
 
-Use `b2c business-create` with an explicit workspace ID, directory, hypothesis and opening
-`--mandate` for a complete delegated business. It creates and registers a planning workspace.
+Use `b2c business-create` with an explicit workspace ID, directory, hypothesis and
+`--mandate-file` (or a short `--mandate`) for a complete delegated business. It creates
+and registers a planning workspace. The canonical founder brief is
+`operations/FOUNDER_BRIEF.md`.
 Keep its provisional ID separate from the accepted product name. Do not write runtime state
 by hand. A focused existing-app task does not need a complete-business installation.
 

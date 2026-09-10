@@ -22,6 +22,8 @@ import { fileURLToPath } from "node:url";
 import { loadProductInstanceDocument, productYamlPath } from "../../catalog/ontology/instance-load.js";
 import { renderProductMarkdown } from "../../catalog/ontology/render-product.js";
 import { isMainModule } from "../lib/cli.js";
+import { writeFounderIntake } from "./founder-brief.js";
+import type { FounderBriefSourceIntent } from "../../contracts/public-api/contract.js";
 import { loadDesignSystem, validateDesignMd } from "../../tooling/lib/design-md.js";
 
 const skillRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -60,6 +62,7 @@ export function createPlanningWorkspace(input: { directory: string; slug: string
   directory: string;
   slug: string;
   name: string;
+  sourceIntent?: FounderBriefSourceIntent;
 } {
   const slug = input.slug,
     name = inline(input.name),
@@ -119,37 +122,7 @@ export function createPlanningWorkspace(input: { directory: string; slug: string
       cpSync(cursorSource, path.join(target, ".cursor/rules/agents.mdc"));
     }
 
-    if (input.mandate !== undefined) {
-      mkdirSync(path.join(target, "operations"), { recursive: true });
-      writeFileSync(
-        path.join(target, "operations/LAUNCH_PROGRAM.md"),
-        [
-          "# Complete consumer-business mandate",
-          "",
-          "Status: planning; no execution or external authority granted.",
-          "",
-          "## Mandate",
-          input.mandate.trim(),
-          "",
-          "## Scope",
-          "Full accepted consumer business. A research pass or internal simulator preview is not completion.",
-          "",
-          "## Program",
-          "workflow.orchestration.full-launch-program -> existing catalog dependencies -> workflow.orchestration.full-launch-closeout",
-          "",
-          "## Identity",
-          `Workspace ID: ${slug}. This is a provisional research identity, not acceptance of a product name.`,
-          "",
-          "## Continuation",
-          "Persist research as it is gathered. Independently review and accept the product, then initialize the existing complete-business recipe. Follow the active planner and evidence through closeout.",
-          "",
-          "## Authority",
-          "Retain founder authority for protected actions. This document grants none. Missing authority is a named hold, never permission to remove required work.",
-          "",
-        ].join("\n"),
-        "utf8",
-      );
-    }
+    const sourceIntent = input.mandate === undefined ? undefined : writeFounderIntake({ target, slug, mandate: input.mandate });
 
     const design = loadDesignSystem(target);
     const designIssues = [...design.issues, ...validateDesignMd(design.markdown)];
@@ -157,7 +130,7 @@ export function createPlanningWorkspace(input: { directory: string; slug: string
       throw new Error("business.design_seed_invalid");
     }
     renameSync(target, destination);
-    return { directory: destination, slug, name };
+    return { directory: destination, slug, name, ...(sourceIntent ? { sourceIntent } : {}) };
   } finally {
     if (existsSync(target)) rmSync(target, { recursive: true, force: true });
   }

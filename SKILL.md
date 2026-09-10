@@ -33,14 +33,17 @@ Discover capabilities, providers, and recipes with `b2c_discover` or `b2c catalo
 For a new business, create and register its planning workspace in one command:
 
 ```sh
-b2c business-create --workspace my-app --directory ./my-app --name "Working name" --hypothesis "A short product hypothesis" --mandate "The full user request" --json
+b2c business-create --workspace my-app --directory ./my-app --name "Working name" --hypothesis "A short product hypothesis" --mandate-file ./brief.md --json
 ```
 
 Choose an absent or empty target directory. Do not add files or register it first.
 The CLI flag is `--workspace`; `workspaceId` is the JSON field. Resume an existing
 registered workspace with `business-plan`. Register an existing scaffold only
-with `b2c workspaces register <id> <path>`. The create command preserves the full
-request from `--mandate` in `operations/LAUNCH_PROGRAM.md`. A provisional workspace ID is
+with `b2c workspaces register <id> <path>`. Direct `--mandate` records a short
+request (8,000 characters). `--mandate-file` preserves a complete founder brief
+verbatim in `operations/FOUNDER_BRIEF.md`. `operations/LAUNCH_PROGRAM.md` is
+the derived program view and does not replace it. Do not compress a founder
+brief by hand. A provisional workspace ID is
 not the final product name. Do not hand-author runtime state during planning. Research and author
 `product.yaml`, then render `PRODUCT.md` with `b2c render-product --workspace ID`.
 After explicit product acceptance,
@@ -69,7 +72,7 @@ first, then research within it.
 - **Existing app, overhaul:** resume current state and inventory what works. Define the target in `product.yaml` and `DESIGN.md`, then render `PRODUCT.md`. Carry the accepted scope through implementation, independent review, and repair.
 - **Idea supplied:** start with `workflow.research.research-backed-spec`. Research precedes product acceptance.
 - **No idea, delegated build:** run the same research workflow before committing to an app name or installing the runtime. A provisional research workspace is allowed. The opening request may delegate opportunity selection, product scope, stack, design, implementation, and local tests. It does not delegate protected actions.
-- **Complete consumer business:** a new build or overhaul covers the mobile app, landing page, and operating systems to Submit-for-Review ready. Load `workflow.orchestration.full-launch-program` first. It records the mandate in `operations/LAUNCH_PROGRAM.md`. The graph then sequences reference packs, producers, fresh-context auditors, and gates. One mandate includes internal repair rounds. The implemented native and landing design must pass `check:design-acceptance`. Blocked or deferred required work stays incomplete. Do not paste a launch prompt.
+- **Complete consumer business:** a new build or overhaul covers the mobile app, landing page, and operating systems to Submit-for-Review ready. Load `workflow.orchestration.full-launch-program` first. Creation records the founder brief in `operations/FOUNDER_BRIEF.md` and a short program view in `operations/LAUNCH_PROGRAM.md`. The graph then sequences reference packs, producers, fresh-context auditors, and gates. One mandate includes internal repair rounds. The implemented native and landing design must pass `check:design-acceptance`. Blocked or deferred required work stays incomplete. Do not paste a launch prompt.
 
 Then:
 

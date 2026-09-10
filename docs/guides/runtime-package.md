@@ -89,13 +89,14 @@ Setup creates `~/.b2c-app-builder/workspaces.json` and prints the MCP registrati
 ```bash
 b2c --help
 b2c doctor
-b2c business-create --workspace my-app --directory ./my-app --name "Working name" --hypothesis "A short product hypothesis" --mandate "The full user request" --json
+b2c business-create --workspace my-app --directory ./my-app --name "Working name" --hypothesis "A short product hypothesis" --mandate-file ./brief.md --json
 b2c business-plan --workspace my-app --json
 ```
 
 Create uses an absent or empty directory and registers it as part of the same
 operation. Do not pre-register it or write files into it. Use `--workspace` on
-the CLI; `workspaceId` is the JSON field.
+the CLI; `workspaceId` is the JSON field. Direct `--mandate` is for short requests.
+`--mandate-file` preserves a complete founder brief in `operations/FOUNDER_BRIEF.md`.
 
 Research first. After explicit acceptance, set product status to `accepted` in
 `product.yaml` and render `PRODUCT.md` with `b2c render-product --workspace my-app`.

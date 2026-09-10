@@ -64,7 +64,7 @@ function main(): number {
       "  Mobile app operation: b2c catalog --id b2c/mobile-app-operation --json (native-first selection; preview only)",
       "  compose previews declarations only. Use composition-plan and composition-activate for installed-package activation.",
       "  Start a complete consumer business:",
-      `  1. Create and register: b2c business-create --workspace <slug> --directory <empty-or-absent-path> --name "<working name>" --hypothesis "<hypothesis>" --mandate "<full request>" --json`,
+      `  1. Create and register: b2c business-create --workspace <slug> --directory <empty-or-absent-path> --name "<working name>" --hypothesis "<hypothesis>" --mandate-file <brief> --json`,
       "     Do not register or add files to the target first. The CLI flag is --workspace, not --workspace-id.",
       `  2. Research it. After explicit acceptance in product.yaml, run b2c render-product --workspace <slug>.`,
       `  3. Read the revision: b2c business-plan --workspace <slug> --json`,

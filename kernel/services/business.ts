@@ -17,6 +17,8 @@ import {
   discoverInputSchema,
   discoverySchema,
   previewSchema,
+  DIRECT_MANDATE_MAX_CHARS,
+  FOUNDER_BRIEF_MAX_BYTES,
   type Binding,
   type ErrorCode,
   type Reference,
@@ -64,6 +66,10 @@ function respond<T>(compute: () => T): Result<T> {
           "Choose a new empty directory for b2c business-create. To adopt an existing B2C scaffold, use b2c workspaces register <id> <path> and then b2c business-status --workspace <id>. Preserve existing files; do not delete them to make creation pass.",
         "registry.scaffold_missing":
           'Use b2c business-create --workspace <id> --directory <empty-directory> --name "<name>" --hypothesis "<hypothesis>". Registration only adopts a planning or runtime scaffold. No registry entry was added.',
+        "business.founder_brief_oversized":
+          "Shorten the founder brief so it stays within the file-backed intake limit. No state changed. Use --mandate-file for a complete brief instead of compressing it by hand.",
+        "business.founder_brief_empty": "Pass a non-empty founder brief. No state changed.",
+        "business.founder_brief_missing": "Retry business-create; the founder brief was not recorded. No registration was added.",
       };
       if (creationRecovery[reason]) return failure("LOCAL_OPERATION_REFUSED", reason, [], creationRecovery[reason]);
     }
@@ -302,6 +308,54 @@ export function businessStatus(input: unknown): Result<z.infer<typeof businessSt
 }
 
 type OperationResult<I extends OperationId> = z.infer<Extract<(typeof publicSchemas.PUBLIC_OPERATIONS)[number], { id: I }>["outputSchema"]>;
+function parseBusinessCreateInput(
+  input: unknown,
+  intake: "direct" | "file",
+): { workspaceId: string; directory: string; name: string; hypothesis: string; mandate?: string } {
+  if (intake === "file") {
+    if (!input || typeof input !== "object" || Array.isArray(input)) return publicSchemas.businessCreateInputSchema.parse(input);
+    const record = input as Record<string, unknown>;
+    const { mandate, ...identity } = record;
+    const parsed = publicSchemas.businessCreateInputSchema.omit({ mandate: true }).parse(identity);
+    if (typeof mandate !== "string" || mandate.length < 1)
+      throw new ContractError(
+        "INVALID_INPUT",
+        "mandate-file is empty. No state changed.",
+        ["mandateFile"],
+        "Pass a non-empty UTF-8 founder brief to --mandate-file.",
+      );
+    const byteLength = Buffer.byteLength(mandate, "utf8");
+    if (byteLength > FOUNDER_BRIEF_MAX_BYTES)
+      throw new ContractError(
+        "INVALID_INPUT",
+        `mandate-file is ${byteLength} bytes; file-backed intake supports ${FOUNDER_BRIEF_MAX_BYTES}. No state changed.`,
+        ["mandateFile"],
+        "Shorten the founder brief. Do not compress it by hand into --mandate.",
+      );
+    return { ...parsed, mandate };
+  }
+  if (
+    input &&
+    typeof input === "object" &&
+    !Array.isArray(input) &&
+    "mandate" in input &&
+    typeof input.mandate === "string" &&
+    input.mandate.length > DIRECT_MANDATE_MAX_CHARS
+  )
+    throw new ContractError(
+      "INVALID_INPUT",
+      `mandate is ${input.mandate.length} characters; direct input supports ${DIRECT_MANDATE_MAX_CHARS}. No state changed.`,
+      ["mandate"],
+      "Use --mandate-file <path> to preserve the complete brief.",
+    );
+  return publicSchemas.businessCreateInputSchema.parse(input);
+}
+export function createBusinessOperation(
+  input: unknown,
+  options: { intake?: "direct" | "file" } = {},
+): Result<z.infer<typeof publicSchemas.businessCreatedSchema>> {
+  return respond(() => publicSchemas.businessCreatedSchema.parse(lifecycleService.createBusiness(parseBusinessCreateInput(input, options.intake ?? "direct"))));
+}
 async function respondAsync<T>(compute: () => Promise<T>): Promise<Result<T>> {
   try {
     const value = await compute();
@@ -321,7 +375,7 @@ export function callPublicOperation(operation: OperationId, input: unknown, host
     case "business.research.record":
       return respond(() => publicSchemas.researchRecordedSchema.parse(recordResearch(publicSchemas.researchRecordInputSchema.parse(input))));
     case "business.create":
-      return respond(() => publicSchemas.businessCreatedSchema.parse(lifecycleService.createBusiness(publicSchemas.businessCreateInputSchema.parse(input))));
+      return createBusinessOperation(input);
     case "business.initialize":
       return respond(() =>
         publicSchemas.businessInitializedSchema.parse(lifecycleService.initializeBusiness(publicSchemas.businessInitializeInputSchema.parse(input))),

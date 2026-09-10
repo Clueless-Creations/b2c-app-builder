@@ -241,6 +241,21 @@ test("specialist workflows keep their own current books that a program packet de
   assert(premium.projected.load.some((entry) => /design-evidence-stack/.test(entry.path)), "premium-mobile-craft must keep design-evidence-stack");
   assert(premium.projected.load.some((entry) => /mobile-flow-craft/.test(entry.path)), "premium-mobile-craft must keep mobile-flow-craft");
 
+  const crossDomainCurrent = [
+    { workflowId: "workflow.experience.onboarding-system.onb-16-journey-graph", keep: ["design-evidence-stack"] },
+    { workflowId: "workflow.experience.onboarding-system.onb-17-screen-control-paywall-contract", keep: ["design-evidence-stack", "mobile-flow-craft"] },
+    { workflowId: "workflow.experience.onboarding-system.onb-18-visual-design-prototype", keep: ["design-evidence-stack", "mobile-flow-craft"] },
+    { workflowId: "workflow.store.store-screenshots-production", keep: ["design-evidence-stack", "mobile-flow-craft"] },
+    { workflowId: "workflow.growth.pre-launch-funnel-landing-waitlist", keep: ["design-evidence-stack"] },
+    { workflowId: "workflow.experience.emotional-experience-design-producer", keep: ["design-evidence-stack"] },
+  ] as const;
+  for (const { workflowId, keep } of crossDomainCurrent) {
+    const { projected } = catalogProjection(workflowId);
+    for (const needle of keep) {
+      assert(projected.load.some((entry) => entry.path.includes(needle)), `${workflowId} dropped current ${needle}`);
+    }
+  }
+
   const program = catalogProjection("workflow.orchestration.full-launch-program");
   assert(!program.projected.load.some((entry) => /design-evidence-stack|mobile-flow-craft|accessibility-readiness/.test(entry.path)));
 });

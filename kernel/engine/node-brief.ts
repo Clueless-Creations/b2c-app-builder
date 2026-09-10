@@ -4,6 +4,7 @@ import type { SourceAccess } from "../../contracts/source-access.js";
 import type { ContextCapsule } from "../context/receipt.js";
 import type { CompiledPlan, CompiledRunNode } from "./compile.js";
 import { requiresIndependentReview } from "./verification-policy.js";
+import { isLaterGuidance, laterGuidanceContext } from "../lib/later-guidance.js";
 
 /**
  * Composes the per-node worker brief from a compiled node's authored contract — the one place
@@ -102,17 +103,28 @@ export function composeNodeBrief(node: CompiledRunNode, plan: CompiledPlan, caps
       if (!entry.sectionId) return true;
       return !sectionId || sectionId === entry.sectionId;
     });
-  const load = (node.references ?? [])
-    .map((reference) => ({
-      path: reference.path,
-      ...(reference.resource ? { resource: reference.resource } : {}),
-      title: reference.title,
-      loadWhen: reference.loadWhen,
-      ...(reference.sectionId ? { sectionId: reference.sectionId } : {}),
-      ...(reference.revision ? { revision: reference.revision } : {}),
-    }))
-    .filter((entry) => !capsule || matchesCapsule(entry, capsule.sourceIds));
-  const seenKnowledgePaths = new Set(load.map((reference) => reference.path));
+  const laterContext = laterGuidanceContext(node.workflowId, node.domainId);
+  const bound = (node.references ?? []).map((reference) => ({
+    path: reference.path,
+    ...(reference.resource ? { resource: reference.resource } : {}),
+    title: reference.title,
+    loadWhen: reference.loadWhen,
+    referenceId: reference.id,
+    ...(reference.sectionId ? { sectionId: reference.sectionId } : {}),
+    ...(reference.revision ? { revision: reference.revision } : {}),
+  }));
+  const load = bound
+    .filter((entry) => !isLaterGuidance(entry.loadWhen, laterContext, entry))
+    .filter((entry) => !capsule || matchesCapsule(entry, capsule.sourceIds))
+    .map((entry) => ({
+      path: entry.path,
+      ...(entry.resource ? { resource: entry.resource } : {}),
+      title: entry.title,
+      loadWhen: entry.loadWhen,
+      ...(entry.sectionId ? { sectionId: entry.sectionId } : {}),
+      ...(entry.revision ? { revision: entry.revision } : {}),
+    }));
+  const seenKnowledgePaths = new Set(bound.map((reference) => reference.path));
   const route =
     node.role?.contextPacks.flatMap((pack) =>
       pack.references.flatMap((reference) => {

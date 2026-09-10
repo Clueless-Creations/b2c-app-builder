@@ -6,6 +6,7 @@ import { z } from "zod";
 import { toCatalogInput } from "../../../catalog/bridge.js";
 import type { Catalog, CatalogKnowledgePackage } from "../../../catalog/types.js";
 import { compilePlan } from "../../../kernel/engine/compile.js";
+import { composeNodeBrief, renderNodeBrief } from "../../../kernel/engine/node-brief.js";
 import { MAX_HOSTED_RESPONSE_BYTES, queryInput } from "../../../hosted/knowledge-mcp/http.js";
 import { codePointPrefix, createKnowledgeService, KnowledgeServiceError } from "../../../kernel/knowledge-service/service.js";
 import { callKnowledgeTool, KNOWLEDGE_TOOL_DEFINITIONS, toCallToolResult } from "../../../kernel/knowledge-service/tools.js";
@@ -833,12 +834,40 @@ export function register(harness: Harness): void {
         `${workflowId} dropped current craft books`,
       );
     }
+    const crossDomainCurrent = [
+      { workflowId: "workflow.experience.onboarding-system.onb-16-journey-graph", keep: ["design-evidence-stack"] },
+      { workflowId: "workflow.experience.onboarding-system.onb-17-screen-control-paywall-contract", keep: ["design-evidence-stack", "mobile-flow-craft"] },
+      { workflowId: "workflow.experience.onboarding-system.onb-18-visual-design-prototype", keep: ["design-evidence-stack", "mobile-flow-craft"] },
+      { workflowId: "workflow.store.store-screenshots-production", keep: ["design-evidence-stack", "mobile-flow-craft"] },
+      { workflowId: "workflow.growth.pre-launch-funnel-landing-waitlist", keep: ["design-evidence-stack"] },
+      { workflowId: "workflow.experience.emotional-experience-design-producer", keep: ["design-evidence-stack"] },
+    ] as const;
+    const compiled = compilePlan(toCatalogInput(bundle.catalog));
+    const compiledByWorkflowId = new Map(compiled.nodes.map((node) => [node.workflowId, node]));
+    for (const { workflowId, keep } of crossDomainCurrent) {
+      const brief = service.workflow({ workflowId, brief: true }).dispatchBrief!;
+      for (const needle of keep) {
+        assert(brief.load.some((entry) => entry.path.includes(needle)), `dispatchBrief ${workflowId} dropped current ${needle}`);
+      }
+      const node = compiledByWorkflowId.get(workflowId);
+      assert(node, `${workflowId} missing from the compiled runtime plan`);
+      const composed = composeNodeBrief(node, compiled);
+      const rendered = renderNodeBrief(composed);
+      for (const needle of keep) {
+        assert(composed.load.some((entry) => entry.path.includes(needle)), `composeNodeBrief ${workflowId} dropped current ${needle}`);
+        assert(rendered.includes(needle), `text plan Load: for ${workflowId} omitted current ${needle}`);
+      }
+    }
     const fastlane = service.workflow({ workflowId: "workflow.growth.fastlane-growth-ops", brief: true }).dispatchBrief!;
     assert(fastlane.load.some((entry) => entry.path.includes("fastlane-growth-ops")), "fastlane-growth-ops omitted its own book");
     const remediate = service.workflow({ workflowId: "workflow.store.app-review-remediate", brief: true }).dispatchBrief!;
     assert(remediate.load.some((entry) => entry.path.includes("app-review-remediate")), "app-review-remediate omitted its own book");
     const program = service.workflow({ workflowId: "workflow.orchestration.full-launch-program", brief: true }).dispatchBrief!;
     assert(!program.load.some((entry) => /design-evidence-stack|mobile-flow-craft/.test(entry.path)), "program packet must still defer specialist later-horizon books");
+    const programNode = compiledByWorkflowId.get("workflow.orchestration.full-launch-program");
+    assert(programNode, "full-launch-program missing from the compiled runtime plan");
+    const programText = renderNodeBrief(composeNodeBrief(programNode, compiled));
+    assert(!/design-evidence-stack|mobile-flow-craft/.test(programText.split("\n").find((line) => line.startsWith("Load:")) ?? ""), "program text plan Load: still listed later-horizon craft books");
   });
 
   harness.check("hosted knowledge: a gated auditor requires independent review outside judgment domains", () => {

@@ -1,15 +1,15 @@
 /**
- * Later-horizon loads are relative to the current workflow's role, not a global
- * property of a catalog `loadWhen` phrase. A specialist book that names store
- * submission or public beta is current for that specialist workflow. The same
- * book is later-horizon when a program packet binds it ahead of that work.
+ * Later-horizon is relative to the current workflow, not a global `loadWhen`
+ * phrase and not domain equality. A book this workflow binds as current work
+ * stays current even when it lives in another domain. The same book is later
+ * when a program packet binds it ahead of that work.
  *
- * Explicit later phrasing (`later, after launch`) still defers when the entry
- * is not this workflow's own book.
+ * Explicit later phrasing (`later, after launch`) still defers.
  */
 const CURRENT_TASK = /\b(this task|before this task|at workflow start|opening, resuming, or closing|always)\b/i;
-const LATER_HORIZON =
-  /\b(later|after (this|dispatch|launch|acceptance)|once .{0,80}complete|future|before production|independent review|user-facing surface|native mobile screen|third-party skill pack|moving from planning|dispatching or coordinating subagents|launch readiness|store submission|public beta)\b/i;
+const EXPLICIT_LATER = /\b(later|after (this|dispatch|launch|acceptance)|once .{0,80}complete|future)\b/i;
+const PROGRAM_FOREIGN_HORIZON =
+  /\b(before production|independent review|user-facing surface|native mobile screen|third-party skill pack|moving from planning|dispatching or coordinating subagents|launch readiness|store submission|public beta)\b/i;
 
 export interface LaterGuidanceContext {
   workflowId?: string;
@@ -46,14 +46,31 @@ function entryDomain(entry: Omit<LaterGuidanceEntry, "loadWhen">): string | unde
   return entry.domainId ?? (entry.path ? domainIdFromKnowledgePath(entry.path) : undefined);
 }
 
-/** This workflow's own book — keep it even when loadWhen names a later calendar phrase. */
-export function isWorkflowOwnBook(entry: Omit<LaterGuidanceEntry, "loadWhen">, context: LaterGuidanceContext = {}): boolean {
+export function isProgramPacket(context: LaterGuidanceContext = {}): boolean {
+  const workflowId = context.workflowId ?? "";
+  return workflowDomain(context) === "domain.orchestration" || /full-launch-program/i.test(workflowId);
+}
+
+function isExactWorkflowBook(entry: Omit<LaterGuidanceEntry, "loadWhen">, context: LaterGuidanceContext): boolean {
   const workflowId = context.workflowId?.trim();
-  if (workflowId && entry.referenceId) {
-    const workflowLeaf = workflowId.replace(/^workflow\./u, "");
-    const referenceLeaf = entry.referenceId.replace(/^reference\./u, "");
-    if (workflowLeaf && referenceLeaf === workflowLeaf) return true;
-  }
+  if (!workflowId || !entry.referenceId) return false;
+  const workflowLeaf = workflowId.replace(/^workflow\./u, "");
+  const referenceLeaf = entry.referenceId.replace(/^reference\./u, "");
+  return Boolean(workflowLeaf && referenceLeaf === workflowLeaf);
+}
+
+function workflowIdMentioned(loadWhen: string, workflowId: string | undefined): boolean {
+  return Boolean(workflowId && loadWhen.toLowerCase().includes(workflowId.toLowerCase()));
+}
+
+/**
+ * A book this workflow binds as current work. Domain equality is not enough:
+ * experience, store, and growth specialists bind design craft as current.
+ * Program packets only keep their own-role books.
+ */
+export function isWorkflowOwnBook(entry: Omit<LaterGuidanceEntry, "loadWhen">, context: LaterGuidanceContext = {}): boolean {
+  if (isExactWorkflowBook(entry, context)) return true;
+  if (!isProgramPacket(context)) return true;
   const roleDomain = workflowDomain(context);
   const bookDomain = entryDomain(entry);
   return Boolean(roleDomain && bookDomain && roleDomain === bookDomain);
@@ -66,14 +83,11 @@ export function isLaterGuidance(
 ): boolean {
   const text = loadWhen.trim();
   if (!text) return false;
+  if (CURRENT_TASK.test(text) || workflowIdMentioned(text, context.workflowId)) return false;
+  if (isExactWorkflowBook(entry, context)) return false;
+  if (EXPLICIT_LATER.test(text)) return true;
   if (isWorkflowOwnBook(entry, context)) return false;
-  if (workflowIdMentioned(text, context.workflowId)) return false;
-  if (CURRENT_TASK.test(text)) return false;
-  return LATER_HORIZON.test(text);
-}
-
-function workflowIdMentioned(loadWhen: string, workflowId: string | undefined): boolean {
-  return Boolean(workflowId && loadWhen.toLowerCase().includes(workflowId.toLowerCase()));
+  return PROGRAM_FOREIGN_HORIZON.test(text);
 }
 
 export function partitionLoadWhen<T extends LaterGuidanceEntry>(

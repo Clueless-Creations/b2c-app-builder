@@ -157,6 +157,29 @@ export function register(harness: Harness): void {
     );
   });
 
+  harness.check("hosted discovery: leftover screenshot-upload goldens target the Apple media envelope, not generic ASC CLI", () => {
+    const corpus = loadCorpus();
+    const screenshotUploadIds = ["store-015", "store-027", "store-028", "store-042", "store-050"];
+    for (const id of screenshotUploadIds) {
+      const entry = corpus.entries.find((item) => item.id === id);
+      assert(entry !== undefined, `store corpus is missing ${id}`);
+      assert(
+        entry.needs.includes("workflow.store.apple-store-media-standing-envelope"),
+        `${id} must need the Apple media standing envelope after that node shipped`,
+      );
+      assert(
+        !entry.needs.includes("workflow.store.asc-cli-automation"),
+        `${id} is screenshot upload, not generic ASC CLI / TestFlight / metadata`,
+      );
+    }
+    const cliNamed = corpus.entries.find((item) => item.id === "store-048");
+    assert(cliNamed !== undefined, "store-048 must stay in the frozen corpus");
+    assert(
+      cliNamed.needs.includes("workflow.store.asc-cli-automation"),
+      "store-048 names 'asc cli'; the strict-match partition still requires the CLI automation node",
+    );
+  });
+
   harness.check("hosted discovery: the ASC command reference reaches the workflow whose outputs it uploads", () => {
     const route = service().workflow({ workflowId: "workflow.store.store-screenshots-production" });
     const bound = route.workflow.referenceIds;

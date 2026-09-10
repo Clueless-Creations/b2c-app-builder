@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.41",
+  "version": "0.219.42",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Split ordinary GitHub CI onto a measured presubmit cadence while keeping full audit explicit.",
-    "Keep version-discipline honest on shallow checkout and record the first Presubmit wall clock."
+    "Project founder constraints from the canonical brief onto launch-program, plan, and NodeBrief.",
+    "Keep the long After Credits pad out of plan JSON while short constraints stay retrievable."
   ]
 }

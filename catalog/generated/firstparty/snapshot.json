@@ -2,7 +2,7 @@
   "extension": {
     "apiVersion": "b2c.extension/v1",
     "id": "b2c/consumer-business",
-    "version": "0.219.41",
+    "version": "0.219.42",
     "hostApiVersion": "b2c/v1",
     "title": "Consumer business",
     "dependencies": [],
@@ -4510,7 +4510,7 @@
           "workflowId": "workflow.orchestration.session-continuity-resume",
           "instructions": "Run `b2c status` and `b2c plan`, then inspect `git status --short` and the relevant authored artifacts before work. Treat `state/business-state.json` as reducer-owned execution state: do not edit it directly. Consult `AGENTS.md`, `operations/ORCHESTRATION.md`, `engineering/PRODUCTION_READINESS.md`, and `operations/FAILURE_CARDS.md` when present. `check:continuity-contract` verifies the installed continuity contract. Prior chat turns do not replace durable evidence.",
           "providerIds": [],
-          "contextFingerprint": "sha256:342635e575439b76dfa9a651a087c26b44aeaf66fffde143f29cd84878efd378"
+          "contextFingerprint": "sha256:4c0489dbb4d5d74e2aed7c1a7acb4bee4e472bb9ebda9b3c43227acdf3b6587e"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "New session, resume, status check, or handoff on an existing launch",
@@ -4559,7 +4559,7 @@
           "workflowId": "workflow.orchestration.orient-scaffold-and-state-cockpit-upkeep",
           "instructions": "Run `b2c status` and `b2c plan` to orient from reducer-owned `state/business-state.json`. Do not edit that file or author a second state document. Submit lane, evidence, and blocker changes through the runtime reducer. A succeeded lane needs evidence or live proof, and a lane cannot succeed while a required upstream lane is running or blocked. Record App Store Connect API-key health and Apple web-session health as two proofs; a healthy API key is not ASC connected. Do not write a signing blocker until `asc certificates list` has been read, and do not treat a local Development keychain as a distribution blocker when App Store Connect already lists Distribution certificates. Do not dispatch research-backed-spec until the live App Store portfolio observe has succeeded. Choose the smallest orchestration strategy that fits the ready work, then report what changed, what happens next, and what needs the human. Do not wait for later operational or readiness artifacts during orientation.",
           "providerIds": [],
-          "contextFingerprint": "sha256:700b33b1cba2a1c39ebe218223f788a1b2442232608c71e002e7f07d1e7dad18"
+          "contextFingerprint": "sha256:a93a97cbec80ce9ad34025bf31af974659f0d161700a82fa6e036136b3996199"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "\"Launch this app\" / broad launch request; any lane/provider/proof/blocker status change",
@@ -4607,9 +4607,9 @@
       {
         "workerContext": {
           "workflowId": "workflow.orchestration.full-launch-program",
-          "instructions": "Open the program. Write `operations/LAUNCH_PROGRAM.md` from the mandate record in `reference.orchestration.full-launch-program`: outcome, stop line, launch scope, start classification, workspace facts, craft references, spend ceiling, autonomy mode, founder-only actions, and the review policy. Record `project.launchScope: full` through the reducer with a dated founder reason when it changes an existing scope; never edit `state/business-state.json` by hand. Confirm the `## Review Ledger` section exists in `operations/ORCHESTRATION.md` before any broad dispatch. Present one start-of-workflow tool-intake AskUserQuestion for the account-gated tools on the research-backed-spec compiled graph; fold it into a pending readiness gate; do not open a second tool gate. Name App Store Connect API auth and the live apps-list receipt as required even when optional research tools are deferred. Record API-key health and web-session health as two proofs. Classify the start: a brownfield overhaul runs research in audit-and-gap-fill mode with keep, refresh, or redo per artifact. Do not dispatch research-backed-spec until live-app-store-portfolio has succeeded. Then let `b2c plan` sequence the existing nodes; this node adds the mandate, the isolated-review edges, the reference-pack edge, and the closeout gates, not a second graph. Hand off with the smallest founder-only ask.",
+          "instructions": "Open the program. Open `operations/FOUNDER_BRIEF.md` as the canonical founder brief. Write `operations/LAUNCH_PROGRAM.md` as the derived mandate record: quote the bounded founder-constraint slice (constraints, targets, authority, selected-app facts) with provenance (artifact and digest), then outcome, stop line, launch scope, start classification, workspace facts, craft references, spend ceiling, autonomy mode, founder-only actions, and the review policy from `reference.orchestration.full-launch-program`. Do not treat `LAUNCH_PROGRAM.md` as the source or the only mandate owner. Record `project.launchScope: full` through the reducer with a dated founder reason when it changes an existing scope; never edit `state/business-state.json` by hand. Confirm the `## Review Ledger` section exists in `operations/ORCHESTRATION.md` before any broad dispatch. Present one start-of-workflow tool-intake AskUserQuestion for the account-gated tools on the research-backed-spec compiled graph; fold it into a pending readiness gate; do not open a second tool gate. Name App Store Connect API auth and the live apps-list receipt as required even when optional research tools are deferred. Record API-key health and web-session health as two proofs. Classify the start: a brownfield overhaul runs research in audit-and-gap-fill mode with keep, refresh, or redo per artifact. Do not dispatch research-backed-spec until live-app-store-portfolio has succeeded. Then let `b2c plan` sequence the existing nodes; this node adds the mandate, the isolated-review edges, the reference-pack edge, and the closeout gates, not a second graph. Hand off with the smallest founder-only ask.",
           "providerIds": [],
-          "contextFingerprint": "sha256:b969430a28c0d4e42f340b7780a5fdc46be7dfd27a76db1a3a5104a1cf00d302"
+          "contextFingerprint": "sha256:8bd608a4357f15ba9f21ccd136749b14d4362bc073d875b2a9ba7c1042fe29a4"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Founder asks for a complete end-to-end consumer delivery — app, full web funnel, store packet, analytics, trust, revenue, and growth artifacts — carried to Submit-for-Review ready with isolated review on every surface",
@@ -4660,9 +4660,9 @@
       {
         "workerContext": {
           "workflowId": "workflow.orchestration.full-launch-closeout",
-          "instructions": "Close the program against the definition-of-done table in `reference.orchestration.full-launch-program`. Write `LAUNCH.md` as the launch dossier: the store-console click path ending at Submit for Review, pointers to the listing, screenshots, signing, console, email, and revenue artifacts, the launch calendar, the monetization thresholds, and the open founder decisions. Confirm every lane is done, blocked with a founder action, or deferred with a dated reason the founder accepted. Confirm the review ledger holds a passing row for every producer-to-auditor pair and that each findings artifact exists. Confirm `engineering/PRODUCTION_READINESS.md` carries physical-device evidence, not simulator-only proof. Run `check:lane-coverage`, `check:orchestration`, `check:readiness-coverage`, and `check:app-copy`; do not narrate readiness a gate contradicts. Hand off what the founder clicks, in order, and the one remaining founder action. You never click Submit for Review.",
+          "instructions": "Close the program against the definition-of-done table in `reference.orchestration.full-launch-program` and the canonical founder brief in `operations/FOUNDER_BRIEF.md`. `operations/LAUNCH_PROGRAM.md` is the derived mandate record, not the only mandate owner. Write `LAUNCH.md` as the launch dossier: the store-console click path ending at Submit for Review, pointers to the listing, screenshots, signing, console, email, and revenue artifacts, the launch calendar, the monetization thresholds, and the open founder decisions. Confirm every lane is done, blocked with a founder action, or deferred with a dated reason the founder accepted. Confirm the review ledger holds a passing row for every producer-to-auditor pair and that each findings artifact exists. Confirm `engineering/PRODUCTION_READINESS.md` carries physical-device evidence, not simulator-only proof. Run `check:lane-coverage`, `check:orchestration`, `check:readiness-coverage`, and `check:app-copy`; do not narrate readiness a gate contradicts. Hand off what the founder clicks, in order, and the one remaining founder action. You never click Submit for Review.",
           "providerIds": [],
-          "contextFingerprint": "sha256:209c7a1b46044f0d5b13f27b93bdc25b5233abaec6de8466ef6597cea5538d6a"
+          "contextFingerprint": "sha256:0b22eabbd4258388e84cb568df05835832a21faa6f38adfe86cfe3f8b8b230ce"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Every store, trust, engineering, and growth terminal node has succeeded and the founder wants the Submit-for-Review handoff",
@@ -4720,7 +4720,7 @@
             "provider.resend",
             "provider.app-store-connect"
           ],
-          "contextFingerprint": "sha256:7e41c56a028a9d2cc891e8c1f9d67e90eb313e7dfa03df55a5172aba1b293187"
+          "contextFingerprint": "sha256:e0d30c1ac6455b2f6d0a5ca54f847409f56299ab30c5cd569e517c11006b2db4"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before marking any provider-backed lane (analytics/revenue/email/store/security/eng) succeeded",
@@ -4770,7 +4770,7 @@
           "workflowId": "workflow.process.change-cascade",
           "instructions": "Run a design_contract_lock cascade when DESIGN.md is first accepted. This creates the public-surface baseline while app implementation starts. After that, ingest engineering/SOURCE_CHANGE_MANIFEST.json and classify each accepted change with every applicable Change Cascade Map type, not one convenient primary type. Use agents/launch-surface-producer.md for the surface audit and bounded update tasks. Check the app, Apple App Store, Google Play, Apple and Play products, billing, landing site, web onboarding, GEO/SEO, lifecycle email, analytics, legal pages and public privacy claims, screenshots, and marketing assets. Update each affected surface or record why it is unaffected. Submit any lane or evidence transitions through the reducer; do not write them into an authored state document. Updated localized, product, device, product-page, or asset surfaces need one evidence variant per applicable dimension. Re-render any screenshot, App Preview, Play feature graphic, landing screenshot, or ad asset whose source digest changed. Reconcile the locked lexicon in DESIGN.md before the change succeeds and write the checked ledger digest to state/CHANGE_CASCADE_RECEIPT.json.",
           "providerIds": [],
-          "contextFingerprint": "sha256:9467a25337f7126f8aba109fecc7f4bd76f30bd101862ece29f9efeb0ea3ce17"
+          "contextFingerprint": "sha256:b63789613e3c8f35808676e342dccfac9135bb06763b0b8a446faf32feb560d7"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "When DESIGN.md is accepted, and after each app, product, copy, brand, pricing, product, or data change",
@@ -4881,7 +4881,7 @@
           "workflowId": "workflow.process.launchbench-failure-cards-coverage-audit",
           "instructions": "Before any launch-readiness claim, after a repeated agent miss, or when adding a validator or scenario, run `npm run launchbench` (definition lint plus the validator fixture suite) and turn any known regression into a durable card in `operations/FAILURE_CARDS.md` (card ID, severity, owner, status, detected date, evidence, impact, next action, validator) instead of leaving it as a chat note. Record scenarios run, validators run, expected failures caught, and unexpected misses in `LAUNCHBENCH.md`. Close a card only with evidence or command proof attached. The node's deterministic gate is `launchbench:lint` — scenario YAML shape only — so a session does not re-run the fixture suite that CI already runs on the heavy lane. Use `b2c status` and `b2c plan` to confirm that reducer-owned lane state does not support a launch-ready claim while an upstream lane is still running or blocked.",
           "providerIds": [],
-          "contextFingerprint": "sha256:95dc330f9d132a903457d2d59c15797d5ea3a2cc2a9d52bb4aa138fb4c8ba1f6"
+          "contextFingerprint": "sha256:f69c704287bad615dd90b56aa23aa4f9599252598fa72d90bc76dcfd9bd3d5ca"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before any launch-readiness claim, after a repeated miss, or adding a validator/scenario",
@@ -4932,7 +4932,7 @@
           "workflowId": "workflow.process.repository-profile-contract",
           "instructions": "Accept one typed repository profile in reducer-owned project state. Compile the applicable artifact and validator contract from that profile plus the active capability graph. A profile cannot suppress privacy, secrets, authorization, billing, account deletion, provider proof, or release-truth gates when those capabilities are present.",
           "providerIds": [],
-          "contextFingerprint": "sha256:e66dac5533f944d41971dd925cd66aa27030c192e1c31a58f04cbab8ce92c015"
+          "contextFingerprint": "sha256:861c489ca51bdc9fcb2926695a06576d567d54d66315b3b81b922333c1dc8d59"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Selecting the repository kind for a workspace, or compiling its artifact and validator contract",
@@ -5090,7 +5090,7 @@
           "providerIds": [
             "provider.doppler"
           ],
-          "contextFingerprint": "sha256:05d0c6f2a71700dcf35d910d80b35a438bbfd722e02c31c2c41ba2f2115eb094"
+          "contextFingerprint": "sha256:94491fe8ce257efc73bc8f765b9380b74268781541a29415b6bdfbd090a1c368"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before any new secret, key, token, env var, webhook secret, or .env",
@@ -5209,7 +5209,7 @@
           "workflowId": "workflow.operations.post-launch-operations",
           "instructions": "Run the named Weekly Ops Review in fixed order — metrics pull (PostHog/RevenueCat/console numbers, not adjectives), crash/review triage, support sweep, ASO delta, growth/spend review against `growth/PAID_UA.md`'s stop/scale rules, then ship one user-visible improvement — and log a one-line delta per step in `operations/POST_LAUNCH_OPS.md` dated against `lanes.post_launch_ops.live_since`. Before automating a value-producing loop, record one manual run with its input, output, result, cost, and failure mode; exempt necessary security, compliance, backup, and monitoring controls. Track discovery-to-owned-contact, owned-contact-to-activation, owned-contact-to-paid, and external-platform concentration when those metrics apply. Route involuntary billing churn through the recovery levers, not written off as normal, and when retention cohorts show a consistent drop at one step, open it through `change-cascade.md` rather than patching only the surface that failed. At the day-30 and day-90 checkpoints, prepare the Kill/Hold/Fix/Scale evidence pack (MRR trajectory, D7/D30 retention trend, CAC/LTV payback, founder hours) in `operations/LAUNCH_RETRO.md` — the agent assembles evidence, the founder makes the verdict. `check:post-launch` fails a checkpoint left uncompleted past its due date or a metric cell holding a placeholder instead of a number.",
           "providerIds": [],
-          "contextFingerprint": "sha256:4e38f52f6c237172f38b50ffbbda138a448b72a573e1fb2a0fe058d024f1ef3d"
+          "contextFingerprint": "sha256:1ce210d31d4b000b5a594d66923053a778cfddb4e518542bbfa7343df0964928"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "App live (phase_6/6b), \"what now\", weekly ops, incident response, retention reviews",
@@ -5355,7 +5355,7 @@
           "providerIds": [
             "provider.revenuecat"
           ],
-          "contextFingerprint": "sha256:d3bb254f58458d4ca67f22c9e4e7f3d887b2d14f132a23941b038b455358aea2"
+          "contextFingerprint": "sha256:ca2aaa867b997cf12d5c7554efaf307ca7685aad89855c7ad4bdd68523a2a4f0"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "App live: the recurring financial pulse; a spend change, refund spike, or runway question",
@@ -5405,7 +5405,7 @@
           "workflowId": "workflow.operations.scheduled-autonomy-installation",
           "instructions": "Install the OS-level trigger that keeps the operating loop alive: run `adapters/install-schedule.ts` in its default dry-run first and show the founder the exact crontab line (or launchd plist) it would install — mechanism, cadence, runtime, wrapper path, and log path — then run it with `--apply` only after the founder's approval, because a standing schedule on their machine is their call, every time. Verify the installation with the command the dry-run prints (`crontab -l | grep b2c:<slug>` or `launchctl list`), and record the whole arrangement in `operations/SCHEDULE.md`: mechanism, cadence, runtime, brief path, wall-clock cap, the verify command, the exact uninstall command (`--uninstall --apply`), and the note that the kill switch in `control/control.json` stops every scheduled session cold even while the OS keeps firing the trigger. The scheduled session itself reopens recurring work (the weekly ops review, the growth iteration loop) on its own calendar — this node installs the heartbeat, it does not do the week's work.",
           "providerIds": [],
-          "contextFingerprint": "sha256:3b65e9de49dc58697ade82c2e64c39a62598d21390c9763031525f823c04c5ce"
+          "contextFingerprint": "sha256:bf411ee01612fe22d087551b954ff9295d2c8c63e5a223bdf17a6c928918d9cd"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Business live and the founder wants the operating rhythm to run without anyone starting sessions by hand; changing or removing that schedule",
@@ -8267,7 +8267,7 @@
           "providerIds": [
             "provider.app-store-connect"
           ],
-          "contextFingerprint": "sha256:ddeddc2026e1deb82d2a73ff125bbd3af19fd17ea4d06f6ed4f52f7e66c6fb20"
+          "contextFingerprint": "sha256:40dbd9b343c5c0a522d092e730ba972c4f99dbda0b66203d794b3560ac74655a"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before Apple Developer enrollment, Team ID, signing, profiles, archive/upload, TestFlight. Founder phrasing: get on the App Store, ship to TestFlight, get the ios build signed and into testers hands.",
@@ -8461,7 +8461,7 @@
           "providerIds": [
             "provider.app-store-connect"
           ],
-          "contextFingerprint": "sha256:018d1c3ea9cbffd2880f58447b27987999f289953dcc26ca3ebdf3cf330e8c79"
+          "contextFingerprint": "sha256:681175106411776ba6c1ccb4b9ab9b7abadb006f5e1910a43ed62b925116e7e2"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before Rork asc CLI app creation, metadata, screenshots, TestFlight, RevenueCat sync",
@@ -8534,7 +8534,7 @@
           "providerIds": [
             "provider.app-store-connect"
           ],
-          "contextFingerprint": "sha256:4e6aae5eaf757ce22531fb536eb458668235bdb3fc9520ae2652d5f07b181653"
+          "contextFingerprint": "sha256:2072cbaa8c49e89a4e0fcc9b0adffdf74303ee85e03d15d44eafaa508ce22e5e"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "When an App Store version is in review, or after a status change, before any remediation or resubmission",
@@ -8604,7 +8604,7 @@
           "providerIds": [
             "provider.app-store-connect"
           ],
-          "contextFingerprint": "sha256:c8550f3936f4ae3a2e7edeef89b090000fce4cca59cf943d0ea32fba64e845fa"
+          "contextFingerprint": "sha256:67ad93ae926264467140daab721d56a808df2144a4642ba585d1e9ca70c44148"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "After App Review observe classifies a rejection, before any store submission",
@@ -8674,7 +8674,7 @@
           "providerIds": [
             "provider.app-store-connect"
           ],
-          "contextFingerprint": "sha256:bbdf4f4ea1fbaee7e33fa26a4e40c5b847ce0f9e3233fc454c7c338545653b0e"
+          "contextFingerprint": "sha256:a4a338bd14b1ae7ab5cdef70f33de6e03121e92ec8bce0f3792166e0d2c41d23"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "After bounded App Review remediation is independently verified, before any further Apple mutation",
@@ -8801,7 +8801,7 @@
           "providerIds": [
             "provider.google-play"
           ],
-          "contextFingerprint": "sha256:2e606dbc5fbc72fff499fc59fc1811866f3c7060f901b54ba850d566cf5a8d66"
+          "contextFingerprint": "sha256:3e2c1c931426f4f909df0b2a5a2bdf350120dc2b5dbd684d0b27973dbb7e258d"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Android in scope (platforms include android or an android bundle id exists)",
@@ -8986,7 +8986,7 @@
           "providerIds": [
             "provider.google-play"
           ],
-          "contextFingerprint": "sha256:aad1b356999df3b19eb62f3cfbd6c08bcff9d852bd0fc98d510be0820acb4b46"
+          "contextFingerprint": "sha256:35dc0479a1aee7bf42355dc667cf068d8071a14389a82eb6399e70c9bfb4138a"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "An AAB is proven and an exact internal or closed-testing track standing envelope is current",
@@ -9058,7 +9058,7 @@
             "provider.app-store-connect",
             "provider.google-play"
           ],
-          "contextFingerprint": "sha256:bf8264115186585790760c6706ba3a8b12fffe42fe2299cd51393c4d9d8cbb12"
+          "contextFingerprint": "sha256:0cc5db913cff5613f898226ba3fdb47ffe80565d95bcd5c8fcbccf2b9359da17"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before store distribution in every selected region",
@@ -9193,7 +9193,7 @@
           "workflowId": "workflow.engineering.engineering-orchestration-ce-production-readiness",
           "instructions": "Route non-trivial implementation through the Compound Engineering loop. Use the five-stage Standalone Engineering Loop when CE is unavailable. Record the route in engineering/ENGINEERING_PLAN.md. When DESIGN.md is accepted, start app implementation and the local landing build in the same ready batch. Also dispatch the prepared launch-surface prompt for store copy, product-page plans, screenshot plans, marketing assets, and price-copy checks. Give each agent a disjoint write scope. Before each app slice merges, start a read-only launch-surface impact audit. Apply affected public-surface updates in parallel with the next app slice. Record file ownership and serialized resources in operations/ORCHESTRATION.md. Require build, typecheck, lint, integration tests, mobile end-to-end proof, provider proof, and an on-device taste pass. Write the results to engineering/PRODUCTION_READINESS.md. Run check:compound-engineering and check:orchestration before the engineering lane is done.",
           "providerIds": [],
-          "contextFingerprint": "sha256:4dcefb565a5c8c6c74d71e50a4f646cb7c4f6e26c7913e476dcd8e235ca928fb"
+          "contextFingerprint": "sha256:b7d03504100f293625f83c349d0aa333a0d86d3410898ee0d5e72d8bee2081f2"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before actual app implementation, builder prompts, or production-readiness claims",
@@ -9326,7 +9326,7 @@
           "workflowId": "workflow.engineering.app-agent-roster-and-repo-entrypoints",
           "instructions": "Fill AGENTS.md, CLAUDE.md, APP_AGENTS.md, and the complete agents/ roster from the current business documents. Include agents/launch-surface-producer.md. AGENTS.md must tell future agents to keep using the B2C App Builder skill's workflow. It must require state updates, validators, and the design-lock fan-out. Assign each role its audit surface. Specialists can edit only an assigned disjoint scope. They never stage, commit, release, spend, submit, or publish. A fresh agent must be able to resume from AGENTS.md and the roster without chat history.",
           "providerIds": [],
-          "contextFingerprint": "sha256:d5b021df9c437a2e961fe53a4bea48b189cfe9d49fb545bbf0ccfbde313fb165"
+          "contextFingerprint": "sha256:0f315dde8d50160fcd87f55e560b88ede0664a5352d678f59ea0ce00f2b004b3"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before builder handoff bundles, AGENTS.md/CLAUDE.md, APP_AGENTS.md, agents/",
@@ -9598,7 +9598,7 @@
           "providerIds": [
             "provider.sentry"
           ],
-          "contextFingerprint": "sha256:43d0670d5b0ec2dea2362847a6827f93a8dea79fc4f701e1c06e27204105e02b"
+          "contextFingerprint": "sha256:737b3812e32838b35c0e0fe0e681ceb2411a92829dd2a21ce42da5f9bb755c09"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before beta or store submission on every mobile launch",
@@ -10251,7 +10251,7 @@
             "provider.revenuecat",
             "provider.stripe"
           ],
-          "contextFingerprint": "sha256:5551557035aad8304d592831bc64375b16b7e103a862d9bba33792207cf7b441"
+          "contextFingerprint": "sha256:11e99d229453123e6ab4569f7d186321b248c9c4e91e8ec55af5f9203c2a4522"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before RevenueCat/Stripe/web billing, products, paywall, entitlement, webhooks, pricing. Founder phrasing: how do I charge for subscriptions or a purchase.",
@@ -10336,7 +10336,7 @@
           "providerIds": [
             "provider.revenuecat"
           ],
-          "contextFingerprint": "sha256:ece69e26e83f573ba73019fccf9cd0a3db29ee95190160504916847ef41ad086"
+          "contextFingerprint": "sha256:e605a168623364ff3474011d1a3e2495586822fcd4cf5e5c5ca77068134cdb88"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "After a live paywall exists, or when the experiment backlog needs a next test",
@@ -15388,8 +15388,8 @@
     ]
   },
   "files": {
-    "extension.yaml": "f95a39e5fcec24ff15f07e383785d3e2f9e0b92455879f5dcb5fd2f086667c8c",
-    "catalog-pack.yaml": "83e7af5274535c1e7cefb93d366a9444ffc98725fda86c4a41ffdede71c0c7b7",
+    "extension.yaml": "ac8b42f09bcc88303850716afa197b47cd2c1d2d729ac10865d630df4b2c237e",
+    "catalog-pack.yaml": "09d08ec9042ce7c1b614720aefa71ec281dccf34dc3c0f02b48d9a9230a978d9",
     "knowledge/data/analytics-attribution.md": "0bba4685b2188b9e80b7fcc14fdac9472c6c4aeac5bc59703188eaa5e26f234a",
     "knowledge/data/posthog-agent-tooling.md": "61ffdbc79a985a41a11fbe6e1c7c5663050104208baa9d05b8ebe33186ab93cc",
     "knowledge/design/audience-derived-identity.md": "04c90b39c9d41cf00257c70b4e579f3e29684254d444917b9a5690d48be74f5f",
@@ -15477,7 +15477,7 @@
     "knowledge/operations/secrets-management.md": "9cd7d56e680be2503dd33f278589c02277d0009231da6a34cdb1469291ee412e",
     "knowledge/orchestration/compound-engineering-routing.md": "a44df01da4fe4c2e24795fa86c5f5cd831c6da63b9e260dfd7a35da7dc7cb766",
     "knowledge/orchestration/dynamic-workflows.md": "5fd3cf91bfd72576d62abeb13c29b4754d46ce9ff90940f3d09df3345fb96d60",
-    "knowledge/orchestration/full-launch-program.md": "c9bfcfc09b6c6aaece63d2fbe7c7a5569b6543627530396535b3c8e85b91795c",
+    "knowledge/orchestration/full-launch-program.md": "e5a93f8315be29f08de0428720580d4a8382aa6b2f63ec215e44bfc3bcda0d3b",
     "knowledge/orchestration/isolated-review.md": "1f6c3557f5dd9e3c8f1525f7cfbdc8dbea5cda12eb76019d648382972baff660",
     "knowledge/orchestration/parallel-agent-orchestration.md": "1fa06f3a50ef3eeac60c6ee02bc6be064fd745fa6cd31b3df14d930fb8bfdced",
     "knowledge/orchestration/project-state.md": "533c1f104b1f9c5624f1d3c2613c60b24bffac5a0409bea6adbfc9792f2cc949",
@@ -15536,7 +15536,7 @@
     "knowledge/words/conversion-copy.md": "68739b91f0f977f28718f48dd2368bb8c59a03a3f3d44a30efa08d12eb2956ab",
     "knowledge/words/no-slop-writing.md": "43a82efe1c0e03ba7315fded03a971f83777e1d7092eb5c6c97bb3eb28f171a8",
     "checks/validation/repository/audit-skill-links.ts": "781b1715e075b59ce673fbefad9bacab29eceb93e9f96ef60944bfda884eaf5c",
-    "package.json": "687dec490fc76cc5fbbd0fa05d8fd38bf30bfca4f5347a46e09b8454e63a44b7",
+    "package.json": "73cab5fb674327254f031c3ba2921075ec9b7e917ef2861d303f142627074f45",
     "tooling/catalog-scaffold.ts": "6a54386c9259c97834599249115b0dd82308c16e2c9bb35c02f3058280467077",
     "catalog/render-routing.ts": "f170fbd755998b843a057be9ae83dc1cc3ec5c9952fcebd4982d253621dd161a",
     "checks/validation/repository/check-agent-entrypoints.ts": "58486e6e69f424c422a3d005cfc432f92fd0bd4cb7dc168f2dafeedfbe137be5",
@@ -15847,5 +15847,5 @@
     "catalog/upstreams/notices/parth-app-store-screenshots.txt": "a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a"
   },
   "dependencies": [],
-  "digest": "sha256:5727fb3e34f3b4df7af7fd38585d9b73cb3d7dac390126b1becf4da25da01e47"
+  "digest": "sha256:42a35358f73bb35c3ec881b24011fc7ac8fc7a27f49cd0473298d4b32315bd2e"
 }

@@ -10,8 +10,9 @@
  *
  * Exit codes: 0 = machine ready (warnings allowed); 1 = the install itself is broken.
  */
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { connectionReceipt, formatConnectionReceipt } from "../../contracts/public-api/connection-receipt.js";
 import { b2cAppBuilderHome, registryPath } from "../../adapters/registry.js";
 import { resolveSkillRoot } from "../../tooling/lib/skill-root.js";
 import { printFindings, runDoctor } from "./doctor.js";
@@ -55,6 +56,13 @@ function main(): number {
   const mcpServer = path.join(skillRoot, "entrypoints", "mcp", "b2c-app-builder-mcp.mjs");
   const cli = path.join(skillRoot, "entrypoints", "cli", "b2c.mjs");
   const node = process.execPath;
+  let engineVersion = "0.0.0";
+  try {
+    engineVersion = (JSON.parse(readFileSync(path.join(skillRoot, "skill-version.json"), "utf8")) as { version?: string }).version ?? "0.0.0";
+  } catch {
+    engineVersion = "0.0.0";
+  }
+  const receipt = connectionReceipt({ mode: "local_execution", knowledge: "available", engineVersion });
   // An npm tarball never carries .git; a source checkout always does. That one fact decides which
   // install advice applies: `npm link` only means something from a checkout, and the portable npx
   // form only resolves once the package is on the registry, which an npm install proves.
@@ -80,28 +88,30 @@ function main(): number {
         ? [`Global \`b2c\` command (optional): run \`npm link\` from ${skillRoot}`, `Without linking, the command is: ${node} ${cli}`]
         : [`Installed from npm: \`b2c\` is on PATH and the MCP server is ${mcpServer}`]),
       "",
-      "Register the MCP server with the agent runtime(s) on this machine — same server, three configs:",
+      "Register the local MCP server as b2c-local. Hosted knowledge is a different connection (b2c-hosted).",
+      "A leftover b2c-app-builder registration is the legacy local name. Do not register hosted knowledge under that name.",
       "",
-      `  Claude Code:  claude mcp add --scope user b2c-app-builder -- ${node} ${mcpServer}`,
+      `  Claude Code:  claude mcp add --scope user b2c-local -- ${node} ${mcpServer}`,
       ...(fromCheckout
         ? []
         : [
-            `    Portable form, no machine paths (any client: command npx, args -y b2c-app-builder):`,
-            `    claude mcp add --scope user b2c-app-builder -- ${PORTABLE_MCP_COMMAND}`,
+            "    Portable form, no machine paths (any client: command npx, args -y b2c-app-builder):",
+            `    claude mcp add --scope user b2c-local -- ${PORTABLE_MCP_COMMAND}`,
           ]),
       `    Then set "alwaysLoad": true on this entry in ~/.claude.json — the router's first call is almost always b2c_catalog or b2c_knowledge_search, so deferral costs a wasted round trip.`,
       "",
       '  Cursor — merge into ~/.cursor/mcp.json under "mcpServers":',
-      `    "b2c-app-builder": { "command": "${node}", "args": ["${mcpServer}"] }`,
+      `    "b2c-local": { "command": "${node}", "args": ["${mcpServer}"] }`,
       "",
       "  Codex CLI (ChatGPT) — append to ~/.codex/config.toml:",
-      "    [mcp_servers.b2c-app-builder]",
+      "    [mcp_servers.b2c-local]",
       `    command = "${node}"`,
       `    args = ["${mcpServer}"]`,
       "",
       "The MCP is read-only by default: public discovery/composition preview plus compatibility knowledge, status, plan, and operating preview.",
       "Use the b2c CLI for approved writes. B2C_APP_BUILDER_MCP_WRITE=1 enables the local write tools",
       "when a user deliberately chooses that wider surface.",
+      formatConnectionReceipt(receipt),
     ].join("\n"),
   );
   return code;

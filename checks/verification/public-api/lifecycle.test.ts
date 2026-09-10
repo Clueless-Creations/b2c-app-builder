@@ -493,6 +493,8 @@ test("public plan schema stays additive and bounds unsafe planner text", () => {
   assert.deepEqual(brief.open, ["operations/LAUNCH_PROGRAM.md"]);
   assert.deepEqual(brief.produce, ["PRODUCT.md"]);
   assert.deepEqual(brief.verify.gateCommands, ["check:catalog"]);
+  assert.equal(brief.effectBoundary, "read_and_produce");
+  assert.equal(brief.context?.openCount, 1);
   const slicedBrief = projectReadyBrief({
     workflowId: "workflow.fixture.sliced",
     title: "Sliced fixture",

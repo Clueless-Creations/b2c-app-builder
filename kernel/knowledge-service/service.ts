@@ -511,9 +511,11 @@ export function createKnowledgeService(bundle: HostedKnowledgeBundle): Knowledge
       warnings: [
         ...(incomplete.length
           ? [
-              mode === "route" || mode === "instructions"
-                ? "Required guidance is available but has not been delivered. Resolve the listed references or relevant contract sections before the work."
-                : "Required guidance was truncated. Follow coverage.incomplete before the work.",
+              mode === "route"
+                ? "Bound references remain discoverable. Expand the current task with route.expand and load only the sections that task names. Later launch, design, and provider references are not an immediate reading list."
+                : mode === "instructions"
+                  ? "Required guidance is available but has not been delivered. Resolve the listed references or relevant contract sections before the work."
+                  : "Required guidance was truncated. Follow coverage.incomplete before the work.",
             ]
           : []),
         ...(outputs.some((output) => !output.specificationAvailable)

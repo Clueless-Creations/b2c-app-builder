@@ -196,6 +196,8 @@ test("real MCP initialization and tool discovery expose only the four read-only 
     assert.ok(HOSTED_INSTRUCTIONS.includes(required), `hosted instructions must name ${required}`);
   }
   assert.match(HOSTED_INSTRUCTIONS, /unknown here, not done and not undone/);
+  assert.match(HOSTED_INSTRUCTIONS, /b2c-hosted/);
+  assert.match(HOSTED_INSTRUCTIONS, /b2c-local/);
   const response = await fetchPath("/mcp", {
     method: "POST",
     headers: mcpHeaders,

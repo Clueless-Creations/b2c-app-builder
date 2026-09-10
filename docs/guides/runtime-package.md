@@ -182,7 +182,7 @@ The input is canonical unpadded base64url SPKI DER text for an Ed25519 public ke
 
 ## MCP
 
-Register the absolute Node command and the `entrypoints/mcp/b2c-app-builder-mcp.mjs` path that `b2c setup` prints, under the name `b2c-app-builder`. Without a local install, register the portable form instead: command `npx`, arguments `-y b2c-app-builder`. The transport is stdio.
+Register the absolute Node command and the `entrypoints/mcp/b2c-app-builder-mcp.mjs` path that `b2c setup` prints, under the name `b2c-local`. Without a local install, register the portable form instead: command `npx`, arguments `-y b2c-app-builder`. The transport is stdio. Hosted knowledge uses `b2c-hosted`. A leftover `b2c-app-builder` client name is the legacy local registration.
 
 The default server exposes public discovery and composition preview plus workspace catalog, workflow, knowledge, status, plan, and operation preview and replay tools. Registered-workspace planning can run read-only provider prerequisite probes. The server resolves workspaces only through `~/.b2c-app-builder/workspaces.json`.
 

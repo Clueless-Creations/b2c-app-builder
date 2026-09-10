@@ -86,13 +86,20 @@ function projectLastFailure(node: HeldNode): BusinessPlan["held"][number]["lastF
   };
 }
 
+/** Later-horizon load conditions stay discoverable but are not current-task context. */
+export function isLaterGuidance(loadWhen: string): boolean {
+  return /\b(later|after (this|dispatch|launch|acceptance)|once .{0,60}complete|future|when (the )?(launch|store|release) )/i.test(loadWhen);
+}
+
 export function projectReadyBrief(brief: NodeBrief, founderIntent?: FounderIntentSlice): PublicReadyBrief {
   const instructions = boundText(brief.instructions, PUBLIC_PLAN_BOUNDS.instructions);
   const open = projectPaths(brief.open);
   const consult = projectPaths(brief.consult);
   const produce = projectPaths(brief.produce);
-  const loadSource = brief.load.slice(0, PUBLIC_PLAN_BOUNDS.loadEntries);
-  let loadFieldsTruncated = brief.load.length !== loadSource.length;
+  const currentLoad = brief.load.filter((entry) => !isLaterGuidance(entry.loadWhen));
+  const deferredLoadCount = brief.load.length - currentLoad.length;
+  const loadSource = currentLoad.slice(0, PUBLIC_PLAN_BOUNDS.loadEntries);
+  let loadFieldsTruncated = currentLoad.length !== loadSource.length;
   const load = loadSource.flatMap((entry) => {
     if (!isSafeWorkspacePath(entry.path)) {
       loadFieldsTruncated = true;
@@ -145,6 +152,17 @@ export function projectReadyBrief(brief: NodeBrief, founderIntent?: FounderInten
     approvals: approvals.map((approval) => approval.text),
     truncated,
     ...(founderIntent ? { founderIntent } : {}),
+    readyWhy: brief.approvals.length
+      ? "This workflow is ready to inspect. Protected effects still need a current founder hold resolution."
+      : "This workflow is ready because its current prerequisites are satisfied.",
+    continuation: "After this bounded task, return to business-plan. Do not load later launch, design, or provider guidance until that plan lists it.",
+    effectBoundary: brief.approvals.length ? "founder_approval_required" : "read_and_produce",
+    context: {
+      instructionChars: instructions.text.length,
+      loadCount: load.length,
+      deferredLoadCount,
+      openCount: open.paths.length,
+    },
   };
 }
 

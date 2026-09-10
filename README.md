@@ -55,11 +55,12 @@ b2c setup
 ```
 
 Setup creates the local workspace registry and prints the MCP registration
-command for Claude Code, Cursor, and Codex. The portable form needs no install
-at all:
+command for Claude Code, Cursor, and Codex. Register that local server as
+`b2c-local`. Hosted knowledge is a separate `b2c-hosted` connection and cannot
+run a workspace. The portable form needs no install at all:
 
 ```bash
-claude mcp add --scope user b2c-app-builder -- npx -y b2c-app-builder
+claude mcp add --scope user b2c-local -- npx -y b2c-app-builder
 ```
 
 To work from source, or if the package is unavailable from npm, clone the

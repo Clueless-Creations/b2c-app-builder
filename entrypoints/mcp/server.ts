@@ -37,6 +37,7 @@ import { runProcess } from "./run-process.js";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { resolveSkillRoot } from "../../tooling/lib/skill-root.js";
+import { localMcpInstructions } from "../../contracts/public-api/connection-receipt.js";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
@@ -107,8 +108,6 @@ const WORKSPACE_ARG = z
   );
 
 const readOnly = process.env.B2C_APP_BUILDER_MCP_WRITE !== "1" || process.env.B2C_APP_BUILDER_MCP_READONLY === "1";
-const server = new McpServer({ name: "b2c-app-builder", version: skillVersion() });
-registerPublicTools(server);
 // Knowledge tools use the same immutable service as the hosted MCP and HTTP API.
 // A missing or invalid knowledge bundle must not disable local workspace tools.
 let knowledgeService: KnowledgeService | undefined;
@@ -121,6 +120,16 @@ try {
     "b2c-app-builder-mcp: Knowledge tools are unavailable. The local knowledge bundle could not be loaded or validated. Workspace tools remain available.",
   );
 }
+const server = new McpServer(
+  { name: "b2c-app-builder", version: skillVersion() },
+  {
+    instructions: localMcpInstructions({
+      knowledge: knowledgeService ? "available" : "unavailable",
+      engineVersion: skillVersion(),
+    }),
+  },
+);
+registerPublicTools(server);
 if (knowledgeService) {
   // b2c_workflow gets a local-only extended registration below (workspace/workspaceState) — every
   // other knowledge tool name still comes straight from the shared loop.

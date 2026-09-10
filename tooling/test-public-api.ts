@@ -3,7 +3,17 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const suites = ["public-api", "lifecycle", "recovery", "initialization", "installed-composition", "setup-help", "business-help", "founder-brief-intake"];
+const suites = [
+  "public-api",
+  "lifecycle",
+  "recovery",
+  "initialization",
+  "installed-composition",
+  "setup-help",
+  "business-help",
+  "founder-brief-intake",
+  "connection-and-packet",
+];
 let failed = false;
 
 // Each integration suite has its own bounded run. A shared five-minute deadline

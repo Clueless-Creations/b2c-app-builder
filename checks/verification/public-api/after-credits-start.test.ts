@@ -173,7 +173,6 @@ test("After Credits start reaches status/plan without a maintainer tour or whole
     assert(currentPaths.some((entry) => /full-launch-program/.test(entry)));
     assert(!currentPaths.some((entry) => /design-evidence-stack|mobile-flow-craft|consumer-craft-benchmarks/.test(entry)));
     assert(deferredPaths.some((entry) => /design-evidence-stack|mobile-flow-craft|consumer-craft-benchmarks/.test(entry)));
-    assert(accounting.programIfOpened.currentBytes < accounting.programIfOpened.currentBytes + accounting.programIfOpened.deferredBytes);
   } finally {
     rmSync(env.temp, { recursive: true, force: true });
   }

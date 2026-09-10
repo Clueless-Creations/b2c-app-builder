@@ -379,6 +379,20 @@ export function register(h: Harness): void {
       "README Get started still skips status between create and plan",
     );
     assert(catalogCommandAt < 0 || catalogCommandAt > planStartedAt, "README Get started still leads with catalog discovery");
+    const recovery = readFileSync(path.join(skillRoot, "contracts/public-api/REFERENCE.md"), "utf8");
+    const authoredRecovery = readFileSync(path.join(skillRoot, "tooling/render-public-api.ts"), "utf8");
+    for (const [label, text] of [
+      ["generated creation recovery", recovery],
+      ["authored creation recovery", authoredRecovery],
+    ] as const) {
+      const conflictAt = text.indexOf("business.registration_conflict");
+      const slice = conflictAt >= 0 ? text.slice(conflictAt, text.indexOf("business.target_occupied", conflictAt)) : "";
+      assert(slice.includes("business-status"), `${label} still omits status`);
+      assert(
+        slice.indexOf("business-status") < slice.indexOf("business-plan"),
+        `${label} still resumes with plan only`,
+      );
+    }
     const guide = readFileSync(path.join(skillRoot, "docs/guides/build-a-business.md"), "utf8");
     const guideCreate = guide.slice(guide.indexOf("## Create a planning workspace"), guide.indexOf("## Knowledge tools"));
     assert(

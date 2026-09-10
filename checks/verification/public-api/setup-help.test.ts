@@ -60,8 +60,8 @@ function assertSetupLeadsWithStatusBeforeCatalog(stdout: string): void {
   assert(statusAt >= 0, "setup next steps omitted business-status");
   assert(planAt >= 0, "setup next steps omitted business-plan");
   assert(statusAt > createAt && planAt > statusAt, "setup next steps must name create, then status, then plan");
-  assert(catalogAt < 0 || catalogAt > statusAt, "setup still leads with catalog before status");
-  assert(composeAt < 0 || composeAt > statusAt, "setup still leads with compose before status");
+  assert(catalogAt < 0 || catalogAt > planAt, "setup still leads with catalog before plan");
+  assert(composeAt < 0 || composeAt > planAt, "setup still leads with compose before plan");
   assert.doesNotMatch(stdout, /first call is almost always b2c_catalog|first call is almost always b2c_knowledge_search/);
 }
 

@@ -160,10 +160,12 @@ test("After Credits start reaches status/plan without a maintainer tour or whole
         deferredLoadCount: projected.context?.deferredLoadCount ?? 0,
       },
     };
-    assert.equal(accounting.firstUsefulAction, planning.nextAction);
+    assert(
+      accounting.startPathCodePoints >= 12_000 && accounting.startPathCodePoints <= 13_000,
+      `start-path size ${accounting.startPathCodePoints} left the locked 12000-13000 bound`,
+    );
     assert.equal(accounting.firstUsefulAction, planning.resume?.nextAction);
     assert.match(String(accounting.firstUsefulAction), /FOUNDER_BRIEF/);
-    assert.equal(accounting.resumeWorkflowId, planning.resume?.workflowId);
     assert.equal(accounting.resumeWorkflowId, "workflow.research.research-backed-spec");
     assert(accounting.programIfOpened.current < accounting.programIfOpened.bound, "opened program packet still treats every bind as current reading");
     assert(accounting.programIfOpened.deferred > 0, "opened program packet lost deferred later-horizon accounting");

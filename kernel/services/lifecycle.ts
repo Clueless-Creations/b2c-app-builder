@@ -1,5 +1,5 @@
 import { journeyWorkflowIds } from "../knowledge-service/journey.js";
-import { isPlanningWorkspace, readPlanningResume } from "../session/planning-context.js";
+import { isPlanningWorkspace, readFounderIntent, readPlanningResume } from "../session/planning-context.js";
 import { initializeWorkspace } from "../session/initialize.js";
 import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
@@ -62,6 +62,7 @@ export function planBusiness(input: { workspaceId: string; maxConcurrency: numbe
   if (!existsSync(path.join(workspace, "state/business-state.json"))) {
     if (!isPlanningWorkspace(workspace)) throw new Error("business.runtime_incomplete");
     const resume = readPlanningResume(workspace);
+    const founderIntent = readFounderIntent(workspace);
     return {
       workspaceId: input.workspaceId,
       revision,
@@ -74,6 +75,7 @@ export function planBusiness(input: { workspaceId: string; maxConcurrency: numbe
       authorityGranted: false as const,
       nextAction: resume.nextAction,
       resume,
+      ...(founderIntent ? { founderIntent } : {}),
       completion: readBusinessCompletion(input.workspaceId, revision),
     };
   }
@@ -84,6 +86,7 @@ export function planBusiness(input: { workspaceId: string; maxConcurrency: numbe
     revision,
     report,
     completion: readBusinessCompletion(input.workspaceId, revision),
+    founderIntent: readFounderIntent(workspace),
   });
 }
 export async function runBusiness(

@@ -6,6 +6,7 @@ import { boundedFileBytes } from "../lib/bounded-file.js";
 import {
   FOUNDER_BRIEF_ARTIFACT,
   FOUNDER_BRIEF_MAX_BYTES,
+  FOUNDER_CONSTRAINT_SLICE_MAX,
   LAUNCH_PROGRAM_ARTIFACT,
   type FounderBriefSourceIntent,
 } from "../../contracts/public-api/contract.js";
@@ -53,11 +54,18 @@ export function writeFounderIntake(input: { target: string; slug: string; mandat
   const sourceIntent = founderBriefSourceIntent(bytes);
   mkdirSync(path.join(input.target, "operations"), { recursive: true });
   writeFileSync(path.join(input.target, FOUNDER_BRIEF_ARTIFACT), bytes);
-  writeFileSync(path.join(input.target, LAUNCH_PROGRAM_ARTIFACT), launchProgramProjection(input.slug, sourceIntent), "utf8");
+  writeFileSync(path.join(input.target, LAUNCH_PROGRAM_ARTIFACT), launchProgramProjection(input.slug, sourceIntent, input.mandate), "utf8");
   return sourceIntent;
 }
 
-function launchProgramProjection(slug: string, sourceIntent: FounderBriefSourceIntent): string {
+/** Prefix of the canonical brief for derived surfaces. Short mandates travel whole; long briefs stay truncated. */
+export function founderConstraintSlice(mandate: string): { slice: string; truncated: boolean } {
+  if (mandate.length <= FOUNDER_CONSTRAINT_SLICE_MAX) return { slice: mandate, truncated: false };
+  return { slice: `${mandate.slice(0, FOUNDER_CONSTRAINT_SLICE_MAX - 1)}…`, truncated: true };
+}
+
+function launchProgramProjection(slug: string, sourceIntent: FounderBriefSourceIntent, mandate: string): string {
+  const { slice, truncated } = founderConstraintSlice(mandate);
   return [
     "# Complete consumer-business mandate",
     "",
@@ -67,11 +75,21 @@ function launchProgramProjection(slug: string, sourceIntent: FounderBriefSourceI
     `Canonical founder brief: \`${sourceIntent.artifact}\`.`,
     "That file is source intent and provenance. It is not accepted product or design truth.",
     "`product.yaml` and `DESIGN.md` remain the accepted authorities after acceptance.",
+    "This derived record quotes a bounded founder-constraint slice. It is not the only mandate owner.",
     "",
     `- Characters: ${sourceIntent.characterCount}`,
     `- Bytes: ${sourceIntent.byteLength}`,
     `- Digest: ${sourceIntent.digest}`,
     "- Derived view embeds source: no",
+    "",
+    "## Founder constraints",
+    "",
+    `Provenance: \`${sourceIntent.artifact}\` (${sourceIntent.digest}, ${sourceIntent.characterCount} characters).`,
+    truncated
+      ? "This slice is truncated active context. Open the founder brief for the remainder."
+      : "This slice is the complete founder brief.",
+    "",
+    slice,
     "",
     "## Scope",
     "Full accepted consumer business. A research pass or internal simulator preview is not completion.",

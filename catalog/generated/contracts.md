@@ -109,7 +109,7 @@ _Founder asks for a complete end-to-end consumer delivery — app, full web funn
 - **Role:** Orchestrator
 - **Phases:** 0
 - **Providers:** —
-- **Reads:** `state/business-state.json`
+- **Reads:** `state/business-state.json`, `operations/FOUNDER_BRIEF.md`
 - **Consults:** `PRODUCT.md`, `DESIGN.md`, `operations/ORCHESTRATION.md`, `strategy/TOOL_DECISIONS.md`, `operations/BUSINESS_ACCESS.md`
 - **Produces:** `operations/LAUNCH_PROGRAM.md`
 - **Gates:** `check:orchestration`
@@ -122,7 +122,7 @@ _Every store, trust, engineering, and growth terminal node has succeeded and the
 - **Role:** Orchestrator
 - **Phases:** Cross-phase (always-on)
 - **Providers:** —
-- **Reads:** `state/business-state.json`, `operations/LAUNCH_PROGRAM.md`, `operations/ORCHESTRATION.md`, `engineering/PRODUCTION_READINESS.md`, `store/STORE_CONSOLE.md`, `product/copy/COPY_REVIEW.md`, `design/reviews/DESIGN_SYSTEM_REVIEW.md`
+- **Reads:** `state/business-state.json`, `operations/FOUNDER_BRIEF.md`, `operations/LAUNCH_PROGRAM.md`, `operations/ORCHESTRATION.md`, `engineering/PRODUCTION_READINESS.md`, `store/STORE_CONSOLE.md`, `product/copy/COPY_REVIEW.md`, `design/reviews/DESIGN_SYSTEM_REVIEW.md`
 - **Consults:** `growth/CRO_AUDIT.md`, `strategy/RED_TEAM_FINDINGS.md`, `LEGAL_REVIEW.md`, `growth/EMAIL_OPS.md`, `revenue/REVENUE_OPS.md`
 - **Produces:** `LAUNCH.md`
 - **Gates:** `check:lane-coverage`, `check:orchestration`, `check:readiness-coverage`, `check:app-copy`, `check:design-acceptance`

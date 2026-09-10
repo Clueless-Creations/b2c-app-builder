@@ -272,6 +272,16 @@ export const PUBLIC_PLAN_BOUNDS = {
   gateCommands: 16,
   approvals: 16,
 } as const;
+/** Bounded active-context slice of the canonical founder brief. Not a substitute for the source file. */
+export const FOUNDER_CONSTRAINT_SLICE_MAX = PUBLIC_PLAN_BOUNDS.instructions;
+export const founderIntentSliceSchema = z.strictObject({
+  artifact: z.literal(FOUNDER_BRIEF_ARTIFACT),
+  digest: lifecycleRevisionSchema,
+  characterCount: z.number().int().nonnegative(),
+  slice: z.string().max(FOUNDER_CONSTRAINT_SLICE_MAX),
+  truncated: z.boolean(),
+});
+export type FounderIntentSlice = z.infer<typeof founderIntentSliceSchema>;
 export const publicHoldKinds = ["founder_approval", "autonomy", "blocked", "upstream"] as const;
 export const publicHoldKindSchema = z.enum(publicHoldKinds);
 export const publicAttemptFailureCodes = [
@@ -328,6 +338,7 @@ export const publicReadyBriefSchema = z.strictObject({
   }),
   approvals: z.array(z.string().max(400)).max(PUBLIC_PLAN_BOUNDS.approvals),
   truncated: z.boolean(),
+  founderIntent: founderIntentSliceSchema.optional(),
 });
 export const publicFounderQuestionSchema = z.strictObject({
   phase: z.string().max(160),
@@ -416,6 +427,7 @@ export const businessPlanSchema = z.strictObject({
   authorityGranted: z.literal(false),
   founderQuestion: publicFounderQuestionSchema.nullable().optional(),
   nextAction: z.string(),
+  founderIntent: founderIntentSliceSchema.optional(),
 });
 export type BusinessPlan = z.infer<typeof businessPlanSchema>;
 export type PublicHoldKind = z.infer<typeof publicHoldKindSchema>;

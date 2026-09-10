@@ -1,5 +1,13 @@
+import { mkdirSync, writeFileSync } from "node:fs";
+import path from "node:path";
 import { compilePlan, type CatalogInput, type RunNodeId } from "../../../kernel/engine/compile.js";
-import { classifyProofStrengthIssues } from "../../../kernel/engine/review-evidence.js";
+import {
+  captureReviewEvidence,
+  classifyProofStrengthIssues,
+  composeProofStrength,
+  formatProofStrength,
+  workspaceArtifactFingerprint,
+} from "../../../kernel/engine/review-evidence.js";
 import { acceptVerification, beginAttempt, reconcilePatch, seedRunState } from "../../../kernel/engine/runstate.js";
 import { laneKeys, type BusinessStateV2 } from "../../../kernel/schema/types.js";
 import { assert, type Harness } from "./_harness.js";
@@ -128,5 +136,86 @@ export function register(harness: Harness): void {
     );
     assert(message.includes("review.runtime_unobserved"), `expected runtime_unobserved, got ${message || "no refusal"}`);
     assert(run.nodes[nodeId("research-scan")]!.status === "blocked", "an unobserved runtime claim must leave the node blocked");
+  });
+
+  harness.check("proof-strength: packet shape-pass still produces semantic and runtime unknown", () => {
+    const produced = formatProofStrength(composeProofStrength({ structural: "checked" }));
+    assert(produced === PACKET_STRENGTH_LINE, `packet producer must stay structural-only, got ${produced}`);
+  });
+
+  harness.check("proof-strength: graph acceptance still produces semantic unknown", () => {
+    const { plan, run, attempt } = blockedResearchScan();
+    acceptVerification(plan, run, nodeId("research-scan"), ["fresh-context reviewer signed off"], now, "session-reviewer");
+    const produced = attempt.independentVerification?.evidence.find((line) => line.startsWith("Proof strength:"));
+    assert(
+      Boolean(produced?.includes("semantic=unknown") && produced.includes("runtime=unknown")),
+      `graph review must not invent semantic proof, got ${produced ?? "none"}`,
+    );
+    assert(!produced?.includes("semantic=checked"), "graph mode cannot become workspace semantic proof");
+  });
+
+  harness.check("proof-strength: workspace review produces semantic=checked and leaves runtime unknown", () => {
+    const root = harness.makeTempDir("proof-strength-semantic");
+    mkdirSync(path.join(root, "research"), { recursive: true });
+    writeFileSync(path.join(root, "research/brief.md"), "Workspace research brief.\n", "utf8");
+    const plan = compilePlan(strengthCatalog(), now);
+    const run = seedRunState(plan, businessState(), { ownerSessionId: "session-1", ttlSeconds: 600, wallClockCapSeconds: 3600, now });
+    const attempt = beginAttempt(plan, run, nodeId("research-scan"), "session-producer", now);
+    attempt.proofSource = "workspace";
+    reconcilePatch(
+      plan,
+      run,
+      {
+        nodeId: nodeId("research-scan"),
+        attemptId: attempt.id,
+        outputs: [
+          {
+            artifactId: "artifact.research-brief",
+            path: "research/brief.md",
+            fingerprint: workspaceArtifactFingerprint(root, "research/brief.md"),
+            evidence: ["workspace bytes produced"],
+          },
+        ],
+      },
+      now,
+    );
+    const snapshot = captureReviewEvidence(plan, run, nodeId("research-scan"), root, "session-reviewer", now);
+    acceptVerification(plan, run, nodeId("research-scan"), ["fresh-context reviewer signed off"], now, "session-reviewer", snapshot, root);
+    const produced = attempt.independentVerification?.evidence.find((line) => line.startsWith("Proof strength:"));
+    assert(
+      Boolean(produced?.includes("semantic=checked") && produced.includes("runtime=unknown")),
+      `workspace review must produce semantic proof only, got ${produced ?? "none"}`,
+    );
+    assert(!produced?.includes("runtime=checked"), "acceptVerification must not invent a device or runtime observation");
+  });
+
+  harness.check("proof-strength: runtime=checked requires an explicit workspace observation, not a sentence", () => {
+    const review = {
+      mode: "workspace" as const,
+      verdict: "accepted" as const,
+      evidence: ["fresh-context reviewer signed off"],
+    };
+    const withoutObservation = composeProofStrength({
+      structural: "checked",
+      review,
+      attempt: { proofSource: "workspace" },
+    });
+    assert(withoutObservation.runtime === "unknown", "a workspace review sentence is not runtime observation");
+    const withObservation = composeProofStrength({
+      structural: "checked",
+      review,
+      attempt: { proofSource: "workspace" },
+      runtimeObservation: { origin: "workspace" },
+    });
+    assert(withObservation.semantic === "checked" && withObservation.runtime === "checked", "only an explicit workspace observation produces runtime proof");
+    assert(
+      composeProofStrength({
+        structural: "checked",
+        review,
+        attempt: { proofSource: "synthetic" },
+        runtimeObservation: { origin: "workspace" },
+      }).runtime === "unknown",
+      "synthetic origin cannot produce runtime proof",
+    );
   });
 }

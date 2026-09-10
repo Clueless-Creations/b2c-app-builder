@@ -22,7 +22,14 @@ import {
   restoreOccurrenceAfterAttempt,
 } from "../work-orders/lifecycle.js";
 import { refuseFreshContextAcceptance, requiresIndependentReview, VERIFICATION_REQUIRED_BLOCKER } from "./verification.js";
-import { captureReviewEvidence, classifyProofStrengthIssues, validateReviewReceipt, workflowContractFingerprint } from "./review-evidence.js";
+import {
+  captureReviewEvidence,
+  classifyProofStrengthIssues,
+  composeProofStrength,
+  formatProofStrength,
+  validateReviewReceipt,
+  workflowContractFingerprint,
+} from "./review-evidence.js";
 import { DESIGN_TASTE_DELEGATION_APPROVAL_ID } from "./founder-decision-receipt.js";
 
 /** A lane in one of these states means the workflows that own it are already done. */
@@ -545,7 +552,11 @@ export function acceptVerification(
       reviewReceipt ?? captureReviewEvidence(plan, run, nodeId, "", verifiedBySessionId!, now, attempt.proofSource === "synthetic" ? "synthetic" : "graph");
     const issues = [...classifyProofStrengthIssues(evidence, attempt, receipt.mode), ...validateReviewReceipt(plan, run, nodeId, receipt, workspaceRoot)];
     if (issues.length) throw new Error(`Independent review does not match current work: ${issues.join(", ")}`);
-    attempt.independentVerification = { ...structuredClone(receipt), verdict: "accepted", checkedAt: now, evidence: [...evidence] };
+    const stored = { ...structuredClone(receipt), verdict: "accepted" as const, checkedAt: now, evidence: [...evidence] };
+    const produced = formatProofStrength(composeProofStrength({ structural: "checked", review: stored, attempt }));
+    stored.evidence = [...stored.evidence, produced];
+    attempt.independentVerification = stored;
+    evidence = [...evidence, produced];
   }
   if (attempt.workOrderOccurrenceId) {
     const proof = recordWorkOrderProof(run, attempt.workOrderOccurrenceId, evidence, now);

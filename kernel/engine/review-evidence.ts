@@ -44,6 +44,15 @@ function claimsRuntimeObservation(line: string): boolean {
   return /\b(live[- ]device|device observation|runtime observation|observed on (?:a |the )?device|ran on (?:a |the )?device)\b/i.test(line);
 }
 
+function trimmedEvidence(evidence: readonly string[]): string[] {
+  return evidence.map((entry) => entry.trim()).filter((entry) => entry.length > 0);
+}
+
+function isStructuralOnlyEvidence(evidence: readonly string[]): boolean {
+  const lines = trimmedEvidence(evidence);
+  return lines.length > 0 && lines.every((line) => isStructuralStrengthLine(line) || isPacketCheckChrome(line)) && lines.some(isStructuralStrengthLine);
+}
+
 /**
  * Shape-pass and packet chrome are not semantic review. A synthetic or graph receipt cannot
  * become live-device or runtime observation.
@@ -53,15 +62,61 @@ export function classifyProofStrengthIssues(
   attempt: { proofSource?: "workspace" | "synthetic" },
   receiptMode?: IndependentVerificationReceipt["mode"],
 ): string[] {
-  const lines = evidence.map((entry) => entry.trim()).filter((entry) => entry.length > 0);
+  const lines = trimmedEvidence(evidence);
   const issues: string[] = [];
-  if (lines.length > 0 && lines.every((line) => isStructuralStrengthLine(line) || isPacketCheckChrome(line)) && lines.some(isStructuralStrengthLine)) {
-    issues.push("review.structural_only");
-  }
+  if (isStructuralOnlyEvidence(lines)) issues.push("review.structural_only");
   if (lines.some(claimsRuntimeObservation) && (attempt.proofSource === "synthetic" || receiptMode === "synthetic" || receiptMode === "graph")) {
     issues.push("review.runtime_unobserved");
   }
   return issues;
+}
+
+export type ProofStrengthLevel = "checked" | "failed" | "unknown";
+
+export interface ComposedProofStrength {
+  readonly structural: ProofStrengthLevel;
+  readonly semantic: ProofStrengthLevel;
+  readonly runtime: ProofStrengthLevel;
+}
+
+/**
+ * Produce structural, semantic, and runtime strength from current proofs. Packet shape-pass
+ * supplies structural only. Semantic requires accepted workspace review. Runtime requires an
+ * explicit workspace observation — a sentence or graph receipt cannot invent one.
+ */
+export function composeProofStrength(input: {
+  readonly structural: "checked" | "failed";
+  readonly review?: Pick<IndependentVerificationReceipt, "mode" | "verdict" | "evidence">;
+  readonly attempt?: { proofSource?: "workspace" | "synthetic" };
+  readonly runtimeObservation?: { origin: "workspace" };
+}): ComposedProofStrength {
+  const reviewIssues = input.review ? classifyProofStrengthIssues(input.review.evidence, input.attempt ?? {}, input.review.mode) : [];
+  const workspaceReview =
+    input.review?.mode === "workspace" &&
+    reviewIssues.length === 0 &&
+    trimmedEvidence(input.review.evidence).length > 0 &&
+    !isStructuralOnlyEvidence(input.review.evidence);
+  const semantic: ProofStrengthLevel =
+    workspaceReview && input.review?.verdict === "accepted" ? "checked" : workspaceReview && input.review?.verdict === "rejected" ? "failed" : "unknown";
+  const runtime: ProofStrengthLevel =
+    input.runtimeObservation?.origin === "workspace" &&
+    input.attempt?.proofSource === "workspace" &&
+    input.review?.mode === "workspace" &&
+    workspaceReview &&
+    input.review.verdict === "accepted"
+      ? "checked"
+      : "unknown";
+  return { structural: input.structural, semantic, runtime };
+}
+
+export function formatProofStrength(strength: ComposedProofStrength): string {
+  const note =
+    strength.semantic === "unknown" && strength.runtime === "unknown"
+      ? "A complete record is not independent review or device observation."
+      : strength.runtime === "unknown"
+        ? "Independent workspace review accepted; runtime remains unobserved."
+        : "Independent workspace review and workspace runtime observation recorded.";
+  return `Proof strength: structural=${strength.structural} semantic=${strength.semantic} runtime=${strength.runtime}. ${note}`;
 }
 
 function subjectIds(plan: CompiledPlan, node: CompiledRunNode): string[] {

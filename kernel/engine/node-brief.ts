@@ -1,10 +1,12 @@
 import { reviewFacet } from "./review-facet.js";
 import { loadSelectedKnowledge, type SelectedOperationBinding } from "../composition/compile-bindings.js";
+import { loadWorkspaceBindingTruth, type WorkspaceBindingTruth } from "../composition/onboarding-selection.js";
 import type { SourceAccess } from "../../contracts/source-access.js";
 import type { ContextCapsule } from "../context/receipt.js";
 import type { CompiledPlan, CompiledRunNode } from "./compile.js";
 import { requiresIndependentReview } from "./verification-policy.js";
 import { domainIdFromKnowledgePath, laterGuidanceContext, partitionLoadWhen } from "../lib/later-guidance.js";
+import type { ProviderDecision } from "../../catalog/ontology/onboarding-applicability.js";
 
 /**
  * Composes the per-node worker brief from a compiled node's authored contract — the one place
@@ -68,6 +70,8 @@ export interface NodeBrief {
    * Present only when either list is non-empty.
    */
   review?: { reviewOf: string[]; reviewedBy: string[] };
+  /** Activated pin versus the candidate declaration. Absent when no workspace was supplied. */
+  bindingTruth?: WorkspaceBindingTruth;
 }
 
 export interface NodeBriefLoad {
@@ -110,7 +114,7 @@ export function mutableTaskArtifactPaths(brief: Pick<NodeBrief, "open" | "produc
 
 const NOT_AUTHORED = "(instructions not authored; record the missing workflow guidance before proceeding)";
 
-export function composeNodeBrief(node: CompiledRunNode, plan: CompiledPlan, capsule?: Pick<ContextCapsule, "sourceIds">): NodeBrief {
+export function composeNodeBrief(node: CompiledRunNode, plan: CompiledPlan, capsule?: Pick<ContextCapsule, "sourceIds">, workspaceRoot?: string): NodeBrief {
   // Worker implementations retain the ordinary capsule and per-reference reads. Their
   // package context is verified by the binding and route; it is not one giant prompt.
   const selectedKnowledge =
@@ -192,12 +196,62 @@ export function composeNodeBrief(node: CompiledRunNode, plan: CompiledPlan, caps
       const review = reviewFacet(node.reviewOf, node.role?.reviewedBy);
       return review ? { review } : {};
     })(),
+    ...(workspaceRoot ? { bindingTruth: loadWorkspaceBindingTruth(workspaceRoot) } : {}),
   };
+}
+
+function renderProviderDecision(decision: ProviderDecision): string {
+  switch (decision.status) {
+    case "selected":
+      return `selected ${decision.providerId}`;
+    case "not_required":
+      return "not_required";
+    case "unresolved":
+      return "unresolved";
+    default: {
+      const exhaustive: never = decision;
+      return exhaustive;
+    }
+  }
+}
+
+function renderBindingTruth(truth: WorkspaceBindingTruth): string[] {
+  const lifecycle = ((): string => {
+    switch (truth.lifecycle) {
+      case "proposal":
+        return "proposal (not an activated execution pin)";
+      case "activated":
+        return "activated";
+      case "pending-activation":
+        return "pending-activation (journal is not execution truth)";
+      case "stale-candidate":
+        return "stale-candidate (candidate declaration is not execution truth)";
+      case "unresolved":
+        return "unresolved";
+      default: {
+        const exhaustive: never = truth.lifecycle;
+        return exhaustive;
+      }
+    }
+  })();
+  const lines = [
+    `Binding lifecycle: ${lifecycle}`,
+    truth.candidateIsExecutionTruth
+      ? `Candidate declaration matches the activated pin. Verified present-paywall ${renderProviderDecision(truth.verified.presentPaywall)}.`
+      : `Candidate declaration is not execution truth. Declared present-paywall ${renderProviderDecision(truth.declared.presentPaywall)}; verified present-paywall ${renderProviderDecision(truth.verified.presentPaywall)}.`,
+  ];
+  if (truth.surfaces.pages.length > 0) {
+    const pages = truth.surfaces.pages.map((page) => `${page.id} job=${page.job} interaction=${page.interaction}`).join("; ");
+    lines.push(`Purpose and technique stay independent: ${pages}. 60fps register: ${truth.surfaces.sixtyFpsRegister}.`);
+  }
+  lines.push("Proof strength on this brief is structural selection state, not semantic review or device observation.");
+  return lines;
 }
 
 /** The brief as compact markdown, for the frontier report's human rendering. */
 export function renderNodeBrief(brief: NodeBrief): string {
   const lines: string[] = [`### ${brief.title} (${brief.workflowId})`];
+  if (brief.bindingTruth) lines.push(...renderBindingTruth(brief.bindingTruth));
   if (brief.selectedOperation)
     lines.push(
       `Selected operation: ${brief.selectedOperation.operation}; implementation: ${brief.selectedOperation.implementation.id}; execution route: unknown`,

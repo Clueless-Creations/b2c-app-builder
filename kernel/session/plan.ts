@@ -291,6 +291,7 @@ export function buildPlanReport(
   decisions: ReadonlyMap<string, AutonomyDecisionDetail>,
   maxConcurrency: number,
   autonomyUnset: boolean,
+  workspaceRoot?: string,
 ): PlanReport {
   const byId = new Map(plan.nodes.map((node) => [node.id, node]));
   const readySet = new Set(ready);
@@ -352,7 +353,7 @@ export function buildPlanReport(
       return describe(node, "upstream", "");
     }),
   );
-  const readyBriefs = batches.flat().map((entry) => composeNodeBrief(byId.get(entry.nodeId)!, plan));
+  const readyBriefs = batches.flat().map((entry) => composeNodeBrief(byId.get(entry.nodeId)!, plan, undefined, workspaceRoot));
   const founderQuestion = pickFounderQuestion(byId, held, autonomyUnset);
 
   return {
@@ -532,7 +533,16 @@ export function planWorkspace(
   const frontier = computeFrontier(plan, scratch, businessState, evaluator);
   const parked = new Map(frontier.parked.map((entry) => [entry.nodeId, entry.reason]));
 
-  const report = buildPlanReport(plan, scratch, frontier.ready, parked, decisions, maxConcurrency, !control || Object.keys(control.grants).length === 0);
+  const report = buildPlanReport(
+    plan,
+    scratch,
+    frontier.ready,
+    parked,
+    decisions,
+    maxConcurrency,
+    !control || Object.keys(control.grants).length === 0,
+    workspace,
+  );
   return report;
 }
 
@@ -598,7 +608,9 @@ function main(): number {
     // A damaged address book must not block a direct path that is still usable. An ID-only
     // request cannot be resolved safely, so report the repair route without exposing parser data.
     if (!existsSync(directWorkspace)) {
-      console.error("plan.registry_invalid: the workspace registry is unreadable. Run `b2c inspect` (or supported `b2c doctor`), then repair or recreate the registry before using an ID.");
+      console.error(
+        "plan.registry_invalid: the workspace registry is unreadable. Run `b2c inspect` (or supported `b2c doctor`), then repair or recreate the registry before using an ID.",
+      );
       return 1;
     }
   }

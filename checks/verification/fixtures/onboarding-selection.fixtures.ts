@@ -1,17 +1,17 @@
-import { cpSync, mkdirSync, writeFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { cpSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { firstpartyRecipes } from "../../../catalog/firstparty-declarations.js";
-import {
-  loadOnboardingApplicability,
-  PRESENT_PAYWALL_OPERATION,
-  REVENUECAT_PROVIDER_ID,
-} from "../../../catalog/ontology/onboarding-applicability.js";
+import { loadOnboardingApplicability, PRESENT_PAYWALL_OPERATION, REVENUECAT_PROVIDER_ID } from "../../../catalog/ontology/onboarding-applicability.js";
 import type { Extension } from "../../../contracts/extensions/contract.js";
+import { compilePlan, type CatalogInput } from "../../../kernel/engine/compile.js";
+import { composeNodeBrief, renderNodeBrief } from "../../../kernel/engine/node-brief.js";
 import { loadVerifiedOnboardingApplicability } from "../../../kernel/composition/onboarding-selection.js";
 import { applyCompositionActivation, previewCompositionActivation } from "../../../kernel/composition/activation.js";
+import { resolveTsxBin } from "../../../tooling/lib/tsx-bin.js";
 import { author } from "./binding-resolution.fixtures.js";
 import { catalog, options, runtime, setup } from "./composition-activation.fixtures.js";
-import { assert, type Harness } from "./_harness.js";
+import { assert, skillRoot, type Harness } from "./_harness.js";
 
 const firstPartyComposition = `apiVersion: b2c/v1
 recipe: { id: b2c/subscription-app, version: 1.0.0 }
@@ -93,7 +93,10 @@ export function register(harness: Harness): void {
     writeFileSync(path.join(workspace, "b2c.yaml"), firstPartyComposition, "utf8");
     const declared = loadOnboardingApplicability(workspace);
     const verified = loadVerifiedOnboardingApplicability(workspace);
-    assert(declared.presentPaywall.status === "selected" && declared.presentPaywall.providerId === REVENUECAT_PROVIDER_ID, "declaration still names the first-party presenter");
+    assert(
+      declared.presentPaywall.status === "selected" && declared.presentPaywall.providerId === REVENUECAT_PROVIDER_ID,
+      "declaration still names the first-party presenter",
+    );
     assert(verified.bindingLifecycle === "pending-activation", `expected pending-activation, got ${verified.bindingLifecycle}`);
     assert(verified.presentPaywall.status === "unresolved", "pending activation must not select a presenter");
   });
@@ -103,7 +106,10 @@ export function register(harness: Harness): void {
     writeFileSync(path.join(workspace, "b2c.yaml"), firstPartyComposition, "utf8");
     const declared = loadOnboardingApplicability(workspace);
     const verified = loadVerifiedOnboardingApplicability(workspace);
-    assert(declared.presentPaywall.status === "selected" && declared.presentPaywall.providerId === REVENUECAT_PROVIDER_ID, "declaration still names the first-party presenter");
+    assert(
+      declared.presentPaywall.status === "selected" && declared.presentPaywall.providerId === REVENUECAT_PROVIDER_ID,
+      "declaration still names the first-party presenter",
+    );
     assert(verified.bindingLifecycle === "stale-candidate", `expected stale-candidate, got ${verified.bindingLifecycle}`);
     assert(verified.presentPaywall.status === "unresolved", "stale candidate must not select a presenter");
   });
@@ -160,6 +166,86 @@ export function register(harness: Harness): void {
     const verified = loadVerifiedOnboardingApplicability(workspace);
     assert(declared.presentPaywall.status === "unresolved", "declaration must not invent a first-party owner for an imported recipe");
     assert(verified.bindingLifecycle === "proposal", `expected proposal, got ${verified.bindingLifecycle}`);
-    assert(verified.presentPaywall.status === "selected" && verified.presentPaywall.providerId === "b2c/imported-paywall", "imported recipe must bind the package presenter");
+    assert(
+      verified.presentPaywall.status === "selected" && verified.presentPaywall.providerId === "b2c/imported-paywall",
+      "imported recipe must bind the package presenter",
+    );
+  });
+
+  harness.check("onboarding-selection: activate-then-edit keeps brief and gate on the verified pin", () => {
+    const workspace = setup(harness);
+    writeFileSync(path.join(workspace, "b2c.yaml"), firstPartyComposition, "utf8");
+    cpSync(path.join(skillRoot, "examples/workspace/business/product.yaml"), path.join(workspace, "product.yaml"));
+    writeFileSync(
+      path.join(workspace, "product.yaml"),
+      readFileSync(path.join(workspace, "product.yaml"), "utf8").replace(
+        /(- id: feature\.paywall-goal-headline\n    class_id: class.feature\n    slots:\n      slot.feature.scope: )\S+/,
+        "$1required",
+      ),
+      "utf8",
+    );
+    mkdirSync(path.join(workspace, "studio/seed"), { recursive: true });
+    writeFileSync(
+      path.join(workspace, "studio/seed/business.json"),
+      `${JSON.stringify({ surfaces: { landingPages: [{ id: "signup", job: "conversion", interaction: "static-document" }] } }, null, 2)}\n`,
+      "utf8",
+    );
+    mkdirSync(path.join(workspace, "product/onboarding/graph"), { recursive: true });
+    writeFileSync(
+      path.join(workspace, "product/onboarding/graph/ONB-17-screen-control-paywall-contract.md"),
+      `## Findings
+
+Finding: Quiz writes paywall_headline_key into offering metadata.
+Source: fixture observation 2026-09-10.
+Classification: observation.
+Decision: bind customVariables and keep the fallback.
+Uncertainty: synthetic fixture evidence.
+paywall_headline_key
+fallback
+offering metadata
+customVariables
+`,
+      "utf8",
+    );
+    const declared = loadOnboardingApplicability(workspace);
+    const verified = loadVerifiedOnboardingApplicability(workspace);
+    assert(declared.presentPaywall.status === "selected" && declared.presentPaywall.providerId === REVENUECAT_PROVIDER_ID, "draft still names RevenueCat");
+    assert(declared.headlineBind === "selected", "draft would treat the headline bind as selected");
+    assert(verified.bindingLifecycle === "stale-candidate", `expected stale-candidate, got ${verified.bindingLifecycle}`);
+    assert(verified.presentPaywall.status === "unresolved" && verified.headlineBind === "unresolved", "verified pin must not adopt the draft presenter");
+    const pinned = JSON.parse(readFileSync(path.join(workspace, "catalog.json"), "utf8")) as CatalogInput;
+    const plan = compilePlan(pinned);
+    const brief = composeNodeBrief(plan.nodes[0]!, plan, undefined, workspace);
+    const rendered = renderNodeBrief(brief);
+    assert(brief.bindingTruth?.lifecycle === "stale-candidate", "brief must carry the verified lifecycle");
+    assert(brief.bindingTruth?.candidateIsExecutionTruth === false, "candidate YAML must not be execution truth");
+    assert(rendered.includes("stale-candidate") && rendered.includes("not execution truth"), `brief must name the stale candidate:\n${rendered}`);
+    assert(
+      rendered.includes("Declared present-paywall selected") && rendered.includes("verified present-paywall unresolved"),
+      `brief must contrast draft vs pin:\n${rendered}`,
+    );
+    assert(rendered.includes("signup job=conversion interaction=static-document"), `brief must keep purpose independent of technique:\n${rendered}`);
+    assert(!rendered.includes("scroll-linked"), "conversion purpose must not invent scroll-linked technique");
+    assert(rendered.includes("semantic review or device observation"), "brief must not overclaim proof strength");
+    const gate = spawnSync(
+      resolveTsxBin(skillRoot),
+      [
+        path.join(skillRoot, "checks/validation/business/experience/check-onboarding-evidence-packet.ts"),
+        "--root",
+        workspace,
+        "--node",
+        "ONB-17",
+        "--path",
+        "product/onboarding/graph/ONB-17-screen-control-paywall-contract.md",
+      ],
+      { cwd: skillRoot, encoding: "utf8" },
+    );
+    assert(gate.status === 1, `ONB-17 gate must hold on the verified pin, got ${String(gate.status)}\n${gate.stdout}\n${gate.stderr}`);
+    assert(
+      gate.stdout.includes("onboarding_evidence.onb17_paywall_goal_headline_unresolved"),
+      `gate must follow verified unresolved, not the draft selected bind:\n${gate.stdout}`,
+    );
+    assert(!gate.stdout.includes("onboarding_evidence.onb17_paywall_goal_headline\n"), "complete draft contract phrases must not satisfy a stale candidate");
+    assert(gate.stdout.includes("semantic=unknown") && gate.stdout.includes("runtime=unknown"), `gate must report structural-only strength:\n${gate.stdout}`);
   });
 }

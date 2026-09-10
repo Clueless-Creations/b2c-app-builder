@@ -256,3 +256,9 @@ if (!relativePath) {
 }
 
 reportAndExit(`${nodeLabel} evidence packet check`, issues);
+if (!argv.includes("--json")) {
+  const structuralFailed = issues.some((item) => item.severity === "error");
+  console.log(
+    `Proof strength: structural=${structuralFailed ? "failed" : "checked"} semantic=unknown runtime=unknown. A complete record is not independent review or device observation.`,
+  );
+}

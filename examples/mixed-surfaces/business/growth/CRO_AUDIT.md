@@ -14,5 +14,6 @@ No conversion job. Static document legal page.
 
 ## cinematic
 
-No conversion job on this URL. Scroll-linked story map; score motion on the
-independent review artifact, not as a CRO experiment.
+Conversion goal: waitlist signup via the join link to conversion.html. This
+page is a cinematic signup: conversion job and scroll-linked story. Score CRO
+for the waitlist action and motion on the independent review artifact.

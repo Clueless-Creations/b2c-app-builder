@@ -1,10 +1,13 @@
 /**
  * Frozen per-page CRO / motion gates shared by design-acceptance and landing-funnel.
  *
- * Authority is `loadDesignSurfaceApplicability` (studio `interaction`, implemented
- * scroll-linked hooks, surface-contract applicable bit). Purpose prose is not parsed.
- * A conversion landing is scored for CRO. A static legal/support page is not forced
- * to invent conversion experiments, waitlist events, or motion evidence.
+ * Authority is `loadDesignSurfaceApplicability` (studio `job` for conversion
+ * purpose, studio `interaction` for technique, implemented scroll-linked hooks
+ * attributed to that surface, surface-contract applicable bit). Purpose prose
+ * is not parsed. A conversion landing is scored for CRO. A static legal/support
+ * page is not forced to invent conversion experiments, waitlist events, or
+ * motion evidence. A cinematic signup keeps both conversion measurement and
+ * scroll-linked proof.
  */
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
@@ -81,9 +84,10 @@ function publicWebSurfaces(applicability: DesignSurfaceApplicability): SurfaceAp
 }
 
 export function surfaceRequiresMotionInteractionEvidence(surfaceId: string, surfaceKind: string, applicability: DesignSurfaceApplicability): boolean {
+  if (surfaceKind !== "landing" && surfaceKind !== "web") return false;
   const row = applicability.surfaces.find((surface) => surface.id === surfaceId);
-  if (row?.motionReference === "selected" || row?.scrollytelling === "selected") return true;
-  return surfaceKind === "landing" && applicability.implementedScrollytelling;
+  if (!row) return false;
+  return row.motionReference === "selected" || row.scrollytelling === "selected" || row.implementedScrollytelling;
 }
 
 export function validateFrozenPageTechniqueGates(root: string, codePrefix: string): Issue[] {
@@ -98,6 +102,22 @@ export function validateFrozenPageTechniqueGates(root: string, codePrefix: strin
       "interaction_unresolved",
       "A listed studio surface omits a parseable interaction class. Record static-document, conversion, scroll-linked, standard-transition, or bespoke-motion before freezing CRO or motion evidence.",
       STUDIO_SEED_PATH,
+    );
+  }
+
+  if (applicability.inventory === "present" && applicability.jobUnresolved) {
+    fail(
+      "job_unresolved",
+      "A listed studio surface records a job that is not conversion, legal-document, or informational. Conversion purpose is independent of interaction technique; do not infer it from a filename or from purpose prose.",
+      STUDIO_SEED_PATH,
+    );
+  }
+
+  if (applicability.implementedScrollytellingUnattributed) {
+    fail(
+      "implemented_motion_unattributed",
+      "Landing source implements scroll-linked hooks that are not attributed to a listed studio surface id (file stem must match the surface id). Inspect which page renders that behavior. Do not treat every public page as animated and do not exempt every page.",
+      "growth/landing",
     );
   }
 
@@ -125,6 +145,13 @@ export function validateFrozenPageTechniqueGates(root: string, codePrefix: strin
         "static_document_invented_conversion",
         `Static document "${surface.id}" must not invent a conversion experiment or waitlist job. Score it for semantic content, legibility, and truthful claims.`,
         cro!.path,
+      );
+    }
+    if (surface.implementedScrollytelling) {
+      fail(
+        "static_document_implemented_motion",
+        `Static document "${surface.id}" implements scroll-linked hooks. Change its interaction to scroll-linked or remove the hooks. Do not silently exempt this page, and do not copy its motion obligations onto other pages.`,
+        STUDIO_SEED_PATH,
       );
     }
   }

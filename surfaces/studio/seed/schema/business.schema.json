@@ -277,6 +277,15 @@
         "purpose": {
           "type": "string"
         },
+        "job": {
+          "type": "string",
+          "enum": [
+            "conversion",
+            "legal-document",
+            "informational"
+          ],
+          "description": "Machine-readable conversion purpose for this surface, independent of interaction technique. Omit it to use the compatibility interpretation of interaction (conversion and static-document). Do not infer it from purpose prose."
+        },
         "interaction": {
           "type": "string",
           "enum": [
@@ -286,7 +295,7 @@
             "standard-transition",
             "bespoke-motion"
           ],
-          "description": "Machine-readable technique class for this surface. Do not infer it from purpose prose. Listed surfaces that omit it stay unresolved."
+          "description": "Machine-readable technique class for this surface, independent of job. conversion remains the compatibility alias for a conventional conversion page without scroll-linked behavior. Do not infer it from purpose prose. Listed surfaces that omit it stay unresolved."
         },
         "decisions": {
           "type": "array",

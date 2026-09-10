@@ -2,7 +2,7 @@
   "extension": {
     "apiVersion": "b2c.extension/v1",
     "id": "b2c/consumer-business",
-    "version": "0.219.34",
+    "version": "0.219.35",
     "hostApiVersion": "b2c/v1",
     "title": "Consumer business",
     "dependencies": [],
@@ -15388,8 +15388,8 @@
     ]
   },
   "files": {
-    "extension.yaml": "e2552ff831aaef6c1ec1f2a63d5f40063794e86b50bcf864e16c96af5d82610b",
-    "catalog-pack.yaml": "8d400d21c7040cb1ddcccfd9d1b8458e29451e9f22d7f21639e63b0b882434e0",
+    "extension.yaml": "7ef783ce803abe307467212edce2283c19f886b77dfde0b353dcf5df4d75b149",
+    "catalog-pack.yaml": "af84b09d2d5c9ad94b0506ce107d036aa0a6c55e424f1fcb77716748b3e7c2f2",
     "knowledge/data/analytics-attribution.md": "0bba4685b2188b9e80b7fcc14fdac9472c6c4aeac5bc59703188eaa5e26f234a",
     "knowledge/data/posthog-agent-tooling.md": "61ffdbc79a985a41a11fbe6e1c7c5663050104208baa9d05b8ebe33186ab93cc",
     "knowledge/design/audience-derived-identity.md": "04c90b39c9d41cf00257c70b4e579f3e29684254d444917b9a5690d48be74f5f",
@@ -15536,7 +15536,7 @@
     "knowledge/words/conversion-copy.md": "68739b91f0f977f28718f48dd2368bb8c59a03a3f3d44a30efa08d12eb2956ab",
     "knowledge/words/no-slop-writing.md": "43a82efe1c0e03ba7315fded03a971f83777e1d7092eb5c6c97bb3eb28f171a8",
     "checks/validation/repository/audit-skill-links.ts": "781b1715e075b59ce673fbefad9bacab29eceb93e9f96ef60944bfda884eaf5c",
-    "package.json": "bac9964b34e0202031b32bcf8ea03f4339042fa3725fdfc1c30f2d8384fa1449",
+    "package.json": "a614c75616ad095513c5df1bcab2dd56ec4e263fdfd6eb3e2198587c05d4621a",
     "tooling/catalog-scaffold.ts": "6a54386c9259c97834599249115b0dd82308c16e2c9bb35c02f3058280467077",
     "catalog/render-routing.ts": "f170fbd755998b843a057be9ae83dc1cc3ec5c9952fcebd4982d253621dd161a",
     "checks/validation/repository/check-agent-entrypoints.ts": "58486e6e69f424c422a3d005cfc432f92fd0bd4cb7dc168f2dafeedfbe137be5",
@@ -15552,7 +15552,7 @@
     "checks/validation/business/store/check-app-store-portfolio.ts": "bca69a90e45e9f3ef4bacb81cf82e972fb6f3502be35b52e6cfeb6afeda8aa0b",
     "checks/validation/business/store/check-apple-app-store-requirements.ts": "160d340517367795b4071acc7ca6870dc3a3cd03447449c03a805852478c4307",
     "checks/validation/business/engineering/check-archetype-starter.ts": "d75c7e552dc6aa96781e1d419890c966613e4702a545435dad08ec69245c6bc8",
-    "checks/validation/repository/check-architecture.ts": "eefcfa9ddf6ffb82ebbaa9200775b2e2400e3dc837283167165d53103acd0e77",
+    "checks/validation/repository/check-architecture.ts": "ad64c0986881412e1b53b3b71846dd7dd4542a74a8790974674101ccd1036699",
     "checks/validation/business/process/check-artifact-templates.ts": "46dc186c0e866f0e32919a98f0aabc1cec425bb945400874c4aef064b3ee69c0",
     "checks/validation/business/store/check-asc-command-contract.ts": "28ad722cbe298cfb8b1e363d518087783b3f298eb1fabf4cd67602a9853bdd16",
     "checks/validation/business/store/check-aso-evidence.ts": "2d22c1d73425cc9eb20c7aeb91858912296a6e936e170240b5389577f531466e",
@@ -15847,5 +15847,5 @@
     "catalog/upstreams/notices/parth-app-store-screenshots.txt": "a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a"
   },
   "dependencies": [],
-  "digest": "sha256:70a72da12b694666637f9ee25abc02fe6f567b6ee53f2aef8fc700f188fd95c2"
+  "digest": "sha256:e96d1f16ae5f39423d1c3049afe21046bcf765d0b71952d0e84ebfaf62dc91d6"
 }

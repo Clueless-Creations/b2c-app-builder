@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.78",
+  "version": "0.219.79",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Name leftover host-observation status copy after the last b2c inspect observation.",
-    "Keep b2c doctor supported, and leave finding codes and doctor-host.json unchanged."
+    "Record semantic=checked from accepted workspace review, not from packet shape-pass.",
+    "Keep runtime unknown unless an explicit workspace observation is supplied."
   ]
 }

@@ -164,6 +164,7 @@ The public README is a mixed document. Narrative stays with this file. Command e
 | `Shipped!` when the issue was only created | `Created the implementation issue. No code changed.` |
 | `Send it out` as a production approval button | `Approve production deployment` |
 | Repeated `Preparing / refining / completing` updates with no state change | Name the changed file, completed check, concrete finding, or hold |
+| `Continuing in the background.` as a handoff | Name the real hold and the next safe action. Do not promise background work. |
 | Rewriting `doctor.node_too_old` to `inspection.oven_cold` | Keep the error identifier; explain it in plain prose |
 | `The request failed.` after a timed-out mutation | `The request timed out. The remote effect is unknown. Reconcile before retrying.` |
 | Flattening `results vary; this is not medical advice` | Keep the uncertainty qualifier and the required legal line |

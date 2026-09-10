@@ -186,12 +186,12 @@ function renderExpoEasCliKindBlock(observation: DoctorHostObservation | null, ki
   const tool = kind === "eas" ? "EAS CLI" : "Expo CLI";
   const header = `Host ${tool} (last b2c doctor observation, not a live PATH probe and not live EAS proof`;
   if (!observation) {
-    return `${header}):\ndoctor has not been run on this machine. Run \`b2c doctor\` to record the winning ${kind === "eas" ? "eas" : "expo"} path and version.`;
+    return `${header}):\ndoctor has not been run on this machine. Run \`b2c inspect\` (or supported \`b2c doctor\`) to record the winning ${kind === "eas" ? "eas" : "expo"} path and version.`;
   }
   const stamped = `${header}; compared-at ${observation.comparedAt}):`;
   const recorded = kind === "eas" ? observation.easCli : observation.expoCli;
   if (!recorded) {
-    return `${stamped}\ndoctor ran; this observation did not record ${tool}. Run \`b2c doctor\` again. This is not live EAS proof.`;
+    return `${stamped}\ndoctor ran; this observation did not record ${tool}. Run \`b2c inspect\` (or supported \`b2c doctor\`) again. This is not live EAS proof.`;
   }
   const latest = recorded.latestObserved ?? "(unknown)";
   switch (recorded.identity) {

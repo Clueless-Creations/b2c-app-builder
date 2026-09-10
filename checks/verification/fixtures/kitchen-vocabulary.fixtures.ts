@@ -24,6 +24,7 @@ export function register(harness: Harness): void {
     assert(!/<desc[^>]*>[^<]*Prep & design/.test(svg), "SVG desc must escape Prep &amp; design");
     assert(svg.includes("THE KITCHEN LAYOUT"), "Sheet 1 title may keep kitchen as the whole-system layout");
     assert(readme.includes("laid out like a restaurant kitchen"), "narrative kitchen for the whole system remains valid");
+    assert(readme.includes("docs/guides/runtime-package.md#find-a-command"), "README must point at grouped help instead of a second command table");
   });
 
   kitchenCase("kitchen-vocabulary: ethos owns the boundary and AGENTS links to it", () => {
@@ -36,5 +37,11 @@ export function register(harness: Harness): void {
     assert(agents.includes("docs/ethos.md#kitchen-language-boundary"), "AGENTS must link the ethos kitchen-language boundary");
     assert(agents.includes("is not the shipped product name"), "AGENTS must keep B2C App Builder as the shipped product name");
     assert(!agents.includes("## Kitchen vocabulary manifesto"), "AGENTS must not duplicate the glossary");
+    const consolePages = readFileSync(path.join(repoRoot, "hosted", "builder-console", "console", "pages.ts"), "utf8");
+    assert(consolePages.includes("Use plain labels"), "console must keep the utility-surface voice rule");
+    assert(consolePages.includes("Manage billing"), "billing controls stay literal");
+    assert(consolePages.includes("Create key"), "key controls stay literal");
+    assert(!consolePages.includes("Send it out"), "console must not theme authority as kitchen slang");
+    assert(!consolePages.includes("the pass"), "console utility copy must not use the pass as a control label");
   });
 }

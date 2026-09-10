@@ -1,0 +1,22 @@
+id: house-style-mixed-readme
+title: Mixed README is sent through one automatic rewrite
+prompt: >
+  A README paragraph explains the kitchen layout, then shows
+  `b2c inspect` and `doctor.node_too_old`. The agent runs the whole file
+  through no-slop and STE100 as one rewrite, turning the command into
+  `b2c walk-the-line` and shortening the error code.
+expected_guardrail: >
+  The public README is a mixed document. Narrative stays with house style.
+  Commands, flags, and error identifiers keep exact technical meaning. Do not
+  send the same sentence through incompatible automatic rewrites. This scenario
+  is authored and linted; it is not a live agent run.
+validators:
+  - check-no-slop
+  - check-technical-docs-ste100
+must_catch:
+  - "literal command and error identifiers must survive a README edit"
+  - "do not apply one rewrite to narrative and machine text"
+should_say:
+  - "Keep `b2c inspect` and `doctor.node_too_old`; edit only surrounding prose"
+forbidden:
+  - "walk-the-line"

@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.67",
+  "version": "0.219.68",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Keep activate-then-edit worker briefs and ONB-17 on the verified pin so an edited candidate YAML cannot pose as execution truth.",
-    "Print semantic=unknown and runtime=unknown on a shape-pass so a complete onboarding packet is not review or device observation."
+    "Prefer b2c inspect in leftover Expo/EAS and RevenueCat diagnostic copy, while b2c doctor stays supported.",
+    "Point README at generated grouped help and register the remaining authored house-style scenarios as lint-only."
   ]
 }

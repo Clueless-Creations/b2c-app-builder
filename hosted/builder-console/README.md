@@ -339,13 +339,10 @@ the event still ships; in tests and on the interest path it throws.
 
 ## Capture is switched ON in production
 
-`POSTHOG_PROJECT_TOKEN` is set on both Workers since 2 September 2026, in the order this section
-used to demand: the published page at `https://clueless-creations.com/privacy/` changed first
-(status table, the analytics section, the cookies section, "switched on 2 September 2026"), the
-PostHog project was set to discard client IP data, then the secret was transferred from Doppler
-`b2c/prd` to `b2c-app-builder-mcp` and `clueless-creations-app` on stdin. The first events were
-three `mcp_call_succeeded` rows from one same-second burst of MCP requests (initialize,
-initialized, tools/call each pass through `mcpResponse`), after which the once-per-day dedupe held.
+Capture follows the published privacy page at `https://clueless-creations.com/privacy/`: update
+that page first, then set `POSTHOG_PROJECT_TOKEN` on the Workers from the shared secret-manager
+config. The PostHog project discards client IP data. A once-per-day cap applies after the first
+successful capture.
 The dedupe is a KV get-then-put, so concurrent same-second requests from one subject can each
 capture; the funnel is unaffected, the cost claim is approximate.
 

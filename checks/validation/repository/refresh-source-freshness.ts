@@ -4,7 +4,7 @@ import path from "node:path";
 import { createHash } from "node:crypto";
 import { parse as parseYaml } from "yaml";
 import { escapeHtml } from "../../../tooling/lib/html.js";
-import { flagNumber, flagString, isRecord, parseFlags } from "../../../tooling/lib/launch-state.js";
+import { flagBoolean, flagNumber, flagString, isRecord, parseFlags } from "../../../tooling/lib/launch-state.js";
 import { readSourceText, SourceHttpError, sourceHttpFailure, sourceReportUrl, type SourceHttpOptions } from "../../../tooling/lib/source-http.js";
 import { trustedSourceCheckTime, trustedSourceHash } from "../../../tooling/lib/source-freshness-state.js";
 import { isMainModule } from "../../../tooling/lib/cli-entrypoint.js";
@@ -46,6 +46,7 @@ interface Args {
   outDir: string;
   timeoutMs: number;
   knowledgePinRoot?: string;
+  pruneUnregistered: boolean;
 }
 
 function parseArgs(argv: string[]): Args {
@@ -59,6 +60,7 @@ function parseArgs(argv: string[]): Args {
     { flags: ["--out-dir"], key: "outDir", kind: "string" },
     { flags: ["--timeout-ms"], key: "timeoutMs", kind: "number" },
     { flags: ["--knowledge-pin-root"], key: "knowledgePinRoot", kind: "string", strict: true },
+    { flags: ["--prune-unregistered"], key: "pruneUnregistered", kind: "boolean" },
   ]);
   const root = flagString(flags, "root") ?? process.cwd();
   const registryPath = flagString(flags, "registry") ?? "checks/validation/repository/source-registry.yaml";
@@ -72,6 +74,7 @@ function parseArgs(argv: string[]): Args {
     outDir: path.isAbsolute(outDir) ? outDir : path.resolve(root, outDir),
     timeoutMs: Number.isFinite(timeoutMs) && timeoutMs > 0 ? timeoutMs : 15000,
     knowledgePinRoot: knowledgePinRoot ? (path.isAbsolute(knowledgePinRoot) ? knowledgePinRoot : path.resolve(root, knowledgePinRoot)) : undefined,
+    pruneUnregistered: flagBoolean(flags, "pruneUnregistered"),
   };
 }
 
@@ -241,8 +244,36 @@ function renderHtml(snapshots: SourceSnapshot[]): string {
 `;
 }
 
+function pruneUnregisteredSnapshots(args: Args): void {
+  const sources = readSources(args.registryPath);
+  const registered = new Set(sources.map((source) => source.id).filter(Boolean));
+  const snapshotPath = path.join(args.outDir, "source-snapshots", "current.json");
+  if (!existsSync(snapshotPath)) {
+    console.log("Source freshness prune");
+    console.log("pruned=0 kept=0");
+    return;
+  }
+  const parsed: unknown = JSON.parse(readFileSync(snapshotPath, "utf8"));
+  if (!isRecord(parsed) || !Array.isArray(parsed.sources)) {
+    throw new Error(`${snapshotPath} must include a sources array.`);
+  }
+  const before = parsed.sources.filter(isRecord);
+  const kept = before.filter((item) => registered.has(String(item.id ?? "")));
+  writeFileSync(
+    snapshotPath,
+    `${JSON.stringify({ ...parsed, sources: kept }, null, 2)}\n`,
+    "utf8",
+  );
+  console.log("Source freshness prune");
+  console.log(`pruned=${before.length - kept.length} kept=${kept.length}`);
+}
+
 export async function refreshSourceFreshness(argv: string[]): Promise<void> {
   const args = parseArgs(argv);
+  if (args.pruneUnregistered) {
+    pruneUnregisteredSnapshots(args);
+    return;
+  }
   const sources = readSources(args.registryPath);
   const snapshotDir = path.join(args.outDir, "source-snapshots");
   const snapshotPath = path.join(snapshotDir, "current.json");

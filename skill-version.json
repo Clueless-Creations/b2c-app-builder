@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.56",
+  "version": "0.219.57",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Freeze the #75 Stage A per-case retrieval report and walk each required class through the real knowledge service.",
-    "Require a real workflow bind, pin the DESIGN.md artifact heading, and measure tight-bundle UTF-8 from delivered markdown."
+    "Keep onboarding packet placeholders on author fields; treat Source-line and quotation TBD as cited evidence, not an unresolved author marker.",
+    "Reopen only the changed import review when a product.yaml import promise changes, and leave unrelated local proof accepted."
   ]
 }

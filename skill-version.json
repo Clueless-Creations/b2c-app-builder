@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.75",
+  "version": "0.219.76",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Freeze store-010 first rank as the non-needed live App Store portfolio workflow so hosted catalog() cannot silently take the router scorer.",
-    "Keep createKnowledgeService().catalog() on matchRank and keep route-utterance out of the Worker bundle."
+    "Point leftover screenshot-upload goldens store-015, store-042, and store-050 at the Apple store-media standing envelope.",
+    "Pin that leftover set in hosted-discovery, and keep store-048 on generic ASC CLI."
   ]
 }

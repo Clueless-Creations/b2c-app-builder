@@ -562,6 +562,10 @@ export function register(harness: Harness): void {
     assert(first.code === 0, `setup must exit 0, got ${first.code}: ${first.output.slice(-400)}`);
     assert(existsSync(path.join(home, "workspaces.json")), "setup must create the empty registry");
     assert(first.output.includes("Next steps:"), "setup must print the consumer's next steps");
+    const next = first.output.slice(Math.max(0, first.output.indexOf("Next steps:")));
+    assert(next.includes("business-status"), "setup next steps omitted business-status");
+    assert(next.indexOf("business-status") < next.indexOf("b2c catalog --json"), "setup still leads with catalog before status");
+    assert(!/first call is almost always b2c_catalog|first call is almost always b2c_knowledge_search/.test(first.output), "setup still tells Claude the first call is catalog/search");
     assert(first.output.includes("b2c-app-builder-mcp.mjs"), "setup must print the MCP registration command with the real server path");
     // The three agent runtimes the engine dispatches are the three the machine owner will want
     // the MCP server registered with — setup prints each runtime's own config shape.

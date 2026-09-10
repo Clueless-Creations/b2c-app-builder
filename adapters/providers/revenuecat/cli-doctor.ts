@@ -4,8 +4,8 @@
  * Local identity uses Increment A discovery (`--version` and `commands --json`).
  * Selected-target checks reuse Increment A preflight. This module never spawns
  * authenticated commands, never mutates, and never claims live catalog proof.
- * Host `b2c doctor` invokes the host probe; catalog mutate stays on the existing
- * execute/ledger path and is not a second planner.
+ * Host `b2c inspect` invokes the host probe; `b2c doctor` is a supported equivalent.
+ * Catalog mutate stays on the existing execute/ledger path and is not a second planner.
  */
 
 import {
@@ -60,7 +60,7 @@ const APP_OPERATION_ID = "rc.apps.show";
 
 export const REVENUECAT_CLI_DOCTOR_REVIEWED_VERSION = REVENUECAT_CLI_RELEASE.version;
 
-/** Isolated `--version` / `commands --json` lookup for `b2c doctor`. Never authenticates. */
+/** Isolated `--version` / `commands --json` lookup for `b2c inspect`. Never authenticates. */
 export function discoverRevenueCatCliForDoctor(input: {
   readonly isolatedHome: string;
   readonly cwd: string;

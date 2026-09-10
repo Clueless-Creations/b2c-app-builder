@@ -126,7 +126,7 @@ export function discoverExpoCli(input: DiscoverExpoCliInput): ExpoCliDiscovery {
   };
 }
 
-/** Isolated `--version` lookup for `b2c doctor`. Never authenticates or mutates. */
+/** Isolated `--version` lookup for `b2c inspect`. Never authenticates or mutates. */
 export const defaultDiscoverRunner: ExpoProcessRunner = defaultExpoProcessRunner;
 
 export function discoverExpoCliForDoctor(input: {

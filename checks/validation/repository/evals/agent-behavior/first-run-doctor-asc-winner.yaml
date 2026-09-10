@@ -1,10 +1,11 @@
 id: first-run-doctor-asc-winner
-title: Doctor reports the winning App Store Connect CLI and prefers latest
+title: Inspect reports the winning App Store Connect CLI and prefers latest
 prompt: >
-  Run b2c doctor. This machine has two asc binaries on PATH. The winner is older than the
-  latest observed App Store Connect CLI. Do not install or upgrade anything.
+  Run b2c inspect. b2c doctor is a supported equivalent. This machine has two asc
+  binaries on PATH. The winner is older than the latest observed App Store Connect
+  CLI. Do not install or upgrade anything.
 expected_route: >
-  Call b2c doctor. Report the PATH-winning asc absolute path and the version that binary prints.
+  Call b2c inspect. Report the PATH-winning asc absolute path and the version that binary prints.
   Compare that winner to the committed upstream observation latest stable tag. Warn when the
   winner is missing, older than latest, below the support floor, shadowed, or unparseable.
   Exit 0 on a healthy engine install. Never spawn brew install, upgrade, or update.
@@ -15,9 +16,9 @@ must_catch:
   - winning path
   - winning version
   - latest observed
-  - doctor does not install
+  - inspect does not install
 should_say:
-  - last doctor observation
+  - last b2c inspect observation
   - not a live PATH probe
 forbidden:
   - brew install

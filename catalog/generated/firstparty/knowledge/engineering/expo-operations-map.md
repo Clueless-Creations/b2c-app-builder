@@ -20,7 +20,7 @@ This map routes selected Expo work to truthful declarations and explicit gaps. I
 
 `catalog/stacks/expo-selection.ts` is the inventory. First-party monetization and mobile-app-operation declarations still target `ios` / `swiftui`. Do not append `expo` to those operations until their implementations exist. A missing target is `binding.target_mismatch`, not a silent alias.
 
-#81 fixture-tests selection, knowledge routing, and passive detection. #82 fixture-tests the isolated starter, React Native adapter source, disposable Metro web export, classified CNG generate, and a bound local-cache persistence seam. #83 fixture-tests local session, SQLite cache reopen, permission safe-states, and notification route restore in a disposable directory. Native purchases stay blocked. #86 fixture-tests local static export, required static HTML routes including `/detail/1`, and classified direct-entry, refresh, back, and unknown/not-found. Device install, EAS Hosting, OTA, and store submit stay separate.
+#81 fixture-tests selection, knowledge routing, and passive detection. #82 fixture-tests the isolated starter, React Native adapter source, disposable Metro web export, classified CNG generate, and a bound local-cache persistence seam that stores starter notes. #83 fixture-tests local session, SQLite cache reopen, starter-note reopen, duplicate and migration-failure writes, permission safe-states, and notification route restore in a disposable directory. Native purchases stay blocked. #86 fixture-tests local static export, required static HTML routes including `/detail/1`, and classified direct-entry, refresh, back, and unknown/not-found. Device install, EAS Hosting, OTA, and store submit stay separate.
 
 ## 2. Building iOS And Android With Expo
 

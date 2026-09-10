@@ -204,6 +204,10 @@ export function register(harness: Harness): void {
     assert(deepLinkRecovery.runtimeVerified === false, "deep-link recovery is a contract, not runtime proof");
     assert(NAVIGATION_RUNTIME_VERIFIED === false, "navigation journeys are not Expo Router runtime");
     assert(PERSISTENCE_SEAM_BOUND === true && PERSISTENCE_STORE_KIND === "local-cache", "local-cache persistence seam is selected");
+    assert(
+      readFileSync(path.join(EXPO_STARTER_FIXTURE_DIR, "src/screens/home.tsx"), "utf8").includes("writeLocalCacheNote"),
+      "home must write local notes through the bound cache, not stay an empty layout",
+    );
     const cold = reduceNavigation([{ type: "cold-start" }]);
     assert(cold.href === ROUTE_HREFS.home && cold.restoredFrom === "cold", "cold start must land on the home tab");
     const warm = reduceNavigation([{ type: "cold-start" }, { type: "warm-link", href: ROUTE_HREFS.detail("42") }]);
@@ -477,9 +481,12 @@ export function register(harness: Harness): void {
     assert(journey.signedIn.snapshot.session.signedIn && journey.signedIn.snapshot.session.appUserId === "user-a", journey.signedIn.reason);
     assert(journey.signedIn.snapshot.session.entitled === false, "local sign-in must not grant paid access");
     assert(
-      journey.restarted.snapshot.notes.some((note) => note.id === "note-1" && note.owner === "user-a"),
-      "SQLite cache must survive reopen",
+      journey.restarted.snapshot.notes.some((note) => note.id === "note-1" && note.owner === "user-a" && note.body === "local cache only"),
+      "SQLite cache must survive reopen without a duplicate overwrite",
     );
+    assert(journey.duplicated.action === "accept", journey.duplicated.reason);
+    assert(journey.migrated.action === "refuse", journey.migrated.reason);
+    assert(!journey.restarted.snapshot.notes.some((note) => note.id === "note-migrate"), "a failed migration must not leave a completed note");
     assert(journey.expired.snapshot.session.signedIn === false && journey.expired.snapshot.notes.length === 0, "expiry clears the current user");
     assert(journey.isolated, "account switch must not leak the prior user's notes");
     assert(journey.interrupted.action === "refuse", journey.interrupted.reason);

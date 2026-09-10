@@ -3891,7 +3891,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/engineering/expo-operations-map.md",
-        "sha256": "sha256:60e213f20d583ab447f49c944bbe073a5ac2c90902042980640e7170a0e9add2",
+        "sha256": "sha256:d8c14b1b3684cfd5eb9885f90da24e635277c54b42f7567c6707fca8726f5bee",
         "origin": "skill"
       }
     },
@@ -18736,14 +18736,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "63820d655accf61b3ced27934b7bfbf04f49af622d2f0b57780cbfcb9d264ff7",
+    "fingerprint": "30bd1e4ed23cb62eb92cd27dcafd2523b640d92142295e5fe7ba62b0b1b3c274",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
         "version": "0.219.85",
         "revision": "0.219.85",
-        "contentDigest": "8ac9cf77178d36787a5d56c834288eb2a5e2d5cda258cfff07f86724ce49d15e"
+        "contentDigest": "33d18f3f5b3a541979f245293459ce225e5a1c0a83e44b6401b4bb5681116432"
       }
     ],
     "base": {

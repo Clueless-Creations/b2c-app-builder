@@ -11,10 +11,10 @@ must record its own commit, package version, and package digest.
 | Issue | This pass | Hold |
 | --- | --- | --- |
 | #2 | Reuse the existing batch harness. `npm run evals:behavioral -- --list` is the authorized local inventory. | Paid Message Batches path still needs an authorized `workflow_dispatch` and a linked results artifact. No key, no spend here. |
-| #39 | Freeze `store-010` first rank as `workflow.operations.live-app-store-portfolio` (not a needed workflow). Hosted `catalog()` stays a different scorer. | Keep open. Do not extract the scorer into hosted `catalog()`. |
+| #39 | Closed on main via #189. Decided no-extract. Not this increment. | Do not extract the store-010 scorer into hosted `catalog()`. |
 | #40 | Closed on main via #156 / #174. Not this increment. | — |
 | #72 | Freeze the report contract and fabricated-receipt checks. | No founder-approved workspace, mandate, stack, budget, host, or publication authority. No live greenfield run. |
-| #73 | Reuse the #72 report fields. Record keep/change as **no-change until a measured interval exists**. | Same authority hold as #72. No workflow merge. |
+| #73 | Compact selected-subgraph boundary table. Keep/change stays **retain the current graph**. Observed cost unknown. | Same authority hold as #72. No workflow merge. No live interval. |
 | #75 | Stage A walks stay on main. Record a **no-change recommendation** on retrieval infrastructure. | Paid Stage B. Held-out unused for tuning. No vector store, embeddings, or graph database. Do not extract `matchWorkflows` into hosted `catalog()`. |
 | #77 | Closed on main via #181. Not this increment. | — |
 | #78 | Closed on main via #174 / #181. Not this increment. | — |
@@ -46,16 +46,18 @@ npm run typecheck
 
 Do not run paid behavioral evals, live providers, devices, deploys, or a version stamp from this document.
 
-## #39 no-extract freeze (this increment)
+## #39 no-extract freeze (already on main)
 
-Replayed `store-010` (`App Store Connect`) on current `main`. `matchWorkflows`
-returns `candidates`. First rank is `workflow.operations.live-app-store-portfolio`,
-which is not a needed workflow for that row. Hosted `catalog()` ranks a different
-workflow first and still reaches the needed Apple workflows at some offset.
+Issue 39 is closed on main through #189. Replayed `store-010` stays
+`candidates`. First rank is `workflow.operations.live-app-store-portfolio`.
+Do not extract the scorer into hosted `catalog()`.
 
-`route-utterance.ts` reads `node:fs` and must not enter the hosted Worker.
-`createKnowledgeService().catalog()` stays on `matchRank`. Do not extract the
-router scorer into hosted `catalog()`. Leave #39 open.
+## #73 boundary table (this increment)
+
+The compact table lives in
+[workflow-overhead-boundaries.md](./workflow-overhead-boundaries.md). It covers
+the selected onboarding subgraph plus the #38 Apple media effect. Observed cost
+is unknown. Candidate action is keep. Leave #73 open for a measured interval.
 
 ## #40 closeout signal (already on main)
 

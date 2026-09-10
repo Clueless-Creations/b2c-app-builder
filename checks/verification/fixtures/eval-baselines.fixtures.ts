@@ -4,7 +4,7 @@
  * Authorized local checks only. No live providers, devices, paid batches, or dispatch.
  */
 import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { codePointPrefix, createKnowledgeService, KnowledgeServiceError } from "../../../kernel/knowledge-service/service.js";
 import {
@@ -16,6 +16,7 @@ import {
 } from "../../../kernel/knowledge-service/types.js";
 import { matchWorkflows, type RoutableWorkflow } from "../../../kernel/session/route-utterance.js";
 import { composeCatalog } from "../../../catalog/index.js";
+import { FIRSTPARTY_RESPONSIBILITY_GROUPS } from "../../../catalog/firstparty-recipes.js";
 import { loadAgentGraph } from "../../../catalog/agent-graph/load.js";
 import { HOSTED_BUNDLE_RELATIVE_PATH } from "../../../tooling/render-hosted-bundle.js";
 import { assert, skillRoot, type Harness } from "./_harness.js";
@@ -542,6 +543,46 @@ export function register(harness: Harness): void {
     assert(protocol.includes("#77"), "protocol records the no-change");
     assert(protocol.includes("checked transcription"), protocol);
     assert(ownership.includes("Why derivation is not worth it"), ownership);
+  });
+
+  harness.check("eval-baselines: #73 selected-subgraph boundaries stay keep with unknown cost", () => {
+    const table = readFileSync(path.join(skillRoot, "checks/verification/rehearsal/workflow-overhead-boundaries.md"), "utf8");
+    const protocol = readFileSync(path.join(skillRoot, "checks/verification/rehearsal/eval-baselines.md"), "utf8");
+    const catalog = composeCatalog(skillRoot);
+    const byId = new Map(catalog.workflows.map((workflow) => [workflow.id, workflow]));
+    const required = [
+      "workflow.experience.onboarding-system.onb-16-journey-graph",
+      "workflow.experience.onboarding-system.onb-17-screen-control-paywall-contract",
+      "workflow.experience.onboarding-system.onb-18-visual-design-prototype",
+      "workflow.experience.onboarding-system.onb-20-adversarial-qa",
+      "workflow.experience.onboarding-system.onb-12-state-identity-contract",
+      "workflow.experience.onboarding-system.onb-13-analytics-experiments",
+      "workflow.design.design-system-audit",
+      "workflow.store.apple-store-media-standing-envelope",
+    ] as const;
+    for (const id of required) {
+      assert(byId.has(id), `catalog is missing ${id}`);
+      assert(table.includes(id.replace("workflow.experience.onboarding-system.", "").replace("workflow.", "")), table);
+    }
+    const journey = byId.get("workflow.experience.onboarding-system.onb-16-journey-graph");
+    const paywall = byId.get("workflow.experience.onboarding-system.onb-17-screen-control-paywall-contract");
+    const apple = byId.get("workflow.store.apple-store-media-standing-envelope");
+    assert(journey !== undefined && paywall !== undefined && apple !== undefined, "required boundary workflows");
+    assert(journey.outputPaths[0] !== paywall.outputPaths[0], "ONB-16 and ONB-17 must keep distinct outputs");
+    assert(apple.outputPaths.includes("store/proof/apple-store-media-apply.json"), apple.outputPaths.join(","));
+    const experience = FIRSTPARTY_RESPONSIBILITY_GROUPS.find((group) => group.title === "Product experience");
+    assert(experience !== undefined, "Product experience group must exist");
+    const experienceIds = experience.workflows as readonly string[];
+    assert(experienceIds.includes("workflow.experience.onboarding-system.onb-16-journey-graph"), "selected subgraph must include ONB-16");
+    assert(!experienceIds.includes("workflow.store.apple-store-media-standing-envelope"), "Apple media is not an onboarding node");
+    assert(table.includes("Observed cost is **unknown**"), table);
+    assert(table.includes("**Retain the current graph.**"), table);
+    assert(table.includes("independent-effect boundary"), table);
+    assert(protocol.includes("retain the current graph"), protocol);
+    assert(
+      !existsSync(path.join(skillRoot, "checks/verification/fixtures/work-package-equivalence.fixtures.ts")),
+      "do not add a merge-equivalence suite without a measured interval",
+    );
   });
 
   harness.check("eval-baselines: Stage A evidence records a no-change recommendation on retrieval infrastructure", () => {

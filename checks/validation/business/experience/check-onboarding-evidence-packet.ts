@@ -3,10 +3,18 @@
  * Deterministic gate for a single ONB-03..ONB-08 evidence-research node's own output packet.
  *
  * These nodes are domain.experience. This gate is structural only: it rejects an empty,
- * hidden-only, placeholder, or incomplete evidence record. It does not judge whether the
+ * hidden-only, author-unresolved, or incomplete evidence record. It does not judge whether the
  * research is true, and a passing structural check is not independent review or runtime proof.
  * A concise record that names a finding, a source or observation, and a classification passes;
  * padding prose cannot upgrade an empty or unsupported packet.
+ *
+ * Two dimensions stay separate:
+ * - Strength: this file checks structural completeness only. Semantic support and observed
+ *   user/provider behavior stay with independent review and runtime proof.
+ * - Origin: a synthetic fixture packet can pass here. That does not make it a live observation.
+ *
+ * A source line or quotation that mentions TODO/TBD is cited evidence, not the author's
+ * unresolved field. A global word ban would reject legitimate source content.
  */
 import { loadDesignSurfaceApplicability } from "../../../../catalog/ontology/design-surface-applicability.js";
 import { loadVerifiedOnboardingApplicability } from "../../../../kernel/composition/onboarding-selection.js";
@@ -39,6 +47,15 @@ const SOURCE_BACKED = /\bsource-backed\b/i;
 const SOURCE_URL = /https?:\/\//i;
 const SOURCE_DATE = /\b\d{4}-\d{2}-\d{2}\b/;
 const LABELED_FINDING = /\bFinding:\s+\S/i;
+
+function authorUnresolvedMarkers(stripped: string): boolean {
+  const withoutQuoted = stripped.replace(/"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/g, " ");
+  const authorLines = withoutQuoted
+    .split(/\r?\n/)
+    .filter((line) => !/^\s*Source:\s+/i.test(line) && !/^\s*>/.test(line))
+    .join("\n");
+  return PLACEHOLDER_MARKERS.test(authorLines);
+}
 
 if (!relativePath) {
   issues.push(
@@ -98,12 +115,12 @@ if (!relativePath) {
       }
     }
 
-    if (PLACEHOLDER_MARKERS.test(stripped)) {
+    if (authorUnresolvedMarkers(stripped)) {
       issues.push(
         issue(
           "error",
           "onboarding_evidence.packet_placeholder",
-          `${relativePath} still contains a TODO/TBD/PLACEHOLDER/not_started marker. ${nodeLabel} is not actually complete.`,
+          `${relativePath} still has an author TODO/TBD/PLACEHOLDER/not_started marker. Quoted source evidence that mentions those words is not an unresolved author field. ${nodeLabel} is not actually complete.`,
           relativePath,
         ),
       );

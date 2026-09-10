@@ -1,5 +1,8 @@
+import { mkdirSync, writeFileSync } from "node:fs";
+import path from "node:path";
 import { compilePlan, type CatalogInput, type CatalogWorkflowId, type RunNodeId } from "../../../kernel/engine/compile.js";
-import { invalidateDescendants, seedRunState } from "../../../kernel/engine/runstate.js";
+import { captureReviewEvidence, workspaceArtifactFingerprint } from "../../../kernel/engine/review-evidence.js";
+import { acceptVerification, beginAttempt, invalidateDescendants, invalidateStaleReviews, reconcilePatch, seedRunState } from "../../../kernel/engine/runstate.js";
 import { laneKeys, type BusinessStateV2, type DomainId, type LaneKey } from "../../../kernel/schema/types.js";
 import { assert, type Harness } from "./_harness.js";
 
@@ -115,4 +118,63 @@ export function register(harness: Harness): void {
     assert(run.nodes[local.id]!.status === "succeeded", "replay must leave unrelated local proof succeeded");
     assert(run.nodes[research.id]!.status === "succeeded", "replay must not self-invalidate the producer");
   });
+
+  harness.check("business-change-impact: a changed import promise review does not stale unrelated local proof", () => {
+    const root = harness.makeTempDir("change-impact-review");
+    mkdirSync(path.join(root, "product"), { recursive: true });
+    mkdirSync(path.join(root, "strategy"), { recursive: true });
+    writeFileSync(path.join(root, "strategy/RESEARCH.md"), "Import observation: permission is recorded as verified.\n", "utf8");
+    writeFileSync(path.join(root, "product.yaml"), "schema_version: 1\nmeta: { name: import-promise }\ninstances: []\n", "utf8");
+    writeFileSync(path.join(root, "product/LOCAL_FEATURE.md"), "Local feature proof stays current.\n", "utf8");
+    writeFileSync(path.join(root, "product/ONBOARDING.md"), "Onboarding claim depends on the import promise.\n", "utf8");
+    const plan = compilePlan(impactCatalog(), now);
+    const product = plan.nodes.find((node) => node.id === nodeId("product-import"))!;
+    const onboarding = plan.nodes.find((node) => node.id === nodeId("onboarding-import"))!;
+    const local = plan.nodes.find((node) => node.id === nodeId("local-feature"))!;
+    const run = seedRunState(plan, businessState(), { ownerSessionId: "session-impact-review", ttlSeconds: 600, wallClockCapSeconds: 3600, now });
+    acceptWorkspaceNode(plan, run, root, product.id, "artifact.product-import-promise", "product.yaml", now);
+    acceptWorkspaceNode(plan, run, root, onboarding.id, "artifact.onboarding-import-claim", "product/ONBOARDING.md", now);
+    acceptWorkspaceNode(plan, run, root, local.id, "artifact.local-feature-proof", "product/LOCAL_FEATURE.md", now);
+    assert(run.nodes[product.id]!.status === "succeeded" && run.nodes[local.id]!.status === "succeeded", "both reviews must start current");
+    writeFileSync(path.join(root, "product.yaml"), "schema_version: 1\nmeta: { name: import-permission-unverified }\ninstances: []\n", "utf8");
+    const stale = invalidateStaleReviews(plan, run, root, "2026-09-09T12:00:03.000Z");
+    assert(stale.includes(product.id), "changed import promise must reopen its current review");
+    assert(run.nodes[product.id]!.status === "stale", "import promise acceptance cannot stay current");
+    assert(run.nodes[onboarding.id]!.status === "stale", "dependent onboarding claim must reopen");
+    assert(!stale.includes(local.id), "unrelated local review must stay out of the stale set");
+    assert(run.nodes[local.id]!.status === "succeeded", "unrelated local proof must stay accepted");
+    assert(run.artifactBindings.find((binding) => binding.artifactId === "artifact.local-feature-proof")!.accepted, "unrelated local binding must remain accepted");
+  });
+}
+
+function acceptWorkspaceNode(
+  plan: ReturnType<typeof compilePlan>,
+  run: ReturnType<typeof seedRunState>,
+  root: string,
+  nodeId: RunNodeId,
+  artifactId: string,
+  relativePath: string,
+  clock: string,
+): void {
+  const attempt = beginAttempt(plan, run, nodeId, "producer", clock);
+  attempt.proofSource = "workspace";
+  reconcilePatch(
+    plan,
+    run,
+    {
+      nodeId,
+      attemptId: attempt.id,
+      outputs: [
+        {
+          artifactId,
+          path: relativePath,
+          fingerprint: workspaceArtifactFingerprint(root, relativePath),
+          evidence: ["workspace bytes produced"],
+        },
+      ],
+    },
+    clock,
+  );
+  const snapshot = captureReviewEvidence(plan, run, nodeId, root, "independent-reviewer", clock);
+  acceptVerification(plan, run, nodeId, ["Inspected the current workspace artifact."], clock, "independent-reviewer", snapshot, root);
 }

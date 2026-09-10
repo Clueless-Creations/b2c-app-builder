@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.42",
+  "version": "0.219.43",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Project founder constraints from the canonical brief onto launch-program, plan, and NodeBrief.",
-    "Keep the long After Credits pad out of plan JSON while short constraints stay retrievable."
+    "Name workflow coverage as this-response delivery instead of a hosted workspace plan.",
+    "Keep the business-completion guardrail and the same not_requested coverage entries."
   ]
 }

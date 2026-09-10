@@ -172,6 +172,14 @@ export function register(harness: Harness): void {
     assert(result.knowledge[0]?.referenceId === "reference.research.interviews", "workflow knowledge is missing");
     assert(!result.guardrails.executionAvailable && !result.guardrails.workspacePlan, "static guidance must not become execution or a workspace plan");
     assert(result.guardrails.founderOnlyActions[0] === "Approve customer outreach", "founder-only boundary was lost");
+    assert(
+      result.route.coverage.delivery === "required references, 0 requested in this response",
+      "instructions mode with no bundle must report zero requested references",
+    );
+    assert(
+      result.route.warnings.some((warning) => warning === "A workflow pass is not a business-completion verdict. This response does not name executable next work."),
+      "completion warning must stay and must not point at a workspace plan",
+    );
   });
 
   harness.check("hosted knowledge: search is deterministic, bounded, and filters by domain", () => {
@@ -598,6 +606,13 @@ export function register(harness: Harness): void {
       );
       assert(generous.consumedChars === 700, "a generous budget must consume every available code point");
       assert(generous.coverage.complete && generous.coverage.incomplete.length === 0, "full documents did not establish complete delivery coverage");
+      const generousRoute = service.workflow({ workflowId: "workflow.research.interviews", include: "full", tokenBudget: 700 }).route;
+      assert(
+        generousRoute.coverage.delivery === "required references, 2 requested in this response" &&
+          generousRoute.coverage.complete &&
+          generousRoute.coverage.incomplete.length === 0,
+        "a fully delivered bundle must count requested references without dropping coverage entries",
+      );
 
       // A tight budget split mid-reference: nextOffset must be a valid b2c_knowledge_get offset —
       // paging from it must reconstruct the untaken remainder exactly.

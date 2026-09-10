@@ -477,6 +477,8 @@ export function createKnowledgeService(bundle: HostedKnowledgeBundle): Knowledge
       };
     });
     const incomplete = bundle?.coverage.incomplete ?? workflow.referenceIds.map((id) => ({ referenceId: id, status: "not_requested" as const }));
+    const requiredCount = workflow.referenceIds.length;
+    const requestedInThisResponse = requiredCount - incomplete.filter((entry) => entry.status === "not_requested").length;
     return {
       mode,
       instructionsIncluded: mode !== "route",
@@ -500,7 +502,12 @@ export function createKnowledgeService(bundle: HostedKnowledgeBundle): Knowledge
         executionAvailable: false,
         businessComplete: false,
       },
-      coverage: { complete: incomplete.length === 0, requiredCount: workflow.referenceIds.length, incomplete },
+      coverage: {
+        complete: incomplete.length === 0,
+        requiredCount,
+        delivery: `required references, ${requestedInThisResponse} requested in this response`,
+        incomplete,
+      },
       warnings: [
         ...(incomplete.length
           ? [
@@ -512,7 +519,7 @@ export function createKnowledgeService(bundle: HostedKnowledgeBundle): Knowledge
         ...(outputs.some((output) => !output.specificationAvailable)
           ? ["Some outputs do not yet have an indexed artifact specification; do not infer acceptance from file existence."]
           : []),
-        "A workflow pass is not a business-completion verdict. Use the selected workspace plan for executable next work.",
+        "A workflow pass is not a business-completion verdict. This response does not name executable next work.",
       ],
     };
   }

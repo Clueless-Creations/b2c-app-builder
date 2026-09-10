@@ -6,4 +6,8 @@ Current source verification lives in the executable fixtures:
 - [Trusted worker host](../fixtures/firstparty-worker-host.fixtures.ts) exercises the shipped worker route with a fake CLI executable. Invalid execution and verification proof is refused.
 - [Business lifecycle](../public-api/lifecycle.test.ts) exercises the public create, initialize, passive plan, run and evidence operations.
 
+Evaluation and measured-simplification baselines live in
+[eval-baselines.md](./eval-baselines.md). They are protocols and fabricated-receipt
+checks, not live-provider, device, purchase, or complete-business proof.
+
 Run the relevant fixtures against the current checkout before claiming source conformance. These fixtures use isolated workspaces and synthetic execution. They do not establish a live provider, device, purchase, store release or complete consumer-business outcome.

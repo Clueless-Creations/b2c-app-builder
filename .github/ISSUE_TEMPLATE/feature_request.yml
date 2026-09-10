@@ -11,7 +11,7 @@ body:
     id: problem
     attributes:
       label: What goes wrong today
-      description: The launch failure, gap, or friction this would fix. Concrete beats abstract.
+      description: Observed failing case or explicit unmet requirement, with a revision when you have one. A competitor having a similar feature is not enough.
       placeholder: |
         Nothing checks that a paywall's trial length matches what the store product actually sells, so the two drift silently.
     validations:
@@ -21,7 +21,7 @@ body:
     id: proposal
     attributes:
       label: What you propose
-      description: The change itself. Name the reference, template, validator, or eval it would touch.
+      description: The least-complex change at the existing owner. Say why a narrower binding, instruction, or test is not enough. Name the reference, template, validator, or eval it would touch.
     validations:
       required: true
 
@@ -51,7 +51,7 @@ body:
     attributes:
       label: How would it be enforced
       description: |
-        The house rule is enforcement over reminders. If this can only be a longer instruction and never a check, say so and explain why.
+        Named baseline and how you will observe benefit, quality, or overhead. More nodes or documents are not evidence. Say whether this is default, optional, or experimental. If this can only be a longer instruction and never a check, say so.
       placeholder: |
         A new check in check-revenue.ts comparing revenue/REVENUE_OPS.md trial length against the product mapping in store/STORE_CONSOLE.md, with positive and negative fixtures.
     validations:

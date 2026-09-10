@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.48",
+  "version": "0.219.49",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Compile CLI and MCP bins to dist/ and alias the package-name MCP command.",
-    "Packed installs launch compiled entrypoints; checkout still falls back to tsx."
+    "Record evaluation baselines and hold live greenfield and Expo benchmark runs.",
+    "Replay store matching as candidates, not a unique primary, without extracting the scorer."
   ]
 }

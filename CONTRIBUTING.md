@@ -79,6 +79,11 @@ Do not add a generic workflow system, B2B guidance, or internal-tool doctrine.
 Keep the skill thin. Put durable expertise in `knowledge/`. Put repeatable
 decisions and ordering in `catalog/`.
 
+Adding default-path cost or a new architectural boundary needs a named problem
+or unmet requirement, the existing owner considered, how benefit will be
+observed, and what maintenance it adds. Ordinary fixes, optional citations, and
+app work do not need that form. Unknown benefit or cost stays unknown.
+
 Write each knowledge document for one narrow decision, with a narrow `load_when`.
 Gloaguen et al. (2026) found that non-essential context files raised inference
 cost over 20 percent on average and did not improve task success

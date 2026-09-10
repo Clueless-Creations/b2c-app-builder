@@ -76,8 +76,12 @@ export function register(harness: Harness): void {
     const onboarding = plan.nodes.find((node) => node.id === nodeId("onboarding-import"))!;
     const local = plan.nodes.find((node) => node.id === nodeId("local-feature"))!;
     const run = seedRunState(plan, businessState(), { ownerSessionId: "session-impact", ttlSeconds: 600, wallClockCapSeconds: 3600, now });
-    const expectedAffected = [product.id, onboarding.id];
-    const expectedUnaffected = [local.id, research.id];
+    const importChain = [product.id, onboarding.id];
+    const unrelatedLocal = [local.id];
+    assert(
+      importChain.every((id) => id !== research.id && !unrelatedLocal.includes(id)),
+      "import-chain, producer, and unrelated local must be disjoint",
+    );
     for (const [id, artifactId, fingerprint] of [
       [research.id, "artifact.research-import-observation", "sha256:import-v1"],
       [product.id, "artifact.product-import-promise", "sha256:promise-v1"],
@@ -93,7 +97,7 @@ export function register(harness: Harness): void {
     }
 
     const invalidated = invalidateDescendants(plan, run, ["artifact.research-import-observation"], "2026-09-09T12:00:01.000Z");
-    for (const id of expectedAffected) {
+    for (const id of importChain) {
       assert(invalidated.includes(id), `${id} should reopen when import evidence changes`);
       assert(run.nodes[id]!.status === "stale", `${id} must be stale`);
     }
@@ -103,7 +107,12 @@ export function register(harness: Harness): void {
     assert(!run.artifactBindings.find((binding) => binding.artifactId === "artifact.product-import-promise")!.accepted, "import promise must un-accept");
     assert(!run.artifactBindings.find((binding) => binding.artifactId === "artifact.onboarding-import-claim")!.accepted, "dependent onboarding claim must un-accept");
     const replayed = invalidateDescendants(plan, run, ["artifact.research-import-observation"], "2026-09-09T12:00:02.000Z");
-    assert(replayed.every((id) => expectedAffected.includes(id) || expectedUnaffected.includes(id)), "replay must stay inside the named impact set");
-    assert(run.nodes[local.id]!.status === "succeeded", "replay must not take unrelated work");
+    assert(replayed.every((id) => importChain.includes(id)), "replay may only retouch the import chain");
+    assert(!replayed.some((id) => unrelatedLocal.includes(id) || id === research.id), "replay must not include unrelated local or the producer");
+    for (const id of importChain) {
+      assert(run.nodes[id]!.status === "stale", `${id} must stay stale after replay`);
+    }
+    assert(run.nodes[local.id]!.status === "succeeded", "replay must leave unrelated local proof succeeded");
+    assert(run.nodes[research.id]!.status === "succeeded", "replay must not self-invalidate the producer");
   });
 }

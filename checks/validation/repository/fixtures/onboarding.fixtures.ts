@@ -1376,12 +1376,14 @@ Uncertainty: sample is US-only.
 
   const evidencePacketThin = makeFixture("onboarding-evidence-packet-thin");
   writeEvidencePacket(evidencePacketThin, "product/onboarding/graph/ONB-04-competitor-reviews.md", "## Findings\n\nDone.\n");
-  runFixture("ONB-04's gate rejects a stub evidence packet that lacks a source and classification", evidencePacketThin, evidenceScript, 1, "onboarding_evidence.packet_record_incomplete", [
-    "--node",
-    "ONB-04",
-    "--path",
-    "product/onboarding/graph/ONB-04-competitor-reviews.md",
-  ]);
+  runFixture(
+    "ONB-04's gate rejects a stub evidence packet that lacks a source and classification",
+    evidencePacketThin,
+    evidenceScript,
+    1,
+    "onboarding_evidence.packet_record_incomplete",
+    ["--node", "ONB-04", "--path", "product/onboarding/graph/ONB-04-competitor-reviews.md"],
+  );
 
   const evidencePacketConcise = makeFixture("onboarding-evidence-packet-concise");
   writeEvidencePacket(evidencePacketConcise, "product/onboarding/graph/ONB-04-competitor-reviews.md", conciseStructuredPacket);

@@ -371,6 +371,7 @@ function writeEasJobClaim(claimPath: string, idempotencyKey: string, at: string)
       at,
     };
     writeSync(fd, `${JSON.stringify(document)}\n`);
+    fsyncSync(fd);
   } finally {
     closeSync(fd);
   }
@@ -391,10 +392,20 @@ function readEasJobClaim(claimPath: string): EasJobClaim | undefined {
   }
 }
 
+function stealEasJobClaim(claimPath: string, idempotencyKey: string, at: string): boolean {
+  try {
+    unlinkSync(claimPath);
+  } catch {
+    return false;
+  }
+  return writeEasJobClaim(claimPath, idempotencyKey, at);
+}
+
 /**
  * Exclusive create of the claim file. Nested same-process re-entry and a live foreign
  * pid are `held` (no wait — that would deadlock a nested fixture). A claim whose pid is
- * dead is stolen once. This is EAS ledger durability, not a kernel scheduler.
+ * dead, or whose file is empty/truncated/wrong-schema, is stolen once. This is EAS
+ * ledger durability, not a kernel scheduler.
  */
 export function tryAcquireEasJobClaim(
   claimPath: string,
@@ -404,17 +415,12 @@ export function tryAcquireEasJobClaim(
   if (writeEasJobClaim(claimPath, idempotencyKey, now())) return { ok: true };
   const existing = readEasJobClaim(claimPath);
   if (!existing) {
-    if (writeEasJobClaim(claimPath, idempotencyKey, now())) return { ok: true };
+    if (stealEasJobClaim(claimPath, idempotencyKey, now())) return { ok: true };
     return { ok: false, reason: "held" };
   }
   if (existing.pid === process.pid) return { ok: false, reason: "held" };
   if (easClaimOwnerAlive(existing.pid)) return { ok: false, reason: "held" };
-  try {
-    unlinkSync(claimPath);
-  } catch {
-    return { ok: false, reason: "held" };
-  }
-  if (writeEasJobClaim(claimPath, idempotencyKey, now())) return { ok: true };
+  if (stealEasJobClaim(claimPath, idempotencyKey, now())) return { ok: true };
   return { ok: false, reason: "held" };
 }
 

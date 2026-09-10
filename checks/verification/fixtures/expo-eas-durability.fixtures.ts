@@ -552,6 +552,47 @@ export function register(harness: Harness): void {
     assert(calls.length === 1, `expected one spawn after stealing a dead claim, got ${calls.length}`);
   });
 
+  harness.check("expo-eas-durability: unparseable claim files are stolen and do not permanently block dispatch", () => {
+    const residues: ReadonlyArray<{ readonly label: string; readonly contents: string }> = [
+      { label: "empty", contents: "" },
+      { label: "truncated", contents: "{" },
+      { label: "wrong-schema", contents: `${JSON.stringify({ schemaVersion: "not-a-claim", pid: 1, idempotencyKey: "corrupt-claim", at: "2026-09-09T00:00:00.000Z" })}\n` },
+    ];
+    for (const residue of residues) {
+      const cwd = writeFakeApp(harness.makeTempDir(`corrupt-claim-${residue.label}`));
+      const isolatedHome = isolatedConfigHome(harness.makeTempDir(`corrupt-claim-${residue.label}-home`), "ws-a");
+      const discovery = trustedDiscovery(harness);
+      const file = easJobLedgerPath(cwd);
+      const claimPath = easJobClaimPath(file, `corrupt-${residue.label}`);
+      mkdirSync(path.dirname(claimPath), { recursive: true });
+      writeFileSync(claimPath, residue.contents);
+      const acquired = tryAcquireEasJobClaim(claimPath, `corrupt-${residue.label}`, () => "2026-09-09T00:00:00.000Z");
+      assert(acquired.ok, `${residue.label} claim residue must be stolen, not held`);
+      releaseEasJobClaim(claimPath);
+      writeFileSync(claimPath, residue.contents);
+      const { run, calls } = recordingRunner(() => ok(queuedBuild(`build_corrupt_${residue.label}`)));
+      const result = runExpoEasCommand({
+        operationId: "eas.build.cloud",
+        executable: "/opt/fake/bin/eas",
+        cwd,
+        isolatedHome,
+        pathEnv: "/opt/fake/bin",
+        run,
+        discovery,
+        target: selectedTarget(),
+        platform: "ios",
+        profile: "preview",
+        idempotencyKey: `corrupt-${residue.label}`,
+        ledger: new EasJobLedger({ now: () => "2026-09-09T00:00:01.000Z" }),
+        ledgerPath: file,
+        jobTransport: createFakeEasJobTransport(),
+      });
+      assert(result.invoked, `${residue.label} claim residue must not permanently block a first paid dispatch`);
+      assert(result.remoteId === `build_corrupt_${residue.label}`, result.remoteId ?? "");
+      assert(calls.length === 1, `${residue.label}: expected one spawn after stealing a corrupt claim, got ${calls.length}`);
+    }
+  });
+
   harness.check("expo-eas-durability: a live foreign process cannot wx-create the same claim file", () => {
     const cwd = writeFakeApp(harness.makeTempDir("foreign-claim"));
     const file = easJobLedgerPath(cwd);

@@ -91,6 +91,34 @@ export function register(harness: Harness): void {
     assert(unselected.reason === "unselected", `expected unselected, got ${JSON.stringify(unselected)}`);
   });
 
+  harness.check("expo-eas-update-policy: metro and babel config deltas are native-or-sdk-change", () => {
+    const cwd = writeFakeApp(harness.makeTempDir("ota-bundler"));
+    writeFileSync(path.join(cwd, "metro.config.js"), "module.exports = {};\n");
+    writeFileSync(path.join(cwd, "babel.config.js"), "module.exports = {};\n");
+    const nativeOnBinary = fingerprintExpoNativeInputs(cwd);
+    writeFileSync(path.join(cwd, "metro.config.js"), "module.exports = { resetCache: true };\n");
+    const metro = assessExpoUpdateEligibility({
+      selected: true,
+      nativeFingerprintOnBinary: nativeOnBinary,
+      currentNativeFingerprint: fingerprintExpoNativeInputs(cwd),
+      runtimeOnBinary: "1.0.0",
+      currentRuntimeVersion: "1.0.0",
+    });
+    assert(metro.eligible === false && metro.reason === "native-or-sdk-change", `metro delta must be native, got ${JSON.stringify(metro)}`);
+    assert(metro.autoPublish === false, "metro native hold must not publish");
+    writeFileSync(path.join(cwd, "metro.config.js"), "module.exports = {};\n");
+    writeFileSync(path.join(cwd, "babel.config.js"), "module.exports = { presets: ['babel-preset-expo'] };\n");
+    const babel = assessExpoUpdateEligibility({
+      selected: true,
+      nativeFingerprintOnBinary: nativeOnBinary,
+      currentNativeFingerprint: fingerprintExpoNativeInputs(cwd),
+      runtimeOnBinary: "1.0.0",
+      currentRuntimeVersion: "1.0.0",
+    });
+    assert(babel.eligible === false && babel.reason === "native-or-sdk-change", `babel delta must be native, got ${JSON.stringify(babel)}`);
+    assert(babel.autoPublish === false, "babel native hold must not publish");
+  });
+
   harness.check("expo-eas-update-policy: eas.update stays unlabeled for spawn", () => {
     let refused = false;
     try {

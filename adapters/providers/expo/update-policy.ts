@@ -27,7 +27,9 @@ export const EXPO_OTA_NATIVE_SOURCE_ROOTS = [
   "native",
   "ios",
   "android",
-] as const;
+  "metro.config.js",
+  "babel.config.js",
+] as const; // Already hashed as EAS upload inputs in identity.ts. A bundler-config delta is native, not js-assets-only.
 
 export const EXPO_OTA_JS_SOURCE_ROOTS = [
   "app",

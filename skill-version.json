@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.59",
+  "version": "0.219.60",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Send an ordinary business start to status and plan before catalog search or a whole-workflow bundle.",
-    "Name status then plan in generated creation recovery, lock start-path size, and require catalog after plan when setup lists it."
+    "Drop the After Credits currentBytes tautology and keep count, deferredLoadCount, and later-horizon path locks.",
+    "Require setup-help catalog and compose to appear after plan, matching cli and connection-and-packet."
   ]
 }

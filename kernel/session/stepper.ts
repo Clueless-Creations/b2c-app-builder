@@ -1,16 +1,16 @@
 /** Onboarding progress comes from accepted run state. Pre-run folders expose only a planned frontier. */
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { toCatalogInput } from "../../catalog/bridge.js";
 import { composeCatalog } from "../../catalog/index.js";
 import { resolveRegisteredWorkspace } from "../../adapters/registry.js";
 import { compilePlan, type CompiledPlan, type CompiledRunNode, type RunNodeId } from "../engine/compile.js";
 import { loadRunState } from "../engine/runstate.js";
 import type { RunStateDocument } from "../schema/types.js";
+import { resolveSkillRoot } from "../../tooling/lib/skill-root.js";
 import { loadWorkspaceCatalogIfPresent } from "./catalog-contract.js";
 import { inspectWorkspace } from "./inspect.js";
 
-const skillRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+const skillRoot = resolveSkillRoot(import.meta.url);
 
 /** Fixed group id for the onboarding graph (U5). Every stepper call defaults to this. */
 export const ONBOARDING_GROUP_ID = "onboarding-system";

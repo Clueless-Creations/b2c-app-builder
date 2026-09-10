@@ -1,11 +1,11 @@
 import path from "node:path";
 import { spawnSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
-import { describeTsxSpawnFailure, resolveTsxCommand } from "../../tooling/lib/tsx-bin.js";
+import { describeTsxSpawnFailure, resolveRuntimeCommand } from "../../tooling/lib/tsx-bin.js";
+import { resolveSkillRoot } from "../../tooling/lib/skill-root.js";
 
-/** Repo root, resolved two levels above kernel/session — shared by every kernel/session CLI. */
+/** Package root — shared by every kernel/session CLI, from source or `dist/`. */
 export function skillRoot(): string {
-  return path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+  return resolveSkillRoot(import.meta.url);
 }
 
 export interface ReducerResult {
@@ -20,7 +20,7 @@ export interface ReducerResult {
  */
 export function runReducer(args: string[], input?: string): ReducerResult {
   const cliPath = path.join(skillRoot(), "kernel/reducer/cli.ts");
-  const command = resolveTsxCommand(skillRoot(), [cliPath, ...args]);
+  const command = resolveRuntimeCommand(skillRoot(), [cliPath, ...args]);
   const result = spawnSync(command.executable, command.args, { cwd: skillRoot(), encoding: "utf8", input });
   // A child that never launched has empty stdout/stderr and a null status, so `code: -1` with the
   // two streams alone reports `exited -1:` and nothing else. Append the launch/signal cause last:

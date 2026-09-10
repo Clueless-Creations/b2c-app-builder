@@ -75,6 +75,7 @@ const allowedTopLevelFiles = new Set([
   "package.json",
   "skill-version.json",
   "tsconfig.json",
+  "tsconfig.build.json",
 ]);
 
 function realPath(value: string): string {

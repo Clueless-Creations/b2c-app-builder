@@ -6,14 +6,13 @@
  * operation input schemas in contracts/contribution/contract.ts. Exit 0 means the request
  * succeeded and, for check and evaluate, that the result passed.
  */
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { CONTRIBUTION_OPERATIONS } from "../../contracts/contribution/contract.js";
 import { resolveCallerPath } from "../../kernel/lib/cli.js";
 import { callContributionOperation } from "../../kernel/contribution/service.js";
 import type { CheckData, EvaluateData, PlanData, UpgradePlanData, UpstreamCheckData, UpstreamInventoryData } from "../../kernel/contribution/types.js";
+import { resolveSkillRoot } from "../../tooling/lib/skill-root.js";
 
-const skillRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+const skillRoot = resolveSkillRoot(import.meta.url);
 const [command, ...argv] = process.argv.slice(2);
 const operation = CONTRIBUTION_OPERATIONS.find((item) => item.cli === command);
 

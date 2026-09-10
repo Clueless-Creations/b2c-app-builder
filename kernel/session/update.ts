@@ -17,10 +17,10 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
 import { isMainModule, parseArgs } from "../lib/cli.js";
+import { resolveSkillRoot } from "../../tooling/lib/skill-root.js";
 
-const skillRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+const skillRoot = resolveSkillRoot(import.meta.url);
 
 function git(repoRoot: string, args: string[]): { code: number; output: string } {
   const result = spawnSync("git", ["-C", repoRoot, ...args], { encoding: "utf8", timeout: 300_000 });

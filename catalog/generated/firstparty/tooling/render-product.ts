@@ -10,7 +10,6 @@
  */
 import { writeFileSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { loadProductInstanceDocument, productYamlPath } from "../catalog/ontology/instance-load.js";
 import { loadWorldOntology } from "../catalog/ontology/load.js";
 import { validateProductWorkspace } from "../catalog/ontology/product-workspace.js";
@@ -18,8 +17,9 @@ import { renderProductMarkdown } from "../catalog/ontology/render-product.js";
 import { isMainModule, resolveCallerPath } from "../kernel/lib/cli.js";
 import { resolveCliWorkspace } from "../kernel/session/status.js";
 import { issue, reportAndExit, type Issue } from "./lib/launch-state.js";
+import { resolveSkillRoot } from "./lib/skill-root.js";
 
-const skillRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const skillRoot = resolveSkillRoot(import.meta.url);
 
 const USAGE = [
   "Usage:",

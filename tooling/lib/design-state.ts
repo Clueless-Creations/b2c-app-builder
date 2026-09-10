@@ -1,10 +1,10 @@
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { Ajv2020, type AnySchema, type ErrorObject } from "ajv/dist/2020.js";
 import { loadDesignSystem } from "./design-md.js";
 import { asArray, asString, isRecord, issue, type Issue } from "./launch-state.js";
+import { resolveSkillRoot } from "./skill-root.js";
 
 export interface DesignCliArgs {
   root: string;
@@ -32,8 +32,7 @@ export interface SurfaceSummary {
   notStarted: number;
 }
 
-const libDir = path.dirname(fileURLToPath(import.meta.url));
-export const skillRoot = path.resolve(libDir, "../..");
+export const skillRoot = resolveSkillRoot(import.meta.url);
 
 export function parseDesignCliArgs(argv: string[]): DesignCliArgs {
   let root = process.cwd();

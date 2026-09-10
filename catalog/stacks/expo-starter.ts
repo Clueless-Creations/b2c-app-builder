@@ -13,7 +13,7 @@
 import { spawnSync } from "node:child_process";
 import { cpSync, existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { resolveSkillRoot } from "../../tooling/lib/skill-root.js";
 import {
   EXPO_APP_RUNTIME,
   EXPO_IS_DEFAULT_STACK,
@@ -33,9 +33,7 @@ import {
   packageJsonHasExpoDependency,
 } from "./expo-native-ownership.js";
 
-const here = path.dirname(fileURLToPath(import.meta.url));
-
-export const EXPO_STARTER_FIXTURE_DIR = path.join(here, "expo-starter-fixture");
+export const EXPO_STARTER_FIXTURE_DIR = path.join(resolveSkillRoot(import.meta.url), "catalog", "stacks", "expo-starter-fixture");
 export const EXPO_STARTER_FIXTURE_ID = "expo-consumer-starter-fixture";
 export const EXPO_STARTER_BOOT_FILES = ["babel.config.js", "metro.config.js"] as const;
 

@@ -1,6 +1,6 @@
 {
   "name": "b2c-app-builder",
-  "version": "0.219.47",
+  "version": "0.219.48",
   "description": "Consumer-business primitives for AI agents: capabilities, providers, recipes, and evidence through a CLI, MCP, and skill.",
   "keywords": [
     "mcp",
@@ -29,7 +29,8 @@
   },
   "bin": {
     "b2c": "entrypoints/cli/b2c.mjs",
-    "b2c-app-builder-mcp": "entrypoints/mcp/b2c-app-builder-mcp.mjs"
+    "b2c-app-builder-mcp": "entrypoints/mcp/b2c-app-builder-mcp.mjs",
+    "b2c-app-builder": "entrypoints/mcp/b2c-app-builder-mcp.mjs"
   },
   "files": [
     "SKILL.md",
@@ -44,6 +45,7 @@
     "catalog",
     "knowledge",
     "tooling",
+    "dist",
     "checks/validation",
     "surfaces/starters",
     "surfaces/ui-library",
@@ -238,6 +240,8 @@
     "test:parity": "tsx checks/verification/parity/run.ts",
     "test:public-api": "tsx tooling/test-public-api.ts",
     "test:validators": "tsx checks/validation/repository/run-validator-fixtures.ts",
+    "build": "tsc -p tsconfig.build.json && node tooling/copy-runtime-assets.mjs",
+    "prepack": "npm run build",
     "typecheck": "tsc --noEmit",
     "validate:design-state": "tsx checks/validation/business/design/validate-state.ts",
     "validate:launch-state": "tsx checks/validation/business/orchestration/validate-project-state.ts",
@@ -254,14 +258,14 @@
     "@modelcontextprotocol/sdk": "^1.30.0",
     "ajv": "^8.20.0",
     "mdast-util-from-markdown": "2.0.3",
-    "tsx": "^4.23.13",
-    "typescript": "7.0.2",
     "yaml": "^2.6.1",
     "zod": "^4.5.4"
   },
   "devDependencies": {
     "@anthropic-ai/sdk": "0.124.0",
     "@types/node": "^24.13.3",
-    "prettier": "^3.9.6"
+    "prettier": "^3.9.6",
+    "tsx": "^4.23.13",
+    "typescript": "7.0.2"
   }
 }

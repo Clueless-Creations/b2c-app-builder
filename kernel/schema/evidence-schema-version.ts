@@ -14,9 +14,9 @@
  */
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { composeCatalog } from "../../catalog/index.js";
 import { digest, stableJson } from "../../tooling/lib/canonical-json.js";
+import { resolveSkillRoot } from "../../tooling/lib/skill-root.js";
 import { isMainModule, parseArgs } from "../lib/cli.js";
 
 /** Parsed in this fixed order so schemaSha256 is stable regardless of directory-listing order. */
@@ -30,7 +30,7 @@ export interface EvidenceSchemaFingerprint {
   readonly generatedAt: string;
 }
 
-const schemaDir = path.dirname(fileURLToPath(import.meta.url));
+const schemaDir = path.join(resolveSkillRoot(import.meta.url), "kernel", "schema");
 
 export function computeEvidenceSchemaFingerprint(skillRoot: string, generatedAt: string): EvidenceSchemaFingerprint {
   const schemas = EVIDENCE_SCHEMA_FILES.map((file) => JSON.parse(readFileSync(path.join(schemaDir, file), "utf8")) as unknown);

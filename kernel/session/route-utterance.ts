@@ -32,11 +32,11 @@
  */
 import { readFileSync, statSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { describeJourney } from "../knowledge-service/journey.js";
 import type { Catalog } from "../../catalog/types.js";
 import { terms } from "../knowledge-service/service.js";
 import type { HostedKnowledgeBundle } from "../knowledge-service/types.js";
+import { resolveSkillRoot } from "../../tooling/lib/skill-root.js";
 import { inspectWorkspace, type InspectResult } from "./inspect.js";
 import {
   combineTriggerWithFounderPhrasings,
@@ -47,7 +47,7 @@ import {
   routerQueryTerms,
 } from "./route-scoring.js";
 
-const skillRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+const skillRoot = resolveSkillRoot(import.meta.url);
 
 // --- calibrated tuning constants (KTD5, U9) -----------------------------------------------------
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { resolveTsxCli } from "../../tooling/lib/tsx-launcher.mjs";
+import { resolveRuntimeNodeArgs } from "../../tooling/lib/tsx-launcher.mjs";
 /**
  * b2c-app-builder-mcp — the engine as a Model Context Protocol server (stdio).
  *
@@ -36,7 +36,7 @@ import { contributorToolsEnabled, registerContributorTools } from "./contribute.
 import { runProcess } from "./run-process.js";
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { resolveSkillRoot } from "../../tooling/lib/skill-root.js";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
@@ -50,7 +50,7 @@ import { withOnboardingStepper } from "../../kernel/session/stepper.js";
 import { appendDoctorHostBlock } from "../../kernel/session/doctor-host.js";
 import { readWorkspaceStatus, renderWorkspaceStatus, resolveCwdWorkspaceState } from "../../kernel/session/status.js";
 
-const skillRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+const skillRoot = resolveSkillRoot(import.meta.url);
 
 function skillVersion(): string {
   try {
@@ -67,7 +67,13 @@ function refusal(text: string): ToolResult {
 }
 
 async function runCli(script: string, args: string[]): Promise<ToolResult> {
-  const result = await runProcess(process.execPath, [resolveTsxCli(skillRoot), path.join(skillRoot, script), ...args], {
+  let nodeArgs: string[];
+  try {
+    nodeArgs = resolveRuntimeNodeArgs(skillRoot, [path.join(skillRoot, script), ...args]);
+  } catch (error) {
+    return refusal(error instanceof Error ? error.message : String(error));
+  }
+  const result = await runProcess(process.execPath, nodeArgs, {
     cwd: skillRoot,
     timeoutMs: 3_600_000,
   });

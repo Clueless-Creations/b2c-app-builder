@@ -8,10 +8,7 @@ export function currentLocalSession(): LocalAuthState {
   return current;
 }
 
-export async function applyLocalSessionEvent(
-  event: LocalAuthEvent,
-  extra?: { incomingUserId?: string; callbackTrusted?: boolean },
-): Promise<LocalAuthState> {
+export async function applyLocalSessionEvent(event: LocalAuthEvent, extra?: { incomingUserId?: string; callbackTrusted?: boolean }): Promise<LocalAuthState> {
   const reduced = reduceLocalAuth({ event, current, incomingUserId: extra?.incomingUserId, callbackTrusted: extra?.callbackTrusted });
   current = reduced.next;
   await seam.persist(current);

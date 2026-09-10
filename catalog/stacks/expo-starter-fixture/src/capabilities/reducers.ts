@@ -20,12 +20,13 @@ export const EMPTY_LOCAL_AUTH: LocalAuthState = {
   entitled: false,
 };
 
-export function reduceLocalAuth(input: {
-  event: LocalAuthEvent;
-  current: LocalAuthState;
-  incomingUserId?: string;
-  callbackTrusted?: boolean;
-}): { next: LocalAuthState; leakedPriorUser: false; paidAccessLeaked: false; code?: string; reason: string } {
+export function reduceLocalAuth(input: { event: LocalAuthEvent; current: LocalAuthState; incomingUserId?: string; callbackTrusted?: boolean }): {
+  next: LocalAuthState;
+  leakedPriorUser: false;
+  paidAccessLeaked: false;
+  code?: string;
+  reason: string;
+} {
   const cleared = { ...EMPTY_LOCAL_AUTH };
   const sealed = (next: LocalAuthState, reason: string, code?: string) => ({
     next,
@@ -121,12 +122,12 @@ export function classifyLocalPermission(input: {
   }
 }
 
-export function classifyLocalNotification(input: {
-  tokenOk: boolean;
-  receiptOk: boolean;
-  claimedPersonSawNotification: boolean;
-  route: string;
-}): { action: "accept" | "refuse"; restoreRoute?: string; deliveredToPerson: false; reason: string } {
+export function classifyLocalNotification(input: { tokenOk: boolean; receiptOk: boolean; claimedPersonSawNotification: boolean; route: string }): {
+  action: "accept" | "refuse";
+  restoreRoute?: string;
+  deliveredToPerson: false;
+  reason: string;
+} {
   if (input.claimedPersonSawNotification) {
     return { action: "refuse", deliveredToPerson: false, reason: "A push ticket or receipt is not evidence a person saw the notification." };
   }

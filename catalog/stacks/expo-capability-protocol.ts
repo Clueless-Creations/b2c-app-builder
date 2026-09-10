@@ -386,7 +386,7 @@ export function classifyOfflineClaim(input: { store: ExpoOfflineStoreKind; claim
   }
   return {
     action: "accept-classification",
-    reason: "Local store classification only. The offline-data operation stays blocked.",
+    reason: "Local store classification only. Local cache fixtures may run. This is not a backend of record.",
   };
 }
 
@@ -404,7 +404,7 @@ export function classifyDeviceCapability(input: { capability: ExpoDeviceCapabili
   }
   return {
     action: "accept-classification",
-    reason: "Per-platform availability stays explicit. The device-capabilities operation stays blocked.",
+    reason: "Per-platform availability stays explicit. Permission and notification fixtures may run. This is not device runtime proof.",
   };
 }
 
@@ -535,7 +535,7 @@ export function classifyUnauthenticatedBackendRequest(input: { authenticated: bo
   }
   return {
     action: "accept-classification",
-    reason: "Authenticated classification only. The authentication operation stays blocked.",
+    reason: "Authenticated classification only. Local session fixtures may run. This is not an identity provider.",
   };
 }
 
@@ -566,7 +566,7 @@ export function classifyOfflineEvent(input: { event: ExpoOfflineEvent; store: Ex
       }
       return {
         action: "accept-classification",
-        reason: "Migration failure stays an explicit hold. The offline-data operation stays blocked.",
+        reason: "Migration failure stays an explicit hold. Local cache is not a backend of record.",
       };
     case "interrupted-write":
       if (input.claimed === "write-complete" || input.claimed === "backend-success") {
@@ -578,7 +578,7 @@ export function classifyOfflineEvent(input: { event: ExpoOfflineEvent; store: Ex
       }
       return {
         action: "accept-classification",
-        reason: "Interrupted write stays incomplete. The offline-data operation stays blocked.",
+        reason: "Interrupted write stays incomplete. Local cache is not a backend of record.",
       };
     case "restart":
     case "reconnect":
@@ -592,7 +592,7 @@ export function classifyOfflineEvent(input: { event: ExpoOfflineEvent; store: Ex
       }
       return {
         action: "accept-classification",
-        reason: "Local cache semantics only. The offline-data operation stays blocked.",
+        reason: "Local cache semantics only. Not a backend of record.",
       };
     default: {
       const exhaustive: never = input.event;
@@ -639,7 +639,7 @@ export function classifyPermissionOutcome(input: {
         safeState: "proceed",
         action: "accept-classification",
         fakeSuccess: false,
-        reason: "Granted classification only. The device-capabilities operation stays blocked.",
+        reason: "Granted classification only. Not device runtime proof.",
       };
     case "denied":
     case "revoked":
@@ -657,7 +657,7 @@ export function classifyPermissionOutcome(input: {
         safeState: "unavailable-safe",
         action: "accept-classification",
         fakeSuccess: false,
-        reason: `${input.capability} ${input.outcome} stays a useful safe state. The device-capabilities operation stays blocked.`,
+        reason: `${input.capability} ${input.outcome} stays a useful safe state. Not device runtime proof.`,
       };
     default: {
       const exhaustive: never = input.outcome;
@@ -715,6 +715,6 @@ export function classifyNotificationHandoff(input: {
     deliveredToPerson: false,
     restoreRoute: input.deepLinkRoute && input.selectedRestoreRoute ? input.selectedRestoreRoute : undefined,
     action: "accept-classification",
-    reason: "Handoff classification only. Token and receipt success is not person-seen proof. The device-capabilities operation stays blocked.",
+    reason: "Handoff classification only. Token and receipt success is not person-seen proof.",
   };
 }

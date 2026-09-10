@@ -14,6 +14,7 @@ export const connectionReceiptSchema = z.strictObject({
     workspaceExecution: z.enum(["local_cli", "none"]),
     writes: z.enum(["cli_default", "none"]),
   }),
+  providerObservation: z.literal("not_tested"),
   observed: z
     .strictObject({
       knowledge: z.enum(["available", "unavailable"]).optional(),
@@ -41,6 +42,7 @@ export function connectionReceipt(input: {
         workspaceExecution: "none",
         writes: "none",
       },
+      providerObservation: "not_tested",
       ...(observed ? { observed } : {}),
     };
   }
@@ -54,8 +56,17 @@ export function connectionReceipt(input: {
       workspaceExecution: "local_cli",
       writes: "cli_default",
     },
+    providerObservation: "not_tested",
     ...(observed ? { observed } : {}),
   };
+}
+
+/** Wrong-surface and provider claims come from declared capabilities, not the leftover server name. */
+export function connectionCapabilityGuidance(receipt: ConnectionReceipt): string {
+  if (receipt.declares.workspaceExecution === "none" || receipt.declares.workspacePlanning === "none") {
+    return "Hosted knowledge is connected. It can return maintained guidance, but it cannot access or run this local business. Connect the local builder as b2c-local for workspace execution.";
+  }
+  return "Use this local builder for workspace status, planning, and CLI-backed execution. Provider readiness is not implied by this receipt.";
 }
 
 export function formatConnectionReceipt(receipt: ConnectionReceipt): string {
@@ -85,10 +96,9 @@ export function localMcpInstructions(input: {
   });
   return [
     "This is the local B2C App Builder. Register it as b2c-local.",
-    "Use it for workspace status, planning, and CLI-backed execution.",
+    connectionCapabilityGuidance(receipt),
     "Hosted knowledge is a different connection (b2c-hosted) and cannot see or run this workspace.",
     "A leftover b2c-app-builder registration is the legacy local name, not hosted knowledge.",
-    "Provider readiness is not implied by this receipt.",
     formatConnectionReceipt(receipt),
   ].join(" ");
 }
@@ -96,9 +106,9 @@ export function localMcpInstructions(input: {
 export function hostedMcpInstructionsSuffix(engineVersion: string): string {
   const receipt = connectionReceipt({ mode: "hosted_knowledge", engineVersion });
   return (
-    " This connection is hosted knowledge (b2c-hosted). It cannot access local files or run a local business. " +
-    "Connect the local builder as b2c-local for workspace planning and execution. " +
-    "A leftover b2c-app-builder client name is the legacy local name, not this hosted handshake. " +
+    " This connection is hosted knowledge (b2c-hosted). " +
+    connectionCapabilityGuidance(receipt) +
+    " A leftover b2c-app-builder client name is the legacy local name, not this hosted handshake. " +
     formatConnectionReceipt(receipt)
   );
 }

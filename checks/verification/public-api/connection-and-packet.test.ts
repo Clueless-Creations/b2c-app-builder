@@ -7,11 +7,13 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
+  connectionCapabilityGuidance,
   connectionReceipt,
   connectionReceiptSchema,
   hostedMcpInstructionsSuffix,
   localMcpInstructions,
   parseConnectionReceipt,
+  type ConnectionReceipt,
 } from "../../../contracts/public-api/connection-receipt.js";
 import { toCatalogInput } from "../../../catalog/bridge.js";
 import type { Catalog } from "../../../catalog/types.js";
@@ -69,6 +71,7 @@ test("setup prints a local connection receipt and distinct b2c-local registratio
     assert.deepEqual(parsed.identity.legacy, ["b2c-app-builder"]);
     assert.equal(parsed.declares.workspaceExecution, "local_cli");
     assert.equal(parsed.declares.writes, "cli_default");
+    assert.equal(parsed.providerObservation, "not_tested");
     assert.equal(parsed.observed, undefined);
     const next = result.stdout.slice(Math.max(0, result.stdout.indexOf("Next steps:")));
     assert(next.includes("business-status"), "setup receipt path still omits business-status");
@@ -89,8 +92,10 @@ test("local MCP instructions name local execution and refuse hosted-as-local", (
   assert.equal(receipt.mode, "local_execution");
   assert.deepEqual(receipt.identity.legacy, ["b2c-app-builder"]);
   assert.equal(receipt.declares.knowledge, "bundled");
+  assert.equal(receipt.providerObservation, "not_tested");
   assert.equal(receipt.observed?.knowledge, "available");
   assert.equal(receipt.observed?.writes, "mcp_write_enabled");
+  assert.match(connectionCapabilityGuidance(receipt), /Provider readiness is not implied/);
 });
 
 test("hosted receipt declares hosted mode and omits the leftover local name", () => {
@@ -98,10 +103,37 @@ test("hosted receipt declares hosted mode and omits the leftover local name", ()
   assert.equal(receipt.identity.recommended, "b2c-hosted");
   assert.equal(receipt.identity.legacy, undefined);
   assert.equal(receipt.declares.workspacePlanning, "none");
+  assert.equal(receipt.providerObservation, "not_tested");
   assert.equal(receipt.observed, undefined);
+  assert.match(connectionCapabilityGuidance(receipt), /cannot access or run this local business/);
   const suffix = hostedMcpInstructionsSuffix("0.219.40");
   assert.match(suffix, /legacy local name/);
+  assert.match(suffix, /cannot access or run this local business/);
   assert.equal(parseConnectionReceipt(suffix).identity.legacy, undefined);
+  assert.equal(parseConnectionReceipt(suffix).providerObservation, "not_tested");
+});
+
+test("connection receipt never treats handshake or leftover names as provider readiness", () => {
+  const local = connectionReceipt({
+    mode: "local_execution",
+    engineVersion: "0.219.40",
+    observed: { knowledge: "available", writes: "mcp_write_enabled" },
+  });
+  const hosted = connectionReceipt({ mode: "hosted_knowledge", engineVersion: "0.219.40" });
+  assert.equal(local.providerObservation, "not_tested");
+  assert.equal(hosted.providerObservation, "not_tested");
+  assert.equal(
+    connectionCapabilityGuidance({ ...local, identity: { recommended: "b2c-hosted" } } as ConnectionReceipt),
+    connectionCapabilityGuidance(local),
+  );
+  assert.equal(
+    connectionCapabilityGuidance({ ...hosted, identity: { recommended: "b2c-local", legacy: ["b2c-app-builder"] } } as ConnectionReceipt),
+    connectionCapabilityGuidance(hosted),
+  );
+  assert.throws(
+    () => connectionReceiptSchema.parse({ ...local, providerObservation: "ready" }),
+    /invalid_literal|invalid_value/,
+  );
 });
 
 test("worker packet keeps current-task guidance and accounts deferred later load", () => {

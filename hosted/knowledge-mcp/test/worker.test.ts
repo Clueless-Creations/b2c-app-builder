@@ -206,6 +206,7 @@ test("real MCP initialization and tool discovery expose only the four read-only 
   assert.equal(hostedReceipt.identity.legacy, undefined);
   assert.equal(hostedReceipt.declares.knowledge, "bundled");
   assert.equal(hostedReceipt.declares.writes, "none");
+  assert.equal(hostedReceipt.providerObservation, "not_tested");
   assert.equal(hostedReceipt.observed, undefined);
   const response = await fetchPath("/mcp", {
     method: "POST",

@@ -1,6 +1,7 @@
 import { researchQuerySchema, researchObservationInputSchema, savedResearchObservationSchema } from "../research/observation.js";
 import { z } from "zod";
 export {
+  connectionCapabilityGuidance,
   connectionReceipt,
   connectionReceiptSchema,
   formatConnectionReceipt,

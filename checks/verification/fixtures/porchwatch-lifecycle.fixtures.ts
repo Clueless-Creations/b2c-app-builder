@@ -3,11 +3,12 @@ import type { HostedKnowledgeBundle } from "../../../kernel/knowledge-service/ty
 import { mkdirSync, readFileSync, writeFileSync, rmSync } from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
+import { parse, stringify } from "yaml";
 import { routeUtterance } from "../../../kernel/session/route-utterance.js";
-import { createBusiness, planBusiness } from "../../../kernel/services/lifecycle.js";
+import { createBusiness, initializeBusiness, planBusiness } from "../../../kernel/services/lifecycle.js";
 import { readWorkspaceStatus } from "../../../kernel/session/status.js";
 import { workspaceRevision } from "../../../kernel/session/workspace-revision.js";
-import { loadProductInstanceDocument } from "../../../catalog/ontology/instance-load.js";
+import { loadProductInstanceDocument, productYamlPath } from "../../../catalog/ontology/instance-load.js";
 import { renderProductMarkdown } from "../../../catalog/ontology/render-product.js";
 import { assert, skillRoot, type Harness } from "./_harness.js";
 
@@ -114,6 +115,45 @@ export function register(h: Harness): void {
       );
       assert(plan.founderIntent?.slice.includes("notification coverage"), "plan founderIntent dropped the founder constraint");
       assert(plan.founderIntent?.slice.includes("performance-budget"), "plan founderIntent dropped the performance-budget target");
+    } finally {
+      if (previous === undefined) delete process.env.B2C_APP_BUILDER_HOME;
+      else process.env.B2C_APP_BUILDER_HOME = previous;
+    }
+  });
+  h.check("Porchwatch: product acceptance and initialize stay separate", () => {
+    const home = h.makeTempDir("porchwatch-accept-home"),
+      root = path.join(h.makeTempDir("porchwatch-accept-business"), "accept-001");
+    const previous = process.env.B2C_APP_BUILDER_HOME;
+    process.env.B2C_APP_BUILDER_HOME = home;
+    try {
+      createBusiness({ workspaceId: "accept-001", directory: root, name: "Acceptance workspace", hypothesis: "A complete consumer utility" });
+      const before = planBusiness({ workspaceId: "accept-001", maxConcurrency: 1 });
+      const product = before.resume?.artifacts.find((entry) => entry.path === "product.yaml");
+      assert(before.status === "not_initialized" && product?.present && product.acceptance === "not_evaluated", "product presence became acceptance");
+      assert(before.nextAction.includes("product.yaml"), "planning resume omitted the product document");
+      let refused = false;
+      try {
+        initializeBusiness({ workspaceId: "accept-001", expectedRevision: before.revision });
+      } catch {
+        refused = true;
+      }
+      assert(refused, "unaccepted product initialized the runtime");
+      const file = productYamlPath(root),
+        doc = parse(readFileSync(file, "utf8"));
+      doc.meta.status = "accepted";
+      writeFileSync(file, stringify(doc));
+      writeFileSync(path.join(root, "PRODUCT.md"), renderProductMarkdown(loadProductInstanceDocument(file)));
+      const accepted = planBusiness({ workspaceId: "accept-001", maxConcurrency: 1 });
+      const acceptedProduct = accepted.resume?.artifacts.find((entry) => entry.path === "product.yaml");
+      assert(accepted.status === "not_initialized", "accepting the product initialized the runtime");
+      assert(acceptedProduct?.acceptance === "not_evaluated", "resume treated product.yaml presence as accepted work");
+      const productBytes = readFileSync(file);
+      const rendered = readFileSync(path.join(root, "PRODUCT.md"));
+      const initialized = initializeBusiness({ workspaceId: "accept-001", expectedRevision: accepted.revision });
+      assert(initialized.status === "initialized" && initialized.authorityGranted === false, "initialize granted authority or failed");
+      assert(readFileSync(file).equals(productBytes), "initialize rewrote accepted product.yaml");
+      assert(readFileSync(path.join(root, "PRODUCT.md")).equals(rendered), "initialize rewrote PRODUCT.md");
+      assert(workspaceRevision(root) !== accepted.revision, "initialize left the planning revision in place");
     } finally {
       if (previous === undefined) delete process.env.B2C_APP_BUILDER_HOME;
       else process.env.B2C_APP_BUILDER_HOME = previous;

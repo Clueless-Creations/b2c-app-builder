@@ -1,1 +1,1 @@
-Expo Router JSX file layout. `expo-router` is pinned to `57.0.17` from published `expo@57.0.17` `bundledNativeModules.json`. Application screens live in `src/`. This is not a native UI adapter and not runtime-verified navigation.
+Thin Expo Router JSX. Screens live in `src/`. Metro/web export is the local runnable proof; native device install is a separate hold.

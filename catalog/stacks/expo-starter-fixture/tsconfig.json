@@ -1,8 +1,6 @@
 {
+  "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "ESNext",
-    "jsx": "react-jsx",
     "strict": true,
     "noEmit": true
   },

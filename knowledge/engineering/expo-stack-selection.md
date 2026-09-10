@@ -61,13 +61,13 @@ A web export cannot satisfy an iOS or Android requirement. Shared TypeScript is 
 
 `product.yaml` and `DESIGN.md` stay authoritative for product and design. The world ontology excludes UI-stack implementation types. If multi-platform shipping later needs a product-world slot, that is an architecture-steward decision. This package does not add `product.platforms`.
 
-Record the chosen stack in `engineering/TECH_SPEC.md`. Native adapter proof lives in `design/platforms/expo.json` when #82 implements it. The slug is already allowed; the adapter is not implemented.
+Record the chosen stack in `engineering/TECH_SPEC.md`. Native adapter proof lives in `surfaces/ui-library/adapters/expo.json` for the reference starter, and in `design/platforms/expo.json` for a selected business. SwiftUI remains a separate adapter. An Expo adapter is not SwiftUI parity.
 
 ## 7. Unselected Services Stay Idle
 
 Unselected Expo, EAS, Expo MCP, or RevenueCat must not change bindings or hold an unrelated business. Available-but-unselected is not an obligation.
 
-Official `expo/skills` and Expo MCP are optional for a selected Expo session after founder approval. They are not a default install during intake. #87 owns that integration.
+Official `expo/skills` and Expo MCP are optional for a selected Expo session after founder approval. They are not a default install during intake. Discover mapped skill names before asking to install. #87 owns that integration.
 
 ## Sources
 

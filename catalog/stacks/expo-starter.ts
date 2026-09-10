@@ -1,9 +1,11 @@
 /**
  * Isolated Expo TypeScript starter fixture (#82).
  *
- * Expo is selectable, not default. This fixture is an input to later Router/UI/CNG work, not
- * accepted delivery. It never relabels the Next.js habit-tracker starter, never replaces
- * product.yaml / DESIGN.md / AGENTS.md, and never treats a marketing site or backend as Expo Router.
+ * Expo is selectable, not default. An authorized empty target gets a copy that can
+ * `npm install` and `expo export --platform web` locally. Device install, EAS, OTA, and
+ * store submit stay out of scope. It never relabels the Next.js habit-tracker starter, never
+ * replaces product.yaml / DESIGN.md / AGENTS.md, and never treats a marketing site or backend
+ * as Expo Router.
  *
  * Consumes `catalog/stacks/expo-selection.ts`. Scaffold writes only into authorized destinations
  * outside the builder checkout.
@@ -35,6 +37,7 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 
 export const EXPO_STARTER_FIXTURE_DIR = path.join(here, "expo-starter-fixture");
 export const EXPO_STARTER_FIXTURE_ID = "expo-consumer-starter-fixture";
+export const EXPO_STARTER_BOOT_FILES = ["babel.config.js", "metro.config.js"] as const;
 
 export const BUILDER_AUTHORITY_FILES = ["AGENTS.md", "APP_AGENTS.md", "product.yaml", "DESIGN.md", "PRODUCT.md"] as const;
 
@@ -89,6 +92,8 @@ export interface PlanExpoStarterScaffoldInput {
   compositionTarget: CompositionTarget;
   platforms: readonly ShippingPlatform[];
   authorized: boolean;
+  /** Default true. Local boot must run lifecycle scripts so Expo CLI can export. */
+  ignoreScripts?: boolean;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -354,10 +359,14 @@ export function installExpoStarterConsumer(input: PlanExpoStarterScaffoldInput):
     reason,
   });
   if (plan.action !== "scaffold") return failed("scaffold-refused", plan.reason);
-  const install = spawnSync("npm", ["install", "--ignore-scripts", "--no-audit", "--no-fund"], {
+  const ignoreScripts = input.ignoreScripts !== false;
+  const installArgs = ["install", "--no-audit", "--no-fund"];
+  if (ignoreScripts) installArgs.splice(1, 0, "--ignore-scripts");
+  const install = spawnSync("npm", installArgs, {
     cwd: input.target,
     encoding: "utf8",
     timeout: 300_000,
+    env: { ...process.env, CI: "1", EXPO_NO_TELEMETRY: "1" },
   });
   if (install.status !== 0) {
     return failed("install-failed", (install.stderr || install.stdout || "npm install failed").trim().slice(-400));

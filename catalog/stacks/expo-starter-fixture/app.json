@@ -3,8 +3,10 @@
     "name": "Expo Consumer Fixture",
     "slug": "expo-consumer-fixture",
     "scheme": "expoconsumerfixture",
-    "plugins": ["expo-router"],
     "version": "0.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
     "platforms": ["ios", "android", "web"],
     "ios": {
       "bundleIdentifier": "app.example.expoconsumerfixture"
@@ -13,8 +15,10 @@
       "package": "app.example.expoconsumerfixture"
     },
     "web": {
-      "bundler": "metro"
+      "bundler": "metro",
+      "output": "static"
     },
+    "plugins": ["expo-router", "expo-dev-client"],
     "extra": {
       "b2cNativeDirectoryOwnership": "generated-cng"
     }

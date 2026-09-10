@@ -63,6 +63,14 @@ export const EXPO_ROUTER_SRC_FILES = [
   "src/states/surface-state.ts",
   "src/persistence/seam.ts",
   "src/ui/contract-binding.ts",
+  "src/ui/empty-state.tsx",
+  "src/ui/skeleton.tsx",
+  "src/ui/haptics.tsx",
+  "src/ui/keyboard-behavior.tsx",
+  "src/ui/press-feedback.tsx",
+  "src/ui/tokens.ts",
+  "src/native/capability-status.tsx",
+  "src/native/capability-status.web.tsx",
 ] as const;
 
 export const EXPO_UI_ADAPTER_RELATIVE_PATH = "surfaces/ui-library/adapters/expo.json";
@@ -76,6 +84,7 @@ export const EXPO_ROUTER_JSX_LAYOUT_PATTERN = /<(Stack|Tabs)\b/;
 export const EXPO_ROUTER_MODAL_PRESENTATION_PATTERN = /presentation:\s*["']modal["']/;
 
 export type ExpoRouterPinStatus = "unpinned" | "workspace-pin" | "fabricated-latest";
+export type ExpoUiAdapterQuality = "absent" | "placeholder" | "implemented";
 export type ExpoRouterLayoutStatus = "layout-ready" | "incomplete" | "fat-routes" | "hardcoded-product" | "data-reexport";
 export type ExpoRouterDeliveryAction = "layout-ready" | "refuse";
 export type ExpoRouterRefusalCode =
@@ -102,6 +111,7 @@ export interface ExpoRouterLayoutReport {
   jsxRoutes: boolean;
   pinStatus: ExpoRouterPinStatus;
   expoAdapterPresent: boolean;
+  expoAdapterQuality: ExpoUiAdapterQuality;
   swiftuiAdapterPresent: boolean;
   status: ExpoRouterLayoutStatus;
 }
@@ -203,8 +213,58 @@ export function inspectExpoCompanionPins(dependencies: Record<string, string> | 
   return { mismatched, rangeFailures };
 }
 
+const REQUIRED_EXPO_ADAPTER_CONTRACTS = [
+  "feedback.empty-state",
+  "feedback.skeleton",
+  "feedback.haptics",
+  "input.keyboard-behavior",
+  "interaction.press-feedback",
+] as const;
+
+function symbolPresent(sourceText: string, symbol: string): boolean {
+  return new RegExp(`\\b(?:export\\s+(?:async\\s+)?function|export\\s+const|function|const|class)\\s+${symbol}\\b`).test(sourceText);
+}
+
+export function inspectExpoUiAdapter(skillRoot: string): { quality: ExpoUiAdapterQuality; missingSymbols: readonly string[] } {
+  const text = readOptionalText(path.join(skillRoot, EXPO_UI_ADAPTER_RELATIVE_PATH));
+  if (!text) return { quality: "absent", missingSymbols: REQUIRED_EXPO_ADAPTER_CONTRACTS };
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    return { quality: "placeholder", missingSymbols: REQUIRED_EXPO_ADAPTER_CONTRACTS };
+  }
+  if (!isRecord(parsed) || !Array.isArray(parsed.implementations)) {
+    return { quality: "placeholder", missingSymbols: REQUIRED_EXPO_ADAPTER_CONTRACTS };
+  }
+  const missingSymbols: string[] = [];
+  const seen = new Set<string>();
+  for (const implementation of parsed.implementations) {
+    if (!isRecord(implementation) || typeof implementation.contractId !== "string") continue;
+    seen.add(implementation.contractId);
+    if (!isRecord(implementation.source) || typeof implementation.source.path !== "string" || !Array.isArray(implementation.source.symbols)) {
+      missingSymbols.push(implementation.contractId);
+      continue;
+    }
+    const sourceText = readOptionalText(path.join(skillRoot, implementation.source.path));
+    if (!sourceText) {
+      missingSymbols.push(`${implementation.contractId}:${implementation.source.path}`);
+      continue;
+    }
+    for (const symbol of implementation.source.symbols) {
+      if (typeof symbol !== "string" || !symbolPresent(sourceText, symbol)) {
+        missingSymbols.push(`${implementation.contractId}:${String(symbol)}`);
+      }
+    }
+  }
+  for (const contractId of REQUIRED_EXPO_ADAPTER_CONTRACTS) {
+    if (!seen.has(contractId)) missingSymbols.push(contractId);
+  }
+  return { quality: missingSymbols.length === 0 ? "implemented" : "placeholder", missingSymbols };
+}
+
 export function expoAdapterManifestExists(skillRoot: string): boolean {
-  return existsSync(path.join(skillRoot, EXPO_UI_ADAPTER_RELATIVE_PATH));
+  return inspectExpoUiAdapter(skillRoot).quality !== "absent";
 }
 
 function inspectJsxRoutes(target: string, routeFilesPresent: readonly string[]): boolean {
@@ -232,6 +292,7 @@ export function inspectExpoRouterLayout(target: string, skillRoot: string): Expo
   const hardcodedProduct = PRODUCT_HARDCODE_PATTERN.test(texts);
   const jsxRoutes = inspectJsxRoutes(target, routeFilesPresent);
   const pinStatus = inspectExpoRouterPin(readOptionalText(path.join(target, "package.json")));
+  const adapter = inspectExpoUiAdapter(skillRoot);
   let status: ExpoRouterLayoutStatus = "layout-ready";
   if (hardcodedProduct) status = "hardcoded-product";
   else if (fatRoutes.length > 0) status = "fat-routes";
@@ -246,7 +307,8 @@ export function inspectExpoRouterLayout(target: string, skillRoot: string): Expo
     hardcodedProduct,
     jsxRoutes,
     pinStatus,
-    expoAdapterPresent: expoAdapterManifestExists(skillRoot),
+    expoAdapterPresent: adapter.quality !== "absent",
+    expoAdapterQuality: adapter.quality,
     swiftuiAdapterPresent: existsSync(path.join(skillRoot, SWIFTUI_ADAPTER_RELATIVE_PATH)),
     status,
   };
@@ -296,8 +358,8 @@ export function planExpoRouterDelivery(input: {
   if (marketingOrBackend(readOptionalText(path.join(input.target, "package.json")))) {
     return refuse("existing-marketing-or-backend", "Expo Router does not replace a separately selected marketing site or backend.");
   }
-  if (layout.expoAdapterPresent) {
-    return refuse("placeholder-expo-adapter", "Do not add an Expo UI adapter until native source exists.");
+  if (layout.expoAdapterQuality === "placeholder") {
+    return refuse("placeholder-expo-adapter", "An Expo UI adapter file without native source is a placeholder. Implement the contracts first.");
   }
   if (layout.pinStatus === "fabricated-latest") {
     return refuse("fabricated-router-pin", "Do not invent an expo-router version from /latest/ docs or the bundled-with-sdk-57 fact.");
@@ -321,7 +383,8 @@ export function planExpoRouterDelivery(input: {
     action: "layout-ready",
     layout: layout.status,
     pinStatus: layout.pinStatus,
-    reason: "JSX Stack/Tabs layout is present with a workspace expo-router pin. Native UI adapter and runtime proof remain separate.",
+    reason:
+      "JSX Stack/Tabs layout is present with a workspace expo-router pin and a source-backed Expo UI adapter. Native device Router runtime remains unverified.",
     runtimeVerified,
   };
 }

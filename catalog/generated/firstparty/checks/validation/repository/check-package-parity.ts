@@ -193,6 +193,7 @@ function checkPackStandalone(runtimePkg: PackageJson): void {
     "tooling/render-design-room.ts",
     "surfaces/ui-library/component-index.json",
     "surfaces/ui-library/adapters/swiftui.json",
+    "surfaces/ui-library/adapters/expo.json",
     "checks/validation/business/design/check-design-md.ts",
     "examples/extensions/support-case/extension.yaml",
     "examples/extensions/support-case/pack.yaml",

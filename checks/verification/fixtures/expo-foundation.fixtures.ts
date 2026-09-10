@@ -37,19 +37,26 @@ import {
   EXPO_ROUTER_SRC_FILES,
   EXPO_ROUTER_WORKSPACE_PIN,
   inspectExpoCompanionPins,
+  inspectExpoUiAdapter,
   isolatedStarterRouterLayout,
   planExpoRouterDelivery,
   reviewedExpoRouterFact,
 } from "../../../catalog/stacks/expo-router-contract.js";
+import {
+  EXPO_BOOT_COMPANION_PINS,
+  inspectExpoBootCompanionPins,
+  localBootDoesNotUseExpoGo,
+  runExpoStarterLocalBoot,
+} from "../../../catalog/stacks/expo-local-boot.js";
 import {
   invokeNativeCapability,
 } from "../../../catalog/stacks/expo-starter-fixture/modules/b2c-native-capability/src/invoke.js";
 import { invokeNativeCapability as invokeWebCapability } from "../../../catalog/stacks/expo-starter-fixture/modules/b2c-native-capability/src/index.web.js";
 import {
   BUILDER_AUTHORITY_FILES,
+  EXPO_STARTER_BOOT_FILES,
   EXPO_STARTER_FIXTURE_DIR,
   habitTrackerStarterIsNextNotExpo,
-  installExpoStarterConsumer,
   isolatedExpoStarterPaths,
   materializeExpoStarterFixture,
   planExpoStarterScaffold,
@@ -113,10 +120,10 @@ export function register(harness: Harness): void {
     assert(habitTrackerStarterIsNextNotExpo(skillRoot), "habit-tracker starter must stay Next.js");
     const selected = resolveExpoSelection({ compositionTarget: iosExpo() });
     assert(operationFor(selected, "starter-scaffold").evidenceTier === "fixture-tested", "selected Expo starter fixture must be fixture-tested");
-    assert(operationFor(selected, "cng-prebuild").evidenceTier === "blocked", "CNG prebuild stays blocked until an executed CLI is fixture-tested");
-    assert(operationFor(selected, "official-skills").evidenceTier === "blocked", "official Expo skills stay blocked until #87 fixture-tests them");
-    assert(operationFor(selected, "router-native-ui").evidenceTier === "blocked", "Router/native UI stays blocked without an expo-router pin and native adapter");
-    assert(operationFor(selected, "custom-native-module").evidenceTier === "blocked", "custom native module stays blocked until autolink and rebuild are proven");
+    assert(operationFor(selected, "cng-prebuild").evidenceTier === "fixture-tested", "CNG prebuild is fixture-tested in a disposable copy");
+    assert(operationFor(selected, "official-skills").evidenceTier === "blocked", "official Expo skills stay blocked until authorized");
+    assert(operationFor(selected, "router-native-ui").evidenceTier === "fixture-tested", "Router/native UI is fixture-tested with a source-backed adapter and local Metro export");
+    assert(operationFor(selected, "custom-native-module").evidenceTier === "fixture-tested", "custom native module sources are fixture-tested; compile stays not-run");
     const unselected = resolveExpoSelection({ compositionTarget: { platform: "host", runtime: HOST_AGENT_RUNTIME } });
     assert(operationFor(unselected, "starter-scaffold").evidenceTier === "blocked", "unselected Expo must not inherit the starter");
     assert(!shippingSatisfiesRequirement("web", "ios"), "web must not satisfy iOS");
@@ -130,6 +137,9 @@ export function register(harness: Harness): void {
       assert(files.includes(relative), `starter fixture must include ${relative}`);
     }
     assert(files.includes("gitignore.template"), "starter fixture must use gitignore.template so npm can pack it");
+    for (const relative of EXPO_STARTER_BOOT_FILES) {
+      assert(files.includes(relative), `starter fixture must include ${relative} so Metro can boot`);
+    }
     assert(!files.includes("package-lock.json"), "must not fabricate a lockfile");
     for (const name of BUILDER_AUTHORITY_FILES) {
       assert(!files.includes(name), `starter fixture must not ship ${name}`);
@@ -151,6 +161,9 @@ export function register(harness: Harness): void {
     const companions = inspectExpoCompanionPins(pkg.dependencies);
     assert(companions.rangeFailures.length === 0, `companion pins must satisfy expo@57.0.17 bundled ranges: ${companions.rangeFailures.join(", ")}`);
     assert(companions.mismatched.length === 0, `companion pins must match the expo@57.0.17 bundled set: ${companions.mismatched.join(", ")}`);
+    const bootPins = inspectExpoBootCompanionPins(pkg.dependencies);
+    assert(bootPins.mismatched.length === 0, `boot companions must match published pins: ${bootPins.mismatched.join(", ")}`);
+    assert(pkg.dependencies?.["expo-dev-client"] === EXPO_BOOT_COMPANION_PINS["expo-dev-client"], "development-client pin must be present");
     assert(pkg.dependencies?.["expo-modules-core"] === undefined, "must not invent an expo-modules-core pin");
     assert(reviewedExpoRouterFact() === "bundled-with-sdk-57", "reviewed Router fact is not a package version");
   });
@@ -160,8 +173,11 @@ export function register(harness: Harness): void {
     assert(layout.status === "layout-ready", `expected layout-ready, got ${layout.status}`);
     assert(layout.jsxRoutes, "routes must be Expo Router JSX, not data-object re-exports");
     assert(layout.pinStatus === "workspace-pin", `expo-router must be a workspace pin, got ${layout.pinStatus}`);
-    assert(layout.expoAdapterPresent === false, "must not add a placeholder Expo UI adapter");
-    assert(layout.swiftuiAdapterPresent, "SwiftUI remains the implemented adapter");
+    assert(layout.expoAdapterPresent, "Expo UI adapter manifest must exist");
+    assert(layout.expoAdapterQuality === "implemented", "Expo UI adapter must point at real source symbols, not a placeholder");
+    const adapter = inspectExpoUiAdapter(skillRoot);
+    assert(adapter.quality === "implemented" && adapter.missingSymbols.length === 0, `adapter missing ${adapter.missingSymbols.join(", ")}`);
+    assert(layout.swiftuiAdapterPresent, "SwiftUI remains an implemented adapter");
     assert(SURFACE_STATES.includes("loading") && SURFACE_STATES.includes("error"), "loading and error states are required");
     assert(SURFACE_STATES.includes("empty") && SURFACE_STATES.includes("retry"), "empty and retry states are required");
     assert(deepLinkRecovery.runtimeVerified === false, "deep-link recovery is a contract, not runtime proof");
@@ -397,36 +413,37 @@ export function register(harness: Harness): void {
     assert(!existsSync(path.join(installed.installedRoot!, "catalog/stacks/expo-starter-fixture/package-lock.json")), "install must not invent a starter lockfile");
   });
 
-  harness.check("expo foundation: disposable Expo-starter consumer generates a local lockfile", () => {
-    const target = harness.makeTempDir("expo-starter-consumer");
-    const installed = installExpoStarterConsumer({
+  harness.check("expo foundation: disposable local boot exports web Metro without Expo Go or EAS", () => {
+    const target = harness.makeTempDir("expo-starter-boot");
+    const booted = runExpoStarterLocalBoot({
       target,
       skillRoot,
       compositionTarget: iosExpo(),
       platforms: ["ios"],
       authorized: true,
     });
-    assert(installed.kind === "expo-starter-consumer-install", "the consumer is the Expo starter, not the builder tarball");
-    assert(installed.status === "installed", installed.reason ?? "Expo starter consumer install failed");
-    assert(installed.lockfileGenerated, "local npm install must generate package-lock.json");
-    assert(existsSync(path.join(target, "package-lock.json")), "lockfile must exist on the Expo starter consumer");
+    assert(booted.kind === "expo-local-boot", "local boot is a disposable Expo starter run, not a builder tarball");
+    assert(booted.status === "booted", booted.reason ?? "Expo local boot failed");
+    assert(booted.lockfileGenerated, "local npm install must generate package-lock.json");
+    assert(booted.webExport.ok && booted.webExport.indexHtmlPresent && booted.webExport.javascriptBundlePresent, booted.webExport.reason ?? "web export missing bundle");
+    assert(booted.expoGoUsed === false && booted.easUsed === false, "local boot must not use Expo Go or EAS");
+    assert(localBootDoesNotUseExpoGo(booted), "Expo Go is not the acceptance path");
+    assert(booted.nativeCompileStatus === NATIVE_COMPILE_STATUS, "web export is not a native compile");
     assert(!existsSync(path.join(EXPO_STARTER_FIXTURE_DIR, "package-lock.json")), "the fixture tree still ships no lockfile");
-    assert(installed.expoLocal, "expo must install into the starter's node_modules");
-    assert(installed.expoInstalledGlobally === false, "must not install Expo globally");
-    assert(installed.localModuleInstalled, "file: b2c-native-capability must install into the starter consumer");
-    assert(installed.expoRouterLocal, "expo-router must install into the starter consumer");
-    assert(installed.noticesPresent.includes(path.join("node_modules", "expo", "LICENSE")), "Expo LICENSE must arrive with the install");
-    assert(installed.noticesPresent.includes(path.join("node_modules", "b2c-native-capability", "NOTICE")), "local module NOTICE must arrive with the install");
-    assert(installed.peerResolution === "npm-default", "reviewed pins must install without --legacy-peer-deps or a global Expo");
-    assert(installed.nativeCompileStatus === NATIVE_COMPILE_STATUS, "starter consumer install is not a native compile");
+    assert(booted.deviceInstallHold.ios.includes("signing"), "iOS device hold must name signing");
+    assert(booted.deviceInstallHold.android.includes("Android SDK"), "Android device hold must name the SDK");
     const lock = JSON.parse(readFileSync(path.join(target, "package-lock.json"), "utf8")) as { packages?: Record<string, { version?: string }> };
-    const expoLock = lock.packages?.["node_modules/expo"]?.version;
-    const reactLock = lock.packages?.["node_modules/react"]?.version;
-    assert(typeof expoLock === "string" && expoLock.startsWith("57."), `lockfile expo pin must stay on SDK 57, got ${expoLock}`);
-    assert(reactLock === "19.2.3", `lockfile react must be the RN 0.86.3 peer patch, got ${reactLock}`);
     for (const [name, pin] of Object.entries(EXPO_ROUTER_COMPANION_PINS)) {
       const locked = lock.packages?.[`node_modules/${name}`]?.version;
       assert(locked === pin, `lockfile ${name} must be ${pin}, got ${locked}`);
+    }
+    for (const [name, pin] of Object.entries(EXPO_BOOT_COMPANION_PINS)) {
+      const locked = lock.packages?.[`node_modules/${name}`]?.version;
+      assert(locked === pin, `lockfile ${name} must be ${pin}, got ${locked}`);
+    }
+    if (booted.cng.attempted) {
+      assert(booted.cng.ok, booted.cng.reason ?? "CNG prebuild failed in the disposable copy");
+      assert(booted.cng.autolinkMentioned, "disposable prebuild must resolve b2c-native-capability through Expo autolinking");
     }
   });
 

@@ -17,6 +17,7 @@ import {
   shippingSatisfiesRequirement,
   SHIPPING_PLATFORM_STEWARD_PROPOSAL,
 } from "../../../catalog/stacks/expo-selection.js";
+import { discoverExpoOfficialSkills, expoMcpDoesNotReplace, expoSkillInstallCommand } from "../../../catalog/stacks/expo-agent-tools.js";
 import { resolveRecipeBindings } from "../../../kernel/composition/resolve.js";
 import { createKnowledgeService } from "../../../kernel/knowledge-service/service.js";
 import type { HostedKnowledgeBundle } from "../../../kernel/knowledge-service/types.js";
@@ -77,8 +78,8 @@ export function register(harness: Harness): void {
     assert(!withEas.idleUnselectedServices.includes("eas-build"), "selected EAS Build is not idle");
     assert(withEas.idleUnselectedServices.includes("eas-update"), "unselected EAS Update stays idle");
     assert(operationFor(withEas, "eas-cloud-build").queuedIssue === 84, "EAS execution remains #84");
-    assert(operationFor(selected, "cng-prebuild").evidenceTier === "blocked", "CNG must stay blocked until #82");
-    assert(operationFor(selected, "official-skills").evidenceTier === "blocked", "official skills must stay blocked until #87");
+    assert(operationFor(selected, "cng-prebuild").evidenceTier === "fixture-tested", "CNG is fixture-tested for a disposable generate, not a live device");
+    assert(operationFor(selected, "official-skills").evidenceTier === "blocked", "official skills must stay blocked until authorized");
   });
 
   harness.check("expo selection: Expo knowledge is not required guidance on SwiftUI-default workflows", () => {
@@ -204,5 +205,22 @@ export function register(harness: Harness): void {
       assert(stale, `${referenceId} must refuse a stale content hash`);
     }
     assert(Object.values(EXPO_SOURCE_URLS).every((url) => url.startsWith("https://")), "consumed Expo sources must be https citations");
+  });
+
+  harness.check("expo selection: official skills stay uninstalled and Expo MCP does not add a device transport", () => {
+    const discovery = discoverExpoOfficialSkills();
+    assert(discovery.installPolicy === "refuse-until-authorized", "skills must not auto-install");
+    assert(discovery.mcpSelectedByDefault === false, "Expo MCP stays unselected");
+    assert(discovery.addsMobileOperationTransport === false, "must not add a fake Expo MobileOperationTransport");
+    assert(discovery.hostNativePreferred === true, "host-native device tools stay preferred");
+    assert(discovery.telemetryDefault === "off", "usage telemetry stays off by default");
+    assert(discovery.skills.some((skill) => skill.id === "expo-router" && skill.group === "framework"), "framework skills must be inventoried");
+    assert(discovery.skills.some((skill) => skill.id === "eas-update" && skill.paidService), "paid EAS skills must be labeled");
+    const refused = expoSkillInstallCommand(false);
+    assert(refused.action === "refuse" && refused.command === undefined, refused.reason);
+    const prepared = expoSkillInstallCommand(true, "expo-router");
+    assert(prepared.action === "prepare" && prepared.command?.includes("--skill expo-router"), prepared.reason);
+    assert(!prepared.command?.includes("--yes"), "must not pass --yes during a prepared install");
+    assert(expoMcpDoesNotReplace("starter-scaffold"), "MCP discovery must not replace starter ownership");
   });
 }

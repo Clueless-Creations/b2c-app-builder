@@ -20,13 +20,13 @@ This map routes selected Expo work to truthful declarations and explicit gaps. I
 
 `catalog/stacks/expo-selection.ts` is the inventory. First-party monetization and mobile-app-operation declarations still target `ios` / `swiftui`. Do not append `expo` to those operations until their implementations exist. A missing target is `binding.target_mismatch`, not a silent alias.
 
-#81 fixture-tests selection, knowledge routing, and passive detection only.
+#81 fixture-tests selection, knowledge routing, and passive detection. #82 fixture-tests the isolated starter, React Native adapter source, disposable Metro web export, and classified CNG generate. Device install, EAS, and store submit stay separate.
 
 ## 2. Building iOS And Android With Expo
 
-A greenfield Expo app needs an explicit composition target per platform, a reviewed lockfile, and a development build. That starter is #82. Until it lands, the operation is blocked.
+A greenfield Expo app needs an explicit composition target per platform, a reviewed lockfile generated in the app workspace, and a development client. The isolated starter under `catalog/stacks/expo-starter-fixture/` copies into an authorized empty target. Local proof is `npm install` plus `expo export --platform web` in a disposable copy. That is not iOS or Android device proof.
 
-Do not require every EAS service. Direct local compile is allowed where the host toolchain actually supports it. iOS local compilation on a Linux-only host is blocked, not “supported via docs.”
+Do not require every EAS service. Direct local compile is allowed where the host toolchain actually supports it. iOS local compilation on a Linux-only host is blocked, not “supported via docs.” Physical-device install remains a signing hold.
 
 ## 3. Adopt An Existing Expo App Without EAS
 

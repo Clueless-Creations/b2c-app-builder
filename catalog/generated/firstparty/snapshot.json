@@ -6610,7 +6610,7 @@
             "provider.app-store-connect",
             "provider.google-play"
           ],
-          "contextFingerprint": "sha256:7101ffb3b154241ef8cd1abe0781d55cdf127bc5abf4050a1dc44ce56fe75404"
+          "contextFingerprint": "sha256:1f97215f442ebefd345c196ff1c343e27be78cdb22f60283c1ef53cbb62ff339"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Refresh monetization, identity, analytics, RevenueCat, billing, platform-policy, and regional capability facts",
@@ -6906,7 +6906,7 @@
           "providerIds": [
             "provider.revenuecat"
           ],
-          "contextFingerprint": "sha256:b786072b5e2e9490295273640a21f8583def09421c044b06874abdb1b91e1beb"
+          "contextFingerprint": "sha256:c9141137b1a277e90a7cfec63322cd004d362f86963b344926d8f5bbb9c7cdd9"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Define canonical journey, profile, identity, entitlement, continuity, and cross-surface state transitions",
@@ -10319,7 +10319,7 @@
             "provider.revenuecat",
             "provider.stripe"
           ],
-          "contextFingerprint": "sha256:eb26251980f9123409abbfbb5576be587e9b21ac3afd893a8ea1cd99f0850193"
+          "contextFingerprint": "sha256:ff7977c4a78ed04c6d435585d558b0b71b4e53bc55cd5f35f8a8dd41830638ca"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Before RevenueCat/Stripe/web billing, products, paywall, entitlement, webhooks, pricing. Founder phrasing: how do I charge for subscriptions or a purchase.",
@@ -10404,7 +10404,7 @@
           "providerIds": [
             "provider.revenuecat"
           ],
-          "contextFingerprint": "sha256:4c9179e5728477e2f5bf2835a63099a1813390162ce791512acbaa945a8a12d7"
+          "contextFingerprint": "sha256:366d66726e15681d7bcf650e101aef6093e6be8971117324144a7ae164a07440"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "After a live paywall exists, or when the experiment backlog needs a next test",
@@ -15506,7 +15506,7 @@
     ]
   },
   "files": {
-    "extension.yaml": "6b705b90eeccc5fec3317b98d0e81d35224015c61e9013bfd27f04bb3dbead9c",
+    "extension.yaml": "aa83252f72aa63e5ecc6bd7e1c75af614c185f12377a4326e750cabac78303bc",
     "catalog-pack.yaml": "aacd676ddb25596ef4d8a1b0b1277ab20d929abf1c2fa73d2ee60459ef2555f3",
     "knowledge/data/analytics-attribution.md": "0bba4685b2188b9e80b7fcc14fdac9472c6c4aeac5bc59703188eaa5e26f234a",
     "knowledge/data/posthog-agent-tooling.md": "61ffdbc79a985a41a11fbe6e1c7c5663050104208baa9d05b8ebe33186ab93cc",
@@ -15580,7 +15580,7 @@
     "knowledge/money/offer-and-pricing-decisions.md": "7ab3804a448bf9736dcab27bb40c7fd5a1404e49d300c4cfbe6ca26fec51568a",
     "knowledge/money/paywall-pricing-and-experiments.md": "28ae9fe61d999ddd3556b6e7e211317aa0deabf44f6c31ec1852ff9caa1e584c",
     "knowledge/money/revenue-monetization.md": "91cacab4e540d573046776ed06783e0df6f9efac594c1ec4099e1f4eade896e1",
-    "knowledge/money/revenuecat-agent-tooling.md": "0d01ef2bca31a0aa0bf0d67165ff2f6f3e7e6ca0cd99e068367d0bcf795081e6",
+    "knowledge/money/revenuecat-agent-tooling.md": "14dd37d9d063c874d2540806f95ea4188e1d18c9790424e9fc4426c055795ea3",
     "knowledge/money/revenuecat-and-store-products.md": "1a78b6a1ec8227ff614d87c6c7768cf316fe9ad6a5500b2b426a91416062d3c6",
     "knowledge/money/stripe-and-web-billing.md": "a75f3ad24a160bda1d6c9d5d1c2c28a33a88504f9886be325a09fe9d5edd99e0",
     "knowledge/money/subscription-price-derivation.md": "20eb57f3fb50972337a16f469d1302eedc86fb4c83168eb3d388611fbbf66c94",
@@ -15654,7 +15654,7 @@
     "knowledge/words/conversion-copy.md": "68739b91f0f977f28718f48dd2368bb8c59a03a3f3d44a30efa08d12eb2956ab",
     "knowledge/words/no-slop-writing.md": "4dcb9d8a78fcee18daa5b46ced399f8b41992853141ff3a9e9b1906d263a98cb",
     "checks/validation/repository/audit-skill-links.ts": "781b1715e075b59ce673fbefad9bacab29eceb93e9f96ef60944bfda884eaf5c",
-    "package.json": "a7d77fd3e86932dfa39c0ae48ddc7fa644a91ebb0c225e74e40e152eaf75c2a7",
+    "package.json": "32262c76a19637bf9402b134b995098be0f3aed5cf3e8320829434cf6586d436",
     "tooling/catalog-scaffold.ts": "6a54386c9259c97834599249115b0dd82308c16e2c9bb35c02f3058280467077",
     "catalog/render-routing.ts": "dc1667ef4d66512306680598aa6ec463c348a654ec45fe5b43348568afbd4822",
     "checks/validation/repository/check-agent-entrypoints.ts": "58486e6e69f424c422a3d005cfc432f92fd0bd4cb7dc168f2dafeedfbe137be5",
@@ -15965,5 +15965,5 @@
     "catalog/upstreams/notices/parth-app-store-screenshots.txt": "a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a"
   },
   "dependencies": [],
-  "digest": "sha256:7fed5d1c49a49228943d627d1c59da8c0966a90a51b7daa8834d056ea1342480"
+  "digest": "sha256:3c0249adfe85e756f396978cf4cebf94adbac0a4b55972e5d2682c60091c9878"
 }

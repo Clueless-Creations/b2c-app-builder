@@ -5021,7 +5021,7 @@ implementations:
         - provider.posthog
         - provider.app-store-connect
         - provider.google-play
-      contextFingerprint: sha256:7101ffb3b154241ef8cd1abe0781d55cdf127bc5abf4050a1dc44ce56fe75404
+      contextFingerprint: sha256:1f97215f442ebefd345c196ff1c343e27be78cdb22f60283c1ef53cbb62ff339
   - id: b2c/worker.experience.onboarding-system.onb-08-motion-research
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -5277,7 +5277,7 @@ implementations:
       instructions: Define the canonical state model keeping identity, onboarding journey, profile completeness, activation, entitlement, experiment assignment/exposure, review eligibility, permission/consent, and lifecycle state as distinct machines, each with its authoritative owner, persistence/event contract, and idempotency/retry/recovery behavior — grounded in the current RevenueCat entitlement and identity model from ONB-07. Write the contract to product/onboarding/graph/ONB-12-state-identity-contract.md. Write its Foundation contract with explicit auth timing, verified-session rules, anonymous continuity, secure credential storage, account isolation, logout, deletion, and restore. Auth success never grants an entitlement. check:onboarding-evidence-onb-12 rejects a stub packet.
       providerIds:
         - provider.revenuecat
-      contextFingerprint: sha256:b786072b5e2e9490295273640a21f8583def09421c044b06874abdb1b91e1beb
+      contextFingerprint: sha256:c9141137b1a277e90a7cfec63322cd004d362f86963b344926d8f5bbb9c7cdd9
   - id: b2c/worker.experience.onboarding-system.onb-13-analytics-experiments
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -8234,7 +8234,7 @@ implementations:
       providerIds:
         - provider.revenuecat
         - provider.stripe
-      contextFingerprint: sha256:eb26251980f9123409abbfbb5576be587e9b21ac3afd893a8ea1cd99f0850193
+      contextFingerprint: sha256:ff7977c4a78ed04c6d435585d558b0b71b4e53bc55cd5f35f8a8dd41830638ca
     validationContract:
       id: revenuecat
       version: 1.0.0
@@ -8303,7 +8303,7 @@ implementations:
       instructions: Write revenue/PAYWALL_EXPERIMENT_PROGRAM.md as this node's owned cycle log. Record Cycle date, Backlog change, and Next experiment on each recurrence. Keep revenue/REVENUE_OPS.md Paywall Experiment Backlog as the registry. Every row names surface and engine (revenuecat_experiments, bandit, or posthog). Default monetization tests to RevenueCat Experiments and fetch the current Offering. Use bandit only for creatives, ASA keywords, or UA arms. Use PostHog only for UX that Offerings cannot express. Record the Surface To Engine Matrix. Fail shipping one paywall and stopping. Judge winners on cohort economics over a renewal window. Price and offer changes stay founder-gated. check:revenue is the pass signal.
       providerIds:
         - provider.revenuecat
-      contextFingerprint: sha256:4c9179e5728477e2f5bf2835a63099a1813390162ce791512acbaa945a8a12d7
+      contextFingerprint: sha256:366d66726e15681d7bcf650e101aef6093e6be8971117324144a7ae164a07440
     validationContract:
       id: revenuecat
       version: 1.0.0

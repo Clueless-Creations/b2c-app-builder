@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.39",
+  "version": "0.219.40",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Pin remaining ASC observe versus non-observe mapping fixtures from the cookbook.",
-    "Pin Superwall iOS 4.16.3 PurchaseController cases as identity, not a live purchase."
+    "Prove a selected Expo starter can install, export web Metro, and classify CNG locally.",
+    "Keep Expo selectable, not default, with a source-backed React Native adapter and no shipped starter lockfile."
   ]
 }

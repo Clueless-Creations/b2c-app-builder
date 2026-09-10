@@ -1,6 +1,6 @@
 {
   "schemaVersion": "2.0.0",
-  "skillVersion": "0.219.39",
+  "skillVersion": "0.219.40",
   "areas": [
     {
       "id": "area.operating-system",
@@ -3824,7 +3824,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/engineering/expo-compatibility.md",
-        "sha256": "sha256:c71a45e51518d7f14f8d561312544b3cc151ac5045886935cad8e3176a989055",
+        "sha256": "sha256:f8a1ffa2fee8410478f737629b67bb1e6b4560f9aa63e2b3f9b400d5b9faa0a1",
         "origin": "skill"
       }
     },
@@ -3891,7 +3891,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/engineering/expo-operations-map.md",
-        "sha256": "sha256:36a3db4d77f5dde0095ce74805d195d85f84f9e216e80825f7457814bc93bd1a",
+        "sha256": "sha256:5020bf226f572201325833d44eb71471c0832bf30454f53460c6ec2e700aa596",
         "origin": "skill"
       }
     },
@@ -3945,7 +3945,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/engineering/expo-stack-selection.md",
-        "sha256": "sha256:5000848db4a304a6b8d01473ca8066be16ccf896bf59d878f81faf696b14f548",
+        "sha256": "sha256:2d398586f35788131d8d2002a12dac53d4049e45ceab2082bd7730c2378a4fba",
         "origin": "skill"
       }
     },
@@ -4277,7 +4277,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/engineering/recommended-agent-skills.md",
-        "sha256": "sha256:37f9b86e3205c49b59596bda4e9a0358b9657bfa6580bceae74ce2e3b49f46ba",
+        "sha256": "sha256:220b6479eb24263b30d9a0b9340f2c71c97d56fee0d8da409176afd32382f541",
         "origin": "skill"
       }
     },
@@ -18604,14 +18604,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "17423cc88cdc11849e3a05c0a7aba8e068d634911d20b7c26110b2328f424801",
+    "fingerprint": "3da364a55676abb346749547debbf01c30cb4940e7eee461d8b9354784f1045d",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
-        "version": "0.219.39",
-        "revision": "0.219.39",
-        "contentDigest": "f782b880ffc6b7e858bf474841294c178900dc5c45cfad7991663fcfd6d452fe"
+        "version": "0.219.40",
+        "revision": "0.219.40",
+        "contentDigest": "9c9a2fb0da27f8f617e88f0b8e52f503a0332440819f15e9f350b81f993a4995"
       }
     ],
     "base": {

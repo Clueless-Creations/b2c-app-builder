@@ -1,10 +1,9 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.53",
+  "version": "0.219.54",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Give workers a bounded packet and distinct local versus hosted connection identities.",
-    "Keep live current-versus-later load counts, including a workflow's own books."
+    "Repair leftover 0.219.52 audit reds: Expo stack format, registered docs URLs, founder-brief catalog reads, CLI help declarations, and Design Room adapter copy."
   ]
 }

@@ -22,8 +22,8 @@
  */
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { loadKnowledgePackages } from "../catalog/knowledge-packages.js";
+import { resolveSkillRoot } from "./lib/skill-root.js";
 import { upstreamCoverage, renderUpstreamCoverage } from "../kernel/contribution/upstream-coverage.js";
 import type { UpstreamManifest, UpstreamObservation, UpstreamRelationshipKind } from "../contracts/contribution/contract.js";
 import { loadUpstreams, UPSTREAMS_DIRECTORY, type LoadedUpstream } from "../kernel/contribution/upstreams-load.js";
@@ -44,8 +44,7 @@ const INCORPORATING_KINDS = new Set<UpstreamRelationshipKind>([
   "selected-skill-guidance",
 ]);
 
-const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-const defaultSkillRoot = path.resolve(scriptDir, "..");
+const defaultSkillRoot = resolveSkillRoot(import.meta.url);
 
 function cell(value: string): string {
   return value.replace(/\r?\n/gu, " ").replace(/\|/gu, "\\|").trim();

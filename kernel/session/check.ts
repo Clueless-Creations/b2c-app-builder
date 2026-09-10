@@ -19,6 +19,10 @@
  * the skill's own shipped reference business — the same target an unmodified `npm run check:<name>`
  * gives a maintainer.
  *
+ * Packed omit-dev prefers `dist/` for `check:credits` (`tooling/render-credits.ts`). Every other
+ * `check:*` stays on the remaining-tsx inventory — including other tooling renderers and the
+ * uncompiled `checks/` graph.
+ *
  * A child gate inherits this process's environment and the target workspace's content, so its raw
  * stdout/stderr must never be forwarded into a retained `--json` result — it may carry credentials,
  * customer data, or internal paths (the same stance kernel/session/run.ts takes for the same reason).
@@ -27,9 +31,12 @@
  *
  * Exit codes: 0 = the gate passed; 1 = the gate failed, the name is unknown, or execution errored.
  */
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { checkNames } from "../../catalog/gates.js";
 import { buildAuditPlan, stripAuditOnlyFlags, GATE_TIMEOUT_MS, type AuditStep } from "../../tooling/lib/audit-plan.js";
+import { resolvePackedCheckCommand } from "../../tooling/lib/packed-check.js";
 import { isMainModule } from "../lib/cli.js";
 import { skillRoot } from "./reducer-cli.js";
 import { resolveCliWorkspace } from "./status.js";
@@ -130,15 +137,22 @@ export function main(argv = process.argv.slice(2)): number {
   }
   const overrideArgs = stripAuditOnlyFlags(plan.find((step) => step.id === `check:${name}`)?.args ?? []);
   const command = `check:${name}`;
-  const spawnArgs = ["run", "--silent", "--prefix", skillRoot(), command, "--", ...overrideArgs, ...(json ? ["--json"] : [])];
+  const extraArgs = [...overrideArgs, ...(json ? ["--json"] : [])];
+  const scripts = (JSON.parse(readFileSync(path.join(skillRoot(), "package.json"), "utf8")) as { scripts?: Record<string, string> }).scripts ?? {};
+  const compiled = resolvePackedCheckCommand(skillRoot(), scripts[command] ?? "", extraArgs);
+  const spawnArgs = ["run", "--silent", "--prefix", skillRoot(), command, "--", ...extraArgs];
 
   if (!json) {
-    // Byte-identical to a human running the npm script directly: real stdout/stderr, real exit code.
-    const result = spawnSync("npm", spawnArgs, { cwd: skillRoot(), stdio: "inherit", env, timeout: GATE_TIMEOUT_MS });
+    // Compiled dist when present (packed omit-dev); otherwise byte-identical to `npm run check:<name>`.
+    const result = compiled
+      ? spawnSync(compiled.executable, compiled.args, { cwd: skillRoot(), stdio: "inherit", env, timeout: GATE_TIMEOUT_MS })
+      : spawnSync("npm", spawnArgs, { cwd: skillRoot(), stdio: "inherit", env, timeout: GATE_TIMEOUT_MS });
     return result.status ?? 1;
   }
 
-  const result = spawnSync("npm", spawnArgs, { cwd: skillRoot(), encoding: "utf8", env, timeout: GATE_TIMEOUT_MS });
+  const result = compiled
+    ? spawnSync(compiled.executable, compiled.args, { cwd: skillRoot(), encoding: "utf8", env, timeout: GATE_TIMEOUT_MS })
+    : spawnSync("npm", spawnArgs, { cwd: skillRoot(), encoding: "utf8", env, timeout: GATE_TIMEOUT_MS });
   const parsedGate = parseGateJson(result.stdout ?? "");
   const timedOut = (result.error as NodeJS.ErrnoException | undefined)?.code === "ETIMEDOUT";
   const body = parsedGate ?? {

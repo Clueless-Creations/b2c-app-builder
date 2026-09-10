@@ -55,9 +55,11 @@ Do not extract the scorer into hosted `catalog()`.
 ## #73 boundary table (this increment)
 
 The compact table lives in
-[workflow-overhead-boundaries.md](./workflow-overhead-boundaries.md). It covers
-the selected onboarding subgraph plus the #38 Apple media effect. Observed cost
-is unknown. Candidate action is keep. Leave #73 open for a measured interval.
+[workflow-overhead-boundaries.md](./workflow-overhead-boundaries.md). The
+selected set is named: ONB-12, ONB-13, ONB-16 through ONB-20, Design Room plus
+design-system-audit, and the #38 Apple media workflow. Comments follow catalog
+`reads` / `dependencies` / `reviewOf` / `roleId`. Observed cost is unknown.
+Candidate action is keep. Leave #73 open for a measured interval.
 
 ## #40 closeout signal (already on main)
 

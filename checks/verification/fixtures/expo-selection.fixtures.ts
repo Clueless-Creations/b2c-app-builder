@@ -79,6 +79,8 @@ export function register(harness: Harness): void {
     assert(withEas.idleUnselectedServices.includes("eas-update"), "unselected EAS Update stays idle");
     assert(operationFor(withEas, "eas-cloud-build").queuedIssue === 84, "EAS execution remains #84");
     assert(operationFor(selected, "cng-prebuild").evidenceTier === "fixture-tested", "CNG is fixture-tested for a disposable generate, not a live device");
+    assert(operationFor(selected, "expo-web-export").evidenceTier === "fixture-tested", "local static Metro export is fixture-tested");
+    assert(operationFor(selected, "eas-hosting").evidenceTier === "blocked", "EAS Hosting stays blocked");
     assert(operationFor(selected, "official-skills").evidenceTier === "blocked", "official skills must stay blocked until authorized");
   });
 
@@ -93,9 +95,7 @@ export function register(harness: Harness): void {
     for (const workflowId of swiftuiDefaultWorkflows) {
       const workflow = catalog.workflows.find((entry) => entry.id === workflowId);
       assert(workflow, `expected ${workflowId} in the composed catalog`);
-      const expoRefs = (workflow?.referenceIds ?? []).filter((id) =>
-        (EXPO_KNOWLEDGE_REFERENCE_IDS as readonly string[]).includes(id),
-      );
+      const expoRefs = (workflow?.referenceIds ?? []).filter((id) => (EXPO_KNOWLEDGE_REFERENCE_IDS as readonly string[]).includes(id));
       assert(expoRefs.length === 0, `${workflowId} must not list Expo refs as required guidance; got ${expoRefs.join(", ")}`);
     }
   });
@@ -145,7 +145,10 @@ export function register(harness: Harness): void {
       recipe: { packageId: extension.id, packageVersion: extension.version, recipeId: "b2c/subscription-app" },
       target: { platform: "ios", runtime: "swiftui" },
     });
-    assert(swiftuiPaywall.status === "refused" && swiftuiPaywall.reasonCodes.includes("binding.recipe_unavailable"), "ios/swiftui subscription-app stays experimental");
+    assert(
+      swiftuiPaywall.status === "refused" && swiftuiPaywall.reasonCodes.includes("binding.recipe_unavailable"),
+      "ios/swiftui subscription-app stays experimental",
+    );
     const expoPaywall = resolveRecipeBindings({
       packages: [owner],
       recipe: { packageId: extension.id, packageVersion: extension.version, recipeId: "b2c/subscription-app" },
@@ -159,8 +162,14 @@ export function register(harness: Harness): void {
     assert(SHIPPING_PLATFORM_STEWARD_PROPOSAL.examples.composition.runtime === EXPO_APP_RUNTIME, "canonical example is composition target");
     const productYaml = readFileSync(path.join(skillRoot, "catalog/ontology/instance.schema.json"), "utf8");
     assert(!productYaml.includes("product.platforms"), "instance schema must not gain a hidden platforms field from this package");
-    assert(EXPO_QUEUED_OWNERS.some((owner) => owner.issue === 82 && owner.doNot.includes("habit-tracker")), "queued #82 ownership must be explicit");
-    assert(EXPO_QUEUED_OWNERS.some((owner) => owner.issue === 84 && owner.doNot.includes("RevenueCat")), "queued #84 must not share a CLI framework with RevenueCat");
+    assert(
+      EXPO_QUEUED_OWNERS.some((owner) => owner.issue === 82 && owner.doNot.includes("habit-tracker")),
+      "queued #82 ownership must be explicit",
+    );
+    assert(
+      EXPO_QUEUED_OWNERS.some((owner) => owner.issue === 84 && owner.doNot.includes("RevenueCat")),
+      "queued #84 must not share a CLI framework with RevenueCat",
+    );
   });
 
   harness.check("expo selection: decision-focused retrieval hits Expo guidance and a SwiftUI query does not alias it", () => {
@@ -204,7 +213,10 @@ export function register(harness: Harness): void {
       }
       assert(stale, `${referenceId} must refuse a stale content hash`);
     }
-    assert(Object.values(EXPO_SOURCE_URLS).every((url) => url.startsWith("https://")), "consumed Expo sources must be https citations");
+    assert(
+      Object.values(EXPO_SOURCE_URLS).every((url) => url.startsWith("https://")),
+      "consumed Expo sources must be https citations",
+    );
   });
 
   harness.check("expo selection: official skills stay uninstalled and Expo MCP does not add a device transport", () => {
@@ -214,8 +226,14 @@ export function register(harness: Harness): void {
     assert(discovery.addsMobileOperationTransport === false, "must not add a fake Expo MobileOperationTransport");
     assert(discovery.hostNativePreferred === true, "host-native device tools stay preferred");
     assert(discovery.telemetryDefault === "off", "usage telemetry stays off by default");
-    assert(discovery.skills.some((skill) => skill.id === "expo-router" && skill.group === "framework"), "framework skills must be inventoried");
-    assert(discovery.skills.some((skill) => skill.id === "eas-update" && skill.paidService), "paid EAS skills must be labeled");
+    assert(
+      discovery.skills.some((skill) => skill.id === "expo-router" && skill.group === "framework"),
+      "framework skills must be inventoried",
+    );
+    assert(
+      discovery.skills.some((skill) => skill.id === "eas-update" && skill.paidService),
+      "paid EAS skills must be labeled",
+    );
     const refused = expoSkillInstallCommand(false);
     assert(refused.action === "refuse" && refused.command === undefined, refused.reason);
     const prepared = expoSkillInstallCommand(true, "expo-router");

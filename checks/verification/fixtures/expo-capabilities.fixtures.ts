@@ -5,6 +5,7 @@
  * RevenueCat mutations, paid EAS, and production hosting stay not-run.
  */
 import {
+  EMPTY_AUTH_SESSION,
   EXPO_CAPABILITY_OPERATION_IDS,
   EXPO_CAPABILITY_SOURCES,
   capabilityOperationsRemainBlocked,
@@ -12,23 +13,30 @@ import {
   classifyDeviceCapability,
   classifyEnvName,
   classifyInstalledIntegration,
+  classifyNotificationHandoff,
   classifyOfflineClaim,
+  classifyOfflineEvent,
+  classifyPermissionOutcome,
   classifyProtectedRoute,
   classifyPurchaseOperation,
+  classifyUnauthenticatedBackendRequest,
   evaluateIdentityBoundary,
   proofScopeIsNativeStore,
+  reduceAuthSession,
   runFakeInAppTransport,
   scanClientArtifacts,
 } from "../../../catalog/stacks/expo-capability-protocol.js";
-import { EXPO_APP_RUNTIME, operationFor, resolveExpoSelection } from "../../../catalog/stacks/expo-selection.js";
+import { EXPO_APP_RUNTIME, HOST_AGENT_RUNTIME, operationFor, resolveExpoSelection } from "../../../catalog/stacks/expo-selection.js";
 import {
   EXPO_WEB_OPERATION_IDS,
   EXPO_WEB_STATIC_SOURCES,
+  bindLocalStaticExport,
   classifyWebNativeModule,
   decideExpoWebSurface,
   defaultWebSurfaceMode,
+  easHostingRemainsBlocked,
+  localStaticExportIsFixtureTested,
   scanStaticExportArtifacts,
-  webOperationsRemainBlocked,
 } from "../../../catalog/stacks/expo-web-static.js";
 import { assert, type Harness } from "./_harness.js";
 
@@ -52,7 +60,10 @@ export function register(harness: Harness): void {
       assert(operation.evidenceTier === "blocked" && operation.queuedIssue === 83, `${id} selection row must stay #83 blocked`);
     }
     assert(operationFor(resolution, "native-purchases").queuedIssue === 83, "native purchases stay #83, not #79");
-    assert(Object.values(EXPO_CAPABILITY_SOURCES).every((url) => url.startsWith("https://")), "capability sources must be https citations");
+    assert(
+      Object.values(EXPO_CAPABILITY_SOURCES).every((url) => url.startsWith("https://")),
+      "capability sources must be https citations",
+    );
   });
 
   harness.check("expo capabilities: fake transport covers purchase, restore, pending, error, expiry, and account isolation", () => {
@@ -226,10 +237,7 @@ export function register(harness: Harness): void {
       "leak must name the management canary",
     );
 
-    const publicOnly = scanClientArtifacts(
-      [{ path: "dist/index.html", contents: "<html>https://example.invalid/public</html>" }],
-      CANARIES,
-    );
+    const publicOnly = scanClientArtifacts([{ path: "dist/index.html", contents: "<html>https://example.invalid/public</html>" }], CANARIES);
     assert(publicOnly.action === "pass" && publicOnly.leaks.length === 0, "EXPO_PUBLIC_ values may appear in the client bundle");
 
     const unknown = scanClientArtifacts(
@@ -237,7 +245,10 @@ export function register(harness: Harness): void {
       [{ name: "MY_PROVIDER_SECRET", value: "CANARY_MY_PROVIDER_SECRET_NOT_A_SECRET" }],
     );
     assert(unknown.action === "refuse" && unknown.code === "secret-in-client-bundle", "unknown non-EXPO_PUBLIC canaries must refuse");
-    assert(unknown.leaks.some((leak) => leak.name === "MY_PROVIDER_SECRET" && leak.secretClass === "unknown"), "unknown canary must be reported");
+    assert(
+      unknown.leaks.some((leak) => leak.name === "MY_PROVIDER_SECRET" && leak.secretClass === "unknown"),
+      "unknown canary must be reported",
+    );
   });
 
   harness.check("expo capabilities: SQLite is not a backend, SecureStore is not web storage, client routes are not authorization", () => {
@@ -293,15 +304,130 @@ export function register(harness: Harness): void {
     assert(absent.action === "absent", "unselected integration stays absent");
   });
 
+  harness.check("expo capabilities: cancelled, expired, malicious callback, and account switch cannot leak prior-user data or paid access", () => {
+    const signedIn = reduceAuthSession({
+      event: "sign-in",
+      current: EMPTY_AUTH_SESSION,
+      incomingUserId: "user-a",
+      callbackTrusted: true,
+    });
+    assert(signedIn.next.signedIn && signedIn.next.appUserId === "user-a", "trusted sign-in records app auth");
+    assert(signedIn.next.entitled === false && signedIn.paidAccessLeaked === false, "sign-in is not a paid entitlement");
+
+    const cancelled = reduceAuthSession({ event: "cancelled", current: signedIn.next });
+    assert(cancelled.next.signedIn === false && cancelled.next.priorUserDataPresent === false, "cancelled sign-in clears the session");
+    assert(cancelled.leakedPriorUser === false && cancelled.paidAccessLeaked === false, "cancel cannot leak prior-user data");
+
+    const expired = reduceAuthSession({
+      event: "expired",
+      current: { signedIn: true, appUserId: "user-a", priorUserDataPresent: true, entitled: true },
+    });
+    assert(expired.next.signedIn === false && expired.next.entitled === false, "expiry clears paid access");
+    assert(expired.next.priorUserDataPresent === false, "expiry clears user-scoped data");
+
+    const revoked = reduceAuthSession({
+      event: "revoked",
+      current: { signedIn: true, appUserId: "user-a", priorUserDataPresent: true, entitled: true },
+    });
+    assert(revoked.next.entitled === false && revoked.paidAccessLeaked === false, "revocation clears paid access");
+
+    const malicious = reduceAuthSession({
+      event: "malicious-callback",
+      current: { signedIn: true, appUserId: "user-a", priorUserDataPresent: true, entitled: true },
+    });
+    assert(malicious.code === "malicious-callback" && malicious.next.signedIn === false, "malicious callback is refused");
+    assert(malicious.next.priorUserDataPresent === false && malicious.next.entitled === false, "malicious callback cannot keep prior-user data");
+
+    const untrustedSignIn = reduceAuthSession({
+      event: "sign-in",
+      current: EMPTY_AUTH_SESSION,
+      incomingUserId: "attacker",
+      callbackTrusted: false,
+    });
+    assert(untrustedSignIn.code === "malicious-callback" && untrustedSignIn.next.signedIn === false, "untrusted sign-in is refused");
+
+    const switched = reduceAuthSession({
+      event: "account-switch",
+      current: { signedIn: true, appUserId: "user-a", priorUserDataPresent: true, entitled: true },
+      incomingUserId: "user-b",
+    });
+    assert(switched.next.appUserId === "user-b" && switched.next.priorUserDataPresent === false, "account switch drops prior-user data");
+    assert(switched.next.entitled === false && switched.paidAccessLeaked === false, "paid access does not follow the previous user");
+
+    const bypassed = classifyUnauthenticatedBackendRequest({ authenticated: false, navigationGuardBypassed: true });
+    assert(bypassed.action === "refuse" && bypassed.code === "unauthenticated-backend", "bypassing a client guard does not authorize the backend");
+    const gated = classifyUnauthenticatedBackendRequest({ authenticated: false, navigationGuardBypassed: false });
+    assert(gated.action === "refuse", "unauthenticated backend requests fail with the guard in place too");
+  });
+
+  harness.check("expo capabilities: offline restart, reconnect, duplicate, migration failure, and interrupted write keep local semantics", () => {
+    const restart = classifyOfflineEvent({ event: "restart", store: "sqlite", claimed: "local-cache-preserved" });
+    assert(restart.action === "accept-classification", "restart may preserve a local cache");
+    const reconnect = classifyOfflineEvent({ event: "reconnect", store: "sqlite", claimed: "local-cache-preserved" });
+    assert(reconnect.action === "accept-classification", "reconnect may preserve a local cache");
+    const duplicate = classifyOfflineEvent({ event: "duplicate-request", store: "sqlite", claimed: "local-cache-preserved" });
+    assert(duplicate.action === "accept-classification", "duplicate local requests stay cache semantics");
+
+    const restartAsBackend = classifyOfflineEvent({ event: "restart", store: "sqlite", claimed: "backend-success" });
+    assert(restartAsBackend.action === "refuse" && restartAsBackend.code === "sqlite-is-not-backend", "restart is not backend success");
+
+    const migration = classifyOfflineEvent({ event: "migration-failure", store: "sqlite", claimed: "write-complete" });
+    assert(migration.action === "refuse" && migration.code === "offline-migration-claimed-success", "failed migration is not write completion");
+
+    const interrupted = classifyOfflineEvent({ event: "interrupted-write", store: "sqlite", claimed: "write-complete" });
+    assert(interrupted.action === "refuse" && interrupted.code === "interrupted-write-claimed-complete", "interrupted write is not completion");
+  });
+
+  harness.check("expo capabilities: permission denial stays a safe state; token and receipt errors are not delivery", () => {
+    const denied = classifyPermissionOutcome({ capability: "camera", platform: "ios", outcome: "denied" });
+    assert(denied.safeState === "unavailable-safe" && denied.fakeSuccess === false, "denied camera stays a safe state");
+    const revoked = classifyPermissionOutcome({ capability: "notifications", platform: "android", outcome: "revoked" });
+    assert(revoked.safeState === "unavailable-safe", "revoked notifications stay a safe state");
+    const loop = classifyPermissionOutcome({
+      capability: "media-library",
+      platform: "ios",
+      outcome: "denied",
+      claimedNativeSuccess: true,
+    });
+    assert(loop.action === "refuse" && loop.code === "permission-loop", "denied permission is not native success");
+
+    const token = classifyNotificationHandoff({ tokenOk: false, receiptOk: true, claimedPersonSawNotification: false });
+    assert(token.action === "refuse" && token.code === "token-error-is-not-delivery", "token error is not delivery");
+    const receipt = classifyNotificationHandoff({ tokenOk: true, receiptOk: false, claimedPersonSawNotification: false });
+    assert(receipt.action === "refuse" && receipt.code === "receipt-error-is-not-delivery", "receipt error is not delivery");
+    const seen = classifyNotificationHandoff({ tokenOk: true, receiptOk: true, claimedPersonSawNotification: true });
+    assert(seen.action === "refuse" && seen.code === "claimed-delivery-without-handoff", "a receipt is not person-seen proof");
+    const mismatch = classifyNotificationHandoff({
+      tokenOk: true,
+      receiptOk: true,
+      claimedPersonSawNotification: false,
+      deepLinkRoute: "detail/1",
+      selectedRestoreRoute: "settings",
+    });
+    assert(mismatch.action === "refuse" && mismatch.code === "deep-link-route-mismatch", "deep link must restore the matching screen");
+    const restored = classifyNotificationHandoff({
+      tokenOk: true,
+      receiptOk: true,
+      claimedPersonSawNotification: false,
+      deepLinkRoute: "detail/1",
+      selectedRestoreRoute: "detail/1",
+    });
+    assert(restored.action === "accept-classification" && restored.restoreRoute === "detail/1", "matching deep link restores the selected screen");
+    assert(restored.deliveredToPerson === false, "restore is not person-seen proof");
+  });
+
   harness.check("expo web static: default is static; SSR, API routes, deploy-server, and production hosts refuse", () => {
     const webTarget = { platform: "web" as const, runtime: EXPO_APP_RUNTIME };
     const resolution = resolveExpoSelection({ compositionTarget: webTarget });
-    assert(webOperationsRemainBlocked(resolution), "web export and EAS Hosting stay blocked");
+    assert(easHostingRemainsBlocked(resolution), "EAS Hosting stays blocked");
+    assert(localStaticExportIsFixtureTested(resolution), "local static export is fixture-tested");
     assert(defaultWebSurfaceMode() === "static", "local/static default is static");
-    for (const id of EXPO_WEB_OPERATION_IDS) {
-      assert(operationFor(resolution, id).queuedIssue === 86, `${id} stays #86`);
-      assert(operationFor(resolution, id).evidenceTier === "blocked", `${id} must not claim fixture-tested`);
-    }
+    assert(operationFor(resolution, "expo-web-export").queuedIssue === 86, "web export stays #86");
+    assert(operationFor(resolution, "eas-hosting").queuedIssue === 86, "EAS Hosting stays #86");
+    assert(operationFor(resolution, "expo-web-export").evidenceTier === "fixture-tested", "local static export may be fixture-tested");
+    assert(operationFor(resolution, "eas-hosting").evidenceTier === "blocked", "EAS Hosting must not claim fixture-tested");
+    const unselected = resolveExpoSelection({ compositionTarget: { platform: "host", runtime: HOST_AGENT_RUNTIME } });
+    assert(operationFor(unselected, "expo-web-export").evidenceTier === "blocked", "unselected Expo must not inherit web export");
 
     const local = decideExpoWebSurface({ compositionTarget: webTarget });
     assert(local.action === "classify-local-static" && local.mode === "static", "unspecified mode defaults to static");
@@ -344,7 +470,33 @@ export function register(harness: Harness): void {
     const native = decideExpoWebSurface({ compositionTarget: webTarget, requiredNativePlatform: "ios" });
     assert(native.action === "refuse" && native.code === "web-is-not-native", "web cannot satisfy iOS");
 
-    assert(Object.values(EXPO_WEB_STATIC_SOURCES).every((url) => url.startsWith("https://")), "web sources must be https citations");
+    const classificationOnly = bindLocalStaticExport({
+      surface: local,
+      webExport: { ok: false, indexHtmlPresent: false, javascriptBundlePresent: false },
+    });
+    assert(classificationOnly.action === "refuse" && classificationOnly.code === "export-missing-bundle", "classification is not export proof");
+
+    const spa = decideExpoWebSurface({ compositionTarget: webTarget, requestedMode: "spa" });
+    const spaBind = bindLocalStaticExport({
+      surface: spa,
+      webExport: { ok: true, indexHtmlPresent: true, javascriptBundlePresent: true },
+    });
+    assert(spaBind.action === "refuse" && spaBind.code === "spa-not-static-export", "SPA classification is not the static boot export");
+
+    const hostingBind = bindLocalStaticExport({
+      surface: hosting,
+      webExport: { ok: true, indexHtmlPresent: true, javascriptBundlePresent: true },
+    });
+    assert(hostingBind.action === "refuse" && hostingBind.code === "eas-hosting-not-authorized", "EAS Hosting cannot bind as local static");
+
+    for (const id of EXPO_WEB_OPERATION_IDS) {
+      assert(operationFor(resolution, id).queuedIssue === 86, `${id} stays #86`);
+    }
+
+    assert(
+      Object.values(EXPO_WEB_STATIC_SOURCES).every((url) => url.startsWith("https://")),
+      "web sources must be https citations",
+    );
   });
 
   harness.check("expo web static: native-only modules stay unsupported; secret canaries fail a static export", () => {
@@ -358,10 +510,29 @@ export function register(harness: Harness): void {
     const webSafe = classifyWebNativeModule("web-safe");
     assert(webSafe.status === "supported" && webSafe.fakeSuccess === false, "web-safe is not a fake-success path");
 
-    const leaked = scanStaticExportArtifacts(
-      [{ path: "dist/_expo/static/js/web/index.js", contents: "CANARY_OPENAI_API_KEY_NOT_A_SECRET" }],
-      CANARIES,
-    );
+    const leaked = scanStaticExportArtifacts([{ path: "dist/_expo/static/js/web/index.js", contents: "CANARY_OPENAI_API_KEY_NOT_A_SECRET" }], CANARIES);
     assert(leaked.action === "refuse" && leaked.code === "secret-in-client-bundle", "AI key canary in a static export must refuse");
+
+    const webTarget = { platform: "web" as const, runtime: EXPO_APP_RUNTIME };
+    const surface = decideExpoWebSurface({ compositionTarget: webTarget });
+    const leakBind = bindLocalStaticExport({
+      surface,
+      webExport: { ok: true, indexHtmlPresent: true, javascriptBundlePresent: true },
+      artifacts: [{ path: "dist/_expo/static/js/web/index.js", contents: "CANARY_OPENAI_API_KEY_NOT_A_SECRET" }],
+      canaries: CANARIES,
+    });
+    assert(leakBind.action === "refuse" && leakBind.code === "secret-in-client-bundle", "leaked export artifacts cannot bind");
+
+    const observed = bindLocalStaticExport({
+      surface,
+      webExport: { ok: true, indexHtmlPresent: true, javascriptBundlePresent: true },
+      artifacts: [{ path: "dist-web/index.html", contents: "<html></html>" }],
+      canaries: CANARIES,
+    });
+    assert(observed.action === "observe-local-static" && observed.exportEvidenceTier === "fixture-tested", "clean static export may be observed");
+    assert(
+      observed.easHosting === false && observed.nativeProof === false && observed.runtimeVerified === false,
+      "observation is not hosting or runtime proof",
+    );
   });
 }

@@ -182,6 +182,8 @@ export function register(harness: Harness): void {
     assert(update.support === "labeled-unavailable" && update.queuedIssue === 85, "OTA stays #85");
     const deploy = getExpoEasCommand("eas.deploy");
     assert(deploy.support === "labeled-unavailable" && deploy.queuedIssue === 86, "hosting stays #86");
+    const exported = getExpoEasCommand("expo.export");
+    assert(exported.support === "labeled-unavailable" && exported.queuedIssue === 86, "executor does not spawn expo.export");
     const cloud = getExpoEasCommand("eas.build.cloud");
     assert(cloud.documentedFlags.freezeCredentials, "eas build documents --freeze-credentials");
     assert(cloud.effects.credentialMutation === false, "frozen dispatch is not a credential mutation");
@@ -714,6 +716,8 @@ export function register(harness: Harness): void {
   harness.check("expo-eas: #82 CNG is fixture-tested when selected; official-skills stay blocked; #84 rows become fixture-tested only when selected", () => {
     const selected = resolveExpoSelection({ compositionTarget: { platform: "ios", runtime: EXPO_APP_RUNTIME } });
     assert(operationFor(selected, "cng-prebuild").evidenceTier === "fixture-tested", "selected CNG classification is fixture-tested for #82");
+    assert(operationFor(selected, "expo-web-export").evidenceTier === "fixture-tested", "local static export is fixture-tested for #86");
+    assert(operationFor(selected, "eas-hosting").evidenceTier === "blocked", "EAS Hosting stays blocked for #86");
     assert(operationFor(selected, "official-skills").evidenceTier === "blocked", "official skills stay blocked for #87");
     assert(operationFor(selected, "eas-update").evidenceTier === "blocked", "OTA stays blocked for #85");
     assert(operationFor(selected, "eas-cloud-build").evidenceTier === "blocked", "unselected EAS cloud stays blocked");

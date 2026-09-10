@@ -2,6 +2,7 @@
  * Expo selected-capability protocol (#83).
  *
  * Classifies authentication, offline data, device capabilities, and native purchases.
+ * Session, offline-event, permission, and notification-handoff rows are protocol only.
  * `catalog/stacks/expo-selection.ts` keeps those operations blocked. This module does not
  * call App Store, Play, or RevenueCat, and does not spawn Expo CLI.
  *
@@ -23,6 +24,8 @@ export const EXPO_CAPABILITY_SOURCES = {
   sqlite: "https://docs.expo.dev/versions/latest/sdk/sqlite/",
   environmentVariables: "https://docs.expo.dev/guides/environment-variables/",
   developmentBuilds: "https://docs.expo.dev/develop/development-builds/introduction/",
+  pushNotifications: "https://docs.expo.dev/push-notifications/overview/",
+  pushReceipts: "https://docs.expo.dev/push-notifications/sending-notifications/",
 } as const;
 
 export const EXPO_CAPABILITY_OPERATION_IDS = ["authentication", "offline-data", "device-capabilities", "native-purchases"] as const;
@@ -64,7 +67,16 @@ export type ExpoCapabilityRefusalCode =
   | "identity-kinds-collapsed"
   | "secret-in-client-bundle"
   | "unselected-integration-present"
-  | "proof-scope-is-not-native-store";
+  | "proof-scope-is-not-native-store"
+  | "malicious-callback"
+  | "unauthenticated-backend"
+  | "offline-migration-claimed-success"
+  | "interrupted-write-claimed-complete"
+  | "permission-loop"
+  | "token-error-is-not-delivery"
+  | "receipt-error-is-not-delivery"
+  | "claimed-delivery-without-handoff"
+  | "deep-link-route-mismatch";
 
 export interface ExpoCapabilityRow {
   id: ExpoCapabilityId;
@@ -431,5 +443,274 @@ export function classifyInstalledIntegration(input: { packageName: string; selec
   return {
     action: "selected",
     reason: "Selection is recorded. Capability operations still stay blocked until a later owner proves them.",
+  };
+}
+
+export type ExpoAuthSessionEvent = "sign-in" | "cancelled" | "expired" | "revoked" | "malicious-callback" | "account-switch";
+
+export interface ExpoAuthSessionState {
+  signedIn: boolean;
+  appUserId: string | null;
+  priorUserDataPresent: boolean;
+  entitled: boolean;
+}
+
+export const EMPTY_AUTH_SESSION: ExpoAuthSessionState = {
+  signedIn: false,
+  appUserId: null,
+  priorUserDataPresent: false,
+  entitled: false,
+};
+
+function clearedAuthSession(): ExpoAuthSessionState {
+  return { signedIn: false, appUserId: null, priorUserDataPresent: false, entitled: false };
+}
+
+export function reduceAuthSession(input: { event: ExpoAuthSessionEvent; current: ExpoAuthSessionState; incomingUserId?: string; callbackTrusted?: boolean }): {
+  next: ExpoAuthSessionState;
+  leakedPriorUser: false;
+  paidAccessLeaked: false;
+  code?: ExpoCapabilityRefusalCode;
+  reason: string;
+} {
+  const sealed = (next: ExpoAuthSessionState, reason: string, code?: ExpoCapabilityRefusalCode) => ({
+    next,
+    leakedPriorUser: false as const,
+    paidAccessLeaked: false as const,
+    code,
+    reason,
+  });
+  switch (input.event) {
+    case "malicious-callback":
+      return sealed(clearedAuthSession(), "Untrusted callback cannot create a session or keep prior-user data.", "malicious-callback");
+    case "cancelled":
+      return sealed(clearedAuthSession(), "Cancelled sign-in leaves no session and no entitlement.");
+    case "expired":
+    case "revoked":
+      return sealed(clearedAuthSession(), "Expired or revoked session clears user-scoped data and paid access.");
+    case "account-switch": {
+      const nextId = input.incomingUserId?.trim() || null;
+      return sealed(
+        { signedIn: Boolean(nextId), appUserId: nextId, priorUserDataPresent: false, entitled: false },
+        "Account switch clears prior-user data. Paid access does not follow the previous user.",
+      );
+    }
+    case "sign-in": {
+      if (input.callbackTrusted !== true) {
+        return sealed(clearedAuthSession(), "Sign-in with an untrusted callback is refused.", "malicious-callback");
+      }
+      const nextId = input.incomingUserId?.trim() || null;
+      if (!nextId) {
+        return sealed(clearedAuthSession(), "Sign-in without an app user id creates no session.");
+      }
+      return sealed(
+        { signedIn: true, appUserId: nextId, priorUserDataPresent: false, entitled: false },
+        "Sign-in records app auth only. It does not grant a paid entitlement.",
+      );
+    }
+    default: {
+      const exhaustive: never = input.event;
+      throw new Error(`unhandled auth session event: ${String(exhaustive)}`);
+    }
+  }
+}
+
+export function classifyUnauthenticatedBackendRequest(input: { authenticated: boolean; navigationGuardBypassed: boolean }): {
+  action: "accept-classification" | "refuse";
+  code?: "unauthenticated-backend";
+  reason: string;
+} {
+  if (!input.authenticated) {
+    return {
+      action: "refuse",
+      code: "unauthenticated-backend",
+      reason: input.navigationGuardBypassed
+        ? "Bypassing an Expo Router guard does not authorize a backend request."
+        : "Unauthenticated backend requests fail. Client navigation is not server authorization.",
+    };
+  }
+  return {
+    action: "accept-classification",
+    reason: "Authenticated classification only. The authentication operation stays blocked.",
+  };
+}
+
+export type ExpoOfflineEvent = "restart" | "reconnect" | "duplicate-request" | "migration-failure" | "interrupted-write";
+
+export type ExpoOfflineEventClaim = "local-cache-preserved" | "backend-success" | "write-complete";
+
+export function classifyOfflineEvent(input: { event: ExpoOfflineEvent; store: ExpoOfflineStoreKind; claimed: ExpoOfflineEventClaim }): {
+  action: "accept-classification" | "refuse";
+  code?: ExpoCapabilityRefusalCode;
+  reason: string;
+} {
+  if (input.store === "sqlite" && input.claimed === "backend-success") {
+    return {
+      action: "refuse",
+      code: "sqlite-is-not-backend",
+      reason: "A local SQLite restart or reconnect is not backend success.",
+    };
+  }
+  switch (input.event) {
+    case "migration-failure":
+      if (input.claimed === "backend-success" || input.claimed === "write-complete") {
+        return {
+          action: "refuse",
+          code: "offline-migration-claimed-success",
+          reason: "A failed local migration is not write completion or backend success.",
+        };
+      }
+      return {
+        action: "accept-classification",
+        reason: "Migration failure stays an explicit hold. The offline-data operation stays blocked.",
+      };
+    case "interrupted-write":
+      if (input.claimed === "write-complete" || input.claimed === "backend-success") {
+        return {
+          action: "refuse",
+          code: "interrupted-write-claimed-complete",
+          reason: "An interrupted write is not completion. Local cache is not a backend of record.",
+        };
+      }
+      return {
+        action: "accept-classification",
+        reason: "Interrupted write stays incomplete. The offline-data operation stays blocked.",
+      };
+    case "restart":
+    case "reconnect":
+    case "duplicate-request":
+      if (input.claimed !== "local-cache-preserved") {
+        return {
+          action: "refuse",
+          code: "sqlite-is-not-backend",
+          reason: "Restart, reconnect, and duplicate local requests preserve cache semantics. They are not backend success.",
+        };
+      }
+      return {
+        action: "accept-classification",
+        reason: "Local cache semantics only. The offline-data operation stays blocked.",
+      };
+    default: {
+      const exhaustive: never = input.event;
+      throw new Error(`unhandled offline event: ${String(exhaustive)}`);
+    }
+  }
+}
+
+export type ExpoPermissionOutcome = "granted" | "denied" | "revoked" | "unavailable";
+
+export function classifyPermissionOutcome(input: {
+  capability: ExpoDeviceCapability;
+  platform: ShippingPlatform;
+  outcome: ExpoPermissionOutcome;
+  claimedNativeSuccess?: boolean;
+}): {
+  safeState: "proceed" | "unavailable-safe";
+  action: "accept-classification" | "refuse";
+  fakeSuccess: false;
+  code?: ExpoCapabilityRefusalCode;
+  reason: string;
+} {
+  if (input.platform === "web" && input.claimedNativeSuccess) {
+    return {
+      safeState: "unavailable-safe",
+      action: "refuse",
+      fakeSuccess: false,
+      code: "web-fakes-native-permission",
+      reason: `Web must not fake native ${input.capability} success.`,
+    };
+  }
+  switch (input.outcome) {
+    case "granted":
+      if (input.claimedNativeSuccess && input.platform === "web") {
+        return {
+          safeState: "unavailable-safe",
+          action: "refuse",
+          fakeSuccess: false,
+          code: "web-fakes-native-permission",
+          reason: `Web must not fake native ${input.capability} success.`,
+        };
+      }
+      return {
+        safeState: "proceed",
+        action: "accept-classification",
+        fakeSuccess: false,
+        reason: "Granted classification only. The device-capabilities operation stays blocked.",
+      };
+    case "denied":
+    case "revoked":
+    case "unavailable":
+      if (input.claimedNativeSuccess) {
+        return {
+          safeState: "unavailable-safe",
+          action: "refuse",
+          fakeSuccess: false,
+          code: "permission-loop",
+          reason: `${input.capability} ${input.outcome} is a safe unavailable state, not native success.`,
+        };
+      }
+      return {
+        safeState: "unavailable-safe",
+        action: "accept-classification",
+        fakeSuccess: false,
+        reason: `${input.capability} ${input.outcome} stays a useful safe state. The device-capabilities operation stays blocked.`,
+      };
+    default: {
+      const exhaustive: never = input.outcome;
+      throw new Error(`unhandled permission outcome: ${String(exhaustive)}`);
+    }
+  }
+}
+
+export function classifyNotificationHandoff(input: {
+  tokenOk: boolean;
+  receiptOk: boolean;
+  claimedPersonSawNotification: boolean;
+  deepLinkRoute?: string;
+  selectedRestoreRoute?: string;
+}): {
+  deliveredToPerson: false;
+  restoreRoute?: string;
+  action: "accept-classification" | "refuse";
+  code?: ExpoCapabilityRefusalCode;
+  reason: string;
+} {
+  if (input.claimedPersonSawNotification) {
+    return {
+      deliveredToPerson: false,
+      action: "refuse",
+      code: "claimed-delivery-without-handoff",
+      reason: "A push ticket or receipt is not evidence a person saw the notification.",
+    };
+  }
+  if (!input.tokenOk) {
+    return {
+      deliveredToPerson: false,
+      action: "refuse",
+      code: "token-error-is-not-delivery",
+      reason: "A token error is not notification delivery.",
+    };
+  }
+  if (!input.receiptOk) {
+    return {
+      deliveredToPerson: false,
+      action: "refuse",
+      code: "receipt-error-is-not-delivery",
+      reason: "A push receipt error is handoff failure to Apple or Google, not delivery to a person.",
+    };
+  }
+  if (input.deepLinkRoute && input.selectedRestoreRoute && input.deepLinkRoute !== input.selectedRestoreRoute) {
+    return {
+      deliveredToPerson: false,
+      action: "refuse",
+      code: "deep-link-route-mismatch",
+      reason: "A selected notification deep link must restore the matching screen.",
+    };
+  }
+  return {
+    deliveredToPerson: false,
+    restoreRoute: input.deepLinkRoute && input.selectedRestoreRoute ? input.selectedRestoreRoute : undefined,
+    action: "accept-classification",
+    reason: "Handoff classification only. Token and receipt success is not person-seen proof. The device-capabilities operation stays blocked.",
   };
 }

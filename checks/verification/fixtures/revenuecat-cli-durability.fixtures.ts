@@ -80,6 +80,27 @@ function offeringsCreateCount(calls: readonly CliProcessRequest[]): number {
   return countArgv(calls, (argv) => argv.includes("offerings") && argv.includes("create"));
 }
 
+function productsCreateCount(calls: readonly CliProcessRequest[]): number {
+  return countArgv(calls, (argv) => argv.includes("products") && argv.includes("create"));
+}
+
+function entitlementsCreateCount(calls: readonly CliProcessRequest[]): number {
+  return countArgv(calls, (argv) => argv.includes("entitlements") && argv.includes("create"));
+}
+
+function packagesCreateCount(calls: readonly CliProcessRequest[]): number {
+  return countArgv(calls, (argv) => argv.includes("packages") && argv.includes("create"));
+}
+
+const WAVE_DESIRED = {
+  projectId: "proj_approved",
+  appId: "app_test",
+  offering: { lookupKey: "default", displayName: "Default" },
+  products: [{ storeIdentifier: "monthly", type: "subscription" as const, appId: "app_test", displayName: "Monthly" }],
+  entitlements: [{ lookupKey: "premium", displayName: "Premium", productStoreIdentifiers: ["monthly"] }],
+  packages: [] as const,
+};
+
 function isCatalogListArgv(argv: readonly string[]): boolean {
   if (argv.includes("create") || argv.includes("attach") || argv.includes("verify") || argv.includes("show") || argv.includes("simulate-purchase")) {
     return false;
@@ -398,6 +419,55 @@ export function register(harness: Harness): void {
     });
     assert(second.invoked === false, "changed lookup key must not spawn");
     assert(second.preflight.code === "request-identity-conflict", second.preflight.code);
+    assert(offeringsCreateCount(calls) === 1, `expected one create, got ${offeringsCreateCount(calls)}`);
+  });
+
+  harness.check("revenuecat-cli-durability: offerings create identity is lookup-key not createTitle", () => {
+    const ledger = new RevenueCatCliLedger({ now: () => "2026-09-09T00:00:00.000Z" });
+    const { run, calls } = recordingRunner((request) => {
+      if (request.argv[0] === "--version") return ok(`${REVENUECAT_CLI_RELEASE.version}\n`);
+      if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
+      return ok(envelope({ id: "ofrng", lookup_key: "default", object: "offering" }));
+    });
+    const home = isolatedConfigHome(harness.makeTempDir("rc-title-identity"), "ws-a");
+    const discovery = discoverTrusted(harness, "rc-title-identity-disc", run);
+    const first = runRevenueCatCli({
+      operationId: "rc.catalog.create",
+      projectId: "proj_approved",
+      lookupKey: "default",
+      displayName: "Default",
+      hostAuthorityGranted: true,
+      executable: "/opt/fake/bin/rc",
+      cwd: home,
+      isolatedHome: home,
+      pathEnv: "/opt/fake/bin",
+      run,
+      discovery,
+      target: selectedTarget(),
+      idempotencyKey: "rc-title-k",
+      ledger,
+    });
+    assert(first.invoked === true, "first lookup-key create must spawn");
+    const second = runRevenueCatCli({
+      operationId: "rc.catalog.create",
+      projectId: "proj_approved",
+      lookupKey: "default",
+      displayName: "Default",
+      createTitle: "Default",
+      hostAuthorityGranted: true,
+      executable: "/opt/fake/bin/rc",
+      cwd: home,
+      isolatedHome: home,
+      pathEnv: "/opt/fake/bin",
+      run,
+      discovery,
+      target: selectedTarget(),
+      idempotencyKey: "rc-title-k",
+      ledger,
+    });
+    assert(second.invoked === false, "unused createTitle must not start a second offerings create");
+    assert(second.resumed === true, "same lookup-key/display-name must resume");
+    assert(second.preflight.code !== "request-identity-conflict", second.preflight.code);
     assert(offeringsCreateCount(calls) === 1, `expected one create, got ${offeringsCreateCount(calls)}`);
   });
 
@@ -759,5 +829,141 @@ export function register(harness: Harness): void {
     assert(second.invoked === false, "must not auto-retry the write");
     assert(second.preflight.code === "mutation-uncertain", second.preflight.code);
     assert(offeringsCreateCount(calls) === 1, `expected one write, got ${offeringsCreateCount(calls)}`);
+  });
+
+  harness.check("revenuecat-cli-durability: uncertain mutation in a catalog wave does not dispatch later writes", () => {
+    const ledger = new RevenueCatCliLedger({ now: () => "2026-09-09T00:00:00.000Z" });
+    const { run, calls } = recordingRunner((request) => {
+      if (request.argv[0] === "--version") return ok(`${REVENUECAT_CLI_RELEASE.version}\n`);
+      if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
+      if (request.argv.includes("offerings") && request.argv.includes("create")) {
+        return ok(envelope({ id: "ofrng", lookup_key: "default", object: "offering" }));
+      }
+      if (request.argv.includes("products") && request.argv.includes("create")) {
+        return { stdout: "", stderr: "", status: null, timedOut: true, truncated: false, cancelled: false, signal: "SIGTERM" };
+      }
+      if (isCatalogListArgv(request.argv) || request.argv.includes("verify")) {
+        return ok(envelope({ object: "list", items: [], next_page: null }));
+      }
+      return ok(envelope({}));
+    });
+    const result = runRevenueCatCatalogSession(
+      durableSession(harness, "rc-wave-uncertain", run, ledger, {
+        intent: "reconcile-catalog",
+        createIfMissing: true,
+        idempotencyKey: "rc-wave-uncertain-k",
+        offeringCreate: { lookupKey: "default", displayName: "Default" },
+        desired: WAVE_DESIRED,
+      }),
+    );
+    assert(result.disposition === "uncertain", `disposition ${result.disposition}`);
+    assert(result.replaySafe === false, "uncertain wave must not be replay-safe");
+    assert(result.nextAction === "hold-uncertain", `nextAction ${result.nextAction}`);
+    assert(offeringsCreateCount(calls) === 1, `offering writes ${offeringsCreateCount(calls)}`);
+    assert(productsCreateCount(calls) === 1, `product writes ${productsCreateCount(calls)}`);
+    assert(entitlementsCreateCount(calls) === 0, `entitlement must not spawn after uncertain product, got ${entitlementsCreateCount(calls)}`);
+    assert(packagesCreateCount(calls) === 0, "package create must not spawn after uncertain product");
+  });
+
+  harness.check("revenuecat-cli-durability: crash mid-wave resumes remaining creates without re-dispatching the applied write", () => {
+    const cwd = isolatedConfigHome(harness.makeTempDir("rc-wave-crash"), "ws-a");
+    const file = revenueCatCliLedgerPath(cwd);
+    const firstLedger = new RevenueCatCliLedger({ now: () => "2026-09-09T00:00:00.000Z" });
+    const { run, calls } = recordingRunner((request) => {
+      if (request.argv[0] === "--version") return ok(`${REVENUECAT_CLI_RELEASE.version}\n`);
+      if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
+      if (request.argv.includes("offerings") && request.argv.includes("create")) {
+        return ok(envelope({ id: "ofrng", lookup_key: "default", object: "offering" }));
+      }
+      if (request.argv.includes("products") && request.argv.includes("create")) {
+        return ok(envelope({ id: "prod", store_identifier: "monthly", type: "subscription", app_id: "app_test", object: "product" }));
+      }
+      if (request.argv.includes("entitlements") && request.argv.includes("create")) {
+        return ok(envelope({ id: "ent", lookup_key: "premium", object: "entitlement" }));
+      }
+      if (isCatalogListArgv(request.argv) || request.argv.includes("verify")) {
+        return ok(envelope({ object: "list", items: [], next_page: null }));
+      }
+      return ok(envelope({}));
+    });
+    const discovery = discoverTrusted(harness, "rc-wave-crash-disc", run);
+    let persistCount = 0;
+    let crashed = false;
+    const session = {
+      intent: "reconcile-catalog" as const,
+      executable: "/opt/fake/bin/rc",
+      cwd,
+      isolatedHome: cwd,
+      pathEnv: "/opt/fake/bin",
+      apiKey: "rc-fixture-key",
+      run,
+      discovery,
+      target: selectedTarget(),
+      expected: {
+        projectId: "proj_approved",
+        appId: "app_test",
+        offeringId: "off_default",
+        productIds: ["prod_monthly"],
+        entitlementIds: ["ent_premium"],
+        packageIds: [] as readonly string[],
+      },
+      hostAuthorityGranted: true,
+      synthetic: true,
+      createIfMissing: true,
+      offeringCreate: { lookupKey: "default", displayName: "Default" },
+      desired: WAVE_DESIRED,
+      idempotencyKey: "rc-wave-crash-k",
+      ledger: firstLedger,
+      ledgerPath: file,
+    };
+    try {
+      runRevenueCatCatalogSession({
+        ...session,
+        persistLedger: () => {
+          persistCount += 1;
+          firstLedger.save(file);
+          if (persistCount === 2) throw new Error("crash-after-first-wave-write");
+        },
+      });
+    } catch (error) {
+      crashed = error instanceof Error && error.message === "crash-after-first-wave-write";
+    }
+    assert(crashed, "first process must die after the first applied catalog write is durable");
+    assert(offeringsCreateCount(calls) === 1, `offering writes before crash ${offeringsCreateCount(calls)}`);
+    assert(productsCreateCount(calls) === 0, `product must not spawn before the crash, got ${productsCreateCount(calls)}`);
+    const recovered = RevenueCatCliLedger.load(file);
+    assert(recovered.get("rc-wave-crash-k:create:offering:default")?.state === "applied-unverified", recovered.get("rc-wave-crash-k:create:offering:default")?.state ?? "");
+    const { run: resumeRun, calls: resumeCalls } = recordingRunner((request) => {
+      if (request.argv[0] === "--version") return ok(`${REVENUECAT_CLI_RELEASE.version}\n`);
+      if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
+      if (request.argv.includes("offerings") && request.argv.includes("create")) {
+        return ok(envelope({ id: "ofrng_dup", lookup_key: "default", object: "offering" }));
+      }
+      if (request.argv.includes("products") && request.argv.includes("create")) {
+        return ok(envelope({ id: "prod", store_identifier: "monthly", type: "subscription", app_id: "app_test", object: "product" }));
+      }
+      if (request.argv.includes("entitlements") && request.argv.includes("create")) {
+        return ok(envelope({ id: "ent", lookup_key: "premium", object: "entitlement" }));
+      }
+      if (isCatalogListArgv(request.argv) || request.argv.includes("verify")) {
+        return ok(envelope({ object: "list", items: [], next_page: null }));
+      }
+      return ok(envelope({}));
+    });
+    const resumeDiscovery = discoverTrusted(harness, "rc-wave-crash-resume-disc", resumeRun);
+    const resume = runRevenueCatCatalogSession({
+      ...session,
+      run: resumeRun,
+      discovery: resumeDiscovery,
+      ledger: new RevenueCatCliLedger({ now: () => "2026-09-09T00:00:02.000Z" }),
+    });
+    assert(offeringsCreateCount(resumeCalls) === 0, `resume must not re-create the offering, got ${offeringsCreateCount(resumeCalls)}`);
+    assert(productsCreateCount(resumeCalls) === 1, `resume must continue with the missing product, got ${productsCreateCount(resumeCalls)}`);
+    assert(entitlementsCreateCount(resumeCalls) === 1, `resume must continue with the missing entitlement, got ${entitlementsCreateCount(resumeCalls)}`);
+    assert(
+      resume.invoked.some((step) => step.operation.id === "rc.catalog.create" && step.resumed === true && step.invoked === false),
+      "applied offering create must resume without spawn",
+    );
+    assert(resume.replaySafe === false, "mid-wave recovery is not a blank replay");
   });
 }

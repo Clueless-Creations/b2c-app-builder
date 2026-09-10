@@ -977,6 +977,19 @@ export function register(harness: Harness): void {
     assert(result.evidence.offering_verify?.complete === false, "issues must block completeness");
   });
 
+  harness.check("revenuecat-cli: verify document with only empty issues is not complete", () => {
+    const { run } = recordingRunner((request) => {
+      if (request.argv[0] === "--version") return ok("revenuecat-cli 0.1.1\n");
+      if (request.argv[0] === "commands") return ok(COMMANDS_JSON);
+      if (request.argv.includes("verify")) return ok(envelope({ issues: [] }));
+      return ok(envelope({}));
+    });
+    const result = runRevenueCatCatalogSession(catalogSession(harness, "rc-verify-empty-issues", run, { intent: "verify-offering" }));
+    assert(result.disposition === "incomplete", `disposition ${result.disposition}`);
+    assert(result.evidence.offering_verify?.complete === false, "issues:[] without an offering graph must not be complete");
+    assert(result.evidence.offering_verify?.protocol_valid !== true, "empty issues alone is not a valid verify graph");
+  });
+
   harness.check("revenuecat-cli: null paywall_components is fallback, not published paywall", () => {
     const preview = interpretOfferingPreview(UPSTREAM_SDK_PREVIEW_MINIMAL, { appId: "app_test", offeringLookupKey: "default" });
     assert(preview.fallbackOnly === true && preview.publishedPaywall === false, JSON.stringify(preview));

@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.28",
+  "version": "0.219.29",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Decode pinned RevenueCat CLI v0.1.1 responses by command instead of a generic JSON blob.",
-    "Keep preview lookup keys, verify graphs, unread list pages, and simulate-purchase product identity command-specific."
+    "Persist prepared RevenueCat CLI mutation intent on the RC-local ledger before spawn so a fresh process resumes observation instead of repeating a Test Store or catalog write.",
+    "Compare the full request identity before reuse so a changed binding with the same key is refused."
   ]
 }

@@ -49,8 +49,11 @@ Do not run paid behavioral evals, live providers, devices, deploys, or a version
 ## #75 Stage A remainder (this increment)
 
 The eight reviewed cases are the issue's required classes. The fixture walks each
-through `createKnowledgeService()` and fails per case id. Character-derived token
-estimates stay labeled estimates. Actual model usage stays unknown.
+through `createKnowledgeService()` and fails per case id. The binding case uses a
+query with no lexical hit on the required reference. Artifact walks pin the
+artifact-contract `DESIGN.md` heading. Tight-bundle UTF-8 is measured from the
+delivered markdown. Character-derived token estimates stay labeled estimates.
+Actual model usage stays unknown.
 
 This increment does not close Stage A. It does not tune retrieval against the
 held-out paraphrases and does not run Stage B.

@@ -33,6 +33,7 @@ interface StageACase {
   query?: string;
   outputPath?: string;
   requiredReferenceId?: string;
+  sectionTitle?: string;
   tokenBudget?: number;
   needs: string[];
   irrelevant: string[];
@@ -128,11 +129,21 @@ function searchHits(service: KnowledgeService, query: string, workflowId?: strin
   }
 }
 
-function boundSpec(service: KnowledgeService, workflowId: string, outputPath: string) {
+function boundSpec(
+  service: KnowledgeService,
+  workflowId: string,
+  outputPath: string,
+  requiredReferenceId: string,
+  sectionTitle: string,
+) {
   const route = service.workflow({ workflowId });
-  const spec = route.route.outputs.find((output) => output.path === outputPath)?.specifications[0]?.get;
-  assert(spec !== undefined, `${workflowId} must bind ${outputPath}`);
-  return spec;
+  const specs = route.route.outputs.find((output) => output.path === outputPath)?.specifications ?? [];
+  const pinned = specs.find((spec) => spec.get.referenceId === requiredReferenceId);
+  assert(pinned !== undefined, `${workflowId} must bind ${outputPath} via ${requiredReferenceId}`);
+  const delivered = service.get({ ...pinned.get, limit: 16384 });
+  assert(delivered.reference.referenceId === requiredReferenceId, `${requiredReferenceId} was not the delivered reference`);
+  assert(delivered.section?.title === sectionTitle, `expected heading ${sectionTitle}, got ${delivered.section?.title ?? "(none)"}`);
+  return { spec: pinned.get, delivered };
 }
 
 function runStageACase(service: KnowledgeService, workflows: readonly CatalogWorkflowRow[], item: StageACase): StageACaseReport {
@@ -169,16 +180,18 @@ function runStageACase(service: KnowledgeService, workflows: readonly CatalogWor
         return { ...base, ...volume(expanded.workflow.instructions), ok: true, detail: item.note };
       }
       case "artifact_specification": {
-        assert(item.outputPath !== undefined, `${item.id} needs outputPath`);
-        const spec = boundSpec(service, item.workflowId, item.outputPath);
-        const delivered = service.get({ ...spec, limit: 16384 });
-        assert((delivered.section?.title ?? "").length > 0, `${item.id} did not deliver a named section`);
+        assert(item.outputPath !== undefined && item.requiredReferenceId !== undefined && item.sectionTitle !== undefined, `${item.id} needs a pinned section`);
+        const { delivered } = boundSpec(service, item.workflowId, item.outputPath, item.requiredReferenceId, item.sectionTitle);
         return { ...base, ...volume(delivered.markdown), uniqueRequiredSections: 1, ok: true, detail: item.note };
       }
       case "binding_not_unscoped_query": {
         assert(item.query !== undefined && item.requiredReferenceId !== undefined, `${item.id} needs query and requiredReferenceId`);
         const unscoped = searchHits(service, item.query);
         assert(unscoped.workflowCoverage === undefined, `${item.id} unscoped search grew a workflowCoverage set`);
+        assert(
+          !unscoped.results.some((result) => result.referenceId === item.requiredReferenceId),
+          `${item.id} unscoped search already returned ${item.requiredReferenceId}; pick a query with no lexical hit`,
+        );
         const scoped = searchHits(service, item.query, item.workflowId);
         assert(scoped.workflowCoverage?.workflowId === item.workflowId, `${item.id} scoped search lost workflowCoverage`);
         assert(
@@ -187,7 +200,7 @@ function runStageACase(service: KnowledgeService, workflows: readonly CatalogWor
         );
         const bound = scoped.results.find((result) => result.referenceId === item.requiredReferenceId);
         assert(bound !== undefined, `${item.id} scoped results omitted ${item.requiredReferenceId}`);
-        assert(bound.match?.kind === "lexical" || bound.match?.kind === "workflow_binding", `${item.id} missing match kind`);
+        assert(bound.match?.kind === "workflow_binding", `${item.id} expected workflow_binding, got ${bound.match?.kind ?? "none"}`);
         return { ...base, ok: true, detail: `${item.note} match=${bound.match.kind}` };
       }
       case "tight_optional_bundle": {
@@ -203,21 +216,19 @@ function runStageACase(service: KnowledgeService, workflows: readonly CatalogWor
           tight.knowledgeBundle.coverage.incomplete.some((entry) => entry.status === "truncated" || entry.status === "omitted"),
           `${item.id} tight bundle hid omitted/truncated entries`,
         );
+        const delivered = tight.knowledgeBundle.references.map((entry) => entry.markdown).join("");
+        const measured = volume(delivered);
+        assert(measured.codePoints === tight.knowledgeBundle.consumedChars, `${item.id} utf-8/code-point volume drifted from consumedChars`);
         return {
           ...base,
-          codePoints: tight.knowledgeBundle.consumedChars,
-          utf8Bytes: 0,
-          estimatedTokens: Math.ceil(tight.knowledgeBundle.consumedChars / 4),
-          estimatedTokenBasis: "character_derived_code_points_div_4",
-          actualModelUsage: "unknown",
+          ...measured,
           ok: true,
-          detail: `${item.note} consumedChars=${tight.knowledgeBundle.consumedChars}`,
+          detail: `${item.note} consumedChars=${tight.knowledgeBundle.consumedChars} utf8Bytes=${measured.utf8Bytes}`,
         };
       }
       case "stale_revision": {
-        assert(item.outputPath !== undefined, `${item.id} needs outputPath`);
-        const spec = boundSpec(service, item.workflowId, item.outputPath);
-        const fresh = service.get({ ...spec, limit: 16384 });
+        assert(item.outputPath !== undefined && item.requiredReferenceId !== undefined && item.sectionTitle !== undefined, `${item.id} needs a pinned section`);
+        const { spec, delivered: fresh } = boundSpec(service, item.workflowId, item.outputPath, item.requiredReferenceId, item.sectionTitle);
         const stable = service.get({ ...spec, expectedContentSha256: fresh.reference.contentSha256, limit: 16384 });
         assert(stable.markdown === fresh.markdown, `${item.id} matching hash changed the section`);
         let stale = false;
@@ -237,9 +248,8 @@ function runStageACase(service: KnowledgeService, workflows: readonly CatalogWor
         return { ...base, ok: true, detail: item.note };
       }
       case "repeated_read": {
-        assert(item.outputPath !== undefined, `${item.id} needs outputPath`);
-        const spec = boundSpec(service, item.workflowId, item.outputPath);
-        const first = service.get({ ...spec, limit: 16384 });
+        assert(item.outputPath !== undefined && item.requiredReferenceId !== undefined && item.sectionTitle !== undefined, `${item.id} needs a pinned section`);
+        const { spec, delivered: first } = boundSpec(service, item.workflowId, item.outputPath, item.requiredReferenceId, item.sectionTitle);
         const second = service.get({ ...spec, expectedContentSha256: first.reference.contentSha256, limit: 16384 });
         assert(second.markdown === first.markdown, `${item.id} repeat read drifted`);
         const measured = volume(first.markdown);

@@ -30,19 +30,21 @@
       "class": "artifact_specification",
       "workflowId": "workflow.design.design-room",
       "outputPath": "DESIGN.md",
+      "requiredReferenceId": "reference.process.artifact-contracts",
+      "sectionTitle": "DESIGN.md",
       "needs": ["workflow.design.design-room"],
       "irrelevant": [],
-      "note": "The bound DESIGN.md specification section must be delivered through get()."
+      "note": "get() must deliver the artifact-contract DESIGN.md heading, not the first DESIGN.md specifier in catalog order."
     },
     {
       "id": "sa-binding-not-unscoped",
       "class": "binding_not_unscoped_query",
       "workflowId": "workflow.design.design-room",
-      "query": "acceptance criteria",
+      "query": "vibecoded tells",
       "requiredReferenceId": "reference.process.artifact-contracts",
       "needs": ["workflow.design.design-room"],
       "irrelevant": [],
-      "note": "Workflow binding supplies the required reference. An unscoped query must not grow a workflowCoverage set."
+      "note": "A query that misses artifact-contracts lexically must still receive it as workflow_binding. Unscoped search must not return that reference or grow workflowCoverage."
     },
     {
       "id": "sa-tight-bundle",
@@ -58,9 +60,11 @@
       "class": "stale_revision",
       "workflowId": "workflow.design.design-room",
       "outputPath": "DESIGN.md",
+      "requiredReferenceId": "reference.process.artifact-contracts",
+      "sectionTitle": "DESIGN.md",
       "needs": ["workflow.design.design-room"],
       "irrelevant": [],
-      "note": "A stale expectedContentSha256 must refuse. A matching hash must re-deliver the same section."
+      "note": "A stale expectedContentSha256 must refuse. A matching hash must re-deliver the pinned artifact-contract DESIGN.md heading."
     },
     {
       "id": "sa-hosted-only",
@@ -75,9 +79,11 @@
       "class": "repeated_read",
       "workflowId": "workflow.design.design-room",
       "outputPath": "DESIGN.md",
+      "requiredReferenceId": "reference.process.artifact-contracts",
+      "sectionTitle": "DESIGN.md",
       "needs": ["workflow.design.design-room"],
       "irrelevant": [],
-      "note": "A second get of the same revision is duplicated delivery, not a second unique required section."
+      "note": "A second get of the pinned artifact-contract DESIGN.md heading is duplicated delivery, not a second unique required section."
     }
   ]
 }

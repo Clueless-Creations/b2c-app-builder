@@ -15,13 +15,7 @@
  */
 
 import { scanClientArtifacts, type ClientArtifact, type ClientSecretScan, type SecretCanary } from "./expo-capability-protocol.js";
-import {
-  operationFor,
-  shippingSatisfiesRequirement,
-  type CompositionTarget,
-  type ExpoSelectionResolution,
-  type ShippingPlatform,
-} from "./expo-selection.js";
+import { operationFor, shippingSatisfiesRequirement, type CompositionTarget, type ExpoSelectionResolution, type ShippingPlatform } from "./expo-selection.js";
 
 export const EXPO_WEB_STATIC_PATH = "catalog/stacks/expo-web-static.ts" as const;
 
@@ -258,9 +252,6 @@ export function classifyWebNativeModule(module: ExpoWebNativeModule): ExpoWebMod
   }
 }
 
-export function scanStaticExportArtifacts(
-  artifacts: readonly ClientArtifact[],
-  canaries: readonly SecretCanary[],
-): ClientSecretScan {
+export function scanStaticExportArtifacts(artifacts: readonly ClientArtifact[], canaries: readonly SecretCanary[]): ClientSecretScan {
   return scanClientArtifacts(artifacts, canaries);
 }

@@ -16,7 +16,7 @@ export type HelpSection = {
   clusters?: HelpCluster[];
 };
 
-export const COMMANDS: Map<string, CommandMeta>;
-export const HELP_SECTIONS: HelpSection[];
+export declare const COMMANDS: Map<string, CommandMeta>;
+export declare const HELP_SECTIONS: HelpSection[];
 export function listedCommandNames(sections?: HelpSection[]): string[];
 export function renderUsage(commands?: Map<string, CommandMeta>): string;

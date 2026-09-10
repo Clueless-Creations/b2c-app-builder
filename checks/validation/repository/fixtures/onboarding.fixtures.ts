@@ -1286,8 +1286,16 @@ export function register(h: Harness): void {
   };
   const substantiveResearchProse = (topic: string): string => {
     const sentence = `This is a substantive, source-backed paragraph describing real research into ${topic}. `;
-    return `## Findings\n\n${sentence.repeat(15)}\n`;
+    return `## Findings\n\nFinding: ${sentence.trim()}\n\nSource: fixture observation 2026-09-09.\nClassification: observation.\nDecision: retain the current plan for ${topic}.\nUncertainty: synthetic fixture evidence.\n\n${sentence.repeat(8)}\n`;
   };
+  const conciseStructuredPacket = `## Findings
+
+Finding: Competitor reviews name the three-step quiz as the drop-off.
+Source: App Store review sample 2026-09-01 (n=40).
+Classification: observation.
+Decision: ONB-09 adopt a shorter quiz.
+Uncertainty: sample is US-only.
+`;
 
   const onb00PacketMissing = makeFixture("onboarding-evidence-onb00-missing");
   runFixture(
@@ -1368,7 +1376,18 @@ export function register(h: Harness): void {
 
   const evidencePacketThin = makeFixture("onboarding-evidence-packet-thin");
   writeEvidencePacket(evidencePacketThin, "product/onboarding/graph/ONB-04-competitor-reviews.md", "## Findings\n\nDone.\n");
-  runFixture("ONB-04's gate rejects a stub-length evidence packet", evidencePacketThin, evidenceScript, 1, "onboarding_evidence.packet_too_thin", [
+  runFixture(
+    "ONB-04's gate rejects a stub evidence packet that lacks a source and classification",
+    evidencePacketThin,
+    evidenceScript,
+    1,
+    "onboarding_evidence.packet_record_incomplete",
+    ["--node", "ONB-04", "--path", "product/onboarding/graph/ONB-04-competitor-reviews.md"],
+  );
+
+  const evidencePacketConcise = makeFixture("onboarding-evidence-packet-concise");
+  writeEvidencePacket(evidencePacketConcise, "product/onboarding/graph/ONB-04-competitor-reviews.md", conciseStructuredPacket);
+  runFixture("ONB-04's gate passes a concise structured record under the old length proxy", evidencePacketConcise, evidenceScript, 0, undefined, [
     "--node",
     "ONB-04",
     "--path",
@@ -1577,11 +1596,11 @@ export function register(h: Harness): void {
     `## Findings\n\n| Rule | Status |\n| --- | --- |\n${"| internal-guidance-rule | resolved |\n".repeat(20)}`,
   );
   runFixture(
-    "ONB-06's gate rejects a packet with a long table but no prose finding",
+    "ONB-06's gate rejects a packet with a long table but no finding, source, or classification",
     evidencePacketNoProse,
     evidenceScript,
     1,
-    "onboarding_evidence.packet_no_prose",
+    "onboarding_evidence.packet_record_incomplete",
     ["--node", "ONB-06", "--path", "product/onboarding/graph/ONB-06-internal-guidance-audit.md"],
   );
 

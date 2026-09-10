@@ -2,17 +2,14 @@
 /**
  * Deterministic gate for a single ONB-03..ONB-08 evidence-research node's own output packet.
  *
- * These nodes are domain.experience with no fresh-context judgment path wired into the
- * production runner (kernel/session/run.ts's acceptVerification() is only ever called from the
- * deterministic-gate branch; fresh_context acceptance exists only in test fixtures) — so a
- * deterministic gate is the only verification path that actually promotes the node to succeeded
- * in a real durable run. This gate cannot judge whether the research is TRUE (that needs a real
- * reviewer, which does not exist yet); it only rejects the mechanical shape of an empty,
- * stub-length, or still-templated packet, closing the "any returned artifact ID is accepted"
- * gap enough to stop a trivially empty or placeholder packet from unlocking ONB-09.
+ * These nodes are domain.experience. This gate is structural only: it rejects an empty,
+ * hidden-only, placeholder, or incomplete evidence record. It does not judge whether the
+ * research is true, and a passing structural check is not independent review or runtime proof.
+ * A concise record that names a finding, a source or observation, and a classification passes;
+ * padding prose cannot upgrade an empty or unsupported packet.
  */
 import { loadDesignSurfaceApplicability } from "../../../../catalog/ontology/design-surface-applicability.js";
-import { loadOnboardingApplicability } from "../../../../catalog/ontology/onboarding-applicability.js";
+import { loadVerifiedOnboardingApplicability } from "../../../../kernel/composition/onboarding-selection.js";
 import {
   flagString,
   issue,
@@ -35,10 +32,13 @@ const nodeLabel = flagString(flags, "node") ?? relativePath ?? "onboarding evide
 
 const issues: Issue[] = [];
 
-// A minimum non-fence character count that a copy-pasted trigger sentence or a one-line stub
-// cannot clear, without being so high that a genuinely terse-but-real packet would fail it.
-const MIN_SUBSTANTIVE_LENGTH = 400;
 const PLACEHOLDER_MARKERS = /\b(TODO|TBD|PLACEHOLDER|not_started)\b/i;
+const CLASSIFICATION_MARKERS = /\b(classification|observation|heuristic|benchmark|hypothesis|open question)\b/i;
+const SOURCE_MARKERS = /\bSource:\s+\S/i;
+const SOURCE_BACKED = /\bsource-backed\b/i;
+const SOURCE_URL = /https?:\/\//i;
+const SOURCE_DATE = /\b\d{4}-\d{2}-\d{2}\b/;
+const LABELED_FINDING = /\bFinding:\s+\S/i;
 
 if (!relativePath) {
   issues.push(
@@ -68,15 +68,34 @@ if (!relativePath) {
     // reviewer ever wrote.
     const stripped = stripNonRenderedMarkdown(text).trim();
 
-    if (stripped.length < MIN_SUBSTANTIVE_LENGTH) {
+    if (stripped.length === 0) {
       issues.push(
         issue(
           "error",
           "onboarding_evidence.packet_too_thin",
-          `${relativePath} has only ${stripped.length} non-fence character(s) of content. ${nodeLabel} must produce a real evidence packet, not a stub.`,
+          `${relativePath} has no visible rendered content. ${nodeLabel} must produce a real evidence packet, not a hidden or empty stub.`,
           relativePath,
         ),
       );
+    } else {
+      const hasFindings = /^##\s+Findings\b/m.test(stripped) || LABELED_FINDING.test(stripped);
+      const hasSource = SOURCE_MARKERS.test(stripped) || SOURCE_BACKED.test(stripped) || SOURCE_URL.test(stripped) || SOURCE_DATE.test(stripped);
+      const hasClassification = CLASSIFICATION_MARKERS.test(stripped);
+      if (!hasFindings || !hasSource || !hasClassification) {
+        const missing = [
+          ...(hasFindings ? [] : ["finding"]),
+          ...(hasSource ? [] : ["source or observation reference"]),
+          ...(hasClassification ? [] : ["classification"]),
+        ];
+        issues.push(
+          issue(
+            "error",
+            "onboarding_evidence.packet_record_incomplete",
+            `${relativePath} is structurally incomplete. A valid evidence record needs a finding, a source or observation reference, and a classification. Missing: ${missing.join(", ")}. Length or padding prose cannot complete the record.`,
+            relativePath,
+          ),
+        );
+      }
     }
 
     if (PLACEHOLDER_MARKERS.test(stripped)) {
@@ -90,10 +109,12 @@ if (!relativePath) {
       );
     }
 
-    const hasProse = stripped.split(/\r?\n/).some((line) => {
-      const trimmed = line.trim();
-      return trimmed.length > 0 && !trimmed.startsWith("#") && !trimmed.startsWith("|") && !trimmed.startsWith("-");
-    });
+    const hasProse =
+      LABELED_FINDING.test(stripped) ||
+      stripped.split(/\r?\n/).some((line) => {
+        const trimmed = line.trim();
+        return trimmed.length > 20 && !trimmed.startsWith("#") && !trimmed.startsWith("|") && !trimmed.startsWith("-");
+      });
     if (!hasProse) {
       issues.push(
         issue(
@@ -106,7 +127,7 @@ if (!relativePath) {
     }
 
     if (nodeLabel === "ONB-17") {
-      const applicability = loadOnboardingApplicability(args.root);
+      const applicability = loadVerifiedOnboardingApplicability(args.root);
       switch (applicability.headlineBind) {
         case "unresolved":
           issues.push(

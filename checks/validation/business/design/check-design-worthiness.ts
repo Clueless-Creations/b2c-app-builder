@@ -31,7 +31,7 @@ import {
 } from "../../../../tooling/lib/launch-state.js";
 import { isEmptyEquivalentEvidenceValue } from "../../../../kernel/lib/empty-equivalent-evidence.js";
 import { inspectRenderedH2Section, parseRenderedPipeTables } from "../../../../kernel/lib/required-table-section.js";
-import { checkContrastMechanical, checkTokenScaleMechanical } from "./lib/worthiness-mechanical.js";
+import { checkContrastMechanical, checkTokenScaleMechanical, checkUndeclaredProofColors } from "./lib/worthiness-mechanical.js";
 import { isWorkerExecutionIdentity, loadRunState } from "../../../../kernel/engine/runstate.js";
 import { workspaceArtifactFingerprint } from "../../../../kernel/engine/review-evidence.js";
 import { validateExactDesignAuthorityEvaluation } from "../../../../kernel/engine/design-taste-authority.js";
@@ -107,6 +107,7 @@ function validateDesignWorthinessContext(context: DesignWorthinessValidationCont
 
   issues.push(...checkContrastMechanical(tokens));
   issues.push(...checkTokenScaleMechanical(root, tokens, proofsRoot));
+  issues.push(...checkUndeclaredProofColors(root, tokens, proofsRoot));
   issues.push(...parseDesignExploration(design.frontmatter, tasteRequired).issues);
 
   if (existsSync(contractPath)) {
@@ -122,6 +123,24 @@ function validateDesignWorthinessContext(context: DesignWorthinessValidationCont
           "error",
           "worthiness.scorecard_missing",
           "A review-ready or design-done business needs a Design Worthiness scorecard in DESIGN.md.",
+          rel(root, contractPath),
+        ),
+      );
+    }
+
+    const nativePlatforms = selectedNativePlatforms(business);
+    const hasNativeFlows = studioHasNativeFlows(business);
+    if (
+      tasteRequired &&
+      nativePlatforms.length > 0 &&
+      hasNativeFlows &&
+      !(worthinessView.ok && hasNativeFlowAttestation(worthinessView.section.renderedBody))
+    ) {
+      issues.push(
+        issue(
+          "error",
+          "worthiness.native_flow_semantics_missing",
+          `Selected native platform(s) ${nativePlatforms.join(", ")} need a Design Worthiness row for Native flow semantics that records presentation, return, and back behavior. A web-only surface does not invent native Back.`,
           rel(root, contractPath),
         ),
       );
@@ -226,6 +245,44 @@ function reportUnsupported(
       ),
     );
   }
+}
+
+function selectedNativePlatforms(business: Record<string, unknown> | undefined): string[] {
+  const mobileApp = studioMobileApp(business);
+  const platforms = mobileApp && Array.isArray(mobileApp.platforms) ? mobileApp.platforms.filter((entry): entry is string => typeof entry === "string") : [];
+  return platforms.filter((platform) => platform === "ios" || platform === "android");
+}
+
+function studioHasNativeFlows(business: Record<string, unknown> | undefined): boolean {
+  const mobileApp = studioMobileApp(business);
+  if (!mobileApp) return false;
+  const screens = Array.isArray(mobileApp.screens) ? mobileApp.screens : [];
+  const flows = Array.isArray(mobileApp.flows) ? mobileApp.flows : [];
+  return screens.length > 0 || flows.length > 0;
+}
+
+function studioMobileApp(business: Record<string, unknown> | undefined): Record<string, unknown> | undefined {
+  const surfaces = business && isRecord(business.surfaces) ? business.surfaces : undefined;
+  return surfaces && isRecord(surfaces.mobileApp) ? surfaces.mobileApp : undefined;
+}
+
+function hasNativeFlowAttestation(renderedBody: string): boolean {
+  const tables = parseRenderedPipeTables(renderedBody);
+  for (const table of tables) {
+    const ruleIndex = headerIndex(table.headers, "Rule");
+    const attestationIndex = headerIndex(table.headers, "Attestation");
+    if (ruleIndex < 0 || attestationIndex < 0) continue;
+    for (const row of table.rows) {
+      const rule = row[ruleIndex] ?? "";
+      const attestation = row[attestationIndex] ?? "";
+      if (!/\bnative flow\b/i.test(rule)) continue;
+      const mentionsPresentation = /\b(presentation|navigation|sheet|stack|modal)\b/i.test(attestation);
+      const mentionsReturn = /\breturn\b/i.test(attestation);
+      const mentionsBack = /\bback\b/i.test(attestation);
+      if (mentionsPresentation && mentionsReturn && mentionsBack && isSubstantiveTasteAnswer(attestation)) return true;
+    }
+  }
+  return false;
 }
 
 function hasHierarchyAttestation(renderedBody: string): boolean {

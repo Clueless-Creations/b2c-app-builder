@@ -21,11 +21,11 @@ import type { CatalogInput } from "../../../kernel/engine/compile.js";
 import { acquireLock, releaseLock } from "../../../kernel/reducer/lock.js";
 import { assert, skillRoot, type Harness } from "./_harness.js";
 
-const config = "apiVersion: b2c/v1\nrecipe: { id: binding/business, version: 1.0.0 }\ntarget: { platform: ios, runtime: swiftui }\nbindings: {}\n";
-const runtime = { schemaVersion: "1.0.0", skill: "b2c-app-builder", skillVersion: "1.0.0", skillRoot: "/fixture/runtime", catalogPath: "catalog.json" };
-const options = { ownerSessionId: "activation-fixture" };
+export const config = "apiVersion: b2c/v1\nrecipe: { id: binding/business, version: 1.0.0 }\ntarget: { platform: ios, runtime: swiftui }\nbindings: {}\n";
+export const runtime = { schemaVersion: "1.0.0", skill: "b2c-app-builder", skillVersion: "1.0.0", skillRoot: "/fixture/runtime", catalogPath: "catalog.json" };
+export const options = { ownerSessionId: "activation-fixture" };
 let selectedBinding: CatalogInput["workflows"][number]["selectedOperation"];
-function catalog(instructions = "Create the app"): CatalogInput {
+export function catalog(instructions = "Create the app"): CatalogInput {
   return {
     version: "fixture",
     artifacts: [],
@@ -50,7 +50,7 @@ function catalog(instructions = "Create the app"): CatalogInput {
     ],
   };
 }
-function setup(h: Harness): string {
+export function setup(h: Harness): string {
   selectedBinding = undefined;
   const extension = definition();
   extension.recipes[0]!.workflows = ["workflow.build"];

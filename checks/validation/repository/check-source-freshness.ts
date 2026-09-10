@@ -465,25 +465,13 @@ for (const file of collectAllFiles(args.root, 20000)) {
   for (const match of text.matchAll(homePathPattern)) {
     const user = match[1] ?? "";
     if (syntheticHomeUsers.has(user)) continue;
-    issues.push(
-      issue(
-        "error",
-        "source_freshness.public_boundary.operator_path",
-        "An authored file contains an operator home path.",
-        relative,
-      ),
-    );
+    issues.push(issue("error", "source_freshness.public_boundary.operator_path", "An authored file contains an operator home path.", relative));
     break;
   }
   secretManagerConfigPattern.lastIndex = 0;
   if (secretManagerConfigPattern.test(text)) {
     issues.push(
-      issue(
-        "error",
-        "source_freshness.public_boundary.secret_manager_config",
-        "An authored file names a secret-manager project/config pair.",
-        relative,
-      ),
+      issue("error", "source_freshness.public_boundary.secret_manager_config", "An authored file names a secret-manager project/config pair.", relative),
     );
   }
 }

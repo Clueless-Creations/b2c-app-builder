@@ -202,7 +202,13 @@ export function register(h: Harness): void {
     }),
     "utf8",
   );
-  runFixture("source registry duplicate url fails after normalizeUrl", sourceRegistryDuplicateUrl, "check-source-freshness.ts", 1, "source_freshness.sources.duplicate_url");
+  runFixture(
+    "source registry duplicate url fails after normalizeUrl",
+    sourceRegistryDuplicateUrl,
+    "check-source-freshness.ts",
+    1,
+    "source_freshness.sources.duplicate_url",
+  );
 
   const sourceBoundaryClean = makeEmptyFixture("source-public-boundary-clean");
   writeSourceRegistryFixture(sourceBoundaryClean);
@@ -231,11 +237,7 @@ export function register(h: Harness): void {
   writeSourceRegistryFixture(sourceBoundarySecretManager);
   writeFileSync(
     path.join(sourceBoundarySecretManager, "README.md"),
-    [
-      "# Source Fixture",
-      "Use current docs from https://docs.doppler.com/docs/cli before setup.",
-      "Copied from Doppler `canary-proj/canary-cfg`.",
-    ].join("\n"),
+    ["# Source Fixture", "Use current docs from https://docs.doppler.com/docs/cli before setup.", "Copied from Doppler `canary-proj/canary-cfg`."].join("\n"),
     "utf8",
   );
   runFixture(

@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.44",
-  "updatedAt": "2026-09-09",
+  "version": "0.219.45",
+  "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Strip operator deployment narration from public Worker docs and freshness snapshots.",
-    "Fail source-freshness on operator home paths, secret-manager pairs, and private-sibling rows."
+    "Format the public-boundary freshness checker and register the Expo modules overview citation.",
+    "Keep the measured Presubmit wall clock as plain text so an ephemeral Actions run is not a source."
   ]
 }

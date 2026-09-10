@@ -1106,6 +1106,19 @@ _App Store screenshots or app previews are ready and a matching media standing e
 - **Gates:** `check:store-screenshots`
 - **Knowledge:** [App Store Connect CLI](../../knowledge/store/app-store-connect-cli.md), [ASO Store Ops](../../knowledge/store/aso-store-ops.md)
 
+### Apple store metadata standing envelope
+
+_App Store listing text is ready and a matching metadata standing envelope is current_
+
+- **Role:** Marketing guru
+- **Phases:** 3
+- **Providers:** `provider.app-store-connect` (cli, api, browser)
+- **Reads:** `store/STORE_CONSOLE.md`, `store/app-store-listing/APP_STORE_LISTING.md`, `state/business-state.json`
+- **Consults:** —
+- **Produces:** `store/proof/apple-store-metadata-apply.json`
+- **Gates:** `check:store-console`, `check:provider-proof`
+- **Knowledge:** [App Store Connect CLI](../../knowledge/store/app-store-connect-cli.md), [ASO Store Ops](../../knowledge/store/aso-store-ops.md)
+
 ### Google Play testing-track standing envelope
 
 _An AAB is proven and an exact internal or closed-testing track standing envelope is current_

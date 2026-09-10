@@ -178,6 +178,20 @@ export function register(harness: Harness): void {
       cliNamed.needs.includes("workflow.store.asc-cli-automation"),
       "store-048 names 'asc cli'; the strict-match partition still requires the CLI automation node",
     );
+    const metadataPush = corpus.entries.find((item) => item.id === "store-016");
+    assert(metadataPush !== undefined, "store-016 must stay in the frozen corpus");
+    assert(
+      metadataPush.needs.includes("workflow.store.apple-store-metadata-standing-envelope"),
+      "store-016 must need the Apple metadata standing envelope after that node shipped",
+    );
+    assert(
+      !metadataPush.needs.includes("workflow.store.asc-cli-automation"),
+      "store-016 is listing-text apply, not generic ASC CLI / TestFlight / screenshot upload",
+    );
+    assert(
+      metadataPush.needs.length === 1,
+      "store-016 retrieves the metadata envelope; store-console stays a dependency, not a second golden slot",
+    );
   });
 
   harness.check("hosted discovery: the ASC command reference reaches the workflow whose outputs it uploads", () => {

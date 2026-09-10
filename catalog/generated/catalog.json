@@ -6668,7 +6668,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/orchestration/full-launch-program.md",
-        "sha256": "sha256:c30f7a9899e86c2bdb25469b1647ca5dfe832f033a7a0a1756ea787fa53078c2",
+        "sha256": "sha256:5aed821974807588307f085018a3901c245f7556f55ea2f2544e86c44b2a21c1",
         "origin": "skill"
       }
     },
@@ -14374,6 +14374,61 @@
       }
     },
     {
+      "id": "workflow.store.apple-store-metadata-standing-envelope",
+      "title": "Apple store metadata standing envelope",
+      "domainId": "domain.store",
+      "areaIds": [
+        "area.build-release"
+      ],
+      "trigger": "App Store listing text is ready and a matching metadata standing envelope is current",
+      "founderPhrasings": [
+        "publish the approved listing metadata",
+        "apply the localized metadata we already signed off on",
+        "push the approved metadata live"
+      ],
+      "instructions": "Apply only the approved App Store listing text, localized metadata, and promotional content covered by the exact current standing envelope. Verify account, version, locale, and payload digest immediately before mutation. Use `asc metadata pull`, `asc metadata validate`, and `asc metadata push` as the selected-provider cookbook forms; the live push is founder-gated and the cookbook records only the `--dry-run` observe form. Probe `--help` before the first live call. Capture before-state and read back every locale. Write store/proof/apple-store-metadata-apply.json with approval ID, request digest, before state, provider operation IDs, readback state, and timestamps. Do not upload media, change products, open TestFlight, submit for review, or change release state.",
+      "reads": [
+        "store/STORE_CONSOLE.md",
+        "store/app-store-listing/APP_STORE_LISTING.md",
+        "state/business-state.json"
+      ],
+      "consults": [],
+      "referenceIds": [
+        "reference.store.app-store-connect-cli",
+        "reference.store.aso-store-ops"
+      ],
+      "roleId": "role.marketing-guru",
+      "laneIds": [
+        "store_console"
+      ],
+      "phaseIds": [
+        "phase.3"
+      ],
+      "dependencies": [
+        "workflow.store.store-console-workflow",
+        "workflow.operations.agent-operations-ledger"
+      ],
+      "outputPaths": [
+        "store/proof/apple-store-metadata-apply.json"
+      ],
+      "gateCommands": [
+        "check:store-console",
+        "check:provider-proof"
+      ],
+      "providerIds": [
+        "provider.app-store-connect"
+      ],
+      "founderOnlyActions": [
+        "approve App Store Connect metadata when no exact standing envelope exists"
+      ],
+      "actionClass": "mutate",
+      "protectedCategory": "credentials_access",
+      "idempotent": false,
+      "applicability": {
+        "mode": "always"
+      }
+    },
+    {
       "id": "workflow.store.google-play-testing-track-standing-envelope",
       "title": "Google Play testing-track standing envelope",
       "domainId": "domain.store",
@@ -17141,6 +17196,15 @@
       "generated": false
     },
     {
+      "id": "artifact.store-proof-apple-store-metadata-apply-json",
+      "path": "store/proof/apple-store-metadata-apply.json",
+      "ownerDomainId": "domain.store",
+      "laneIds": [
+        "store_console"
+      ],
+      "generated": false
+    },
+    {
       "id": "artifact.store-proof-google-play-media-apply-json",
       "path": "store/proof/google-play-media-apply.json",
       "ownerDomainId": "domain.store",
@@ -18672,14 +18736,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "518a4fc26a8d06074ecb456c62dea6ea2796de762ef3086cd8aa92a68a3e2e7d",
+    "fingerprint": "29a55e298608e42d11e5e86f1ea2255833e1983220dc1ea666d8c596fa430ef1",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
         "version": "0.219.81",
         "revision": "0.219.81",
-        "contentDigest": "4f292616424cf8f6743f7f0c79dd12037a361db8fcb630aa10b8a483e2f614c4"
+        "contentDigest": "d03ce48ce8d81fb3405a10ff22aad058b8e16b63bd5e02ea4848adc389d5f934"
       }
     ],
     "base": {
@@ -18690,7 +18754,7 @@
     "deltas": {
       "business-pack.consumer-business": {
         "domains": 15,
-        "workflows": 113,
+        "workflows": 114,
         "references": 145
       }
     }

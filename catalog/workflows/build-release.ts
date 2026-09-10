@@ -419,6 +419,32 @@ export const workflows = [
     idempotent: false,
   }),
   workflow({
+    id: "workflow.store.apple-store-metadata-standing-envelope",
+    founderPhrasings: [
+      "publish the approved listing metadata",
+      "apply the localized metadata we already signed off on",
+      "push the approved metadata live",
+    ],
+    title: "Apple store metadata standing envelope",
+    domainId: "domain.store",
+    areaIds: ["area.build-release"],
+    trigger: "App Store listing text is ready and a matching metadata standing envelope is current",
+    instructions:
+      "Apply only the approved App Store listing text, localized metadata, and promotional content covered by the exact current standing envelope. Verify account, version, locale, and payload digest immediately before mutation. Use `asc metadata pull`, `asc metadata validate`, and `asc metadata push` as the selected-provider cookbook forms; the live push is founder-gated and the cookbook records only the `--dry-run` observe form. Probe `--help` before the first live call. Capture before-state and read back every locale. Write store/proof/apple-store-metadata-apply.json with approval ID, request digest, before state, provider operation IDs, readback state, and timestamps. Do not upload media, change products, open TestFlight, submit for review, or change release state.",
+    reads: ["store/STORE_CONSOLE.md", "store/app-store-listing/APP_STORE_LISTING.md", "state/business-state.json"],
+    roleId: "role.marketing-guru",
+    laneIds: ["store_console"],
+    phaseIds: ["phase.3"],
+    dependencies: ["workflow.store.store-console-workflow"],
+    gates: ["check:store-console", "check:provider-proof"],
+    outputPaths: ["store/proof/apple-store-metadata-apply.json"],
+    providers: ["provider.app-store-connect"],
+    founderOnlyActions: ["approve App Store Connect metadata when no exact standing envelope exists"],
+    actionClass: "mutate",
+    protectedCategory: "credentials_access",
+    idempotent: false,
+  }),
+  workflow({
     id: "workflow.store.google-play-testing-track-standing-envelope",
     founderPhrasings: [
       "roll the build out to our play store testing track",

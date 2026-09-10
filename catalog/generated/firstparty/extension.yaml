@@ -2772,6 +2772,14 @@ capabilities:
         effect: mutate
         acceptance:
           - Declared workspace outputs pass deterministic checks and independent verification for the current input fingerprint.
+      - id: b2c/work.store.apple-store-metadata-standing-envelope
+        title: Apple store metadata standing envelope
+        inputSchema: b2c/worker-input
+        outputSchema: b2c/worker-output
+        evidenceSchema: b2c/worker-evidence
+        effect: mutate
+        acceptance:
+          - Declared workspace outputs pass deterministic checks and independent verification for the current input fingerprint.
       - id: b2c/work.store.google-play-testing-track-standing-envelope
         title: Google Play testing-track standing envelope
         inputSchema: b2c/worker-input
@@ -3235,7 +3243,7 @@ implementations:
       workflowId: workflow.orchestration.session-continuity-resume
       instructions: "Run `b2c status` and `b2c plan`, then inspect `git status --short` and the relevant authored artifacts before work. Treat `state/business-state.json` as reducer-owned execution state: do not edit it directly. Consult `AGENTS.md`, `operations/ORCHESTRATION.md`, `engineering/PRODUCTION_READINESS.md`, and `operations/FAILURE_CARDS.md` when present. `check:continuity-contract` verifies the installed continuity contract. Prior chat turns do not replace durable evidence."
       providerIds: []
-      contextFingerprint: sha256:ae4d7c47e6a7d3d2965ce17281bec55b15418b9a0ec88cf528a9a8a878d42e8d
+      contextFingerprint: sha256:1bb0aa24998ff1ce79155504a6246b64d52f0679d37aba25e2bf83f00b020d74
   - id: b2c/worker.orchestration.orient-scaffold-and-state-cockpit-upkeep
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -3277,7 +3285,7 @@ implementations:
       workflowId: workflow.orchestration.orient-scaffold-and-state-cockpit-upkeep
       instructions: Run `b2c status` and `b2c plan` to orient from reducer-owned `state/business-state.json`. Do not edit that file or author a second state document. Submit lane, evidence, and blocker changes through the runtime reducer. A succeeded lane needs evidence or live proof, and a lane cannot succeed while a required upstream lane is running or blocked. Record App Store Connect API-key health and Apple web-session health as two proofs; a healthy API key is not ASC connected. Do not write a signing blocker until `asc certificates list` has been read, and do not treat a local Development keychain as a distribution blocker when App Store Connect already lists Distribution certificates. Do not dispatch research-backed-spec until the live App Store portfolio observe has succeeded. Choose the smallest orchestration strategy that fits the ready work, then report what changed, what happens next, and what needs the human. Do not wait for later operational or readiness artifacts during orientation.
       providerIds: []
-      contextFingerprint: sha256:98af6c1a9f929c50d5975da2d95466d0b67f5e906b8cc7f9295cad775338b65b
+      contextFingerprint: sha256:a022ef4bf87bff54cd5235eaa1b2e814098dfdcd5e3b32ff701c12fc51464b56
   - id: b2c/worker.orchestration.full-launch-program
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -3322,7 +3330,7 @@ implementations:
       workflowId: workflow.orchestration.full-launch-program
       instructions: "Open the program. Open `operations/FOUNDER_BRIEF.md` as the canonical founder brief. Write `operations/LAUNCH_PROGRAM.md` as the derived mandate record: quote the bounded founder-constraint slice (constraints, targets, authority, selected-app facts) with provenance (artifact and digest), then outcome, stop line, launch scope, start classification, workspace facts, craft references, spend ceiling, autonomy mode, founder-only actions, and the review policy from `reference.orchestration.full-launch-program`. Do not treat `LAUNCH_PROGRAM.md` as the source or the only mandate owner. Record `project.launchScope: full` through the reducer with a dated founder reason when it changes an existing scope; never edit `state/business-state.json` by hand. Confirm the `## Review Ledger` section exists in `operations/ORCHESTRATION.md` before any broad dispatch. Present one start-of-workflow tool-intake AskUserQuestion for the account-gated tools on the research-backed-spec compiled graph; fold it into a pending readiness gate; do not open a second tool gate. Name App Store Connect API auth and the live apps-list receipt as required even when optional research tools are deferred. Record API-key health and web-session health as two proofs. Classify the start: a brownfield overhaul runs research in audit-and-gap-fill mode with keep, refresh, or redo per artifact. Do not dispatch research-backed-spec until live-app-store-portfolio has succeeded. Then let `b2c plan` sequence the existing nodes; this node adds the mandate, the isolated-review edges, the reference-pack edge, and the closeout gates, not a second graph. Hand off with the smallest founder-only ask."
       providerIds: []
-      contextFingerprint: sha256:50cc1642cbc2c4a7b8869e5446e6a41ac50553e48606fd6ace513a910aae4bc4
+      contextFingerprint: sha256:0fdc187c224683d28c72fc5123f90e77dbeb32e76bbd75a414fe373a2b5e992b
   - id: b2c/worker.orchestration.full-launch-closeout
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -3367,7 +3375,7 @@ implementations:
       workflowId: workflow.orchestration.full-launch-closeout
       instructions: "Close the program against the definition-of-done table in `reference.orchestration.full-launch-program` and the canonical founder brief in `operations/FOUNDER_BRIEF.md`. `operations/LAUNCH_PROGRAM.md` is the derived mandate record, not the only mandate owner. Write `LAUNCH.md` as the launch dossier: the store-console click path ending at Submit for Review, pointers to the listing, screenshots, signing, console, email, and revenue artifacts, the launch calendar, the monetization thresholds, and the open founder decisions. Confirm every lane is done, blocked with a founder action, or deferred with a dated reason the founder accepted. Confirm the review ledger holds a passing row for every producer-to-auditor pair and that each findings artifact exists. Confirm `engineering/PRODUCTION_READINESS.md` carries physical-device evidence, not simulator-only proof. Run `check:lane-coverage`, `check:orchestration`, `check:readiness-coverage`, and `check:app-copy`; do not narrate readiness a gate contradicts. Hand off what the founder clicks, in order, and the one remaining founder action. You never click Submit for Review."
       providerIds: []
-      contextFingerprint: sha256:f27450314b316d3a8b1fedd2f5029c1e57bc42a7ca302af6b644b08308e7afc4
+      contextFingerprint: sha256:9749c91c3cf53111a81c942164347554c87a1cd02e19dc8513623895f9312a5e
   - id: b2c/worker.process.provider-proof-verification
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -3413,7 +3421,7 @@ implementations:
         - provider.revenuecat
         - provider.resend
         - provider.app-store-connect
-      contextFingerprint: sha256:6f1fca0a923b93d121ea33527aa475bf8f78aebcf2bd44ecc0694a6e61411d8b
+      contextFingerprint: sha256:35e05219cf5d8da2be91ac4842a139d97bfb8b7713ecdd5d9bcc4d046bdbf9c7
   - id: b2c/worker.process.change-cascade
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -3455,7 +3463,7 @@ implementations:
       workflowId: workflow.process.change-cascade
       instructions: Run a design_contract_lock cascade when DESIGN.md is first accepted. This creates the public-surface baseline while app implementation starts. After that, ingest engineering/SOURCE_CHANGE_MANIFEST.json and classify each accepted change with every applicable Change Cascade Map type, not one convenient primary type. Use agents/launch-surface-producer.md for the surface audit and bounded update tasks. Check the app, Apple App Store, Google Play, Apple and Play products, billing, landing site, web onboarding, GEO/SEO, lifecycle email, analytics, legal pages and public privacy claims, screenshots, and marketing assets. Update each affected surface or record why it is unaffected. Submit any lane or evidence transitions through the reducer; do not write them into an authored state document. Updated localized, product, device, product-page, or asset surfaces need one evidence variant per applicable dimension. Re-render any screenshot, App Preview, Play feature graphic, landing screenshot, or ad asset whose source digest changed. Reconcile the locked lexicon in DESIGN.md before the change succeeds and write the checked ledger digest to state/CHANGE_CASCADE_RECEIPT.json.
       providerIds: []
-      contextFingerprint: sha256:1ae7de0dfaef4a66fad37ccfb2bd47d894e9ab0495b6d93b744d7136c3309129
+      contextFingerprint: sha256:99214793db5c8861a59e3721832f95eab661becf1b9f34acd19168704ebb04d3
   - id: b2c/worker.process.launch-trace-and-build-contracts
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -3551,7 +3559,7 @@ implementations:
       workflowId: workflow.process.launchbench-failure-cards-coverage-audit
       instructions: Before any launch-readiness claim, after a repeated agent miss, or when adding a validator or scenario, run `npm run launchbench` (definition lint plus the validator fixture suite) and turn any known regression into a durable card in `operations/FAILURE_CARDS.md` (card ID, severity, owner, status, detected date, evidence, impact, next action, validator) instead of leaving it as a chat note. Record scenarios run, validators run, expected failures caught, and unexpected misses in `LAUNCHBENCH.md`. Close a card only with evidence or command proof attached. The node's deterministic gate is `launchbench:lint` — scenario YAML shape only — so a session does not re-run the fixture suite that CI already runs on the heavy lane. Use `b2c status` and `b2c plan` to confirm that reducer-owned lane state does not support a launch-ready claim while an upstream lane is still running or blocked.
       providerIds: []
-      contextFingerprint: sha256:44284f7caa502362e596796888bebbd3d84a0ef107f7b13dfe4f66fb94886685
+      contextFingerprint: sha256:71c2166f86aa88067ddb8a778e43cc5c46e3fb8d8330240264513c690afa3543
   - id: b2c/worker.process.repository-profile-contract
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -3592,7 +3600,7 @@ implementations:
       workflowId: workflow.process.repository-profile-contract
       instructions: Accept one typed repository profile in reducer-owned project state. Compile the applicable artifact and validator contract from that profile plus the active capability graph. A profile cannot suppress privacy, secrets, authorization, billing, account deletion, provider proof, or release-truth gates when those capabilities are present.
       providerIds: []
-      contextFingerprint: sha256:ecbfb023962aff2eea55032070df8506e8516a66a3d7d7d9e8101904f8b2661f
+      contextFingerprint: sha256:c4841e2965dea1ae2a76ffd76a2f6751f7012b9ebaa80b6af52b63303c101fcf
   - id: b2c/worker.operations.paid-tool-routing-and-fallback
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -3747,7 +3755,7 @@ implementations:
       instructions: Before any new secret, API key, token, webhook signing secret, or `.env` value is introduced, classify it (public_client_config, server_secret, webhook_signing_secret, store_credential, oauth_or_refresh_token, ci_deploy_secret, runtime_user_secret, or local_operator_secret) and route it into Doppler by default — the business's own project for business-specific credentials, the shared `b2c` project for account-level ones — recording only the name, class, and location in `trust/secrets/SECRETS.md`, never the value. Resolve the Doppler config name from `SECRETS.md` or `doppler configs --project <name>` before constructing any `doppler run` command; never guess between naming conventions like `prod` and `prd`. Set automation-consumed secrets with `masked` (not `restricted`) visibility so `doppler run --` can inject them, and never `source` an `.env`/`.p8` file — extract single values with `awk -F= '/^KEY=/{print $2}' file`. `check:secrets` fails the lane if a raw secret value appears in git, docs, screenshots, or logs, or if production uses a personal CLI token instead of a service token or OIDC.
       providerIds:
         - provider.doppler
-      contextFingerprint: sha256:841a89dc3dfa85981e33b4c66f3bdeda57972cd9726da7f97deca2cac47cf9ff
+      contextFingerprint: sha256:dc626ec8cd4e1e0d63e7ed6d2d86451019e7a542c5d343d9ec30675e2c003e9b
   - id: b2c/worker.operations.resend-email-ops
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -3832,7 +3840,7 @@ implementations:
       workflowId: workflow.operations.post-launch-operations
       instructions: Run the named Weekly Ops Review in fixed order — metrics pull (PostHog/RevenueCat/console numbers, not adjectives), crash/review triage, support sweep, ASO delta, growth/spend review against `growth/PAID_UA.md`'s stop/scale rules, then ship one user-visible improvement — and log a one-line delta per step in `operations/POST_LAUNCH_OPS.md` dated against `lanes.post_launch_ops.live_since`. Before automating a value-producing loop, record one manual run with its input, output, result, cost, and failure mode; exempt necessary security, compliance, backup, and monitoring controls. Track discovery-to-owned-contact, owned-contact-to-activation, owned-contact-to-paid, and external-platform concentration when those metrics apply. Route involuntary billing churn through the recovery levers, not written off as normal, and when retention cohorts show a consistent drop at one step, open it through `change-cascade.md` rather than patching only the surface that failed. At the day-30 and day-90 checkpoints, prepare the Kill/Hold/Fix/Scale evidence pack (MRR trajectory, D7/D30 retention trend, CAC/LTV payback, founder hours) in `operations/LAUNCH_RETRO.md` — the agent assembles evidence, the founder makes the verdict. `check:post-launch` fails a checkpoint left uncompleted past its due date or a metric cell holding a placeholder instead of a number.
       providerIds: []
-      contextFingerprint: sha256:ef0155e8432acfaf8e9078f91b00f394c7285e7c21dc1b62b016fa260ebc4305
+      contextFingerprint: sha256:c81b276356ad8d68a59c2e3b067de3ffb3f5c04662224fa8aed01850ca40e815
   - id: b2c/worker.operations.support-queue-operations
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -3947,7 +3955,7 @@ implementations:
       instructions: "Read the money every cycle and prove it in `operations/FINANCE_OPS.md`: a dated row with the MRR-labeled dollar amount from RevenueCat (\"MRR $0\" is a legitimate value; an adjective is not), monthly spend across tools and acquisition, and the runway or burn those two imply (`check:post-launch` fails a pulse with no MRR figure or no runway statement). Reconcile against the pricing scenarios and stop/scale rules the strategy docs carry — spend drifting past its stop rule surfaces here first, before the weekly review decides anything. This node assembles the evidence; verdicts stay where they belong: kill/hold/fix/scale is the Weekly Ops Review's founder gate, and spend changes route through the paid-acquisition gates."
       providerIds:
         - provider.revenuecat
-      contextFingerprint: sha256:84840e407f69edf65ef2d753a0bc4ff082dbe007f8da78102eaf3d6ab81a6280
+      contextFingerprint: sha256:244fed4dc43ef591d9b4f170650d679ff1ec70aebec6afefccd05fe679d608e0
   - id: b2c/worker.operations.scheduled-autonomy-installation
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -3989,7 +3997,7 @@ implementations:
       workflowId: workflow.operations.scheduled-autonomy-installation
       instructions: "Install the OS-level trigger that keeps the operating loop alive: run `adapters/install-schedule.ts` in its default dry-run first and show the founder the exact crontab line (or launchd plist) it would install — mechanism, cadence, runtime, wrapper path, and log path — then run it with `--apply` only after the founder's approval, because a standing schedule on their machine is their call, every time. Verify the installation with the command the dry-run prints (`crontab -l | grep b2c:<slug>` or `launchctl list`), and record the whole arrangement in `operations/SCHEDULE.md`: mechanism, cadence, runtime, brief path, wall-clock cap, the verify command, the exact uninstall command (`--uninstall --apply`), and the note that the kill switch in `control/control.json` stops every scheduled session cold even while the OS keeps firing the trigger. The scheduled session itself reopens recurring work (the weekly ops review, the growth iteration loop) on its own calendar — this node installs the heartbeat, it does not do the week's work."
       providerIds: []
-      contextFingerprint: sha256:828b5f156a4e695fe609d94f0a75347adb9dec63e7c108d67313ad8101b0f61a
+      contextFingerprint: sha256:03d5d852197ffabbc48bf7d784b1ea46f854977c76aec32c788762d607bf4cd4
   - id: b2c/worker.operations.founder-zero-operator-bootstrap
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -6459,7 +6467,7 @@ implementations:
       instructions: Classify the Apple account state (membership, Team ID, role, agreements signed) before any TestFlight/App Store distribution claim, and treat a simulator build as engineering proof only, never distribution readiness. Before each release archive, read Apple's live Upcoming Requirements, submission baseline, Xcode compatibility, and upload pages; compare them with the local Xcode/SDK; reconcile the intended Release bundle ID, version, and build with App Store Connect; lint PrivacyInfo.xcprivacy; audit required-reason API coverage; prepare API-key export authentication; and check native screenshot dimensions. Record items 1 through 6 in store/APPLE_SIGNING.md before archiving. After the new archive exists, read its compiled Info.plist and confirm its bundle ID, CFBundleShortVersionString, CFBundleVersion, and injected SDK keys. Record item 7 before export or upload. Do not use an older archive as evidence for a new build. A current exact TestFlight upload standing envelope authorizes archive/upload without another prompt; read back the build state and record proof. Enrollment, certificate creation/rotation, agreements, pricing, final review submission, and production release remain founder decisions unless the opening envelope names that exact action.
       providerIds:
         - provider.app-store-connect
-      contextFingerprint: sha256:5d4aa854e976ad06b7136f82c37f3fb0bacf65fa7fea914531bd78879078acaf
+      contextFingerprint: sha256:9fbfa9895526851cfc4a4a14b2d0e711897f8cf3b15f4558042f907ac0329340
   - id: b2c/worker.store.apple-app-store-requirements-privacy-manifest
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -6628,7 +6636,7 @@ implementations:
       instructions: "Default to the `asc` CLI/skill-pack route for App Store Connect work — reads, ID resolution, metadata/screenshot dry-runs, and TestFlight/review-status checks are safe without new approval. Work the auth ladder before reporting ASC as blocked: check an existing keychain profile first (`asc --profile <Name>`), never `source` a credential `.env` file, and treat 'app record not found' as a setup step. Confirm `--help` before any unverified subcommand. Apply approved metadata, screenshots, previews, product pages, and TestFlight uploads automatically when an exact current standing envelope covers the workflow, target, resource, and action class; use the required confirmation flag, capture before-state, and read back the provider result. Ask only when that scope is absent or expired. Pricing, agreements, final review submission, and public release remain exceptional unless explicitly named in the envelope. Pass `npm run check:asc-command-contract -- --root .` and return the state/STORE_CONSOLE reconciliation patch after every external change."
       providerIds:
         - provider.app-store-connect
-      contextFingerprint: sha256:160fcad7b1d94c5df794be1b3c08d6c26bb0c8a6c998853ad1577f169db4e046
+      contextFingerprint: sha256:df7acac212fc39762e7af28166b2cdf6b62845e1e09c1cf96fb7ad9cb3e9cb64
   - id: b2c/worker.store.app-review-observe
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -6689,7 +6697,7 @@ implementations:
       instructions: "Run an observe-only App Review watch for one exact app version. Probe public API commands and a separate web-session receipt (`asc web auth status`, `asc web review list`, `asc web review show`). Poll the three Apple layers, persist every raw value, and store unknown states as unknown_provider_state. A signed Apple webhook is a wake-up only: verify `x-apple-signature` HMAC-SHA256 on the raw body, persist a host-neutral envelope, then drain that queue with `b2c app-review-ingress consume` so poll writes `run/app-review.json`. Consume polls App Store Connect through the live `asc` provider. Archive each accepted envelope after the watch write. Keep `--provider-fixture` test-only. Deduplicate by Apple event ID, including archived IDs, during persist. Do not copy webhook oldValue or newValue into layer truth. When the listing has no match, clear stored registration. Ignore Apple deliveries that predate the mandate start. Fail closed when `asc review status` JSON has no valid app-version layer. Order live snapshots by poll time, not createdDate or submittedDate. If `asc web agreements status` fails, keep the public review snapshot and treat a missing web session as a founder handoff. When review issues appear, probe web-session readiness, retrieve `asc web review show` for the exact submission ID, quarantine reviewer content as fingerprints, and classify without implementing a fix. Write durable state to run/app-review.json. Project the current blocker and case surface into store/APP_REVIEW.md in founder language. Classify a pending Apple agreement as founder action required. Never call `asc web agreements accept`. Never run `asc webhooks serve` as production ingress. Never submit, upload, or mutate store material. Pass `npm run check:app-review-contract -- --root .`."
       providerIds:
         - provider.app-store-connect
-      contextFingerprint: sha256:fd5aad361135a5ed2f96aa99eeb4501c2928650e89a15a27a32e4a6c6fbb0029
+      contextFingerprint: sha256:e29f2e016c709ef7e8c7ef71c7e2538c40465d20a62583e5b6f1655975b44b2c
   - id: b2c/worker.store.app-review-remediate
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -6750,7 +6758,7 @@ implementations:
       instructions: Build a bounded remediation plan from the classified App Review case. Route metadata_rejected to same-build metadata repair, invalid_binary to a new inspected archive, and missing_review_information to review notes. Park legal, privacy-promise, payments, product-scope, and unclear cases. Apply consumer-repo patches only. Run `asc metadata validate` and `asc metadata push --dry-run` before treating metadata as applied. Independent verification must use a different session than the producer. A verifier rejection opens a new attempt on the same occurrence. Never call `asc review submit`. Never call `asc publish appstore --submit`. Never call `asc web agreements accept`. Never upload. Pass `npm run check:app-review-contract -- --root .`.
       providerIds:
         - provider.app-store-connect
-      contextFingerprint: sha256:b27fafce7e8ebd6d12d464c738f8f517fca0aa5d885f936467489f4449752532
+      contextFingerprint: sha256:6b504fddf5d272167b32160b2001c57606f3276b0e80ba3755f2e47db34ed691
   - id: b2c/worker.store.app-review-resubmit
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -6811,7 +6819,7 @@ implementations:
       instructions: Run a capped App Review resubmission for one exact app version. Require a standing envelope that names the app ID, App Store version ID, marketing version, cycle cap, and already-uploaded proof. Never infer approval from a multiplier or from the verified fix. Same-build metadata and review-notes routes call `asc review submit --confirm` without a new upload. A new-binary route still needs the inspected archive identity and already-uploaded proof; this node does not upload. Probe `asc review submit --help` before the first live call. Record the exact command on run/app-review.json. Do not write that command into store/APP_REVIEW.md. After submit, poll App Store Connect. A timed-out mutation performs provider readback and does not submit again. A second rejection opens a linked cycle. Cycle exhaustion parks with founder action and emits no more submits. Pending developer release still needs a separate founder yes. Never call `asc publish appstore --submit`. Never call `asc web agreements accept`. Never run `asc webhooks serve` as production ingress. Pass `npm run check:app-review-contract -- --root .`.
       providerIds:
         - provider.app-store-connect
-      contextFingerprint: sha256:edcbb2dd50bcbae67b77fa3eb72b78cc7bb83968e5b6d17dcf9d6fe20371b510
+      contextFingerprint: sha256:85a92047dac1daae3405fcb9340dc51eaca842d2c52669fe5faa621648fabe27
   - id: b2c/worker.store.store-screenshots-production
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -6921,7 +6929,7 @@ implementations:
       instructions: Classify the Play developer account (organization vs personal, verification status, payments profile) before any Android readiness claim, and if personal, plan the 12-tester/14-continuous-day closed-testing production gate into the launch timeline now — it is a calendar gate, not a paperwork gate. Complete every Policy > App content task (Data safety, content rating, App access demo credentials, account deletion) and reconcile the Data safety answers against the same data inventory used for Apple App Privacy; a divergence between the two stores for one codebase is a reconciliation failure unless explicitly documented. Enroll in Play App Signing, upload an AAB (never an APK) as the readiness artifact, and stage production rollout in percentages with a named halt owner rather than 0% straight to 100%. Write the eight required sections (Developer Account, Data Safety, Content Rating, Play App Signing, Target API Level, Release Tracks, Closed Testing, Pre-Launch Report) to store/GOOGLE_PLAY_RELEASE.md before calling the Play side of lanes.store_console done.
       providerIds:
         - provider.google-play
-      contextFingerprint: sha256:61092ab28f56f4ee2f340abd8f073150407d36a3b87a283d086f1a9fc745329d
+      contextFingerprint: sha256:aadfc2b3fdb43a56b481ae7a55836d98fb086201523c7a555a8e90aff7c6f590
   - id: b2c/worker.store.google-play-metadata-standing-envelope
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -7066,6 +7074,54 @@ implementations:
       providerIds:
         - provider.app-store-connect
       contextFingerprint: sha256:5fba293642907f4ac340329e89873288fff1fae72b512b6e8121b9b14de8a58d
+  - id: b2c/worker.store.apple-store-metadata-standing-envelope
+    version: 1.0.0
+    provider: b2c/consumer-business-worker
+    description: App Store listing text is ready and a matching metadata standing envelope is current
+    operation: b2c/work.store.apple-store-metadata-standing-envelope
+    targets:
+      - platform: host
+        runtime: agent-cli
+    mode: worker-artifact
+    sdkRange: ^1.0.0
+    limitations:
+      - Requires a trusted host worker and independent verifier. External effects still require current authority and provider evidence.
+    knowledge:
+      - b2c/resource-20e7bc66464d876122ed1376f5fccc28e4ceae977de9af19c478dfe33d467f75
+      - b2c/resource-2412f52930002b9d9f52081c65196b41b3759dcd8840cf2dab53ada513728fe9
+      - b2c/resource-bd12055a0b99acfca666f9e6b423680f0a3194ec7f79457a9d9503a128e73fc4
+      - b2c/resource-b1661d825a499b63b01e1b403812396a8fc1f352256baf73a14a4beca3e0ffce
+      - b2c/resource-b65a5af5a00d5089c6a14e06fd72827f3ea55fa7106637039634c0a8c5767b31
+      - b2c/resource-5b00f0309dd4a88e0c6d720c6fd03efa5cad4d3142f8a5082e7f19dbf82e9644
+      - b2c/resource-7d933895cc4c2266d910ae11a4c7e5d94ba9cb6fe4c7c2e4846cc39f2fe263cd
+      - b2c/resource-a66c25ac72781015a89ff24d61ced9c2fd0f95b96726bc96d463387fd9c8d381
+      - b2c/resource-8c1a16f5c5577f24e8cd568e6c9fbddcf4adfb84f0683f8731d4911c7c628e38
+      - b2c/resource-f4ea04a195c07eaad14b89adc2c7c95ad414e81f7af9578761447fdca5a880d3
+      - b2c/resource-fced17879db370b89d8d59847106733962a4691f2f03cba3168e394b4d82c816
+      - b2c/resource-c5e0b9c5142a872a9b8a2bb6a63eed9ce9e630fb4652226ef83048977eca7ca2
+      - b2c/resource-71b652ebf4dc33836693fa64b004f9c52512b09edf658bcdceb2534d60ae8980
+      - b2c/resource-09f38c6934a692b76582a8edf89b9978ee7753723e4680d023c0bc4fb8605453
+      - b2c/resource-2969312defdb9db8d3568815a9e3019212e17cafcc174a1de723289ac95a747e
+      - b2c/resource-070a9c90f514996933446ec2b9e63bd948f5ac5aab3d5656782e2bab1d54db14
+      - b2c/resource-b6ab3f2f0e4fdf080971cd098a8d00d89a1d55ee55a66f563bf374810d0e990d
+      - b2c/resource-882743e115020ba250d4a4923831c2cebfcdee96cac98a04c37a0ed97f248b28
+      - b2c/resource-929695a1863a07204e1f236a88443dd0d66765fd886427863e679b75c615deca
+      - b2c/resource-e8b456342c2bf7101771eda7274a3ae9d874d554fa7c7c34313bf648ffe7c1c7
+      - b2c/resource-f16d173342beb59a717d2a4a47aec9d1db01f7724bc92e9d2852801cdc75be8a
+      - b2c/resource-4b1e937ae17454760e11d5e5f2719d3a4340d254935163f584def2939b20518d
+      - b2c/resource-c882d7c9e8f83709b70b36dfb630d64f2378087c543e5e1a215bc37130bd9333
+      - b2c/resource-71f3349b763efea514f6b606c6632ed6bf7d18a429d2d10be1c06f047b7c373e
+      - b2c/resource-75ce409c2580630cb4693bb04a5a791bd29f253440ee18c4e353f3f8c3f58a29
+      - b2c/resource-a7ba0aa37cf269dd17021d28d2c6bd43831635cc2c7e10b20798046247b02e3f
+      - b2c/resource-b2dc43ff0e233c9e1592ecf13e53333ad1f66b1df4c8e4c6a52eced5cc130a18
+    connectionRequired: false
+    maturity: implemented
+    workerContext:
+      workflowId: workflow.store.apple-store-metadata-standing-envelope
+      instructions: Apply only the approved App Store listing text, localized metadata, and promotional content covered by the exact current standing envelope. Verify account, version, locale, and payload digest immediately before mutation. Use `asc metadata pull`, `asc metadata validate`, and `asc metadata push` as the selected-provider cookbook forms; the live push is founder-gated and the cookbook records only the `--dry-run` observe form. Probe `--help` before the first live call. Capture before-state and read back every locale. Write store/proof/apple-store-metadata-apply.json with approval ID, request digest, before state, provider operation IDs, readback state, and timestamps. Do not upload media, change products, open TestFlight, submit for review, or change release state.
+      providerIds:
+        - provider.app-store-connect
+      contextFingerprint: sha256:2f6e392ed0658aa65c0756846da1c6432581faad07dbbaf78876c3380dd9da9e
   - id: b2c/worker.store.google-play-testing-track-standing-envelope
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -7127,7 +7183,7 @@ implementations:
       instructions: Upload the exact AAB digest and assign it only to the named internal or closed-testing track covered by the current standing envelope. Verify package, signing, version code, tester cohort, country scope, rollout state, and release notes immediately before upload. Read back processing and tester availability. Write store/proof/google-play-testing-track-apply.json with approval ID, AAB digest, version code, track, provider operation ID, processing/readback state, tester cohort, and timestamps. Production submission and public rollout remain separate founder decisions.
       providerIds:
         - provider.google-play
-      contextFingerprint: sha256:fc950d3ca67c7338993e18f5e0887e6ae29072f41f1eb4c92bf596bec4e9c224
+      contextFingerprint: sha256:2cb0dedbd788119dfc35d9934a6d2b7216b9c9ca0ecfd45e06220a55187bae8d
   - id: b2c/worker.store.marketplace-regional-compliance
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -7189,7 +7245,7 @@ implementations:
       providerIds:
         - provider.app-store-connect
         - provider.google-play
-      contextFingerprint: sha256:8f863f6a6a9df4b7840f6be1802765f741ff67fe373805cf86f20c2d2ff9c6e8
+      contextFingerprint: sha256:1c9c6a863a4e35c3efc7b1c741b6328e17e10dfb8f02a0d04507e6408b5185d7
   - id: b2c/worker.engineering.source-change-manifest
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -7312,7 +7368,7 @@ implementations:
       workflowId: workflow.engineering.engineering-orchestration-ce-production-readiness
       instructions: Route non-trivial implementation through the Compound Engineering loop. Use the five-stage Standalone Engineering Loop when CE is unavailable. Record the route in engineering/ENGINEERING_PLAN.md. When DESIGN.md is accepted, start app implementation and the local landing build in the same ready batch. Also dispatch the prepared launch-surface prompt for store copy, product-page plans, screenshot plans, marketing assets, and price-copy checks. Give each agent a disjoint write scope. Before each app slice merges, start a read-only launch-surface impact audit. Apply affected public-surface updates in parallel with the next app slice. Record file ownership and serialized resources in operations/ORCHESTRATION.md. Require build, typecheck, lint, integration tests, mobile end-to-end proof, provider proof, and an on-device taste pass. Write the results to engineering/PRODUCTION_READINESS.md. Run check:compound-engineering and check:orchestration before the engineering lane is done.
       providerIds: []
-      contextFingerprint: sha256:4bfee32ca54c215b65e0ef1203fb119479f4cc3277d9daaa0cb51e1cd43885da
+      contextFingerprint: sha256:80ea7fc14020bd6da1be25c92915f7401cad2da988e1b7094819fdcc36a2b200
   - id: b2c/worker.engineering.backend-data-contract
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -7407,7 +7463,7 @@ implementations:
       workflowId: workflow.engineering.app-agent-roster-and-repo-entrypoints
       instructions: Fill AGENTS.md, CLAUDE.md, APP_AGENTS.md, and the complete agents/ roster from the current business documents. Include agents/launch-surface-producer.md. AGENTS.md must tell future agents to keep using the B2C App Builder skill's workflow. It must require state updates, validators, and the design-lock fan-out. Assign each role its audit surface. Specialists can edit only an assigned disjoint scope. They never stage, commit, release, spend, submit, or publish. A fresh agent must be able to resume from AGENTS.md and the roster without chat history.
       providerIds: []
-      contextFingerprint: sha256:d721ae342165164a8d0bab940ce74fbe00c084f9cf0ee80d460f19a62952327f
+      contextFingerprint: sha256:78a52fd1e82d6ca4e1fa16d92b57948b8c8e5c63c3b1cc4a529a0f699aea80f3
   - id: b2c/worker.engineering.mobai-device-automation-and-demo-videos
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -7662,7 +7718,7 @@ implementations:
       instructions: Measure crash-free operation, application-not-responding events, startup time, battery use, app size, offline behavior, and adaptive-layout behavior on supported devices. Define release thresholds and owners. Record observed values and evidence in engineering/APP_QUALITY.md. Mark missing device or production evidence as a blocker. When beta testing is in scope, the persona-balanced worksheet is optional planning guidance for recruiting complementary perspectives; it is not required proof, does not satisfy app-quality completion, and does not change this workflow's whole-artifact fresh-context acceptance. Do not treat empty or completed tester rows as measured quality evidence. Do not replace measured results with general guidance.
       providerIds:
         - provider.sentry
-      contextFingerprint: sha256:e9672416f37f695ca440018510cd97a932fa06c3b83c8bf104ae201613dede09
+      contextFingerprint: sha256:2d62ede20d57e99af317e365da4ab913366335babc5aea7ffda880dd0ded0fb0
   - id: b2c/worker.data.analytics-and-attribution-blueprint
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -8234,7 +8290,7 @@ implementations:
       providerIds:
         - provider.revenuecat
         - provider.stripe
-      contextFingerprint: sha256:9d6cca6c652d8579f576b2f072c14a955bbf3bf9222dfc9292dc7bfd9f069be5
+      contextFingerprint: sha256:3d56fa7df93df7b1189542226306f403d77116c1c42a926284cfb10445eb8dde
     validationContract:
       id: revenuecat
       version: 1.0.0
@@ -8303,7 +8359,7 @@ implementations:
       instructions: Write revenue/PAYWALL_EXPERIMENT_PROGRAM.md as this node's owned cycle log. Record Cycle date, Backlog change, and Next experiment on each recurrence. Keep revenue/REVENUE_OPS.md Paywall Experiment Backlog as the registry. Every row names surface and engine (revenuecat_experiments, bandit, or posthog). Default monetization tests to RevenueCat Experiments and fetch the current Offering. Use bandit only for creatives, ASA keywords, or UA arms. Use PostHog only for UX that Offerings cannot express. Record the Surface To Engine Matrix. Fail shipping one paywall and stopping. Judge winners on cohort economics over a renewal window. Price and offer changes stay founder-gated. check:revenue is the pass signal.
       providerIds:
         - provider.revenuecat
-      contextFingerprint: sha256:fb26fbea2a5dc2214d84d44401d93e81623268bedaee80b2ecd1ac915c70e9e3
+      contextFingerprint: sha256:eaafa31258b8fe18c37fb9cbe5e15af87d62f278cd63cb79279e63816dca6176
     validationContract:
       id: revenuecat
       version: 1.0.0
@@ -8458,6 +8514,7 @@ recipes:
       - workflow.store.google-play-metadata-standing-envelope
       - workflow.store.google-play-media-standing-envelope
       - workflow.store.apple-store-media-standing-envelope
+      - workflow.store.apple-store-metadata-standing-envelope
       - workflow.store.google-play-testing-track-standing-envelope
       - workflow.store.marketplace-regional-compliance
       - workflow.engineering.source-change-manifest
@@ -11255,6 +11312,45 @@ recipes:
           - workflow.store.apple-store-media-standing-envelope
         workflowContexts:
           - workflowId: workflow.store.apple-store-media-standing-envelope
+            instructions: implementation
+            roleInstructions: implementation
+            neutralReferenceIds: []
+            providerReferenceIds:
+              - reference.store.app-store-connect-cli
+              - reference.store.aso-store-ops
+            neutralContextPackIds: []
+            providerContextPackIds:
+              - context.founder-language
+              - context.growth
+              - context.store
+              - context.data
+              - context.words
+            neutralSkillRouteIds: []
+            providerSkillRouteIds:
+              - aso
+              - geo
+              - launch
+              - ads
+              - social
+              - analytics
+              - usefastlane-ai
+              - pricing
+              - cro
+              - marketing-council
+              - competitor-profiling
+              - positioning-ideas
+              - value-prop-statements
+              - release-notes
+            neutralToolRouteIds: []
+            providerToolRouteIds:
+              - current ASO, analytics, ad, and social provider tools
+      - operation: b2c/work.store.apple-store-metadata-standing-envelope
+        implementation: b2c/worker.store.apple-store-metadata-standing-envelope
+        required: true
+        workflowIds:
+          - workflow.store.apple-store-metadata-standing-envelope
+        workflowContexts:
+          - workflowId: workflow.store.apple-store-metadata-standing-envelope
             instructions: implementation
             roleInstructions: implementation
             neutralReferenceIds: []

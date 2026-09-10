@@ -39,8 +39,10 @@ unplanned builder rescue; discretionary product/scope change.
 
 Reuse this report. The unit of analysis is one observed selected subgraph, not
 the whole catalog. Until a #72 interval exists, the keep/change recommendation
-is **retain the current graph**. Apple media (#38) stays an independent-effect
-boundary. Do not merge to reduce workflow count.
+is **retain the current graph**. The compact boundary table is
+[workflow-overhead-boundaries.md](./workflow-overhead-boundaries.md). Observed
+cost stays unknown. Apple media (#38) stays an independent-effect boundary. Do
+not merge to reduce workflow count.
 
 ## #88 reuse
 

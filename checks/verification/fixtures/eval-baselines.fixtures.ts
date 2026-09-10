@@ -1,10 +1,11 @@
 /**
- * Evaluation and measured-simplification baselines (#39, #40, #72, #73, #75, #77, #78).
+ * Evaluation and measured-simplification baselines.
+ * Open leftover: #2, #72, #73, #75, #88. Closed on main: #39, #40, #77, #78.
  *
  * Authorized local checks only. No live providers, devices, paid batches, or dispatch.
  */
 import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { codePointPrefix, createKnowledgeService, KnowledgeServiceError } from "../../../kernel/knowledge-service/service.js";
 import {
@@ -16,6 +17,7 @@ import {
 } from "../../../kernel/knowledge-service/types.js";
 import { matchWorkflows, type RoutableWorkflow } from "../../../kernel/session/route-utterance.js";
 import { composeCatalog } from "../../../catalog/index.js";
+import { FIRSTPARTY_RESPONSIBILITY_GROUPS } from "../../../catalog/firstparty-recipes.js";
 import { loadAgentGraph } from "../../../catalog/agent-graph/load.js";
 import { HOSTED_BUNDLE_RELATIVE_PATH } from "../../../tooling/render-hosted-bundle.js";
 import { assert, skillRoot, type Harness } from "./_harness.js";
@@ -542,6 +544,109 @@ export function register(harness: Harness): void {
     assert(protocol.includes("#77"), "protocol records the no-change");
     assert(protocol.includes("checked transcription"), protocol);
     assert(ownership.includes("Why derivation is not worth it"), ownership);
+  });
+
+  harness.check("eval-baselines: #73 selected-subgraph boundaries stay keep with unknown cost", () => {
+    const table = readFileSync(path.join(skillRoot, "checks/verification/rehearsal/workflow-overhead-boundaries.md"), "utf8");
+    const protocol = readFileSync(path.join(skillRoot, "checks/verification/rehearsal/eval-baselines.md"), "utf8");
+    const catalog = composeCatalog(skillRoot);
+    const byId = new Map(catalog.workflows.map((workflow) => [workflow.id, workflow]));
+    const requireWorkflow = (id: `workflow.${string}`) => {
+      const workflow = byId.get(id);
+      assert(workflow !== undefined, `catalog is missing ${id}`);
+      return workflow;
+    };
+    const onb12 = requireWorkflow("workflow.experience.onboarding-system.onb-12-state-identity-contract");
+    const onb13 = requireWorkflow("workflow.experience.onboarding-system.onb-13-analytics-experiments");
+    const onb16 = requireWorkflow("workflow.experience.onboarding-system.onb-16-journey-graph");
+    const onb17 = requireWorkflow("workflow.experience.onboarding-system.onb-17-screen-control-paywall-contract");
+    const onb18 = requireWorkflow("workflow.experience.onboarding-system.onb-18-visual-design-prototype");
+    const onb19 = requireWorkflow("workflow.experience.onboarding-system.onb-19-implementation-cutover-contract");
+    const onb20 = requireWorkflow("workflow.experience.onboarding-system.onb-20-adversarial-qa");
+    const designRoom = requireWorkflow("workflow.design.design-room");
+    const designAudit = requireWorkflow("workflow.design.design-system-audit");
+    const apple = requireWorkflow("workflow.store.apple-store-media-standing-envelope");
+
+    const selected = [onb12, onb13, onb16, onb17, onb18, onb19, onb20, designRoom, designAudit, apple];
+    const journeyPath = "product/onboarding/graph/ONB-16-journey-graph.md";
+    const journeyConsumers = [onb17, onb18, onb19];
+    const reviewTargets = [onb17, onb18, onb19];
+
+    assert(onb16.outputPaths[0] === journeyPath, onb16.outputPaths.join(","));
+    assert(onb16.outputPaths[0] !== onb17.outputPaths[0], "ONB-16 and ONB-17 must keep distinct outputs");
+    for (const consumer of journeyConsumers) {
+      assert(consumer.reads.includes(journeyPath), `${consumer.id} reads ${JSON.stringify(consumer.reads)}`);
+      assert(consumer.dependencies.includes(onb16.id), `${consumer.id} deps ${JSON.stringify(consumer.dependencies)}`);
+    }
+    assert(!onb20.reads.includes(journeyPath), JSON.stringify(onb20.reads));
+    assert(!onb20.dependencies.includes(onb16.id), JSON.stringify(onb20.dependencies));
+    assert(
+      JSON.stringify(onb20.reviewOf ?? []) === JSON.stringify(reviewTargets.map((workflow) => workflow.id)),
+      JSON.stringify(onb20.reviewOf),
+    );
+    for (const producer of reviewTargets) {
+      const outputPath = producer.outputPaths[0];
+      assert(outputPath !== undefined, `${producer.id} must declare an output`);
+      assert(onb20.dependencies.includes(producer.id), JSON.stringify(onb20.dependencies));
+      assert(onb20.reads.includes(outputPath), `${producer.id} output ${outputPath} vs ${JSON.stringify(onb20.reads)}`);
+    }
+    assert(JSON.stringify(designAudit.reviewOf ?? []) === JSON.stringify([designRoom.id]), JSON.stringify(designAudit.reviewOf));
+    assert(onb13.dependencies.includes(onb12.id), JSON.stringify(onb13.dependencies));
+    assert(onb13.dependencies.includes("workflow.experience.onboarding-system.onb-10-first-value-activation"), JSON.stringify(onb13.dependencies));
+    assert(onb13.dependencies.includes("workflow.experience.onboarding-system.onb-14-trust-lifecycle-policy"), JSON.stringify(onb13.dependencies));
+    assert(onb12.roleId === "role.product-leader" && onb13.roleId === "role.product-leader", `${onb12.roleId} ${onb13.roleId}`);
+    assert(onb19.roleId === "role.product-leader", onb19.roleId);
+    assert(designRoom.roleId === "role.design-guru" && designAudit.roleId === "role.design-guru", `${designRoom.roleId} ${designAudit.roleId}`);
+    assert(onb18.roleId === "role.product-leader" && onb20.roleId === "role.product-leader", `${onb18.roleId} ${onb20.roleId}`);
+    assert(apple.roleId === "role.marketing-guru", apple.roleId);
+    assert((apple.reviewOf ?? []).length === 0, JSON.stringify(apple.reviewOf));
+    assert(apple.outputPaths.includes("store/proof/apple-store-media-apply.json"), apple.outputPaths.join(","));
+
+    const experience = FIRSTPARTY_RESPONSIBILITY_GROUPS.find((group) => group.title === "Product experience");
+    assert(experience !== undefined, "Product experience group must exist");
+    const experienceIds = experience.workflows as readonly string[];
+    assert(experienceIds.length === 26, `Product experience group size drifted: ${experienceIds.length}`);
+    assert(experienceIds.includes(onb16.id), "ONB-16 stays in Product experience");
+    assert(experienceIds.includes(onb19.id), "ONB-19 stays in Product experience");
+    assert(!experienceIds.includes(apple.id), "Apple media is not an onboarding node");
+    assert(!experienceIds.includes(designRoom.id) && !experienceIds.includes(designAudit.id), "design-room / audit are not the Product experience group");
+
+    assert(table.includes("**Selected set**"), "name the selected set; do not claim the whole Product experience group");
+    assert(!table.includes("unit of analysis is the selected onboarding subgraph in"), table);
+    assert(!table.includes("26 workflows"), table);
+    for (const workflow of selected) {
+      const shortName = workflow.id.replace(/^workflow\.(?:experience\.onboarding-system\.)?/, "");
+      assert(table.includes(shortName), `table omitted catalog id ${workflow.id}`);
+      assert(table.includes(workflow.roleId), `table omitted ${workflow.id} roleId ${workflow.roleId}`);
+    }
+    assert(table.includes(onb16.outputPaths[0]), "table must name the ONB-16 output the consumers read");
+    assert(table.includes("ONB-17 and ONB-18") && table.includes("`reads` / `dependencies`"), table);
+    assert(table.includes("ONB-19 also `reads` and `depends on` ONB-16"), table);
+    assert(table.includes("ONB-20 does not read or depend on ONB-16"), table);
+    assert(table.includes("ONB-20 `reviewOf` and `reads` this contract"), table);
+    assert(table.includes("ONB-20 `reviewOf` those three"), table);
+    assert(table.includes("Catalog `reviewOf` is design-room → design-system-audit"), table);
+    assert(table.includes("Not ONB-18 vs design-system-audit"), table);
+    assert(table.includes("ONB-13 `depends on` ONB-12"), table);
+    assert(table.includes("and ONB-10 / ONB-14"), table);
+    assert(table.includes("Not parallel ownership"), table);
+    assert(table.includes("No `reviewOf` on this node"), table);
+    assert(!table.includes("Useful parallel ownership"), table);
+    assert(!table.includes("analytics specialist"), table);
+    assert(!table.includes("ONB-17/18/20"), table);
+    assert(!table.includes("ONB-20 depends on the graph"), table);
+    assert(!table.includes("onb-18-visual-design-prototype` vs `workflow.design.design-system-audit"), table);
+    assert(table.includes("Observed cost is **unknown**"), table);
+    assert(table.includes("**Retain the current graph.**"), table);
+    assert(table.includes("independent-effect boundary"), table);
+    assert(protocol.includes("retain the current graph"), protocol);
+    assert(protocol.includes("Leave #73 open"), protocol);
+    assert(protocol.includes("Closed on main via #189"), protocol);
+    assert(!protocol.includes("Leave #39 open"), protocol);
+    assert(
+      !existsSync(path.join(skillRoot, "checks/verification/fixtures/work-package-equivalence.fixtures.ts")),
+      "do not add a merge-equivalence suite without a measured interval",
+    );
   });
 
   harness.check("eval-baselines: Stage A evidence records a no-change recommendation on retrieval infrastructure", () => {

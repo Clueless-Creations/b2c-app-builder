@@ -9,7 +9,9 @@ Current source verification lives in the executable fixtures:
 Evaluation and measured-simplification baselines live in
 [eval-baselines.md](./eval-baselines.md). The #78 sample lives in
 [complexity-sample.md](./complexity-sample.md). The #77 overlay ownership
-table lives in [agent-graph-ownership.md](./agent-graph-ownership.md). They
+table lives in [agent-graph-ownership.md](./agent-graph-ownership.md). The
+#73 boundary table lives in
+[workflow-overhead-boundaries.md](./workflow-overhead-boundaries.md). They
 are protocols and fabricated-receipt checks, not live-provider, device,
 purchase, or complete-business proof.
 

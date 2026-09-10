@@ -1,6 +1,6 @@
 {
   "schemaVersion": "2.0.0",
-  "skillVersion": "0.219.67",
+  "skillVersion": "0.219.68",
   "areas": [
     {
       "id": "area.operating-system",
@@ -5914,7 +5914,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/money/revenuecat-agent-tooling.md",
-        "sha256": "sha256:f616f681b0dac5620b32eb9eedf0f85bf799b01c2a3223133867649b4cbf1cd2",
+        "sha256": "sha256:0d01ef2bca31a0aa0bf0d67165ff2f6f3e7e6ca0cd99e068367d0bcf795081e6",
         "origin": "skill"
       }
     },
@@ -10104,7 +10104,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/words/no-slop-writing.md",
-        "sha256": "sha256:8a8cebc6d49f4352e735daef460aa29741afcdbdf949490cf606ee2a47ce6580",
+        "sha256": "sha256:4dcb9d8a78fcee18daa5b46ced399f8b41992853141ff3a9e9b1906d263a98cb",
         "origin": "skill"
       }
     }
@@ -18606,14 +18606,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "3b8ae351456f9e0b6149827f2f201cd5b9bd57d51d2be13b87d90be4e6032b9d",
+    "fingerprint": "eddf703388ad6ab278b5bf2850bcd5cf37e543a24ff0978c6c6bcaa80a2d53eb",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
-        "version": "0.219.67",
-        "revision": "0.219.67",
-        "contentDigest": "89479aca05a605ecce9b6d04c206a2992a72ad08368a41ce27a862c4014cd755"
+        "version": "0.219.68",
+        "revision": "0.219.68",
+        "contentDigest": "0c8380c99d82755f0e342f80e925db67130c313cf256f685961d2fe2bd3ca082"
       }
     ],
     "base": {

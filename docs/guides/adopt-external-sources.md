@@ -37,6 +37,10 @@ A business worker never receives contributor tools or contribution results.
 A small change stays small. One sentence added to one reference needs a source
 record and a derivation, not a full contribution root.
 
+Default-path cost or a new architectural boundary still needs a named problem,
+the existing owner, an observation plan, and a maintenance owner. Optional
+providers and citations can stay available without becoming compulsory.
+
 ## Sources and intake
 
 The contract accepts these source kinds: repository, post, article, skill,

@@ -18,15 +18,7 @@ export const CONFORMANCE_EVIDENCE_KINDS = [
 ] as const;
 export type ConformanceEvidenceKind = (typeof CONFORMANCE_EVIDENCE_KINDS)[number];
 
-export const CONFORMANCE_ESTABLISHES = [
-  "request-shape",
-  "response-shape",
-  "error",
-  "pagination",
-  "effect",
-  "protocol-validity",
-  "completeness-claim",
-] as const;
+export const CONFORMANCE_ESTABLISHES = ["request-shape", "response-shape", "error", "pagination", "effect", "protocol-validity", "completeness-claim"] as const;
 export type ConformanceEstablishes = (typeof CONFORMANCE_ESTABLISHES)[number];
 
 export interface ProviderConformanceProvenance {

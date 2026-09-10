@@ -43,15 +43,7 @@ const GENERATED_APP_PREFIXES = [
   "examples/contributions/",
 ] as const;
 
-const VENDOR_PACKAGE_PREFIXES = [
-  "@revenuecat/",
-  "react-native-purchases",
-  "posthog-js",
-  "posthog-node",
-  "@posthog/",
-  "expo-superwall",
-  "@superwall/",
-] as const;
+const VENDOR_PACKAGE_PREFIXES = ["@revenuecat/", "react-native-purchases", "posthog-js", "posthog-node", "@posthog/", "expo-superwall", "@superwall/"] as const;
 
 export type ProviderBoundaryClassification =
   | { readonly kind: "allowed"; readonly reason: string }
@@ -131,22 +123,14 @@ export function collectProviderBoundaryIssues(
     const classification = classifyProviderBoundaryImport(edge.from, edge.resolved);
     if (classification.kind !== "forbidden") continue;
     const location = recordedKey(edge);
-    const recorded = RECORDED_PROVIDER_BOUNDARY_EDGES.find(
-      (item) => item.from === edge.from && item.line === edge.line && item.specifier === edge.specifier,
-    );
+    const recorded = RECORDED_PROVIDER_BOUNDARY_EDGES.find((item) => item.from === edge.from && item.line === edge.line && item.specifier === edge.specifier);
     if (recorded) seenRecorded.add(recordedKey(recorded));
     if (allowEdges.has(location) || (options.acceptRecordedDebt && recorded)) continue;
     issues.push(
-      issue(
-        "error",
-        PROVIDER_BOUNDARY_RULE,
-        `${classification.reason} (${edge.specifier} → ${edge.resolved}).`,
-        location,
-        {
-          line: edge.line,
-          fixHint: "Keep provider-native types in the adapter. Composition-root and selected generated-app SDK imports stay allowed.",
-        },
-      ),
+      issue("error", PROVIDER_BOUNDARY_RULE, `${classification.reason} (${edge.specifier} → ${edge.resolved}).`, location, {
+        line: edge.line,
+        fixHint: "Keep provider-native types in the adapter. Composition-root and selected generated-app SDK imports stay allowed.",
+      }),
     );
   }
 

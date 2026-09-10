@@ -19,8 +19,9 @@ export function register(harness: Harness): void {
     assert(readme.includes("| Experience              | Prep & design"), "README coverage table must use Prep & design for Experience");
     assert(ethos.includes("| **Prep & design**"), "ethos station table must use Prep & design");
     assert(ethos.includes("Product and Experience"), "ethos must keep the catalog identity beside the display label");
-    assert(svg.includes("PREP &amp; DESIGN") || svg.includes("PREP & DESIGN"), "Sheet 1 must label station 2 Prep & design");
-    assert(svg.includes("Prep & design"), "SVG accessibility text must name Prep & design");
+    assert(svg.includes("PREP &amp; DESIGN"), "Sheet 1 must label station 2 Prep &amp; design");
+    assert(svg.includes("Prep &amp; design"), "SVG accessibility text must name Prep &amp; design");
+    assert(!/<desc[^>]*>[^<]*Prep & design/.test(svg), "SVG desc must escape Prep &amp; design");
     assert(svg.includes("THE KITCHEN LAYOUT"), "Sheet 1 title may keep kitchen as the whole-system layout");
     assert(readme.includes("laid out like a restaurant kitchen"), "narrative kitchen for the whole system remains valid");
   });

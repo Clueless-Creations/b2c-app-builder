@@ -3,7 +3,8 @@
  *
  * Local identity uses `--version` only. This module never spawns authenticated commands,
  * never mutates credentials, never runs eas init, and never claims a live EAS job.
- * Host `b2c doctor` invokes the host probe; paid build/submit stay on the mutating executor.
+ * Host `b2c inspect` invokes the host probe; `b2c doctor` is a supported equivalent.
+ * Paid build/submit stay on the mutating executor.
  */
 
 import { EAS_CLI_DOCUMENTED_VERSION } from "../../../catalog/stacks/expo-eas-commands.js";
@@ -52,7 +53,7 @@ export interface ExpoEasSelectedTargetProbe {
 
 export const EAS_CLI_DOCTOR_DOCUMENTED_VERSION = EAS_CLI_DOCUMENTED_VERSION;
 
-/** Isolated `--version` lookup for `b2c doctor`. Never authenticates. */
+/** Isolated `--version` lookup for `b2c inspect`. Never authenticates. */
 export function discoverExpoCliKindForDoctor(input: {
   readonly kind: ExpoCliKind;
   readonly isolatedHome: string;

@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { assert, type Harness } from "./_harness.js";
+import { assert, skillRoot, type Harness } from "./_harness.js";
 import { REVENUECAT_CLI_RELEASE } from "../../../adapters/providers/revenuecat/cli-operations.js";
 import { EAS_CLI_DOCUMENTED_VERSION } from "../../../catalog/stacks/expo-eas-commands.js";
 import type { RevenueCatCliDiscovery } from "../../../adapters/providers/revenuecat/cli-discovery.js";
@@ -230,6 +230,18 @@ export function register(harness: Harness): void {
     const block = appendDoctorHostBlock("No durable run yet — bootstrap the workspace and run a session first.", home);
     assert(block.includes("/opt/homebrew/bin/asc") && block.includes(LATEST) && block.includes(COMPARED_AT), `dated block must name winner and stamp: ${block}`);
     assert(block.includes("not a live PATH probe"), `dated block must refuse to look like a live probe: ${block}`);
+  });
+
+  harness.check("doctor-asc: first-run eval expects inspect observation copy", () => {
+    const text = readFileSync(
+      path.join(skillRoot, "checks", "validation", "repository", "evals", "agent-behavior", "first-run-doctor-asc-winner.yaml"),
+      "utf8",
+    );
+    assert(text.includes("Run b2c inspect"), "first-run eval must prefer inspect");
+    assert(text.includes("b2c doctor is a supported equivalent"), "first-run eval must keep doctor supported");
+    assert(text.includes("last b2c inspect observation"), "first-run eval must match current status copy");
+    assert(!text.includes("last doctor observation"), "first-run eval must not expect the retired doctor observation phrase");
+    assert(!/^behavioral:\s*true\s*$/m.test(text), "first-run eval stays authored/linted; do not mark it live behavioral");
   });
 
   harness.check("doctor-asc: sanitizeExecutablePath rewrites only the home prefix", () => {

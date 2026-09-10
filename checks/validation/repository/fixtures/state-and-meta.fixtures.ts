@@ -913,6 +913,30 @@ export function register(h: Harness): void {
     0,
   );
 
+  const versionShallowSrc = versionBranchRepo("version-discipline-shallow-src", "0.1.0");
+  const versionShallowClone = path.join(path.dirname(versionShallowSrc), "version-discipline-shallow-clone");
+  const shallowClone = spawnSync("git", ["-c", "commit.gpgsign=false", "clone", "--depth", "1", "--no-local", versionShallowSrc, versionShallowClone], {
+    encoding: "utf8",
+    env: versionGitEnv,
+  });
+  if (shallowClone.status !== 0) {
+    runScriptArgs(
+      "version discipline shallow clone must be created for the fetch-depth honesty check",
+      "check-version-discipline.ts",
+      ["--repo-root", versionShallowSrc, "--skill-root", versionShallowSrc],
+      0,
+      `clone failed: ${shallowClone.stderr}`,
+    );
+  } else {
+    runScriptArgs(
+      "version discipline fails a fetch-depth 1 clone instead of hiding version_not_ahead_of_base",
+      "check-version-discipline.ts",
+      ["--repo-root", versionShallowClone, "--skill-root", versionShallowClone],
+      1,
+      "version_discipline.history_insufficient",
+    );
+  }
+
   // --- check-version-discipline (monotonicity scoped to the skill pathspec, #30) ---
   // The "ahead of base" count used to ignore which paths a commit touched, so a branch whose only
   // change was a REPOSITORY_ONLY_PATHS file (README.md, AGENTS.md, ...) was still counted as ahead

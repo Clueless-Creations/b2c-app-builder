@@ -149,7 +149,10 @@ npm run check:agent-entrypoints
 npm run check:catalog
 ```
 
-Run larger audit suites when runtime, catalog, reducer, provider, security, or release contracts change.
+GitHub Actions on ordinary PRs and `main` pushes runs presubmit, not the full
+audit. Follow [CONTRIBUTING.md](CONTRIBUTING.md) for the cadence. Run
+`npm run audit:ci` plus hosted/app checks at checkpoints and before merge. A
+green presubmit is not a full-audit pass.
 
 The primary agent owns integration, Git, external systems, destructive actions, releases, and final verification. Subagents receive explicit file ownership and do not perform those actions.
 

@@ -70,12 +70,7 @@ function featureApplicability(doc: ProductInstanceDocument | undefined, featureI
   return "unresolved";
 }
 
-function recipeProviderDecision(
-  recipeId: string,
-  recipeVersion: string,
-  operation: string,
-  catalog: OnboardingProviderCatalog,
-): ProviderDecision {
+function recipeProviderDecision(recipeId: string, recipeVersion: string, operation: string, catalog: OnboardingProviderCatalog): ProviderDecision {
   const recipe = catalog.recipes.find((entry) => entry.id === recipeId && entry.version === recipeVersion);
   if (!recipe) {
     // The complete-consumer-business recipe is generated from worker responsibilities and is
@@ -92,11 +87,7 @@ function recipeProviderDecision(
   return { status: "selected", providerId: implementation.provider };
 }
 
-function providerForOperation(
-  composition: Composition | undefined,
-  operation: string,
-  catalog: OnboardingProviderCatalog,
-): ProviderDecision {
+function providerForOperation(composition: Composition | undefined, operation: string, catalog: OnboardingProviderCatalog): ProviderDecision {
   if (!composition) return { status: "unresolved" };
   const override = composition.bindings[operation]?.provider;
   if (override) {

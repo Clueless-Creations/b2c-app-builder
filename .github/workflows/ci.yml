@@ -1,31 +1,49 @@
 name: CI
 
-# Fast lane (cheap validators, hosted worker, reference app) on every pull request
-# and push to main. Heavy lane (validator fixtures, engine fixtures, e2e) only when
-# engine/catalog/validation/CI paths change — see tooling/ci-lane.mjs. Docs,
-# knowledge, and Dependabot lockfile-only PRs skip the 15–20 minute suites.
-# Manual dispatch always runs heavy.
+# Ordinary pull requests and pushes to main run PRESUBMIT: a measured cheap
+# set plus extra safety jobs when the change actually reaches those trees.
+# Full verification (historical fast pool + heavy shards + hosted + app) is
+# explicit: workflow_dispatch with verification=full (the dispatch default).
+# A presubmit pass is not a full-audit pass. Suites are deferred, not deleted.
+#
+# Do not add top-level on.pull_request.paths — a skipped required workflow stays
+# pending. Job-level `if:` plus the aggregator keeps merge-gate semantics honest.
+# publish.yml is a separate workflow with cancel-in-progress: false; do not
+# share this concurrency group with it.
 
 on:
   pull_request:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      verification:
+        description: "presubmit for the ordinary path, or full for checkpoint / final verification"
+        type: choice
+        default: full
+        options:
+          - presubmit
+          - full
 
 concurrency:
-  # A pull request shares one group per ref so superseded pushes cancel the run they replace.
-  # A push to main gets a group per commit: GitHub cancels a PENDING run whenever another run
-  # enters its group, so sharing a group across main commits lost every queued main run.
-  group: ci-${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  # Ordinary runs share one group per PR number or branch so a new push cancels
+  # the run it replaces, including ordinary main commits. Explicit full runs use
+  # a different group so an ordinary push cannot cancel checkpoint verification.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name == 'workflow_dispatch' && inputs.verification == 'full' && 'full' || 'ordinary' }}
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' || inputs.verification != 'full' }}
 
 jobs:
-  changes:
-    name: Lane
+  scope:
+    name: Scope
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
+      verification: ${{ steps.lane.outputs.verification }}
       heavy: ${{ steps.lane.outputs.heavy }}
+      hosted: ${{ steps.lane.outputs.hosted }}
+      app: ${{ steps.lane.outputs.app }}
+      scopes: ${{ steps.lane.outputs.scopes }}
+      expand: ${{ steps.lane.outputs.expand }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -34,16 +52,32 @@ jobs:
       - id: lane
         env:
           EVENT_NAME: ${{ github.event_name }}
+          VERIFICATION: ${{ github.event_name == 'workflow_dispatch' && inputs.verification || 'presubmit' }}
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
           HEAD_SHA: ${{ github.sha }}
         run: node tooling/ci-lane.mjs
 
-  audit-fast:
-    name: Audit (fast)
+  presubmit:
+    name: Presubmit
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    needs: [scope]
+    # Skip when an explicit full run already covers this set via Audit (fast).
+    # If Scope failed, still run the cheap set (fail closed).
+    if: ${{ always() && (needs.scope.result != 'success' || needs.scope.outputs.verification != 'full') }}
+    timeout-minutes: 15
+    env:
+      B2C_REQUIRE_GIT_HISTORY: "1"
+      B2C_AUDIT_SCOPES: ${{ needs.scope.outputs.scopes }}
+      GITHUB_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch merge-base history
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref || github.event.repository.default_branch }}
+        run: git fetch --no-tags origin "$BASE_REF:refs/remotes/origin/${BASE_REF}"
 
       - uses: actions/setup-node@v4
         with:
@@ -56,33 +90,61 @@ jobs:
 
       - run: npm ci
 
+      # Entrypoint smoke: the CLI dispatcher boots. Not a second doctor.
+      - run: node entrypoints/cli/b2c.mjs --help
+
       # Must run from the repo root (the package root since ADR-0002) — the
-      # .git/.github markers there are what make detectLayout() pick "repo". --lane fast skips serial
-      # suites (test:validators, test:fixtures, test:boundaries, test:parity,
-      # check:engine-e2e). --ci skips only the maintainer-only validate:skill step.
+      # .git/.github markers there are what make detectLayout() pick "repo".
+      # --lane presubmit is the measured allow-list, not a rename of --lane fast.
+      - run: npm run audit:ci -- --lane presubmit
+
+  audit-fast:
+    name: Audit (fast)
+    runs-on: ubuntu-latest
+    needs: [scope]
+    if: ${{ always() && (needs.scope.result != 'success' || needs.scope.outputs.verification == 'full') }}
+    timeout-minutes: 20
+    env:
+      B2C_REQUIRE_GIT_HISTORY: "1"
+      GITHUB_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch merge-base history
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref || github.event.repository.default_branch }}
+        run: git fetch --no-tags origin "$BASE_REF:refs/remotes/origin/${BASE_REF}"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            hosted/knowledge-mcp/package-lock.json
+            hosted/builder-console/package-lock.json
+
+      - run: npm ci
+
+      # Historical cheap pool: every non-serial audit step. Full verification
+      # still runs this. --ci skips only the maintainer-only validate:skill step.
       - run: npm run audit:ci -- --lane fast
 
   audit-heavy:
     name: Audit (heavy ${{ matrix.shard }})
     runs-on: ubuntu-latest
-    # Run when the lane job says so. If the lane job itself failed, run heavy
-    # anyway — a path-filter outage must not skip fixture suites.
-    if: ${{ always() && (needs.changes.result != 'success' || needs.changes.outputs.heavy == 'true') }}
-    needs: [changes]
+    needs: [scope]
+    # Full verification, or Scope failure (cannot safely defer). Ordinary PRs
+    # defer this job even when paths would have selected it.
+    if: ${{ always() && (needs.scope.result != 'success' || needs.scope.outputs.verification == 'full') }}
     timeout-minutes: 60
-    # The serial suites are ~89% of this lane's wall clock and used to run one after another in a
-    # single job: 28m50s on the run that merged #47, against ~19m on a ten-core laptop. The runner
-    # is the constraint, so spread the suites across runners. --shard partitions them round-robin
-    # in tooling/lib/audit-plan.ts, and audit.fixtures.ts proves every serial step runs in exactly
-    # one shard at every width — a suite added later cannot land in no shard at all.
     strategy:
       fail-fast: false
       matrix:
         shard: ["1/2", "2/2"]
     env:
-      # GitHub's standard two-vCPU runners otherwise resolve the fixture shard pool's
-      # cores-minus-two default to one worker. Two workers is the rollback-safe width;
-      # B2C_FIXTURE_CONCURRENCY=1 remains the kill switch.
       B2C_FIXTURE_CONCURRENCY: "2"
     steps:
       - uses: actions/checkout@v4
@@ -103,6 +165,8 @@ jobs:
   hosted-check:
     name: Hosted worker check
     runs-on: ubuntu-latest
+    needs: [scope]
+    if: ${{ always() && (needs.scope.result != 'success' || needs.scope.outputs.verification == 'full' || needs.scope.outputs.hosted == 'true') }}
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -128,6 +192,8 @@ jobs:
   app-check:
     name: App check
     runs-on: ubuntu-latest
+    needs: [scope]
+    if: ${{ always() && (needs.scope.result != 'success' || needs.scope.outputs.verification == 'full' || needs.scope.outputs.app == 'true') }}
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -150,20 +216,20 @@ jobs:
     name: CI complete
     runs-on: ubuntu-latest
     if: always()
-    needs: [audit-fast, audit-heavy, hosted-check, app-check]
+    needs: [scope, presubmit, audit-fast, audit-heavy, hosted-check, app-check]
     timeout-minutes: 5
     steps:
-      - name: Require fast, hosted, and app; heavy may skip
-        run: |
-          fast="${{ needs.audit-fast.result }}"
-          hosted="${{ needs.hosted-check.result }}"
-          app="${{ needs.app-check.result }}"
-          heavy="${{ needs.audit-heavy.result }}"
-          if [ "$fast" != "success" ] || [ "$hosted" != "success" ] || [ "$app" != "success" ]; then
-            echo "fast=$fast hosted=$hosted app=$app"
-            exit 1
-          fi
-          if [ "$heavy" != "success" ] && [ "$heavy" != "skipped" ]; then
-            echo "heavy=$heavy (expected success or skipped)"
-            exit 1
-          fi
+      - uses: actions/checkout@v4
+
+      - name: Aggregate selected, deferred, failed, and cancelled jobs
+        env:
+          JOB_PRESUBMIT: ${{ needs.presubmit.result }}
+          JOB_AUDIT_FAST: ${{ needs.audit-fast.result }}
+          JOB_AUDIT_HEAVY: ${{ needs.audit-heavy.result }}
+          JOB_HOSTED: ${{ needs.hosted-check.result }}
+          JOB_APP: ${{ needs.app-check.result }}
+          VERIFICATION: ${{ needs.scope.outputs.verification }}
+          HOSTED: ${{ needs.scope.outputs.hosted }}
+          APP: ${{ needs.scope.outputs.app }}
+          SCOPE_RESULT: ${{ needs.scope.result }}
+        run: node tooling/ci-aggregate.mjs

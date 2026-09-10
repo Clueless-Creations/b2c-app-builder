@@ -16,8 +16,9 @@
  *   tsx tooling/run-audit.ts --concurrency 8
  *   tsx tooling/run-audit.ts --only check:secrets --only launchbench:lint
  *   tsx tooling/run-audit.ts --list     # print the resolved plan and exit
- *   tsx tooling/run-audit.ts --ci --lane fast   # cheap validators (every PR)
- *   tsx tooling/run-audit.ts --ci --lane heavy  # fixture suites + engine e2e
+ *   tsx tooling/run-audit.ts --ci --lane presubmit   # measured ordinary-PR set
+ *   tsx tooling/run-audit.ts --ci --lane fast         # historical cheap pool (full verification)
+ *   tsx tooling/run-audit.ts --ci --lane heavy        # fixture suites + engine e2e
  *   tsx tooling/run-audit.ts --ci --lane heavy --shard 1/2   # one CI shard of the serial suites
  */
 import { spawn } from "node:child_process";
@@ -28,6 +29,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import {
   buildAuditPlan,
+  parseAuditScopes,
   parseAuditShard,
   stepSkippedByLane,
   stepSkippedByShard,
@@ -55,6 +57,7 @@ interface Options {
   packageRoot: string;
   lane: AuditLane;
   shard: AuditShard | undefined;
+  scopes: string[];
 }
 
 function parseLane(value: string | undefined): AuditLane {
@@ -74,6 +77,7 @@ function parseOptions(argv: string[]): Options {
     packageRoot: process.cwd(),
     lane: "all",
     shard: undefined,
+    scopes: parseAuditScopes(process.env.B2C_AUDIT_SCOPES),
   };
   for (let index = 0; index < argv.length; index += 1) {
     const token = argv[index];
@@ -101,6 +105,9 @@ function parseOptions(argv: string[]): Options {
       index += 1;
     } else if (token === "--shard" && value) {
       options.shard = parseAuditShard(value);
+      index += 1;
+    } else if (token === "--scope" && value) {
+      options.scopes.push(...parseAuditScopes(value));
       index += 1;
     }
   }
@@ -260,12 +267,13 @@ export async function main(): Promise<void> {
 
   if (options.list) {
     for (const step of plan) {
-      const laneSkip = stepSkippedByLane(step, options.lane);
+      const laneSkip = stepSkippedByLane(step, options.lane, options.scopes);
       const flags = [
         step.ciSkip ? "ci-skip" : "",
         step.serial ? "serial" : "",
         step.repoOnly ? "repo-only" : "",
-        laneSkip ? (options.lane === "fast" ? "heavy-lane" : "fast-lane") : "",
+        step.presubmit ? "presubmit" : "",
+        laneSkip ? (options.lane === "fast" ? "heavy-lane" : options.lane === "presubmit" ? "deferred" : "fast-lane") : "",
       ].filter(Boolean);
       console.log(`${step.id}${step.args ? ` ${step.args.join(" ")}` : ""}${flags.length ? ` [${flags.join(",")}]` : ""}`);
     }
@@ -274,8 +282,10 @@ export async function main(): Promise<void> {
 
   console.log(
     `Maintainer audit (${layout} layout, ${options.ci ? "ci" : "full"} mode, lane ${options.lane}${
+      options.scopes.length ? `, scopes ${options.scopes.join(",")}` : ""
+    }${
       options.shard ? `, shard ${options.shard.index}/${options.shard.total}` : ""
-    }, concurrency ${options.serial ? 1 : options.concurrency})`,
+    }, concurrency ${options.serial ? 1 : options.concurrency})${options.lane === "presubmit" ? " — not a full-audit pass" : ""}`,
   );
 
   const results = new Array<StepResult | undefined>(plan.length);
@@ -314,7 +324,7 @@ export async function main(): Promise<void> {
       record(index, { step, skipped: "maintainer-only step (--ci)", code: 0, output: "", durationMs: 0 });
       continue;
     }
-    const laneSkip = stepSkippedByLane(step, options.lane);
+    const laneSkip = stepSkippedByLane(step, options.lane, options.scopes);
     if (laneSkip) {
       record(index, { step, skipped: laneSkip, code: 0, output: "", durationMs: 0 });
       continue;

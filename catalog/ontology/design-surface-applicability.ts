@@ -418,8 +418,7 @@ export function projectDesignSurfaceApplicability(input: {
     emptyResult,
   );
   if (forceScrollLinked) motionTechnique = "selected";
-  const unattributed =
-    input.implementedUnattributed ?? (input.implementedScrollytelling && implementedIds.size === 0);
+  const unattributed = input.implementedUnattributed ?? (input.implementedScrollytelling && implementedIds.size === 0);
   return {
     inventory: studio.inventory,
     surfaces,

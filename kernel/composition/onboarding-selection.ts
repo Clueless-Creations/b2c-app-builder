@@ -11,6 +11,7 @@ import { existsSync, lstatSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import {
   ENTITLEMENT_OPERATION,
+  loadOnboardingApplicability,
   loadProductDecisions,
   parseWorkspaceComposition,
   PRESENT_PAYWALL_OPERATION,
@@ -21,6 +22,7 @@ import {
   type OnboardingApplicability,
   type ProviderDecision,
 } from "../../catalog/ontology/onboarding-applicability.js";
+import { loadDesignSurfaceApplicability, type MotionReferenceApplicability } from "../../catalog/ontology/design-surface-applicability.js";
 import type { Composition } from "../../contracts/public-api/contract.js";
 import type { ProductInstanceDocument } from "../../catalog/ontology/instance-types.js";
 import { resolveRecipeBindings, type RecipeBindingResult } from "./resolve.js";
@@ -30,6 +32,19 @@ export type BindingLifecycle = "proposal" | "activated" | "pending-activation" |
 
 export interface VerifiedOnboardingApplicability extends OnboardingApplicability {
   bindingLifecycle: BindingLifecycle;
+}
+
+export interface WorkspaceBindingTruth {
+  lifecycle: BindingLifecycle;
+  declared: OnboardingApplicability;
+  verified: VerifiedOnboardingApplicability;
+  candidateIsExecutionTruth: boolean;
+  surfaces: {
+    jobUnresolved: boolean;
+    interactionUnresolved: boolean;
+    sixtyFpsRegister: MotionReferenceApplicability;
+    pages: Array<{ id: string; job: string; interaction: string }>;
+  };
 }
 
 const JOURNAL = ".b2c-launch/composition-activation.json";
@@ -55,7 +70,9 @@ function readWorkspacePackages(workspaceRoot: string): PackageDependency[] {
   const directory = isSafeFile(workspaceRoot, PACKAGES);
   if (!directory || !lstatSync(directory).isDirectory()) return [];
   const result: PackageDependency[] = [];
-  for (const entry of readdirSync(directory).filter((name) => /^[a-f0-9]{64}$/.test(name)).sort()) {
+  for (const entry of readdirSync(directory)
+    .filter((name) => /^[a-f0-9]{64}$/.test(name))
+    .sort()) {
     const packageDirectory = path.join(directory, entry);
     if (!lstatSync(packageDirectory).isDirectory()) continue;
     result.push({ directory: packageDirectory, snapshot: readStoredSnapshot(packageDirectory, `sha256:${entry}`) });
@@ -171,4 +188,23 @@ export function loadVerifiedOnboardingApplicability(workspaceRoot: string): Veri
   }
   if (!composition) return withLifecycle(projectOnboardingApplicability(doc, undefined), "unresolved");
   return withLifecycle(projectOnboardingApplicability(doc, composition), "proposal");
+}
+
+/** Current pin versus the candidate declaration. A draft YAML edit is not execution truth. */
+export function loadWorkspaceBindingTruth(workspaceRoot: string): WorkspaceBindingTruth {
+  const declared = loadOnboardingApplicability(workspaceRoot);
+  const verified = loadVerifiedOnboardingApplicability(workspaceRoot);
+  const design = loadDesignSurfaceApplicability(workspaceRoot);
+  return {
+    lifecycle: verified.bindingLifecycle,
+    declared,
+    verified,
+    candidateIsExecutionTruth: verified.bindingLifecycle === "activated",
+    surfaces: {
+      jobUnresolved: design.jobUnresolved,
+      interactionUnresolved: design.interactionUnresolved,
+      sixtyFpsRegister: design.sixtyFpsRegister,
+      pages: design.surfaces.map((surface) => ({ id: surface.id, job: surface.job, interaction: surface.interaction })),
+    },
+  };
 }

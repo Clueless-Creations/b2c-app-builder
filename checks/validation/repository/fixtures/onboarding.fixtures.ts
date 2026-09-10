@@ -1636,7 +1636,7 @@ This long fluent paragraph restates the same unsupported claim with more confide
     evidencePacketFluentUnsupported,
     evidenceScript,
     0,
-    undefined,
+    "semantic=unknown",
     ["--node", "ONB-04", "--path", "product/onboarding/graph/ONB-04-competitor-reviews.md"],
   );
 

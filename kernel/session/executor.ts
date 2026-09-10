@@ -515,6 +515,7 @@ function createCliWorkerExecutor(requestedRuntime: WorkerRuntime): NodeExecutor 
           artifactBindings,
         },
         context.contextSelectors !== undefined ? { sourceIds: [...context.contextSelectors] } : undefined,
+        context.workspaceDir,
       );
       if (context.refreshInstructions?.length) {
         brief.instructions = `${brief.instructions}\n\nRefresh scope for this dispatch:\n${context.refreshInstructions.map((entry) => `- ${entry}`).join("\n")}`;
@@ -741,14 +742,19 @@ function createCliWorkerVerifier(requestedRuntime: WorkerRuntime): NodeVerifier 
       if (runtimes.length === 0) {
         return { status: "unavailable", evidence: "", error: `no worker CLI is installed for requested runtime ${requestedRuntime}` };
       }
-      const brief = composeNodeBrief(node, {
-        planId: `verify:${context.now}`,
-        planRevision: 0,
-        catalogVersion: "runtime",
-        compiledAt: context.now,
-        nodes: [node],
-        artifactBindings: context.outputs.map((output) => ({ artifactId: output.artifactId, path: output.path, accepted: false })),
-      });
+      const brief = composeNodeBrief(
+        node,
+        {
+          planId: `verify:${context.now}`,
+          planRevision: 0,
+          catalogVersion: "runtime",
+          compiledAt: context.now,
+          nodes: [node],
+          artifactBindings: context.outputs.map((output) => ({ artifactId: output.artifactId, path: output.path, accepted: false })),
+        },
+        undefined,
+        context.workspaceDir,
+      );
       try {
         verifyPackageRolePrompts(node, context.workspaceDir);
         prepareKnowledgeReferences(brief, context.workspaceDir, context.skillRootDir);

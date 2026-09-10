@@ -48,7 +48,12 @@ import {
   localBootDoesNotUseExpoGo,
   runExpoStarterLocalBoot,
 } from "../../../catalog/stacks/expo-local-boot.js";
-import { bindLocalStaticExport, bindStaticExportRoutes, decideExpoWebSurface } from "../../../catalog/stacks/expo-web-static.js";
+import {
+  bindLocalStaticExport,
+  bindStaticExportRoutes,
+  classifyStaticExportNavigation,
+  decideExpoWebSurface,
+} from "../../../catalog/stacks/expo-web-static.js";
 import { runLocalCapabilityJourney } from "../../../catalog/stacks/expo-local-capabilities.js";
 import { invokeNativeCapability } from "../../../catalog/stacks/expo-starter-fixture/modules/b2c-native-capability/src/invoke.js";
 import { invokeNativeCapability as invokeWebCapability } from "../../../catalog/stacks/expo-starter-fixture/modules/b2c-native-capability/src/index.web.js";
@@ -66,7 +71,7 @@ import { SURFACE_STATES } from "../../../catalog/stacks/expo-starter-fixture/src
 import { PERSISTENCE_SEAM_BOUND, PERSISTENCE_STORE_KIND } from "../../../catalog/stacks/expo-starter-fixture/src/persistence/seam.js";
 import { deepLinkRecovery } from "../../../catalog/stacks/expo-starter-fixture/src/navigation/deep-link.js";
 import { NAVIGATION_RUNTIME_VERIFIED, reduceNavigation } from "../../../catalog/stacks/expo-starter-fixture/src/navigation/journeys.js";
-import { ROUTE_HREFS } from "../../../catalog/stacks/expo-starter-fixture/src/navigation/route-graph.js";
+import { ROUTE_HREFS, STATIC_EXPORT_REQUIRED_HREFS } from "../../../catalog/stacks/expo-starter-fixture/src/navigation/route-graph.js";
 import { inspectWorkspace } from "../../../kernel/session/inspect.js";
 import { assert, skillRoot, type Harness } from "./_harness.js";
 
@@ -184,6 +189,10 @@ export function register(harness: Harness): void {
     const layout = isolatedStarterRouterLayout(skillRoot);
     assert(layout.status === "layout-ready", `expected layout-ready, got ${layout.status}`);
     assert(layout.jsxRoutes, "routes must be Expo Router JSX, not data-object re-exports");
+    assert(
+      readFileSync(path.join(EXPO_STARTER_FIXTURE_DIR, "app/detail/[id].tsx"), "utf8").includes("generateStaticParams"),
+      "dynamic detail must declare generateStaticParams so /detail/1 exists in the static export",
+    );
     assert(layout.pinStatus === "workspace-pin", `expo-router must be a workspace pin, got ${layout.pinStatus}`);
     assert(layout.expoAdapterPresent, "Expo UI adapter manifest must exist");
     assert(layout.expoAdapterQuality === "implemented", "Expo UI adapter must point at real source symbols, not a placeholder");
@@ -467,19 +476,40 @@ export function register(harness: Harness): void {
     const journey = runLocalCapabilityJourney(target);
     assert(journey.signedIn.snapshot.session.signedIn && journey.signedIn.snapshot.session.appUserId === "user-a", journey.signedIn.reason);
     assert(journey.signedIn.snapshot.session.entitled === false, "local sign-in must not grant paid access");
-    assert(journey.restarted.snapshot.notes.some((note) => note.id === "note-1" && note.owner === "user-a"), "SQLite cache must survive reopen");
+    assert(
+      journey.restarted.snapshot.notes.some((note) => note.id === "note-1" && note.owner === "user-a"),
+      "SQLite cache must survive reopen",
+    );
     assert(journey.expired.snapshot.session.signedIn === false && journey.expired.snapshot.notes.length === 0, "expiry clears the current user");
     assert(journey.isolated, "account switch must not leak the prior user's notes");
     assert(journey.interrupted.action === "refuse", journey.interrupted.reason);
     assert(journey.denied.action === "accept" && journey.denied.snapshot.permission?.outcome === "denied", journey.denied.reason);
     assert(journey.restored.snapshot.restoreRoute === ROUTE_HREFS.detail("1"), journey.restored.reason);
     assert(journey.labeledLive === false && journey.restarted.snapshot.backendOfRecord === false, "local journey is not live or backend proof");
+    const exportDir = booted.webExport.outputDir ?? path.join(target, "dist-web");
     const routes = bindStaticExportRoutes({
-      exportDir: booted.webExport.outputDir ?? path.join(target, "dist-web"),
-      requiredHrefs: [ROUTE_HREFS.home, ROUTE_HREFS.settings, ROUTE_HREFS.signIn, ROUTE_HREFS.modal],
+      exportDir,
+      requiredHrefs: STATIC_EXPORT_REQUIRED_HREFS,
     });
     assert(routes.action === "observe-static-routes", routes.reason);
+    assert(routes.notFoundPresent, "static export must emit +not-found or 404 HTML");
     assert(routes.easHosting === false && routes.ssr === false && routes.labeledLive === false, "static routes are not hosting or SSR");
+    const navigation = classifyStaticExportNavigation({
+      exportDir,
+      steps: [
+        { kind: "direct-entry", href: ROUTE_HREFS.home },
+        { kind: "refresh", href: ROUTE_HREFS.settings },
+        { kind: "deep-route", href: ROUTE_HREFS.detail("1") },
+        { kind: "back", href: ROUTE_HREFS.home },
+        { kind: "unknown", href: "/missing-static-route" },
+      ],
+    });
+    assert(navigation.action === "observe-static-navigation", navigation.reason);
+    assert(navigation.browser === false && navigation.runtimeVerified === false, "HTML classification is not a live browser");
+    assert(
+      navigation.steps.every((step) => step.kind !== "unknown" || step.outcome === "recoverable-not-found"),
+      "unknown href must recover through not-found HTML",
+    );
   });
 
   harness.check("expo foundation: empty authorized target scaffolds only the selected platform and preserves product.yaml", () => {

@@ -367,15 +367,16 @@ export function register(h: Harness): void {
   // ADR-0002: check-package-parity now treats the root package.json as the shipped runtime
   // manifest (checkPackStandalone reads args.repoRoot, not args.skillRoot), so the files/
   // dependencies mutation below has to land on the repo-root manifest to be seen at all. It is
-  // mirrored onto the skill/pkg manifest too, so this fixture exercises only the dev-only-parser
-  // failure it names — not an incidental shared-parser-version-drift finding from the two
-  // manifests disagreeing on every other dependency.
-  const parityMissingTypeScript = makeEmptyFixture("package-parity-missing-typescript-runtime-dependency");
+  // mirrored onto the skill/pkg manifest too, so this fixture exercises only the missing
+  // checkout-compiler failure it names — not an incidental shared-parser-version-drift
+  // finding from the two manifests disagreeing on every other dependency. After the compiled
+  // runtime, typescript and tsx belong in devDependencies; packed bins must not carry them.
+  const parityMissingTypeScript = makeEmptyFixture("package-parity-missing-typescript-checkout-tool");
   const missingTypeScriptPair = writeParityPair(parityMissingTypeScript, { rootVersion: "0.0.1", skillVersion: "0.0.1" });
   const missingTypeScriptDependencies = {
+    "@google/design.md": "1.0.0",
     "@mdx-js/mdx": "1.0.0",
     "@modelcontextprotocol/sdk": "1.0.0",
-    tsx: "1.0.0",
     yaml: "1.0.0",
     zod: "1.0.0",
   };
@@ -383,16 +384,17 @@ export function register(h: Harness): void {
     const manifest = JSON.parse(readFileSync(manifestPath, "utf8")) as Record<string, unknown>;
     manifest.files = ["entrypoints"];
     manifest.dependencies = missingTypeScriptDependencies;
+    manifest.devDependencies = { tsx: "1.0.0" };
     writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), "utf8");
   }
   mkdirSync(path.join(missingTypeScriptPair.parityScriptRoot, "entrypoints", "cli"), { recursive: true });
   writeFileSync(path.join(missingTypeScriptPair.parityScriptRoot, "entrypoints", "cli", "b2c.mjs"), "#!/usr/bin/env node\n", "utf8");
   runScriptArgs(
-    "package parity fails when the shipped TypeScript parser remains dev-only",
+    "package parity fails when the TypeScript compiler is missing from checkout tools",
     "check-package-parity.ts",
     ["--repo-root", missingTypeScriptPair.repoRoot, "--skill-root", missingTypeScriptPair.parityScriptRoot],
     1,
-    "typescript is imported (or execed)",
+    "typescript is a checkout/build tool and must live in devDependencies",
   );
 
   const parityMissingMdx = makeEmptyFixture("package-parity-missing-mdx-runtime-dependency");

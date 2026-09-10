@@ -25,7 +25,7 @@ export const KNOWLEDGE_TOOL_DEFINITIONS = [
     description:
       "Get a compact workflow route by stable workflowId. The default include=route omits working instructions and knowledge bodies. " +
       "route.outputs links each indexed artifact specification to its exact section call and validator; route.references carries bounded section discovery and revision-pinned retrieval. " +
-      "Read the required guidance before work. A route is not evidence that it was delivered or read. route.coverage and warnings name missing delivery. " +
+      "Read the required guidance before work. A route is not evidence that it was delivered or read. route.coverage.delivery and warnings name missing delivery. " +
       "Use include=instructions for the complete working instructions without a knowledge bundle. Use brief:true only when an expanded dispatch packet is needed. " +
       "Opt-in include=summaries or full retains the bounded bundle allocator. tokenBudget counts Unicode code points, not measured tokens, and is valid only for those two modes. " +
       "Follow coverage.incomplete and nextOffset on explicit bundles; prefer exact sections over a large bundle. " +

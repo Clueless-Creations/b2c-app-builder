@@ -148,8 +148,11 @@ export interface WorkflowKnowledgeRoute {
   outputs: Array<{ path: string; specifications: Array<{ get: KnowledgeResolver }>; validators: string[]; specificationAvailable: boolean }>;
   continuation: { dependencies: string[]; successors: string[]; executionAvailable: false; businessComplete: false };
   coverage: {
+    /** True when this response delivered every required reference in full. Not a caller-reading ledger. */
     complete: boolean;
     requiredCount: number;
+    /** Per-response delivery statement. Does not say whether the caller read or finished the work. */
+    delivery: string;
     incomplete: Array<
       | { referenceId: ReferenceId; status: "not_requested" }
       | { referenceId: ReferenceId; status: "omitted" | "truncated"; offset: number; contentSha256: string }

@@ -18,6 +18,18 @@ export function register(h: Harness): void {
       result.route.coverage.incomplete.every((entry) => entry.status === "not_requested"),
       "discovery was called truncation",
     );
+    assert(
+      result.route.coverage.delivery === `required references, 0 requested in this response`,
+      "route-mode coverage must be a delivery statement, not a completion ledger",
+    );
+    assert(
+      result.route.warnings.some((warning) => warning.startsWith("A workflow pass is not a business-completion verdict.")),
+      "completion guardrail missing",
+    );
+    assert(
+      result.route.warnings.every((warning) => !/workspace plan/i.test(warning)),
+      "workflow response pointed at a workspace-plan tool this surface may not have",
+    );
     assert(result.route.warnings.length > 0, "required guidance warning missing");
     // Research-backed-spec now lists the live-portfolio and paid-tool holds in route metadata.
     // The body still stays empty; 14 KiB is the measured ceiling after that graph change.

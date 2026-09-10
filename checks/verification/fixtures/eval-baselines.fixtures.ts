@@ -25,6 +25,8 @@ const COMPLETION_WARNING =
   "A workflow pass is not a business-completion verdict. This response does not name executable next work.";
 const WORKSPACE_PLAN_POINTER = "Use the selected workspace plan";
 const FORBIDDEN_RETRIEVAL_INFRA = ["pinecone", "chromadb", "weaviate", "qdrant", "@xenova/transformers"] as const;
+const STORE_010_ROUTER_FIRST = "workflow.operations.live-app-store-portfolio";
+const HOSTED_WORKER_FORBIDDEN_IMPORTS = ["route-utterance", "route-scoring", "matchWorkflows"] as const;
 const STAGE_A_CASES_RELATIVE_PATH = "checks/verification/goldens/eval/stage-a-cases.json";
 
 type StageAClass =
@@ -383,10 +385,13 @@ export function register(harness: Harness): void {
       case "candidates": {
         const ids = match.candidates.map((candidate) => candidate.workflowId);
         assert(match.candidates.length >= 2, `candidates must record a tie, not a unique first rank: ${ids.join(",")}`);
+        assert(ids[0] === STORE_010_ROUTER_FIRST, `store-010 first rank moved: ${ids.join(",")}`);
+        assert(!asc.needs.includes(STORE_010_ROUTER_FIRST), "first rank must stay a non-needed workflow so #39 is not extracted");
         assert(
           ids.includes("workflow.store.store-console-workflow"),
           `needed store-console-workflow missing from matchWorkflows candidates: ${ids.join(",")}`,
         );
+        assert(hosted[0] !== STORE_010_ROUTER_FIRST, `hosted catalog() first rank must stay a different scorer than matchWorkflows: ${hosted[0]}`);
         break;
       }
       default: {
@@ -398,6 +403,23 @@ export function register(harness: Harness): void {
       asc.needs.every((id) => hosted.includes(id)),
       `catalog() must still reach needed Apple workflows at some offset: missing ${asc.needs.filter((id) => !hosted.includes(id)).join(", ")}`,
     );
+  });
+
+  harness.check("eval-baselines: hosted catalog() does not import the store-010 router scorer", () => {
+    const serviceSource = readFileSync(path.join(skillRoot, "kernel/knowledge-service/service.ts"), "utf8");
+    const catalogSource = readFileSync(path.join(skillRoot, "catalog/index.ts"), "utf8");
+    const workerInputs = readFileSync(path.join(skillRoot, "hosted/knowledge-mcp/test/bundle-inputs.test.ts"), "utf8");
+    const routerSource = readFileSync(path.join(skillRoot, "kernel/session/route-utterance.ts"), "utf8");
+    const protocol = readFileSync(path.join(skillRoot, "checks/verification/rehearsal/eval-baselines.md"), "utf8");
+    for (const name of HOSTED_WORKER_FORBIDDEN_IMPORTS) {
+      assert(!serviceSource.includes(name), `knowledge service must not import ${name}`);
+      assert(!catalogSource.includes(name), `catalog composition must not import ${name}`);
+    }
+    assert(!workerInputs.includes("route-utterance"), workerInputs);
+    assert(!workerInputs.includes("route-scoring"), workerInputs);
+    assert(routerSource.includes('from "node:fs"'), "route-utterance remains Worker-unsafe because it reads the filesystem");
+    assert(protocol.includes("Do not extract the scorer into hosted `catalog()`"), protocol);
+    assert(protocol.includes(STORE_010_ROUTER_FIRST), protocol);
   });
 
   harness.check("eval-baselines: workflow route coverage is a delivery record and not a workspace-plan instruction", () => {

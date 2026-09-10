@@ -307,7 +307,9 @@ export function register(harness: Harness): void {
     const notRun = renderRevenueCatCliHostBlock(null);
     assert(notRun.includes("not a live PATH probe"), `not-run block must deny a live probe: ${notRun}`);
     assert(notRun.includes("not live catalog proof"), `not-run block must deny live catalog: ${notRun}`);
-    assert(notRun.includes("doctor has not been run"), `missing file must say doctor has not been run: ${notRun}`);
+    assert(notRun.includes("last b2c inspect observation"), `not-run header must prefer inspect: ${notRun}`);
+    assert(notRun.includes("inspect has not been run"), `missing file must say inspect has not been run: ${notRun}`);
+    assert(notRun.includes("supported `b2c doctor`"), `missing file must keep doctor supported: ${notRun}`);
     const home = harness.makeTempDir("rc-doctor-status");
     writeDoctorHostObservation(
       {
@@ -328,7 +330,7 @@ export function register(harness: Harness): void {
     const recorded = renderRevenueCatCliHostBlock(readDoctorHostObservation(home));
     assert(recorded.includes("/opt/fake/bin/rc") && recorded.includes(REVIEWED) && recorded.includes(COMPARED_AT), `recorded block must name winner and stamp: ${recorded}`);
     assert(recorded.includes("Live catalog is unproven"), `trusted sibling must leave catalog unproven: ${recorded}`);
-    assert(!recorded.includes("doctor has not been run"), "a recorded observation is not doctor-not-run");
+    assert(!recorded.includes("inspect has not been run"), "a recorded observation is not inspect-not-run");
     const legacy = renderRevenueCatCliHostBlock({
       schemaVersion: "b2c.doctor-host/v1",
       comparedAt: COMPARED_AT,

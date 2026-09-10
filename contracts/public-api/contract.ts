@@ -667,7 +667,7 @@ export const PUBLIC_OPERATIONS = [
     mcp: "b2c_business_plan",
     title: "Plan authorized consumer-business work",
     description:
-      "Passive registered-workspace frontier from existing compiler and autonomy owner. No network or provider prerequisite probes; unobserved prerequisites remain held. Ready work includes bounded briefs. Held work includes hold classification, bounded detail, and a sanitized last failure when one exists. The current founder question is bound to this revision and is not an approval.",
+      "Passive registered-workspace frontier from existing compiler and autonomy owner. No network or provider prerequisite probes; unobserved prerequisites remain held. Ready work includes bounded briefs. Held work includes hold classification, bounded detail, and a sanitized last failure when one exists. The current founder question is bound to this revision and is not an approval. completion.deliveryAccepted is current closeout evidence, not store submission or release.",
     inputSchema: businessPlanInputSchema,
     outputSchema: resultSchema(businessPlanSchema),
     flags: ["workspace", "concurrency", "json"],
@@ -678,7 +678,7 @@ export const PUBLIC_OPERATIONS = [
     mcp: null,
     title: "Run one authorized business session",
     description:
-      "CLI-only bounded execution through the existing runner, exact revision and durable request identity. Uses existing grants. Notifications disabled. Selected operations require trusted host routes.",
+      "CLI-only bounded execution through the existing runner, exact revision and durable request identity. Uses existing grants. Notifications disabled. Selected operations require trusted host routes. A successful bounded session is not delivery; inspect completion.deliveryAccepted. liveLaunchProven stays false without provider-native proof.",
     inputSchema: businessRunInputSchema,
     outputSchema: resultSchema(businessRunSchema),
     flags: ["workspace", "revision", "request", "scope", "seconds", "concurrency", "json"],
@@ -700,7 +700,7 @@ export const PUBLIC_OPERATIONS = [
     mcp: "b2c_business_evidence",
     title: "Read current business evidence",
     description:
-      "Project current run attempts, artifact identities and validated acceptance. No raw state, grants or provider credentials. Synthetic proof and stale evidence remain explicit.",
+      "Project current run attempts, artifact identities and validated acceptance. No raw state, grants or provider credentials. Synthetic proof and stale evidence remain explicit. liveLaunchProven stays false until separately granted provider-native proof.",
     inputSchema: businessEvidenceInputSchema,
     outputSchema: resultSchema(businessEvidenceSchema),
     flags: ["workspace", "workflow", "json"],

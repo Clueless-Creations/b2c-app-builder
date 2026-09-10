@@ -136,7 +136,7 @@ CLI-only initialization of an accepted authored product through the existing boo
 
 ## business.plan
 
-Passive registered-workspace frontier from existing compiler and autonomy owner. No network or provider prerequisite probes; unobserved prerequisites remain held. Ready work includes bounded briefs. Held work includes hold classification, bounded detail, and a sanitized last failure when one exists. The current founder question is bound to this revision and is not an approval.
+Passive registered-workspace frontier from existing compiler and autonomy owner. No network or provider prerequisite probes; unobserved prerequisites remain held. Ready work includes bounded briefs. Held work includes hold classification, bounded detail, and a sanitized last failure when one exists. The current founder question is bound to this revision and is not an approval. completion.deliveryAccepted is current closeout evidence, not store submission or release.
 
 - CLI: `b2c business-plan`
 - Accepted CLI flags: `--workspace`, `--concurrency`, `--json`. See `b2c business-plan --help` for usage.
@@ -146,7 +146,7 @@ Passive registered-workspace frontier from existing compiler and autonomy owner.
 
 ## business.run
 
-CLI-only bounded execution through the existing runner, exact revision and durable request identity. Uses existing grants. Notifications disabled. Selected operations require trusted host routes.
+CLI-only bounded execution through the existing runner, exact revision and durable request identity. Uses existing grants. Notifications disabled. Selected operations require trusted host routes. A successful bounded session is not delivery; inspect completion.deliveryAccepted. liveLaunchProven stays false without provider-native proof.
 
 - CLI: `b2c business-run`
 - Accepted CLI flags: `--workspace`, `--revision`, `--request`, `--scope`, `--seconds`, `--concurrency`, `--json`. See `b2c business-run --help` for usage.
@@ -166,7 +166,7 @@ CLI-only revision-checked recovery of a settled request through the session owne
 
 ## business.evidence
 
-Project current run attempts, artifact identities and validated acceptance. No raw state, grants or provider credentials. Synthetic proof and stale evidence remain explicit.
+Project current run attempts, artifact identities and validated acceptance. No raw state, grants or provider credentials. Synthetic proof and stale evidence remain explicit. liveLaunchProven stays false until separately granted provider-native proof.
 
 - CLI: `b2c business-evidence`
 - Accepted CLI flags: `--workspace`, `--workflow`, `--json`. See `b2c business-evidence --help` for usage.

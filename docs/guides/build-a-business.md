@@ -130,6 +130,13 @@ bundle.
 MCP resolves workspaces through the local registry only. The CLI may take an
 explicit path. Registration gives a workspace a stable ID and makes it visible to MCP.
 
+## Completion language
+
+`completion.deliveryAccepted` means the selected closeout evidence is currently
+accepted. It does not imply store submission or production release.
+`liveLaunchProven: false` is an explicit contract limit. Provider-native proof
+and separately granted authority are required for any further claim.
+
 ## Worker runtime and failed attempts
 
 A session dispatches work to the first available agent CLI in the order `codex`,

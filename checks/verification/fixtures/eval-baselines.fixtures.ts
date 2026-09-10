@@ -1,5 +1,5 @@
 /**
- * Evaluation and measured-simplification baselines (#39, #40, #72, #73, #75, #77).
+ * Evaluation and measured-simplification baselines (#39, #40, #72, #73, #75, #77, #78).
  *
  * Authorized local checks only. No live providers, devices, paid batches, or dispatch.
  */
@@ -21,6 +21,10 @@ import { HOSTED_BUNDLE_RELATIVE_PATH } from "../../../tooling/render-hosted-bund
 import { assert, skillRoot, type Harness } from "./_harness.js";
 
 const COMPLETION_GUARD = "A workflow pass is not a business-completion verdict.";
+const COMPLETION_WARNING =
+  "A workflow pass is not a business-completion verdict. This response does not name executable next work.";
+const WORKSPACE_PLAN_POINTER = "Use the selected workspace plan";
+const FORBIDDEN_RETRIEVAL_INFRA = ["pinecone", "chromadb", "weaviate", "qdrant", "@xenova/transformers"] as const;
 const STAGE_A_CASES_RELATIVE_PATH = "checks/verification/goldens/eval/stage-a-cases.json";
 
 type StageAClass =
@@ -402,11 +406,12 @@ export function register(harness: Harness): void {
     assert(route.guardrails.workspacePlan === false, "workspacePlan stays the literal false");
     assert(route.route.coverage.incomplete.every((entry) => entry.status === "not_requested"), JSON.stringify(route.route.coverage.incomplete));
     assert(route.route.coverage.complete === false, "route-mode coverage stays incomplete while nothing was requested");
-    assert(route.route.warnings.some((warning) => warning.startsWith(COMPLETION_GUARD)), route.route.warnings.join(" | "));
-    const delivery = "delivery" in route.route.coverage ? (route.route.coverage as { delivery?: string }).delivery : undefined;
-    if (delivery !== undefined) {
-      assert(delivery === "required references, 0 requested in this response", delivery);
-    }
+    assert(route.route.warnings.includes(COMPLETION_WARNING), route.route.warnings.join(" | "));
+    assert(
+      route.route.warnings.every((warning) => !warning.includes(WORKSPACE_PLAN_POINTER)),
+      route.route.warnings.join(" | "),
+    );
+    assert(route.route.coverage.delivery === "required references, 0 requested in this response", route.route.coverage.delivery);
   });
 
   harness.check("eval-baselines: retrieval cases walk the real service, nextCall, and worker brief", () => {
@@ -510,5 +515,44 @@ export function register(harness: Harness): void {
     const protocol = readFileSync(path.join(skillRoot, "checks/verification/rehearsal/eval-baselines.md"), "utf8");
     assert(protocol.includes("#77"), "protocol records the no-change");
     assert(protocol.includes("checked transcription"), protocol);
+  });
+
+  harness.check("eval-baselines: Stage A evidence records a no-change recommendation on retrieval infrastructure", () => {
+    const protocol = readFileSync(path.join(skillRoot, "checks/verification/rehearsal/eval-baselines.md"), "utf8");
+    const catalogSource = readFileSync(path.join(skillRoot, "catalog/index.ts"), "utf8");
+    const serviceSource = readFileSync(path.join(skillRoot, "kernel/knowledge-service/service.ts"), "utf8");
+    const packageJson = readFileSync(path.join(skillRoot, "package.json"), "utf8");
+    assert(protocol.includes("no-change recommendation"), protocol);
+    assert(protocol.includes("No vector store, embeddings, or graph database"), protocol);
+    assert(protocol.includes("Do not extract `matchWorkflows` into hosted `catalog()`"), protocol);
+    assert(!catalogSource.includes("matchWorkflows"), "hosted catalog composition must not import the session scorer");
+    assert(serviceSource.includes("BM25"), "existing BM25 search stays the retrieval owner");
+    for (const name of FORBIDDEN_RETRIEVAL_INFRA) {
+      assert(!packageJson.includes(name), `package.json must not add ${name}`);
+    }
+  });
+
+  harness.check("eval-baselines: #78 sample keeps existing proposal fields and is not a runtime gate", () => {
+    const protocol = readFileSync(path.join(skillRoot, "checks/verification/rehearsal/eval-baselines.md"), "utf8");
+    const sample = readFileSync(path.join(skillRoot, "checks/verification/rehearsal/complexity-sample.md"), "utf8");
+    const contributing = readFileSync(path.join(skillRoot, "CONTRIBUTING.md"), "utf8");
+    const adoption = readFileSync(path.join(skillRoot, "docs/guides/adopt-external-sources.md"), "utf8");
+    const template = readFileSync(path.join(skillRoot, ".github/ISSUE_TEMPLATE/feature_request.yml"), "utf8");
+    assert(protocol.includes("existing fields suffice"), protocol);
+    assert(protocol.includes("Not a runtime gate"), protocol);
+    assert(sample.includes("No schema expansion"), sample);
+    assert(sample.includes("#156"), "sample must include the #40 runtime change");
+    assert(sample.includes("#165"), "sample must include the Stage A pin");
+    assert(sample.includes("#151"), "sample must include the eval-baseline scorer ownership");
+    assert(sample.includes("#77"), "sample must include the overlay-order no-change");
+    assert(sample.includes("#88"), "sample must include the optional Expo hold");
+    assert(contributing.includes("Adding default-path cost or a new architectural boundary"), contributing);
+    assert(contributing.includes("Ordinary fixes, optional citations, and"), contributing);
+    assert(adoption.includes("Default-path cost or a new architectural boundary"), adoption);
+    assert(template.includes("id: problem") && template.includes("id: proposal") && template.includes("id: enforcement"), template);
+    assert(template.includes("A competitor having a similar feature is not enough"), template);
+    assert(template.includes("The least-complex change at the existing owner"), template);
+    assert(template.includes("Named baseline and how you will observe benefit"), template);
+    assert(!template.includes("anti-complexity"), "do not add a parallel policy form");
   });
 }

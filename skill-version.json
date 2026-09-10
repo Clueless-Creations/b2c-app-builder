@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.65",
+  "version": "0.219.66",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Name connection receipts providerObservation as not_tested so handshake success and leftover names cannot parse as provider readiness.",
-    "Give the local MCP handshake the b2c-local identity so leftover b2c-app-builder stays documented, not the live server name."
+    "Require the live #40 warning and coverage.delivery shape in the eval fixture so a later rewrite cannot restore the workspace-plan pointer.",
+    "Keep #75 and #78 at no new retrieval infrastructure or schema expansion; Stage A walks stay and paid Stage B stays held."
   ]
 }

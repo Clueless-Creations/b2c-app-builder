@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.32",
+  "version": "0.219.33",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Hash RevenueCat catalog mutation identity on lookup-key and display-name. Unused createTitle no longer looks like a new offerings create.",
-    "Lock catalog-session fixtures for uncertain-wave stop, mid-wave crash resume, and verify {issues:[]} without a graph as incomplete."
+    "Console /health reports engineVersion from the skill pin and does not invent a knowledge-bundle hash.",
+    "npm run hosted:version prints engineVersion and bundleSha256 from the generated hosted-knowledge artifact."
   ]
 }

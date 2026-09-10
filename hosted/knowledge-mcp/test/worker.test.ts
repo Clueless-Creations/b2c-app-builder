@@ -7,6 +7,7 @@ import { attachD1, seedAccountInto, revokeSeedKey } from "./support/d1.js";
 import { sha256 } from "../auth.js";
 import { HOSTED_INSTRUCTIONS } from "../instructions.js";
 import type { HostedCatalogResult, HostedKnowledgeGetResult, HostedKnowledgeSearchResult } from "../../../kernel/knowledge-service/types.js";
+import hostedKnowledge from "../../../catalog/generated/hosted-knowledge.json" with { type: "json" };
 
 const origin = "https://b2c.test";
 const key = `b2c_${"a".repeat(43)}`;
@@ -148,7 +149,14 @@ async function exchange(clientId: string, code: string, changes: Record<string, 
 }
 
 test("health and OAuth discovery are public; content requires authentication on both transports", async () => {
-  assert.equal((await fetchPath("/health")).status, 200);
+  const health = await fetchPath("/health");
+  assert.equal(health.status, 200);
+  assert.deepEqual(await health.json(), {
+    status: "ok",
+    service: "b2c-hosted",
+    engineVersion: hostedKnowledge.engineVersion,
+    bundleSha256: hostedKnowledge.bundleSha256,
+  });
   const metadata = (await (await fetchPath("/.well-known/oauth-protected-resource/mcp")).json()) as { resource: string; scopes_supported: string[] };
   assert.equal(metadata.resource, `${origin}/mcp`);
   assert.deepEqual(metadata.scopes_supported, ["b2c:read"]);

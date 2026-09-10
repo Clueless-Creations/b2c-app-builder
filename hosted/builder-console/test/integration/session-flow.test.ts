@@ -378,6 +378,8 @@ test("GET /console answers 503 with the unavailable page, not a thrown error, wh
 
   const health = await dispatch(new Request(`${ORIGIN}/health`), brokenEnv);
   assert.equal(health.status, 200, "a malformed console CSRF secret must not take /health down with it");
+  const healthBody = (await health.json()) as { engineVersion?: string };
+  assert.equal(typeof healthBody.engineVersion, "string", "/health must report engineVersion even when the console secret is malformed");
 });
 
 test("a second sign-in from the same Google account reuses the existing user and account", async () => {

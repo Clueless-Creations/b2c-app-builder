@@ -41,6 +41,7 @@ form-action 'self'`. The two fonts are served by this Worker itself from `/fonts
 
 | Route                              | What it does                                                                                                                                                                                   |
 | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /health`                      | Unauthenticated JSON: `status`, `service`, and `engineVersion` from the repo-root `skill-version.json` pin. No knowledge-bundle hash.                                                          |
 | `GET /`                            | 302 to `/console`.                                                                                                                                                                             |
 | `GET /signin`                      | The front door: one button to `/auth/google/start` (carrying `entry_point`), the three steps, the open-source door, and the Terms and Privacy links. A valid session is sent on to `/console`. |
 | `GET /auth/google/start`           | Sets the OAuth state cookie and redirects to Google. `entry_point` is one of `landing`, `header`, `console_guard`, `pricing`, `signin`.                                                         |

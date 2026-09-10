@@ -49,6 +49,7 @@ export function register(h: Harness): void {
       assert(plan.revision !== before && !plan.completion.deliveryAccepted, "research changes ignored or business accepted");
       assert(readWorkspaceStatus(root).resume?.artifacts[0]?.contentSha256 === plan.resume.artifacts[0]?.contentSha256, "resume surfaces disagree");
       assert(readFileSync(path.join(root, "operations/LAUNCH_PROGRAM.md"), "utf8").includes("complete"), "durable mandate missing");
+      assert(readFileSync(path.join(root, "operations/FOUNDER_BRIEF.md"), "utf8").includes("complete consumer business"), "canonical founder brief missing");
       const gate = spawnSync(
         process.execPath,
         ["--import", "tsx", "checks/validation/business/research/check-research-evidence.ts", "--root", root, "--require-workflow-outputs", "--json"],
@@ -79,6 +80,31 @@ export function register(h: Harness): void {
         { cwd: skillRoot, encoding: "utf8" },
       );
       assert(`${invalid.stdout}${invalid.stderr}`.includes("project_state.invalid_schema"), "invalid state was ignored");
+    } finally {
+      if (previous === undefined) delete process.env.B2C_APP_BUILDER_HOME;
+      else process.env.B2C_APP_BUILDER_HOME = previous;
+    }
+  });
+  h.check("Porchwatch: absent-directory creation preserves the founder brief losslessly", () => {
+    const home = h.makeTempDir("porchwatch-brief-home"),
+      root = path.join(h.makeTempDir("porchwatch-brief-business"), "after-credits");
+    const previous = process.env.B2C_APP_BUILDER_HOME;
+    process.env.B2C_APP_BUILDER_HOME = home;
+    try {
+      const mandate = "Keep notification coverage and the performance-budget. Unicode café.\n";
+      const created = createBusiness({
+        workspaceId: "after-credits",
+        directory: root,
+        name: "After Credits",
+        hypothesis: "A recap companion",
+        mandate,
+      });
+      assert(created.sourceIntent.derivedViewEmbedsSource === false, "derived launch program claimed to be the source");
+      assert(readFileSync(path.join(root, "operations/FOUNDER_BRIEF.md"), "utf8") === mandate, "founder brief was rewritten");
+      assert(!readFileSync(path.join(root, "operations/LAUNCH_PROGRAM.md"), "utf8").includes("notification coverage"), "derived view embedded the source");
+      const plan = planBusiness({ workspaceId: "after-credits", maxConcurrency: 1 });
+      assert(plan.status === "not_initialized", "creation initialized the runtime");
+      assert(typeof plan.nextAction === "string" && plan.nextAction.length > 0, "planning resume missing after lossless creation");
     } finally {
       if (previous === undefined) delete process.env.B2C_APP_BUILDER_HOME;
       else process.env.B2C_APP_BUILDER_HOME = previous;

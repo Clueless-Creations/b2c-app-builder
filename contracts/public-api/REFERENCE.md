@@ -119,7 +119,7 @@ Read registered independent businesses from existing metric contracts and accept
 CLI-only scaffold and registration in an explicitly selected empty directory. Creates no grants, providers or accepted product decision.
 
 - CLI: `b2c business-create`
-- Accepted CLI flags: `--workspace`, `--directory`, `--name`, `--hypothesis`, `--mandate`, `--json`. See `b2c business-create --help` for usage.
+- Accepted CLI flags: `--workspace`, `--directory`, `--name`, `--hypothesis`, `--mandate`, `--mandate-file`, `--json`. See `b2c business-create --help` for usage.
 - MCP: unavailable (CLI operator only)
 - [Input schema](schemas/business.create.input.schema.json)
 - [Result schema](schemas/business.create.result.schema.json)
@@ -176,7 +176,7 @@ Project current run attempts, artifact identities and validated acceptance. No r
 
 ## Creation recovery
 
-Create and register a new planning workspace with `b2c business-create --workspace my-app --directory ./my-app --name "Working name" --hypothesis "A short product hypothesis" --mandate "The full user request" --json`. `--mandate` is optional; supply it to preserve the complete request. The CLI flag `--workspace` maps to JSON `workspaceId`; `--workspace-id` is not a supported flag. The target must be absent or empty. Do not add agent files or register it before creation.
+Create and register a new planning workspace with `b2c business-create --workspace my-app --directory ./my-app --name "Working name" --hypothesis "A short product hypothesis" --mandate-file ./brief.md --json`. Direct `--mandate` remains optional for short requests (8,000 characters). `--mandate-file` preserves a complete founder brief in `operations/FOUNDER_BRIEF.md`. `operations/LAUNCH_PROGRAM.md` is the derived program view. The CLI flag `--workspace` maps to JSON `workspaceId`; `--workspace-id` is not a supported flag. The target must be absent or empty. Do not add agent files or register it before creation.
 
 - `business.registration_conflict`: the requested ID or directory already belongs to a registry entry. Inspect `b2c workspaces list`. Resume a valid existing workspace with `b2c business-plan --workspace <registered-id> --json`. If inspection confirms a stale registration from a failed attempt, remove only that registration with `b2c workspaces remove <id>`; this leaves workspace files intact. Retry creation only when the intended ID is free and the target is absent or empty. Preserve other businesses and their registrations.
 - `business.target_occupied`: the destination contains files. Inspect and preserve them. Resume an existing registered scaffold, or register an existing unregistered scaffold with `b2c workspaces register <id> <path>`. For a new business, choose an absent or empty destination. Do not delete unfamiliar files or retry creation over an existing app.

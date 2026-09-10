@@ -85,13 +85,15 @@ explicit path. Registration gives a workspace a stable ID and makes it visible t
 For a new complete business, create and register the planning workspace together:
 
 ```bash
-b2c business-create --workspace my-app --directory ./my-app --name "Working name" --hypothesis "A short product hypothesis" --mandate "The full user request" --json
+b2c business-create --workspace my-app --directory ./my-app --name "Working name" --hypothesis "A short product hypothesis" --mandate-file ./brief.md --json
 b2c business-plan --workspace my-app --json
 ```
 
 The target must be absent or empty. Do not register it or add agent instructions
-before creation. The command creates the planning scaffold and records the mandate
-in `operations/LAUNCH_PROGRAM.md`. The CLI uses `--workspace`; the JSON schema
+before creation. The command creates the planning scaffold and preserves the
+founder brief in `operations/FOUNDER_BRIEF.md`. `operations/LAUNCH_PROGRAM.md` is
+the derived program view and does not replace it. Direct `--mandate` remains
+valid for short requests (8,000 characters). The CLI uses `--workspace`; the JSON schema
 calls that field `workspaceId`.
 
 Research the hypothesis. After explicit product acceptance, record it in

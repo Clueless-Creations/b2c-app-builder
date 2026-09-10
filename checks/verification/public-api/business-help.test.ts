@@ -18,7 +18,7 @@ function help(command: string): string {
 test("business creation help requires identity and hypothesis but permits omitted mandate", () => {
   assert.equal(
     help("business-create"),
-    "Usage: b2c business-create --workspace <value> --directory <value> --name <value> --hypothesis <value> [--mandate <value>] [--json]",
+    "Usage: b2c business-create --workspace <value> --directory <value> --name <value> --hypothesis <value> [--mandate <value>] [--mandate-file <value>] [--json]",
   );
 });
 

@@ -336,4 +336,21 @@ export function register(h: Harness): void {
       "refusal changed files or registry",
     );
   });
+
+  h.check("onboarding: business entry reaches create/status/plan before composition and maintainer architecture", () => {
+    const skill = readFileSync(path.join(skillRoot, "SKILL.md"), "utf8");
+    const buildAt = skill.indexOf("## Build a business");
+    const composeAt = skill.indexOf("## Customize composition");
+    const mobileAt = skill.indexOf("## Mobile app operation");
+    assert(buildAt >= 0 && composeAt > buildAt, "skill teaches composition before the ordinary business path");
+    assert(mobileAt > composeAt, "mobile capture precedes composition customization");
+    assert(!/docs\/north-star-architecture|ARCH-\d+|docs\/architecture-conformance/.test(skill), "business skill requires maintainer architecture");
+    const readme = readFileSync(path.join(skillRoot, "README.md"), "utf8");
+    const startedAt = readme.indexOf("## Get started");
+    const nextAt = readme.indexOf("\n## ", startedAt + 1);
+    const started = readme.slice(startedAt, nextAt < 0 ? undefined : nextAt);
+    const createAt = started.indexOf("b2c business-create");
+    const catalogAt = started.indexOf("b2c catalog --json");
+    assert(createAt >= 0 && catalogAt > createAt, "README Get started still leads with catalog discovery");
+  });
 }

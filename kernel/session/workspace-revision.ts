@@ -11,6 +11,7 @@ import { assertCompositionActivationComplete } from "../composition/activation.j
 const FILES = [
   ...RESEARCH_ARTIFACTS,
   "operations/LAUNCH_PROGRAM.md",
+  "operations/FOUNDER_BRIEF.md",
   "b2c.yaml",
   "product.yaml",
   "PRODUCT.md",

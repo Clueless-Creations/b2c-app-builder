@@ -37,13 +37,54 @@
             },
             "nextAction": {
               "type": "string"
+            },
+            "sourceIntent": {
+              "type": "object",
+              "properties": {
+                "artifact": {
+                  "type": "string",
+                  "const": "operations/FOUNDER_BRIEF.md"
+                },
+                "characterCount": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "byteLength": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "digest": {
+                  "type": "string",
+                  "pattern": "^sha256:[a-f0-9]{64}$"
+                },
+                "derivedView": {
+                  "type": "string",
+                  "const": "operations/LAUNCH_PROGRAM.md"
+                },
+                "derivedViewEmbedsSource": {
+                  "type": "boolean",
+                  "const": false
+                }
+              },
+              "required": [
+                "artifact",
+                "characterCount",
+                "byteLength",
+                "digest",
+                "derivedView",
+                "derivedViewEmbedsSource"
+              ],
+              "additionalProperties": true
             }
           },
           "required": [
             "workspaceId",
             "status",
             "revision",
-            "nextAction"
+            "nextAction",
+            "sourceIntent"
           ],
           "additionalProperties": true
         }

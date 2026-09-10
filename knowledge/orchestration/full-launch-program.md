@@ -23,7 +23,7 @@ The program replaces a pasted launch prompt. The founder supplies a short mandat
 
 The program is a top-level node with two ends:
 
-- `workflow.orchestration.full-launch-program` opens the program. It records the mandate in `operations/LAUNCH_PROGRAM.md`, sets `project.launchScope` to `full` through the reducer, and dispatches the orient work.
+- `workflow.orchestration.full-launch-program` opens the program. Creation records the founder brief in `operations/FOUNDER_BRIEF.md` and a short program view in `operations/LAUNCH_PROGRAM.md`, sets `project.launchScope` to `full` through the reducer, and dispatches the orient work.
 - `workflow.orchestration.full-launch-closeout` closes the program. It depends on the store, trust, engineering, and growth terminal nodes and runs the definition-of-done gates.
 
 Between the two ends, the existing catalog nodes do the work. The program adds no second router, catalog, planner, or state store. It adds the mandate, the isolated-review edges, the reference-pack edge, and the closeout gates.
@@ -32,7 +32,7 @@ The `full` launch profile parks no lane. Every lane ends `done`, `blocked` with 
 
 ## The Mandate Record
 
-Write `operations/LAUNCH_PROGRAM.md` at program start. It carries the facts a pasted prompt used to carry. Keep it short. Link, do not duplicate.
+Write `operations/LAUNCH_PROGRAM.md` at program start. It carries the facts a pasted prompt used to carry. Keep it short. Link the canonical founder brief in `operations/FOUNDER_BRIEF.md`; do not duplicate it.
 
 | Field                | Content                                                                                                                                                                                 |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -52,7 +52,7 @@ Workspace-specific identities belong here and in reducer-owned state, never in c
 
 ## Start Path
 
-1. For a new business, create and register the planning workspace together: `b2c business-create --workspace my-app --directory ./my-app --name "Working name" --hypothesis "A short product hypothesis" --mandate "The full founder request" --json`. Select an absent or empty directory; do not add files or register it first. The command records the mandate. For an existing registered workspace, resume it. For an existing unregistered scaffold, use `b2c workspaces register <id> <path>`. Inspect an existing app before installing a scaffold; preserve its files. Never create a second workspace or re-scaffold an existing one.
+1. For a new business, create and register the planning workspace together: `b2c business-create --workspace my-app --directory ./my-app --name "Working name" --hypothesis "A short product hypothesis" --mandate-file ./brief.md --json`. Direct `--mandate` remains valid for short requests. Select an absent or empty directory; do not add files or register it first. The command records the founder brief in `operations/FOUNDER_BRIEF.md`. For an existing registered workspace, resume it. For an existing unregistered scaffold, use `b2c workspaces register <id> <path>`. Inspect an existing app before installing a scaffold; preserve its files. Never create a second workspace or re-scaffold an existing one.
 2. Run `workflow.orchestration.session-continuity-resume`. Read the durable artifacts before new work. Chat memory is not state.
 3. Run `workflow.orchestration.orient-scaffold-and-state-cockpit-upkeep`. Write `operations/ORCHESTRATION.md` with the `## Review Ledger` section before any broad dispatch.
 4. Present one start-of-workflow tool-intake AskUserQuestion from `reference.operations.paid-tool-routing` for the tools on the `research-backed-spec` compiled graph. Fold it into a pending readiness gate. Do not open a second tool gate. Do not substitute a generic fallback and call it equivalent. App Store Connect API auth and a live `asc apps list` receipt stay required; they are not optional research tools. Deferred AppKittie, XPOZ, Firecrawl, or paid ASO continue as labeled fallback.

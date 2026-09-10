@@ -31,6 +31,39 @@ export function workspaceArtifactFingerprint(workspaceRoot: string, relativePath
   return outputFingerprintPath(current);
 }
 
+function isStructuralStrengthLine(line: string): boolean {
+  return /structural\s*=\s*(?:checked|failed)/i.test(line) && /semantic=unknown/i.test(line) && /runtime=unknown/i.test(line);
+}
+
+function isPacketCheckChrome(line: string): boolean {
+  return /evidence packet check/i.test(line) || /^\d+ error\(s\), \d+ warning\(s\)$/i.test(line);
+}
+
+function claimsRuntimeObservation(line: string): boolean {
+  if (/\bnot\b.{0,80}\b(live[- ]device|device observation|runtime observation)\b/i.test(line)) return false;
+  return /\b(live[- ]device|device observation|runtime observation|observed on (?:a |the )?device|ran on (?:a |the )?device)\b/i.test(line);
+}
+
+/**
+ * Shape-pass and packet chrome are not semantic review. A synthetic or graph receipt cannot
+ * become live-device or runtime observation.
+ */
+export function classifyProofStrengthIssues(
+  evidence: readonly string[],
+  attempt: { proofSource?: "workspace" | "synthetic" },
+  receiptMode?: IndependentVerificationReceipt["mode"],
+): string[] {
+  const lines = evidence.map((entry) => entry.trim()).filter((entry) => entry.length > 0);
+  const issues: string[] = [];
+  if (lines.length > 0 && lines.every((line) => isStructuralStrengthLine(line) || isPacketCheckChrome(line)) && lines.some(isStructuralStrengthLine)) {
+    issues.push("review.structural_only");
+  }
+  if (lines.some(claimsRuntimeObservation) && (attempt.proofSource === "synthetic" || receiptMode === "synthetic" || receiptMode === "graph")) {
+    issues.push("review.runtime_unobserved");
+  }
+  return issues;
+}
+
 function subjectIds(plan: CompiledPlan, node: CompiledRunNode): string[] {
   return [...new Set([...node.outputs, ...(node.reviewOf ?? []).flatMap((id) => plan.nodes.find((entry) => entry.id === id)?.outputs ?? [])])];
 }
@@ -119,6 +152,7 @@ export function validateReviewReceipt(
     }
   }
   if (!receipt.evidence.some((entry) => entry.trim())) issues.push("review.evidence_missing");
+  issues.push(...classifyProofStrengthIssues(receipt.evidence, attempt, receipt.mode));
   const expectedSubjects = subjectIds(plan, node);
   if (
     receipt.subjects.length !== expectedSubjects.length ||

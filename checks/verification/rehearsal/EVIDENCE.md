@@ -8,8 +8,9 @@ Current source verification lives in the executable fixtures:
 
 Evaluation and measured-simplification baselines live in
 [eval-baselines.md](./eval-baselines.md). The #78 sample lives in
-[complexity-sample.md](./complexity-sample.md). They are protocols and
-fabricated-receipt checks, not live-provider, device, purchase, or
-complete-business proof.
+[complexity-sample.md](./complexity-sample.md). The #77 overlay ownership
+table lives in [agent-graph-ownership.md](./agent-graph-ownership.md). They
+are protocols and fabricated-receipt checks, not live-provider, device,
+purchase, or complete-business proof.
 
 Run the relevant fixtures against the current checkout before claiming source conformance. These fixtures use isolated workspaces and synthetic execution. They do not establish a live provider, device, purchase, store release or complete consumer-business outcome.

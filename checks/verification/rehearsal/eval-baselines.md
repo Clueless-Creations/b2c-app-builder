@@ -12,11 +12,11 @@ must record its own commit, package version, and package digest.
 | --- | --- | --- |
 | #2 | Reuse the existing batch harness. `npm run evals:behavioral -- --list` is the authorized local inventory. | Paid Message Batches path still needs an authorized `workflow_dispatch` and a linked results artifact. No key, no spend here. |
 | #39 | Replay `store-010` with real `matchWorkflows` (primary vs candidates). Keep `catalog()` on the hosted surface. | Keep open. A terse ASC ask is `candidates`, not a confident primary. Do not extract the scorer into hosted `catalog()`. |
-| #40 | AC is on main via #156. This increment requires the live warning and `coverage.delivery` in the eval fixture. Do not change `service.ts`. | Do not close from this write-up. Integrator may close after independent review. |
+| #40 | Closed on main via #156 / #174. Not this increment. | — |
 | #72 | Freeze the report contract and fabricated-receipt checks. | No founder-approved workspace, mandate, stack, budget, host, or publication authority. No live greenfield run. |
 | #73 | Reuse the #72 report fields. Record keep/change as **no-change until a measured interval exists**. | Same authority hold as #72. No workflow merge. |
 | #75 | Stage A walks stay on main. Record a **no-change recommendation** on retrieval infrastructure. | Paid Stage B. Held-out unused for tuning. No vector store, embeddings, or graph database. Do not extract `matchWorkflows` into hosted `catalog()`. |
-| #77 | Keep authored overlay `order` as a checked transcription of catalog phase order. | Deriving order out of YAML needs a schema/loader/legacy contract change that is not justified by a measured failure. |
+| #77 | Ownership/consumer table and evidence-backed **no-change** on deriving overlay `order`. Unknown phase fails closed. | Authored `order` stays. No schema/loader/legacy rewrite. |
 | #78 | Guidance paragraph and proposal-field descriptions stay on main. Bounded sample + verdict: existing fields suffice. | Not a runtime gate. No schema expansion. |
 | #88 | Freeze the proof matrix against existing contracts. | No selected Expo app, device, cloud job, or matching #72 authority. Protocol cannot close the issue. |
 
@@ -46,19 +46,12 @@ npm run typecheck
 
 Do not run paid behavioral evals, live providers, devices, deploys, or a version stamp from this document.
 
-## #40 closeout signal (this increment)
+## #40 closeout signal (already on main)
 
-The #40 acceptance criteria are on main through #156:
+Issue 40 is closed on main through #156 / #174. The live warning and
+`coverage.delivery` shape stay required in the eval fixture.
 
-- The warning is `A workflow pass is not a business-completion verdict. This response does not name executable next work.`
-- `coverage.delivery` is `required references, N requested in this response`.
-- Route-mode `not_requested` entries stay. `workspacePlan` stays the literal `false`.
-
-This increment does not edit `service.ts`. It requires that live shape in the
-eval fixture so a later rewrite cannot restore the workspace-plan pointer. This
-write-up does not close #40.
-
-## #75 no-change recommendation (this increment)
+## #75 no-change recommendation (already on main)
 
 Stage A already walks the real service, `nextCall`, worker brief, tight bundle,
 stale hash, and the eight-class golden. Those walks do not show a missing
@@ -68,12 +61,20 @@ ranking or synonym tuning. Hosted `catalog()` stays a discovery page; it does
 not import `matchWorkflows`.
 
 **Recommendation: no-change** on retrieval infrastructure. Paid Stage B stays
-held. This increment does not close #75.
+held. Leave #75 open for that hold.
 
-## #78 sample verdict (this increment)
+## #77 ownership and no-change (this increment)
+
+The consumer and ownership tables live in
+[agent-graph-ownership.md](./agent-graph-ownership.md). Authored overlay
+`order` stays a checked transcription of catalog phase order. The loader still
+takes only `skillRoot`. An unknown `phase_id` fails; it does not become order
+zero. This increment does not GitHub-close the issue.
+
+## #78 sample verdict (already on main)
 
 The contributor paragraph and `problem` / `proposal` / `enforcement` field
 descriptions are already on main. The bounded sample in
 [complexity-sample.md](./complexity-sample.md) supports keeping that form. Do
-not add questions, a policy database, or a runtime gate. This increment does
-not close #78.
+not add questions, a policy database, or a runtime gate. Leave #78 for
+independent review of that already-landed sample.

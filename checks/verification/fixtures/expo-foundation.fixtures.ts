@@ -48,9 +48,8 @@ import {
   localBootDoesNotUseExpoGo,
   runExpoStarterLocalBoot,
 } from "../../../catalog/stacks/expo-local-boot.js";
-import {
-  invokeNativeCapability,
-} from "../../../catalog/stacks/expo-starter-fixture/modules/b2c-native-capability/src/invoke.js";
+import { bindLocalStaticExport, decideExpoWebSurface } from "../../../catalog/stacks/expo-web-static.js";
+import { invokeNativeCapability } from "../../../catalog/stacks/expo-starter-fixture/modules/b2c-native-capability/src/invoke.js";
 import { invokeNativeCapability as invokeWebCapability } from "../../../catalog/stacks/expo-starter-fixture/modules/b2c-native-capability/src/index.web.js";
 import {
   BUILDER_AUTHORITY_FILES,
@@ -121,9 +120,17 @@ export function register(harness: Harness): void {
     const selected = resolveExpoSelection({ compositionTarget: iosExpo() });
     assert(operationFor(selected, "starter-scaffold").evidenceTier === "fixture-tested", "selected Expo starter fixture must be fixture-tested");
     assert(operationFor(selected, "cng-prebuild").evidenceTier === "fixture-tested", "CNG prebuild is fixture-tested in a disposable copy");
+    assert(operationFor(selected, "expo-web-export").evidenceTier === "fixture-tested", "local static Metro export is fixture-tested");
+    assert(operationFor(selected, "eas-hosting").evidenceTier === "blocked", "EAS Hosting stays blocked");
     assert(operationFor(selected, "official-skills").evidenceTier === "blocked", "official Expo skills stay blocked until authorized");
-    assert(operationFor(selected, "router-native-ui").evidenceTier === "fixture-tested", "Router/native UI is fixture-tested with a source-backed adapter and local Metro export");
-    assert(operationFor(selected, "custom-native-module").evidenceTier === "fixture-tested", "custom native module sources are fixture-tested; compile stays not-run");
+    assert(
+      operationFor(selected, "router-native-ui").evidenceTier === "fixture-tested",
+      "Router/native UI is fixture-tested with a source-backed adapter and local Metro export",
+    );
+    assert(
+      operationFor(selected, "custom-native-module").evidenceTier === "fixture-tested",
+      "custom native module sources are fixture-tested; compile stays not-run",
+    );
     const unselected = resolveExpoSelection({ compositionTarget: { platform: "host", runtime: HOST_AGENT_RUNTIME } });
     assert(operationFor(unselected, "starter-scaffold").evidenceTier === "blocked", "unselected Expo must not inherit the starter");
     assert(!shippingSatisfiesRequirement("web", "ios"), "web must not satisfy iOS");
@@ -191,11 +198,7 @@ export function register(harness: Harness): void {
     assert(modal.modalPresented && modal.tab === "settings" && modal.href === ROUTE_HREFS.modal, "modal must keep the tab anchor");
     const back = reduceNavigation([{ type: "cold-start" }, { type: "open-modal" }, { type: "back" }]);
     assert(!back.modalPresented && back.href === ROUTE_HREFS.home, "back must dismiss the modal");
-    const restored = reduceNavigation([
-      { type: "cold-start" },
-      { type: "open-detail", id: "7" },
-      { type: "offline-restart" },
-    ]);
+    const restored = reduceNavigation([{ type: "cold-start" }, { type: "open-detail", id: "7" }, { type: "offline-restart" }]);
     assert(restored.href === "/detail/7" && restored.restoredFrom === "session", "offline restart must restore the last href");
     const target = harness.makeTempDir("expo-router-layout");
     materializeExpoStarterFixture({
@@ -410,7 +413,10 @@ export function register(harness: Harness): void {
     assert(installed.lockfileInFixture === false, "the isolated starter still has no lockfile");
     assert(installed.missing.length === 0, `installed builder is missing ${installed.missing.join(", ")}`);
     assert(installed.installedRoot !== undefined && existsSync(installed.installedRoot), "consumer must have node_modules/b2c-app-builder");
-    assert(!existsSync(path.join(installed.installedRoot!, "catalog/stacks/expo-starter-fixture/package-lock.json")), "install must not invent a starter lockfile");
+    assert(
+      !existsSync(path.join(installed.installedRoot!, "catalog/stacks/expo-starter-fixture/package-lock.json")),
+      "install must not invent a starter lockfile",
+    );
   });
 
   harness.check("expo foundation: disposable local boot exports web Metro without Expo Go or EAS", () => {
@@ -425,7 +431,10 @@ export function register(harness: Harness): void {
     assert(booted.kind === "expo-local-boot", "local boot is a disposable Expo starter run, not a builder tarball");
     assert(booted.status === "booted", booted.reason ?? "Expo local boot failed");
     assert(booted.lockfileGenerated, "local npm install must generate package-lock.json");
-    assert(booted.webExport.ok && booted.webExport.indexHtmlPresent && booted.webExport.javascriptBundlePresent, booted.webExport.reason ?? "web export missing bundle");
+    assert(
+      booted.webExport.ok && booted.webExport.indexHtmlPresent && booted.webExport.javascriptBundlePresent,
+      booted.webExport.reason ?? "web export missing bundle",
+    );
     assert(booted.expoGoUsed === false && booted.easUsed === false, "local boot must not use Expo Go or EAS");
     assert(localBootDoesNotUseExpoGo(booted), "Expo Go is not the acceptance path");
     assert(booted.nativeCompileStatus === NATIVE_COMPILE_STATUS, "web export is not a native compile");
@@ -445,6 +454,11 @@ export function register(harness: Harness): void {
       assert(booted.cng.ok, booted.cng.reason ?? "CNG prebuild failed in the disposable copy");
       assert(booted.cng.autolinkMentioned, "disposable prebuild must resolve b2c-native-capability through Expo autolinking");
     }
+    const surface = decideExpoWebSurface({ compositionTarget: { platform: "web", runtime: EXPO_APP_RUNTIME } });
+    const bound = bindLocalStaticExport({ surface, webExport: booted.webExport });
+    assert(bound.action === "observe-local-static" && bound.exportEvidenceTier === "fixture-tested", bound.reason);
+    assert(bound.easHosting === false && bound.nativeProof === false && bound.labeledLive === false, "local static export is not hosting or native proof");
+    assert(!shippingSatisfiesRequirement("web", "ios"), "web export still cannot satisfy iOS");
   });
 
   harness.check("expo foundation: empty authorized target scaffolds only the selected platform and preserves product.yaml", () => {

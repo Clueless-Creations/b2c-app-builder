@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.61",
+  "version": "0.219.62",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Restore the autopilot SKILL term Load the matching workflow with b2c_workflow so the run contract matches the gate.",
-    "Wrap generated b2c help at 80 columns and register authored lint-only house-style scenarios."
+    "Classify Expo session, offline, permission, and notification protocol as blocked, and bind disposable local static web export as fixture-tested.",
+    "Keep EAS Hosting, OTA publish, device install, and Expo MCP unrun; expo.export stays labeled-unavailable in the executor."
   ]
 }

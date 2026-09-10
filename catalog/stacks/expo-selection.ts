@@ -487,11 +487,12 @@ function operationSupport(): ExpoOperationSupport[] {
     {
       id: "expo-web-export",
       title: "Expo web export",
-      selection: "shipping-platform",
+      selection: "app-framework",
       platforms: ["web"],
-      evidenceTier: "blocked",
+      evidenceTier: "fixture-tested",
       queuedIssue: 86,
-      notes: "Cannot satisfy an iOS or Android native requirement. Alpha SSR stays explicit.",
+      notes:
+        "Disposable Metro static export (`expo export --platform web`) is fixture-tested. It cannot satisfy iOS or Android. Alpha SSR, API routes, and EAS Hosting stay blocked. The Expo/EAS executor still labels expo.export unavailable.",
     },
     {
       id: "eas-hosting",

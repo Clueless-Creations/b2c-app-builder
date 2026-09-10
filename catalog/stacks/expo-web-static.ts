@@ -2,8 +2,9 @@
  * Local/static Expo web decision (#86).
  *
  * Classifies `web.output` modes and refuses combinations that need a server, SSR, or a
- * remote host. This module does not deploy, does not run EAS Hosting, and does not claim
- * `expo-web-export` fixture-tested.
+ * remote host. This module does not deploy and does not run EAS Hosting.
+ * Classification alone is not export proof. `bindLocalStaticExport` observes a disposable
+ * Metro static export. The Expo/EAS executor still labels `expo.export` unavailable.
  *
  * Documented Expo Router outputs: `single` (SPA, documented default), `static`
  * (HTML/JS/assets), `server` (API routes / server bundle). This module defaults
@@ -47,7 +48,10 @@ export type ExpoWebRefusalCode =
   | "server-output-not-local-static"
   | "ssr-not-local-static"
   | "unstable-deploy-server-not-local-static"
-  | "operation-blocked";
+  | "operation-blocked"
+  | "export-missing-bundle"
+  | "classification-is-not-export"
+  | "spa-not-static-export";
 
 export interface ExpoWebSurfaceDecision {
   action: "classify-local-static" | "refuse";
@@ -74,11 +78,18 @@ export function defaultWebSurfaceMode(): "static" {
   return "static";
 }
 
+export function easHostingRemainsBlocked(resolution: ExpoSelectionResolution): boolean {
+  const hosting = operationFor(resolution, "eas-hosting");
+  return hosting.evidenceTier === "blocked" && hosting.queuedIssue === 86;
+}
+
+export function localStaticExportIsFixtureTested(resolution: ExpoSelectionResolution): boolean {
+  const exported = operationFor(resolution, "expo-web-export");
+  return exported.evidenceTier === "fixture-tested" && exported.queuedIssue === 86;
+}
+
 export function webOperationsRemainBlocked(resolution: ExpoSelectionResolution): boolean {
-  return EXPO_WEB_OPERATION_IDS.every((id) => {
-    const operation = operationFor(resolution, id);
-    return operation.evidenceTier === "blocked" && operation.queuedIssue === 86;
-  });
+  return easHostingRemainsBlocked(resolution) && operationFor(resolution, "expo-web-export").evidenceTier === "blocked";
 }
 
 export function decideExpoWebSurface(input: {
@@ -222,7 +233,7 @@ export function decideExpoWebSurface(input: {
     mode: requested,
     defaultedToStatic,
     ...blocked,
-    reason: "Local/static classification only. expo-web-export stays blocked; no production host was selected.",
+    reason: "Local/static classification only. Bind a disposable Metro static export separately. EAS Hosting stays blocked.",
   };
 }
 
@@ -254,4 +265,91 @@ export function classifyWebNativeModule(module: ExpoWebNativeModule): ExpoWebMod
 
 export function scanStaticExportArtifacts(artifacts: readonly ClientArtifact[], canaries: readonly SecretCanary[]): ClientSecretScan {
   return scanClientArtifacts(artifacts, canaries);
+}
+
+export interface ExpoLocalStaticExportObservation {
+  action: "observe-local-static" | "refuse";
+  exportEvidenceTier: "fixture-tested" | "blocked";
+  productionHost: false;
+  easHosting: false;
+  runtimeVerified: false;
+  nativeProof: false;
+  labeledLive: false;
+  code?: ExpoWebRefusalCode;
+  reason: string;
+}
+
+export function bindLocalStaticExport(input: {
+  surface: ExpoWebSurfaceDecision;
+  webExport: {
+    ok: boolean;
+    indexHtmlPresent: boolean;
+    javascriptBundlePresent: boolean;
+  };
+  artifacts?: readonly ClientArtifact[];
+  canaries?: readonly SecretCanary[];
+}): ExpoLocalStaticExportObservation {
+  const blocked = {
+    exportEvidenceTier: "blocked" as const,
+    productionHost: false as const,
+    easHosting: false as const,
+    runtimeVerified: false as const,
+    nativeProof: false as const,
+    labeledLive: false as const,
+  };
+  if (input.surface.action === "refuse") {
+    return { action: "refuse", ...blocked, code: input.surface.code, reason: input.surface.reason };
+  }
+  switch (input.surface.mode) {
+    case "spa":
+      return {
+        action: "refuse",
+        ...blocked,
+        code: "spa-not-static-export",
+        reason: "Local boot export uses web.output static. A SPA classification is not that export.",
+      };
+    case "server":
+    case "alpha-ssr":
+      return {
+        action: "refuse",
+        ...blocked,
+        code: "classification-is-not-export",
+        reason: "Server and alpha SSR surfaces are not a local static Metro export.",
+      };
+    case "static":
+      break;
+    default: {
+      const exhaustive: never = input.surface.mode;
+      throw new Error(`unhandled web surface mode: ${String(exhaustive)}`);
+    }
+  }
+  if (!input.webExport.ok || !input.webExport.indexHtmlPresent || !input.webExport.javascriptBundlePresent) {
+    return {
+      action: "refuse",
+      ...blocked,
+      code: "export-missing-bundle",
+      reason: "Local static export needs index.html and a JavaScript bundle. Classification alone is not export proof.",
+    };
+  }
+  if (input.artifacts && input.canaries) {
+    const scan = scanStaticExportArtifacts(input.artifacts, input.canaries);
+    if (scan.action === "refuse") {
+      return {
+        action: "refuse",
+        ...blocked,
+        code: "secret-in-client-bundle",
+        reason: "Static export artifacts contain a non-public canary secret.",
+      };
+    }
+  }
+  return {
+    action: "observe-local-static",
+    exportEvidenceTier: "fixture-tested",
+    productionHost: false,
+    easHosting: false,
+    runtimeVerified: false,
+    nativeProof: false,
+    labeledLive: false,
+    reason: "Local static export artifacts observed. Not EAS Hosting, not SSR, not iOS or Android proof.",
+  };
 }

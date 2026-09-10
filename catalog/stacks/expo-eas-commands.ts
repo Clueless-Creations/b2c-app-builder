@@ -263,7 +263,7 @@ export const EXPO_EAS_COMMANDS: readonly ExpoEasCommandSpec[] = [
     title: "Expo web/export",
     tool: "expo-cli",
     command: ["export"],
-    requiredSelection: "shipping-platform",
+    requiredSelection: "expo-cli",
     queuedIssue: 86,
     support: "labeled-unavailable",
     effects: { ...none, localCodeExecution: true },
@@ -273,7 +273,8 @@ export const EXPO_EAS_COMMANDS: readonly ExpoEasCommandSpec[] = [
     projectLinkRequired: false,
     requiredAuthority: "compile",
     documentedFlags: flags(),
-    notes: "#86 owns export/hosting semantics. Classified here so a later owner can dispatch through this executor.",
+    notes:
+      "Disposable local-boot static export is fixture-tested outside this executor. This row stays labeled unavailable so SSR, API routes, and EAS Hosting cannot sneak through expo.export.",
     docsUrl: EXPO_EAS_COMMAND_SOURCES.expoCli,
   }),
   spec({

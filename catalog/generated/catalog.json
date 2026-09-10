@@ -1,6 +1,6 @@
 {
   "schemaVersion": "2.0.0",
-  "skillVersion": "0.219.61",
+  "skillVersion": "0.219.62",
   "areas": [
     {
       "id": "area.operating-system",
@@ -3891,7 +3891,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/engineering/expo-operations-map.md",
-        "sha256": "sha256:5020bf226f572201325833d44eb71471c0832bf30454f53460c6ec2e700aa596",
+        "sha256": "sha256:6f04d262cd014e4b12759bc72118e7b5008c54df41cf5186a724fc469dfd420d",
         "origin": "skill"
       }
     },
@@ -18606,14 +18606,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "2e23c1c3018773127d7438c0b3b470ef3bf09707a3119b3d7c9b8d94cb10c722",
+    "fingerprint": "68ac9b3e2b21656af236982eefef12686fad646eb04bddb5036484359daced86",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
-        "version": "0.219.61",
-        "revision": "0.219.61",
-        "contentDigest": "39ecab363226a8fea7fbde7e4af6ddcedb6435bc8a767dfe27301e19978fb6b5"
+        "version": "0.219.62",
+        "revision": "0.219.62",
+        "contentDigest": "34cdd2733ea5fa1cdf8c21dbe1be2ce9cb54a14489860eeefdf5ea83e7231b2f"
       }
     ],
     "base": {

@@ -825,6 +825,24 @@ sources:
     locations:
       - catalog/stacks/expo-capability-protocol.ts
     notes: Citation for offline-store classification. Not a live database or backend of record.
+  - id: docs-expo-dev-push-notifications-overview
+    name: Expo push notifications
+    source_type: official_docs
+    url: https://docs.expo.dev/push-notifications/overview
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-capability-protocol.ts
+    notes: Citation for notification handoff classification. A ticket is not person-seen proof.
+  - id: docs-expo-dev-push-notifications-sending-notifications
+    name: Expo push receipts
+    source_type: official_docs
+    url: https://docs.expo.dev/push-notifications/sending-notifications
+    refresh_cadence_days: 7
+    owner: b2c-maintainers
+    locations:
+      - catalog/stacks/expo-capability-protocol.ts
+    notes: Citation that push receipts record Apple/Google handoff, not that a person saw the notification.
   - id: docs-expo-dev-eas-hosting-introduction
     name: EAS Hosting
     source_type: official_docs

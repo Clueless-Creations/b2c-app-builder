@@ -14,9 +14,9 @@
  * effects are never replayed.
  */
 
-import { closeSync, existsSync, fsyncSync, lstatSync, mkdirSync, openSync, readFileSync, renameSync, unlinkSync, writeFileSync, writeSync } from "node:fs";
+import { closeSync, existsSync, fstatSync, fsyncSync, linkSync, lstatSync, mkdirSync, openSync, readFileSync, renameSync, unlinkSync, writeFileSync, writeSync } from "node:fs";
 import path from "node:path";
-import { createHash } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 import type { ExpoEasCommandId } from "../../../catalog/stacks/expo-eas-commands.js";
 
 export type EasRemoteJobState = "queued" | "running" | "finished" | "errored" | "canceled" | "expired" | "uncertain";
@@ -353,16 +353,22 @@ export function easClaimOwnerAlive(pid: number): boolean {
   }
 }
 
+/** True only while `fd` still names the inode at `claimPath`. A peer unlink during write loses the claim. */
+export function easJobClaimFdOwnsPath(fd: number, claimPath: string): boolean {
+  try {
+    const opened = fstatSync(fd);
+    const onDisk = lstatSync(claimPath);
+    return opened.dev === onDisk.dev && opened.ino === onDisk.ino && !onDisk.isSymbolicLink();
+  } catch {
+    return false;
+  }
+}
+
 function writeEasJobClaim(claimPath: string, idempotencyKey: string, at: string): boolean {
   assertNoSymlink(claimPath);
   mkdirSync(path.dirname(claimPath), { recursive: true });
-  let fd: number;
-  try {
-    fd = openSync(claimPath, "wx", 0o600);
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === "EEXIST") return false;
-    throw error;
-  }
+  const temporary = `${claimPath}.${process.pid}.${randomBytes(8).toString("hex")}.tmp`;
+  const fd = openSync(temporary, "wx", 0o600);
   try {
     const document: EasJobClaim = {
       schemaVersion: EAS_JOB_CLAIM_SCHEMA,
@@ -375,7 +381,24 @@ function writeEasJobClaim(claimPath: string, idempotencyKey: string, at: string)
   } finally {
     closeSync(fd);
   }
-  return true;
+  try {
+    linkSync(temporary, claimPath);
+  } catch (error) {
+    try {
+      unlinkSync(temporary);
+    } catch {
+      // Temporary already gone.
+    }
+    if ((error as NodeJS.ErrnoException).code === "EEXIST") return false;
+    throw error;
+  }
+  try {
+    unlinkSync(temporary);
+  } catch {
+    // Linked name is the claim; leftover tmp is harmless.
+  }
+  const published = readEasJobClaim(claimPath);
+  return published?.pid === process.pid && published.idempotencyKey === idempotencyKey;
 }
 
 function readEasJobClaim(claimPath: string): EasJobClaim | undefined {
@@ -404,8 +427,9 @@ function stealEasJobClaim(claimPath: string, idempotencyKey: string, at: string)
 /**
  * Exclusive create of the claim file. Nested same-process re-entry and a live foreign
  * pid are `held` (no wait — that would deadlock a nested fixture). A claim whose pid is
- * dead, or whose file is empty/truncated/wrong-schema, is stolen once. This is EAS
- * ledger durability, not a kernel scheduler.
+ * dead, or whose file is empty/truncated/wrong-schema, is stolen once. The claim
+ * path is published with `link` from a complete tmp file so an empty `wx` inode is
+ * never the exclusive name. This is EAS ledger durability, not a kernel scheduler.
  */
 export function tryAcquireEasJobClaim(
   claimPath: string,

@@ -11,6 +11,7 @@ export {
   canonicalEasRequestIdentity,
   createFakeEasJobTransport,
   easBindingsMatch,
+  easJobClaimFdOwnsPath,
   easJobClaimPath,
   easJobLedgerPath,
   fingerprintBinding,

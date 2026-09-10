@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.38",
+  "version": "0.219.39",
   "updatedAt": "2026-09-09",
   "sourcePath": ".",
   "releaseNotes": [
-    "Stop attaching credentials to source reads and drop the unreachable private-source GitHub path.",
-    "Fail source-freshness when two registry rows share an id or a normalized URL."
+    "Pin remaining ASC observe versus non-observe mapping fixtures from the cookbook.",
+    "Pin Superwall iOS 4.16.3 PurchaseController cases as identity, not a live purchase."
   ]
 }

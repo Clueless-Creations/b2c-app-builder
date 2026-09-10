@@ -6,7 +6,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { createKnowledgeService } from "../../../kernel/knowledge-service/service.js";
-import type { HostedKnowledgeBundle } from "../../../kernel/knowledge-service/types.js";
+import type { HostedKnowledgeBundle, KnowledgeService } from "../../../kernel/knowledge-service/types.js";
 import { matchWorkflows, type RoutableWorkflow } from "../../../kernel/session/route-utterance.js";
 import { composeCatalog } from "../../../catalog/index.js";
 import { loadAgentGraph } from "../../../catalog/agent-graph/load.js";
@@ -14,7 +14,49 @@ import { HOSTED_BUNDLE_RELATIVE_PATH } from "../../../tooling/render-hosted-bund
 import { assert, skillRoot, type Harness } from "./_harness.js";
 
 const COMPLETION_GUARD = "A workflow pass is not a business-completion verdict.";
-const HELD_OUT_PARAPHRASE_IDS = ["store-001", "store-002"] as const;
+const STAGE_A_CASES_RELATIVE_PATH = "checks/verification/goldens/eval/stage-a-cases.json";
+
+type StageAClass =
+  | "explicit_apple_store"
+  | "accepted_no_quiz_journey"
+  | "artifact_specification"
+  | "binding_not_unscoped_query"
+  | "tight_optional_bundle"
+  | "stale_revision"
+  | "hosted_only_caller"
+  | "repeated_read";
+
+interface StageACase {
+  id: string;
+  class: StageAClass;
+  workflowId: string;
+  query?: string;
+  outputPath?: string;
+  requiredReferenceId?: string;
+  tokenBudget?: number;
+  needs: string[];
+  irrelevant: string[];
+  note: string;
+}
+
+interface StageACorpus {
+  metadata: { heldOutUtteranceIds: string[]; actualModelUsage: "unknown" };
+  cases: StageACase[];
+}
+
+interface StageACaseReport {
+  id: string;
+  class: StageAClass;
+  ok: boolean;
+  detail: string;
+  uniqueRequiredSections: number;
+  duplicatedDelivery: number;
+  utf8Bytes: number;
+  codePoints: number;
+  estimatedTokens: number;
+  estimatedTokenBasis: "character_derived_code_points_div_4";
+  actualModelUsage: "unknown";
+}
 
 interface StoreCorpus {
   entries: Array<{ id: string; utterance: string; needs: string[] }>;
@@ -44,6 +86,180 @@ function loadBundle(): HostedKnowledgeBundle {
 
 function loadStoreCorpus(): StoreCorpus {
   return JSON.parse(readFileSync(path.join(skillRoot, "checks/verification/goldens/routing/store-utterances.json"), "utf8")) as StoreCorpus;
+}
+
+function loadStageACorpus(): StageACorpus {
+  return JSON.parse(readFileSync(path.join(skillRoot, STAGE_A_CASES_RELATIVE_PATH), "utf8")) as StageACorpus;
+}
+
+function volume(markdown: string): Pick<StageACaseReport, "utf8Bytes" | "codePoints" | "estimatedTokens" | "estimatedTokenBasis" | "actualModelUsage"> {
+  const codePoints = Array.from(markdown).length;
+  return {
+    utf8Bytes: new TextEncoder().encode(markdown).byteLength,
+    codePoints,
+    estimatedTokens: Math.ceil(codePoints / 4),
+    estimatedTokenBasis: "character_derived_code_points_div_4",
+    actualModelUsage: "unknown",
+  };
+}
+
+function emptyVolume(): ReturnType<typeof volume> {
+  return volume("");
+}
+
+function catalogIds(service: KnowledgeService, query: string): string[] {
+  const ids: string[] = [];
+  for (let offset = 0; ; offset += 50) {
+    const page = service.catalog({ query, offset, limit: 50 });
+    ids.push(...page.workflows.map((workflow) => workflow.id));
+    if (page.pagination.nextOffset === null) return ids;
+  }
+}
+
+function searchHits(service: KnowledgeService, query: string, workflowId?: string) {
+  const results: ReturnType<KnowledgeService["search"]>["results"] = [];
+  let coverage: ReturnType<KnowledgeService["search"]>["workflowCoverage"];
+  for (let offset = 0; ; ) {
+    const page = service.search({ query, offset, limit: 20, ...(workflowId ? { workflowId } : {}) });
+    results.push(...page.results);
+    coverage = page.workflowCoverage;
+    if (page.pagination.nextOffset === null) return { results, workflowCoverage: coverage };
+    offset = page.pagination.nextOffset;
+  }
+}
+
+function boundSpec(service: KnowledgeService, workflowId: string, outputPath: string) {
+  const route = service.workflow({ workflowId });
+  const spec = route.route.outputs.find((output) => output.path === outputPath)?.specifications[0]?.get;
+  assert(spec !== undefined, `${workflowId} must bind ${outputPath}`);
+  return spec;
+}
+
+function runStageACase(service: KnowledgeService, workflows: readonly CatalogWorkflowRow[], item: StageACase): StageACaseReport {
+  const base = {
+    id: item.id,
+    class: item.class,
+    uniqueRequiredSections: 0,
+    duplicatedDelivery: 0,
+    ...emptyVolume(),
+  };
+  try {
+    switch (item.class) {
+      case "explicit_apple_store": {
+        assert(item.query !== undefined, `${item.id} needs a query`);
+        const hosted = catalogIds(service, item.query);
+        assert(
+          item.needs.every((id) => hosted.includes(id)),
+          `${item.id} missing needed workflows: ${item.needs.filter((id) => !hosted.includes(id)).join(",")}`,
+        );
+        assert(
+          item.irrelevant.every((id) => !hosted.includes(id) || hosted[0] !== id),
+          `${item.id} treated irrelevant ${item.irrelevant.join(",")} as the required first route`,
+        );
+        return { ...base, ok: true, detail: item.note };
+      }
+      case "accepted_no_quiz_journey": {
+        const authored = workflows.find((workflow) => workflow.id === item.workflowId);
+        assert(authored !== undefined, `${item.id} missing ${item.workflowId}`);
+        assert(authored.instructions.includes("not selected, selected but unavailable"), `${item.id} lost #67 applicability language`);
+        assert(!authored.instructions.includes("unconditional quiz"), `${item.id} reintroduced an unconditional quiz`);
+        const expanded = service.workflow({ workflowId: item.workflowId, include: "instructions" });
+        assert(expanded.workflow.instructions.length > 0, `${item.id} instruction expand was empty`);
+        assert(expanded.route.mode === "instructions", `${item.id} include=instructions must set route.mode`);
+        return { ...base, ...volume(expanded.workflow.instructions), ok: true, detail: item.note };
+      }
+      case "artifact_specification": {
+        assert(item.outputPath !== undefined, `${item.id} needs outputPath`);
+        const spec = boundSpec(service, item.workflowId, item.outputPath);
+        const delivered = service.get({ ...spec, limit: 16384 });
+        assert((delivered.section?.title ?? "").length > 0, `${item.id} did not deliver a named section`);
+        return { ...base, ...volume(delivered.markdown), uniqueRequiredSections: 1, ok: true, detail: item.note };
+      }
+      case "binding_not_unscoped_query": {
+        assert(item.query !== undefined && item.requiredReferenceId !== undefined, `${item.id} needs query and requiredReferenceId`);
+        const unscoped = searchHits(service, item.query);
+        assert(unscoped.workflowCoverage === undefined, `${item.id} unscoped search grew a workflowCoverage set`);
+        const scoped = searchHits(service, item.query, item.workflowId);
+        assert(scoped.workflowCoverage?.workflowId === item.workflowId, `${item.id} scoped search lost workflowCoverage`);
+        assert(
+          scoped.workflowCoverage?.requiredReferenceIds.some((id) => id === item.requiredReferenceId) === true,
+          `${item.id} binding dropped ${item.requiredReferenceId}`,
+        );
+        const bound = scoped.results.find((result) => result.referenceId === item.requiredReferenceId);
+        assert(bound !== undefined, `${item.id} scoped results omitted ${item.requiredReferenceId}`);
+        assert(bound.match?.kind === "lexical" || bound.match?.kind === "workflow_binding", `${item.id} missing match kind`);
+        return { ...base, ok: true, detail: `${item.note} match=${bound.match.kind}` };
+      }
+      case "tight_optional_bundle": {
+        const tight = service.workflow({
+          workflowId: item.workflowId,
+          include: "full",
+          tokenBudget: item.tokenBudget ?? 256,
+          brief: true,
+        });
+        assert(tight.dispatchBrief !== null, `${item.id} tight bundle omitted the worker brief`);
+        assert(tight.knowledgeBundle !== null && tight.knowledgeBundle.coverage.complete === false, `${item.id} tight bundle claimed complete delivery`);
+        assert(
+          tight.knowledgeBundle.coverage.incomplete.some((entry) => entry.status === "truncated" || entry.status === "omitted"),
+          `${item.id} tight bundle hid omitted/truncated entries`,
+        );
+        return {
+          ...base,
+          codePoints: tight.knowledgeBundle.consumedChars,
+          utf8Bytes: 0,
+          estimatedTokens: Math.ceil(tight.knowledgeBundle.consumedChars / 4),
+          estimatedTokenBasis: "character_derived_code_points_div_4",
+          actualModelUsage: "unknown",
+          ok: true,
+          detail: `${item.note} consumedChars=${tight.knowledgeBundle.consumedChars}`,
+        };
+      }
+      case "stale_revision": {
+        assert(item.outputPath !== undefined, `${item.id} needs outputPath`);
+        const spec = boundSpec(service, item.workflowId, item.outputPath);
+        const fresh = service.get({ ...spec, limit: 16384 });
+        const stable = service.get({ ...spec, expectedContentSha256: fresh.reference.contentSha256, limit: 16384 });
+        assert(stable.markdown === fresh.markdown, `${item.id} matching hash changed the section`);
+        let stale = false;
+        try {
+          service.get({ ...spec, expectedContentSha256: "0".repeat(64) });
+        } catch {
+          stale = true;
+        }
+        assert(stale, `${item.id} stale hash served a different revision`);
+        return { ...base, ...volume(fresh.markdown), uniqueRequiredSections: 1, ok: true, detail: item.note };
+      }
+      case "hosted_only_caller": {
+        const route = service.workflow({ workflowId: item.workflowId });
+        assert(route.dispatchBrief === null, `${item.id} route-only implied a brief`);
+        assert(route.guardrails.executionAvailable === false && route.guardrails.workspacePlan === false, `${item.id} claimed local plan execution`);
+        assert(route.route.warnings.some((warning) => warning.startsWith(COMPLETION_GUARD)), route.route.warnings.join(" | "));
+        return { ...base, ok: true, detail: item.note };
+      }
+      case "repeated_read": {
+        assert(item.outputPath !== undefined, `${item.id} needs outputPath`);
+        const spec = boundSpec(service, item.workflowId, item.outputPath);
+        const first = service.get({ ...spec, limit: 16384 });
+        const second = service.get({ ...spec, expectedContentSha256: first.reference.contentSha256, limit: 16384 });
+        assert(second.markdown === first.markdown, `${item.id} repeat read drifted`);
+        const measured = volume(first.markdown);
+        return {
+          ...base,
+          ...measured,
+          uniqueRequiredSections: 1,
+          duplicatedDelivery: 1,
+          ok: true,
+          detail: `${item.note} unique=1 duplicated=1`,
+        };
+      }
+      default: {
+        const exhaustive: never = item.class;
+        throw new Error(`unhandled Stage A class ${String(exhaustive)}`);
+      }
+    }
+  } catch (error) {
+    return { ...base, ok: false, detail: error instanceof Error ? error.message : String(error) };
+  }
 }
 
 function elapsedMs(start: string, end: string): number {
@@ -151,13 +367,14 @@ export function register(harness: Harness): void {
     const corpus = loadStoreCorpus();
     const workflows = bundle.catalog.workflows as CatalogWorkflowRow[];
     const service = createKnowledgeService(bundle);
-    const heldOut = HELD_OUT_PARAPHRASE_IDS.map((id) => {
+    const stageA = loadStageACorpus();
+    const heldOut = stageA.metadata.heldOutUtteranceIds.map((id) => {
       const entry = corpus.entries.find((item) => item.id === id);
       assert(entry !== undefined, `held-out paraphrase ${id} must stay frozen in the store corpus`);
       assert(entry.id !== "store-010", "held-out paraphrases must not be the ASC ranking utterance");
       return entry;
     });
-    assert(heldOut.length === HELD_OUT_PARAPHRASE_IDS.length, "held-out set must stay reserved and unused for ranking");
+    assert(heldOut.length === stageA.metadata.heldOutUtteranceIds.length, "held-out set must stay reserved and unused for ranking");
     const apple = service.catalog({ query: "App Store Connect screenshots", offset: 0, limit: 10 }).workflows.map((workflow) => workflow.id);
     assert(apple.includes("workflow.store.store-screenshots-production"), apple.join(","));
     assert(!apple.includes("workflow.store.google-play-release") || apple[0] !== "workflow.store.google-play-release", "Android-only release is not the required Apple route");
@@ -206,6 +423,38 @@ export function register(harness: Harness): void {
     assert(again.route.coverage.requiredCount > 0, "repeat route still names required references");
     assert(again.guardrails.executionAvailable === false && again.guardrails.workspacePlan === false, "hosted caller cannot execute local plan tools");
     assert(again.dispatchBrief === null, "route-only repeat must not imply a brief was requested");
+  });
+
+  harness.check("eval-baselines: Stage A per-case report walks the reviewed split without using held-out paraphrases", () => {
+    const bundle = loadBundle();
+    const store = loadStoreCorpus();
+    const stageA = loadStageACorpus();
+    const service = createKnowledgeService(bundle);
+    const workflows = bundle.catalog.workflows as CatalogWorkflowRow[];
+    assert(stageA.metadata.actualModelUsage === "unknown", "Stage A must not invent model usage");
+    assert(stageA.cases.length === 8, `reviewed Stage A set must stay the eight issue cases, got ${stageA.cases.length}`);
+    for (const id of stageA.metadata.heldOutUtteranceIds) {
+      const entry = store.entries.find((item) => item.id === id);
+      assert(entry !== undefined, `held-out ${id} missing from store-utterances.json`);
+      assert(entry.id !== "store-010", "held-out set must not include the ASC ranking utterance");
+    }
+    const seen = new Set<string>();
+    const reports = stageA.cases.map((item) => {
+      assert(!seen.has(item.id), `duplicate Stage A case id ${item.id}`);
+      seen.add(item.id);
+      return runStageACase(service, workflows, item);
+    });
+    const failed = reports.filter((report) => !report.ok);
+    assert(
+      failed.length === 0,
+      failed.map((report) => `${report.id}: ${report.detail}`).join(" | "),
+    );
+    const repeated = reports.find((report) => report.class === "repeated_read");
+    assert(repeated !== undefined && repeated.uniqueRequiredSections === 1 && repeated.duplicatedDelivery === 1, JSON.stringify(repeated));
+    assert(
+      reports.every((report) => report.actualModelUsage === "unknown" && report.estimatedTokenBasis === "character_derived_code_points_div_4"),
+      "volume units must stay separate from actual model usage",
+    );
   });
 
   harness.check("eval-baselines: overlay order remains a checked transcription of catalog phase order", () => {

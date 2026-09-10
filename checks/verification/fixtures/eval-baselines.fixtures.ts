@@ -513,8 +513,10 @@ export function register(harness: Harness): void {
       assert(phase.order === node.order, `${node.id} ${node.order} vs ${phase.order}`);
     }
     const protocol = readFileSync(path.join(skillRoot, "checks/verification/rehearsal/eval-baselines.md"), "utf8");
+    const ownership = readFileSync(path.join(skillRoot, "checks/verification/rehearsal/agent-graph-ownership.md"), "utf8");
     assert(protocol.includes("#77"), "protocol records the no-change");
     assert(protocol.includes("checked transcription"), protocol);
+    assert(ownership.includes("Why derivation is not worth it"), ownership);
   });
 
   harness.check("eval-baselines: Stage A evidence records a no-change recommendation on retrieval infrastructure", () => {

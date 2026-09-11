@@ -19,11 +19,10 @@
  * `rubricVersion`. That is the whole mechanism — no second, hand-maintained version scheme.
  *
  * SCOPE. Every dimension below traces to a named row: the ten codes in vibecoded-tells.md's
- * "Mechanical Detection" table, and the twelve numbered rules in design-worthiness.md — except
- * the two named in KNOWN_UNMAPPED_WORTHINESS_RULES, which carry no dimension yet and say so out
- * loud rather than leaving the gap for a reader to discover. Only the
- * dimensions marked `automatedByGrader: true` are ones tooling/grade-design-surface.ts can
- * compute itself today, from the pure libraries this Wave extracted
+ * "Mechanical Detection" table, and the twelve numbered rules in design-worthiness.md. Keep
+ * KNOWN_UNMAPPED_WORTHINESS_RULES empty unless a later rule heading has no dimension yet.
+ * Only the dimensions marked `automatedByGrader: true` are ones tooling/grade-design-surface.ts
+ * can compute itself today, from the pure libraries this Wave extracted
  * (checks/validation/business/design/lib/vibecode-tells.ts and lib/worthiness-mechanical.ts). The
  * rest — vibecode.legal_links_missing (needs site-shape and link-reachability analysis, not a
  * per-file regex) and every Attested/Taste row (needs DESIGN.md section parsing already owned
@@ -46,7 +45,7 @@ export interface RubricDimension {
   readonly severity?: "error" | "warning";
   readonly sourceReferenceId: RubricReferenceId;
   readonly description: string;
-  /** True only when tooling/grade-design-surface.ts computes this finding itself today, via the extracted TELLS[]/contrast/token-scale libraries — never asserted for a dimension this grader cannot yet reach. */
+  /** True only when tooling/grade-design-surface.ts computes this finding itself today, via the extracted TELLS[]/contrast/token-scale/undeclared-color libraries — never asserted for a dimension this grader cannot yet reach. */
   readonly automatedByGrader: boolean;
 }
 
@@ -57,30 +56,21 @@ export interface PinnedKnowledgeReference {
 }
 
 /** Bump only on a deliberate, reviewed change to the dimension list below or a knowingly-accepted knowledge-doc edit. */
-export const DESIGN_TASTE_RUBRIC_VERSION = "1.2.1";
+export const DESIGN_TASTE_RUBRIC_VERSION = "1.3.0";
 
 /**
  * design-worthiness.md rule numbers this rubric maps to at least one dimension below.
- * The taste gate is rule 12: PR #34 inserted rules 10 and 11 and pushed it down from 10.
+ * Rule 10 is attested native-flow semantics. Rule 11 splits mechanical token-color drift from
+ * attested remainder. The taste gate is rule 12.
  */
-export const MAPPED_WORTHINESS_RULES: readonly number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 12];
+export const MAPPED_WORTHINESS_RULES: readonly number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
 /**
- * Rules PR #34 added that this rubric does NOT map yet: 10 "Native flow semantics are explicit"
- * and 11 "Mechanical anti-generic consistency".
- *
- * They are declared here rather than left as a silent hole. A dimension needs a tier AND, for
- * every tier except "taste", a severity ceiling — and the document supplies neither. Rule 11's
- * own tier line is conditional ("Mechanical where the repository can derive the fact from
- * authored tokens/contracts; otherwise Attested until a shared validator owns the field"), so
- * resolving it is a judgment about which validators exist today, not a transcription. That
- * judgment belongs to the founder, not to whoever re-pinned the hash.
- *
+ * Rule numbers that still have no dimension. Empty while every numbered heading is mapped.
  * design-taste-rubric.fixtures.ts asserts this list plus MAPPED_WORTHINESS_RULES accounts for
- * every rule heading in the document, so adding rule 13 — or finally mapping 10 and 11 — fails
- * loudly here instead of widening the gap in silence.
+ * every rule heading in the document, so adding rule 13 fails loudly instead of widening a gap.
  */
-export const KNOWN_UNMAPPED_WORTHINESS_RULES: readonly number[] = [10, 11];
+export const KNOWN_UNMAPPED_WORTHINESS_RULES: readonly number[] = [];
 
 export const PINNED_KNOWLEDGE_REFERENCES: readonly PinnedKnowledgeReference[] = [
   {
@@ -179,7 +169,7 @@ export const DESIGN_TASTE_DIMENSIONS: readonly RubricDimension[] = [
     automatedByGrader: true,
   },
 
-  // --- reference.design.design-worthiness — the 10 numbered rules ---
+  // --- reference.design.design-worthiness — the 12 numbered rules ---
   {
     key: "worthiness.contrast_text",
     tier: "mechanical",
@@ -269,6 +259,33 @@ export const DESIGN_TASTE_DIMENSIONS: readonly RubricDimension[] = [
     severity: "warning",
     sourceReferenceId: "reference.design.design-worthiness",
     description: "Rule 9, Edge-state thoroughness: empty, loading, success, error, and offline states exist for each primary surface.",
+    automatedByGrader: false,
+  },
+  {
+    key: "worthiness.native_flow_semantics",
+    tier: "attested",
+    severity: "warning",
+    sourceReferenceId: "reference.design.design-worthiness",
+    description:
+      "Rule 10, Native flow semantics are explicit: a selected native screen records presentation, return, and back behavior. check:design-worthiness fails worthiness.native_flow_semantics_missing when that row is absent. Web-only work is not burdened with native Back. Runtime interaction evidence stays with design-acceptance, not this pre-build attestation.",
+    automatedByGrader: false,
+  },
+  {
+    key: "worthiness.anti_generic_undeclared_color",
+    tier: "mechanical",
+    severity: "error",
+    sourceReferenceId: "reference.design.design-worthiness",
+    description:
+      "Rule 11 where modeled: proof HTML/CSS hex that is not in the authored color token tree is objective anti-generic drift. checkUndeclaredProofColors owns the check.",
+    automatedByGrader: true,
+  },
+  {
+    key: "worthiness.anti_generic_consistency",
+    tier: "attested",
+    severity: "warning",
+    sourceReferenceId: "reference.design.design-worthiness",
+    description:
+      "Rule 11 remainder: canonical labels, icon-system consistency, unexplained decorative effects, and required state coverage stay attested until a shared validator owns those fields. Do not pretend prose review is machine proof.",
     automatedByGrader: false,
   },
   {

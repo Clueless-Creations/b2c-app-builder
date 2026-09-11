@@ -2,8 +2,8 @@
  * grading.ts — the shared finding/report shape and the single-recommended-edit priority for
  * the design-taste surface grader (tooling/grade-design-surface.ts).
  *
- * knowledge/design/design-worthiness.md rule 10 states its own escalation order: "After
- * mechanical checks pass and attested warnings have rows, send a taste packet to the founder."
+ * knowledge/design/design-worthiness.md rule 12 states its own escalation order: "After
+ * mechanical checks pass and attested warnings have rows, prepare a taste packet for the authorized decision maker."
  * selectRecommendedNextEdit() is that order made deterministic and testable, so the grader
  * cannot be gamed into recommending whichever finding sounds easiest to fix.
  */
@@ -20,7 +20,7 @@ export interface GradingFinding extends Issue {
   readonly dimensionKey: string;
   /**
    * Issue requires a severity even for tier:"taste" findings, which design-worthiness.md rule
-   * 10 says an agent may only ever recommend, never pass or fail — so taste findings always
+   * 12 says an agent may only ever recommend, never pass or fail — so taste findings always
    * carry "warning" here as a formality. selectRecommendedNextEdit() never branches on
    * severity for tier:"taste"; it branches on `strength` instead. Treat a taste finding's
    * severity as inert.
@@ -47,7 +47,7 @@ export const NO_FURTHER_EDIT_MESSAGE =
   "No further edit needed: every mechanical check this grader can run is clean, no attested-tier warning was recorded, and no taste observation was submitted.";
 
 /**
- * Chooses exactly one next edit, per design-worthiness.md rule 10's own escalation order:
+ * Chooses exactly one next edit, per design-worthiness.md rule 12's own escalation order:
  * the first mechanical-tier error, in the order `findings` lists them (the caller is
  * responsible for that being file order — see sortFindingsInFileOrder in
  * grade-design-surface.ts); failing that, the first attested-tier warning, in the same order;

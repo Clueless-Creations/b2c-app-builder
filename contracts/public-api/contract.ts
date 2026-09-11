@@ -9,6 +9,7 @@ export {
   connectionReceiptSchema,
   formatConnectionReceipt,
   HOSTED_CLIENT_NAME,
+  HOSTED_WRONG_SURFACE_LEFTOVER_CLI_ONLY_TOOL_NAMES,
   HOSTED_WRONG_SURFACE_TOOL_NAMES,
   hostedMcpInstructionsSuffix,
   hostedWrongSurfaceRefusal,

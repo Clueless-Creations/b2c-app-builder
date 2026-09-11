@@ -19,6 +19,10 @@ const nodeId = (workflowSlug: string): RunNodeId => `run.${workflowSlug}` as Run
 const PACKET_STRENGTH_LINE =
   "Proof strength: structural=checked semantic=unknown runtime=unknown. A complete record is not independent review or device observation.";
 
+/** A static screenshot of a required navigation flow. Asset exists; not interaction proof. */
+const SCREENSHOT_FLOW_LINE = "Static screenshot at screenshots/onboarding.png proves the onboarding navigation flow.";
+const SCREENSHOT_ASSET_LINE = "Screenshot at screenshots/onboarding.png";
+
 function strengthCatalog(): CatalogInput {
   return {
     version: "catalog.proof-strength.1",
@@ -339,5 +343,54 @@ export function register(harness: Harness): void {
     );
     assert(produced.includes("semantic=unknown") && produced.includes("Synthetic review is not workspace semantic proof"), `got ${produced}`);
     assert(!produced.includes("A complete record is not independent review"), "packet shape-pass wording is not a synthetic-review result");
+  });
+
+  harness.check("proof-strength: a static screenshot of a navigation flow is not interaction proof", () => {
+    const issues = classifyProofStrengthIssues([SCREENSHOT_FLOW_LINE], {}, "graph");
+    assert(JSON.stringify(issues) === JSON.stringify(["review.screenshot_not_interaction"]), `expected screenshot_not_interaction, got ${issues.join(",")}`);
+  });
+
+  harness.check("proof-strength: a screenshot asset alone is not independent review", () => {
+    const issues = classifyProofStrengthIssues([SCREENSHOT_ASSET_LINE], {}, "workspace");
+    assert(JSON.stringify(issues) === JSON.stringify(["review.screenshot_not_interaction"]), `expected screenshot_not_interaction, got ${issues.join(",")}`);
+  });
+
+  harness.check("proof-strength: a reviewer sentence next to a screenshot path is not screenshot-only", () => {
+    const issues = classifyProofStrengthIssues([SCREENSHOT_ASSET_LINE, "fresh-context reviewer signed off"], {}, "graph");
+    assert(issues.length === 0, `expected no issues, got ${issues.join(",")}`);
+  });
+
+  harness.check("proof-strength: denying that a screenshot proves a flow is not screenshot-as-interaction", () => {
+    const issues = classifyProofStrengthIssues(["A screenshot does not prove the onboarding navigation flow."], {}, "graph");
+    assert(issues.length === 0, `expected no issues, got ${issues.join(",")}`);
+  });
+
+  harness.check("proof-strength: acceptVerification refuses a screenshot as interaction proof", () => {
+    const { plan, run } = blockedResearchScan();
+    const message = thrownMessage(() => acceptVerification(plan, run, nodeId("research-scan"), [SCREENSHOT_FLOW_LINE], now, "session-reviewer"));
+    assert(message.includes("review.screenshot_not_interaction"), `expected screenshot_not_interaction, got ${message || "no refusal"}`);
+    assert(run.nodes[nodeId("research-scan")]!.status === "blocked", "a screenshot cannot promote the node as interaction proof");
+  });
+
+  harness.check("proof-strength: acceptVerification still accepts a reviewer sentence next to a screenshot path", () => {
+    const { plan, run } = blockedResearchScan();
+    acceptVerification(plan, run, nodeId("research-scan"), [SCREENSHOT_ASSET_LINE, "fresh-context reviewer signed off"], now, "session-reviewer");
+    assert(run.nodes[nodeId("research-scan")]!.status === "succeeded", "a reviewer sentence next to a screenshot path must still promote the node");
+  });
+
+  harness.check("proof-strength: a screenshot cannot become runtime=checked even with an explicit observation", () => {
+    const screenshotReview = {
+      mode: "workspace" as const,
+      verdict: "accepted" as const,
+      evidence: [SCREENSHOT_FLOW_LINE, "fresh-context reviewer signed off"],
+    };
+    const produced = composeProofStrength({
+      structural: "checked",
+      review: screenshotReview,
+      attempt: { proofSource: "workspace" },
+      runtimeObservation: { origin: "workspace" },
+    });
+    assert(produced.semantic === "checked", `reviewer sentence may still produce semantic proof, got semantic=${produced.semantic}`);
+    assert(produced.runtime === "unknown", "a screenshot cannot satisfy interactive or runtime proof");
   });
 }

@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.95",
+  "version": "0.219.96",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Prefer compiled catalog check once package-root resolution is dist-safe.",
-    "Keep the rest of the uncompiled checks graph on remaining-tsx."
+    "Name that a green house-style lint is not a live-agent run or a fresh-context review.",
+    "Keep LaunchBench house-style scenarios authored and linted without claiming live-agent proof."
   ]
 }

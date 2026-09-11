@@ -1,0 +1,136 @@
+import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
+import { existsSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import test from "node:test";
+import { fileURLToPath } from "node:url";
+import { parse } from "yaml";
+import { composeCatalog } from "../../catalog/index.js";
+import { publicBusinessAreas } from "../../catalog/areas.js";
+import { referencesForTask, renderTaskSkillFiles, skillDirectory, taskSkills, workflowsForTask } from "../../catalog/task-skills.js";
+import { collectTaskSkillPackage, writeTaskSkillPackage } from "../../tooling/export-task-skill.js";
+import { replaceGeneratedBlock, taskSkillProjections } from "../../tooling/render-task-skills.js";
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
+const catalog = composeCatalog(root);
+const revision = "1971c5d1e6f2c1aed38dde1ec8debc2c459be69d";
+const hash = (text: string): string => createHash("sha256").update(text).digest("hex");
+
+void test("six public areas cover business domains without changing internal authority groups", () => {
+  assert.deepEqual(publicBusinessAreas.map((area) => area.name), ["Opportunity", "Product", "Experience", "Engineering", "Revenue and growth", "Learning and operations"]);
+  const mapped = new Set(publicBusinessAreas.flatMap((area) => [...area.domainIds]));
+  for (const domain of catalog.domains) if (domain.slug !== "machine") assert.ok(mapped.has(domain.id), domain.id);
+  assert.ok(!mapped.has("domain.machine"));
+  assert.ok(catalog.areas.some((area) => area.id === "area.operating-system"));
+});
+
+void test("pilot tasks project real workflow contracts without mutating the catalog", () => {
+  const before = JSON.stringify(catalog);
+  const files = renderTaskSkillFiles(catalog);
+  assert.equal(taskSkills.length, 3);
+  for (const skill of taskSkills) {
+    const body = files[`${skillDirectory(skill)}/SKILL.md`]!;
+    const frontmatter = parse(body.split("---")[1]!);
+    assert.equal(frontmatter.name, skill.name);
+    assert.ok(/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(frontmatter.name));
+    assert.ok(frontmatter.name.length <= 64);
+    assert.ok(frontmatter.description.length <= 1024);
+    assert.equal(frontmatter["allowed-tools"], undefined);
+    assert.ok(body.split("\n").length < 150);
+    assert.ok(Buffer.byteLength(body) < 8000, `${skill.name} startup context grew`);
+    assert.ok(body.includes(workflowsForTask(catalog, skill)[0]!.instructions));
+    assert.doesNotMatch(body, /RevenueCat|Stripe|PostHog|AppKittie|XPOZ|Firecrawl|mcp__|claude -p|codex exec/u);
+    assert.match(body, /A review is read-only/);
+    assert.match(body, /business-status then business-plan/);
+    assert.match(body, /Do not record business completion/);
+    assert.ok(referencesForTask(catalog, skill).length > 0);
+  }
+  assert.equal(JSON.stringify(catalog), before);
+});
+
+void test("one onboarding skill preserves the internal group without requiring every stage on startup", () => {
+  const skill = taskSkills.find((entry) => entry.groupId)!;
+  const workflows = workflowsForTask(catalog, skill);
+  assert.equal(workflows.length, 23);
+  const files = renderTaskSkillFiles(catalog);
+  assert.match(files[`${skillDirectory(skill)}/SKILL.md`]!, /audit or small change does not imply a full rebuild/);
+  assert.equal((files[`${skillDirectory(skill)}/references/stages.md`]!.match(/\| \[Onboarding ONB-/gu) ?? []).length, 23);
+});
+
+void test("missing workflow or required reference fails closed", () => {
+  const skill = taskSkills[0]!;
+  assert.throws(() => workflowsForTask({ ...catalog, workflows: catalog.workflows.filter((workflow) => workflow.id !== skill.workflowId) }, skill), /no canonical workflow/);
+  assert.throws(() => referencesForTask({ ...catalog, references: [] }, skill), /unresolved knowledge/);
+});
+
+void test("provider selection metadata cannot rewrite neutral task instructions", () => {
+  const skill = taskSkills[2]!;
+  const altered = { ...catalog, workflows: catalog.workflows.map((workflow) => workflow.id === skill.workflowId ? { ...workflow, providerIds: ["provider.different-vendor"] } : workflow) };
+  const file = `${skillDirectory(skill)}/SKILL.md`;
+  assert.equal(renderTaskSkillFiles(catalog)[file], renderTaskSkillFiles(altered)[file]);
+});
+
+void test("generated projections remain current and root routing stays bounded", () => {
+  const files = taskSkillProjections(root);
+  for (const [file, content] of Object.entries(files)) assert.equal(readFileSync(path.join(root, file), "utf8"), content, file);
+  const entry = files["SKILL.md"]!;
+  assert.ok(Buffer.byteLength(entry) < 6500);
+  assert.match(entry, /Focused task/);
+  assert.match(entry, /Managed business/);
+  assert.match(entry, /Setup request/);
+  assert.doesNotMatch(entry, /b2c composition-activate|--expected-revision|--mandate-file|B2C_APP_BUILDER_MCP_WRITE/u);
+  for (const area of publicBusinessAreas) {
+    assert.ok(files["README.md"]!.includes(`knowledge/README.md#${area.slug}`));
+    assert.ok(readFileSync(path.join(root, "knowledge/README.md"), "utf8").includes(`## ${area.name}`));
+  }
+});
+
+void test("generated block replacement refuses ambiguous ownership", () => {
+  assert.throws(() => replaceGeneratedBlock("no markers", "task-skills", "x"), /Missing/);
+  const marked = "<!-- catalog-generated:start x -->old<!-- catalog-generated:end x -->";
+  assert.match(replaceGeneratedBlock(marked, "x", "new"), /new/);
+  assert.throws(() => replaceGeneratedBlock(marked + marked, "x", "new"), /duplicated/);
+});
+
+for (const skill of taskSkills) {
+  void test(`${skill.name} exports relocatable bound guidance and complete notices`, () => {
+    const temporary = mkdtempSync(path.join(os.tmpdir(), "b2c-task-skill-"));
+    try {
+      const bundle = collectTaskSkillPackage(root, catalog, skill.name, revision);
+      const target = writeTaskSkillPackage(temporary, skill.name, bundle);
+      const manifest = JSON.parse(bundle.files["source-manifest.json"]!);
+      assert.equal(manifest.executionIncluded, false);
+      assert.equal(bundle.files["THIRD_PARTY_NOTICES.md"], readFileSync(path.join(root, "THIRD_PARTY_NOTICES.md"), "utf8"));
+      for (const resource of manifest.resources) assert.equal(hash(bundle.files[resource.path]!), resource.sha256);
+      for (const reference of referencesForTask(catalog, skill)) assert.ok(bundle.sourcePaths.includes(reference.path));
+      for (const [file, content] of Object.entries(bundle.files)) {
+        if (!file.endsWith(".md") || file === "THIRD_PARTY_NOTICES.md") continue;
+        for (const match of content.matchAll(/!?\[[^\]\n]*\]\(([^\s)]+)[^)\n]*\)/gu)) {
+          const url = match[1]!;
+          if (/^(?:[a-z][a-z0-9+.-]*:|\/\/|#)/iu.test(url)) continue;
+          const destination = path.resolve(target, path.dirname(file), decodeURIComponent(url.split(/[?#]/u)[0]!));
+          assert.ok(destination.startsWith(`${target}${path.sep}`), `${file}: ${url} escapes`);
+          assert.ok(existsSync(destination), `${file}: ${url} is missing`);
+        }
+      }
+      assert.throws(() => writeTaskSkillPackage(temporary, skill.name, bundle), /already exists/);
+      assert.ok(!Object.keys(bundle.files).some((file) => /b2c-maintainer|b2c-contributor|\.env$/u.test(file)));
+    } finally { rmSync(temporary, { recursive: true, force: true }); }
+  });
+}
+
+void test("export refuses unknown skills, escaping resources, and symlinked destinations", () => {
+  assert.throws(() => collectTaskSkillPackage(root, catalog, "../escape", revision), /Unknown task/);
+  assert.throws(() => collectTaskSkillPackage(root, catalog, taskSkills[0]!.name, "main"), /full source commit/);
+  const temporary = mkdtempSync(path.join(os.tmpdir(), "b2c-export-safety-"));
+  try {
+    const name = taskSkills[0]!.name;
+    const sentinel = path.join(temporary, "sentinel");
+    writeFileSync(sentinel, "unchanged");
+    assert.throws(() => writeTaskSkillPackage(temporary, name, { files: { "../sentinel": "bad" }, sourcePaths: [], supplementalLinks: [] }), /escapes/);
+    assert.equal(readFileSync(sentinel, "utf8"), "unchanged");
+    symlinkSync(temporary, path.join(temporary, "alias"));
+    assert.throws(() => writeTaskSkillPackage(path.join(temporary, "alias"), name, { files: {}, sourcePaths: [], supplementalLinks: [] }), /symlinks/);
+  } finally { rmSync(temporary, { recursive: true, force: true }); }
+});

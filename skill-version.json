@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.127",
+  "version": "0.219.128",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Record runtime=checked from operator verify --runtime-observed on a workspace-proof attempt.",
-    "Keep omitted-flag and live-device refusals unchanged, and leave session and MCP without the token."
+    "Keep degraded local execution on b2c-local when a missing worker CLI uses the interpreter reading.",
+    "Planning stays selected, hosted-by-design stays wrong_surface, and leftover b2c-app-builder is not a third surface."
   ]
 }

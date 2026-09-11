@@ -1,60 +1,41 @@
 name: Task skill projections (temporary branch integration)
 
-# Branch-only integration support. Remove this workflow before the final merge.
-# It has no deployment, release, secret, or default-branch write path.
+# Branch-only support, removed before merge. No deployment or release actions.
 on:
   push:
     branches: [feat/task-skills-navigation]
   workflow_dispatch:
-
 permissions:
-  contents: write
-
+  contents: read
 concurrency:
   group: task-skills-branch-integration
   cancel-in-progress: false
-
 jobs:
-  integrate:
+  capture:
     if: github.repository == 'Clueless-Creations/b2c-app-builder' && github.ref == 'refs/heads/feat/task-skills-navigation'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
           ref: feat/task-skills-navigation
           fetch-depth: 0
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
           cache: npm
-      - name: Apply reviewed source edits once
-        run: |
-          if test -f tooling/implement-task-skills.mjs; then
-            node tooling/implement-task-skills.mjs
-          fi
       - run: npm ci
-      - name: Format changed source owners
+      - name: Capture public source and installed toolchain only
         run: |
-          npx prettier --write catalog/areas.ts catalog/task-skills.ts catalog/render-routing.ts catalog/workflows/product-experience.ts catalog/workflows/growth-revenue.ts tooling/render-task-skills.ts tooling/export-task-skill.ts checks/verification/task-skills.test.ts
-      - name: Render canonical projections and version stamps
-        run: |
-          npm run render:all
-          npm run render:evidence-schema-version
-      - name: Commit only to the implementation branch
-        run: |
-          test "$(git branch --show-current)" = feat/task-skills-navigation
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -A
-          if ! git diff --cached --quiet; then
-            git commit -m 'Render task-skill entrypoints, navigation, and versioned projections'
-            git push origin HEAD:refs/heads/feat/task-skills-navigation
-          fi
-      - name: Task and entrypoint verification
-        run: npm run check:agent-entrypoints
-      - name: Presubmit
-        env:
-          B2C_REQUIRE_GIT_HISTORY: '1'
-          GITHUB_BASE_SHA: 1971c5d1e6f2c1aed38dde1ec8debc2c459be69d
-        run: npm run audit:ci -- --lane presubmit
+          mkdir -p "$RUNNER_TEMP/task-skill-checkout"
+          git bundle create "$RUNNER_TEMP/task-skill-checkout/source.bundle" HEAD refs/heads/feat/task-skills-navigation refs/remotes/origin/main
+          tar -czf "$RUNNER_TEMP/task-skill-checkout/dependencies.tgz" node_modules
+          NODE_ROOT="$(dirname "$(dirname "$(command -v node)")")"
+          tar -czf "$RUNNER_TEMP/task-skill-checkout/node-toolchain.tgz" -C "$NODE_ROOT" bin lib/node_modules/npm
+      - uses: actions/upload-artifact@v4
+        with:
+          name: task-skill-checkout
+          path: ${{ runner.temp }}/task-skill-checkout
+          retention-days: 1
+          compression-level: 0

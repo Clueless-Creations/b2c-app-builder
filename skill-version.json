@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.88",
+  "version": "0.219.89",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Launch check:hosted-bundle from compiled dist once package-root resolution walks from dist.",
-    "Keep render-public-api and the uncompiled checks graph on remaining-tsx."
+    "Reopen Expo starter notes from the bound local-cache seam peek.",
+    "Expose in-process Home reopen without treating it as SQLite, SecureStore, or a live restart."
   ]
 }

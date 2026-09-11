@@ -246,7 +246,7 @@ export function renderUsage(commands = COMMANDS) {
   lines.push(
     wrapRow(
       "",
-      "inspect and doctor run the same installation diagnostic. They record a sanitized local host observation.",
+      "inspect runs the installation diagnostic and records a sanitized local host observation. b2c doctor is a supported equivalent.",
       HELP_WRAP_COLUMNS,
     ),
   );

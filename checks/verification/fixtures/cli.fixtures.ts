@@ -122,6 +122,12 @@ export function register(harness: Harness): void {
     assert(help.output.includes("Business lifecycle (normal supported path)"), "help must distinguish the normal business path");
     assert(help.output.includes("not aliases of business-* commands"), "advanced session controls must not be described as business-* aliases");
     assert(help.output.includes("Supported equivalent of inspect"), "doctor must be annotated as the inspect equivalent");
+    assert(help.output.includes("inspect runs the installation diagnostic"), "grouped help must prefer inspect as the diagnostic actor");
+    assert(help.output.includes("b2c doctor is a supported equivalent"), "grouped help must keep doctor supported");
+    assert(
+      !help.output.includes("inspect and doctor run the same"),
+      "grouped help must not treat inspect and doctor as equal diagnostic actors",
+    );
     assert(help.output.includes("sanitized local host observation"), "help must disclose the host observation write");
     assert(help.output.includes("command-specific --help flag"), "help must say inspect/doctor do not accept command-specific --help");
     assert(!help.output.includes("inspect --json"), "help must not advertise inspect --json");

@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.107",
+  "version": "0.219.108",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Retarget leftover mixed TestFlight-plus-screenshots routing onto the Apple TestFlight standing envelope.",
-    "Keep signing and screenshot production on that golden and leave the hosted-discovery slot count at 89."
+    "Refuse hosted HTTP and MCP calls for local workspace planning or execution names as wrong_surface with the hosted interpretConfiguredConnection reading.",
+    "Keep unknown knowledge-tool names as not_found, leave auth failures unauthorized, and keep the live local handshake as b2c-local."
   ]
 }

@@ -4,12 +4,15 @@
  * Reuses the observe command list, apple-asc.yaml, rork unsupported operations, and the
  * verified command cookbook (local --help, 2026-09-08). Does not live-call `asc`.
  * Screenshot upload maps to the Apple store-media standing envelope (#38). TestFlight
- * beta distribution maps to the Apple TestFlight standing envelope. Adapter-built
- * resubmit argv is not independent evidence.
+ * beta distribution maps to the Apple TestFlight standing envelope. The independent
+ * review-status response envelope is the 5.1.0 CLI `reviewStatusResult` object.
+ * Adapter-built resubmit argv and canned live-provider snapshots are not independent
+ * evidence.
  */
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import {
+  adapterGeneratedMentions,
   describeConformanceCoverage,
   isIndependentEvidence,
   type ProviderConformanceProvenance,
@@ -22,14 +25,22 @@ import {
   OBSERVE_APP_REVIEW_COMMANDS,
 } from "../../../adapters/app-review/types.js";
 import { commandIsForbiddenForAppReview } from "../../../adapters/app-review/mandate.js";
+import { AscProviderReadError, createAscAppReviewProvider, type AscCommandRunner } from "../../../adapters/app-review/asc-provider.js";
 import { assert, skillRoot, type Harness } from "./_harness.js";
 
 const COOKBOOK = path.join(skillRoot, "knowledge/store/app-store-connect-cli.md");
 const APPLE_ASC = path.join(skillRoot, "catalog/providers/apple-asc.yaml");
 const RORK = path.join(skillRoot, "catalog/upstreams/rork-app-store-connect-cli.yaml");
 const RESUBMIT = path.join(skillRoot, "adapters/app-review/resubmit.ts");
+const APP_REVIEW_FIXTURES = path.join(skillRoot, "checks/verification/fixtures/app-review.fixtures.ts");
+const ASC_CLI_NATIVE_DIR = path.join(skillRoot, "checks/verification/test/data/asc-cli");
 const RORK_REVIEWED_VERSION = "5.1.0";
+const RORK_REVIEWED_REVISION = "ca759a3b6ab88c8c39aed13325461248436615ca";
 const COOKBOOK_SOURCE = "knowledge/store/app-store-connect-cli.md Verified Command Cookbook (local --help, 2026-09-08)";
+const REVIEW_STATUS_SOURCE = "rork-app-store-connect-cli 5.1.0 internal/cli/reviews/review_overview.go reviewStatusResult";
+const REVIEW_STATUS_OBJECT_KEYS = ["appId", "version", "reviewDetailConfigured", "reviewDetailId", "latestSubmission", "reviewState", "nextAction"] as const;
+const REVIEW_VERSION_KEYS = ["id", "version", "platform", "state", "createdDate"] as const;
+const REVIEW_SUBMISSION_KEYS = ["id", "state", "platform", "submittedDate"] as const;
 
 type SemanticFit = "exact" | "partial" | "none";
 type MappingEffect = "read" | "mutation" | "publish" | "credential";
@@ -196,6 +207,23 @@ function provenance(record: ProviderConformanceProvenance): ProviderConformanceP
   return record;
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function loadNativeJson(fileName: string): unknown {
+  return JSON.parse(readFileSync(path.join(ASC_CLI_NATIVE_DIR, fileName), "utf8")) as unknown;
+}
+
+function reviewStatusRunner(payload: unknown): AscCommandRunner {
+  return (args) => {
+    if (args[0] === "review" && args[1] === "status") {
+      return { status: 0, stdout: `${JSON.stringify(payload)}\n`, stderr: "" };
+    }
+    return { status: 1, stdout: "", stderr: "unused" };
+  };
+}
+
 export function register(harness: Harness): void {
   harness.check("asc-conformance: observe capabilities stay the declared Slice 0 set", () => {
     const yaml = readFileSync(APPLE_ASC, "utf8");
@@ -250,7 +278,10 @@ export function register(harness: Harness): void {
       "TestFlight feedback read stays knowledge-only",
     );
     for (const row of rejected) {
-      assert(ALWAYS_FORBIDDEN_APP_REVIEW_COMMANDS.some((command) => command.includes(row.nativeCapability)), row.nativeCapability);
+      assert(
+        ALWAYS_FORBIDDEN_APP_REVIEW_COMMANDS.some((command) => command.includes(row.nativeCapability)),
+        row.nativeCapability,
+      );
       assert(commandIsForbiddenForAppReview(row.nativeCapability, "observe"), row.nativeCapability);
       assert(commandIsForbiddenForAppReview(row.nativeCapability, "resubmit"), `${row.nativeCapability} stays forbidden in resubmit`);
     }
@@ -282,7 +313,7 @@ export function register(harness: Harness): void {
       evidenceKind: "official-example",
       establishes: ["request-shape"],
       coverageLimits: "Cookbook argv stem from local --help on 2026-09-08. No live review-status JSON and no live App Review.",
-      sample: "asc review status --app \"123456789\" --output table",
+      sample: 'asc review status --app "123456789" --output table',
     });
     const screenshotUpload = provenance({
       provider: "apple-asc",
@@ -295,7 +326,8 @@ export function register(harness: Harness): void {
       evidenceKind: "official-example",
       establishes: ["request-shape"],
       coverageLimits: "Cookbook argv stem from local --help on 2026-09-08. No live screenshot-upload JSON and no live App Store Connect.",
-      sample: 'asc screenshots upload --version-localization "LOC_ID" --path "./screenshots/final/en-US/<device-well>" --device-type "<ASC_DEVICE_TYPE>" --output json',
+      sample:
+        'asc screenshots upload --version-localization "LOC_ID" --path "./screenshots/final/en-US/<device-well>" --device-type "<ASC_DEVICE_TYPE>" --output json',
     });
     const metadataPush = provenance({
       provider: "apple-asc",
@@ -307,8 +339,7 @@ export function register(harness: Harness): void {
       canonicalOperation: "workflow.store.apple-store-metadata-standing-envelope",
       evidenceKind: "official-example",
       establishes: ["request-shape"],
-      coverageLimits:
-        "Cookbook records only the dry-run form from local --help on 2026-09-08. No live metadata-apply JSON and no live App Store Connect.",
+      coverageLimits: "Cookbook records only the dry-run form from local --help on 2026-09-08. No live metadata-apply JSON and no live App Store Connect.",
       sample: 'asc metadata push --app "123456789" --version "1.2.3" --platform IOS --dir "./metadata" --dry-run --output table',
     });
     const testflightBeta = provenance({
@@ -321,8 +352,7 @@ export function register(harness: Harness): void {
       canonicalOperation: "workflow.store.apple-testflight-standing-envelope",
       evidenceKind: "official-example",
       establishes: ["request-shape"],
-      coverageLimits:
-        "Cookbook records only the dry-run form from local --help on 2026-09-08. No live TestFlight JSON and no live App Store Connect.",
+      coverageLimits: "Cookbook records only the dry-run form from local --help on 2026-09-08. No live TestFlight JSON and no live App Store Connect.",
       sample: "asc workflow run --dry-run testflight_beta VERSION:1.2.3",
     });
     const submit = provenance({
@@ -361,5 +391,90 @@ export function register(harness: Harness): void {
     assert(cookbook.includes(String(screenshotUpload.sample)), "screenshot upload sample must be the cookbook line");
     assert(cookbook.includes(String(metadataPush.sample)), "metadata push sample must be the cookbook dry-run line");
     assert(cookbook.includes(String(testflightBeta.sample)), "TestFlight beta sample must be the cookbook dry-run line");
+  });
+
+  harness.check("asc-conformance: independent review-status response envelope is the 5.1.0 CLI object", () => {
+    const nativeSource = readFileSync(path.join(ASC_CLI_NATIVE_DIR, "review-status-object.json"), "utf8");
+    const mistakenSource = readFileSync(path.join(ASC_CLI_NATIVE_DIR, "review-status-mistaken-jsonapi.json"), "utf8");
+    const wiring = readFileSync(APP_REVIEW_FIXTURES, "utf8");
+    const native = loadNativeJson("review-status-object.json");
+    const mistaken = loadNativeJson("review-status-mistaken-jsonapi.json");
+    assert(isRecord(native), "native review-status envelope must be one object");
+    assert(isRecord(native.version), "native envelope nests version");
+    assert(isRecord(native.latestSubmission), "native envelope nests latestSubmission");
+    for (const key of REVIEW_STATUS_OBJECT_KEYS) {
+      assert(key in native, `native envelope missing ${key}`);
+    }
+    for (const key of REVIEW_VERSION_KEYS) {
+      assert(key in native.version, `native version missing ${key}`);
+    }
+    for (const key of REVIEW_SUBMISSION_KEYS) {
+      assert(key in native.latestSubmission, `native latestSubmission missing ${key}`);
+    }
+    assert(!("data" in native) && !("attributes" in native), "CLI envelope is not Apple JSON:API");
+    assert(native.reviewState === "WAITING_FOR_REVIEW", "reviewState follows the 5.1.0 WAITING_FOR_REVIEW branch");
+    assert(native.nextAction === "Wait for App Store review outcome.", "nextAction is the 5.1.0 WAITING_FOR_REVIEW sentence");
+    assert(!("blockers" in native), "empty blockers stay omitted");
+    assert(
+      adapterGeneratedMentions(nativeSource, ["buildResubmitCommand", "liveReviewStatusJson", "createAscAppReviewProvider"]).length === 0,
+      "native envelope must not name adapter helpers",
+    );
+    assert(
+      adapterGeneratedMentions(mistakenSource, ["buildResubmitCommand", "liveReviewStatusJson"]).length === 0,
+      "mistaken envelope must not name adapter helpers",
+    );
+    assert(wiring.includes("function liveReviewStatusJson"), "wiring suite still owns the canned snapshot");
+    assert(!wiring.includes("test/data/asc-cli"), "canned live-provider snapshots are not this envelope");
+    const record = provenance({
+      provider: "apple-asc",
+      transport: "cli",
+      reviewedVersion: RORK_REVIEWED_VERSION,
+      reviewedRevision: RORK_REVIEWED_REVISION,
+      sourceSelector: REVIEW_STATUS_SOURCE,
+      nativeOperation: "asc review status",
+      canonicalOperation: "workflow.store.app-review-observe",
+      evidenceKind: "upstream-source-test",
+      establishes: ["response-shape"],
+      coverageLimits:
+        "CLI reviewStatusResult object at 5.1.0 only. Nested version and latestSubmission id/state. Not Apple JSON:API. Not a live review-status capture.",
+      sample: native,
+    });
+    const canned: ProviderConformanceProvenance = {
+      provider: "apple-asc",
+      transport: "cli",
+      reviewedVersion: RORK_REVIEWED_VERSION,
+      reviewedRevision: "unknown",
+      sourceSelector: "checks/verification/fixtures/app-review.fixtures.ts liveReviewStatusJson",
+      nativeOperation: "asc review status",
+      canonicalOperation: "workflow.store.app-review-observe",
+      evidenceKind: "adapter-generated",
+      establishes: ["response-shape"],
+      coverageLimits: "Canned runner payload in the wiring suite. Not independent native evidence.",
+      sample: "function liveReviewStatusJson",
+    };
+    assert(isIndependentEvidence(record.evidenceKind), describeConformanceCoverage(record));
+    assert(isIndependentEvidence(canned.evidenceKind) === false, describeConformanceCoverage(canned));
+    const snapshot = createAscAppReviewProvider({
+      appId: "123456789",
+      runner: reviewStatusRunner(native),
+      now: () => "2026-09-08T12:00:00.000Z",
+    }).readSnapshot();
+    assert(snapshot.layers[0]?.layer === "app_version" && snapshot.layers[0].providerObjectId === "asv-native-1", JSON.stringify(snapshot.layers));
+    assert(snapshot.layers[0]?.rawValue === "WAITING_FOR_REVIEW", snapshot.layers[0]?.rawValue);
+    assert(
+      snapshot.layers.some((layer) => layer.layer === "review_submission" && layer.providerObjectId === "rs-native-1"),
+      JSON.stringify(snapshot.layers),
+    );
+    let thrown: unknown;
+    try {
+      createAscAppReviewProvider({
+        appId: "123456789",
+        runner: reviewStatusRunner(mistaken),
+      }).readSnapshot();
+    } catch (error) {
+      thrown = error;
+    }
+    assert(thrown instanceof AscProviderReadError, "JSON:API review-status document fails closed");
+    assert(thrown instanceof Error && thrown.message.includes("no valid app-version layer"), "JSON:API document is not the CLI object");
   });
 }

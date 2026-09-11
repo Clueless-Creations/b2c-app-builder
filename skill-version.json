@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.84",
+  "version": "0.219.85",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Prefer b2c inspect in the leftover first-run ASC eval and match last b2c inspect observation copy.",
-    "Align Expo and RevenueCat host-probe comments with inspect, and keep doctor and finding-code owners unchanged."
+    "Prefer b2c inspect in the leftover RevenueCat CLI doctor-is-not-live-catalog adaptation.",
+    "Keep b2c doctor as a supported equivalent and re-render the support-report from that source."
   ]
 }

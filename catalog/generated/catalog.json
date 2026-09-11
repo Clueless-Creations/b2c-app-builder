@@ -3824,7 +3824,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/engineering/expo-compatibility.md",
-        "sha256": "sha256:f8a1ffa2fee8410478f737629b67bb1e6b4560f9aa63e2b3f9b400d5b9faa0a1",
+        "sha256": "sha256:8bd94152843ea4fee9f518998fad077776ff1907d2dc8f863d7c65339f8a49fe",
         "origin": "skill"
       }
     },
@@ -18807,14 +18807,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "9f60939729dfa3534b86d2d36f1612f1580c36c13fefc85cd0df5052fd6c664d",
+    "fingerprint": "eb9ad2809d9181e555b7ca5e9397413481adfc7728397c3b04844a30ee41deed",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
         "version": "0.219.146",
         "revision": "0.219.146",
-        "contentDigest": "4bec9a6384007229148888fb8839dd4df3339687fa109ae78c30b63fc33468a8"
+        "contentDigest": "6dad179edaf3a3c6a12a0c139b9cf6ff82fde32b31f361eedf65ae90f5015df4"
       }
     ],
     "base": {

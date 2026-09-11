@@ -38,7 +38,9 @@ adjacency reference is returned as fenced Markdown with separate source and cont
 
 This service does not run the engine remotely. It cannot access local files, business state,
 approvals, schedules, provider credentials, or execution commands. Those workspace
-operations remain local. The local and hosted MCP servers use the same knowledge
+operations remain local. A local workspace planning or execution tool name fails as
+`wrong_surface` with the hosted connection receipt reading; it is not a missing knowledge
+tool. The local and hosted MCP servers use the same knowledge
 implementation.
 If the local knowledge bundle is missing or invalid, the local MCP keeps its execution
 tools available. It omits the four knowledge tools and emits a fixed recovery warning.

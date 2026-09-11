@@ -7,8 +7,11 @@ export {
   connectionReceiptSchema,
   formatConnectionReceipt,
   HOSTED_CLIENT_NAME,
+  HOSTED_WRONG_SURFACE_TOOL_NAMES,
   hostedMcpInstructionsSuffix,
+  hostedWrongSurfaceRefusal,
   interpretConfiguredConnection,
+  isHostedWrongSurfaceTool,
   LEFTOVER_LOCAL_CLIENT_NAME,
   leftoverNameClientMatrix,
   leftoverNameMigrationGuidance,
@@ -20,6 +23,8 @@ export type {
   ConfiguredConnectionReading,
   ConfiguredConnectionSet,
   ConnectionReceipt,
+  HostedWrongSurfaceRefusal,
+  HostedWrongSurfaceToolName,
   LeftoverNameClientRow,
 } from "./connection-receipt.js";
 

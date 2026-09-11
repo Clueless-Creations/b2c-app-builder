@@ -14,12 +14,15 @@ import {
   connectionReceipt,
   connectionReceiptSchema,
   hostedMcpInstructionsSuffix,
+  hostedWrongSurfaceRefusal,
   interpretConfiguredConnection,
+  isHostedWrongSurfaceTool,
   leftoverNameClientMatrix,
   leftoverNameMigrationGuidance,
   localMcpInstructions,
   parseConnectionReceipt,
   type ConnectionReceipt,
+  type HostedWrongSurfaceRefusal,
 } from "../../../contracts/public-api/connection-receipt.js";
 import { toCatalogInput } from "../../../catalog/bridge.js";
 import type { Catalog } from "../../../catalog/types.js";
@@ -29,7 +32,7 @@ import { createKnowledgeService } from "../../../kernel/knowledge-service/servic
 import { projectHeldWork, projectInitializedBusinessPlan, projectReadyBrief, isLaterGuidance } from "../../../kernel/services/plan-projection.js";
 import { buildWorkerPrompt } from "../../../kernel/session/worker-prompt.js";
 import type { HeldNode, PlanReport } from "../../../kernel/session/plan.js";
-import { handleApi } from "../../../hosted/knowledge-mcp/http.js";
+import { handleApi, hostedWrongSurfaceMcpResponse } from "../../../hosted/knowledge-mcp/http.js";
 import { buildHostedKnowledgeBundle } from "../../../tooling/render-hosted-bundle.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
@@ -298,6 +301,61 @@ test("hosted API discovery includes interpretConfiguredConnection reading", asyn
     receipt: connectionReceipt({ mode: "hosted_knowledge", engineVersion: service.metadata.engineVersion }),
   });
   assert.deepEqual(body.connection, expected);
+});
+
+test("hosted local-workspace tool names fail as wrong-surface with receipt guidance", async () => {
+  const service = createKnowledgeService(buildHostedKnowledgeBundle(root));
+  const hosted = connectionReceipt({ mode: "hosted_knowledge", engineVersion: service.metadata.engineVersion });
+  const expected = interpretConfiguredConnection({ clientName: "b2c-hosted", receipt: hosted });
+  assert.equal(isHostedWrongSurfaceTool("b2c_catalog"), false);
+  assert.equal(isHostedWrongSurfaceTool("b2c_workflow"), false);
+  assert.equal(isHostedWrongSurfaceTool("b2c_not_a_tool"), false);
+  for (const toolName of ["b2c_plan", "b2c_run", "b2c_business_plan"] as const) {
+    assert.equal(isHostedWrongSurfaceTool(toolName), true, toolName);
+    const response = await handleApi(
+      new Request(`https://knowledge.test/api/v1/tools/${toolName}`, { method: "POST", body: "{}" }),
+      service,
+    );
+    assert.equal(response.status, 400, toolName);
+    const body = (await response.json()) as HostedWrongSurfaceRefusal;
+    const refusal = hostedWrongSurfaceRefusal({ engineVersion: service.metadata.engineVersion, toolName });
+    assert.deepEqual(body, refusal);
+    assert.deepEqual(body.connection, expected);
+    assert.equal(body.connection.guidance, expected.guidance);
+    assert.match(body.connection.guidance, /cannot access or run this local business/);
+    assert.doesNotMatch(JSON.stringify(body), /Knowledge tool was not found/);
+    assertSingleCapability(JSON.stringify(body), hosted, `${toolName} HTTP wrong-surface`);
+  }
+  const leftover = hostedWrongSurfaceRefusal({
+    engineVersion: service.metadata.engineVersion,
+    toolName: "b2c_plan",
+    clientName: "b2c-app-builder",
+  });
+  assert.equal(leftover.connection.leftoverName, true);
+  assert.match(leftover.connection.guidance, /not a capability/);
+  assertSingleCapability(leftover.connection.guidance, hosted, "leftover hosted wrong-surface");
+  const unknown = await handleApi(
+    new Request("https://knowledge.test/api/v1/tools/b2c_not_a_tool", { method: "POST", body: "{}" }),
+    service,
+  );
+  assert.equal(unknown.status, 404);
+  const unknownBody = await unknown.text();
+  assert.match(unknownBody, /not_found/);
+  assert.doesNotMatch(unknownBody, /wrong_surface/);
+  assert.doesNotMatch(unknownBody, /cannot access or run this local business/);
+  const mcp = hostedWrongSurfaceMcpResponse(
+    JSON.stringify({ jsonrpc: "2.0", id: 7, method: "tools/call", params: { name: "b2c_run", arguments: { workspace: "/tmp" } } }),
+    service.metadata.engineVersion,
+  ) as { result?: { isError?: boolean; structuredContent?: HostedWrongSurfaceRefusal } };
+  assert.equal(mcp.result?.isError, true);
+  assert.deepEqual(mcp.result?.structuredContent, hostedWrongSurfaceRefusal({ engineVersion: service.metadata.engineVersion, toolName: "b2c_run" }));
+  assert.equal(
+    hostedWrongSurfaceMcpResponse(
+      JSON.stringify({ jsonrpc: "2.0", id: 8, method: "tools/call", params: { name: "b2c_catalog", arguments: { limit: 1 } } }),
+      service.metadata.engineVersion,
+    ),
+    null,
+  );
 });
 
 test("connection receipt never treats handshake or leftover names as provider readiness", () => {

@@ -12,6 +12,7 @@ import {
   boundedBody,
   failure,
   handleApi,
+  hostedWrongSurfaceMcpResponse,
   json,
   MAX_HOSTED_RESPONSE_BYTES,
   normalizeOAuthResources,
@@ -67,6 +68,8 @@ async function mcpResponse(request: Request, env: Env, ctx: ExecutionContext): P
   // Stateless clients use POST. GET would open an unbounded SSE stream in the SDK.
   if (request.method !== "POST") return failure(405, "method_not_allowed", { Allow: "POST" });
   const service = getService();
+  const wrongSurface = hostedWrongSurfaceMcpResponse(await request.clone().text(), service.metadata.engineVersion);
+  if (wrongSurface) return json(wrongSurface);
   const server = new McpServer(
     { name: "b2c-hosted", version: service.metadata.engineVersion },
     {

@@ -2,7 +2,9 @@ import { z } from "zod";
 import {
   connectionReceipt,
   HOSTED_CLIENT_NAME,
+  hostedWrongSurfaceRefusal,
   interpretConfiguredConnection,
+  isHostedWrongSurfaceTool,
 } from "../../contracts/public-api/connection-receipt.js";
 import { KnowledgeServiceError } from "../../kernel/knowledge-service/service.js";
 import { callKnowledgeTool, KNOWLEDGE_TOOL_DEFINITIONS } from "../../kernel/knowledge-service/tools.js";
@@ -103,6 +105,32 @@ export function readBearer(request: Request): string {
   return match[1];
 }
 
+/** MCP tools/call for a local workspace name becomes an isError result, not a protocol missing-tool guess. */
+export function hostedWrongSurfaceMcpResponse(body: string, engineVersion: string): unknown {
+  let payload: unknown;
+  try {
+    payload = JSON.parse(body);
+  } catch {
+    return null;
+  }
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) return null;
+  const message = payload as { jsonrpc?: unknown; id?: unknown; method?: unknown; params?: unknown };
+  if (message.method !== "tools/call") return null;
+  if (!message.params || typeof message.params !== "object" || Array.isArray(message.params)) return null;
+  const name = (message.params as { name?: unknown }).name;
+  if (typeof name !== "string" || !isHostedWrongSurfaceTool(name)) return null;
+  const refusal = hostedWrongSurfaceRefusal({ engineVersion, toolName: name });
+  return {
+    jsonrpc: "2.0",
+    id: "id" in message ? message.id : null,
+    result: {
+      content: [{ type: "text", text: JSON.stringify(refusal) }],
+      structuredContent: refusal,
+      isError: true,
+    },
+  };
+}
+
 export function queryInput(url: URL): Record<string, string | number | boolean> {
   const result: Record<string, string | number | boolean> = uniqueParams(url.searchParams);
   // tokenBudget joins offset/limit as a bounded-digit-string GET query param (b2c_workflow bundle
@@ -145,6 +173,9 @@ export async function handleApi(request: Request, service: KnowledgeService): Pr
     if (request.method === "POST" && /^\/api\/v1\/tools\/[a-z0-9_]+$/.test(url.pathname)) {
       if (url.search) throw new RequestError(400, "invalid_arguments");
       name = url.pathname.split("/").at(-1);
+      if (name && isHostedWrongSurfaceTool(name)) {
+        return json(hostedWrongSurfaceRefusal({ engineVersion: service.metadata.engineVersion, toolName: name }), 400);
+      }
       try {
         input = JSON.parse(await request.text());
       } catch {

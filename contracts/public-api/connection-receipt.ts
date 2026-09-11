@@ -223,3 +223,49 @@ export function leftoverNameMigrationGuidance(): string {
     "Do not register hosted knowledge under the leftover name.",
   ].join("\n");
 }
+
+/** Local workspace planning and execution names. Hosted knowledge refuses these without listing them as tools. */
+export const HOSTED_WRONG_SURFACE_TOOL_NAMES = [
+  "b2c_plan",
+  "b2c_status",
+  "b2c_operate",
+  "b2c_bootstrap",
+  "b2c_run",
+  "b2c_approvals",
+  "b2c_verify",
+  "b2c_schedule",
+  "b2c_business_status",
+  "b2c_business_plan",
+  "b2c_business_evidence",
+  "b2c_packages",
+  "b2c_composition_plan",
+  "b2c_research_lookup",
+] as const;
+
+export type HostedWrongSurfaceToolName = (typeof HOSTED_WRONG_SURFACE_TOOL_NAMES)[number];
+
+export type HostedWrongSurfaceRefusal = {
+  error: "wrong_surface";
+  toolName: string;
+  connection: ConfiguredConnectionReading;
+};
+
+export function isHostedWrongSurfaceTool(name: string): name is HostedWrongSurfaceToolName {
+  return (HOSTED_WRONG_SURFACE_TOOL_NAMES as readonly string[]).includes(name);
+}
+
+/** Wrong-surface local workspace requests take capability from the hosted receipt, not a missing-tool guess. */
+export function hostedWrongSurfaceRefusal(input: {
+  engineVersion: string;
+  toolName: string;
+  clientName?: string;
+}): HostedWrongSurfaceRefusal {
+  return {
+    error: "wrong_surface",
+    toolName: input.toolName,
+    connection: interpretConfiguredConnection({
+      clientName: input.clientName ?? HOSTED_CLIENT_NAME,
+      receipt: connectionReceipt({ mode: "hosted_knowledge", engineVersion: input.engineVersion }),
+    }),
+  };
+}

@@ -59,7 +59,8 @@ The authorization page asks for an entitled API key and explicit read permission
 receives an OAuth token, not an entitled API key. Keep the local `b2c-local` entry if you use local
 execution. When both are configured, this hosted connection is knowledge-only and `b2c-local` is the
 workspace surface. A leftover `b2c-app-builder` client name is not this hosted connection. Duplicate
-names are a collision, not a third surface. Configure other
+names are a collision, not a third surface. A missing local worker CLI is local execution health, not
+this hosted wrong-surface. Configure other
 clients with the same remote URL and OAuth authorization.
 
 ChatGPT can use dynamic client registration. The default HTTPS callback is its documented

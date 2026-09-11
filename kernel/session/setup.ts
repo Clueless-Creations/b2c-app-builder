@@ -13,14 +13,17 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import {
+  anyWorkerRuntimeFound,
   connectionCapabilityGuidance,
   connectionReceipt,
   formatConnectionReceipt,
   leftoverNameMigrationGuidance,
+  observedLocalWorkspaceHealth,
 } from "../../contracts/public-api/connection-receipt.js";
 import { b2cAppBuilderHome, registryPath } from "../../adapters/registry.js";
 import { resolveSkillRoot } from "../../tooling/lib/skill-root.js";
 import { printFindings, runDoctor } from "./doctor.js";
+import { detectWorkerRuntimes } from "./executor.js";
 import { isMainModule } from "../lib/cli.js";
 
 const skillRoot = resolveSkillRoot(import.meta.url);
@@ -67,7 +70,13 @@ function main(): number {
   } catch {
     engineVersion = "0.0.0";
   }
-  const receipt = connectionReceipt({ mode: "local_execution", engineVersion });
+  const receipt = connectionReceipt({
+    mode: "local_execution",
+    engineVersion,
+    observed: observedLocalWorkspaceHealth({
+      workerRuntimeFound: anyWorkerRuntimeFound(detectWorkerRuntimes()),
+    }),
+  });
   // An npm tarball never carries .git; a source checkout always does. That one fact decides which
   // install advice applies: `npm link` only means something from a checkout, and the portable npx
   // form only resolves once the package is on the registry, which an npm install proves.

@@ -1,6 +1,7 @@
 import { researchQuerySchema, researchObservationInputSchema, savedResearchObservationSchema } from "../research/observation.js";
 import { z } from "zod";
 export {
+  anyWorkerRuntimeFound,
   bothConfiguredRoutingGuidance,
   configuredConnectionSet,
   connectionCapabilityGuidance,
@@ -18,6 +19,7 @@ export {
   leftoverNameMigrationGuidance,
   LOCAL_CLIENT_NAME,
   localMcpInstructions,
+  observedLocalWorkspaceHealth,
   parseConnectionReceipt,
   selectConfiguredSurface,
 } from "./connection-receipt.js";

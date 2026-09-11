@@ -18,6 +18,8 @@ export const connectionReceiptSchema = z.strictObject({
   observed: z
     .strictObject({
       knowledge: z.enum(["available", "unavailable"]).optional(),
+      workspacePlanning: z.enum(["available", "unavailable"]).optional(),
+      workspaceExecution: z.enum(["available", "unavailable"]).optional(),
       writes: z.enum(["mcp_readonly", "mcp_write_enabled"]).optional(),
     })
     .optional(),
@@ -135,10 +137,28 @@ export function connectionReceipt(input: {
   };
 }
 
+/** Declared local support is not live worker-runtime health. Hosted-by-design stays on declares.none. */
+export function anyWorkerRuntimeFound(runtimes: readonly { available: boolean }[]): boolean {
+  return runtimes.some((entry) => entry.available);
+}
+
+export function observedLocalWorkspaceHealth(input: { workerRuntimeFound: boolean }): {
+  workspacePlanning: "available";
+  workspaceExecution: "available" | "unavailable";
+} {
+  return {
+    workspacePlanning: "available",
+    workspaceExecution: input.workerRuntimeFound ? "available" : "unavailable",
+  };
+}
+
 /** Wrong-surface and provider claims come from declared capabilities, not the leftover server name. */
 export function connectionCapabilityGuidance(receipt: ConnectionReceipt): string {
   if (receipt.declares.workspaceExecution === "none" || receipt.declares.workspacePlanning === "none") {
     return "Hosted knowledge is connected. It can return maintained guidance, but it cannot access or run this local business. Connect the local builder as b2c-local for workspace execution.";
+  }
+  if (receipt.observed?.workspaceExecution === "unavailable") {
+    return "Use this local builder for workspace status, planning, and packaged knowledge. Execution health is separately degraded: no worker CLI was found. Fixture sessions still run. Provider readiness is not implied by this receipt.";
   }
   return "Use this local builder for workspace status, planning, and CLI-backed execution. Provider readiness is not implied by this receipt.";
 }
@@ -195,6 +215,7 @@ export function localMcpInstructions(input: {
   engineVersion: string;
   writes?: "mcp_readonly" | "mcp_write_enabled";
   clientName?: string;
+  workspaceExecution: "available" | "unavailable";
 }): string {
   const receipt = connectionReceipt({
     mode: "local_execution",
@@ -202,6 +223,7 @@ export function localMcpInstructions(input: {
     observed: {
       knowledge: input.knowledge,
       writes: input.writes ?? "mcp_readonly",
+      ...observedLocalWorkspaceHealth({ workerRuntimeFound: input.workspaceExecution === "available" }),
     },
   });
   return [

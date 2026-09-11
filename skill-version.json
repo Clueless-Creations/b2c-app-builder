@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.143",
+  "version": "0.219.144",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Refuse leftover CLI-only public MCP names as local cli_only.",
-    "Those leftover names stay unlisted. Hosted leftover names stay wrong_surface. Handshake stays b2c-local."
+    "Prefer compiled autopilot check once package-root resolution is dist-safe.",
+    "Remaining-tsx inventory goes from 117 to 116. The rest of the uncompiled checks graph stays on remaining-tsx."
   ]
 }

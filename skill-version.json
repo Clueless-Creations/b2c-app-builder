@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.114",
+  "version": "0.219.115",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Name inspect as the leftover setup-help health-check command.",
-    "Keep doctor as a supported equivalent of inspect without rewriting historical ADR-0010."
+    "Select b2c-local for workspace planning and execution when both local and hosted surfaces are configured.",
+    "Select b2c-hosted for knowledge in that same set, and treat leftover b2c-app-builder as a name, not a third surface."
   ]
 }

@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.85",
+  "version": "0.219.86",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Prefer b2c inspect in the leftover RevenueCat CLI doctor-is-not-live-catalog adaptation.",
-    "Keep b2c doctor as a supported equivalent and re-render the support-report from that source."
+    "Persist Expo starter notes through the bound local-cache seam.",
+    "Run host SQLite duplicate and migration-failure writes without treating them as a backend or live restart."
   ]
 }

@@ -59,8 +59,11 @@ export function register(harness: Harness): void {
     ];
     for (const file of required) {
       const text = readFileSync(path.join(scenarioDir, file), "utf8");
+      const collapsed = text.replace(/\s+/g, " ");
       assert(!/^behavioral:\s*true\s*$/m.test(text), `${file} is authored/linted only; do not mark it live behavioral`);
       assert(text.includes("expected_guardrail:"), `${file} must keep the LaunchBench authored format`);
+      assert(collapsed.includes("not a live agent run"), `${file} must say lint is not a live-agent run`);
+      assert(collapsed.includes("not a fresh-context review"), `${file} must say lint is not a fresh-context review`);
     }
     const harnessDoc = readFileSync(
       path.join(skillRoot, "checks", "validation", "repository", "launchbench-evals.md"),
@@ -68,5 +71,13 @@ export function register(harness: Harness): void {
     );
     assert(harnessDoc.includes("house-style-*.yaml"), "launchbench-evals.md must name the authored house-style examples");
     assert(harnessDoc.includes("must omit `behavioral: true`"), "launchbench-evals.md must keep house-style examples lint-only");
+    assert(
+      harnessDoc.includes("not proof that an agent followed"),
+      "launchbench-evals.md must say a green lint is not live-agent proof",
+    );
+    assert(
+      harnessDoc.includes("not a fresh-context review of representative outputs"),
+      "launchbench-evals.md must say lint is not a fresh-context review",
+    );
   });
 }

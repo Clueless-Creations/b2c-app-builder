@@ -8,6 +8,7 @@ expected_guardrail: >
   not proof that the operation failed or that it succeeded. Name the unknown
   remote effect and the safe reconcile-before-retry boundary. This scenario is
   authored and linted; it is not a live agent run.
+  It is not a fresh-context review of representative outputs.
 validators:
   - check-no-slop
 must_catch:

@@ -8,7 +8,7 @@ expected_guardrail: >
   Root AGENTS is the short writing route. Host adapters stay thin and point at
   AGENTS. Business workspace templates do not receive builder station labels or
   a copied glossary. This scenario is authored and linted; it is not a live
-  agent run.
+  agent run. It is not a fresh-context review of representative outputs.
 validators:
   - check-agent-entrypoints
 must_catch:

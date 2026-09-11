@@ -8,7 +8,8 @@ expected_guardrail: >
   Packaged house style must not depend on a repository-only ethos path.
   Customer output keeps the accepted business brand, not the builder kitchen.
   Source checkout docs may link ethos; installed skill/business workspaces may
-  not. This scenario is authored and linted; it is not a live agent run.
+  not. This scenario is authored and linted; it is not a live agent run. It is
+  not a fresh-context review of representative outputs.
 validators:
   - check-no-slop
   - check-package-parity

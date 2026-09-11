@@ -116,20 +116,26 @@ test("After Credits start reaches status/plan without a maintainer tour or whole
     const agents = readFileSync(path.join(root, "AGENTS.md"), "utf8");
     const skill = readFileSync(path.join(root, "SKILL.md"), "utf8");
     const guide = readFileSync(path.join(root, "docs/guides/build-a-business.md"), "utf8");
-    const connect = headingSlice(skill, "## Connect", "## Build a business");
-    const skillStart = headingSlice(skill, "## Build a business", "## Customize composition");
+    const lifecyclePath = "agents/skills/b2c-app-builder/references/business-lifecycle.md";
+    const setupPath = "agents/skills/b2c-app-builder/references/setup.md";
+    assert(skill.includes(`](${lifecyclePath})`), "root skill lost the managed lifecycle route");
+    assert(skill.includes(`](${setupPath})`), "root skill lost the conditional setup route");
+    const connect = readFileSync(path.join(root, setupPath), "utf8");
+    const lifecycle = readFileSync(path.join(root, lifecyclePath), "utf8");
+    const skillStart = headingSlice(lifecycle, "## Build a business", "## Boundaries");
+    const managed = headingSlice(skill, "## Managed business", "## Setup request");
+    assert(Buffer.byteLength(skill, "utf8") <= 6500, "root activation exceeded the bounded routing budget");
+    assert(!/--mandate-file|composition-activate|--expected-revision/.test(skill), "root activation still carries conditional procedures");
     const guideCreate = headingSlice(guide, "## Create a planning workspace", "## Knowledge tools");
-    const startPath = [
-      headingSlice(agents, "# B2C App Builder Agent Guide", "### Contribution"),
-      connect,
-      skillStart,
-      guideCreate,
-    ].join("\n");
+    const startPath = [headingSlice(agents, "# B2C App Builder Agent Guide", "### Contribution"), managed, skillStart].join("\n");
     assert(startPath.includes("Business is an early exit"));
     assert(startPath.includes("b2c_business_status"));
-    assert(!/docs\/north-star-architecture|docs\/architecture-conformance|docs\/decisions|ARCH-\d+/.test(startPath), "ordinary start path still names maintainer architecture");
+    assert(
+      !/docs\/north-star-architecture|docs\/architecture-conformance|docs\/decisions|ARCH-\d+/.test(startPath),
+      "ordinary start path still names maintainer architecture",
+    );
     assert(!/b2c_catalog|b2c_knowledge_search/.test(connect), "Connect still presents catalog/search as the start path");
-    assertCreateStatusPlanBeforeCatalog(skillStart, "SKILL Build a business");
+    assertCreateStatusPlanBeforeCatalog(skillStart, "linked business lifecycle");
     assertCreateStatusPlanBeforeCatalog(guideCreate, "build-a-business create example");
     assert(
       startPath.indexOf("business-status") < startPath.indexOf("business-plan") &&
@@ -147,6 +153,9 @@ test("After Credits start reaches status/plan without a maintainer tour or whole
     const deferredBytes = Buffer.byteLength(JSON.stringify(dispatched.deferredLoad ?? []), "utf8");
     const planning = plan as { nextAction?: string; resume?: { workflowId?: string; nextAction?: string } };
     const accounting = {
+      // Source-size accounting, not measured host loading or model-token usage.
+      rootActivationBytes: Buffer.byteLength(skill, "utf8"),
+      conditionalLifecycleBytes: Buffer.byteLength(lifecycle, "utf8"),
       startPathCodePoints: codePoints(startPath),
       startPathBytes: Buffer.byteLength(startPath, "utf8"),
       firstUsefulAction: planning.nextAction,
@@ -161,8 +170,8 @@ test("After Credits start reaches status/plan without a maintainer tour or whole
       },
     };
     assert(
-      accounting.startPathCodePoints >= 12_000 && accounting.startPathCodePoints <= 13_000,
-      `start-path size ${accounting.startPathCodePoints} left the locked 12000-13000 bound`,
+      accounting.startPathCodePoints > 0 && accounting.startPathCodePoints <= 13_000,
+      `start-path size ${accounting.startPathCodePoints} exceeded the 13000-code-point managed-instruction ceiling`,
     );
     assert.equal(accounting.firstUsefulAction, planning.resume?.nextAction);
     assert.match(String(accounting.firstUsefulAction), /FOUNDER_BRIEF/);
@@ -173,7 +182,10 @@ test("After Credits start reaches status/plan without a maintainer tour or whole
     assert(currentPaths.some((entry) => /full-launch-program/.test(entry)));
     assert(!currentPaths.some((entry) => /design-evidence-stack|mobile-flow-craft|consumer-craft-benchmarks|paid-tool-routing/.test(entry)));
     assert(deferredPaths.some((entry) => /design-evidence-stack|mobile-flow-craft|consumer-craft-benchmarks/.test(entry)));
-    assert(deferredPaths.some((entry) => /paid-tool-routing/.test(entry)), "opened program packet must defer paid-tool-routing");
+    assert(
+      deferredPaths.some((entry) => /paid-tool-routing/.test(entry)),
+      "opened program packet must defer paid-tool-routing",
+    );
   } finally {
     rmSync(env.temp, { recursive: true, force: true });
   }

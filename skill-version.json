@@ -6,6 +6,7 @@
   "releaseNotes": [
     "Expose catalog-backed task skills for research, onboarding, and monetization with one public business-area map.",
     "Keep the root skill bounded and preserve lifecycle, setup, composition, and mobile procedures through tested direct references.",
-    "Package create-only portable guidance with source hashes, notices, and fail-closed reference checks."
+    "Package create-only portable guidance with source hashes, notices, and fail-closed reference checks.",
+    "Verify conditional startup routes without forcing setup procedures into every root skill activation."
   ]
 }

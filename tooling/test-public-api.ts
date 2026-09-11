@@ -14,6 +14,7 @@ const suites = [
   "founder-brief-intake",
   "connection-and-packet",
   "after-credits-start",
+  "run-session-runtime-observed",
 ];
 let failed = false;
 

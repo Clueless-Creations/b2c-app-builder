@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.131",
+  "version": "0.219.132",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Pin the reviewed App Store Connect CLI 5.1.0 ValidateResult object as independent response-shape evidence for asc metadata validate.",
-    "Empty issues stays an empty array, nested ValidateIssue omitempty fields stay omitted, and a mistaken Apple JSON:API document is not that CLI object."
+    "Refuse leftover contributor MCP names as hosted wrong-surface.",
+    "Hosted leftover contributor names fail as wrong_surface with the hosted interpretConfiguredConnection reading. Knowledge names stay on the hosted surface."
   ]
 }

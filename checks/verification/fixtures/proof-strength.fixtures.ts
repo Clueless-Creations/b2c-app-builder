@@ -122,6 +122,35 @@ export function register(harness: Harness): void {
     assert(run.nodes[nodeId("research-scan")]!.status === "blocked", "structural-only evidence must leave the node blocked");
   });
 
+  harness.check("proof-strength: a deterministic gate receipt is structural-only, not independent review", () => {
+    const issues = classifyProofStrengthIssues(["gate:check:design-worthiness=passed"], {}, "graph");
+    assert(JSON.stringify(issues) === JSON.stringify(["review.structural_only"]), `expected structural_only, got ${issues.join(",")}`);
+  });
+
+  harness.check("proof-strength: gate chrome plus a structural strength line is still not semantic review", () => {
+    const issues = classifyProofStrengthIssues(["gate:check:design-worthiness=passed", PACKET_STRENGTH_LINE], {}, "graph");
+    assert(JSON.stringify(issues) === JSON.stringify(["review.structural_only"]), `expected structural_only, got ${issues.join(",")}`);
+  });
+
+  harness.check("proof-strength: a typed gate_issue line is structural-only, not independent review", () => {
+    const issues = classifyProofStrengthIssues(["gate:check:design-worthiness=exit 1", "gate_issue:worthiness.taste_gate_rejected"], {}, "graph");
+    assert(JSON.stringify(issues) === JSON.stringify(["review.structural_only"]), `expected structural_only, got ${issues.join(",")}`);
+  });
+
+  harness.check("proof-strength: a reviewer sentence next to a gate receipt is not structural-only", () => {
+    const issues = classifyProofStrengthIssues(["gate:check:design-worthiness=passed", "fresh-context reviewer signed off"], {}, "graph");
+    assert(issues.length === 0, `expected no issues, got ${issues.join(",")}`);
+  });
+
+  harness.check("proof-strength: acceptVerification refuses a deterministic gate receipt as independent review", () => {
+    const { plan, run } = blockedResearchScan();
+    const message = thrownMessage(() =>
+      acceptVerification(plan, run, nodeId("research-scan"), ["gate:check:design-worthiness=passed"], now, "session-reviewer"),
+    );
+    assert(message.includes("review.structural_only"), `expected structural_only, got ${message || "no refusal"}`);
+    assert(run.nodes[nodeId("research-scan")]!.status === "blocked", "a gate receipt must not promote the node");
+  });
+
   harness.check("proof-strength: acceptVerification still accepts a fresh-context reviewer sentence", () => {
     const { plan, run } = blockedResearchScan();
     acceptVerification(plan, run, nodeId("research-scan"), ["fresh-context reviewer signed off"], now, "session-reviewer");

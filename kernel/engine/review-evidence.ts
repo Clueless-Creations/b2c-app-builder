@@ -39,6 +39,14 @@ function isPacketCheckChrome(line: string): boolean {
   return /evidence packet check/i.test(line) || /^\d+ error\(s\), \d+ warning\(s\)$/i.test(line);
 }
 
+function isDeterministicGateChrome(line: string): boolean {
+  return /^gate:check:\S+=/.test(line) || /^gate_issue:[a-z][a-z0-9_.-]*$/i.test(line);
+}
+
+function isStructuralChrome(line: string): boolean {
+  return isStructuralStrengthLine(line) || isPacketCheckChrome(line) || isDeterministicGateChrome(line);
+}
+
 function claimsRuntimeObservation(line: string): boolean {
   if (/\bnot\b.{0,80}\b(live[- ]device|device observation|runtime observation)\b/i.test(line)) return false;
   return /\b(live[- ]device|device observation|runtime observation|observed on (?:a |the )?device|ran on (?:a |the )?device)\b/i.test(line);
@@ -50,12 +58,12 @@ function trimmedEvidence(evidence: readonly string[]): string[] {
 
 function isStructuralOnlyEvidence(evidence: readonly string[]): boolean {
   const lines = trimmedEvidence(evidence);
-  return lines.length > 0 && lines.every((line) => isStructuralStrengthLine(line) || isPacketCheckChrome(line)) && lines.some(isStructuralStrengthLine);
+  return lines.length > 0 && lines.every(isStructuralChrome);
 }
 
 /**
- * Shape-pass and packet chrome are not semantic review. A synthetic or graph receipt cannot
- * become live-device or runtime observation.
+ * Shape-pass, packet chrome, and deterministic gate receipts are not semantic review. A
+ * synthetic or graph receipt cannot become live-device or runtime observation.
  */
 export function classifyProofStrengthIssues(
   evidence: readonly string[],

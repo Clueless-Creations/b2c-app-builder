@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.140",
+  "version": "0.219.141",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Prefer the compiled architecture check once package-root resolution walks from dist.",
-    "Remaining-tsx inventory for check scripts moves from 118 to 117."
+    "Pin the independent App Store Connect CLI 5.1.0 screenshotValidateResult ready envelope.",
+    "One ok APP_IPHONE_65 PNG. Empty issues, apiDisplayType, and file hidden stay omitted. Observe still fails closed."
   ]
 }

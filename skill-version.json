@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.86",
+  "version": "0.219.87",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Persist Expo starter notes through the bound local-cache seam.",
-    "Run host SQLite duplicate and migration-failure writes without treating them as a backend or live restart."
+    "Map mixed screenshot-and-version goldens onto the Apple media and metadata standing envelopes.",
+    "Keep store-048 and store-040 on generic ASC CLI until those rows rank the envelopes."
   ]
 }

@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.119",
+  "version": "0.219.120",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Refuse leftover local-only public MCP names as wrong-surface on hosted knowledge.",
-    "Keep hosted knowledge names hosted and unknown names not_found."
+    "Forward an explicit workspace runtime observation from operator verify into acceptVerification.",
+    "A live-device word or omitted flag cannot invent runtime=checked."
   ]
 }

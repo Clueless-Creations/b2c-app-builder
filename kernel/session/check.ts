@@ -32,6 +32,7 @@
  * `check:pack-composition` (`checks/validation/repository/check-pack-composition.ts`),
  * `check:package-parity` (`checks/validation/repository/check-package-parity.ts`),
  * `check:provider-contracts` (`checks/validation/repository/check-provider-contracts.ts`),
+ * `check:upstreams` (`checks/validation/repository/check-upstreams.ts`),
  * `check:validator-docs` (`checks/validation/repository/check-validator-docs.ts`),
  * `check:credits` (`tooling/render-credits.ts`), `check:hosted-bundle` (`tooling/render-hosted-bundle.ts`),
  * and `check:public-api` (`tooling/render-public-api.ts`). Every other `check:*` stays on the

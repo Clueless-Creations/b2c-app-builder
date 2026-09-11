@@ -15,6 +15,8 @@ Reviewed revision: `ca759a3b6ab88c8c39aed13325461248436615ca` (tag 5.1.0, 2026-0
 | `metadata-validate-mistaken-jsonapi.json` | mistaken Apple JSON:API document | not an `asc metadata validate` envelope                                                                              | JSON:API `data`/`attributes` is not the CLI `ValidateResult` object                                                    |
 | `screenshots-sizes-object.json`      | `asc screenshots sizes --output json` | `internal/cli/assets/assets_screenshots.go` `focusedScreenshotSizeCatalog` plus `internal/asc/screenshot_sizes.go` `ScreenshotSizesResult` | One high-level CLI object for the default focused branch. `sizes` has `APP_IPHONE_65` then `APP_IPAD_PRO_3GEN_129`. Nested `family` is `APP`. This is not Apple JSON:API. |
 | `screenshots-sizes-mistaken-jsonapi.json` | mistaken Apple JSON:API document | not an `asc screenshots sizes` envelope                                                                                | JSON:API `data`/`attributes` is not the CLI `ScreenshotSizesResult` object                                              |
+| `screenshots-validate-object.json`  | `asc screenshots validate --output json` | `internal/cli/assets/assets_screenshots_validate.go` `screenshotValidateResult`                                      | One high-level CLI object for the ready branch. `displayType` is `APP_IPHONE_65`. Nested `files` has one `ok` PNG. Empty `issues` and `apiDisplayType` stay omitted. This is not Apple JSON:API. |
+| `screenshots-validate-mistaken-jsonapi.json` | mistaken Apple JSON:API document | not an `asc screenshots validate` envelope                                                                              | JSON:API `data`/`attributes` is not the CLI `screenshotValidateResult` object                                             |
 
 `reviewState` and `nextAction` for `WAITING_FOR_REVIEW` come from
 `buildReviewStatusResult` in that same file. Empty `blockers` are omitted
@@ -43,6 +45,18 @@ matching `TestAssetsScreenshotsSizesCommandDefaultFocused` /
 `internal/screenshotcatalog/catalog.go`, sorted by width then height. `family`
 is `APP` because both display types have the `APP_` prefix. The `--all`
 catalog is not this envelope.
+
+The screenshots-validate object follows `screenshotValidateResult` after
+`validateScreenshotAssets` records one ready PNG for `APP_IPHONE_65`,
+matching `TestRenderScreenshotValidateResultSkipsRedundantAPIDisplayTypeRow`
+and the 1242x2688 files in
+`TestValidateScreenshotAssetsSortsEntriesAndKeepsHiddenWarningsNonBlocking`
+at 5.1.0. `path` is the cookbook path `./screenshots`, not a live capture.
+`displayType` is `APP_IPHONE_65` because `normalizeScreenshotDisplayType`
+prefixes ShortUsage `IPHONE_65`. `apiDisplayType` stays omitted because
+`CanonicalScreenshotDisplayTypeForAPI` returns the same value. Empty
+`issues` stay omitted because the field is `json:"issues,omitempty"`. Nested
+file `hidden` stays omitted because it is false.
 
 Ids are synthetic. They are not live App Store Connect apps, versions, or
 submissions. No host `asc` binary and no App Store Connect account were used to

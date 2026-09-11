@@ -15903,7 +15903,7 @@
     "package.json": "a49836b60bc49d1a62038cea242ab7c8f5c4d543596bbe28d74b0ec2017ea902",
     "tooling/catalog-scaffold.ts": "6a54386c9259c97834599249115b0dd82308c16e2c9bb35c02f3058280467077",
     "catalog/render-routing.ts": "dc1667ef4d66512306680598aa6ec463c348a654ec45fe5b43348568afbd4822",
-    "checks/validation/repository/check-agent-entrypoints.ts": "58486e6e69f424c422a3d005cfc432f92fd0bd4cb7dc168f2dafeedfbe137be5",
+    "checks/validation/repository/check-agent-entrypoints.ts": "8a8b3973f1c2806f0d13d5a2adb1e5d9a0642f6365cdad6b97145f6cedf0677b",
     "checks/validation/repository/run-agent-evals.ts": "f70805b96ab293baf560b976e2c9261197025b69d06111e841013b12c3ebba24",
     "checks/validation/business/operations/check-agent-operations.ts": "9e69dbaf17f1f946df5431b059c6985048fc5e19d8e4598382479ce82417d2d9",
     "checks/validation/business/engineering/check-roster-overlap.ts": "88b87601167ea569c3b44d602cc745d38383a9d249827061097e9ae752ce676f",
@@ -16211,5 +16211,5 @@
     "catalog/upstreams/notices/parth-app-store-screenshots.txt": "a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a"
   },
   "dependencies": [],
-  "digest": "sha256:7726754dd0d22e76d2b386d69ad233ceb694feb2c63ebd4127bcb20c8aeaa9b3"
+  "digest": "sha256:53c5a7310687f30d8421eb9f49e42e584758ec2fae54d087825b970ece5ca4dc"
 }

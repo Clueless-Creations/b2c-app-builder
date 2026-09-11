@@ -12,13 +12,17 @@ export function register(h: Harness): void {
     const remaining = inventory.filter((entry) => entry.remainingTsx);
     assert(
       compiled.join(",") ===
-        "check:catalog,check:credits,check:gates-layout,check:graph-foundations,check:hosted-bundle,check:hub-spoke,check:learning-grounding,check:operating-graph,check:pack-composition,check:package-parity,check:public-api",
+        "check:agent-entrypoints,check:catalog,check:credits,check:gates-layout,check:graph-foundations,check:hosted-bundle,check:hub-spoke,check:learning-grounding,check:operating-graph,check:pack-composition,check:package-parity,check:public-api",
       `compiled-eligible check scripts drifted: ${compiled.join(",")}`,
     );
     assert(remaining.length > 0, "remaining-tsx inventory must still name the uncompiled checks graph");
     assert(
       remaining.every((entry) => entry.sourcePath === undefined || entry.sourcePath.startsWith("checks/")),
       "remaining-tsx entries must stay under the uncompiled checks/ graph",
+    );
+    assert(
+      !remaining.some((entry) => entry.id === "check:agent-entrypoints"),
+      "check:agent-entrypoints must leave remaining-tsx once its compiled twin is eligible",
     );
     assert(!remaining.some((entry) => entry.id === "check:catalog"), "check:catalog must leave remaining-tsx once its compiled twin is eligible");
     assert(!remaining.some((entry) => entry.id === "check:gates-layout"), "check:gates-layout must leave remaining-tsx once its compiled twin is eligible");
@@ -40,7 +44,7 @@ export function register(h: Harness): void {
       "check:pack-composition must leave remaining-tsx once its compiled twin is eligible",
     );
     assert(!remaining.some((entry) => entry.id === "check:package-parity"), "check:package-parity must leave remaining-tsx once its compiled twin is eligible");
-    assert(remaining.length === 120, `remaining-tsx count drifted: ${remaining.length}`);
+    assert(remaining.length === 119, `remaining-tsx count drifted: ${remaining.length}`);
     assert(
       remaining.some((entry) => entry.id === "check:design-md" && entry.sourcePath === "checks/validation/business/design/check-design-md.ts"),
       "remaining-tsx inventory lost a representative checks/ gate",
@@ -301,5 +305,30 @@ export function register(h: Harness): void {
     assert(observed.compiled === true && observed.args?.join(" ") === "--repo-root . --skill-root . --json", "compiled package-parity arguments changed");
     const source = readFileSync(path.join(skillRoot, "checks/validation/repository/check-package-parity.ts"), "utf8");
     assert(source.includes("resolveSkillRoot(import.meta.url)"), "package-parity check default skill root must walk from compiled dist");
+  });
+
+  h.check("packed-check: check:agent-entrypoints prefers compiled dist without tsx", () => {
+    const root = h.makeTempDir("packed-check-agent-entrypoints");
+    mkdirSync(path.join(root, "checks/validation/repository"), { recursive: true });
+    mkdirSync(path.join(root, "dist", "checks/validation/repository"), { recursive: true });
+    writeFileSync(
+      path.join(root, "dist", "checks/validation/repository/check-agent-entrypoints.js"),
+      "console.log(JSON.stringify({ compiled: true, args: process.argv.slice(2) }));",
+    );
+    writeFileSync(
+      path.join(root, "checks/validation/repository/check-agent-entrypoints.ts"),
+      'console.error("source ts fallback should not run"); process.exit(9);',
+    );
+    const command = resolvePackedCheckCommand(root, "tsx checks/validation/repository/check-agent-entrypoints.ts --repo-root .", ["--json"]);
+    assert(
+      command?.executable === process.execPath && command.args[0] === path.join(root, "dist", "checks/validation/repository/check-agent-entrypoints.js"),
+      "packed check:agent-entrypoints must exec dist/checks/validation/repository/check-agent-entrypoints.js, not bare tsx",
+    );
+    const result = spawnSync(command.executable, command.args, { env: { ...process.env, PATH: "" }, encoding: "utf8" });
+    assert(result.status === 0, `compiled agent-entrypoints launch failed: ${result.stderr}`);
+    const observed = JSON.parse(result.stdout) as { compiled?: boolean; args?: string[] };
+    assert(observed.compiled === true && observed.args?.join(" ") === "--repo-root . --json", "compiled agent-entrypoints arguments changed");
+    const source = readFileSync(path.join(skillRoot, "checks/validation/repository/check-agent-entrypoints.ts"), "utf8");
+    assert(source.includes("resolveSkillRoot(import.meta.url)"), "agent-entrypoints check default skill root must walk from compiled dist");
   });
 }

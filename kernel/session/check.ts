@@ -19,7 +19,8 @@
  * the skill's own shipped reference business — the same target an unmodified `npm run check:<name>`
  * gives a maintainer.
  *
- * Packed omit-dev prefers `dist/` for `check:catalog` (`checks/validation/repository/check-catalog.ts`),
+ * Packed omit-dev prefers `dist/` for `check:agent-entrypoints` (`checks/validation/repository/check-agent-entrypoints.ts`),
+ * `check:catalog` (`checks/validation/repository/check-catalog.ts`),
  * `check:gates-layout` (`checks/validation/repository/check-gates-layout.ts`),
  * `check:graph-foundations` (`checks/validation/repository/check-graph-foundations.ts`),
  * `check:hub-spoke` (`checks/validation/repository/check-hub-spoke.ts`),

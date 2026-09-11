@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.2",
+  "version": "0.220.3",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Prefer compiled check:upstreams once package-root resolution walks from dist.",
-    "Remaining-tsx inventory moves from 115 to 114. Pin and snapshot re-rendered from source."
+    "Pin the independent ASC screenshots-download response envelope from CLI 5.1.0.",
+    "Keep Apple JSON:API out of that decoder path. No live asc. Slot 89."
   ]
 }

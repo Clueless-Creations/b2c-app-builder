@@ -15798,7 +15798,7 @@
     "checks/validation/business/engineering/check-backend-data-contract.ts": "a8885e938c238a8ec22e038a5343095b19b23fc47423bf50f43814b9201c22fe",
     "checks/validation/business/design/check-browser-runtime-proof.ts": "a6b01564ab04a7f07ff42c8c2fd1fce74e7b5134e8dff9182181601a7b768435",
     "checks/validation/repository/check-capability-delta.ts": "f3a7164662e5b68817d62a7577b650dec3e0f32ed45d93b88722609b5ee6483d",
-    "checks/validation/repository/check-catalog.ts": "64f123c94b616295c8303a5aa31d8db3f217ddbabd9dfbdf57342ff7136e8aa7",
+    "checks/validation/repository/check-catalog.ts": "2ecd9271a9dbdde6af78192883064409f4cd6e25a73990e5431b4db36f6ce147",
     "checks/validation/business/process/check-change-cascade.ts": "2cf5c3c69e6881657c770d5bb15ea97ec558d69b1f22404c44018b64b11a4ba1",
     "checks/validation/business/design/check-component-contracts.ts": "c900137d09f4827f527a77548352a54e640f1a112e4f4ae31d188a9b11423e6b",
     "checks/validation/business/engineering/check-compound-engineering-routing.ts": "6ecfccded6baacd8adc360224a73bf47fb99c767b40a5dd24f6ea8d3a4244e1d",
@@ -16083,5 +16083,5 @@
     "catalog/upstreams/notices/parth-app-store-screenshots.txt": "a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a"
   },
   "dependencies": [],
-  "digest": "sha256:1b591d148f902905916f649a988b9caed03406a5af8f991dd9fb59a3a18e5c96"
+  "digest": "sha256:068143aaebd2283db178879191493ada05270d6e850043d9a3b6466d5ac11e0a"
 }

@@ -3,9 +3,14 @@ import { resolveCompiledScript } from "./tsx-launcher.mjs";
 
 /**
  * Scripts this increment may launch from `dist/` without tsx. `tsconfig.build.json` already
- * emits `tooling/**`. The uncompiled `checks/` graph stays on tsx.
+ * emits `tooling/**` plus the catalog wrapper. The rest of the uncompiled `checks/` graph stays on tsx.
  */
-export const PACKED_CHECK_COMPILED_SOURCES = ["tooling/render-credits.ts", "tooling/render-hosted-bundle.ts", "tooling/render-public-api.ts"] as const;
+export const PACKED_CHECK_COMPILED_SOURCES = [
+  "checks/validation/repository/check-catalog.ts",
+  "tooling/render-credits.ts",
+  "tooling/render-hosted-bundle.ts",
+  "tooling/render-public-api.ts",
+] as const;
 
 export interface PackedCheckInventoryEntry {
   readonly id: string;

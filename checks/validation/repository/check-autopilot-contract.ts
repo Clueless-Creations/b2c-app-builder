@@ -1,12 +1,18 @@
 #!/usr/bin/env node
+/**
+ * Default skill root walks from this file so packed omit-dev can launch the compiled twin
+ * under `dist/checks/validation/repository/` without treating `dist/` as the package root.
+ *
+ * npm script: check:autopilot
+ * Usage: tsx checks/validation/repository/check-autopilot-contract.ts [--skill-root /path/to/skill]
+ */
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { parse as parseYaml } from "yaml";
 import { asArray, asString, flagString, isRecord, issue, parseFlags, reportAndExit } from "../../../tooling/lib/launch-state.js";
+import { resolveSkillRoot } from "../../../tooling/lib/skill-root.js";
 
-const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-const defaultSkillRoot = path.resolve(scriptDir, "../../..");
+const defaultSkillRoot = resolveSkillRoot(import.meta.url);
 
 function parseArgs(argv: string[]): { skillRoot: string } {
   const flags = parseFlags(argv, [{ flags: ["--skill-root", "--root"], key: "skillRoot" }]);

@@ -21,6 +21,7 @@
  *
  * Packed omit-dev prefers `dist/` for `check:agent-entrypoints` (`checks/validation/repository/check-agent-entrypoints.ts`),
  * `check:architecture` (`checks/validation/repository/check-architecture.ts`),
+ * `check:autopilot` (`checks/validation/repository/check-autopilot-contract.ts`),
  * `check:catalog` (`checks/validation/repository/check-catalog.ts`),
  * `check:gates-layout` (`checks/validation/repository/check-gates-layout.ts`),
  * `check:graph-foundations` (`checks/validation/repository/check-graph-foundations.ts`),

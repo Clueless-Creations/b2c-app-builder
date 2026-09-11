@@ -1,4 +1,9 @@
 import { z } from "zod";
+import {
+  connectionReceipt,
+  HOSTED_CLIENT_NAME,
+  interpretConfiguredConnection,
+} from "../../contracts/public-api/connection-receipt.js";
 import { KnowledgeServiceError } from "../../kernel/knowledge-service/service.js";
 import { callKnowledgeTool, KNOWLEDGE_TOOL_DEFINITIONS } from "../../kernel/knowledge-service/tools.js";
 import type { KnowledgeService } from "../../kernel/knowledge-service/types.js";
@@ -128,6 +133,10 @@ export async function handleApi(request: Request, service: KnowledgeService): Pr
         service: "B2C App Builder",
         scope: "knowledge_only",
         ...service.metadata,
+        connection: interpretConfiguredConnection({
+          clientName: HOSTED_CLIENT_NAME,
+          receipt: connectionReceipt({ mode: "hosted_knowledge", engineVersion: service.metadata.engineVersion }),
+        }),
         tools: KNOWLEDGE_TOOL_DEFINITIONS.map((tool) => ({ ...tool, inputSchema: z.toJSONSchema(tool.inputSchema, { io: "input" }) })),
       });
     }

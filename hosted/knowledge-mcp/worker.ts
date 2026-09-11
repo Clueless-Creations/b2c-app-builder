@@ -20,7 +20,12 @@ import {
   secureResponse,
   uniqueParams,
 } from "./http.js";
-import { hostedMcpInstructionsSuffix } from "../../contracts/public-api/connection-receipt.js";
+import {
+  connectionReceipt,
+  HOSTED_CLIENT_NAME,
+  hostedMcpInstructionsSuffix,
+  interpretConfiguredConnection,
+} from "../../contracts/public-api/connection-receipt.js";
 import { HOSTED_INSTRUCTIONS } from "./instructions.js";
 import { browserAuthorizationFailure, createOAuthProvider } from "./oauth.js";
 
@@ -121,7 +126,17 @@ async function dispatch(request: Request, env: Env, ctx: ExecutionContext, cors:
   if (path === "/health")
     return json({ status: "ok", service: "b2c-hosted", engineVersion: bundleMetadata.engineVersion, bundleSha256: bundleMetadata.bundleSha256 });
   if (path === "/")
-    return json({ service: "B2C App Builder", access: "api_key", scope: "knowledge_only", mcp: `${url.origin}/mcp`, api: `${url.origin}/api/v1` });
+    return json({
+      service: "B2C App Builder",
+      access: "api_key",
+      scope: "knowledge_only",
+      mcp: `${url.origin}/mcp`,
+      api: `${url.origin}/api/v1`,
+      connection: interpretConfiguredConnection({
+        clientName: HOSTED_CLIENT_NAME,
+        receipt: connectionReceipt({ mode: "hosted_knowledge", engineVersion: bundleMetadata.engineVersion }),
+      }),
+    });
   const canonicalResource = `${env.B2C_APP_BUILDER_PUBLIC_ORIGIN}/mcp`;
   // GET and POST must bind consent challenges to the same normalized authorization query.
   if (path === "/oauth/authorize" && normalizeOAuthResources(url.searchParams, canonicalResource)) request = new Request(url.toString(), request);

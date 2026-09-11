@@ -1417,10 +1417,7 @@ function writeAcceptedDesignInputsWithoutAuditReport(handle: WorkspaceHandle): v
     "design/reference-packs/hierarchy.md",
     "# Fixture hierarchy reference\n\nThe source keeps one dominant action per screen with a quiet supporting hierarchy.\n",
   );
-  put(
-    "design/reference-packs/behavior.md",
-    "# Fixture behavior reference\n\nThe source explains keyboard and screen-reader behavior for the primary task.\n",
-  );
+  put("design/reference-packs/behavior.md", "# Fixture behavior reference\n\nThe source explains keyboard and screen-reader behavior for the primary task.\n");
   const reference = (id: string, relative: string, observation: string) => ({
     id,
     // Observed before the rubric was frozen, so the chronology rule holds.
@@ -4392,6 +4389,22 @@ main().catch((error) => { console.error(String(error)); process.exit(1); });
     );
     const noEvidence = runVerify(["--workspace", handle.dir, "--node", "workflow.research-scan", "--session", "sess-reviewer-1"]);
     assert(noEvidence.code === 1 && noEvidence.output.includes("verify.evidence_required"), `empty evidence must be refused, got: ${noEvidence.output}`);
+    const liveDevice = runVerify([
+      "--workspace",
+      handle.dir,
+      "--node",
+      "workflow.research-scan",
+      "--session",
+      "sess-reviewer-1",
+      "--evidence",
+      "fresh-context review: brief matches the category evidence and names sources",
+      "--runtime-observed",
+      "live-device",
+    ]);
+    assert(
+      liveDevice.code === 1 && liveDevice.output.includes("verify.runtime_observation_invalid"),
+      `a live-device word cannot invent observation, got: ${liveDevice.output}`,
+    );
     assert(readFileSync(path.join(handle.dir, "run", "run-state.json"), "utf8") === pendingBytes, "refused operator acceptance must preserve run-state bytes");
     assert(
       readFileSync(path.join(handle.dir, "run", "checkpoint.json"), "utf8") === checkpointBytes,
@@ -4424,6 +4437,11 @@ main().catch((error) => { console.error(String(error)); process.exit(1); });
     assert(
       readAuditEntries(handle).some((entry) => entry.action === "verification_accepted" && entry.sessionId === "sess-reviewer-1"),
       "the independent acceptance must be attested in the audit log",
+    );
+    const defaultProof = verified.attempts.at(-1)?.independentVerification?.evidence.find((line) => line.startsWith("Proof strength:"));
+    assert(
+      Boolean(defaultProof?.includes("runtime=unknown") && !defaultProof.includes("runtime=checked")),
+      `operator verify without --runtime-observed cannot invent runtime proof, got ${defaultProof ?? "none"}`,
     );
   });
 

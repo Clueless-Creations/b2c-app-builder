@@ -342,6 +342,65 @@ export function register(harness: Harness): void {
     assert(legacy.includes("not live catalog proof"), `legacy file must not claim live catalog: ${legacy}`);
   });
 
+  harness.check("revenuecat-cli-doctor: finding messages prefer inspect as the diagnostic actor", () => {
+    const source = readFileSync(path.join(skillRoot, "adapters/providers/revenuecat/cli-doctor.ts"), "utf8");
+    const missing = assessRevenueCatCliHostDoctor({
+      discovery: discovery("missing"),
+      latestObserved: REVIEWED,
+      sanitizePath: (executablePath) => executablePath,
+    });
+    const unrelated = assessRevenueCatCliHostDoctor({
+      discovery: discovery("unrelated-executable", "/usr/bin/rc", "1.2.3"),
+      latestObserved: REVIEWED,
+      sanitizePath: (executablePath) => executablePath,
+    });
+    const unsupported = assessRevenueCatCliHostDoctor({
+      discovery: discovery("unsupported-version", "/opt/fake/bin/rc", "0.0.9"),
+      latestObserved: REVIEWED,
+      sanitizePath: (executablePath) => executablePath,
+    });
+    const schema = assessRevenueCatCliHostDoctor({
+      discovery: discovery("unsupported-schema", "/opt/fake/bin/rc", REVIEWED),
+      latestObserved: REVIEWED,
+      sanitizePath: (executablePath) => executablePath,
+    });
+    const trusted = assessRevenueCatCliHostDoctor({
+      discovery: identity("/opt/fake/bin/rc", REVIEWED, ["/usr/local/bin/rc"]),
+      latestObserved: REVIEWED,
+      sanitizePath: (executablePath) => executablePath,
+    });
+    const trustedFinding = trusted.findings.find((item) => item.code === "doctor.revenuecat_cli");
+    const shadowed = trusted.findings.find((item) => item.code === "doctor.revenuecat_cli_shadowed");
+    assert(missing.findings[0]?.code === "doctor.revenuecat_cli_missing", "finding codes stay doctor.*");
+    assert(
+      missing.findings[0]?.message.includes("inspect will not install it"),
+      `missing actor copy must prefer inspect: ${missing.findings[0]?.message}`,
+    );
+    assert(
+      unrelated.findings[0]?.message.includes("Inspect will not install a replacement"),
+      `unrelated actor copy must prefer inspect: ${unrelated.findings[0]?.message}`,
+    );
+    assert(
+      unsupported.findings[0]?.message.includes("Inspect will not upgrade the host"),
+      `unsupported actor copy must prefer inspect: ${unsupported.findings[0]?.message}`,
+    );
+    assert(
+      schema.findings[0]?.message.includes("Inspect will not install or rewrite the binary"),
+      `unsupported-schema actor copy must prefer inspect: ${schema.findings[0]?.message}`,
+    );
+    assert(
+      trustedFinding?.message.includes("Inspect will not install, log in, or refresh OAuth"),
+      `trusted actor copy must prefer inspect: ${trustedFinding?.message}`,
+    );
+    assert(
+      shadowed?.message.includes("Inspect will not install or upgrade the host"),
+      `shadowed actor copy must prefer inspect: ${shadowed?.message}`,
+    );
+    assert(source.includes("`b2c doctor` is a supported equivalent"), "RevenueCat diagnostic copy must keep doctor supported");
+    assert(!source.includes("Doctor will not"), "RevenueCat findings must not keep Doctor as the named actor");
+    assert(!source.includes("doctor will not install it"), "RevenueCat missing copy must not keep doctor as the named actor");
+  });
+
   harness.check("revenuecat-cli-doctor: leftover adaptation copy prefers inspect", () => {
     const manifest = readFileSync(path.join(skillRoot, "catalog/upstreams/revenuecat-cli.yaml"), "utf8");
     const report = readFileSync(path.join(skillRoot, "docs/upstreams/support-report.md"), "utf8");

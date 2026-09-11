@@ -10,7 +10,8 @@ expected_guardrail: >
   Do not infer a filesystem read-only guarantee from the word inspect. Do not
   advertise --json or a command-specific --help flag that the diagnostic does not
   accept. Finding codes stay doctor.*. This scenario is authored and linted; it is
-  not a live agent run.
+  not a live agent run. It is not a fresh-context review of representative
+  outputs.
 validators:
   - check-no-slop
 must_catch:

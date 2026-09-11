@@ -8,6 +8,7 @@ expected_guardrail: >
   Style applies to surrounding prose only. Required legal wording, verbatim
   upstream quotes, and literal error identifiers stay unchanged. This scenario
   is authored and linted; it is not a live agent run.
+  It is not a fresh-context review of representative outputs.
 validators:
   - check-no-slop
   - check-privacy-terms

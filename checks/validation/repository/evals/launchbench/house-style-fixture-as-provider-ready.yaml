@@ -8,6 +8,7 @@ expected_guardrail: >
   execution and is not business acceptance. Name the fixture scope and the
   outstanding live proof. Do not claim the provider or business is ready. This
   scenario is authored and linted; it is not a live agent run.
+  It is not a fresh-context review of representative outputs.
 validators:
   - check-no-slop
   - check-live-provider-proof

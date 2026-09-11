@@ -8,7 +8,8 @@ expected_guardrail: >
   A pull request with a partial result leads with the outcome, names checks
   that ran, and leaves review and remaining work explicit. Do not invent counts
   or claim independent review that did not happen. This scenario is authored
-  and linted; it is not a live agent run.
+  and linted; it is not a live agent run. It is not a fresh-context review of
+  representative outputs.
 validators:
   - check-no-slop
 must_catch:

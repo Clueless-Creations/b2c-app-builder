@@ -8,6 +8,7 @@ expected_guardrail: >
   ADRs and API examples stay in the technical register. Exact command names,
   flags, and identifiers survive unchanged. Do not add kitchen aliases. This
   scenario is authored and linted; it is not a live agent run.
+  It is not a fresh-context review of representative outputs.
 validators:
   - check-technical-docs-ste100
 must_catch:

@@ -10,6 +10,7 @@ expected_guardrail: >
   Commands, flags, and error identifiers keep exact technical meaning. Do not
   send the same sentence through incompatible automatic rewrites. This scenario
   is authored and linted; it is not a live agent run.
+  It is not a fresh-context review of representative outputs.
 validators:
   - check-no-slop
   - check-technical-docs-ste100

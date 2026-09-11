@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.109",
+  "version": "0.219.110",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Refuse static screenshots of a required navigation flow as independent review or interactive runtime proof.",
-    "Keep a reviewer sentence next to a screenshot path as a screenshot, and leave packet-gate and gate-receipt leftovers unchanged."
+    "Name CLI inspect and setup as the writers of the engine-home host snapshot on current ARCH-07.",
+    "Keep doctor as a supported equivalent and leave historical ADR-0010 unchanged."
   ]
 }

@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.93",
+  "version": "0.219.94",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Store a proof-strength line when independent review rejects.",
-    "Keep graph and synthetic rejects from claiming workspace semantic failure."
+    "Retarget mixed screenshot-and-metadata goldens onto Apple standing envelopes.",
+    "Keep generic ASC CLI off store-040 now that both envelopes rank."
   ]
 }

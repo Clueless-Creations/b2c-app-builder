@@ -15816,7 +15816,7 @@
     "checks/validation/business/research/check-evidence-schema-drift.ts": "1ee6973050bcf6108be3f75ff2ca501a839d7c7f790122fa42033b5ba7139a2d",
     "checks/validation/business/words/check-founder-copy.ts": "e1fe357003369611ac57571b1290cbee349a20499c08c838c792509a432f87bb",
     "checks/validation/business/operations/check-founder-operator-bootstrap.ts": "f971a2ab37b72b7c295e662e07bd93926ac1b59b7af6787fbcaf4cc7c4bc581b",
-    "checks/validation/repository/check-gates-layout.ts": "15b01996597655712ce63fd31bcac34c74cdfa8065b719944507e0439579ff62",
+    "checks/validation/repository/check-gates-layout.ts": "e5cb7fc21aa5fe0cc6dd8f9f10de13ee4525990241ef482923ec1e3bcfc66480",
     "checks/validation/business/process/check-generated-pages.ts": "ce061e8c22491f04d3d3eff55392c7300c03af2a72a574d65b4fed53db892f53",
     "checks/validation/repository/check-graph-foundations.ts": "7fcf85053ab148d60b723a38fb14fe93f0680818236fa02c0e354022004ea7a9",
     "tooling/render-hosted-bundle.ts": "cb7845d2bda23c408c01eb048d4ec4750440526ea2add4b2c40d50ceec772876",
@@ -16083,5 +16083,5 @@
     "catalog/upstreams/notices/parth-app-store-screenshots.txt": "a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a"
   },
   "dependencies": [],
-  "digest": "sha256:a23ee145df0345c1918d46163b5541acdb22def7fe2f824e875cc20ff40e5324"
+  "digest": "sha256:edf9391087c195f8e4dca6e6a28b06c33f47230380c9df93a28e0dc01e5522d1"
 }

@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.106",
+  "version": "0.219.107",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Prefer compiled graph-foundations check once package-root resolution is dist-safe.",
-    "Keep the rest of the uncompiled checks graph on remaining-tsx after the packed wrapper ships."
+    "Retarget leftover mixed TestFlight-plus-screenshots routing onto the Apple TestFlight standing envelope.",
+    "Keep signing and screenshot production on that golden and leave the hosted-discovery slot count at 89."
   ]
 }

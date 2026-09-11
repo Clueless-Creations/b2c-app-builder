@@ -1,6 +1,7 @@
 import { researchQuerySchema, researchObservationInputSchema, savedResearchObservationSchema } from "../research/observation.js";
 import { z } from "zod";
 export {
+  bothConfiguredRoutingGuidance,
   configuredConnectionSet,
   connectionCapabilityGuidance,
   connectionReceipt,
@@ -18,10 +19,14 @@ export {
   LOCAL_CLIENT_NAME,
   localMcpInstructions,
   parseConnectionReceipt,
+  selectConfiguredSurface,
 } from "./connection-receipt.js";
 export type {
+  ConfiguredConnectionEntry,
   ConfiguredConnectionReading,
   ConfiguredConnectionSet,
+  ConfiguredSurfaceNeed,
+  ConfiguredSurfaceSelection,
   ConnectionReceipt,
   HostedWrongSurfaceRefusal,
   HostedWrongSurfaceToolName,

@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import {
+  bothConfiguredRoutingGuidance,
   configuredConnectionSet,
   connectionCapabilityGuidance,
   connectionReceipt,
@@ -21,6 +22,7 @@ import {
   leftoverNameMigrationGuidance,
   localMcpInstructions,
   parseConnectionReceipt,
+  selectConfiguredSurface,
   type ConnectionReceipt,
   type HostedWrongSurfaceRefusal,
 } from "../../../contracts/public-api/connection-receipt.js";
@@ -236,6 +238,15 @@ test("leftover-name client matrix covers Claude, Cursor, and Codex without silen
     }
     assert(hostedReadme.includes("Keep the local `b2c-local` entry"), "hosted README lost the local recommended name");
     assert(hostedReadme.includes("leftover `b2c-app-builder` client name is not this hosted connection"));
+    assert(hostedReadme.includes("When both are configured"), "hosted README omitted both-configured routing");
+    assert(guidance.includes(bothConfiguredRoutingGuidance()), "migration guidance omitted both-configured routing");
+    assert(packageGuide.includes("workspace planning and execution use `b2c-local`"), "package guide omitted local surface selection");
+    assert(packageGuide.includes("hosted knowledge uses `b2c-hosted`"), "package guide omitted hosted surface selection");
+    assert(packageGuide.includes("not a third surface"), "package guide omitted leftover-is-not-third-surface");
+    assert(packageGuide.includes("Duplicate names are a collision"), "package guide omitted duplicate-name collision");
+    const skill = readFileSync(path.join(root, "SKILL.md"), "utf8");
+    assert(skill.includes("When both are configured, select by that capability"), "skill omitted both-configured selection");
+    assert(skill.includes("Duplicate names are a collision"), "skill omitted duplicate-name collision");
   } finally {
     rmSync(temp, { recursive: true, force: true });
   }
@@ -289,6 +300,105 @@ test("leftover client names take capability from the handshake, including both-c
   assert(leftoverLocalHandshake.includes(leftoverLocal.guidance));
   assert.doesNotMatch(leftoverLocalHandshake, /The leftover client name b2c-app-builder is the legacy local registration.*The leftover client name b2c-app-builder is the legacy local registration/);
   assertSingleCapability(leftoverLocalHandshake, local, "leftover local handshake");
+});
+
+test("both-configured sets select a surface and refuse duplicate names", () => {
+  const local = connectionReceipt({ mode: "local_execution", engineVersion: "0.219.110" });
+  const hosted = connectionReceipt({ mode: "hosted_knowledge", engineVersion: "0.219.110" });
+  const recommendedLocal = interpretConfiguredConnection({ clientName: "b2c-local", receipt: local });
+  const recommendedHosted = interpretConfiguredConnection({ clientName: "b2c-hosted", receipt: hosted });
+  const leftoverLocal = interpretConfiguredConnection({ clientName: "b2c-app-builder", receipt: local });
+  const leftoverHosted = interpretConfiguredConnection({ clientName: "b2c-app-builder", receipt: hosted });
+  const both = [
+    { clientName: "b2c-local", receipt: local },
+    { clientName: "b2c-hosted", receipt: hosted },
+  ];
+  const execution = selectConfiguredSurface({ entries: both, need: "workspace_execution" });
+  const planning = selectConfiguredSurface({ entries: both, need: "workspace_planning" });
+  const knowledge = selectConfiguredSurface({ entries: both, need: "knowledge" });
+  assert.equal(execution.status, "selected");
+  assert.equal(planning.status, "selected");
+  assert.equal(knowledge.status, "selected");
+  if (execution.status !== "selected" || planning.status !== "selected" || knowledge.status !== "selected") return;
+  assert.equal(execution.set.bothConfigured, true);
+  assert.equal(execution.set.duplicateNames, false);
+  assert.deepEqual(execution.connection, recommendedLocal);
+  assert.deepEqual(planning.connection, recommendedLocal);
+  assert.deepEqual(knowledge.connection, recommendedHosted);
+  assert.equal(execution.connection.clientName, "b2c-local");
+  assert.equal(knowledge.connection.clientName, "b2c-hosted");
+  assert.match(execution.guidance, /Use b2c-local for workspace execution/);
+  assert.match(knowledge.guidance, /Use b2c-hosted for hosted knowledge/);
+  assert.doesNotMatch(execution.guidance, /Use b2c-hosted for workspace/);
+  assert.doesNotMatch(knowledge.guidance, /Use b2c-local for hosted knowledge/);
+  assertSingleCapability(execution.connection.guidance, local, "both-configured execution");
+  assertSingleCapability(knowledge.connection.guidance, hosted, "both-configured knowledge");
+  const routing = bothConfiguredRoutingGuidance();
+  assert(routing.includes(`Workspace planning and execution use ${execution.connection.clientName}`));
+  assert(routing.includes(`Hosted knowledge uses ${knowledge.connection.clientName}`));
+  assert(routing.includes("Duplicate names are a collision, not a capability."));
+  assert.doesNotMatch(routing, /disconnected/);
+
+  const leftoverPlusHosted = [
+    { clientName: "b2c-app-builder", receipt: local },
+    { clientName: "b2c-hosted", receipt: hosted },
+  ];
+  const leftoverExecution = selectConfiguredSurface({ entries: leftoverPlusHosted, need: "workspace_execution" });
+  const leftoverKnowledge = selectConfiguredSurface({ entries: leftoverPlusHosted, need: "knowledge" });
+  assert.equal(leftoverExecution.status, "selected");
+  assert.equal(leftoverKnowledge.status, "selected");
+  if (leftoverExecution.status !== "selected" || leftoverKnowledge.status !== "selected") return;
+  assert.deepEqual(leftoverExecution.connection, leftoverLocal);
+  assert.deepEqual(leftoverKnowledge.connection, recommendedHosted);
+  assert.equal(leftoverExecution.set.leftoverPointsAtLocal, true);
+
+  const leftoverAsThird = selectConfiguredSurface({
+    entries: [...both, { clientName: "b2c-app-builder", receipt: local }],
+    need: "workspace_execution",
+  });
+  assert.equal(leftoverAsThird.status, "selected");
+  if (leftoverAsThird.status !== "selected") return;
+  assert.equal(leftoverAsThird.connection.clientName, "b2c-local");
+  assert.equal(leftoverAsThird.connection.leftoverName, false);
+
+  const leftoverHostedOnly = selectConfiguredSurface({
+    entries: [{ clientName: "b2c-app-builder", receipt: hosted }],
+    need: "workspace_execution",
+  });
+  assert.equal(leftoverHostedOnly.status, "wrong_surface");
+  if (leftoverHostedOnly.status !== "wrong_surface") return;
+  assert.deepEqual(leftoverHostedOnly.connection, leftoverHosted);
+  assert.equal(leftoverHostedOnly.guidance, leftoverHosted.guidance);
+
+  const localKnowledge = selectConfiguredSurface({
+    entries: [{ clientName: "b2c-local", receipt: local }],
+    need: "knowledge",
+  });
+  assert.equal(localKnowledge.status, "selected");
+  if (localKnowledge.status !== "selected") return;
+  assert.deepEqual(localKnowledge.connection, recommendedLocal);
+  assert.match(localKnowledge.guidance, /packaged knowledge/);
+  assert.doesNotMatch(localKnowledge.guidance, /disconnected/);
+  assert.equal(localKnowledge.set.bothConfigured, false);
+
+  const collision = selectConfiguredSurface({
+    entries: [
+      { clientName: "b2c-local", receipt: local },
+      { clientName: "b2c-local", receipt: hosted },
+    ],
+    need: "workspace_execution",
+  });
+  assert.equal(collision.status, "collision");
+  if (collision.status !== "collision") return;
+  assert.equal(collision.set.duplicateNames, true);
+  assert.equal("connection" in collision, false);
+  assert.match(collision.guidance, /collision, not a capability/);
+  assert.doesNotMatch(collision.guidance, /Use b2c-local for workspace execution/);
+
+  const none = selectConfiguredSurface({ entries: [], need: "workspace_execution" });
+  assert.equal(none.status, "unavailable");
+  if (none.status !== "unavailable") return;
+  assert.match(none.guidance, /Connect the local builder as b2c-local/);
 });
 
 test("hosted API discovery includes interpretConfiguredConnection reading", async () => {

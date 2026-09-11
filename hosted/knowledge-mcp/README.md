@@ -57,7 +57,9 @@ codex mcp login b2c-hosted --scopes b2c:read --oauth-client-registration dcr
 
 The authorization page asks for an entitled API key and explicit read permission. The client
 receives an OAuth token, not an entitled API key. Keep the local `b2c-local` entry if you use local
-execution. A leftover `b2c-app-builder` client name is not this hosted connection. Configure other
+execution. When both are configured, this hosted connection is knowledge-only and `b2c-local` is the
+workspace surface. A leftover `b2c-app-builder` client name is not this hosted connection. Duplicate
+names are a collision, not a third surface. Configure other
 clients with the same remote URL and OAuth authorization.
 
 ChatGPT can use dynamic client registration. The default HTTPS callback is its documented

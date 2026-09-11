@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.116",
+  "version": "0.219.117",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Prefer compiled operating-graph check once package-root resolution is dist-safe.",
-    "Keep the rest of the uncompiled checks graph on remaining-tsx after the packed wrapper ships."
+    "Pin the reviewed App Store Connect CLI 5.1.0 reviewSubmitResult dry-run object as independent response-shape evidence for asc review submit.",
+    "Keep nested buildAttachment on wouldAttach, fail closed on a mistaken Apple JSON:API document, and leave review submit mapping deferred."
   ]
 }

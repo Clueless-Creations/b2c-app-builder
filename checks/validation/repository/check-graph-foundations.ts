@@ -9,18 +9,20 @@
  *
  * npm script: check:graph-foundations
  * Usage: tsx checks/validation/repository/check-graph-foundations.ts --skill-root /path/to/skill
+ *
+ * Default skill root walks from this file so packed omit-dev can launch the compiled twin
+ * under `dist/checks/validation/repository/` without treating `dist/` as the package root.
  */
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { parse as parseYaml } from "yaml";
 import { evaluateGuard } from "../../../catalog/principles/guards.js";
 import { isPinnedCommit, isPublicTermAllowed, loadPrinciples, loadVocabulary, principlesPath, vocabularyPath } from "../../../catalog/principles/load.js";
 import { PRINCIPLE_SOURCE_IDS } from "../../../catalog/principles/types.js";
 import { flagString, isRecord, issue, parseFlags, reportAndExit, type Issue } from "../../../tooling/lib/launch-state.js";
+import { resolveSkillRoot } from "../../../tooling/lib/skill-root.js";
 
-const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-const defaultSkillRoot = path.resolve(scriptDir, "../../..");
+const defaultSkillRoot = resolveSkillRoot(import.meta.url);
 
 const flags = parseFlags(process.argv.slice(2), [
   { flags: ["--skill-root"], key: "skillRoot" },

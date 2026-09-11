@@ -1,11 +1,15 @@
 #!/usr/bin/env node
+/**
+ * Default skill root walks from this file so packed omit-dev can launch the compiled twin
+ * under `dist/checks/validation/repository/` without treating `dist/` as the package root.
+ */
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
 import { flagString, isRecord, issue, parseFlags, reportAndExit, type Issue } from "../../../tooling/lib/launch-state.js";
 import { auditExcludedScripts, buildAuditPlan, type AuditLayout } from "../../../tooling/lib/audit-plan.js";
 import { SCRIPT_ROOTS, findScriptPath, scriptBasenameFromCommand } from "../../../tooling/lib/script-paths.js";
+import { resolveSkillRoot } from "../../../tooling/lib/skill-root.js";
 
 interface PackageJson {
   name?: string;
@@ -23,8 +27,7 @@ interface Args {
   skillRoot: string;
 }
 
-const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-const defaultSkillRoot = path.resolve(scriptDir, "../../..");
+const defaultSkillRoot = resolveSkillRoot(import.meta.url);
 const defaultRepoRoot = defaultSkillRoot;
 
 /** Workspace-template entrypoints the installer copies. Must be tracked, not merely on disk. */

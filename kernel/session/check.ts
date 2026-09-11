@@ -26,6 +26,7 @@
  * `check:learning-grounding` (`checks/validation/repository/check-learning-grounding.ts`),
  * `check:operating-graph` (`checks/validation/repository/check-operating-graph.ts`),
  * `check:pack-composition` (`checks/validation/repository/check-pack-composition.ts`),
+ * `check:package-parity` (`checks/validation/repository/check-package-parity.ts`),
  * `check:credits` (`tooling/render-credits.ts`), `check:hosted-bundle` (`tooling/render-hosted-bundle.ts`),
  * and `check:public-api` (`tooling/render-public-api.ts`). Every other `check:*` stays on the
  * remaining-tsx inventory — the rest of the uncompiled `checks/` graph.

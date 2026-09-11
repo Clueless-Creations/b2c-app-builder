@@ -15965,7 +15965,7 @@
     "checks/validation/repository/check-operating-graph.ts": "01c6b1e7f3ec13947af46efed2b0bbc7423282660ae21d245250e88bfb29f01c",
     "checks/validation/business/orchestration/check-parallel-orchestration.ts": "4e363997f7b6cd9d2d367c09bd5c7f9ee0fb9d860df02a1c139370d8a670f5a1",
     "checks/validation/repository/check-pack-composition.ts": "ec6104a7752a541ad04727c151a2f52c8e3999015dc35cad3243a6f593cb0a0d",
-    "checks/validation/repository/check-package-parity.ts": "7a0f994cc2a42050852b56668645c5de037460c075a8a7f7d74f7529973da890",
+    "checks/validation/repository/check-package-parity.ts": "a57f2218c59d3e03f5b68fb76fe64b1f3d52fa681afd42e409b28a4de8bba781",
     "checks/validation/business/operations/check-paid-tool-intake.ts": "3f246b91a30ddcebd156bb00f1469b6c1166fc05a199214e49a6ee65c1b3fe34",
     "checks/validation/business/growth/check-paid-user-acquisition.ts": "9ba895a9d029cfd5a259701e1f8a114f6a24f7d55c3478e292aa65d1edce4e88",
     "checks/validation/business/operations/check-portfolio-registry.ts": "00be2669e925ee74d2563be2edaa6d08b725128809e9b90a4b0ddc7ac2934a56",
@@ -16211,5 +16211,5 @@
     "catalog/upstreams/notices/parth-app-store-screenshots.txt": "a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a"
   },
   "dependencies": [],
-  "digest": "sha256:03403fd8143cbd52d56ea67b3255f6347a3753deb0999dd99ccf4a61e5b9f759"
+  "digest": "sha256:18d730d36521e3a2c3e407d03499b2a59f70f8bf9517d1f422ffc62b6991671a"
 }

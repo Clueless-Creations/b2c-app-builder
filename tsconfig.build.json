@@ -23,7 +23,8 @@
     "checks/validation/repository/check-hub-spoke.ts",
     "checks/validation/repository/check-learning-grounding.ts",
     "checks/validation/repository/check-operating-graph.ts",
-    "checks/validation/repository/check-pack-composition.ts"
+    "checks/validation/repository/check-pack-composition.ts",
+    "checks/validation/repository/check-package-parity.ts"
   ],
   "exclude": [
     "catalog/generated/firstparty/**",

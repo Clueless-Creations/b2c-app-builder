@@ -14384,7 +14384,9 @@
       "founderPhrasings": [
         "publish the approved listing metadata",
         "apply the localized metadata we already signed off on",
-        "push the approved metadata live"
+        "push the approved metadata live",
+        "metadata update",
+        "bump the listing version"
       ],
       "instructions": "Apply only the approved App Store listing text, localized metadata, and promotional content covered by the exact current standing envelope. Verify account, version, locale, and payload digest immediately before mutation. Use `asc metadata pull`, `asc metadata validate`, and `asc metadata push` as the selected-provider cookbook forms; the live push is founder-gated and the cookbook records only the `--dry-run` observe form. Probe `--help` before the first live call. Capture before-state and read back every locale. Write store/proof/apple-store-metadata-apply.json with approval ID, request digest, before state, provider operation IDs, readback state, and timestamps. Do not upload media, change products, open TestFlight, submit for review, or change release state.",
       "reads": [
@@ -18736,14 +18738,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "ccc4645eb470e0d3b1a8a4eb94f2cf9438abe3d42bdf60a35bf050b97d082dea",
+    "fingerprint": "edb5334cfc8ef5e297385ca9f0777c39ca3d8bc558b9a3741e2b0fd725b34e41",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
         "version": "0.219.86",
         "revision": "0.219.86",
-        "contentDigest": "61c158713a000e68b17b28bfd90fa422e09af6bad635e5c11642aba1a60ee45b"
+        "contentDigest": "66a41b1c242ae96eaa3608f70d2c4e8523568a860651a1b3ab3b8c45aec70990"
       }
     ],
     "base": {

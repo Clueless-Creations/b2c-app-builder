@@ -267,6 +267,13 @@ export function register(harness: Harness): void {
     );
   });
 
+  harness.check("doctor-asc: utterance router catalog-bundle comment prefers inspect", () => {
+    const text = readFileSync(path.join(skillRoot, "kernel", "session", "route-utterance.ts"), "utf8");
+    assert(text.includes("`b2c inspect` checks"), "utterance router must prefer inspect for catalog-bundle checks");
+    assert(text.includes("`b2c doctor` is a supported equivalent"), "utterance router must keep doctor supported");
+    assert(!text.includes("`b2c doctor` checks"), "utterance router must not keep doctor as the named catalog-bundle check");
+  });
+
   harness.check("doctor-asc: sanitizeExecutablePath rewrites only the home prefix", () => {
     assert(sanitizeExecutablePath("/Users/fixture-operator/bin/asc", "/Users/fixture-operator") === "~/bin/asc", "home prefix must become ~");
     assert(sanitizeExecutablePath("/opt/homebrew/bin/asc", "/Users/fixture-operator") === "/opt/homebrew/bin/asc", "non-home paths stay absolute");

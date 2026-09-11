@@ -1,15 +1,27 @@
 import { researchQuerySchema, researchObservationInputSchema, savedResearchObservationSchema } from "../research/observation.js";
 import { z } from "zod";
 export {
+  configuredConnectionSet,
   connectionCapabilityGuidance,
   connectionReceipt,
   connectionReceiptSchema,
   formatConnectionReceipt,
+  HOSTED_CLIENT_NAME,
   hostedMcpInstructionsSuffix,
+  interpretConfiguredConnection,
+  LEFTOVER_LOCAL_CLIENT_NAME,
+  leftoverNameClientMatrix,
+  leftoverNameMigrationGuidance,
+  LOCAL_CLIENT_NAME,
   localMcpInstructions,
   parseConnectionReceipt,
 } from "./connection-receipt.js";
-export type { ConnectionReceipt } from "./connection-receipt.js";
+export type {
+  ConfiguredConnectionReading,
+  ConfiguredConnectionSet,
+  ConnectionReceipt,
+  LeftoverNameClientRow,
+} from "./connection-receipt.js";
 
 /** Public compatibility is independent of engine and provider SDK versions. */
 export const API_VERSION = "b2c/v1" as const;

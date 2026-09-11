@@ -9,10 +9,14 @@ import { fileURLToPath } from "node:url";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import {
+  configuredConnectionSet,
   connectionCapabilityGuidance,
   connectionReceipt,
   connectionReceiptSchema,
   hostedMcpInstructionsSuffix,
+  interpretConfiguredConnection,
+  leftoverNameClientMatrix,
+  leftoverNameMigrationGuidance,
   localMcpInstructions,
   parseConnectionReceipt,
   type ConnectionReceipt,
@@ -78,6 +82,7 @@ test("setup prints a local connection receipt and distinct b2c-local registratio
     assert.match(result.stdout, /Provider readiness is not implied by this receipt/);
     assert.match(result.stdout, /claude mcp add --scope user b2c-local/);
     assert.match(result.stdout, /\[mcp_servers\.b2c-local\]/);
+    assert.match(result.stdout, /"b2c-local": \{ "command"/);
     assert.doesNotMatch(result.stdout, /claude mcp add --scope user b2c-app-builder(?:\s|$)/);
     const next = result.stdout.slice(Math.max(0, result.stdout.indexOf("Next steps:")));
     assert(next.includes("business-status"), "setup receipt path still omits business-status");
@@ -140,6 +145,78 @@ test("hosted receipt declares hosted mode and omits the leftover local name", ()
   assert.match(suffix, /cannot access or run this local business/);
   assert.equal(parseConnectionReceipt(suffix).identity.legacy, undefined);
   assert.equal(parseConnectionReceipt(suffix).providerObservation, "not_tested");
+});
+
+test("leftover-name client matrix covers Claude, Cursor, and Codex without silent rewrite", () => {
+  const temp = mkdtempSync(path.join(tmpdir(), "b2c-leftover-names-"));
+  const home = path.join(temp, "home");
+  try {
+    const result = spawnSync(process.execPath, [path.join(root, "entrypoints/cli/b2c.mjs"), "setup"], {
+      cwd: temp,
+      env: { ...process.env, B2C_APP_BUILDER_HOME: home },
+      encoding: "utf8",
+      timeout: 30_000,
+    });
+    assert.equal(result.status, 0, result.stderr);
+    const guidance = leftoverNameMigrationGuidance();
+    assert(result.stdout.includes(guidance), "setup omitted leftover-name migration");
+    assert.match(result.stdout, /Setup never edits Claude, Cursor, or Codex files/);
+    assert.doesNotMatch(result.stdout, /claude mcp add --scope user b2c-app-builder(?:\s|$)/);
+    const hostedPages = readFileSync(path.join(root, "hosted/builder-console/console/pages.ts"), "utf8");
+    const hostedReadme = readFileSync(path.join(root, "hosted/knowledge-mcp/README.md"), "utf8");
+    const packageGuide = readFileSync(path.join(root, "docs/guides/runtime-package.md"), "utf8");
+    assert(packageGuide.includes("### Leftover names"), "package guide omitted leftover-name matrix");
+    assert(packageGuide.includes("Setup never edits those files"));
+    for (const row of leftoverNameClientMatrix) {
+      assert(result.stdout.includes(row.freshLocal), `${row.client} fresh local snippet missing from setup`);
+      assert(guidance.includes(row.leftoverLocal), `${row.client} leftover name missing from migration guidance`);
+      assert(
+        hostedPages.includes(row.hosted) || hostedReadme.includes(row.hosted),
+        `${row.client} hosted snippet missing from hosted setup surfaces`,
+      );
+    }
+    assert(hostedReadme.includes("Keep the local `b2c-local` entry"), "hosted README lost the local recommended name");
+    assert(hostedReadme.includes("leftover `b2c-app-builder` client name is not this hosted connection"));
+  } finally {
+    rmSync(temp, { recursive: true, force: true });
+  }
+});
+
+test("leftover client names take capability from the handshake, including both-configured sets", () => {
+  const local = connectionReceipt({ mode: "local_execution", engineVersion: "0.219.89" });
+  const hosted = connectionReceipt({ mode: "hosted_knowledge", engineVersion: "0.219.89" });
+  const leftoverLocal = interpretConfiguredConnection({ clientName: "b2c-app-builder", receipt: local });
+  const leftoverHosted = interpretConfiguredConnection({ clientName: "b2c-app-builder", receipt: hosted });
+  const recommendedLocal = interpretConfiguredConnection({ clientName: "b2c-local", receipt: local });
+  const recommendedHosted = interpretConfiguredConnection({ clientName: "b2c-hosted", receipt: hosted });
+  assert.equal(leftoverLocal.leftoverName, true);
+  assert.equal(leftoverLocal.mode, "local_execution");
+  assert.match(leftoverLocal.guidance, /legacy local registration/);
+  assert.match(leftoverLocal.guidance, /Provider readiness is not implied/);
+  assert.equal(leftoverHosted.leftoverName, true);
+  assert.equal(leftoverHosted.mode, "hosted_knowledge");
+  assert.match(leftoverHosted.guidance, /not a capability/);
+  assert.match(leftoverHosted.guidance, /cannot access or run this local business/);
+  assert.equal(recommendedLocal.leftoverName, false);
+  assert.equal(recommendedHosted.leftoverName, false);
+  const both = configuredConnectionSet([
+    { clientName: "b2c-local", receipt: local },
+    { clientName: "b2c-hosted", receipt: hosted },
+  ]);
+  assert.equal(both.bothConfigured, true);
+  assert.equal(both.duplicateNames, false);
+  assert.equal(both.leftoverPointsAtLocal, false);
+  assert.equal(both.leftoverPointsAtHosted, false);
+  const leftoverPlusHosted = configuredConnectionSet([
+    { clientName: "b2c-app-builder", receipt: local },
+    { clientName: "b2c-hosted", receipt: hosted },
+  ]);
+  assert.equal(leftoverPlusHosted.bothConfigured, true);
+  assert.equal(leftoverPlusHosted.leftoverPointsAtLocal, true);
+  assert.equal(leftoverPlusHosted.duplicateNames, false);
+  const leftoverNamedHosted = configuredConnectionSet([{ clientName: "b2c-app-builder", receipt: hosted }]);
+  assert.equal(leftoverNamedHosted.leftoverPointsAtHosted, true);
+  assert.equal(leftoverNamedHosted.bothConfigured, false);
 });
 
 test("connection receipt never treats handshake or leftover names as provider readiness", () => {

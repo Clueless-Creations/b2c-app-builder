@@ -63,6 +63,11 @@ run a workspace. The portable form needs no install at all:
 claude mcp add --scope user b2c-local -- npx -y b2c-app-builder
 ```
 
+A leftover `b2c-app-builder` client name is not a third capability. Read the
+connection receipt. See leftover names in the
+[package guide](docs/guides/runtime-package.md#mcp). Setup never edits Claude,
+Cursor, or Codex config.
+
 To work from source, or if the package is unavailable from npm, clone the
 repository and run the same setup:
 

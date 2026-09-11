@@ -192,6 +192,23 @@ export function register(harness: Harness): void {
       metadataPush.needs.length === 1,
       "store-016 retrieves the metadata envelope; store-console stays a dependency, not a second golden slot",
     );
+    const mixedVersion = corpus.entries.find((item) => item.id === "store-036");
+    assert(mixedVersion !== undefined, "store-036 must stay in the frozen corpus");
+    assert(
+      mixedVersion.needs.includes("workflow.store.apple-store-media-standing-envelope") &&
+        mixedVersion.needs.includes("workflow.store.apple-store-metadata-standing-envelope"),
+      "store-036 is screenshot update plus version bump, not generic ASC CLI",
+    );
+    assert(
+      !mixedVersion.needs.includes("workflow.store.asc-cli-automation"),
+      "store-036 is mixed media and metadata, not generic ASC CLI / TestFlight",
+    );
+    const mixedMetadata = corpus.entries.find((item) => item.id === "store-040");
+    assert(mixedMetadata !== undefined, "store-040 must stay in the frozen corpus");
+    assert(
+      mixedMetadata.needs.includes("workflow.store.asc-cli-automation"),
+      "store-040 still needs generic ASC CLI until the metadata envelope ranks in the top three",
+    );
   });
 
   harness.check("hosted discovery: the ASC command reference reaches the workflow whose outputs it uploads", () => {

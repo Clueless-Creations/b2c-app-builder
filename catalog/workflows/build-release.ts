@@ -424,6 +424,8 @@ export const workflows = [
       "publish the approved listing metadata",
       "apply the localized metadata we already signed off on",
       "push the approved metadata live",
+      "metadata update",
+      "bump the listing version",
     ],
     title: "Apple store metadata standing envelope",
     domainId: "domain.store",

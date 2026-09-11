@@ -147,7 +147,7 @@ adaptations:
     owner: adapters/providers/revenuecat/cli-proof.ts
     intentional: true
   - id: doctor-is-not-live-catalog
-    description: b2c doctor records local CLI identity only. Selected-target checks fail closed without host authority and never spawn authenticated commands or claim live catalog proof.
+    description: b2c inspect records local CLI identity only. b2c doctor is a supported equivalent. Selected-target checks fail closed without host authority and never spawn authenticated commands or claim live catalog proof.
     owner: adapters/providers/revenuecat/cli-doctor.ts
     intentional: true
 host_probe:

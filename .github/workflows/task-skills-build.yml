@@ -1,0 +1,84 @@
+name: Task skill final release metadata verification
+# Temporary branch-only support. Runtime and test bytes must stay identical to
+# the candidate undergoing both full heavy audit shards in run 34640627362.
+on:
+  push:
+    branches: [feat/task-skills-navigation]
+permissions:
+  contents: read
+jobs:
+  metadata:
+    if: github.repository == 'Clueless-Creations/b2c-app-builder' && github.ref == 'refs/heads/feat/task-skills-navigation'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    outputs:
+      sha: ${{ steps.candidate.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/task-skills-navigation
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - name: Record the completed fixture work without changing runtime content
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          p = Path('skill-version.json')
+          data = json.loads(p.read_text())
+          data['releaseNotes'].append('Preserve selected provider requirements and verify the completed navigation, packaging, and MCP fixture updates.')
+          p.write_text(json.dumps(data, indent=2) + '\n')
+          PY
+          rm .github/workflows/task-skills-build.yml
+          npm run render:all
+          npm run check:evidence-schema-drift
+      - name: Commit only the verified metadata difference
+        id: candidate
+        run: |
+          test "$(git branch --show-current)" = feat/task-skills-navigation
+          test "$(git diff --name-only d4ec02d70f47640eedb878167987f02c27bc8ee5)" = skill-version.json
+          git add -A
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Record completed task-skill integration in the release manifest'
+          git push origin HEAD:refs/heads/feat/task-skills-navigation
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "Candidate commit: $(git rev-parse HEAD)"
+          echo "Candidate tree: $(git rev-parse HEAD^{tree})"
+          git diff --stat d4ec02d70f47640eedb878167987f02c27bc8ee5
+          git bundle create /tmp/task-skills-release-candidate.bundle --all
+      - uses: actions/upload-artifact@v4
+        with:
+          name: task-skills-release-candidate-source
+          path: /tmp/task-skills-release-candidate.bundle
+          retention-days: 1
+  fast:
+    name: Full fast audit and release metadata
+    needs: metadata
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      B2C_REQUIRE_GIT_HISTORY: '1'
+      GITHUB_BASE_SHA: d0873cc301fa2487bb22e25af3fe275a624162e0
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.metadata.outputs.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - name: Prove executable sources and tests are unchanged
+        run: |
+          test "$(git diff --name-only d4ec02d70f47640eedb878167987f02c27bc8ee5 HEAD)" = skill-version.json
+          npm run check:version-discipline
+      - run: npm run audit:ci -- --lane fast

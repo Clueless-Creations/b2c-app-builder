@@ -1,0 +1,10 @@
+{
+  "data": {
+    "type": "appInfoLocalizations",
+    "id": "ail-native-1",
+    "attributes": {
+      "locale": "en-US",
+      "name": "App Name"
+    }
+  }
+}

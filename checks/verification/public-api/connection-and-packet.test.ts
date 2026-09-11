@@ -21,6 +21,8 @@ import {
   hostedWrongSurfaceRefusal,
   interpretConfiguredConnection,
   isHostedWrongSurfaceTool,
+  leftoverCliOnlyLocalMcpResponse,
+  leftoverCliOnlyLocalRefusal,
   leftoverNameClientMatrix,
   leftoverNameMigrationGuidance,
   localMcpInstructions,
@@ -29,6 +31,7 @@ import {
   selectConfiguredSurface,
   type ConnectionReceipt,
   type HostedWrongSurfaceRefusal,
+  type LeftoverCliOnlyLocalRefusal,
 } from "../../../contracts/public-api/connection-receipt.js";
 import { PUBLIC_OPERATIONS } from "../../../contracts/public-api/contract.js";
 import { CONTRIBUTION_OPERATIONS } from "../../../contracts/contribution/contract.js";
@@ -294,8 +297,15 @@ test("leftover-name client matrix covers Claude, Cursor, and Codex without silen
     assert(skill.includes("Degraded execution still selects b2c-local"), "skill omitted degraded execution surface selection");
     assert(packageGuide.includes("leftover contributor names"), "package guide omitted leftover contributor wrong-surface names");
     assert(packageGuide.includes("leftover CLI-only public names"), "package guide omitted leftover CLI-only public wrong-surface names");
+    assert(
+      packageGuide.includes("Leftover CLI-only public names on local MCP fail as `cli_only`"),
+      "package guide omitted leftover CLI-only public local cli_only names",
+    );
     assert.match(hostedReadme, /leftover\s+contributor names/, "hosted README omitted leftover contributor wrong-surface names");
     assert.match(hostedReadme, /leftover CLI-only public names/, "hosted README omitted leftover CLI-only public wrong-surface names");
+    assert.match(hostedReadme, /fail as `cli_only`/, "hosted README omitted leftover CLI-only public local cli_only names");
+    assert(skill.includes("Leftover CLI-only public MCP names stay CLI-only"), "skill omitted leftover CLI-only public local names");
+    assert(skill.includes("Hosted leftover names stay wrong-surface"), "skill omitted hosted leftover wrong-surface names");
   } finally {
     rmSync(temp, { recursive: true, force: true });
   }
@@ -558,6 +568,78 @@ test("hosted local-only MCP names fail as wrong-surface with receipt guidance", 
     ),
     null,
   );
+});
+
+test("leftover CLI-only public MCP names fail locally as cli_only with local receipt reading", async () => {
+  const client = new Client({ name: "leftover-cli-only-local", version: "1.0.0" });
+  await client.connect(
+    new StdioClientTransport({
+      command: process.execPath,
+      args: ["--import", "tsx", path.join(root, "entrypoints/mcp/server.ts")],
+      cwd: root,
+      env: { ...process.env, B2C_APP_BUILDER_MCP_READONLY: "1" },
+      stderr: "pipe",
+    }),
+  );
+  try {
+    assert.equal(client.getServerVersion()?.name, "b2c-local");
+    const instructions = client.getInstructions() ?? "";
+    const receipt = parseConnectionReceipt(instructions);
+    assert.equal(receipt.identity.recommended, "b2c-local");
+    const names = (await client.listTools()).tools.map((tool) => tool.name);
+    for (const toolName of HOSTED_WRONG_SURFACE_LEFTOVER_CLI_ONLY_TOOL_NAMES) {
+      assert.equal(names.includes(toolName), false, `${toolName} must stay unlisted on local MCP`);
+      const intercepted = leftoverCliOnlyLocalMcpResponse(
+        { jsonrpc: "2.0", id: 9, method: "tools/call", params: { name: toolName, arguments: {} } },
+        { engineVersion: receipt.engineVersion, observed: receipt.observed },
+      ) as { result?: { isError?: boolean; structuredContent?: LeftoverCliOnlyLocalRefusal } };
+      const refusal = leftoverCliOnlyLocalRefusal({
+        engineVersion: receipt.engineVersion,
+        toolName,
+        observed: receipt.observed,
+      });
+      assert.equal(intercepted.result?.isError, true, toolName);
+      assert.deepEqual(intercepted.result?.structuredContent, refusal);
+      assert.equal(refusal.error, "cli_only");
+      assert.equal(refusal.connection.clientName, "b2c-local");
+      assert.equal(refusal.connection.mode, "local_execution");
+      assert.doesNotMatch(JSON.stringify(refusal), /wrong_surface/);
+    }
+    const routed = await client.callTool({ name: "b2c_business_create", arguments: {} });
+    assert.equal(routed.isError, true);
+    const expected = leftoverCliOnlyLocalRefusal({
+      engineVersion: receipt.engineVersion,
+      toolName: "b2c_business_create",
+      observed: receipt.observed,
+    });
+    assert.deepEqual(routed.structuredContent, expected);
+    assert.equal(expected.connection.clientName, "b2c-local");
+    assert.doesNotMatch(JSON.stringify(routed.structuredContent), /wrong_surface/);
+    const leftover = leftoverCliOnlyLocalRefusal({
+      engineVersion: receipt.engineVersion,
+      toolName: "b2c_business_create",
+      clientName: "b2c-app-builder",
+      observed: receipt.observed,
+    });
+    assert.equal(leftover.connection.leftoverName, true);
+    assert.equal(leftover.connection.mode, "local_execution");
+    assert.doesNotMatch(JSON.stringify(leftover), /wrong_surface/);
+    const unknown = leftoverCliOnlyLocalMcpResponse(
+      { jsonrpc: "2.0", id: 10, method: "tools/call", params: { name: "b2c_not_a_tool", arguments: {} } },
+      { engineVersion: receipt.engineVersion, observed: receipt.observed },
+    );
+    assert.equal(unknown, null);
+    const evaluate = leftoverCliOnlyLocalMcpResponse(
+      { jsonrpc: "2.0", id: 11, method: "tools/call", params: { name: "b2c_contribute_evaluate", arguments: {} } },
+      { engineVersion: receipt.engineVersion, observed: receipt.observed },
+    );
+    assert.equal(evaluate, null);
+    const missing = await client.callTool({ name: "b2c_not_a_tool", arguments: {} });
+    assert.equal(missing.isError, true);
+    assert.doesNotMatch(JSON.stringify(missing.structuredContent ?? missing.content), /cli_only|wrong_surface/);
+  } finally {
+    await client.close();
+  }
 });
 
 test("missing local worker CLI degrades execution health without hosted wrong-surface", () => {

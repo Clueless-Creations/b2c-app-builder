@@ -41,6 +41,7 @@ import {
   anyWorkerRuntimeFound,
   connectionReceipt,
   interpretConfiguredConnection,
+  leftoverCliOnlyLocalMcpResponse,
   LOCAL_CLIENT_NAME,
   localMcpInstructions,
   observedLocalWorkspaceHealth,
@@ -760,4 +761,26 @@ if (!readOnly) {
 // Never registered by default, so business sessions do not see maintenance inventories.
 if (contributorToolsEnabled()) registerContributorTools(server, { skillRoot });
 
-await server.connect(new StdioServerTransport());
+const leftoverCliOnlyObserved = {
+  knowledge: knowledgeService ? ("available" as const) : ("unavailable" as const),
+  writes: readOnly ? ("mcp_readonly" as const) : ("mcp_write_enabled" as const),
+  ...localWorkspaceHealth,
+};
+const transport = new StdioServerTransport();
+const start = transport.start.bind(transport);
+transport.start = async () => {
+  const inner = transport.onmessage;
+  transport.onmessage = (message) => {
+    const intercepted = leftoverCliOnlyLocalMcpResponse(message, {
+      engineVersion: skillVersion(),
+      observed: leftoverCliOnlyObserved,
+    });
+    if (intercepted) {
+      void transport.send(intercepted as Parameters<StdioServerTransport["send"]>[0]);
+      return;
+    }
+    inner?.(message);
+  };
+  return start();
+};
+await server.connect(transport);

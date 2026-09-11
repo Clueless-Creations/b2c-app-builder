@@ -1,0 +1,15 @@
+{
+  "versionLocalizationId": "LOC_ID",
+  "setId": "set-native-1",
+  "displayType": "APP_IPHONE_65",
+  "dryRun": true,
+  "total": 1,
+  "results": [
+    {
+      "fileName": "01-home.png",
+      "filePath": "./screenshots/01-home.png",
+      "assetId": "",
+      "state": "would-upload"
+    }
+  ]
+}

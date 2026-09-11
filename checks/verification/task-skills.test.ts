@@ -194,3 +194,26 @@ void test("moving procedures preserves authority and fails on missing, unlinked,
     rmSync(temporary, { recursive: true, force: true });
   }
 });
+
+void test("task-skill checker returns canonical JSON for invalid sources without crashing", () => {
+  const temporary = mkdtempSync(path.join(os.tmpdir(), "b2c-task-json-"));
+  try {
+    const result = spawnSync(
+      process.execPath,
+      ["--import", "tsx", path.join(root, "checks/validation/repository/check-task-skills.ts"), "--root", temporary, "--json"],
+      { cwd: root, encoding: "utf8", timeout: 30_000 },
+    );
+    assert.equal(result.status, 1);
+    const report = JSON.parse(result.stdout);
+    assert.equal(report.pass, false);
+    assert.ok(report.failures.length > 0);
+    assert.ok(
+      report.failures.every(
+        (entry: { rule: string; severity: string; message: string }) =>
+          typeof entry.rule === "string" && entry.severity === "error" && typeof entry.message === "string",
+      ),
+    );
+  } finally {
+    rmSync(temporary, { recursive: true, force: true });
+  }
+});

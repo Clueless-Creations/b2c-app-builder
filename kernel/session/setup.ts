@@ -36,7 +36,7 @@ function main(): number {
         "",
         "Prepare this machine for B2C App Builder.",
         "Without flags, create the builder home and an empty workspace registry when absent,",
-        "run doctor health checks, and print MCP registration plus create, status, and plan commands.",
+        "run inspect health checks, and print MCP registration plus create, status, and plan commands.",
         "Existing workspace registrations are preserved. Setup does not install software or create a business.",
         "",
         "--help, -h  Show this help without creating files or running health checks.",

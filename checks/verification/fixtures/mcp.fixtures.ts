@@ -120,6 +120,9 @@ export function register(harness: Harness): void {
       // Doctor host summary is imported by the copied server at module load. Without this
       // symlink the isolated server dies before the unavailable-bundle warning can print.
       symlinkSync(path.join(skillRoot, "kernel/session/doctor-host.ts"), path.join(temp, "kernel/session/doctor-host.ts"));
+      // Worker-runtime health is part of the local handshake even when knowledge is absent.
+      // Share its actual implementation so this fixture tests bundle isolation, not an incomplete module copy.
+      symlinkSync(path.join(skillRoot, "kernel/session/executor.ts"), path.join(temp, "kernel/session/executor.ts"));
       // U3: the copied server.ts now imports route-utterance.ts (b2c_plan's routing mode) at
       // module load time, unconditionally -- without this symlink the copied server fails to
       // start at all (ERR_MODULE_NOT_FOUND), well before any of this scenario's own assertions
@@ -516,7 +519,9 @@ async function main() {
   }
   const pinnedFragments = [
     "(catalog 2.0.0+",
-    ": 100 steps, 0 done.",
+    // The current default recipe has 103 business workflows (also on the main baseline).
+    // Task-skill projections do not add execution nodes.
+    ": 103 steps, 0 done.",
     "This business has no work authority, so every business step below is parked.",
     "Ready now: 3 step(s), in 3 groups. Everything inside a group can run at the same time.",
     "Session continuity / resume  [run.orchestration.session-continuity-resume]",

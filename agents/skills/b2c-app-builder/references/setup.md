@@ -2,7 +2,7 @@
 
 ## Connect
 
-Use the local `b2c-local` MCP server from this repository for workspace planning and execution. Hosted knowledge registers as `b2c-hosted` and cannot see or run a local business. When both are configured, select by that capability; a leftover `b2c-app-builder` name is not a third surface. Duplicate names are a collision. A missing worker CLI degrades local execution health; it does not turn this connection into hosted knowledge. Degraded execution still selects b2c-local. Leftover CLI-only public MCP names stay CLI-only on this local connection. Hosted leftover names stay wrong-surface. Do not route consumer-app work through Planes.
+Use the local `b2c-local` MCP server from this repository for workspace planning and execution. Hosted knowledge registers as `b2c-hosted` and cannot see or run a local business. When both are configured, select by that capability; a leftover `b2c-app-builder` name is not a third surface. Duplicate names are a collision. A missing worker CLI degrades local execution health; it does not turn this connection into hosted knowledge. Degraded execution still selects b2c-local. Leftover CLI-only public MCP names stay CLI-only on this local connection. Leftover write-gated MCP names stay CLI-only on this local connection when writes are mcp_readonly. Hosted leftover names stay wrong-surface. Do not route consumer-app work through Planes.
 
 This section is a connectivity gate, not the business start path. If the local MCP is unavailable:
 

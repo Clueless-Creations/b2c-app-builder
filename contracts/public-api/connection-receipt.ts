@@ -489,15 +489,27 @@ export function leftoverCliOnlyLocalRefusal(input: {
   };
 }
 
-/** MCP tools/call for a leftover CLI-only public name becomes cli_only, not a missing-tool guess. */
-export function leftoverCliOnlyLocalMcpResponse(
-  payload: unknown,
-  input: {
-    engineVersion: string;
-    clientName?: string;
-    observed?: ConnectionReceipt["observed"];
-  },
-): unknown {
+/**
+ * Leftover write-gated local MCP names. Default local MCP never registers these;
+ * leftover agents still call them. Hosted knowledge refuses them as wrong-surface.
+ * Read-only local MCP refuses them as cli_only with the local receipt reading.
+ * Write-enabled local MCP registers them and does not intercept.
+ */
+export const LOCAL_WRITE_GATED_LEFTOVER_TOOL_NAMES = [
+  "b2c_bootstrap",
+  "b2c_run",
+  "b2c_approvals",
+  "b2c_verify",
+  "b2c_schedule",
+] as const;
+
+export type LeftoverWriteGatedLocalToolName = (typeof LOCAL_WRITE_GATED_LEFTOVER_TOOL_NAMES)[number];
+
+export function isLeftoverWriteGatedLocalTool(name: string): name is LeftoverWriteGatedLocalToolName {
+  return (LOCAL_WRITE_GATED_LEFTOVER_TOOL_NAMES as readonly string[]).includes(name);
+}
+
+function leftoverLocalMcpCallName(payload: unknown): { id: unknown; name: string } | null {
   let message = payload;
   if (typeof message === "string") {
     try {
@@ -511,20 +523,80 @@ export function leftoverCliOnlyLocalMcpResponse(
   if (call.method !== "tools/call") return null;
   if (!call.params || typeof call.params !== "object" || Array.isArray(call.params)) return null;
   const name = (call.params as { name?: unknown }).name;
-  if (typeof name !== "string" || !isLeftoverCliOnlyPublicTool(name)) return null;
-  const refusal = leftoverCliOnlyLocalRefusal({
-    engineVersion: input.engineVersion,
-    toolName: name,
-    clientName: input.clientName,
-    observed: input.observed,
-  });
+  if (typeof name !== "string") return null;
+  return { id: "id" in call ? call.id : null, name };
+}
+
+function leftoverCliOnlyLocalMcpResult(
+  id: unknown,
+  refusal: LeftoverCliOnlyLocalRefusal,
+): {
+  jsonrpc: "2.0";
+  id: unknown;
+  result: { content: Array<{ type: "text"; text: string }>; structuredContent: LeftoverCliOnlyLocalRefusal; isError: true };
+} {
   return {
     jsonrpc: "2.0",
-    id: "id" in call ? call.id : null,
+    id,
     result: {
       content: [{ type: "text", text: JSON.stringify(refusal) }],
       structuredContent: refusal,
       isError: true,
     },
   };
+}
+
+/** MCP tools/call for a leftover CLI-only public name becomes cli_only, not a missing-tool guess. */
+export function leftoverCliOnlyLocalMcpResponse(
+  payload: unknown,
+  input: {
+    engineVersion: string;
+    clientName?: string;
+    observed?: ConnectionReceipt["observed"];
+  },
+): unknown {
+  const call = leftoverLocalMcpCallName(payload);
+  if (!call || !isLeftoverCliOnlyPublicTool(call.name)) return null;
+  return leftoverCliOnlyLocalMcpResult(
+    call.id,
+    leftoverCliOnlyLocalRefusal({
+      engineVersion: input.engineVersion,
+      toolName: call.name,
+      clientName: input.clientName,
+      observed: input.observed,
+    }),
+  );
+}
+
+/** Leftover write-gated names stay on the local surface. They are not hosted wrong-surface. */
+export function leftoverWriteGatedLocalRefusal(input: {
+  engineVersion: string;
+  toolName: string;
+  clientName?: string;
+  observed?: ConnectionReceipt["observed"];
+}): LeftoverCliOnlyLocalRefusal {
+  return leftoverCliOnlyLocalRefusal(input);
+}
+
+/** MCP tools/call for a leftover write-gated name on read-only local MCP becomes cli_only. */
+export function leftoverWriteGatedLocalMcpResponse(
+  payload: unknown,
+  input: {
+    engineVersion: string;
+    clientName?: string;
+    observed?: ConnectionReceipt["observed"];
+  },
+): unknown {
+  if (input.observed?.writes === "mcp_write_enabled") return null;
+  const call = leftoverLocalMcpCallName(payload);
+  if (!call || !isLeftoverWriteGatedLocalTool(call.name)) return null;
+  return leftoverCliOnlyLocalMcpResult(
+    call.id,
+    leftoverWriteGatedLocalRefusal({
+      engineVersion: input.engineVersion,
+      toolName: call.name,
+      clientName: input.clientName,
+      observed: input.observed,
+    }),
+  );
 }

@@ -110,7 +110,9 @@ stays identified and neither response claims a live launch.
 
 `business.run` requires the plan revision and a caller-chosen request ID. It uses
 the existing bounded session executor and authority evaluator, with notifications
-disabled. A completed exact request returns its recorded result without dispatch.
+disabled. Optional `runtimeObserved` (`true` or `workspace`) forwards the explicit
+workspace observation into that session; omit stays unobserved, and a live-device
+word cannot invent runtime proof. A completed exact request returns its recorded result without dispatch.
 A changed payload with that ID refuses. An interrupted recorded request blocks
 both its retry and new request IDs. After session ownership and uncertain effects
 are reconciled, `business.recover` closes the exact pending request as interrupted

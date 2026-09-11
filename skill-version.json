@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.129",
+  "version": "0.219.130",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Prefer compiled agent-entrypoints once package-root resolution walks from dist.",
-    "Keep the remaining uncompiled checks graph on remaining-tsx."
+    "Name inspect as the diagnostic actor in leftover RevenueCat host-probe finding messages.",
+    "Finding codes stay doctor.*, and b2c doctor stays a supported equivalent."
   ]
 }

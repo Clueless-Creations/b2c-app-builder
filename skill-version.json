@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.134",
+  "version": "0.219.135",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Prefer compiled validator-docs once package-root resolution walks from dist.",
-    "Remaining-tsx inventory goes from 119 to 118. The rest of the uncompiled checks graph stays on remaining-tsx."
+    "Prefer inspect in leftover Expo selected-target diagnostic hold and ready copy.",
+    "Authority-missing Expo selected-target messages name inspect. Finding codes stay doctor.*, and b2c doctor stays a supported equivalent."
   ]
 }

@@ -199,7 +199,7 @@ export function probeExpoEasSelectedTarget(input: {
       ...unproven,
       preflight: selectedTargetHold(
         "authority-missing",
-        "Selected EAS project/profile checks fail closed without host authority. Doctor/probe will not spawn authenticated eas commands or claim a live EAS job.",
+        "Selected EAS project/profile checks fail closed without host authority. Inspect will not spawn authenticated eas commands or claim a live EAS job.",
       ),
     };
   }
@@ -210,7 +210,7 @@ export function probeExpoEasSelectedTarget(input: {
       status: "ready",
       code: "ready",
       message:
-        "Selected EAS project/profile ids match the approved target. Live EAS remains unproven; doctor/probe did not spawn an authenticated command.",
+        "Selected EAS project/profile ids match the approved target. Live EAS remains unproven; inspect did not spawn an authenticated command.",
       blocksUnrelatedWork: false,
     },
   };

@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.124",
+  "version": "0.219.125",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Record worker-runtime health separately from declared local_cli support.",
-    "Degrade execution when a worker CLI is missing while planning and packaged knowledge stay available."
+    "Map asc testflight feedback list onto workflow.store.apple-testflight-standing-envelope as implement.",
+    "Keep hosted-discovery slot count at 89 and do not invent TestFlight JSON."
   ]
 }

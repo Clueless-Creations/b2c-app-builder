@@ -302,6 +302,19 @@ export function register(harness: Harness): void {
     assert(!text.includes("doctor still did not install anything"), "ASC unreadable copy must not keep doctor as the named actor");
   });
 
+  harness.check("doctor-asc: ASC reviewed-guidance note prefers inspect as the host-upgrade actor", () => {
+    const text = readFileSync(path.join(skillRoot, "catalog", "upstreams", "rork-app-store-connect-cli.yaml"), "utf8");
+    const adr = readFileSync(path.join(skillRoot, "docs", "decisions", "0010-first-run-honesty-owners.md"), "utf8");
+    assert(text.includes("inspect does not upgrade the host"), "ASC reviewed-guidance must prefer inspect");
+    assert(text.includes("`b2c doctor` is a supported equivalent"), "ASC reviewed-guidance must keep doctor supported");
+    assert(!text.includes("doctor does not upgrade the host"), "ASC reviewed-guidance must not keep doctor as the named host-upgrade actor");
+    assert(adr.includes("CLI `doctor` / `setup` write it"), "ADR-0010 historical writer sentence stays");
+    assert(
+      adr.includes("A doctor snapshot and a `run/` receipt are stored observations"),
+      "ADR-0010 historical doctor snapshot wording stays",
+    );
+  });
+
   harness.check("doctor-asc: sanitizeExecutablePath rewrites only the home prefix", () => {
     assert(sanitizeExecutablePath("/Users/fixture-operator/bin/asc", "/Users/fixture-operator") === "~/bin/asc", "home prefix must become ~");
     assert(sanitizeExecutablePath("/opt/homebrew/bin/asc", "/Users/fixture-operator") === "/opt/homebrew/bin/asc", "non-home paths stay absolute");

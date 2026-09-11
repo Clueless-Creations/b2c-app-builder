@@ -12,7 +12,7 @@ import { compilePlan, type CatalogInput, type RunNodeId } from "../../../kernel/
 import { beginAttempt, reconcilePatch, seedRunState, writeRunState } from "../../../kernel/engine/runstate.js";
 import { workspaceArtifactFingerprint } from "../../../kernel/engine/review-evidence.js";
 import type { BusinessStateV2 } from "../../../kernel/schema/types.js";
-import { bootstrapWorkspace, readRunState } from "./session.fixtures.js";
+import { bootstrapWorkspace, grant, readRunState } from "./session.fixtures.js";
 
 const workspaceRuntimeObservedCatalog: CatalogInput = {
   version: "catalog.mcp-fixture.workspace-runtime-observed",
@@ -35,7 +35,9 @@ const workspaceRuntimeObservedCatalog: CatalogInput = {
 };
 
 function seedPendingWorkspaceProof(harness: Harness, name: string) {
-  const handle = bootstrapWorkspace(harness, name, workspaceRuntimeObservedCatalog);
+  const handle = bootstrapWorkspace(harness, name, workspaceRuntimeObservedCatalog, {
+    grants: { "domain.research": grant("domain.research", "run-with-guardrails") },
+  });
   mkdirSync(path.join(handle.dir, "research"), { recursive: true });
   writeFileSync(path.join(handle.dir, "research/scan.md"), "Workspace research scan.\n", "utf8");
   const plan = compilePlan(workspaceRuntimeObservedCatalog, "2026-09-11T18:00:00.000Z");
@@ -1169,6 +1171,157 @@ main().catch((error) => { console.error(error instanceof Error ? error.message :
     assert(
       readFileSync(path.join(liveDevice.dir, "run", "run-state.json"), "utf8") === liveDeviceBytes,
       "live-device MCP verify must leave run-state bytes unchanged",
+    );
+  });
+
+  harness.check("mcp: b2c_run forwards an explicit workspace runtime observation", () => {
+    const omit = seedPendingWorkspaceProof(harness, "mcp-run-omit");
+    const booleanFlag = seedPendingWorkspaceProof(harness, "mcp-run-boolean");
+    const workspaceToken = seedPendingWorkspaceProof(harness, "mcp-run-workspace");
+    const liveDevice = seedPendingWorkspaceProof(harness, "mcp-run-live-device");
+    const fixtureLoop = bootstrapWorkspace(harness, "mcp-run-fixture", workspaceRuntimeObservedCatalog, {
+      grants: { "domain.research": grant("domain.research", "run-with-guardrails") },
+    });
+    const liveDeviceBytes = readFileSync(path.join(liveDevice.dir, "run", "run-state.json"), "utf8");
+    const temp = harness.makeTempDir("mcp-run-runtime-home");
+    const b2cAppBuilderHome = path.join(temp, "b2c-home");
+    const registeredWorkspaces = [
+      ["mcp-run-omit", omit],
+      ["mcp-run-boolean", booleanFlag],
+      ["mcp-run-workspace", workspaceToken],
+      ["mcp-run-live-device", liveDevice],
+      ["mcp-run-fixture", fixtureLoop],
+    ] as const;
+    for (const [id, handle] of registeredWorkspaces) {
+      const registered = spawnSync(resolveTsxBin(skillRoot), [path.join(skillRoot, "kernel/session/workspaces.ts"), "register", id, handle.dir], {
+        cwd: skillRoot,
+        encoding: "utf8",
+        env: { ...process.env, B2C_APP_BUILDER_HOME: b2cAppBuilderHome },
+      });
+      assert(registered.status === 0, `workspace registration failed for ${id}: ${registered.stdout}\n${registered.stderr}`);
+    }
+    const driverPath = path.join(temp, "drive-run-runtime.mts");
+    const driverSource = `
+import { spawn } from "node:child_process";
+import readline from "node:readline";
+
+const server = spawn(${JSON.stringify(resolveTsxBin(skillRoot))}, [${JSON.stringify(path.join(skillRoot, "entrypoints/mcp/server.ts"))}], {
+  cwd: ${JSON.stringify(skillRoot)},
+  env: { ...process.env, B2C_APP_BUILDER_HOME: ${JSON.stringify(b2cAppBuilderHome)}, B2C_APP_BUILDER_MCP_WRITE: "1" },
+  stdio: ["pipe", "pipe", "inherit"],
+});
+const lines = readline.createInterface({ input: server.stdout });
+const pending = new Map();
+lines.on("line", (line) => {
+  try {
+    const message = JSON.parse(line);
+    if (message.id !== undefined && pending.has(message.id)) {
+      pending.get(message.id)(message);
+      pending.delete(message.id);
+    }
+  } catch { /* non-JSON noise is not part of the protocol */ }
+});
+let nextId = 1;
+function request(method, params) {
+  const id = nextId++;
+  return new Promise((resolve, reject) => {
+    pending.set(id, resolve);
+    setTimeout(() => reject(new Error("timeout waiting for " + method)), 120_000).unref?.();
+    server.stdin.write(JSON.stringify({ jsonrpc: "2.0", id, method, params }) + "\\n");
+  });
+}
+async function main() {
+  const init = await request("initialize", {
+    protocolVersion: "2025-06-18",
+    capabilities: {},
+    clientInfo: { name: "run-runtime-driver", version: "0.0.0" },
+  });
+  if (init.result?.serverInfo?.name !== "b2c-local") throw new Error("handshake failed: " + JSON.stringify(init.result?.serverInfo));
+  server.stdin.write(JSON.stringify({ jsonrpc: "2.0", method: "notifications/initialized" }) + "\\n");
+
+  const listedTools = (await request("tools/list", {})).result?.tools ?? [];
+  const runTool = listedTools.find((tool) => tool.name === "b2c_run");
+  const fields = runTool?.inputSchema?.properties ?? {};
+  if (!("runtimeObserved" in fields)) throw new Error("b2c_run schema is missing runtimeObserved");
+  if (!String(runTool?.description ?? "").includes("live-device")) {
+    throw new Error("b2c_run must say a live-device word cannot invent runtime proof");
+  }
+
+  const sessionArgs = { executor: "fixture", verifier: "fixture" };
+  const omit = await request("tools/call", {
+    name: "b2c_run",
+    arguments: { workspace: "mcp-run-omit", brief: ${JSON.stringify(omit.briefPath)}, session: "sess-run-omit", ...sessionArgs },
+  });
+  if (omit.result?.isError) throw new Error("omitted runtimeObserved must still accept review: " + JSON.stringify(omit.result).slice(0, 400));
+  const booleanFlag = await request("tools/call", {
+    name: "b2c_run",
+    arguments: { workspace: "mcp-run-boolean", brief: ${JSON.stringify(booleanFlag.briefPath)}, session: "sess-run-boolean", runtimeObserved: true, ...sessionArgs },
+  });
+  if (booleanFlag.result?.isError) throw new Error("runtimeObserved true must accept: " + JSON.stringify(booleanFlag.result).slice(0, 400));
+  const workspaceToken = await request("tools/call", {
+    name: "b2c_run",
+    arguments: { workspace: "mcp-run-workspace", brief: ${JSON.stringify(workspaceToken.briefPath)}, session: "sess-run-workspace", runtimeObserved: "workspace", ...sessionArgs },
+  });
+  if (workspaceToken.result?.isError) throw new Error("runtimeObserved workspace must accept: " + JSON.stringify(workspaceToken.result).slice(0, 400));
+  const liveDevice = await request("tools/call", {
+    name: "b2c_run",
+    arguments: { workspace: "mcp-run-live-device", brief: ${JSON.stringify(liveDevice.briefPath)}, session: "sess-run-live-device", runtimeObserved: "live-device", ...sessionArgs },
+  });
+  if (!liveDevice.result?.isError) throw new Error("live-device must be refused");
+  const liveDeviceText = (liveDevice.result?.content ?? []).map((entry) => entry.text).join("");
+  if (!liveDeviceText.includes("session.runtime_observation_invalid")) {
+    throw new Error("live-device must keep the CLI refusal, got: " + liveDeviceText.slice(0, 300));
+  }
+  const fixtureLoop = await request("tools/call", {
+    name: "b2c_run",
+    arguments: { workspace: "mcp-run-fixture", brief: ${JSON.stringify(fixtureLoop.briefPath)}, session: "sess-run-fixture", runtimeObserved: true, ...sessionArgs },
+  });
+  if (fixtureLoop.result?.isError) throw new Error("fixture loop must still accept: " + JSON.stringify(fixtureLoop.result).slice(0, 400));
+
+  console.log("mcp-run-runtime ok");
+  server.kill();
+}
+main().catch((error) => { console.error(error instanceof Error ? error.message : String(error)); server.kill(); process.exit(1); });
+`;
+    writeFileSync(driverPath, driverSource, "utf8");
+    const result = spawnSync(resolveTsxBin(skillRoot), [driverPath], { cwd: skillRoot, encoding: "utf8", timeout: 180_000 });
+    assert(
+      result.status === 0 && (result.stdout ?? "").includes("mcp-run-runtime ok"),
+      `run-runtime driver failed (exit ${result.status}):\n${(result.stdout ?? "").slice(-400)}\n${(result.stderr ?? "").slice(-400)}`,
+    );
+    const omitProof = readRunState(omit)
+      .nodes["run.research-scan"]!.attempts.at(-1)
+      ?.independentVerification?.evidence.find((line) => line.startsWith("Proof strength:"));
+    assert(
+      Boolean(omitProof?.includes("semantic=checked") && omitProof.includes("runtime=unknown") && !omitProof.includes("runtime=checked")),
+      `omitted MCP runtimeObserved cannot invent runtime proof, got ${omitProof ?? "none"}`,
+    );
+    for (const [label, handle] of [
+      ["boolean", booleanFlag],
+      ["workspace", workspaceToken],
+    ] as const) {
+      const proof = readRunState(handle)
+        .nodes["run.research-scan"]!.attempts.at(-1)
+        ?.independentVerification?.evidence.find((line) => line.startsWith("Proof strength:"));
+      assert(
+        Boolean(proof?.includes("semantic=checked") && proof.includes("runtime=checked") && !proof.includes("runtime=unknown")),
+        `MCP b2c_run runtimeObserved ${label} must record workspace runtime proof, got ${proof ?? "none"}`,
+      );
+    }
+    assert(
+      readFileSync(path.join(liveDevice.dir, "run", "run-state.json"), "utf8") === liveDeviceBytes,
+      "live-device MCP b2c_run must leave run-state bytes unchanged",
+    );
+    const fixtureState = readRunState(fixtureLoop).nodes["run.research-scan"]!;
+    assert(fixtureState.status === "succeeded", "fixture MCP b2c_run must still accept the synthetic attempt");
+    assert(
+      fixtureState.attempts.every((entry) => entry.proofSource === "synthetic"),
+      "a fixture loop must remain explicitly synthetic",
+    );
+    const fixtureProof = fixtureState.attempts.at(-1)?.independentVerification?.evidence.find((line) => line.startsWith("Proof strength:"));
+    assert(
+      Boolean(fixtureProof?.includes("runtime=unknown") && !fixtureProof.includes("runtime=checked")),
+      `fixture MCP b2c_run cannot invent runtime proof, got ${fixtureProof ?? "none"}`,
     );
   });
 }

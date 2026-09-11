@@ -471,7 +471,7 @@ if (!readOnly) {
     {
       description:
         "Two modes, one tool name. " +
-        "mode session (default): run one bounded headless session against a registered workspace — resume durable state, dispatch ready work within the founder's autonomy grants, verify, and write a founder-plain digest. Exits when done; never runs indefinitely. brief and session are required. " +
+        "mode session (default): run one bounded headless session against a registered workspace — resume durable state, dispatch ready work within the founder's autonomy grants, verify, and write a founder-plain digest. Exits when done; never runs indefinitely. brief and session are required. Runtime proof still requires an explicit workspace observation; a live-device word cannot invent it. " +
         "mode proof: deterministic device-adapter proof only — auto-selects a Route Ladder rung from workspace state (rung 2: xcodebuild/xcrun simctl for iOS on a local macOS session; rung 4: the MobAI CLI for Android or an explicit MobAI provider selection). Rungs 0/1 (Claude Desktop's in-app simulator pane, CLI computer-use) are interactive-agent-only and are never selected here — they stay owned by an interactive worker's own tool use during a normal session run; when neither reachable rung is available the result says so plainly (verdict blocked) rather than narrating a run that did not happen. Each call proves one exact platform target. It returns a bounded adapter-action artifact with top-level platform, target, and verificationScope fields under proof/ios-simulator/, proof/ios-device/, proof/android-emulator/, or proof/android-device/; unresolved Android device identity goes to proof/android-incomplete/. verificationScope is adapter-actions-only. Android CLI success does not establish the strict candidate/package/versionCode/APK-or-AAB/install-APK identity receipt required by design acceptance. brief/session/executor/verifier/wallClockSeconds are not used in this mode; platform selects one branch and is required by the proof CLI for a mixed-platform business; flow and device select the exact proof target, project/scheme/bundleId configure iOS, and packageName plus an exact installable APK configure Android.",
       inputSchema: {
         workspace: WORKSPACE_ARG,
@@ -497,6 +497,12 @@ if (!readOnly) {
         executor: z.enum(["auto", "fixture", "noop"]).optional().describe("Worker executor (default auto: real worker CLIs; mode session only)"),
         verifier: z.enum(["cli", "fixture", "off"]).optional().describe("Fresh-context verifier (default follows executor; mode session only)"),
         wallClockSeconds: z.number().optional().describe("Session wall-clock cap (default 1800; mode session only)"),
+        runtimeObserved: z
+          .union([z.boolean(), z.string()])
+          .optional()
+          .describe(
+            'Explicit workspace runtime observation forwarded to session --runtime-observed. Pass true or "workspace". A live-device word cannot invent it. Unused in mode proof.',
+          ),
       },
     },
     async ({
@@ -515,6 +521,7 @@ if (!readOnly) {
       executor,
       verifier,
       wallClockSeconds,
+      runtimeObserved,
     }) => {
       const resolved = workspaceOr(workspace);
       if (!resolved.ok) return resolved.result;
@@ -575,6 +582,7 @@ if (!readOnly) {
         ...flag("executor", executor),
         ...flag("verifier", verifier),
         ...flag("wall-clock-seconds", wallClockSeconds),
+        ...flag("runtime-observed", runtimeObserved),
       ]);
     },
   );

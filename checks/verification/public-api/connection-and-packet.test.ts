@@ -284,6 +284,12 @@ test("leftover-name client matrix covers Claude, Cursor, and Codex without silen
     assert(skill.includes("When both are configured, select by that capability"), "skill omitted both-configured selection");
     assert(skill.includes("Duplicate names are a collision"), "skill omitted duplicate-name collision");
     assert(skill.includes("A missing worker CLI degrades local execution health"), "skill omitted worker-runtime health");
+    assert(
+      packageGuide.includes("degraded execution still selects `b2c-local`"),
+      "package guide omitted degraded execution surface selection",
+    );
+    assert(hostedReadme.includes("degraded execution still selects `b2c-local`"), "hosted README omitted degraded execution surface selection");
+    assert(skill.includes("Degraded execution still selects b2c-local"), "skill omitted degraded execution surface selection");
   } finally {
     rmSync(temp, { recursive: true, force: true });
   }
@@ -585,6 +591,78 @@ test("missing local worker CLI degrades execution health without hosted wrong-su
     undefined,
     "local handshake helper omitted observed.workspaceExecution",
   );
+});
+
+test("degraded local execution still selects local and not hosted wrong-surface", () => {
+  const degraded = connectionReceipt({
+    mode: "local_execution",
+    engineVersion: "0.219.125",
+    observed: observedLocalWorkspaceHealth({ workerRuntimeFound: false }),
+  });
+  const hosted = connectionReceipt({ mode: "hosted_knowledge", engineVersion: "0.219.125" });
+  const recommendedLocal = interpretConfiguredConnection({ clientName: "b2c-local", receipt: degraded });
+  const leftoverLocal = interpretConfiguredConnection({ clientName: "b2c-app-builder", receipt: degraded });
+  const both = [
+    { clientName: "b2c-local", receipt: degraded },
+    { clientName: "b2c-hosted", receipt: hosted },
+  ];
+  const execution = selectConfiguredSurface({ entries: both, need: "workspace_execution" });
+  const planning = selectConfiguredSurface({ entries: both, need: "workspace_planning" });
+  const knowledge = selectConfiguredSurface({ entries: both, need: "knowledge" });
+  assert.equal(execution.status, "selected");
+  assert.equal(planning.status, "selected");
+  assert.equal(knowledge.status, "selected");
+  if (execution.status !== "selected" || planning.status !== "selected" || knowledge.status !== "selected") return;
+  assert.deepEqual(execution.connection, recommendedLocal);
+  assert.equal(execution.guidance, recommendedLocal.guidance);
+  assert.match(execution.guidance, /Execution health is separately degraded/);
+  assert.doesNotMatch(execution.guidance, /Use b2c-local for workspace execution/);
+  assert.doesNotMatch(execution.guidance, /cannot access or run this local business/);
+  assert.equal(execution.connection.clientName, "b2c-local");
+  assert.equal(execution.connection.leftoverName, false);
+  assert.match(planning.guidance, /Use b2c-local for workspace planning/);
+  assert.doesNotMatch(planning.guidance, /separately degraded/);
+  assert.match(knowledge.guidance, /Use b2c-hosted for hosted knowledge/);
+  const leftoverExecution = selectConfiguredSurface({
+    entries: [
+      { clientName: "b2c-app-builder", receipt: degraded },
+      { clientName: "b2c-hosted", receipt: hosted },
+    ],
+    need: "workspace_execution",
+  });
+  assert.equal(leftoverExecution.status, "selected");
+  if (leftoverExecution.status !== "selected") return;
+  assert.deepEqual(leftoverExecution.connection, leftoverLocal);
+  assert.equal(leftoverExecution.guidance, leftoverLocal.guidance);
+  assert.equal(leftoverExecution.connection.leftoverName, true);
+  assert.match(leftoverExecution.guidance, /legacy local registration/);
+  assert.match(leftoverExecution.guidance, /Execution health is separately degraded/);
+  assert.doesNotMatch(leftoverExecution.guidance, /cannot access or run this local business/);
+  const hostedOnly = selectConfiguredSurface({
+    entries: [{ clientName: "b2c-hosted", receipt: hosted }],
+    need: "workspace_execution",
+  });
+  assert.equal(hostedOnly.status, "wrong_surface");
+  if (hostedOnly.status !== "wrong_surface") return;
+  assert.match(hostedOnly.guidance, /cannot access or run this local business/);
+  assert.doesNotMatch(hostedOnly.guidance, /separately degraded/);
+  const routing = bothConfiguredRoutingGuidance();
+  assert.match(routing, /missing worker CLI degrades local execution health/);
+  assert.match(routing, /does not select hosted knowledge for execution/);
+  assert.doesNotMatch(routing, /cannot access or run this local business/);
+  const healthy = connectionReceipt({
+    mode: "local_execution",
+    engineVersion: "0.219.125",
+    observed: observedLocalWorkspaceHealth({ workerRuntimeFound: true }),
+  });
+  const healthyExecution = selectConfiguredSurface({
+    entries: [{ clientName: "b2c-local", receipt: healthy }],
+    need: "workspace_execution",
+  });
+  assert.equal(healthyExecution.status, "selected");
+  if (healthyExecution.status !== "selected") return;
+  assert.match(healthyExecution.guidance, /Use b2c-local for workspace execution/);
+  assert.doesNotMatch(healthyExecution.guidance, /separately degraded/);
 });
 
 test("connection receipt never treats handshake or leftover names as provider readiness", () => {

@@ -5,8 +5,8 @@ import { resolveCompiledScript } from "./tsx-launcher.mjs";
  * Scripts this increment may launch from `dist/` without tsx. `tsconfig.build.json` already
  * emits `tooling/**` plus the agent-entrypoints, architecture, autopilot, capability-delta,
  * catalog, gates-layout, graph-foundations, hub-spoke, learning-grounding, operating-graph,
- * pack-composition, package-parity, and validator-docs wrappers. The rest of the uncompiled
- * `checks/` graph stays on tsx.
+ * pack-composition, package-parity, provider-contracts, and validator-docs wrappers. The rest
+ * of the uncompiled `checks/` graph stays on tsx.
  */
 export const PACKED_CHECK_COMPILED_SOURCES = [
   "checks/validation/repository/check-agent-entrypoints.ts",
@@ -21,6 +21,7 @@ export const PACKED_CHECK_COMPILED_SOURCES = [
   "checks/validation/repository/check-operating-graph.ts",
   "checks/validation/repository/check-pack-composition.ts",
   "checks/validation/repository/check-package-parity.ts",
+  "checks/validation/repository/check-provider-contracts.ts",
   "checks/validation/repository/check-validator-docs.ts",
   "tooling/render-credits.ts",
   "tooling/render-hosted-bundle.ts",

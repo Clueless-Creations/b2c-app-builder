@@ -15985,7 +15985,7 @@
     "checks/validation/business/money/check-price-derivation.ts": "1a64d0666de294799effd1bb10234a542da0fe26ccc220dd7eb0885cc4ce1268",
     "checks/validation/business/trust/check-privacy-terms.ts": "8fa781ca58112c46185c558c95b2b6f4941cf9907d83259b226aedc342a5ba68",
     "checks/validation/business/product/check-product-md.ts": "05c2fc866cb35259707df0d357aa35933c30afa8576e1e50b0acc9be0aed7cce",
-    "checks/validation/repository/check-provider-contracts.ts": "e2b63e8d340602ff18a1d93fa990b207ba613f323b87ab840f1adb0a1a53e7be",
+    "checks/validation/repository/check-provider-contracts.ts": "f5f46f64115df8f77ba4d6f25a4fbb22d6d154d0a9241bc1a9495f7502ea6b3a",
     "checks/validation/business/process/check-live-provider-proof.ts": "e41fa0a10d6d04facfa9f230a6a8e702d2f601a9d6b2b59f36debb62dfb6e7ae",
     "tooling/render-public-api.ts": "d998bb42877d8108956d61d04e15468788609803cb27c6eef9afdb4fd0eca27d",
     "checks/validation/business/engineering/check-readiness-coverage.ts": "55c2503548df4eb4d7176974be807cfc6c58e4f7587072f21bd9b124da384a5c",
@@ -16225,5 +16225,5 @@
     "catalog/upstreams/notices/parth-app-store-screenshots.txt": "a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a"
   },
   "dependencies": [],
-  "digest": "sha256:feb28469b82a1378063b23443620577bfd32908447ff578585564efc915ba9ae"
+  "digest": "sha256:f3e2d4eb7f48f27d35bb4900a1ccd698fb4741b7421935714fc248524f3956e8"
 }

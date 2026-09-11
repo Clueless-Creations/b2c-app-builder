@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.94",
+  "version": "0.219.95",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Retarget mixed screenshot-and-metadata goldens onto Apple standing envelopes.",
-    "Keep generic ASC CLI off store-040 now that both envelopes rank."
+    "Prefer compiled catalog check once package-root resolution is dist-safe.",
+    "Keep the rest of the uncompiled checks graph on remaining-tsx."
   ]
 }

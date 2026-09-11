@@ -12,11 +12,11 @@
  *
  *   Runs the Mechanical-tier rubric dimensions IN PROCESS, as plain library calls against the
  *   pure functions this Wave extracted (checks/validation/business/design/lib/vibecode-tells.ts's
- *   TELLS[], and lib/worthiness-mechanical.ts's contrast/token-scale checks) — no subprocess,
+ *   TELLS[], and lib/worthiness-mechanical.ts's contrast/token-scale/undeclared-color checks) — no subprocess,
  *   no re-reading DESIGN.md's prose sections. Prints a GradingReport with every mechanical
  *   finding it found. If no mechanical ERROR is present, also prints a task-template section
  *   naming every Attested- and Taste-tier dimension for a model-judged pass, per
- *   design-worthiness.md rule 10's own order: "After mechanical checks pass ... send a taste
+ *   design-worthiness.md rule 12's own order: "After mechanical checks pass ... prepare a taste
  *   packet." Always exits 0 — this command informs, it never gates a build (that is what
  *   check:vibecoded-tells and check:design-worthiness are for).
  *
@@ -51,7 +51,11 @@
  */
 import { existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { checkContrastMechanical, checkTokenScaleMechanical } from "../checks/validation/business/design/lib/worthiness-mechanical.js";
+import {
+  checkContrastMechanical,
+  checkTokenScaleMechanical,
+  checkUndeclaredProofColors,
+} from "../checks/validation/business/design/lib/worthiness-mechanical.js";
 import { ALL_EXTENSIONS, TELLS } from "../checks/validation/business/design/lib/vibecode-tells.js";
 import { loadDesignSystem } from "./lib/design-md.js";
 import { DESIGN_TASTE_RUBRIC, findRubricDimension } from "./lib/design-taste-rubric.js";
@@ -103,7 +107,7 @@ function toGradingFinding(base: Issue): GradingFinding {
 }
 
 /**
- * Runs every rubric dimension this grader can compute today: the two worthiness-mechanical
+ * Runs every rubric dimension this grader can compute today: the three worthiness-mechanical
  * checks over the whole business root, and the TELLS[] scan over each existing --scan-roots
  * entry. Pure orchestration — every actual rule lives in the two extracted libraries.
  */
@@ -112,7 +116,11 @@ function runMechanicalPass(root: string, scanRoots: readonly string[]): GradingF
 
   const design = loadDesignSystem(root);
   const proofsRoot = path.join(root, "design/proofs");
-  for (const worthinessIssue of [...checkContrastMechanical(design.tokens), ...checkTokenScaleMechanical(root, design.tokens, proofsRoot)]) {
+  for (const worthinessIssue of [
+    ...checkContrastMechanical(design.tokens),
+    ...checkTokenScaleMechanical(root, design.tokens, proofsRoot),
+    ...checkUndeclaredProofColors(root, design.tokens, proofsRoot),
+  ]) {
     findings.push(toGradingFinding(worthinessIssue));
   }
 
@@ -176,7 +184,7 @@ function emitTaskTemplate(report: GradingReport): string {
   lines.push("## Surfaces to Grade — Taste tier");
   lines.push("");
   lines.push(
-    "The founder or owner may decide directly in DESIGN.md and bind the exact candidate through b2c approve --design-taste. An independent fresh-context audit may record pass or fail in DESIGN_SYSTEM_REVIEW.md only under the current-run reducer-audited design-taste delegation; run-state binds that current audit output and excludes Design Room producer identities (knowledge/design/design-worthiness.md rule 10).",
+    "The founder or owner may decide directly in DESIGN.md and bind the exact candidate through b2c approve --design-taste. An independent fresh-context audit may record pass or fail in DESIGN_SYSTEM_REVIEW.md only under the current-run reducer-audited design-taste delegation; run-state binds that current audit output and excludes Design Room producer identities (knowledge/design/design-worthiness.md rule 12).",
   );
   lines.push("");
   for (const dimension of taste) {
@@ -389,7 +397,7 @@ console.log(JSON.stringify(report, null, 2));
 console.log("");
 
 if (hasMechanicalError(mechanicalFindings)) {
-  console.log("Mechanical errors found. Fix these first — design-worthiness.md rule 10 sends a taste");
+  console.log("Mechanical errors found. Fix these first — design-worthiness.md rule 12 sends a taste");
   console.log("packet only after mechanical checks pass. Re-run this command once they are clean.");
 } else {
   console.log(emitTaskTemplate(report));

@@ -90,10 +90,9 @@ export function register(harness: Harness): void {
     assert.equal(findRubricDimension("worthiness.not_a_real_dimension"), undefined);
   });
 
-  // PR #34 grew design-worthiness.md from ten rules to twelve without touching this rubric, and the
-  // content-hash pin was the only thing that noticed. A hash says "these bytes changed"; it cannot say
-  // "and two of the rules they added are still unmapped". This check says that part out loud, so the
-  // gap cannot widen the next time the document grows.
+  // Every numbered design-worthiness heading must have a dimension or sit in
+  // KNOWN_UNMAPPED_WORTHINESS_RULES. Mapping 10 and 11 closed the historical ten-of-twelve gap;
+  // adding rule 13 without a dimension still fails here.
   check("every design-worthiness rule is either mapped or declared unmapped", () => {
     const declared = worthinessRuleNumbers(skillRoot);
     assert.ok(declared.length > 0, "design-worthiness.md must declare numbered rules for this check to mean anything");
@@ -107,6 +106,26 @@ export function register(harness: Harness): void {
     for (const rule of KNOWN_UNMAPPED_WORTHINESS_RULES) {
       assert.ok(!MAPPED_WORTHINESS_RULES.includes(rule), `rule ${rule} cannot be both mapped and declared unmapped`);
     }
+  });
+
+  check("rules 10 and 11 reuse the document's declared tiers and severities", () => {
+    assert.ok(MAPPED_WORTHINESS_RULES.includes(10) && MAPPED_WORTHINESS_RULES.includes(11), "rules 10 and 11 must be mapped");
+    assert.ok(
+      !KNOWN_UNMAPPED_WORTHINESS_RULES.includes(10) && !KNOWN_UNMAPPED_WORTHINESS_RULES.includes(11),
+      "rules 10 and 11 must not stay in the unmapped hole",
+    );
+    const nativeFlow = findRubricDimension("worthiness.native_flow_semantics");
+    assert.equal(nativeFlow?.tier, "attested");
+    assert.equal(nativeFlow?.severity, "warning");
+    assert.equal(nativeFlow?.automatedByGrader, false);
+    const undeclaredColor = findRubricDimension("worthiness.anti_generic_undeclared_color");
+    assert.equal(undeclaredColor?.tier, "mechanical");
+    assert.equal(undeclaredColor?.severity, "error");
+    assert.equal(undeclaredColor?.automatedByGrader, true);
+    const antiGenericRemainder = findRubricDimension("worthiness.anti_generic_consistency");
+    assert.equal(antiGenericRemainder?.tier, "attested");
+    assert.equal(antiGenericRemainder?.severity, "warning");
+    assert.equal(antiGenericRemainder?.automatedByGrader, false);
   });
 
   check("the exported rubric composes the same version, references, and dimensions", () => {

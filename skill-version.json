@@ -1,10 +1,11 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.116",
+  "version": "0.220.0",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Prefer compiled operating-graph check once package-root resolution is dist-safe.",
-    "Keep the rest of the uncompiled checks graph on remaining-tsx after the packed wrapper ships."
+    "Expose catalog-generated task skills for research, onboarding, and monetization review.",
+    "Align public navigation across six business areas and move root procedures behind conditional references.",
+    "Export create-only portable guidance snapshots with bound knowledge, source hashes, and notices."
   ]
 }

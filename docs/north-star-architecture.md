@@ -116,6 +116,8 @@ coordination, authority enforcement, evidence binding, interruption recovery,
 and reconciliation. It must not choose a monetization vendor, category, brand,
 visual style, or growth strategy.
 
+Catalog-generated task skills are entrypoint projections of this same logical owner. Public navigation may group existing domains without changing their IDs, scheduling, or authority. A task skill does not create another method store, planner, provider selector, or acceptance path. See [ADR-0014](decisions/0014-task-skill-projections.md).
+
 ### ARCH-03: Separate capability, implementation, and recipe
 
 A capability defines meaningful operations and the outcomes required to accept

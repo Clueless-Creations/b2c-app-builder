@@ -19,7 +19,11 @@ function resolveLink(source: string, url: string): { file: string; suffix: strin
   const [file, ...suffix] = url.split(/(?=[?#])/u);
   if (!file) return undefined;
   let decoded: string;
-  try { decoded = decodeURIComponent(file); } catch { throw new Error(`Invalid encoded source link in ${source}`); }
+  try {
+    decoded = decodeURIComponent(file);
+  } catch {
+    throw new Error(`Invalid encoded source link in ${source}`);
+  }
   const resolved = path.posix.normalize(path.posix.join(path.posix.dirname(source), decoded));
   if (resolved.startsWith("../") || resolved.startsWith("/") || resolved.includes("\\")) throw new Error(`Escaping source link in ${source}`);
   return { file: resolved, suffix: suffix.join("") };
@@ -85,20 +89,25 @@ export function collectTaskSkillPackage(root: string, catalog: Catalog, name: st
     });
   }
   for (const [source, text] of [...Object.entries(generated), ...sources.entries()]) files[destinations.get(source)!] = transform(source, text);
-  files["SKILL.md"] += "\nBound knowledge and linked manifest-backed references are included in this package. Other repository links are pinned supplemental sources and need network access. The execution runtime and provider tools are not bundled.\n";
+  files["SKILL.md"] +=
+    "\nBound knowledge and linked manifest-backed references are included in this package. Other repository links are pinned supplemental sources and need network access. The execution runtime and provider tools are not bundled.\n";
   files["LICENSE"] = safeSource(root, "LICENSE");
   files["THIRD_PARTY_NOTICES.md"] = safeSource(root, "THIRD_PARTY_NOTICES.md");
-  files["source-manifest.json"] = `${JSON.stringify({
-    schemaVersion: "1.0.0",
-    skill: name,
-    sourceRevision,
-    kind: "generated-guidance-snapshot",
-    executionIncluded: false,
-    noticesScope: "Full repository notices retained conservatively; not all credited material is selected by this task.",
-    sources: [...sources].map(([file, text]) => ({ path: file, referenceId: known.get(file)!.id, sha256: digest(text) })),
-    supplementalLinks: [...supplemental].sort(),
-    resources: Object.entries(files).map(([file, text]) => ({ path: file, sha256: digest(text) })),
-  }, null, 2)}\n`;
+  files["source-manifest.json"] = `${JSON.stringify(
+    {
+      schemaVersion: "1.0.0",
+      skill: name,
+      sourceRevision,
+      kind: "generated-guidance-snapshot",
+      executionIncluded: false,
+      noticesScope: "Full repository notices retained conservatively; not all credited material is selected by this task.",
+      sources: [...sources].map(([file, text]) => ({ path: file, referenceId: known.get(file)!.id, sha256: digest(text) })),
+      supplementalLinks: [...supplemental].sort(),
+      resources: Object.entries(files).map(([file, text]) => ({ path: file, sha256: digest(text) })),
+    },
+    null,
+    2,
+  )}\n`;
   return { files, sourcePaths: [...sources.keys()], supplementalLinks: [...supplemental].sort() };
 }
 
@@ -137,7 +146,8 @@ if (isMainModule(import.meta.url)) {
   for (let index = 0; index < args.length; index += 2) {
     const key = args[index]!;
     const value = args[index + 1];
-    if (!["--skill", "--output", "--root", "--source-revision"].includes(key) || !value || value.startsWith("--") || flags.has(key)) throw new Error("Usage: export-task-skill.ts --skill NAME --output PARENT [--root PATH] [--source-revision SHA]");
+    if (!["--skill", "--output", "--root", "--source-revision"].includes(key) || !value || value.startsWith("--") || flags.has(key))
+      throw new Error("Usage: export-task-skill.ts --skill NAME --output PARENT [--root PATH] [--source-revision SHA]");
     flags.set(key, value);
   }
   const name = flags.get("--skill");
@@ -146,10 +156,26 @@ if (isMainModule(import.meta.url)) {
   const root = flags.get("--root") ?? resolveSkillRoot(import.meta.url);
   let revision = flags.get("--source-revision");
   if (!revision) {
-    try { revision = execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(); }
-    catch { throw new Error("Outside a Git checkout, supply --source-revision with the full reviewed source commit."); }
+    try {
+      revision = execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+    } catch {
+      throw new Error("Outside a Git checkout, supply --source-revision with the full reviewed source commit.");
+    }
   }
   const bundle = collectTaskSkillPackage(root, composeCatalog(root), name, revision);
   const directory = writeTaskSkillPackage(output, name, bundle);
-  console.log(JSON.stringify({ directory, skill: name, bundledSources: bundle.sourcePaths.length, supplementalSourceLinks: bundle.supplementalLinks.length, installed: false, executionIncluded: false }, null, 2));
+  console.log(
+    JSON.stringify(
+      {
+        directory,
+        skill: name,
+        bundledSources: bundle.sourcePaths.length,
+        supplementalSourceLinks: bundle.supplementalLinks.length,
+        installed: false,
+        executionIncluded: false,
+      },
+      null,
+      2,
+    ),
+  );
 }

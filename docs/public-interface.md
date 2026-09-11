@@ -136,3 +136,7 @@ Discovery and recipe defaults derive from the shipped verified extension package
 An explicit provider binding resolves one exact provider version, operation and
 target to one implementation. Missing or ambiguous mappings refuse. Changing a
 provider group version does not imply that every implementation has that version.
+
+## Focused task skill entrypoints
+
+[Task skills](guides/task-skills.md) project catalog guidance for focused work. They add no public operation, workspace state, provider grant, or completion mechanism. Managed execution still uses this versioned business interface. Advisory findings remain separate from accepted runtime evidence.

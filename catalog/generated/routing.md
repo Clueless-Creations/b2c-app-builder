@@ -1,3 +1,14 @@
+# Business areas
+
+| Area | Station | What the system helps an agent do |
+| --- | --- | --- |
+| [Opportunity](../../knowledge/README.md#opportunity) | Prep & design, menu planning | Research users, competitors, demand, and a defensible product hypothesis. |
+| [Product](../../knowledge/README.md#product) | Prep & design | Define the promise, first value, core loop, complete scope, and success measures. |
+| [Experience](../../knowledge/README.md#experience) | Prep & design | Develop a distinct identity, onboarding, interaction, motion, accessible states, and user-facing words. |
+| [Engineering](../../knowledge/README.md#engineering) | The hot line | Build and release native and web surfaces with explicit contracts, runtime verification, privacy, and security. |
+| [Revenue and growth](../../knowledge/README.md#revenue-and-growth) | Front of house | Establish subscriptions, acquisition, funnels, attribution, and lifecycle work. |
+| [Learning and operations](../../knowledge/README.md#learning-and-operations) | The pass and the office | Inspect evidence, plan improvements, support users, coordinate work, and maintain the business. |
+
 <!-- catalog-generated:start domain-routing -->
 # Domain Routing
 

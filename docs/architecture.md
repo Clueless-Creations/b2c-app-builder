@@ -78,7 +78,7 @@ and store actions cannot cross their boundary until that handoff is complete.
 
 ## Simplicity constraints
 
-- One thin skill routes agents.
+- One logical business routing model serves the thin default skill and optional catalog-generated task entrypoints. Task skills expose expertise, not a second planner or authority model.
 - One typed catalog owns workflow IDs, order, dependencies, gates, roles, and knowledge bindings.
 - One manifest-backed knowledge library owns durable expertise and provenance.
 - One core runtime serves CLI and MCP. One reducer owns controlled workspace state.
@@ -91,6 +91,10 @@ and store actions cannot cross their boundary until that handoff is complete.
 ### Skill
 
 `SKILL.md` is a small router. It detects broad consumer-app work and points the agent to MCP or CLI. It does not duplicate the knowledge library.
+
+### Task skill projections
+
+`catalog/areas.ts` owns public business-area labels. `catalog/task-skills.ts` owns presentation-only task names and bindings to existing workflows. `tooling/render-task-skills.ts` projects their methods and conditional contracts into `agents/skills/`. The same renderer maintains the README and skill navigation. `tooling/export-task-skill.ts` creates optional guidance snapshots with bound references and notices; it never installs a skill or carries workspace authority. [ADR-0014](decisions/0014-task-skill-projections.md) defines this boundary.
 
 ### MCP
 

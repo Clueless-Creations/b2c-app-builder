@@ -15,27 +15,30 @@ export const taskSkills: readonly TaskSkill[] = [
   {
     name: "b2c-research-opportunity",
     title: "Research an opportunity",
-    description: "Research whether a consumer-app idea is worth building. Compare demand, competitors, distribution, offer evidence, and product scope; recommend Go, Pivot, or Kill. Use for opportunity validation or delegated idea selection, not a narrow code fix or execution of an entire launch.",
+    description:
+      "Research whether a consumer-app idea is worth building. Compare demand, competitors, distribution, offer evidence, and product scope; recommend Go, Pivot, or Kill. Use for opportunity validation or delegated idea selection, not a narrow code fix or execution of an entire launch.",
     workflowId: "workflow.research.research-backed-spec",
   },
   {
     name: "b2c-design-onboarding",
     title: "Design or review onboarding",
-    description: "Design, review, or improve a consumer app's onboarding and first-value journey. Classify a focused audit, incremental change, or full redesign before selecting the relevant research, flow, state, accessibility, and verification guidance. Do not start a full rebuild for a small signup fix.",
+    description:
+      "Design, review, or improve a consumer app's onboarding and first-value journey. Classify a focused audit, incremental change, or full redesign before selecting the relevant research, flow, state, accessibility, and verification guidance. Do not start a full rebuild for a small signup fix.",
     workflowId: "workflow.experience.onboarding-system.onb-00-resume-scope",
     groupId: "onboarding-system",
   },
   {
     name: "b2c-review-monetization",
     title: "Review monetization",
-    description: "Review a consumer app's offer, pricing proposal, paywall, purchases, entitlements, restore behavior, and billing evidence. Use for a monetization audit or explicitly requested implementation. A review does not authorize live product changes, pricing changes, payments, or provider selection.",
+    description:
+      "Review a consumer app's offer, pricing proposal, paywall, purchases, entitlements, restore behavior, and billing evidence. Use for a monetization audit or explicitly requested implementation. A review does not authorize live product changes, pricing changes, payments, or provider selection.",
     workflowId: "workflow.money.revenue-monetization",
   },
 ];
 
 export const taskSkillMarker = "<!-- Generated task skill. Edit catalog owners, then run render:task-skills. -->";
 const cell = (text: string): string => text.replace(/\|/gu, "\\|").replace(/\s+/gu, " ").trim();
-const codeList = (values: readonly string[]): string => values.length ? values.map((value) => `\`${value}\``).join(", ") : "None declared.";
+const codeList = (values: readonly string[]): string => (values.length ? values.map((value) => `\`${value}\``).join(", ") : "None declared.");
 export const skillDirectory = (skill: TaskSkill): string => `agents/skills/${skill.name}`;
 export const relativeLink = (from: string, to: string): string => path.posix.relative(path.posix.dirname(from), to);
 
@@ -93,11 +96,16 @@ export function renderPublicKnowledgeReadme(catalog?: Catalog): string {
         ? `Task skills: ${skills.map((skill) => `[${skill.title}](../${skillDirectory(skill)}/SKILL.md)`).join(" · ")}.`
         : "Use the existing workflows and references below. A dedicated task skill for this area is not yet shipped.",
       "",
-      ...area.domainIds.map((domainId) => {
-        const domain = catalog?.domains.find((candidate) => candidate.id === domainId);
-        const anchor = (domain?.name ?? "").toLowerCase().replace(/[^\w\s-]/gu, "").replace(/\s+/gu, "-");
-        return domain ? `Browse [${domain.routeLabel}](../catalog/generated/routing.md#${anchor}) for task-specific load conditions.` : "";
-      }).filter(Boolean),
+      ...area.domainIds
+        .map((domainId) => {
+          const domain = catalog?.domains.find((candidate) => candidate.id === domainId);
+          const anchor = (domain?.name ?? "")
+            .toLowerCase()
+            .replace(/[^\w\s-]/gu, "")
+            .replace(/\s+/gu, "-");
+          return domain ? `Browse [${domain.routeLabel}](../catalog/generated/routing.md#${anchor}) for task-specific load conditions.` : "";
+        })
+        .filter(Boolean),
     ].join("\n");
   });
   return [
@@ -110,7 +118,7 @@ export function renderPublicKnowledgeReadme(catalog?: Catalog): string {
     "",
     "For a focused question, open one matching task or reference. No workspace or MCP connection is required to read and apply the expertise. For a managed business, use [the main skill](../SKILL.md) and its current status and plan rather than browsing the entire library.",
     "",
-    ...publicBusinessAreas.map((area) => `[${area.name}](#${area.slug})`).join(" · "),
+    publicBusinessAreas.map((area) => `[${area.name}](#${area.slug})`).join(" · "),
     "",
     ...sections,
     "",
@@ -223,7 +231,12 @@ export function renderTaskSkillFiles(catalog: Catalog): Record<string, string> {
       "## Load only what the task needs",
       "",
       "[Task inputs, outputs, checks, and knowledge selectors](references/task.md) supplies the canonical details when they are needed. Open the specific referenced sections, not the whole library. In connected knowledge retrieval, follow exact section selectors, revision hashes, and continuation calls. Unresolved guidance remains unresolved.",
-      ...(workflows.length > 1 ? ["", "For onboarding beyond scope classification, choose the relevant [task stage](references/stages.md). An audit or small change does not imply a full rebuild; a complete redesign preserves all applicable catalog obligations."] : []),
+      ...(workflows.length > 1
+        ? [
+            "",
+            "For onboarding beyond scope classification, choose the relevant [task stage](references/stages.md). An audit or small change does not imply a full rebuild; a complete redesign preserves all applicable catalog obligations.",
+          ]
+        : []),
       "",
       "## Tools and evidence",
       "",

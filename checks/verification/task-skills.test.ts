@@ -18,7 +18,10 @@ const revision = "1971c5d1e6f2c1aed38dde1ec8debc2c459be69d";
 const hash = (text: string): string => createHash("sha256").update(text).digest("hex");
 
 void test("six public areas cover business domains without changing internal authority groups", () => {
-  assert.deepEqual(publicBusinessAreas.map((area) => area.name), ["Opportunity", "Product", "Experience", "Engineering", "Revenue and growth", "Learning and operations"]);
+  assert.deepEqual(
+    publicBusinessAreas.map((area) => area.name),
+    ["Opportunity", "Product", "Experience", "Engineering", "Revenue and growth", "Learning and operations"],
+  );
   const mapped = new Set(publicBusinessAreas.flatMap((area) => [...area.domainIds]));
   for (const domain of catalog.domains) if (domain.slug !== "machine") assert.ok(mapped.has(domain.id), domain.id);
   assert.ok(!mapped.has("domain.machine"));
@@ -60,13 +63,19 @@ void test("one onboarding skill preserves the internal group without requiring e
 
 void test("missing workflow or required reference fails closed", () => {
   const skill = taskSkills[0]!;
-  assert.throws(() => workflowsForTask({ ...catalog, workflows: catalog.workflows.filter((workflow) => workflow.id !== skill.workflowId) }, skill), /no canonical workflow/);
+  assert.throws(
+    () => workflowsForTask({ ...catalog, workflows: catalog.workflows.filter((workflow) => workflow.id !== skill.workflowId) }, skill),
+    /no canonical workflow/,
+  );
   assert.throws(() => referencesForTask({ ...catalog, references: [] }, skill), /unresolved knowledge/);
 });
 
 void test("provider selection metadata cannot rewrite neutral task instructions", () => {
   const skill = taskSkills[2]!;
-  const altered = { ...catalog, workflows: catalog.workflows.map((workflow) => workflow.id === skill.workflowId ? { ...workflow, providerIds: ["provider.different-vendor"] } : workflow) };
+  const altered = {
+    ...catalog,
+    workflows: catalog.workflows.map((workflow) => (workflow.id === skill.workflowId ? { ...workflow, providerIds: ["provider.different-vendor"] } : workflow)),
+  };
   const file = `${skillDirectory(skill)}/SKILL.md`;
   assert.equal(renderTaskSkillFiles(catalog)[file], renderTaskSkillFiles(altered)[file]);
 });
@@ -116,7 +125,9 @@ for (const skill of taskSkills) {
       }
       assert.throws(() => writeTaskSkillPackage(temporary, skill.name, bundle), /already exists/);
       assert.ok(!Object.keys(bundle.files).some((file) => /b2c-maintainer|b2c-contributor|\.env$/u.test(file)));
-    } finally { rmSync(temporary, { recursive: true, force: true }); }
+    } finally {
+      rmSync(temporary, { recursive: true, force: true });
+    }
   });
 }
 
@@ -132,5 +143,7 @@ void test("export refuses unknown skills, escaping resources, and symlinked dest
     assert.equal(readFileSync(sentinel, "utf8"), "unchanged");
     symlinkSync(temporary, path.join(temporary, "alias"));
     assert.throws(() => writeTaskSkillPackage(path.join(temporary, "alias"), name, { files: {}, sourcePaths: [], supplementalLinks: [] }), /symlinks/);
-  } finally { rmSync(temporary, { recursive: true, force: true }); }
+  } finally {
+    rmSync(temporary, { recursive: true, force: true });
+  }
 });

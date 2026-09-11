@@ -34,7 +34,7 @@ This repository is public. Keep secret values, live provider/operator identifier
 
 1. Read this file only far enough to classify scope.
 2. Read `SKILL.md`.
-3. Create/resume through the supported business lifecycle and inspect current `business-status` then `business-plan`.
+3. For managed work, create/resume through the supported business lifecycle and inspect current `business-status` then `business-plan`. For focused expertise, open the matching task directly without requiring runtime setup.
 4. Load only the current ready/held brief, relevant accepted product/design/source requirements, knowledge selectors, selected provider facts, authority boundary, outputs, and verification.
 5. Execute/verify the bounded work and return to `business-status` then `business-plan`.
 
@@ -63,7 +63,7 @@ Do not continue into maintenance reading unless the task changes the builder its
 
 `docs/north-star-architecture.md` owns target architecture and stable `ARCH-xx` rules. `docs/architecture.md` describes current mechanisms. A target rule is not evidence that its refactor is implemented.
 
-Use `docs/architecture-conformance.md` for bounded architecture work. Keep one logical owner per responsibility. Replace owners behind stable contracts when justified. Do not add competing routers, catalogs, knowledge stores, planners, reducers, task stores, summary stores, agent graphs, or workspace state stores. Context-first routing is [ADR-0012](docs/decisions/0012-context-first-agent-routing.md).
+Use `docs/architecture-conformance.md` for bounded architecture work. Keep one logical owner per responsibility. Replace owners behind stable contracts when justified. Do not add competing routers, catalogs, knowledge stores, planners, reducers, task stores, summary stores, agent graphs, or workspace state stores. Context-first routing is [ADR-0012](docs/decisions/0012-context-first-agent-routing.md). [ADR-0014](docs/decisions/0014-task-skill-projections.md) permits generated task entrypoints over that one logical routing model, not a second planner or authority owner.
 
 Changes to public contracts, truth ownership, dependency direction, authority, or migration guarantees require an architecture decision with evidence and migration treatment. Compatible internal choices remain implementation decisions.
 
@@ -137,7 +137,7 @@ Agent-facing files have three classes. Do not add a fourth.
 
 - **Canonical authored:** root `AGENTS.md`, `SKILL.md`, contributor/maintainer routers, and workspace `AGENTS.md` template.
 - **Thin host adapters:** root/template `CLAUDE.md`, Cursor rules, and future host-specific entrypoints. Each routes to the nearest applicable `AGENTS.md` first and contains only host-specific invocation/tool notes. Never restate architecture, lifecycle semantics, provider policy, or business requirements.
-- **Generated:** operation/tool lists, CLI help from `entrypoints/cli/help.mjs` (command registry and grouped headings), public reference, workflow IDs, versions, credits, and support reports. Render them from owners.
+- **Generated:** catalog-backed business task skills and conditional contract references, operation/tool lists, CLI help from `entrypoints/cli/help.mjs` (command registry and grouped headings), public reference, workflow IDs, versions, credits, and support reports. Render them from owners.
 
 Nested `AGENTS.md` files may narrow guidance for a subtree. They inherit the root contract and cannot redefine repository-wide truth or authority. Prefer one scoped router over duplicated host instructions.
 

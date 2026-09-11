@@ -242,6 +242,22 @@ export function register(harness: Harness): void {
     );
   });
 
+  harness.check("hosted discovery: leftover review-submit goldens target the App Review resubmit workflow, not generic ASC CLI", () => {
+    const corpus = loadCorpus();
+    for (const id of ["store-006", "store-020", "store-030"]) {
+      const entry = corpus.entries.find((item) => item.id === id);
+      assert(entry !== undefined, `store corpus is missing ${id}`);
+      assert(
+        entry.needs.includes("workflow.store.app-review-resubmit"),
+        `${id} must need the App Review resubmit workflow after that mapping shipped`,
+      );
+      assert(
+        !entry.needs.includes("workflow.store.asc-cli-automation"),
+        `${id} is review submit, not generic ASC CLI / TestFlight / media`,
+      );
+    }
+  });
+
   harness.check("hosted discovery: the ASC command reference reaches the workflow whose outputs it uploads", () => {
     const route = service().workflow({ workflowId: "workflow.store.store-screenshots-production" });
     const bound = route.workflow.referenceIds;

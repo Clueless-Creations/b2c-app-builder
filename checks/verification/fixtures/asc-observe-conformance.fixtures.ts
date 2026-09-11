@@ -7,7 +7,8 @@
  * beta distribution maps to the Apple TestFlight standing envelope. The independent
  * review-status response envelope is the 5.1.0 CLI `reviewStatusResult` object.
  * The independent review-submit response envelope is the 5.1.0 CLI
- * `reviewSubmitResult` dry-run object. Adapter-built resubmit argv and canned
+ * `reviewSubmitResult` dry-run object. `asc review submit` maps to
+ * `workflow.store.app-review-resubmit`. Adapter-built resubmit argv and canned
  * live-provider snapshots are not independent evidence.
  */
 import { readFileSync } from "node:fs";
@@ -109,7 +110,7 @@ const ASC_NATIVE_MAPPING: readonly AscNativeMappingRow[] = [
     canonicalOperation: APP_REVIEW_RESUBMIT_WORKFLOW_ID,
     semanticFit: "exact",
     effects: "mutation",
-    disposition: "defer",
+    disposition: "implement",
     owner: "adapters/app-review/resubmit.ts",
   },
   {
@@ -248,10 +249,23 @@ export function register(harness: Harness): void {
     const implemented = ASC_NATIVE_MAPPING.filter((row) => mappingDisposition(row) === "implement");
     const deferred = ASC_NATIVE_MAPPING.filter((row) => mappingDisposition(row) === "defer");
     const rejected = ASC_NATIVE_MAPPING.filter((row) => mappingDisposition(row) === "reject");
-    assert(implemented.length === 9, `observe/remediate/media/metadata/testflight implement rows: ${implemented.length}`);
+    assert(implemented.length === 10, `observe/remediate/media/metadata/testflight/review-submit implement rows: ${implemented.length}`);
     assert(
-      deferred.some((row) => row.nativeCapability === "asc review submit" && row.canonicalOperation === APP_REVIEW_RESUBMIT_WORKFLOW_ID),
-      "review submit maps to the existing resubmit workflow and stays deferred",
+      implemented.some(
+        (row) =>
+          row.nativeCapability === "asc review submit" &&
+          row.canonicalOperation === APP_REVIEW_RESUBMIT_WORKFLOW_ID &&
+          row.owner === "adapters/app-review/resubmit.ts",
+      ),
+      "review submit maps to the existing resubmit workflow",
+    );
+    assert(
+      deferred.every((row) => row.nativeCapability !== "asc review submit"),
+      "review submit mapping is no longer deferred",
+    );
+    assert(
+      deferred.length === 1 && deferred[0]?.nativeCapability === "asc testflight feedback list",
+      `only TestFlight feedback read stays deferred: ${deferred.map((row) => row.nativeCapability).join(", ")}`,
     );
     assert(
       implemented.some(

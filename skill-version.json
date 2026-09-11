@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.146",
+  "version": "0.219.148",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Pin the independent App Store Connect CLI 5.1.0 AppScreenshotUploadResult dry-run envelope.",
-    "One would-upload APP_IPHONE_65 PNG. Empty omitempty fields stay omitted. Nested assetId is empty. JSON:API is rejected."
+    "Prefer the compiled capability-delta check once package-root resolution walks from dist.",
+    "Remaining-tsx inventory for check scripts moves from 116 to 115."
   ]
 }

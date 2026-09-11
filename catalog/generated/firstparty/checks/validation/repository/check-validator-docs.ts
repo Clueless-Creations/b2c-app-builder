@@ -12,15 +12,17 @@
  * - every gate-shaped script (check:*, validate:*) must appear in the doc (no undocumented
  *   gates).
  *
+ * Default repo root walks from this file so packed omit-dev can launch the compiled twin
+ * under `dist/checks/validation/repository/` without treating `dist/` as the package root.
+ *
  * npm script: check:validator-docs (repo-only; the runtime ships no docs/ tree).
  */
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { flagString, issue, parseFlags, reportAndExit, type Issue } from "../../../tooling/lib/launch-state.js";
+import { resolveSkillRoot } from "../../../tooling/lib/skill-root.js";
 
-const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-const defaultRepoRoot = path.resolve(scriptDir, "../../..");
+const defaultRepoRoot = resolveSkillRoot(import.meta.url);
 
 const flags = parseFlags(process.argv.slice(2), [{ flags: ["--repo-root"], key: "repoRoot" }]);
 const repoRoot = flagString(flags, "repoRoot") ?? defaultRepoRoot;

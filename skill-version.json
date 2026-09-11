@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.142",
+  "version": "0.219.143",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Prefer inspect in leftover ASC reviewed-guidance host-upgrade copy.",
-    "Inspect does not upgrade the host. Doctor stays a supported equivalent. Finding codes stay doctor.*."
+    "Refuse leftover CLI-only public MCP names as local cli_only.",
+    "Those leftover names stay unlisted. Hosted leftover names stay wrong_surface. Handshake stays b2c-local."
   ]
 }

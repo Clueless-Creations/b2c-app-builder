@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.89",
-  "updatedAt": "2026-09-10",
+  "version": "0.219.90",
+  "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Reopen Expo starter notes from the bound local-cache seam peek.",
-    "Expose in-process Home reopen without treating it as SQLite, SecureStore, or a live restart."
+    "Prefer compiled public-api check once package-root resolution is dist-safe.",
+    "Keep the uncompiled checks graph on remaining-tsx for packed omit-dev installs."
   ]
 }

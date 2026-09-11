@@ -9004,11 +9004,11 @@
       {
         "workerContext": {
           "workflowId": "workflow.store.apple-store-media-standing-envelope",
-          "instructions": "Upload only the locale, device-well, screenshot, and app-preview assets covered by the exact current standing envelope. Verify every file digest, App Store Connect version-localization ID, and device type from SCREENSHOTS.md immediately before upload. Use `asc screenshots sizes`, `asc screenshots validate`, and `asc screenshots upload` as the selected-provider cookbook forms; probe `--help` before the first live call. Capture before-state and read back the resulting media set. Write store/proof/apple-store-media-apply.json with approval ID, per-file digest, locale, device well, version-localization ID, provider operation IDs, readback state, and timestamps. Do not apply listing text, products, TestFlight, review submission, or release state.",
+          "instructions": "Upload only the locale, device-well, screenshot, and app-preview assets covered by the exact current standing envelope. Verify every file digest, App Store Connect version-localization ID, and device type from SCREENSHOTS.md immediately before upload. Use `asc screenshots sizes`, `asc screenshots validate`, and `asc screenshots upload` as the selected-provider ASC CLI cookbook forms; probe `--help` before the first live call. Capture before-state and read back the resulting media set. Write store/proof/apple-store-media-apply.json with approval ID, per-file digest, locale, device well, version-localization ID, provider operation IDs, readback state, and timestamps. Do not apply listing text, products, TestFlight, review submission, or release state.",
           "providerIds": [
             "provider.app-store-connect"
           ],
-          "contextFingerprint": "sha256:5fba293642907f4ac340329e89873288fff1fae72b512b6e8121b9b14de8a58d"
+          "contextFingerprint": "sha256:c5064ced9146ad4f99abd19405505a8ebe43e5faaa3eeb39c2987bc062d9cfe8"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "App Store screenshots or app previews are ready and a matching media standing envelope is current",
@@ -15624,8 +15624,8 @@
     ]
   },
   "files": {
-    "extension.yaml": "72431cf80cbd550fab78059bec29cbee1c580a1fe8f0588f3f74b5314a8c1294",
-    "catalog-pack.yaml": "8040e3470e604d97bb606c3a80caf293f32ece777fc9e6dac95984843000a1c0",
+    "extension.yaml": "36974848087ea6b10300d7f9f869ddc639f73800e856471c513877763f55b126",
+    "catalog-pack.yaml": "6ad3659c74aa06af0d67c8c20c73ed5b80ea8fa811a705801db0beb14868eda7",
     "knowledge/data/analytics-attribution.md": "0bba4685b2188b9e80b7fcc14fdac9472c6c4aeac5bc59703188eaa5e26f234a",
     "knowledge/data/posthog-agent-tooling.md": "61ffdbc79a985a41a11fbe6e1c7c5663050104208baa9d05b8ebe33186ab93cc",
     "knowledge/design/audience-derived-identity.md": "04c90b39c9d41cf00257c70b4e579f3e29684254d444917b9a5690d48be74f5f",
@@ -16083,5 +16083,5 @@
     "catalog/upstreams/notices/parth-app-store-screenshots.txt": "a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a"
   },
   "dependencies": [],
-  "digest": "sha256:a921af664f489142f2208b8553c727f4e0b02b9b3a87b60f8ddee75883e1ef73"
+  "digest": "sha256:e6f6fb21cd9ebfcde675f98dc7e0fddba2e07e25487d57b00c832055d56fe6df"
 }

@@ -7070,10 +7070,10 @@ implementations:
     maturity: implemented
     workerContext:
       workflowId: workflow.store.apple-store-media-standing-envelope
-      instructions: Upload only the locale, device-well, screenshot, and app-preview assets covered by the exact current standing envelope. Verify every file digest, App Store Connect version-localization ID, and device type from SCREENSHOTS.md immediately before upload. Use `asc screenshots sizes`, `asc screenshots validate`, and `asc screenshots upload` as the selected-provider cookbook forms; probe `--help` before the first live call. Capture before-state and read back the resulting media set. Write store/proof/apple-store-media-apply.json with approval ID, per-file digest, locale, device well, version-localization ID, provider operation IDs, readback state, and timestamps. Do not apply listing text, products, TestFlight, review submission, or release state.
+      instructions: Upload only the locale, device-well, screenshot, and app-preview assets covered by the exact current standing envelope. Verify every file digest, App Store Connect version-localization ID, and device type from SCREENSHOTS.md immediately before upload. Use `asc screenshots sizes`, `asc screenshots validate`, and `asc screenshots upload` as the selected-provider ASC CLI cookbook forms; probe `--help` before the first live call. Capture before-state and read back the resulting media set. Write store/proof/apple-store-media-apply.json with approval ID, per-file digest, locale, device well, version-localization ID, provider operation IDs, readback state, and timestamps. Do not apply listing text, products, TestFlight, review submission, or release state.
       providerIds:
         - provider.app-store-connect
-      contextFingerprint: sha256:5fba293642907f4ac340329e89873288fff1fae72b512b6e8121b9b14de8a58d
+      contextFingerprint: sha256:c5064ced9146ad4f99abd19405505a8ebe43e5faaa3eeb39c2987bc062d9cfe8
   - id: b2c/worker.store.apple-store-metadata-standing-envelope
     version: 1.0.0
     provider: b2c/consumer-business-worker

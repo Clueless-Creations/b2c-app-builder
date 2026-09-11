@@ -68,6 +68,36 @@ export type ConfiguredConnectionSet = {
   duplicateNames: boolean;
 };
 
+export type ConfiguredSurfaceNeed = "workspace_planning" | "workspace_execution" | "knowledge";
+
+export type ConfiguredSurfaceSelection =
+  | {
+      status: "selected";
+      need: ConfiguredSurfaceNeed;
+      set: ConfiguredConnectionSet;
+      connection: ConfiguredConnectionReading;
+      guidance: string;
+    }
+  | {
+      status: "wrong_surface";
+      need: ConfiguredSurfaceNeed;
+      set: ConfiguredConnectionSet;
+      connection: ConfiguredConnectionReading;
+      guidance: string;
+    }
+  | {
+      status: "collision";
+      need: ConfiguredSurfaceNeed;
+      set: ConfiguredConnectionSet;
+      guidance: string;
+    }
+  | {
+      status: "unavailable";
+      need: ConfiguredSurfaceNeed;
+      set: ConfiguredConnectionSet;
+      guidance: string;
+    };
+
 export function connectionReceipt(input: {
   mode: "local_execution" | "hosted_knowledge";
   engineVersion: string;
@@ -192,9 +222,12 @@ export function hostedMcpInstructionsSuffix(engineVersion: string, clientName: s
   );
 }
 
-export function configuredConnectionSet(
-  entries: readonly { clientName: string; receipt: ConnectionReceipt }[],
-): ConfiguredConnectionSet {
+export type ConfiguredConnectionEntry = {
+  clientName: string;
+  receipt: ConnectionReceipt;
+};
+
+export function configuredConnectionSet(entries: readonly ConfiguredConnectionEntry[]): ConfiguredConnectionSet {
   const names = entries.map((entry) => entry.clientName);
   return {
     names,
@@ -211,6 +244,98 @@ export function configuredConnectionSet(
   };
 }
 
+function pickConfiguredEntry(
+  entries: readonly ConfiguredConnectionEntry[],
+  mode: ConnectionReceipt["mode"],
+  recommendedName: ConnectionReceipt["identity"]["recommended"],
+): ConfiguredConnectionEntry | undefined {
+  const matches = entries.filter((entry) => entry.receipt.mode === mode);
+  return matches.find((entry) => entry.clientName === recommendedName) ?? matches[0];
+}
+
+function configuredSurfaceNeedLabel(need: ConfiguredSurfaceNeed, mode: ConnectionReceipt["mode"]): string {
+  if (need === "workspace_planning") return "workspace planning";
+  if (need === "workspace_execution") return "workspace execution";
+  return mode === "hosted_knowledge" ? "hosted knowledge" : "packaged knowledge";
+}
+
+/** Pick local vs hosted from declared receipts. Duplicate names are a collision, not a leftover third surface. */
+export function selectConfiguredSurface(input: {
+  entries: readonly ConfiguredConnectionEntry[];
+  need: ConfiguredSurfaceNeed;
+}): ConfiguredSurfaceSelection {
+  const set = configuredConnectionSet(input.entries);
+  if (set.duplicateNames) {
+    return {
+      status: "collision",
+      need: input.need,
+      set,
+      guidance: `Duplicate B2C connection names are a collision, not a capability. Keep ${LOCAL_CLIENT_NAME} and ${HOSTED_CLIENT_NAME} as distinct names.`,
+    };
+  }
+  const local = pickConfiguredEntry(input.entries, "local_execution", LOCAL_CLIENT_NAME);
+  const hosted = pickConfiguredEntry(input.entries, "hosted_knowledge", HOSTED_CLIENT_NAME);
+  if (input.need === "workspace_planning" || input.need === "workspace_execution") {
+    if (local) {
+      const connection = interpretConfiguredConnection(local);
+      return {
+        status: "selected",
+        need: input.need,
+        set,
+        connection,
+        guidance: `Use ${connection.clientName} for ${configuredSurfaceNeedLabel(input.need, connection.mode)}.`,
+      };
+    }
+    if (hosted) {
+      const connection = interpretConfiguredConnection(hosted);
+      return { status: "wrong_surface", need: input.need, set, connection, guidance: connection.guidance };
+    }
+    return {
+      status: "unavailable",
+      need: input.need,
+      set,
+      guidance: `No B2C connection is configured for workspace planning or execution. Connect the local builder as ${LOCAL_CLIENT_NAME}.`,
+    };
+  }
+  if (hosted) {
+    const connection = interpretConfiguredConnection(hosted);
+    return {
+      status: "selected",
+      need: input.need,
+      set,
+      connection,
+      guidance: `Use ${connection.clientName} for ${configuredSurfaceNeedLabel(input.need, connection.mode)}.`,
+    };
+  }
+  if (local && local.receipt.declares.knowledge === "bundled") {
+    const connection = interpretConfiguredConnection(local);
+    return {
+      status: "selected",
+      need: input.need,
+      set,
+      connection,
+      guidance: `Use ${connection.clientName} for ${configuredSurfaceNeedLabel(input.need, connection.mode)}.`,
+    };
+  }
+  return {
+    status: "unavailable",
+    need: input.need,
+    set,
+    guidance: "No B2C knowledge connection is configured.",
+  };
+}
+
+export function bothConfiguredRoutingGuidance(): string {
+  return [
+    `When ${LOCAL_CLIENT_NAME} and ${HOSTED_CLIENT_NAME} are both configured, they stay separately named.`,
+    `Workspace planning and execution use ${LOCAL_CLIENT_NAME}.`,
+    `Hosted knowledge uses ${HOSTED_CLIENT_NAME}.`,
+    `A leftover ${LEFTOVER_LOCAL_CLIENT_NAME} name is not a third surface.`,
+    "Duplicate names are a collision, not a capability.",
+    "Local packaged knowledge stays available when hosted knowledge is absent.",
+  ].join(" ");
+}
+
 export function leftoverNameMigrationGuidance(): string {
   return [
     "Existing leftover names stay in your agent config. Setup never edits Claude, Cursor, or Codex files.",
@@ -219,7 +344,8 @@ export function leftoverNameMigrationGuidance(): string {
     `Codex leftover: ${leftoverNameClientMatrix[2].leftoverLocal}.`,
     "The leftover name is not a capability. The handshake receipt decides local execution versus hosted knowledge.",
     `Rename a leftover local entry to ${LOCAL_CLIENT_NAME}, or a leftover hosted entry to ${HOSTED_CLIENT_NAME}, only when you choose to.`,
-    `Fresh local setup uses ${LOCAL_CLIENT_NAME}. Hosted snippets use ${HOSTED_CLIENT_NAME}. Both names may exist in one client.`,
+    `Fresh local setup uses ${LOCAL_CLIENT_NAME}. Hosted snippets use ${HOSTED_CLIENT_NAME}.`,
+    bothConfiguredRoutingGuidance(),
     "Do not register hosted knowledge under the leftover name.",
   ].join("\n");
 }

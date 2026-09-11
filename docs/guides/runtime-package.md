@@ -195,7 +195,7 @@ The leftover client name is not a capability. The handshake receipt decides loca
 | Cursor | `"b2c-local"` in `~/.cursor/mcp.json` | existing Cursor `mcpServers` key `"b2c-app-builder"` | `"b2c-hosted"` URL entry |
 | Codex | `[mcp_servers.b2c-local]` | existing Codex table `[mcp_servers.b2c-app-builder]` | `codex mcp add b2c-hosted --url` |
 
-Setup never edits those files. Rename a leftover local entry to `b2c-local`, or a leftover hosted entry to `b2c-hosted`, only when you choose to. `b2c-local` and `b2c-hosted` may exist in one client. Do not register hosted knowledge under the leftover name.
+Setup never edits those files. Rename a leftover local entry to `b2c-local`, or a leftover hosted entry to `b2c-hosted`, only when you choose to. When both are configured, workspace planning and execution use `b2c-local` and hosted knowledge uses `b2c-hosted`. A leftover `b2c-app-builder` name is not a third surface. Duplicate names are a collision, not a capability. Local packaged knowledge stays available when hosted knowledge is absent. Do not register hosted knowledge under the leftover name.
 
 The default server exposes public discovery and composition preview plus workspace catalog, workflow, knowledge, status, plan, and operation preview and replay tools. Registered-workspace planning can run read-only provider prerequisite probes. The server resolves workspaces only through `~/.b2c-app-builder/workspaces.json`.
 

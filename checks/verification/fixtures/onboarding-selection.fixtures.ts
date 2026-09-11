@@ -6,6 +6,7 @@ import { loadOnboardingApplicability, PRESENT_PAYWALL_OPERATION, REVENUECAT_PROV
 import type { Extension } from "../../../contracts/extensions/contract.js";
 import { compilePlan, type CatalogInput } from "../../../kernel/engine/compile.js";
 import { composeNodeBrief, renderNodeBrief } from "../../../kernel/engine/node-brief.js";
+import { buildVerifierPrompt, buildWorkerPrompt } from "../../../kernel/session/worker-prompt.js";
 import { loadVerifiedOnboardingApplicability } from "../../../kernel/composition/onboarding-selection.js";
 import { applyCompositionActivation, previewCompositionActivation } from "../../../kernel/composition/activation.js";
 import { resolveTsxBin } from "../../../tooling/lib/tsx-bin.js";
@@ -66,6 +67,17 @@ function importedSupport(): Extension {
     ],
     recipes: [],
   };
+}
+
+function assertPromptFollowsVerifiedPin(prompt: string, label: string): void {
+  assert(prompt.includes("stale-candidate") && prompt.includes("not execution truth"), `${label} must name the stale candidate:\n${prompt}`);
+  assert(
+    prompt.includes("Declared present-paywall selected") && prompt.includes("verified present-paywall unresolved"),
+    `${label} must contrast draft vs pin:\n${prompt}`,
+  );
+  assert(prompt.includes("signup job=conversion interaction=static-document"), `${label} must keep purpose independent of technique:\n${prompt}`);
+  assert(!prompt.includes("scroll-linked"), `${label} must not invent scroll-linked technique`);
+  assert(prompt.includes("semantic review or device observation"), `${label} must not overclaim proof strength`);
 }
 
 function pinPackages(workspace: string, packages: ReadonlyArray<{ directory: string; digest: string }>): void {
@@ -172,7 +184,7 @@ export function register(harness: Harness): void {
     );
   });
 
-  harness.check("onboarding-selection: activate-then-edit keeps brief and gate on the verified pin", () => {
+  harness.check("onboarding-selection: activate-then-edit keeps brief, producer prompt, and gate on the verified pin", () => {
     const workspace = setup(harness);
     writeFileSync(path.join(workspace, "b2c.yaml"), firstPartyComposition, "utf8");
     cpSync(path.join(skillRoot, "examples/workspace/business/product.yaml"), path.join(workspace, "product.yaml"));
@@ -227,6 +239,18 @@ customVariables
     assert(rendered.includes("signup job=conversion interaction=static-document"), `brief must keep purpose independent of technique:\n${rendered}`);
     assert(!rendered.includes("scroll-linked"), "conversion purpose must not invent scroll-linked technique");
     assert(rendered.includes("semantic review or device observation"), "brief must not overclaim proof strength");
+    const producerPrompt = buildWorkerPrompt(brief, workspace, skillRoot);
+    const verifierPrompt = buildVerifierPrompt(brief, workspace, skillRoot, [
+      {
+        artifactId: "artifact.onboarding-screen-control-paywall-contract",
+        path: "product/onboarding/graph/ONB-17-screen-control-paywall-contract.md",
+        evidence: ["draft contract phrases"],
+      },
+    ]);
+    assertPromptFollowsVerifiedPin(producerPrompt, "producer prompt");
+    assertPromptFollowsVerifiedPin(verifierPrompt, "verifier prompt");
+    const omittedWorkspace = buildWorkerPrompt(composeNodeBrief(plan.nodes[0]!, plan), workspace, skillRoot);
+    assert(!omittedWorkspace.includes("Binding lifecycle"), "omitting the workspace must not invent a verified pin");
     const gate = spawnSync(
       resolveTsxBin(skillRoot),
       [

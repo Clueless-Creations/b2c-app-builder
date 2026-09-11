@@ -215,7 +215,8 @@ function renderProviderDecision(decision: ProviderDecision): string {
   }
 }
 
-function renderBindingTruth(truth: WorkspaceBindingTruth): string[] {
+/** Shared pin-versus-declaration lines for the frontier brief and the producer/verifier prompts. */
+export function renderBindingTruth(truth: WorkspaceBindingTruth): string[] {
   const lifecycle = ((): string => {
     switch (truth.lifecycle) {
       case "proposal":

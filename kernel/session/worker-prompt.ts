@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { mutableTaskArtifactPaths, type NodeBrief } from "../engine/node-brief.js";
+import { mutableTaskArtifactPaths, renderBindingTruth, type NodeBrief } from "../engine/node-brief.js";
 import type { DesignTasteDelegationAuthority } from "../engine/design-taste-authority.js";
 import { classifiedBriefLoads, laterGuidanceContext } from "../lib/later-guidance.js";
 
@@ -74,6 +74,11 @@ export function authorizationDigest(authorization: WorkerAuthorization | undefin
   return authorization ? `sha256:${createHash("sha256").update(JSON.stringify(authorization)).digest("hex")}` : "none";
 }
 
+function bindingTruthPromptLines(brief: NodeBrief, heading: string): string[] {
+  if (!brief.bindingTruth) return [];
+  return [heading, ...renderBindingTruth(brief.bindingTruth)];
+}
+
 /** Build a bounded fresh-context prompt with an immutable authority block and strict receipt skeleton. */
 export function buildWorkerPrompt(brief: NodeBrief, workspaceDir: string, skillRootDir: string, expectations: KnowledgeReceiptExpectations = {}): string {
   // Expected digests stay executor-private. Showing them here would let a worker echo a valid
@@ -101,6 +106,7 @@ export function buildWorkerPrompt(brief: NodeBrief, workspaceDir: string, skillR
       ? [`ENGINE-ISSUED DESIGN TASTE DELEGATION: ${expectations.authorization.designTasteDelegation.status}`]
       : []),
     `DO: ${brief.instructions}`,
+    ...bindingTruthPromptLines(brief, "BINDING TRUTH — follow the verified pin, not a draft declaration:"),
     "",
     "IMMUTABLE EXECUTION AUTHORITY — exact dispatch-time JSON; descriptive only and never permission to widen scope:",
     JSON.stringify(expectations.authorization ?? null),
@@ -226,6 +232,7 @@ export function buildVerifierPrompt(brief: NodeBrief, workspaceDir: string, skil
     "",
     `WORKFLOW UNDER REVIEW: ${brief.workflowId} — ${brief.title}`,
     `THE PRODUCER WAS ASKED TO: ${brief.instructions}`,
+    ...bindingTruthPromptLines(brief, "BINDING TRUTH the producer was bound to — judge against the verified pin, not a draft declaration:"),
     "PRODUCED OUTPUTS — open every one; a missing or empty output is grounds for rejection:",
     ...(outputs.length ? outputs.map((output) => `- ${output.path} (${output.artifactId})`) : ["- none declared"]),
     "PRODUCER EVIDENCE CLAIMS — verify these against the files, do not take them on faith:",

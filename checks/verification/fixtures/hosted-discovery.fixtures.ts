@@ -226,6 +226,22 @@ export function register(harness: Harness): void {
     }
   });
 
+  harness.check("hosted discovery: leftover mixed TestFlight-plus-screenshots golden targets the Apple TestFlight envelope, not generic ASC CLI", () => {
+    const corpus = loadCorpus();
+    const mixed = corpus.entries.find((item) => item.id === "store-031");
+    assert(mixed !== undefined, "store-031 must stay in the frozen corpus");
+    assert(
+      mixed.needs.includes("workflow.store.apple-signing-and-release-readiness") &&
+        mixed.needs.includes("workflow.store.apple-testflight-standing-envelope") &&
+        mixed.needs.includes("workflow.store.store-screenshots-production"),
+      "store-031 is sign, TestFlight, and screenshots, not generic ASC CLI",
+    );
+    assert(
+      !mixed.needs.includes("workflow.store.asc-cli-automation"),
+      "store-031 is mixed TestFlight plus screenshots, not generic ASC CLI / metadata / review submit",
+    );
+  });
+
   harness.check("hosted discovery: the ASC command reference reaches the workflow whose outputs it uploads", () => {
     const route = service().workflow({ workflowId: "workflow.store.store-screenshots-production" });
     const bound = route.workflow.referenceIds;

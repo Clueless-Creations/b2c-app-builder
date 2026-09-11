@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.133",
+  "version": "0.219.134",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Forward an explicit runtimeObserved token from MCP b2c_verify into operator verify --runtime-observed.",
-    "true and workspace record runtime=checked on a workspace-proof attempt. Omitting the field stays runtime=unknown. A live-device word still cannot invent it."
+    "Prefer compiled validator-docs once package-root resolution walks from dist.",
+    "Remaining-tsx inventory goes from 119 to 118. The rest of the uncompiled checks graph stays on remaining-tsx."
   ]
 }

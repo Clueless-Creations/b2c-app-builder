@@ -244,6 +244,22 @@ export function register(harness: Harness): void {
     assert(!/^behavioral:\s*true\s*$/m.test(text), "first-run eval stays authored/linted; do not mark it live behavioral");
   });
 
+  harness.check("doctor-asc: ARCH-07 prefers inspect as the CLI host-snapshot writer", () => {
+    const northStar = readFileSync(path.join(skillRoot, "docs", "north-star-architecture.md"), "utf8");
+    const adr = readFileSync(path.join(skillRoot, "docs", "decisions", "0010-first-run-honesty-owners.md"), "utf8");
+    assert(northStar.includes("written only by CLI `inspect`/`setup`"), "ARCH-07 must name inspect as the CLI writer");
+    assert(northStar.includes("`doctor` is a supported equivalent"), "ARCH-07 must keep doctor supported");
+    assert(
+      !northStar.includes("written only by CLI `doctor`/`setup`"),
+      "ARCH-07 must not keep doctor as the only named CLI writer",
+    );
+    assert(adr.includes("CLI `doctor` / `setup` write it"), "ADR-0010 historical writer sentence stays");
+    assert(
+      adr.includes("A doctor snapshot and a `run/` receipt are stored observations"),
+      "ADR-0010 historical doctor snapshot wording stays",
+    );
+  });
+
   harness.check("doctor-asc: sanitizeExecutablePath rewrites only the home prefix", () => {
     assert(sanitizeExecutablePath("/Users/fixture-operator/bin/asc", "/Users/fixture-operator") === "~/bin/asc", "home prefix must become ~");
     assert(sanitizeExecutablePath("/opt/homebrew/bin/asc", "/Users/fixture-operator") === "/opt/homebrew/bin/asc", "non-home paths stay absolute");

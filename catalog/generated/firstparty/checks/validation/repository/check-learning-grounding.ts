@@ -32,16 +32,18 @@
  *
  * npm script: check:learning-grounding
  * Usage: tsx checks/validation/repository/check-learning-grounding.ts --skill-root /path/to/skill
+ *
+ * Default skill root walks from this file so packed omit-dev can launch the compiled twin
+ * under `dist/checks/validation/repository/` without treating `dist/` as the package root.
  */
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { loadKnowledgePackages } from "../../../catalog/knowledge-packages.js";
 import { flagString, issue, parseFlags, reportAndExit, type Issue, type Severity } from "../../../tooling/lib/launch-state.js";
+import { resolveSkillRoot } from "../../../tooling/lib/skill-root.js";
 
-const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-const defaultSkillRoot = path.resolve(scriptDir, "../../..");
+const defaultSkillRoot = resolveSkillRoot(import.meta.url);
 
 const REVIEW_CADENCE_DAYS = 180;
 const REQUIRED_SECTIONS = ["Learning", "Evidence", "Captured", "Refresh"] as const;

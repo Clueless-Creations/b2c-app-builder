@@ -30,6 +30,7 @@ import {
   type HostedWrongSurfaceRefusal,
 } from "../../../contracts/public-api/connection-receipt.js";
 import { PUBLIC_OPERATIONS } from "../../../contracts/public-api/contract.js";
+import { CONTRIBUTION_OPERATIONS } from "../../../contracts/contribution/contract.js";
 import { KNOWLEDGE_TOOL_DEFINITIONS } from "../../../kernel/knowledge-service/tools.js";
 import { toCatalogInput } from "../../../catalog/bridge.js";
 import type { Catalog } from "../../../catalog/types.js";
@@ -290,6 +291,8 @@ test("leftover-name client matrix covers Claude, Cursor, and Codex without silen
     );
     assert(hostedReadme.includes("degraded execution still selects `b2c-local`"), "hosted README omitted degraded execution surface selection");
     assert(skill.includes("Degraded execution still selects b2c-local"), "skill omitted degraded execution surface selection");
+    assert(packageGuide.includes("leftover contributor names"), "package guide omitted leftover contributor wrong-surface names");
+    assert.match(hostedReadme, /leftover\s+contributor names/, "hosted README omitted leftover contributor wrong-surface names");
   } finally {
     rmSync(temp, { recursive: true, force: true });
   }
@@ -462,6 +465,7 @@ test("hosted local-only MCP names fail as wrong-surface with receipt guidance", 
   const hosted = connectionReceipt({ mode: "hosted_knowledge", engineVersion: service.metadata.engineVersion });
   const expected = interpretConfiguredConnection({ clientName: "b2c-hosted", receipt: hosted });
   const publicMcp = PUBLIC_OPERATIONS.flatMap((operation) => (operation.mcp === null ? [] : [operation.mcp]));
+  const contributionMcp = CONTRIBUTION_OPERATIONS.flatMap((operation) => (operation.mcp === null ? [] : [operation.mcp]));
   const localWorkspaceTools = [
     "b2c_plan",
     "b2c_status",
@@ -474,9 +478,12 @@ test("hosted local-only MCP names fail as wrong-surface with receipt guidance", 
   ] as const;
   assert.deepEqual(
     [...HOSTED_WRONG_SURFACE_TOOL_NAMES].sort(),
-    [...new Set([...publicMcp, ...localWorkspaceTools])].sort(),
-    "hosted wrong-surface names must cover every local-only public MCP name",
+    [...new Set([...publicMcp, ...localWorkspaceTools, ...contributionMcp])].sort(),
+    "hosted wrong-surface names must cover every local-only public MCP name plus leftover contributor names",
   );
+  assert.ok(contributionMcp.includes("b2c_contribute_plan"), "contribution contract omitted leftover contributor MCP names");
+  assert.equal(isHostedWrongSurfaceTool("b2c_contribute_plan"), true);
+  assert.equal(isHostedWrongSurfaceTool("b2c_contribute_evaluate"), false);
   for (const tool of KNOWLEDGE_TOOL_DEFINITIONS) {
     assert.equal(isHostedWrongSurfaceTool(tool.name), false, tool.name);
   }
@@ -499,12 +506,12 @@ test("hosted local-only MCP names fail as wrong-surface with receipt guidance", 
   }
   const leftover = hostedWrongSurfaceRefusal({
     engineVersion: service.metadata.engineVersion,
-    toolName: "b2c_discover",
+    toolName: "b2c_contribute_plan",
     clientName: "b2c-app-builder",
   });
   assert.equal(leftover.connection.leftoverName, true);
   assert.match(leftover.connection.guidance, /not a capability/);
-  assertSingleCapability(leftover.connection.guidance, hosted, "leftover hosted wrong-surface");
+  assertSingleCapability(leftover.connection.guidance, hosted, "leftover hosted contributor wrong-surface");
   const unknown = await handleApi(
     new Request("https://knowledge.test/api/v1/tools/b2c_not_a_tool", { method: "POST", body: "{}" }),
     service,
@@ -514,7 +521,13 @@ test("hosted local-only MCP names fail as wrong-surface with receipt guidance", 
   assert.match(unknownBody, /not_found/);
   assert.doesNotMatch(unknownBody, /wrong_surface/);
   assert.doesNotMatch(unknownBody, /cannot access or run this local business/);
-  for (const toolName of ["b2c_run", "b2c_discover", "b2c_compose", "b2c_market_report"] as const) {
+  const evaluate = await handleApi(
+    new Request("https://knowledge.test/api/v1/tools/b2c_contribute_evaluate", { method: "POST", body: "{}" }),
+    service,
+  );
+  assert.equal(evaluate.status, 404);
+  assert.match(await evaluate.text(), /not_found/);
+  for (const toolName of ["b2c_run", "b2c_discover", "b2c_compose", "b2c_market_report", "b2c_contribute_plan"] as const) {
     const mcp = hostedWrongSurfaceMcpResponse(
       JSON.stringify({ jsonrpc: "2.0", id: 7, method: "tools/call", params: { name: toolName, arguments: {} } }),
       service.metadata.engineVersion,

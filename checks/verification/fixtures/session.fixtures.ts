@@ -5,7 +5,7 @@ import { generateKeyPairSync, sign as signEd25519 } from "node:crypto";
 import { assert, skillRoot, type Harness } from "./_harness.js";
 import { laneKeys, type BusinessStateV2, type FounderDecision, type FounderDecisionReceipt, type RunStateDocument } from "../../../kernel/schema/types.js";
 import { acquireLock, releaseLock } from "../../../kernel/reducer/lock.js";
-import { compilePlan, type CatalogInput } from "../../../kernel/engine/compile.js";
+import { compilePlan, type CatalogInput, type RunNodeId } from "../../../kernel/engine/compile.js";
 import { allowAllAutonomyEvaluator, computeFrontier } from "../../../kernel/engine/frontier.js";
 import { captureDesignAuthorityEvaluation } from "../../../kernel/engine/design-taste-authority.js";
 import {
@@ -4443,6 +4443,86 @@ main().catch((error) => { console.error(String(error)); process.exit(1); });
       Boolean(defaultProof?.includes("runtime=unknown") && !defaultProof.includes("runtime=checked")),
       `operator verify without --runtime-observed cannot invent runtime proof, got ${defaultProof ?? "none"}`,
     );
+  });
+
+  harness.check("session/verify: operator --runtime-observed records workspace runtime proof", () => {
+    const researchCatalog: CatalogInput = {
+      version: "catalog.session-fixture.workspace-runtime-observed",
+      artifacts: [{ id: "artifact.research-scan", path: "research/scan.md" }],
+      workflows: [
+        {
+          id: "workflow.research-scan",
+          title: "Research what people need",
+          domainId: "domain.research",
+          actionClass: "draft",
+          dependencies: [],
+          outputPaths: ["research/scan.md"],
+          providerIds: [],
+          laneIds: [],
+          founderOnlyActions: [],
+          gateCommands: [],
+          idempotent: true,
+        },
+      ],
+    };
+    const tokens: ReadonlyArray<{ readonly label: string; readonly args: string[] }> = [
+      { label: "boolean flag", args: ["--runtime-observed"] },
+      { label: "workspace token", args: ["--runtime-observed", "workspace"] },
+    ];
+    for (const token of tokens) {
+      const handle = bootstrapWorkspace(harness, `runtime-observed-${token.label.replace(" ", "-")}`, researchCatalog);
+      mkdirSync(path.join(handle.dir, "research"), { recursive: true });
+      writeFileSync(path.join(handle.dir, "research/scan.md"), "Workspace research scan.\n", "utf8");
+      const plan = compilePlan(researchCatalog, "2026-09-11T16:00:00.000Z");
+      const businessState = JSON.parse(readFileSync(handle.statePath, "utf8")) as BusinessStateV2;
+      const run = seedRunState(plan, businessState, {
+        ownerSessionId: "sess-workspace-producer",
+        ttlSeconds: 600,
+        wallClockCapSeconds: 3600,
+        now: "2026-09-11T16:00:00.000Z",
+      });
+      const nodeId = "run.research-scan" as RunNodeId;
+      const attempt = beginAttempt(plan, run, nodeId, "sess-workspace-producer", "2026-09-11T16:00:01.000Z");
+      attempt.proofSource = "workspace";
+      reconcilePatch(
+        plan,
+        run,
+        {
+          nodeId,
+          attemptId: attempt.id,
+          outputs: [
+            {
+              artifactId: "artifact.research-scan",
+              path: "research/scan.md",
+              fingerprint: workspaceArtifactFingerprint(handle.dir, "research/scan.md"),
+              evidence: ["workspace bytes produced"],
+            },
+          ],
+        },
+        "2026-09-11T16:00:02.000Z",
+      );
+      mkdirSync(path.join(handle.dir, "run"), { recursive: true });
+      writeRunState(path.join(handle.dir, "run/run-state.json"), run);
+      const accepted = runVerify([
+        "--workspace",
+        handle.dir,
+        "--node",
+        "workflow.research-scan",
+        "--session",
+        "sess-workspace-reviewer",
+        "--evidence",
+        "fresh-context review: brief matches the category evidence and names sources",
+        ...token.args,
+      ]);
+      assert(accepted.code === 0 && accepted.output.includes("VERIFIED run.research-scan"), `expected acceptance for ${token.label}, got: ${accepted.output}`);
+      const verified = readRunState(handle).nodes["run.research-scan"]!;
+      const proof = verified.attempts.at(-1)?.independentVerification?.evidence.find((line) => line.startsWith("Proof strength:"));
+      assert(
+        Boolean(proof?.includes("semantic=checked") && proof.includes("runtime=checked")),
+        `operator verify ${token.label} must record workspace runtime proof, got ${proof ?? "none"}`,
+      );
+      assert(!proof?.includes("runtime=unknown"), `operator verify ${token.label} must not leave runtime unobserved`);
+    }
   });
 
   harness.check("session: a lane-seeded success preserves continuation without inventing an attempt or independent proof", () => {

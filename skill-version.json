@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.120",
+  "version": "0.219.121",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Forward an explicit workspace runtime observation from operator verify into acceptVerification.",
-    "A live-device word or omitted flag cannot invent runtime=checked."
+    "Map asc review submit onto workflow.store.app-review-resubmit as implement.",
+    "Keep TestFlight feedback read deferred."
   ]
 }

@@ -75,6 +75,7 @@ import {
 } from "../engine/verification.js";
 import {
   captureReviewEvidence,
+  parseWorkspaceRuntimeObservation,
   refreshProducedArtifacts,
   validateReviewReceipt,
   validateCurrentReview,
@@ -788,6 +789,18 @@ async function runSessionCore(args: Record<string, string | undefined>, host: In
     return 1;
   }
 
+  let runtimeObservation;
+  try {
+    runtimeObservation = parseWorkspaceRuntimeObservation(args["runtime-observed"]);
+  } catch {
+    if (!host.request) {
+      console.error(
+        "ISSUE session.runtime_observation_invalid: --runtime-observed accepts only an explicit workspace token; a sentence or live-device word cannot invent it",
+      );
+    }
+    return 1;
+  }
+
   const maxConcurrency = Number(args["max-concurrency"] ?? 4);
   if (!Number.isSafeInteger(maxConcurrency) || maxConcurrency < 1) {
     if (!host.request) console.error("session.invalid_concurrency: --max-concurrency must be a positive integer");
@@ -1415,7 +1428,7 @@ async function runSessionCore(args: Record<string, string | undefined>, host: In
           } else if (outcome.status === "accepted") {
             try {
               assertReviewOwnership();
-              acceptVerification(plan, run, nodeId, [outcome.evidence], judgedAt, verifierSessionId, reviewReceipt, workspace);
+              acceptVerification(plan, run, nodeId, [outcome.evidence], judgedAt, verifierSessionId, reviewReceipt, workspace, runtimeObservation);
             } catch (error) {
               if (reviewClaims.length) parkReviewReadback();
               if (!host.request) console.error(`session.verify_accept_failed ${nodeId}: ${error instanceof Error ? error.message : String(error)}`);

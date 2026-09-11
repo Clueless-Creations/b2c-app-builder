@@ -48,7 +48,7 @@ Do not collapse them.
 
 If the workspace pin is missing, compatibility is unknown. If the major does not match the reviewed baseline, compatibility is a mismatch. For React Native 0.x, compare `0.minor` (`0.86` versus `0.85` is a mismatch). Expo SDK and React 19.x compare on the leading major. Either way: stop, report the pins, and wait for an explicit upgrade plan. Do not execute `npx expo install expo@latest --fix` as a silent repair.
 
-Module versions that do not match the selected SDK are the same class of incompatibility. Doctor output is a diagnostic, not authority to change the lockfile.
+Module versions that do not match the selected SDK are the same class of incompatibility. Inspect output is a diagnostic, not authority to change the lockfile. `b2c doctor` is a supported equivalent.
 
 ## 4. CNG And Native Ownership
 

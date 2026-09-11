@@ -214,6 +214,30 @@ export function register(harness: Harness): void {
     assert(!source.includes("doctor will not install it"), "Expo missing copy must not keep doctor as the named actor");
   });
 
+  harness.check("expo-eas-doctor: leftover Expo compatibility knowledge prefers inspect as the diagnostic actor", () => {
+    const knowledge = readFileSync(path.join(skillRoot, "knowledge/engineering/expo-compatibility.md"), "utf8");
+    const generated = readFileSync(
+      path.join(skillRoot, "catalog/generated/firstparty/knowledge/engineering/expo-compatibility.md"),
+      "utf8",
+    );
+    assert(knowledge.includes("Inspect output is a diagnostic"), "Expo compatibility knowledge must prefer inspect");
+    assert(
+      knowledge.includes("`b2c doctor` is a supported equivalent"),
+      "Expo compatibility knowledge must keep doctor supported",
+    );
+    assert(
+      !knowledge.includes("Doctor output is a diagnostic"),
+      "Expo compatibility knowledge must not keep Doctor as the named diagnostic actor",
+    );
+    assert(generated === knowledge, "generated firstparty knowledge must re-render from the source");
+    const hosted = readFileSync(path.join(skillRoot, "catalog/generated/hosted-knowledge.json"), "utf8");
+    assert(hosted.includes("Inspect output is a diagnostic"), "hosted knowledge must re-render the inspect diagnostic actor");
+    assert(
+      !hosted.includes("Doctor output is a diagnostic"),
+      "hosted knowledge must not keep Doctor as the named diagnostic actor",
+    );
+  });
+
   harness.check("expo-eas-doctor: persist records identity once with ASC fields; write failure warns owners", () => {
     const home = harness.makeTempDir("eas-doctor-persist");
     const findings = runDoctor({

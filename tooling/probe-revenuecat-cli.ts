@@ -365,9 +365,7 @@ function run(): void {
     executed: purchase.evidence.test_store?.executed === true,
     entitlementCount: purchase.evidence.test_store?.entitlement_ids.length ?? 0,
   });
-  console.log(
-    `  Test Store catalog session disposition=${purchase.disposition} executed=${purchase.evidence.test_store?.executed === true}. Not native IAP.`,
-  );
+  console.log(`  Test Store catalog session disposition=${purchase.disposition} executed=${purchase.evidence.test_store?.executed === true}. Not native IAP.`);
   if (purchase.disposition !== "complete" && purchase.disposition !== "incomplete") process.exit(1);
 }
 

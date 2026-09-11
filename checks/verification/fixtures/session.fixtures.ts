@@ -1838,6 +1838,69 @@ main().catch((error) => { console.error(String(error?.stack ?? error)); process.
   return { code: result.status ?? -1, output: `${result.stdout ?? ""}\n${result.stderr ?? ""}` };
 }
 
+function researchScanCatalog(version: string): CatalogInput {
+  return {
+    version,
+    artifacts: [{ id: "artifact.research-scan", path: "research/scan.md" }],
+    workflows: [
+      {
+        id: "workflow.research-scan",
+        title: "Research what people need",
+        domainId: "domain.research",
+        actionClass: "draft",
+        dependencies: [],
+        outputPaths: ["research/scan.md"],
+        providerIds: [],
+        laneIds: [],
+        founderOnlyActions: [],
+        gateCommands: [],
+        idempotent: true,
+      },
+    ],
+  };
+}
+
+function seedWorkspacePendingResearch(handle: WorkspaceHandle, catalog: CatalogInput, producer: string): void {
+  mkdirSync(path.join(handle.dir, "research"), { recursive: true });
+  writeFileSync(path.join(handle.dir, "research/scan.md"), "Workspace research scan.\n", "utf8");
+  const plan = compilePlan(catalog, "2026-09-11T16:00:00.000Z");
+  const businessState = JSON.parse(readFileSync(handle.statePath, "utf8")) as BusinessStateV2;
+  const run = seedRunState(plan, businessState, {
+    ownerSessionId: producer,
+    ttlSeconds: 600,
+    wallClockCapSeconds: 3600,
+    now: "2026-09-11T16:00:00.000Z",
+  });
+  const nodeId = "run.research-scan" as RunNodeId;
+  const attempt = beginAttempt(plan, run, nodeId, producer, "2026-09-11T16:00:01.000Z");
+  attempt.proofSource = "workspace";
+  reconcilePatch(
+    plan,
+    run,
+    {
+      nodeId,
+      attemptId: attempt.id,
+      outputs: [
+        {
+          artifactId: "artifact.research-scan",
+          path: "research/scan.md",
+          fingerprint: workspaceArtifactFingerprint(handle.dir, "research/scan.md"),
+          evidence: ["workspace bytes produced"],
+        },
+      ],
+    },
+    "2026-09-11T16:00:02.000Z",
+  );
+  mkdirSync(path.join(handle.dir, "run"), { recursive: true });
+  writeRunState(path.join(handle.dir, "run/run-state.json"), run);
+}
+
+function proofStrengthLine(handle: WorkspaceHandle): string | undefined {
+  return readRunState(handle).nodes["run.research-scan"]!.attempts.at(-1)?.independentVerification?.evidence.find((line) =>
+    line.startsWith("Proof strength:"),
+  );
+}
+
 export function register(harness: Harness): void {
   // --- scenario 1: all nodes gated exits cleanly with a parked digest, not silence -----------
 
@@ -4582,6 +4645,114 @@ main().catch((error) => { console.error(String(error)); process.exit(1); });
     assert(
       computeFrontier(plan, structuredClone(run), businessState, allowAllAutonomyEvaluator).ready.length === 0,
       "seeded success must not rerun completed work",
+    );
+  });
+
+  harness.check("session: auto-verify records workspace runtime proof from --runtime-observed", () => {
+    const tokens: ReadonlyArray<{ readonly label: string; readonly args: string[] }> = [
+      { label: "omitted", args: [] },
+      { label: "boolean flag", args: ["--runtime-observed"] },
+      { label: "workspace token", args: ["--runtime-observed", "workspace"] },
+    ];
+    for (const token of tokens) {
+      const catalog = researchScanCatalog(`catalog.session-fixture.auto-verify-runtime-${token.label.replace(" ", "-")}`);
+      const handle = bootstrapWorkspace(harness, `auto-verify-runtime-${token.label.replace(" ", "-")}`, catalog, {
+        grants: { "domain.research": grant("domain.research", "run-with-guardrails") },
+      });
+      seedWorkspacePendingResearch(handle, catalog, "sess-workspace-producer");
+      const pendingBytes = readFileSync(path.join(handle.dir, "run/run-state.json"), "utf8");
+      const result = runSession([
+        "--workspace",
+        handle.dir,
+        "--brief",
+        handle.briefPath,
+        "--session",
+        "sess-auto-verify-runtime",
+        "--executor",
+        "fixture",
+        "--verifier",
+        "fixture",
+        ...token.args,
+      ]);
+      assert(result.code === 0, `expected session auto-verify for ${token.label}, got ${result.code}: ${result.output}`);
+      const verified = readRunState(handle).nodes["run.research-scan"]!;
+      assert(verified.status === "succeeded", `${token.label} auto-verify must accept the pending workspace attempt`);
+      assert(verified.verifiedBySessionId === "sess-auto-verify-runtime.verifier", "acceptance must identify the session verifier");
+      const proof = proofStrengthLine(handle);
+      if (token.args.length === 0) {
+        assert(readFileSync(path.join(handle.dir, "run/run-state.json"), "utf8") !== pendingBytes, "omitted-token auto-verify still accepts review");
+        assert(
+          Boolean(proof?.includes("semantic=checked") && proof.includes("runtime=unknown") && !proof.includes("runtime=checked")),
+          `session auto-verify without --runtime-observed cannot invent runtime proof, got ${proof ?? "none"}`,
+        );
+        continue;
+      }
+      assert(
+        Boolean(proof?.includes("semantic=checked") && proof.includes("runtime=checked")),
+        `session auto-verify ${token.label} must record workspace runtime proof, got ${proof ?? "none"}`,
+      );
+      assert(!proof?.includes("runtime=unknown"), `session auto-verify ${token.label} must not leave runtime unobserved`);
+    }
+  });
+
+  harness.check("session: a live-device word cannot invent auto-verify runtime proof", () => {
+    const catalog = researchScanCatalog("catalog.session-fixture.auto-verify-live-device");
+    const handle = bootstrapWorkspace(harness, "auto-verify-live-device", catalog, {
+      grants: { "domain.research": grant("domain.research", "run-with-guardrails") },
+    });
+    seedWorkspacePendingResearch(handle, catalog, "sess-workspace-producer");
+    const pendingBytes = readFileSync(path.join(handle.dir, "run/run-state.json"), "utf8");
+    const result = runSession([
+      "--workspace",
+      handle.dir,
+      "--brief",
+      handle.briefPath,
+      "--session",
+      "sess-auto-verify-live-device",
+      "--executor",
+      "fixture",
+      "--verifier",
+      "fixture",
+      "--runtime-observed",
+      "live-device",
+    ]);
+    assert(
+      result.code === 1 && result.output.includes("session.runtime_observation_invalid"),
+      `a live-device word cannot invent observation, got: ${result.output}`,
+    );
+    assert(readFileSync(path.join(handle.dir, "run/run-state.json"), "utf8") === pendingBytes, "refused live-device auto-verify must preserve run-state bytes");
+    assert(readRunState(handle).nodes["run.research-scan"]!.status !== "succeeded", "a live-device word cannot accept the pending attempt");
+  });
+
+  harness.check("session: fixture auto-verify cannot invent runtime=checked even with --runtime-observed", () => {
+    const catalog = researchScanCatalog("catalog.session-fixture.auto-verify-fixture-runtime");
+    const handle = bootstrapWorkspace(harness, "auto-verify-fixture-runtime", catalog, {
+      grants: { "domain.research": grant("domain.research", "run-with-guardrails") },
+    });
+    const result = runSession([
+      "--workspace",
+      handle.dir,
+      "--brief",
+      handle.briefPath,
+      "--session",
+      "sess-auto-verify-fixture",
+      "--executor",
+      "fixture",
+      "--verifier",
+      "fixture",
+      "--runtime-observed",
+    ]);
+    assert(result.code === 0, `expected fixture auto-verify, got ${result.code}: ${result.output}`);
+    const state = readRunState(handle).nodes["run.research-scan"]!;
+    assert(state.status === "succeeded", "fixture auto-verify must still accept the synthetic attempt");
+    assert(
+      state.attempts.every((entry) => entry.proofSource === "synthetic"),
+      "a fixture loop must remain explicitly synthetic",
+    );
+    const proof = proofStrengthLine(handle);
+    assert(
+      Boolean(proof?.includes("runtime=unknown") && !proof.includes("runtime=checked")),
+      `fixture auto-verify cannot invent runtime proof, got ${proof ?? "none"}`,
     );
   });
 }

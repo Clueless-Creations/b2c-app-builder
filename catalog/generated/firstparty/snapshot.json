@@ -15625,7 +15625,7 @@
   },
   "files": {
     "extension.yaml": "50e0b8f8c05a45a96a12316f8b18255f369bfa5c93bae8781603136b7d1c5b2f",
-    "catalog-pack.yaml": "dac5f1a7742941efa65b972263bac29adf0b51ab103a2ed92bdb35a0ff0d7d5c",
+    "catalog-pack.yaml": "e8d9e1ab77fa64d82d1fc67b84e7b5fe4c04d14d6626ba3d6d4f2fbf003cbaaf",
     "knowledge/data/analytics-attribution.md": "0bba4685b2188b9e80b7fcc14fdac9472c6c4aeac5bc59703188eaa5e26f234a",
     "knowledge/data/posthog-agent-tooling.md": "61ffdbc79a985a41a11fbe6e1c7c5663050104208baa9d05b8ebe33186ab93cc",
     "knowledge/design/audience-derived-identity.md": "04c90b39c9d41cf00257c70b4e579f3e29684254d444917b9a5690d48be74f5f",
@@ -16083,5 +16083,5 @@
     "catalog/upstreams/notices/parth-app-store-screenshots.txt": "a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a"
   },
   "dependencies": [],
-  "digest": "sha256:e83b7c90310c5d10b5fa3c92a6d960fda25946ef38630c92b86d0c667ed7333b"
+  "digest": "sha256:3fc70924dba3d170648349641048b8cbfc2dc333947c61e9fbaf41233ce2115b"
 }

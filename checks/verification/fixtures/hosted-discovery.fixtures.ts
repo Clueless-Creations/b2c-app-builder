@@ -206,8 +206,13 @@ export function register(harness: Harness): void {
     const mixedMetadata = corpus.entries.find((item) => item.id === "store-040");
     assert(mixedMetadata !== undefined, "store-040 must stay in the frozen corpus");
     assert(
-      mixedMetadata.needs.includes("workflow.store.asc-cli-automation"),
-      "store-040 still needs generic ASC CLI until the metadata envelope ranks in the top three",
+      mixedMetadata.needs.includes("workflow.store.apple-store-media-standing-envelope") &&
+        mixedMetadata.needs.includes("workflow.store.apple-store-metadata-standing-envelope"),
+      "store-040 is new screenshots plus a metadata update, not generic ASC CLI",
+    );
+    assert(
+      !mixedMetadata.needs.includes("workflow.store.asc-cli-automation"),
+      "store-040 is mixed media and metadata, not generic ASC CLI / TestFlight",
     );
   });
 

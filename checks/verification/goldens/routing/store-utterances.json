@@ -369,8 +369,8 @@
       "utterance": "new screenshots plus a metadata update in App Store Connect",
       "shape": "compound",
       "needs": [
-        "workflow.store.store-screenshots-production",
-        "workflow.store.asc-cli-automation"
+        "workflow.store.apple-store-media-standing-envelope",
+        "workflow.store.apple-store-metadata-standing-envelope"
       ]
     },
     {

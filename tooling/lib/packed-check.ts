@@ -3,8 +3,9 @@ import { resolveCompiledScript } from "./tsx-launcher.mjs";
 
 /**
  * Scripts this increment may launch from `dist/` without tsx. `tsconfig.build.json` already
- * emits `tooling/**` plus the catalog, gates-layout, graph-foundations, hub-spoke, and
- * learning-grounding wrappers. The rest of the uncompiled `checks/` graph stays on tsx.
+ * emits `tooling/**` plus the catalog, gates-layout, graph-foundations, hub-spoke,
+ * learning-grounding, and operating-graph wrappers. The rest of the uncompiled `checks/` graph
+ * stays on tsx.
  */
 export const PACKED_CHECK_COMPILED_SOURCES = [
   "checks/validation/repository/check-catalog.ts",
@@ -12,6 +13,7 @@ export const PACKED_CHECK_COMPILED_SOURCES = [
   "checks/validation/repository/check-graph-foundations.ts",
   "checks/validation/repository/check-hub-spoke.ts",
   "checks/validation/repository/check-learning-grounding.ts",
+  "checks/validation/repository/check-operating-graph.ts",
   "tooling/render-credits.ts",
   "tooling/render-hosted-bundle.ts",
   "tooling/render-public-api.ts",

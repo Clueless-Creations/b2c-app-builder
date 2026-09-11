@@ -24,6 +24,7 @@
  * `check:graph-foundations` (`checks/validation/repository/check-graph-foundations.ts`),
  * `check:hub-spoke` (`checks/validation/repository/check-hub-spoke.ts`),
  * `check:learning-grounding` (`checks/validation/repository/check-learning-grounding.ts`),
+ * `check:operating-graph` (`checks/validation/repository/check-operating-graph.ts`),
  * `check:credits` (`tooling/render-credits.ts`), `check:hosted-bundle` (`tooling/render-hosted-bundle.ts`),
  * and `check:public-api` (`tooling/render-public-api.ts`). Every other `check:*` stays on the
  * remaining-tsx inventory — the rest of the uncompiled `checks/` graph.

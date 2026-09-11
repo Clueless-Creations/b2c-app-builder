@@ -15962,7 +15962,7 @@
     "checks/validation/business/experience/check-onboarding-evidence-packet.ts": "022ebfc341513d7f350638d5a736bd1d57bc0a8f2fec3097dac8f6c28947830c",
     "checks/validation/business/experience/check-onboarding-foundations.ts": "d549271f29dacdbdbaf1d232ca1223232749a02c8fa15254c5f11ba71ce01e21",
     "checks/validation/business/experience/check-onboarding-graph.ts": "f60c484e8426b7c5beba22bb32c54c1b38d0ecfbe651aee2051de72161d9d7c7",
-    "checks/validation/repository/check-operating-graph.ts": "0ef4abde62b8754069ee764766f5145c3e1a2f4872f9412dd9b0bc8f6639333e",
+    "checks/validation/repository/check-operating-graph.ts": "01c6b1e7f3ec13947af46efed2b0bbc7423282660ae21d245250e88bfb29f01c",
     "checks/validation/business/orchestration/check-parallel-orchestration.ts": "4e363997f7b6cd9d2d367c09bd5c7f9ee0fb9d860df02a1c139370d8a670f5a1",
     "checks/validation/repository/check-pack-composition.ts": "e703d35b21137dd9e6a6e643ef63ee15a6d2731d3e47258f0de2161e9a09a156",
     "checks/validation/repository/check-package-parity.ts": "7a0f994cc2a42050852b56668645c5de037460c075a8a7f7d74f7529973da890",
@@ -16211,5 +16211,5 @@
     "catalog/upstreams/notices/parth-app-store-screenshots.txt": "a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a"
   },
   "dependencies": [],
-  "digest": "sha256:da6045e7c5752e72f85ebebbfd8aec5de8959958cf18719fd4be07bc763ddcca"
+  "digest": "sha256:93bee7a72599273c248915c0241f20db0b4ec156872df306874b292797715202"
 }

@@ -94,7 +94,7 @@ export function assessRevenueCatCliHostDoctor(input: {
     extras.push({
       severity: "warn",
       code: "doctor.revenuecat_cli_shadowed",
-      message: `PATH also has ${extrasCandidates.map((entry) => input.sanitizePath(entry.path)).join(", ")}; winner is ${selectedPath}. Doctor will not install or upgrade the host.`,
+      message: `PATH also has ${extrasCandidates.map((entry) => input.sanitizePath(entry.path)).join(", ")}; winner is ${selectedPath}. Inspect will not install or upgrade the host.`,
     });
   }
 
@@ -106,7 +106,7 @@ export function assessRevenueCatCliHostDoctor(input: {
           {
             severity: "ok",
             code: "doctor.revenuecat_cli",
-            message: `winning ${selectedPath} ${version ?? "(unparseable)"} (reviewed executable ${latest}). Local identity only — not live catalog proof. Doctor will not install, log in, or refresh OAuth.`,
+            message: `winning ${selectedPath} ${version ?? "(unparseable)"} (reviewed executable ${latest}). Local identity only — not live catalog proof. Inspect will not install, log in, or refresh OAuth.`,
           },
           ...extras,
         ],
@@ -119,7 +119,7 @@ export function assessRevenueCatCliHostDoctor(input: {
           {
             severity: "warn",
             code: "doctor.revenuecat_cli_missing",
-            message: `no rc or revenuecat on PATH. Reviewed executable ${latest}. Billing lanes that select RevenueCat CLI need that binary; doctor will not install it. This is not live catalog proof.`,
+            message: `no rc or revenuecat on PATH. Reviewed executable ${latest}. Billing lanes that select RevenueCat CLI need that binary; inspect will not install it. This is not live catalog proof.`,
           },
         ],
         liveCatalogProven: false,
@@ -131,7 +131,7 @@ export function assessRevenueCatCliHostDoctor(input: {
           {
             severity: "warn",
             code: "doctor.revenuecat_cli_unrelated",
-            message: `found executable(s) named rc/revenuecat that did not identify as RevenueCat CLI ${latest}${selectedPath ? ` (winner ${selectedPath})` : ""}. An unrelated rc binary is not the provider. Doctor will not install a replacement.`,
+            message: `found executable(s) named rc/revenuecat that did not identify as RevenueCat CLI ${latest}${selectedPath ? ` (winner ${selectedPath})` : ""}. An unrelated rc binary is not the provider. Inspect will not install a replacement.`,
           },
         ],
         liveCatalogProven: false,
@@ -143,7 +143,7 @@ export function assessRevenueCatCliHostDoctor(input: {
           {
             severity: "warn",
             code: "doctor.revenuecat_cli_unsupported",
-            message: `winning ${selectedPath ?? "(unknown path)"} reports ${version ?? "an unparseable version"}; reviewed executable support is exactly ${latest}. Doctor will not upgrade the host. This is not live catalog proof.`,
+            message: `winning ${selectedPath ?? "(unknown path)"} reports ${version ?? "an unparseable version"}; reviewed executable support is exactly ${latest}. Inspect will not upgrade the host. This is not live catalog proof.`,
           },
           ...extras,
         ],
@@ -156,7 +156,7 @@ export function assessRevenueCatCliHostDoctor(input: {
           {
             severity: "warn",
             code: "doctor.revenuecat_cli_unsupported_schema",
-            message: `winning ${selectedPath ?? "(unknown path)"} ${version ?? ""} did not return a usable commands --json tree for RevenueCat CLI ${latest}. Doctor will not install or rewrite the binary. This is not live catalog proof.`,
+            message: `winning ${selectedPath ?? "(unknown path)"} ${version ?? ""} did not return a usable commands --json tree for RevenueCat CLI ${latest}. Inspect will not install or rewrite the binary. This is not live catalog proof.`,
           },
           ...extras,
         ],

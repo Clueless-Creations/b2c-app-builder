@@ -13,6 +13,7 @@ const suites = [
   "business-help",
   "founder-brief-intake",
   "connection-and-packet",
+  "leftover-contributor-local",
   "after-credits-start",
   "run-session-runtime-observed",
   "business-run-runtime-observed",

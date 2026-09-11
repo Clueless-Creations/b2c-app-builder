@@ -42,6 +42,7 @@ import {
   connectionReceipt,
   interpretConfiguredConnection,
   leftoverCliOnlyLocalMcpResponse,
+  leftoverContributorLocalMcpResponse,
   leftoverWriteGatedLocalMcpResponse,
   LOCAL_CLIENT_NAME,
   localMcpInstructions,
@@ -788,6 +789,11 @@ transport.start = async () => {
       leftoverWriteGatedLocalMcpResponse(message, {
         engineVersion: skillVersion(),
         observed: leftoverCliOnlyObserved,
+      }) ??
+      leftoverContributorLocalMcpResponse(message, {
+        engineVersion: skillVersion(),
+        observed: leftoverCliOnlyObserved,
+        contributorEnabled: contributorToolsEnabled(),
       });
     if (intercepted) {
       void transport.send(intercepted as Parameters<StdioServerTransport["send"]>[0]);

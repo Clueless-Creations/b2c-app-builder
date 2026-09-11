@@ -600,3 +600,58 @@ export function leftoverWriteGatedLocalMcpResponse(
     }),
   );
 }
+
+/**
+ * Leftover contributor local MCP names. Default local MCP never registers these;
+ * leftover agents still call them. Hosted knowledge refuses them as wrong-surface.
+ * Default local MCP refuses them as cli_only with the local receipt reading.
+ * Contributor-enabled local MCP registers them and does not intercept.
+ */
+export const LOCAL_CONTRIBUTOR_LEFTOVER_TOOL_NAMES = [
+  "b2c_contribute_plan",
+  "b2c_contribute_check",
+  "b2c_contribute_preview",
+  "b2c_contribute_upstreams",
+  "b2c_contribute_upstream_check",
+  "b2c_contribute_upgrade_plan",
+] as const;
+
+export type LeftoverContributorLocalToolName = (typeof LOCAL_CONTRIBUTOR_LEFTOVER_TOOL_NAMES)[number];
+
+export function isLeftoverContributorLocalTool(name: string): name is LeftoverContributorLocalToolName {
+  return (LOCAL_CONTRIBUTOR_LEFTOVER_TOOL_NAMES as readonly string[]).includes(name);
+}
+
+/** Leftover contributor names stay on the local surface. They are not hosted wrong-surface. */
+export function leftoverContributorLocalRefusal(input: {
+  engineVersion: string;
+  toolName: string;
+  clientName?: string;
+  observed?: ConnectionReceipt["observed"];
+}): LeftoverCliOnlyLocalRefusal {
+  return leftoverCliOnlyLocalRefusal(input);
+}
+
+/** MCP tools/call for a leftover contributor name on default local MCP becomes cli_only. */
+export function leftoverContributorLocalMcpResponse(
+  payload: unknown,
+  input: {
+    engineVersion: string;
+    clientName?: string;
+    observed?: ConnectionReceipt["observed"];
+    contributorEnabled?: boolean;
+  },
+): unknown {
+  if (input.contributorEnabled) return null;
+  const call = leftoverLocalMcpCallName(payload);
+  if (!call || !isLeftoverContributorLocalTool(call.name)) return null;
+  return leftoverCliOnlyLocalMcpResult(
+    call.id,
+    leftoverContributorLocalRefusal({
+      engineVersion: input.engineVersion,
+      toolName: call.name,
+      clientName: input.clientName,
+      observed: input.observed,
+    }),
+  );
+}

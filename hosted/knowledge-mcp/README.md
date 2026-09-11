@@ -45,7 +45,9 @@ contributor names, and leftover CLI-only public names. Leftover CLI-only public 
 hosted `wrong_surface`. On the local MCP they fail as `cli_only` with the local receipt
 reading, not as hosted `wrong_surface`. Leftover write-gated names stay hosted
 `wrong_surface`. On read-only local MCP they fail as `cli_only` with the local receipt
-reading; write-enabled local MCP registers them. The local
+reading; write-enabled local MCP registers them. Leftover contributor names stay hosted
+`wrong_surface`. On default local MCP they fail as `cli_only` with the local receipt
+reading; contributor-enabled local MCP registers them. The local
 and hosted MCP servers use the same knowledge implementation.
 If the local knowledge bundle is missing or invalid, the local MCP keeps its execution
 tools available. It omits the four knowledge tools and emits a fixed recovery warning.

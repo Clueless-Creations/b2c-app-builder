@@ -12,7 +12,7 @@ export function register(h: Harness): void {
     const remaining = inventory.filter((entry) => entry.remainingTsx);
     assert(
       compiled.join(",") ===
-        "check:catalog,check:credits,check:gates-layout,check:graph-foundations,check:hosted-bundle,check:hub-spoke,check:learning-grounding,check:operating-graph,check:pack-composition,check:public-api",
+        "check:catalog,check:credits,check:gates-layout,check:graph-foundations,check:hosted-bundle,check:hub-spoke,check:learning-grounding,check:operating-graph,check:pack-composition,check:package-parity,check:public-api",
       `compiled-eligible check scripts drifted: ${compiled.join(",")}`,
     );
     assert(remaining.length > 0, "remaining-tsx inventory must still name the uncompiled checks graph");
@@ -39,6 +39,8 @@ export function register(h: Harness): void {
       !remaining.some((entry) => entry.id === "check:pack-composition"),
       "check:pack-composition must leave remaining-tsx once its compiled twin is eligible",
     );
+    assert(!remaining.some((entry) => entry.id === "check:package-parity"), "check:package-parity must leave remaining-tsx once its compiled twin is eligible");
+    assert(remaining.length === 120, `remaining-tsx count drifted: ${remaining.length}`);
     assert(
       remaining.some((entry) => entry.id === "check:design-md" && entry.sourcePath === "checks/validation/business/design/check-design-md.ts"),
       "remaining-tsx inventory lost a representative checks/ gate",
@@ -274,5 +276,30 @@ export function register(h: Harness): void {
     assert(observed.compiled === true && observed.args?.join(" ") === "--skill-root . --json", "compiled pack-composition arguments changed");
     const source = readFileSync(path.join(skillRoot, "checks/validation/repository/check-pack-composition.ts"), "utf8");
     assert(source.includes("resolveSkillRoot(import.meta.url)"), "pack-composition check default skill root must walk from compiled dist");
+  });
+
+  h.check("packed-check: check:package-parity prefers compiled dist without tsx", () => {
+    const root = h.makeTempDir("packed-check-package-parity");
+    mkdirSync(path.join(root, "checks/validation/repository"), { recursive: true });
+    mkdirSync(path.join(root, "dist", "checks/validation/repository"), { recursive: true });
+    writeFileSync(
+      path.join(root, "dist", "checks/validation/repository/check-package-parity.js"),
+      "console.log(JSON.stringify({ compiled: true, args: process.argv.slice(2) }));",
+    );
+    writeFileSync(
+      path.join(root, "checks/validation/repository/check-package-parity.ts"),
+      'console.error("source ts fallback should not run"); process.exit(9);',
+    );
+    const command = resolvePackedCheckCommand(root, "tsx checks/validation/repository/check-package-parity.ts --repo-root . --skill-root .", ["--json"]);
+    assert(
+      command?.executable === process.execPath && command.args[0] === path.join(root, "dist", "checks/validation/repository/check-package-parity.js"),
+      "packed check:package-parity must exec dist/checks/validation/repository/check-package-parity.js, not bare tsx",
+    );
+    const result = spawnSync(command.executable, command.args, { env: { ...process.env, PATH: "" }, encoding: "utf8" });
+    assert(result.status === 0, `compiled package-parity launch failed: ${result.stderr}`);
+    const observed = JSON.parse(result.stdout) as { compiled?: boolean; args?: string[] };
+    assert(observed.compiled === true && observed.args?.join(" ") === "--repo-root . --skill-root . --json", "compiled package-parity arguments changed");
+    const source = readFileSync(path.join(skillRoot, "checks/validation/repository/check-package-parity.ts"), "utf8");
+    assert(source.includes("resolveSkillRoot(import.meta.url)"), "package-parity check default skill root must walk from compiled dist");
   });
 }

@@ -1,0 +1,151 @@
+name: Task skills completion verification
+# Temporary branch-only integration; removed before the candidate commit.
+on:
+  push:
+    branches: [feat/task-skills-navigation]
+permissions:
+  contents: read
+jobs:
+  integrate:
+    if: github.repository == 'Clueless-Creations/b2c-app-builder' && github.ref == 'refs/heads/feat/task-skills-navigation'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    outputs:
+      sha: ${{ steps.candidate.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/task-skills-navigation
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - name: Reconcile reviewed upstream changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git merge --no-commit --no-ff a102c8c6e6c20400686af375b11ba5957413513d || {
+            while IFS= read -r file; do
+              case "$file" in
+                package.json|package-lock.json|skill-version.json) git checkout --ours -- "$file" ;;
+                catalog/generated/*|kernel/schema/evidence-schema-version.json) git checkout --theirs -- "$file" ;;
+                *) echo "Unreviewed merge conflict: $file"; exit 1 ;;
+              esac
+              git add -- "$file"
+            done < <(git diff --name-only --diff-filter=U)
+          }
+          test -z "$(git diff --name-only --diff-filter=U)"
+      - run: npm ci
+      - run: python3 tooling/finalize-entry-tests.py
+      - name: Render and check the corrected candidate
+        run: |
+          npx prettier --write checks/verification/public-api/connection-and-packet.test.ts checks/verification/public-api/after-credits-start.test.ts
+          npm run render:all
+          npm run render:evidence-schema-version
+          npm run check:task-skills
+          npm run check:autopilot
+          node --import tsx --test checks/verification/public-api/connection-and-packet.test.ts checks/verification/public-api/after-credits-start.test.ts
+      - name: Commit without integration-only files
+        id: candidate
+        run: |
+          test "$(git branch --show-current)" = feat/task-skills-navigation
+          rm .github/workflows/task-skills-build.yml tooling/finalize-entry-tests.py
+          git add -A
+          git commit -m 'Verify conditional entry paths and integrate current runtime observations'
+          git push origin HEAD:refs/heads/feat/task-skills-navigation
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "Candidate commit: $(git rev-parse HEAD)"
+          echo "Candidate tree: $(git rev-parse HEAD^{tree})"
+          git bundle create /tmp/task-skills-complete.bundle --all
+      - uses: actions/upload-artifact@v4
+        with:
+          name: task-skills-complete-source
+          path: /tmp/task-skills-complete.bundle
+          retention-days: 1
+  audit:
+    needs: integrate
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: fast
+            args: --lane fast
+          - name: heavy-1
+            args: --lane heavy --shard 1/2
+          - name: heavy-2
+            args: --lane heavy --shard 2/2
+    name: Full audit (${{ matrix.name }})
+    env:
+      B2C_REQUIRE_GIT_HISTORY: '1'
+      GITHUB_BASE_SHA: a102c8c6e6c20400686af375b11ba5957413513d
+      B2C_FIXTURE_CONCURRENCY: '2'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.integrate.outputs.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - run: node entrypoints/cli/b2c.mjs --help
+      - run: npm run audit:ci -- ${{ matrix.args }}
+  hosted:
+    needs: integrate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.integrate.outputs.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - run: npm ci --prefix hosted/knowledge-mcp
+      - run: npm run hosted:check
+  app:
+    needs: integrate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.integrate.outputs.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - run: npm ci --prefix hosted/builder-console
+      - run: npm run app:check
+  complete:
+    if: always()
+    needs: [integrate, audit, hosted, app]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every selected suite
+        env:
+          INTEGRATE: ${{ needs.integrate.result }}
+          AUDIT: ${{ needs.audit.result }}
+          HOSTED: ${{ needs.hosted.result }}
+          APP: ${{ needs.app.result }}
+          CANDIDATE: ${{ needs.integrate.outputs.sha }}
+        run: |
+          test "$INTEGRATE" = success
+          test "$AUDIT" = success
+          test "$HOSTED" = success
+          test "$APP" = success
+          echo "Full verification passed for $CANDIDATE"

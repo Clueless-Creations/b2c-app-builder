@@ -922,7 +922,7 @@ export function register(harness: Harness): void {
     );
     const firstparty = composition!.deltas["business-pack.consumer-business"]!;
     assert(firstparty.domains === 15, `expected 15 firstparty domains, got ${firstparty.domains}`);
-    assert(firstparty.workflows === 114, `expected 114 firstparty workflows, got ${firstparty.workflows}`);
+    assert(firstparty.workflows === 115, `expected 115 firstparty workflows, got ${firstparty.workflows}`);
     assert(firstparty.references === 145, `expected 145 firstparty references, got ${firstparty.references}`);
     const deltaWorkflows = Object.values(composition!.deltas).reduce((sum, delta) => sum + delta.workflows, 0);
     const deltaDomains = Object.values(composition!.deltas).reduce((sum, delta) => sum + delta.domains, 0);
@@ -1054,6 +1054,37 @@ export function register(harness: Harness): void {
       "Apple metadata must read APP_STORE_LISTING.md and write the metadata apply proof",
     );
     assert(appleMetadata!.actionClass === "mutate" && appleMetadata!.protectedCategory === "credentials_access", "Apple metadata stays a credentialed mutate");
+    const appleTestflight = catalog.workflows.find((wf) => wf.id === "workflow.store.apple-testflight-standing-envelope");
+    const playTestingTrack = catalog.workflows.find((wf) => wf.id === "workflow.store.google-play-testing-track-standing-envelope");
+    assert(Boolean(appleTestflight), "expected Apple TestFlight standing envelope");
+    assert(Boolean(playTestingTrack), "expected Google Play testing-track standing envelope");
+    assert(
+      appleTestflight!.dependencies.includes("workflow.store.apple-signing-and-release-readiness") &&
+        appleTestflight!.dependencies.includes("workflow.store.store-console-workflow") &&
+        !appleTestflight!.dependencies.includes("workflow.store.asc-cli-automation") &&
+        !appleTestflight!.dependencies.includes("workflow.store.apple-store-media-standing-envelope") &&
+        !appleTestflight!.dependencies.includes("workflow.store.apple-store-metadata-standing-envelope"),
+      "Apple TestFlight must depend on signing and store console and must not depend on ASC automation, media, or metadata",
+    );
+    assert(
+      appleTestflight!.gateCommands.length === 1 && appleTestflight!.gateCommands[0] === "check:provider-proof",
+      "Apple TestFlight must fail closed on provider-proof — ASC command contract is not this node's trigger",
+    );
+    assert(
+      appleTestflight!.providerIds.includes("provider.app-store-connect") && !appleTestflight!.providerIds.includes("provider.google-play"),
+      "Apple TestFlight is the App Store Connect reader, not a dual-store node",
+    );
+    assert(
+      appleTestflight!.reads.includes("store/APPLE_SIGNING.md") &&
+        appleTestflight!.outputPaths.includes("store/proof/apple-testflight-apply.json"),
+      "Apple TestFlight must read APPLE_SIGNING.md and write the TestFlight apply proof",
+    );
+    assert(appleTestflight!.actionClass === "release" && appleTestflight!.protectedCategory === "release", "Apple TestFlight stays a release-class tester distribution");
+    assert(
+      playTestingTrack!.outputPaths.includes("store/proof/google-play-testing-track-apply.json") &&
+        playTestingTrack!.actionClass === "release",
+      "Play testing-track remains the Google Play tester-distribution sibling",
+    );
     assert(
       playMetadata!.reads.includes("store/app-store-listing/APP_STORE_LISTING.md") &&
         playMetadata!.dependencies.includes("workflow.store.store-console-workflow"),

@@ -164,6 +164,7 @@ export const FIRSTPARTY_RESPONSIBILITY_GROUPS = [
       "workflow.store.google-play-media-standing-envelope",
       "workflow.store.apple-store-media-standing-envelope",
       "workflow.store.apple-store-metadata-standing-envelope",
+      "workflow.store.apple-testflight-standing-envelope",
       "workflow.store.google-play-testing-track-standing-envelope",
       "workflow.store.marketplace-regional-compliance",
     ],

@@ -22,6 +22,8 @@ bindings:
     - workflow.store.apple-store-media-standing-envelope
     # Listing-text apply is a separate standing envelope from media upload.
     - workflow.store.apple-store-metadata-standing-envelope
+    # TestFlight group assignment is a separate standing envelope from media and metadata.
+    - workflow.store.apple-testflight-standing-envelope
   context_pack_ids:
     - context.store
 sources:

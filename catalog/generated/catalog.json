@@ -6668,7 +6668,7 @@
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/orchestration/full-launch-program.md",
-        "sha256": "sha256:5aed821974807588307f085018a3901c245f7556f55ea2f2544e86c44b2a21c1",
+        "sha256": "sha256:10d3e51123f4265e114c11cc7fa6ffd6fa80b2b1ac21a10f7775207def0c5fd6",
         "origin": "skill"
       }
     },
@@ -14433,6 +14433,63 @@
       }
     },
     {
+      "id": "workflow.store.apple-testflight-standing-envelope",
+      "title": "Apple TestFlight standing envelope",
+      "domainId": "domain.store",
+      "areaIds": [
+        "area.build-release"
+      ],
+      "trigger": "A signed iOS build is proven and an exact TestFlight group standing envelope is current",
+      "founderPhrasings": [
+        "upload this build to TestFlight",
+        "ship the build to TestFlight testers",
+        "push this build to the approved TestFlight group"
+      ],
+      "instructions": "Assign the exact build digest only to the named TestFlight group covered by the current standing envelope. Verify app ID, build ID, group ID, tester cohort, internal versus external distribution, and test notes immediately before mutation. Use `asc testflight feedback list`, `asc testflight crashes list`, and `asc workflow run --dry-run testflight_beta` as the selected-provider cookbook forms; live group assignment and external distribution are founder-gated and the cookbook records only the dry-run and read forms. Probe `--help` before the first live call. Capture before-state and read back processing and tester availability. Write store/proof/apple-testflight-apply.json with approval ID, build digest, app ID, group ID, provider operation IDs, processing/readback state, tester cohort, and timestamps. Do not apply listing text, upload screenshots, submit for review, or change public release state.",
+      "reads": [
+        "store/APPLE_SIGNING.md",
+        "store/STORE_CONSOLE.md",
+        "state/business-state.json"
+      ],
+      "consults": [],
+      "referenceIds": [
+        "reference.process.provider-proof",
+        "reference.store.app-store-connect-cli",
+        "reference.store.apple-signing-release"
+      ],
+      "roleId": "role.engineering-leader",
+      "laneIds": [
+        "store_console",
+        "engineering"
+      ],
+      "phaseIds": [
+        "phase.3"
+      ],
+      "dependencies": [
+        "workflow.store.apple-signing-and-release-readiness",
+        "workflow.store.store-console-workflow",
+        "workflow.operations.agent-operations-ledger"
+      ],
+      "outputPaths": [
+        "store/proof/apple-testflight-apply.json"
+      ],
+      "gateCommands": [
+        "check:provider-proof"
+      ],
+      "providerIds": [
+        "provider.app-store-connect"
+      ],
+      "founderOnlyActions": [
+        "approve TestFlight distribution when no exact standing envelope exists"
+      ],
+      "actionClass": "release",
+      "protectedCategory": "release",
+      "idempotent": false,
+      "applicability": {
+        "mode": "always"
+      }
+    },
+    {
       "id": "workflow.store.google-play-testing-track-standing-envelope",
       "title": "Google Play testing-track standing envelope",
       "domainId": "domain.store",
@@ -17209,6 +17266,16 @@
       "generated": false
     },
     {
+      "id": "artifact.store-proof-apple-testflight-apply-json",
+      "path": "store/proof/apple-testflight-apply.json",
+      "ownerDomainId": "domain.store",
+      "laneIds": [
+        "store_console",
+        "engineering"
+      ],
+      "generated": false
+    },
+    {
       "id": "artifact.store-proof-google-play-media-apply-json",
       "path": "store/proof/google-play-media-apply.json",
       "ownerDomainId": "domain.store",
@@ -18740,14 +18807,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "8b5cb620c008ebfe480cc632d7fc649aa0f4deab9bd78ead7e348e4f3a71bae8",
+    "fingerprint": "fe6eeca1a11480aac97b0927d9857d30f7fa9b67ad095b38f0f522494036c1a5",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
         "version": "0.219.102",
         "revision": "0.219.102",
-        "contentDigest": "b2cc99f1197b72be454e2a41aed5fe1612da4181465dedbef665b1738e45e88c"
+        "contentDigest": "58254e09d2a9a4c8f9ebc9795d1a2f0009271b5d9b435ad8ece5686c1082aaa9"
       }
     ],
     "base": {
@@ -18758,7 +18825,7 @@
     "deltas": {
       "business-pack.consumer-business": {
         "domains": 15,
-        "workflows": 114,
+        "workflows": 115,
         "references": 145
       }
     }

@@ -456,6 +456,8 @@ export function register(harness: Harness): void {
     assert(apple.includes("workflow.store.apple-store-media-standing-envelope"), apple.join(","));
     const appleListing = service.catalog({ query: "push metadata to App Store Connect", offset: 0, limit: 10 }).workflows.map((workflow) => workflow.id);
     assert(appleListing.includes("workflow.store.apple-store-metadata-standing-envelope"), appleListing.join(","));
+    const appleTestflight = service.catalog({ query: "testflight", offset: 0, limit: 10 }).workflows.map((workflow) => workflow.id);
+    assert(appleTestflight.includes("workflow.store.apple-testflight-standing-envelope"), appleTestflight.join(","));
     assert(!apple.includes("workflow.store.google-play-release") || apple[0] !== "workflow.store.google-play-release", "Android-only release is not the required Apple route");
     const journeyAuthored = workflows.find((workflow) => workflow.id === "workflow.experience.onboarding-system.onb-16-journey-graph");
     assert(journeyAuthored !== undefined, "onboarding journey workflow must exist");

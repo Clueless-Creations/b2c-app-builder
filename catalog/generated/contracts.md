@@ -1119,6 +1119,19 @@ _App Store listing text is ready and a matching metadata standing envelope is cu
 - **Gates:** `check:store-console`, `check:provider-proof`
 - **Knowledge:** [App Store Connect CLI](../../knowledge/store/app-store-connect-cli.md), [ASO Store Ops](../../knowledge/store/aso-store-ops.md)
 
+### Apple TestFlight standing envelope
+
+_A signed iOS build is proven and an exact TestFlight group standing envelope is current_
+
+- **Role:** Engineering leader
+- **Phases:** 3
+- **Providers:** `provider.app-store-connect` (cli, api, browser)
+- **Reads:** `store/APPLE_SIGNING.md`, `store/STORE_CONSOLE.md`, `state/business-state.json`
+- **Consults:** —
+- **Produces:** `store/proof/apple-testflight-apply.json`
+- **Gates:** `check:provider-proof`
+- **Knowledge:** [Provider Proof](../../knowledge/process/provider-proof.md), [App Store Connect CLI](../../knowledge/store/app-store-connect-cli.md), [Apple Signing Release](../../knowledge/store/apple-signing-release.md)
+
 ### Google Play testing-track standing envelope
 
 _An AAB is proven and an exact internal or closed-testing track standing envelope is current_

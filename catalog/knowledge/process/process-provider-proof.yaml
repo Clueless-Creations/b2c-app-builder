@@ -10,6 +10,7 @@ bindings:
   workflow_ids:
     - workflow.process.provider-proof-verification
     - workflow.store.google-play-testing-track-standing-envelope
+    - workflow.store.apple-testflight-standing-envelope
     - workflow.data.analytics-and-attribution-blueprint
   context_pack_ids:
     - context.operations

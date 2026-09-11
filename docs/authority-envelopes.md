@@ -82,12 +82,15 @@ standing envelope in `agent-operations.json` naming the exact provider, account,
 workflow ids. `catalog/workflows/build-release.ts`'s
 `workflow.store.google-play-metadata-standing-envelope`,
 `workflow.store.google-play-media-standing-envelope`,
-`workflow.store.apple-store-media-standing-envelope`, and
-`workflow.store.apple-store-metadata-standing-envelope` are the working standing-envelope
+`workflow.store.apple-store-media-standing-envelope`,
+`workflow.store.apple-store-metadata-standing-envelope`,
+`workflow.store.apple-testflight-standing-envelope`, and
+`workflow.store.google-play-testing-track-standing-envelope` are the working standing-envelope
 pattern. Apple media is scoped like Play media: locale, device-well, screenshot, and
 app-preview assets only. Apple metadata is scoped like Play metadata: approved listing
-text, localized metadata, and promotional content only. Products, TestFlight, review
-submit, and release state stay on other nodes.
+text, localized metadata, and promotional content only. Apple TestFlight is scoped like
+Play testing-track: named group, build digest, and tester cohort only. Products, review
+submit, and public release stay on other nodes.
 
 **Founder gates that no envelope can widen** (`knowledge/store/apple-signing-release.md:487-497`):
 Apple Developer Program enrollment/payment; creating or changing a team, app record, bundle ID,

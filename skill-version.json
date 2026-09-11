@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.122",
+  "version": "0.219.123",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Prefer compiled pack-composition once package-root resolution walks from dist.",
-    "Keep the remaining uncompiled checks graph on remaining-tsx."
+    "Print inspect: healthy or inspect: N error(s) from the shared findings footer.",
+    "Keep b2c doctor as a supported equivalent and leave doctor.* finding codes unchanged."
   ]
 }

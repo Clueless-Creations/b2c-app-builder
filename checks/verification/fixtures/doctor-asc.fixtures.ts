@@ -244,6 +244,13 @@ export function register(harness: Harness): void {
     assert(!/^behavioral:\s*true\s*$/m.test(text), "first-run eval stays authored/linted; do not mark it live behavioral");
   });
 
+  harness.check("doctor-asc: setup help prefers inspect health checks", () => {
+    const setup = readFileSync(path.join(skillRoot, "kernel", "session", "setup.ts"), "utf8");
+    assert(setup.includes("run inspect health checks"), "setup help must prefer inspect health checks");
+    assert(setup.includes("b2c doctor is a supported equivalent"), "setup help must keep doctor supported");
+    assert(!setup.includes("run doctor health checks"), "setup help must not keep doctor as the named health-check command");
+  });
+
   harness.check("doctor-asc: ARCH-07 prefers inspect as the CLI host-snapshot writer", () => {
     const northStar = readFileSync(path.join(skillRoot, "docs", "north-star-architecture.md"), "utf8");
     const adr = readFileSync(path.join(skillRoot, "docs", "decisions", "0010-first-run-honesty-owners.md"), "utf8");

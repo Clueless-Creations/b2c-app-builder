@@ -15925,7 +15925,7 @@
     "checks/validation/repository/check-autopilot-contract.ts": "114a2b4520a898d4ab3d8a597d55ef92e9bc01e5a2c1abe38226ece8c2268d99",
     "checks/validation/business/engineering/check-backend-data-contract.ts": "a8885e938c238a8ec22e038a5343095b19b23fc47423bf50f43814b9201c22fe",
     "checks/validation/business/design/check-browser-runtime-proof.ts": "a6b01564ab04a7f07ff42c8c2fd1fce74e7b5134e8dff9182181601a7b768435",
-    "checks/validation/repository/check-capability-delta.ts": "f3a7164662e5b68817d62a7577b650dec3e0f32ed45d93b88722609b5ee6483d",
+    "checks/validation/repository/check-capability-delta.ts": "6c0493c3c4967bda59e6fe24c19b847044ef7465384ae65a90d84705cb93623c",
     "checks/validation/repository/check-catalog.ts": "2ecd9271a9dbdde6af78192883064409f4cd6e25a73990e5431b4db36f6ce147",
     "checks/validation/business/process/check-change-cascade.ts": "2cf5c3c69e6881657c770d5bb15ea97ec558d69b1f22404c44018b64b11a4ba1",
     "checks/validation/business/design/check-component-contracts.ts": "c900137d09f4827f527a77548352a54e640f1a112e4f4ae31d188a9b11423e6b",
@@ -16211,5 +16211,5 @@
     "catalog/upstreams/notices/parth-app-store-screenshots.txt": "a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a"
   },
   "dependencies": [],
-  "digest": "sha256:ffd22a0d1e7d6285ef253a5f91712f371d7278de96e98fb951095826d2570c70"
+  "digest": "sha256:c59c58ed2c9eb3452312ffa307b9f7832e526c1f074ebade98df194504e4eaa8"
 }

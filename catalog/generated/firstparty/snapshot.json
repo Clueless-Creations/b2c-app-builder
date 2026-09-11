@@ -15922,7 +15922,7 @@
     "checks/validation/business/store/check-aso-evidence.ts": "2d22c1d73425cc9eb20c7aeb91858912296a6e936e170240b5389577f531466e",
     "checks/validation/business/data/check-attribution-contract.ts": "aff86d2fcd696f8d3daf301fad37816b8d1e8ecba06acbfb43fd3e6d780a1930",
     "checks/validation/business/design/check-audience-identity.ts": "912577f200c5510b1580996e9700d7e04aaa9519ab0eb5abff6e379efacfead3",
-    "checks/validation/repository/check-autopilot-contract.ts": "19e4df8a8e2d1b28688b68995c403cfae70ed3489aac4d0370a3053271284a95",
+    "checks/validation/repository/check-autopilot-contract.ts": "114a2b4520a898d4ab3d8a597d55ef92e9bc01e5a2c1abe38226ece8c2268d99",
     "checks/validation/business/engineering/check-backend-data-contract.ts": "a8885e938c238a8ec22e038a5343095b19b23fc47423bf50f43814b9201c22fe",
     "checks/validation/business/design/check-browser-runtime-proof.ts": "a6b01564ab04a7f07ff42c8c2fd1fce74e7b5134e8dff9182181601a7b768435",
     "checks/validation/repository/check-capability-delta.ts": "f3a7164662e5b68817d62a7577b650dec3e0f32ed45d93b88722609b5ee6483d",
@@ -16211,5 +16211,5 @@
     "catalog/upstreams/notices/parth-app-store-screenshots.txt": "a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a"
   },
   "dependencies": [],
-  "digest": "sha256:3a4a5dfc5afcde1c14dd322aca3e60efc902125954e494cd0670d16a3b321ccc"
+  "digest": "sha256:38bdb918ae704691f8933be94ec181c23882d7c5eeae84953ee0f264b962537f"
 }

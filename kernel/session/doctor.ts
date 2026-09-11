@@ -375,8 +375,9 @@ export function printFindings(findings: readonly DoctorFinding[]): number {
   for (const item of findings) console.log(`${item.severity.toUpperCase().padEnd(5)} ${item.code} — ${item.message}`);
   const errors = findings.filter((item) => item.severity === "error").length;
   const warns = findings.filter((item) => item.severity === "warn").length;
+  // Shared inspect/doctor footer. Prefer inspect; `b2c doctor` is a supported equivalent. Finding codes stay `doctor.*`.
   console.log(
-    errors > 0 ? `\ndoctor: ${errors} error(s), ${warns} warning(s) — this install cannot run businesses yet.` : `\ndoctor: healthy (${warns} warning(s)).`,
+    errors > 0 ? `\ninspect: ${errors} error(s), ${warns} warning(s) — this install cannot run businesses yet.` : `\ninspect: healthy (${warns} warning(s)).`,
   );
   return errors > 0 ? 1 : 0;
 }

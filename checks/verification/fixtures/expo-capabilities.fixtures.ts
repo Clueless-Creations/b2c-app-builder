@@ -35,6 +35,7 @@ import {
   runLocalCapabilityJourney,
 } from "../../../catalog/stacks/expo-local-capabilities.js";
 import { ROUTE_HREFS } from "../../../catalog/stacks/expo-starter-fixture/src/navigation/route-graph.js";
+import { listLocalCacheNotes, reopenLocalCache, writeLocalCacheNote } from "../../../catalog/stacks/expo-starter-fixture/src/offline/local-cache.js";
 import {
   EXPO_WEB_OPERATION_IDS,
   EXPO_WEB_STATIC_SOURCES,
@@ -611,11 +612,38 @@ export function register(harness: Harness): void {
       "local session is not SecureStore or paid access",
     );
     assert(journey.persistedNote.action === "accept" && journey.restarted.snapshot.notes.some((note) => note.id === "note-1"), journey.restarted.reason);
+    assert(
+      journey.duplicated.action === "accept" && journey.restarted.snapshot.notes.some((note) => note.id === "note-1" && note.body === "local cache only"),
+      "duplicate write must keep the original local note",
+    );
+    assert(journey.migrated.action === "refuse" && !journey.restarted.snapshot.notes.some((note) => note.id === "note-migrate"), journey.migrated.reason);
     assert(journey.expired.snapshot.session.signedIn === false, "expired session clears the current user");
     assert(journey.switched.snapshot.session.appUserId === "user-b" && journey.isolated, "account switch isolates prior-user notes");
     assert(journey.interrupted.action === "refuse", "interrupted write is not completion");
     assert(journey.denied.snapshot.permission?.outcome === "denied", journey.denied.reason);
     assert(journey.restored.snapshot.restoreRoute === ROUTE_HREFS.detail("1"), journey.restored.reason);
     assert(journey.labeledLive === false && journey.restarted.snapshot.backendOfRecord === false, "local journey is not live or backend proof");
+  });
+
+  harness.check("expo capabilities: starter notes persist through the bound local-cache seam", () => {
+    const written = writeLocalCacheNote({ id: "note-1", owner: "user-a", body: "local cache only" });
+    assert(written.action === "accept", written.reason);
+    const duplicate = writeLocalCacheNote({ id: "note-1", owner: "user-a", body: "should not replace", duplicate: true });
+    assert(duplicate.action === "accept", duplicate.reason);
+    const migrated = writeLocalCacheNote({ id: "note-migrate", owner: "user-a", body: "failed migration", migrationFailure: true });
+    assert(migrated.action === "refuse", migrated.reason);
+    const interrupted = writeLocalCacheNote({ id: "note-2", owner: "user-a", body: "partial", interrupt: true });
+    assert(interrupted.action === "refuse", interrupted.reason);
+    const reopened = reopenLocalCache();
+    assert(
+      reopened.some((note) => note.id === "note-1" && note.body === "local cache only" && note.owner === "user-a"),
+      "bound local-cache seam must restore the original note after reopen",
+    );
+    assert(!reopened.some((note) => note.id === "note-migrate"), "failed migration must not persist a note");
+    assert(
+      reopened.some((note) => note.id === "note-2" && note.writeState === "incomplete"),
+      "interrupted write stays incomplete after reopen",
+    );
+    assert(listLocalCacheNotes("user-b").length === 0, "another owner must not see the restored notes");
   });
 }

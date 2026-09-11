@@ -215,15 +215,15 @@ export function applyLocalAuthEvent(
 
 export function writeLocalNote(
   root: string,
-  input: { id: string; body: string; interrupt?: boolean; duplicate?: boolean; claimBackend?: boolean },
+  input: { id: string; body: string; interrupt?: boolean; duplicate?: boolean; migrationFailure?: boolean; claimBackend?: boolean },
 ): LocalCapabilityStep {
   const session = readSession(root);
   if (!session.signedIn || !session.appUserId) {
     const backend = classifyUnauthenticatedBackendRequest({ authenticated: false, navigationGuardBypassed: true });
     return { action: "refuse", code: backend.code, reason: backend.reason, snapshot: snapshotOf(root) };
   }
-  const event = input.interrupt ? "interrupted-write" : input.duplicate ? "duplicate-request" : "reconnect";
-  const claimed = input.claimBackend ? "backend-success" : input.interrupt ? "write-complete" : "local-cache-preserved";
+  const event = input.interrupt ? "interrupted-write" : input.duplicate ? "duplicate-request" : input.migrationFailure ? "migration-failure" : "reconnect";
+  const claimed = input.claimBackend ? "backend-success" : input.interrupt || input.migrationFailure ? "write-complete" : "local-cache-preserved";
   const classified = classifyOfflineEvent({ event, store: "sqlite", claimed });
   if (classified.action === "refuse" && !input.interrupt) {
     return { action: "refuse", code: classified.code, reason: classified.reason, snapshot: snapshotOf(root) };
@@ -289,6 +289,8 @@ export function restoreNotificationRoute(
 export function runLocalCapabilityJourney(root: string): {
   signedIn: LocalCapabilityStep;
   persistedNote: LocalCapabilityStep;
+  duplicated: LocalCapabilityStep;
+  migrated: LocalCapabilityStep;
   restarted: LocalCapabilityStep;
   expired: LocalCapabilityStep;
   switched: LocalCapabilityStep;
@@ -300,6 +302,8 @@ export function runLocalCapabilityJourney(root: string): {
 } {
   const signedIn = applyLocalAuthEvent(root, "sign-in", { incomingUserId: "user-a", callbackTrusted: true });
   const persistedNote = writeLocalNote(root, { id: "note-1", body: "local cache only" });
+  const duplicated = writeLocalNote(root, { id: "note-1", body: "should not replace", duplicate: true });
+  const migrated = writeLocalNote(root, { id: "note-migrate", body: "failed migration", migrationFailure: true });
   const restarted = reopenLocalCapabilities(root);
   const expired = applyLocalAuthEvent(root, "expired");
   const switched = applyLocalAuthEvent(root, "account-switch", { incomingUserId: "user-b" });
@@ -310,6 +314,8 @@ export function runLocalCapabilityJourney(root: string): {
   return {
     signedIn,
     persistedNote,
+    duplicated,
+    migrated,
     restarted,
     expired,
     switched,

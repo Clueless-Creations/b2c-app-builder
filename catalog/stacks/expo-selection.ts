@@ -350,7 +350,7 @@ function operationSupport(): ExpoOperationSupport[] {
       evidenceTier: "fixture-tested",
       queuedIssue: 82,
       notes:
-        "Isolated TypeScript starter copies into an authorized empty target. A disposable consumer can npm install and run Metro web export (`expo export --platform web`). The fixture tree still ships no lockfile. Habit-tracker starter remains Next.js. Device install is a recorded hold.",
+        "Isolated TypeScript starter copies into an authorized empty target. Home writes local notes through the bound local-cache seam. A disposable consumer can npm install and run Metro web export (`expo export --platform web`). The fixture tree still ships no lockfile. Habit-tracker starter remains Next.js. Device install is a recorded hold.",
     },
     {
       id: "router-native-ui",
@@ -400,7 +400,7 @@ function operationSupport(): ExpoOperationSupport[] {
       evidenceTier: "fixture-tested",
       queuedIssue: 83,
       notes:
-        "Node SQLite local cache survives a reopen in a disposable directory. Restart, duplicate, and interrupted writes keep cache semantics. Not a backend of record. Not SecureStore.",
+        "Node SQLite local cache survives a reopen in a disposable directory. Starter notes persist through the bound local-cache seam. Restart, duplicate, migration-failure, and interrupted writes keep cache semantics. Not a backend of record. Not SecureStore.",
     },
     {
       id: "device-capabilities",

@@ -11,7 +11,7 @@ This skill is a router. It routes consumer-business work. Capabilities define re
 
 ## Connect
 
-Use the local `b2c-local` MCP server from this repository for workspace planning and execution. Hosted knowledge registers as `b2c-hosted` and cannot see or run a local business. A leftover `b2c-app-builder` registration is the legacy local name. Do not route consumer-app work through Planes.
+Use the local `b2c-local` MCP server from this repository for workspace planning and execution. Hosted knowledge registers as `b2c-hosted` and cannot see or run a local business. A leftover `b2c-app-builder` registration is the legacy local name; the handshake receipt decides capability, not that leftover name. Do not route consumer-app work through Planes.
 
 This section is a connectivity gate, not the business start path. If the local MCP is unavailable:
 

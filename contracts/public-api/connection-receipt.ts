@@ -24,6 +24,50 @@ export const connectionReceiptSchema = z.strictObject({
 });
 export type ConnectionReceipt = z.infer<typeof connectionReceiptSchema>;
 
+export const LOCAL_CLIENT_NAME = "b2c-local" as const;
+export const HOSTED_CLIENT_NAME = "b2c-hosted" as const;
+export const LEFTOVER_LOCAL_CLIENT_NAME = "b2c-app-builder" as const;
+
+/** Claude, Cursor, and Codex names. Handshake receipts decide capability, not these labels. */
+export const leftoverNameClientMatrix = [
+  {
+    client: "claude",
+    freshLocal: "claude mcp add --scope user b2c-local --",
+    leftoverLocal: "existing Claude user-scope name b2c-app-builder",
+    hosted: "claude mcp add --transport http b2c-hosted ",
+  },
+  {
+    client: "cursor",
+    freshLocal: '"b2c-local": { "command"',
+    leftoverLocal: 'existing Cursor mcpServers key "b2c-app-builder"',
+    hosted: '"b2c-hosted": { "url"',
+  },
+  {
+    client: "codex",
+    freshLocal: "[mcp_servers.b2c-local]",
+    leftoverLocal: "existing Codex table [mcp_servers.b2c-app-builder]",
+    hosted: "codex mcp add b2c-hosted --url",
+  },
+] as const;
+
+export type LeftoverNameClientRow = (typeof leftoverNameClientMatrix)[number];
+
+export type ConfiguredConnectionReading = {
+  clientName: string;
+  leftoverName: boolean;
+  mode: ConnectionReceipt["mode"];
+  recommendedName: ConnectionReceipt["identity"]["recommended"];
+  guidance: string;
+};
+
+export type ConfiguredConnectionSet = {
+  names: readonly string[];
+  bothConfigured: boolean;
+  leftoverPointsAtLocal: boolean;
+  leftoverPointsAtHosted: boolean;
+  duplicateNames: boolean;
+};
+
 export function connectionReceipt(input: {
   mode: "local_execution" | "hosted_knowledge";
   engineVersion: string;
@@ -111,4 +155,57 @@ export function hostedMcpInstructionsSuffix(engineVersion: string): string {
     " A leftover b2c-app-builder client name is the legacy local name, not this hosted handshake. " +
     formatConnectionReceipt(receipt)
   );
+}
+
+/** Capability comes from the handshake receipt, not the leftover client name. */
+export function interpretConfiguredConnection(input: {
+  clientName: string;
+  receipt: ConnectionReceipt;
+}): ConfiguredConnectionReading {
+  const leftoverName = input.clientName === LEFTOVER_LOCAL_CLIENT_NAME;
+  const capability = connectionCapabilityGuidance(input.receipt);
+  const guidance = leftoverName
+    ? input.receipt.mode === "hosted_knowledge"
+      ? `The leftover client name ${LEFTOVER_LOCAL_CLIENT_NAME} is not a capability. ${capability}`
+      : `The leftover client name ${LEFTOVER_LOCAL_CLIENT_NAME} is the legacy local registration. ${capability}`
+    : capability;
+  return {
+    clientName: input.clientName,
+    leftoverName,
+    mode: input.receipt.mode,
+    recommendedName: input.receipt.identity.recommended,
+    guidance,
+  };
+}
+
+export function configuredConnectionSet(
+  entries: readonly { clientName: string; receipt: ConnectionReceipt }[],
+): ConfiguredConnectionSet {
+  const names = entries.map((entry) => entry.clientName);
+  return {
+    names,
+    bothConfigured:
+      entries.some((entry) => entry.receipt.mode === "local_execution") &&
+      entries.some((entry) => entry.receipt.mode === "hosted_knowledge"),
+    leftoverPointsAtLocal: entries.some(
+      (entry) => entry.clientName === LEFTOVER_LOCAL_CLIENT_NAME && entry.receipt.mode === "local_execution",
+    ),
+    leftoverPointsAtHosted: entries.some(
+      (entry) => entry.clientName === LEFTOVER_LOCAL_CLIENT_NAME && entry.receipt.mode === "hosted_knowledge",
+    ),
+    duplicateNames: names.length !== new Set(names).size,
+  };
+}
+
+export function leftoverNameMigrationGuidance(): string {
+  return [
+    "Existing leftover names stay in your agent config. Setup never edits Claude, Cursor, or Codex files.",
+    `Claude leftover: ${leftoverNameClientMatrix[0].leftoverLocal}.`,
+    `Cursor leftover: ${leftoverNameClientMatrix[1].leftoverLocal}.`,
+    `Codex leftover: ${leftoverNameClientMatrix[2].leftoverLocal}.`,
+    "The leftover name is not a capability. The handshake receipt decides local execution versus hosted knowledge.",
+    `Rename a leftover local entry to ${LOCAL_CLIENT_NAME}, or a leftover hosted entry to ${HOSTED_CLIENT_NAME}, only when you choose to.`,
+    `Fresh local setup uses ${LOCAL_CLIENT_NAME}. Hosted snippets use ${HOSTED_CLIENT_NAME}. Both names may exist in one client.`,
+    "Do not register hosted knowledge under the leftover name.",
+  ].join("\n");
 }

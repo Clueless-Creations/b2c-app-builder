@@ -79,6 +79,8 @@ test("setup next steps name status and plan before catalog or compose", () => {
     assertSetupLeadsWithStatusBeforeCatalog(result.stdout);
     assert.match(result.stdout, /claude mcp add --scope user b2c-local/);
     assert.match(result.stdout, /\[mcp_servers\.b2c-local\]/);
+    assert.match(result.stdout, /"b2c-local": \{ "command"/);
+    assert.match(result.stdout, /Setup never edits Claude, Cursor, or Codex files/);
     assert.match(result.stdout, /Provider readiness is not implied by this receipt/);
     assert.doesNotMatch(result.stdout, /claude mcp add --scope user b2c-app-builder(?:\s|$)/);
   } finally {

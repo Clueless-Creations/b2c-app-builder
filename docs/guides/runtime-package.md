@@ -185,6 +185,18 @@ The input is canonical unpadded base64url SPKI DER text for an Ed25519 public ke
 
 Register the absolute Node command and the `entrypoints/mcp/b2c-app-builder-mcp.mjs` path that `b2c setup` prints, under the name `b2c-local`. Without a local install, register the portable form instead: command `npx`, arguments `-y b2c-app-builder`. The transport is stdio. Hosted knowledge uses `b2c-hosted`. A leftover `b2c-app-builder` client name is the legacy local registration.
 
+### Leftover names
+
+The leftover client name is not a capability. The handshake receipt decides local execution versus hosted knowledge.
+
+| Client | Fresh local | Leftover name still in config | Hosted |
+| --- | --- | --- | --- |
+| Claude Code | `claude mcp add --scope user b2c-local --` | existing Claude user-scope name `b2c-app-builder` | `claude mcp add --transport http b2c-hosted` |
+| Cursor | `"b2c-local"` in `~/.cursor/mcp.json` | existing Cursor `mcpServers` key `"b2c-app-builder"` | `"b2c-hosted"` URL entry |
+| Codex | `[mcp_servers.b2c-local]` | existing Codex table `[mcp_servers.b2c-app-builder]` | `codex mcp add b2c-hosted --url` |
+
+Setup never edits those files. Rename a leftover local entry to `b2c-local`, or a leftover hosted entry to `b2c-hosted`, only when you choose to. `b2c-local` and `b2c-hosted` may exist in one client. Do not register hosted knowledge under the leftover name.
+
 The default server exposes public discovery and composition preview plus workspace catalog, workflow, knowledge, status, plan, and operation preview and replay tools. Registered-workspace planning can run read-only provider prerequisite probes. The server resolves workspaces only through `~/.b2c-app-builder/workspaces.json`.
 
 Set `B2C_APP_BUILDER_MCP_WRITE=1` only for an explicitly approved local write session. It adds bootstrap, run, approvals, verify, and schedule tools and permits gated operate commits. Keep the CLI as the normal write path.

@@ -16,6 +16,7 @@ import {
   type HostedKnowledgeBundle,
   type HostedKnowledgeDocument,
 } from "../kernel/knowledge-service/types.js";
+import { resolveSkillRoot } from "./lib/skill-root.js";
 
 export const HOSTED_BUNDLE_RELATIVE_PATH = "catalog/generated/hosted-knowledge.json";
 
@@ -157,7 +158,7 @@ function writeBundle(skillRoot: string, bundle: HostedKnowledgeBundle): void {
 }
 
 function main(argv: string[]): number {
-  let skillRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  let skillRoot = resolveSkillRoot(import.meta.url);
   let check = false;
   let json = false;
   for (let index = 0; index < argv.length; index += 1) {

@@ -3,10 +3,10 @@ import { resolveCompiledScript } from "./tsx-launcher.mjs";
 
 /**
  * Scripts this increment may launch from `dist/` without tsx. `tsconfig.build.json` already
- * emits `tooling/**`; other tooling checks stay on tsx until their package-root resolution
+ * emits `tooling/**`; remaining tooling checks stay on tsx until their package-root resolution
  * is compiled-safe. `checks/` stays uncompiled.
  */
-export const PACKED_CHECK_COMPILED_SOURCES = ["tooling/render-credits.ts"] as const;
+export const PACKED_CHECK_COMPILED_SOURCES = ["tooling/render-credits.ts", "tooling/render-hosted-bundle.ts"] as const;
 
 export interface PackedCheckInventoryEntry {
   readonly id: string;

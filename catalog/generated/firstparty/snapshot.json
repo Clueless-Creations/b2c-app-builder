@@ -15819,7 +15819,7 @@
     "checks/validation/repository/check-gates-layout.ts": "15b01996597655712ce63fd31bcac34c74cdfa8065b719944507e0439579ff62",
     "checks/validation/business/process/check-generated-pages.ts": "ce061e8c22491f04d3d3eff55392c7300c03af2a72a574d65b4fed53db892f53",
     "checks/validation/repository/check-graph-foundations.ts": "7fcf85053ab148d60b723a38fb14fe93f0680818236fa02c0e354022004ea7a9",
-    "tooling/render-hosted-bundle.ts": "96504484c7917076e4cbf8bb21598b73686407529f5e1b6304d8767446fa819d",
+    "tooling/render-hosted-bundle.ts": "cb7845d2bda23c408c01eb048d4ec4750440526ea2add4b2c40d50ceec772876",
     "checks/validation/repository/check-hub-spoke.ts": "a9248a797f3164c415816e09d35a4d89499f7680afba26cc24abe507f711d01b",
     "checks/validation/business/growth/check-landing-funnel.ts": "a2813bfb35afcc32f2647f94d0c74d1b21ed2730f5a646436e2ae6a15190adbd",
     "checks/validation/business/process/check-lane-coverage.ts": "25ce2fd700c7dc6569c7e6771db4b7434ff204d35f6c431c47b0a1bae29fe6ac",
@@ -16083,5 +16083,5 @@
     "catalog/upstreams/notices/parth-app-store-screenshots.txt": "a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a"
   },
   "dependencies": [],
-  "digest": "sha256:485abd7f49aa65104f2c3611208460dc29e2601cdc050fa95d4ea5c558b310d6"
+  "digest": "sha256:1aca3285f2d1b62080d702c1d29ce647cffa3054b271702590d5325ddfd177bf"
 }

@@ -15,6 +15,9 @@
  * This is a repository-only check. An installed skill does not contain the
  * repository root, so the runtime audit must not run this check.
  *
+ * Default repo root walks from this file so packed omit-dev can launch the compiled twin
+ * under `dist/checks/validation/repository/` without treating `dist/` as the package root.
+ *
  * npm script: check:architecture
  * Usage: tsx checks/validation/repository/check-architecture.ts --repo-root /path/to/repo
  *
@@ -25,10 +28,10 @@
  */
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { parse } from "@babel/parser";
 import { isMainModule } from "../../../tooling/lib/cli-entrypoint.js";
 import { flagBoolean, flagString, issue, parseFlags, reportAndExit, type Issue } from "../../../tooling/lib/launch-state.js";
+import { resolveSkillRoot } from "../../../tooling/lib/skill-root.js";
 import { collectProviderBoundaryIssues } from "./check-provider-boundary.js";
 
 export const ARCH02_RULE = "architecture.arch02.runtime_imports_validation";
@@ -373,8 +376,7 @@ function collectAllowEdges(argv: string[]): Set<string> {
 }
 
 export function runArchitectureCheck(argv: string[] = process.argv.slice(2)): Issue[] {
-  const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-  const defaultRepoRoot = path.resolve(scriptDir, "../../..");
+  const defaultRepoRoot = resolveSkillRoot(import.meta.url);
   const flags = parseFlags(argv, [
     { flags: ["--repo-root", "--root"], key: "repoRoot" },
     { flags: ["--accept-recorded-debt"], key: "acceptRecordedDebt", kind: "boolean" },

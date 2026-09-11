@@ -15916,7 +15916,7 @@
     "checks/validation/business/store/check-app-store-portfolio.ts": "bca69a90e45e9f3ef4bacb81cf82e972fb6f3502be35b52e6cfeb6afeda8aa0b",
     "checks/validation/business/store/check-apple-app-store-requirements.ts": "160d340517367795b4071acc7ca6870dc3a3cd03447449c03a805852478c4307",
     "checks/validation/business/engineering/check-archetype-starter.ts": "d75c7e552dc6aa96781e1d419890c966613e4702a545435dad08ec69245c6bc8",
-    "checks/validation/repository/check-architecture.ts": "ad64c0986881412e1b53b3b71846dd7dd4542a74a8790974674101ccd1036699",
+    "checks/validation/repository/check-architecture.ts": "4959041612a80a9c9f6de42a1c60f096eb66ca134bb117f2e02405ff81b498b9",
     "checks/validation/business/process/check-artifact-templates.ts": "46dc186c0e866f0e32919a98f0aabc1cec425bb945400874c4aef064b3ee69c0",
     "checks/validation/business/store/check-asc-command-contract.ts": "28ad722cbe298cfb8b1e363d518087783b3f298eb1fabf4cd67602a9853bdd16",
     "checks/validation/business/store/check-aso-evidence.ts": "2d22c1d73425cc9eb20c7aeb91858912296a6e936e170240b5389577f531466e",
@@ -16211,5 +16211,5 @@
     "catalog/upstreams/notices/parth-app-store-screenshots.txt": "a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a"
   },
   "dependencies": [],
-  "digest": "sha256:d8070a0c6883691f4cb728891901fc0327c22b5e30a67dec87b03b79e4c7cb00"
+  "digest": "sha256:3d25adbf8a3b0ce5e9e9441ae110a24c25cb5df79da23a140a655f46601b5dfb"
 }

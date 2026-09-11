@@ -18,6 +18,7 @@
     "entrypoints/**/*.ts",
     "catalog/**/*.ts",
     "checks/validation/repository/check-agent-entrypoints.ts",
+    "checks/validation/repository/check-architecture.ts",
     "checks/validation/repository/check-catalog.ts",
     "checks/validation/repository/check-gates-layout.ts",
     "checks/validation/repository/check-graph-foundations.ts",

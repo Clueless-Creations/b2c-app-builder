@@ -261,7 +261,7 @@ export function probeRevenueCatCliSelectedTarget(input: {
       ...unproven,
       preflight: selectedTargetHold(
         "authority-missing",
-        "Selected RevenueCat project/app checks fail closed without host authority. Doctor/probe will not spawn authenticated rc commands or claim live catalog proof.",
+        "Selected RevenueCat project/app checks fail closed without host authority. Inspect will not spawn authenticated rc commands or claim live catalog proof.",
       ),
     };
   }
@@ -272,7 +272,7 @@ export function probeRevenueCatCliSelectedTarget(input: {
       status: "ready",
       code: "ready",
       message:
-        "Selected RevenueCat project/app ids match the approved target. Live catalog remains unproven; doctor/probe did not spawn an authenticated command.",
+        "Selected RevenueCat project/app ids match the approved target. Live catalog remains unproven; inspect did not spawn an authenticated command.",
       blocksUnrelatedWork: false,
     },
   };

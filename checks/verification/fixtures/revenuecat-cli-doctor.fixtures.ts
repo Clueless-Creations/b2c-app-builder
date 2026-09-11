@@ -303,6 +303,35 @@ export function register(harness: Harness): void {
     assert(probe.preflight.message.includes("did not spawn"), `ready message must deny spawn: ${probe.preflight.message}`);
   });
 
+  harness.check("revenuecat-cli-doctor: selected-target copy prefers inspect as the diagnostic actor", () => {
+    const source = readFileSync(path.join(skillRoot, "adapters/providers/revenuecat/cli-doctor.ts"), "utf8");
+    const missingAuthority = probeRevenueCatCliSelectedTarget({
+      discovery: identity("/opt/fake/bin/rc", REVIEWED),
+      target: selectedTarget({ hostAuthorityGranted: false }),
+      requestProjectId: "proj_approved",
+      requestAppId: "app_test",
+    });
+    const ready = probeRevenueCatCliSelectedTarget({
+      discovery: identity("/opt/fake/bin/rc", REVIEWED),
+      target: selectedTarget({ hostAuthorityGranted: true }),
+      requestProjectId: "proj_approved",
+      requestAppId: "app_test",
+    });
+    assert(missingAuthority.preflight.code === "authority-missing", "finding/hold codes stay doctor.* / authority-missing");
+    assert(
+      missingAuthority.preflight.message.includes("Inspect will not spawn authenticated rc commands"),
+      `authority-missing actor copy must prefer inspect: ${missingAuthority.preflight.message}`,
+    );
+    assert(
+      ready.preflight.message.includes("inspect did not spawn an authenticated command"),
+      `ready actor copy must prefer inspect: ${ready.preflight.message}`,
+    );
+    assert(source.includes("`b2c doctor` is a supported equivalent"), "RevenueCat selected-target copy must keep doctor supported");
+    assert(!source.includes("Doctor/probe will not"), "selected-target copy must not keep Doctor/probe as the named actor");
+    assert(!source.includes("doctor/probe did not spawn"), "ready copy must not keep doctor/probe as the named actor");
+    assert(missingAuthority.spawnedAuthenticatedCommand === false && ready.spawnedAuthenticatedCommand === false, "selected-target probe must still never spawn");
+  });
+
   harness.check("revenuecat-cli-doctor: status sibling is last observation, not a live PATH probe or live catalog", () => {
     const notRun = renderRevenueCatCliHostBlock(null);
     assert(notRun.includes("not a live PATH probe"), `not-run block must deny a live probe: ${notRun}`);

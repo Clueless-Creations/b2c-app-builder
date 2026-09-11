@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.128",
+  "version": "0.219.129",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Keep degraded local execution on b2c-local when a missing worker CLI uses the interpreter reading.",
-    "Planning stays selected, hosted-by-design stays wrong_surface, and leftover b2c-app-builder is not a third surface."
+    "Prefer compiled agent-entrypoints once package-root resolution walks from dist.",
+    "Keep the remaining uncompiled checks graph on remaining-tsx."
   ]
 }

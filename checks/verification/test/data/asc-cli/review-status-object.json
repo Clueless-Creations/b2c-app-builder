@@ -1,0 +1,20 @@
+{
+  "appId": "123456789",
+  "version": {
+    "id": "asv-native-1",
+    "version": "1.2.3",
+    "platform": "IOS",
+    "state": "WAITING_FOR_REVIEW",
+    "createdDate": "2026-09-08T00:00:00.000Z"
+  },
+  "reviewDetailConfigured": true,
+  "reviewDetailId": "rd-native-1",
+  "latestSubmission": {
+    "id": "rs-native-1",
+    "state": "WAITING_FOR_REVIEW",
+    "platform": "IOS",
+    "submittedDate": "2026-09-08T12:00:00.000Z"
+  },
+  "reviewState": "WAITING_FOR_REVIEW",
+  "nextAction": "Wait for App Store review outcome."
+}

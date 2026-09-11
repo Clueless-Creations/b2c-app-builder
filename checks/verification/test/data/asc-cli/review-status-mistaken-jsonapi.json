@@ -1,0 +1,11 @@
+{
+  "data": {
+    "type": "appStoreVersions",
+    "id": "asv-native-1",
+    "attributes": {
+      "platform": "IOS",
+      "versionString": "1.2.3",
+      "appStoreState": "WAITING_FOR_REVIEW"
+    }
+  }
+}

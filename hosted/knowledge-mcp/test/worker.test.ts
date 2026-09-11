@@ -233,7 +233,7 @@ test("real MCP initialization and tool discovery expose only the four read-only 
     clientName: "b2c-hosted",
     receipt: connectionReceipt({ mode: "hosted_knowledge", engineVersion: hostedKnowledge.engineVersion }),
   });
-  for (const toolName of ["b2c_run", "b2c_discover", "b2c_compose", "b2c_market_report", "b2c_contribute_plan"] as const) {
+  for (const toolName of ["b2c_run", "b2c_discover", "b2c_compose", "b2c_market_report", "b2c_contribute_plan", "b2c_business_create"] as const) {
     const local = await mcpCall(toolName, {});
     assert.equal(local.status, 200, toolName);
     const localBody = (await local.json()) as {

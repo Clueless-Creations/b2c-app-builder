@@ -384,6 +384,21 @@ export function leftoverNameMigrationGuidance(): string {
   ].join("\n");
 }
 
+/**
+ * Leftover MCP names for CLI-only public operations. Local MCP never registers these;
+ * leftover agents still call them. Hosted knowledge refuses them as wrong-surface, not missing tools.
+ */
+export const HOSTED_WRONG_SURFACE_LEFTOVER_CLI_ONLY_TOOL_NAMES = [
+  "b2c_research_record",
+  "b2c_package_import",
+  "b2c_composition_activate",
+  "b2c_composition_recover",
+  "b2c_business_create",
+  "b2c_business_initialize",
+  "b2c_business_run",
+  "b2c_business_recover",
+] as const;
+
 /** Local-only MCP names. Hosted knowledge refuses these without listing them as tools. */
 export const HOSTED_WRONG_SURFACE_TOOL_NAMES = [
   "b2c_plan",
@@ -409,6 +424,7 @@ export const HOSTED_WRONG_SURFACE_TOOL_NAMES = [
   "b2c_contribute_upstreams",
   "b2c_contribute_upstream_check",
   "b2c_contribute_upgrade_plan",
+  ...HOSTED_WRONG_SURFACE_LEFTOVER_CLI_ONLY_TOOL_NAMES,
 ] as const;
 
 export type HostedWrongSurfaceToolName = (typeof HOSTED_WRONG_SURFACE_TOOL_NAMES)[number];

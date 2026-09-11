@@ -40,8 +40,8 @@ This service does not run the engine remotely. It cannot access local files, bus
 approvals, schedules, provider credentials, or execution commands. Those workspace
 operations remain local. A local-only MCP name fails as `wrong_surface` with the hosted
 connection receipt reading; it is not a missing knowledge tool. That includes workspace
-planning and execution, public discovery, composition preview, market reports, and leftover
-contributor names. The local
+planning and execution, public discovery, composition preview, market reports, leftover
+contributor names, and leftover CLI-only public names. The local
 and hosted MCP servers use the same knowledge implementation.
 If the local knowledge bundle is missing or invalid, the local MCP keeps its execution
 tools available. It omits the four knowledge tools and emits a fixed recovery warning.

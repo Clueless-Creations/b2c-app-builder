@@ -281,6 +281,17 @@ function configuredSurfaceNeedLabel(need: ConfiguredSurfaceNeed, mode: Connectio
   return mode === "hosted_knowledge" ? "hosted knowledge" : "packaged knowledge";
 }
 
+function selectedSurfaceGuidance(
+  need: ConfiguredSurfaceNeed,
+  connection: ConfiguredConnectionReading,
+  receipt: ConnectionReceipt,
+): string {
+  if (need === "workspace_execution" && receipt.observed?.workspaceExecution === "unavailable") {
+    return connection.guidance;
+  }
+  return `Use ${connection.clientName} for ${configuredSurfaceNeedLabel(need, connection.mode)}.`;
+}
+
 /** Pick local vs hosted from declared receipts. Duplicate names are a collision, not a leftover third surface. */
 export function selectConfiguredSurface(input: {
   entries: readonly ConfiguredConnectionEntry[];
@@ -305,7 +316,7 @@ export function selectConfiguredSurface(input: {
         need: input.need,
         set,
         connection,
-        guidance: `Use ${connection.clientName} for ${configuredSurfaceNeedLabel(input.need, connection.mode)}.`,
+        guidance: selectedSurfaceGuidance(input.need, connection, local.receipt),
       };
     }
     if (hosted) {
@@ -355,6 +366,7 @@ export function bothConfiguredRoutingGuidance(): string {
     `A leftover ${LEFTOVER_LOCAL_CLIENT_NAME} name is not a third surface.`,
     "Duplicate names are a collision, not a capability.",
     "Local packaged knowledge stays available when hosted knowledge is absent.",
+    "A missing worker CLI degrades local execution health. It does not select hosted knowledge for execution.",
   ].join(" ");
 }
 

@@ -8,7 +8,8 @@
  * review-status response envelope is the 5.1.0 CLI `reviewStatusResult` object.
  * The independent review-submit response envelope is the 5.1.0 CLI
  * `reviewSubmitResult` dry-run object. `asc review submit` maps to
- * `workflow.store.app-review-resubmit`. Adapter-built resubmit argv and canned
+ * `workflow.store.app-review-resubmit`. `asc testflight feedback list` maps to
+ * `workflow.store.apple-testflight-standing-envelope`. Adapter-built resubmit argv and canned
  * live-provider snapshots are not independent evidence.
  */
 import { readFileSync } from "node:fs";
@@ -34,6 +35,7 @@ const COOKBOOK = path.join(skillRoot, "knowledge/store/app-store-connect-cli.md"
 const APPLE_ASC = path.join(skillRoot, "catalog/providers/apple-asc.yaml");
 const RORK = path.join(skillRoot, "catalog/upstreams/rork-app-store-connect-cli.yaml");
 const RESUBMIT = path.join(skillRoot, "adapters/app-review/resubmit.ts");
+const BUILD_RELEASE = path.join(skillRoot, "catalog/workflows/build-release.ts");
 const APP_REVIEW_FIXTURES = path.join(skillRoot, "checks/verification/fixtures/app-review.fixtures.ts");
 const ASC_CLI_NATIVE_DIR = path.join(skillRoot, "checks/verification/test/data/asc-cli");
 const RORK_REVIEWED_VERSION = "5.1.0";
@@ -163,11 +165,11 @@ const ASC_NATIVE_MAPPING: readonly AscNativeMappingRow[] = [
   },
   {
     nativeCapability: "asc testflight feedback list",
-    canonicalOperation: "none",
-    semanticFit: "none",
+    canonicalOperation: "workflow.store.apple-testflight-standing-envelope",
+    semanticFit: "partial",
     effects: "read",
-    disposition: "defer",
-    owner: "knowledge/store/app-store-connect-cli.md",
+    disposition: "implement",
+    owner: "catalog/workflows/build-release.ts",
   },
   {
     nativeCapability: "asc workflow run testflight_beta",
@@ -246,10 +248,11 @@ export function register(harness: Harness): void {
   harness.check("asc-conformance: non-observe mapping names deferral and rejection without a generic encoder", () => {
     const rork = readFileSync(RORK, "utf8");
     const cookbook = readFileSync(COOKBOOK, "utf8");
+    const buildRelease = readFileSync(BUILD_RELEASE, "utf8");
     const implemented = ASC_NATIVE_MAPPING.filter((row) => mappingDisposition(row) === "implement");
     const deferred = ASC_NATIVE_MAPPING.filter((row) => mappingDisposition(row) === "defer");
     const rejected = ASC_NATIVE_MAPPING.filter((row) => mappingDisposition(row) === "reject");
-    assert(implemented.length === 10, `observe/remediate/media/metadata/testflight/review-submit implement rows: ${implemented.length}`);
+    assert(implemented.length === 11, `observe/remediate/media/metadata/testflight/review-submit implement rows: ${implemented.length}`);
     assert(
       implemented.some(
         (row) =>
@@ -260,13 +263,19 @@ export function register(harness: Harness): void {
       "review submit maps to the existing resubmit workflow",
     );
     assert(
-      deferred.every((row) => row.nativeCapability !== "asc review submit"),
-      "review submit mapping is no longer deferred",
+      implemented.some(
+        (row) =>
+          row.nativeCapability === "asc testflight feedback list" &&
+          row.canonicalOperation === "workflow.store.apple-testflight-standing-envelope" &&
+          row.owner === "catalog/workflows/build-release.ts",
+      ),
+      "TestFlight feedback read maps to the existing TestFlight standing envelope",
     );
     assert(
-      deferred.length === 1 && deferred[0]?.nativeCapability === "asc testflight feedback list",
-      `only TestFlight feedback read stays deferred: ${deferred.map((row) => row.nativeCapability).join(", ")}`,
+      deferred.every((row) => row.nativeCapability !== "asc review submit" && row.nativeCapability !== "asc testflight feedback list"),
+      "review submit and TestFlight feedback read are no longer deferred",
     );
+    assert(deferred.length === 0, `no native mapping row stays deferred: ${deferred.map((row) => row.nativeCapability).join(", ")}`);
     assert(
       implemented.some(
         (row) =>
@@ -294,10 +303,8 @@ export function register(harness: Harness): void {
       ),
       "TestFlight beta workflow maps to the Apple TestFlight standing envelope",
     );
-    assert(
-      deferred.some((row) => row.nativeCapability === "asc testflight feedback list" && row.canonicalOperation === "none"),
-      "TestFlight feedback read stays knowledge-only",
-    );
+    assert(buildRelease.includes("asc testflight feedback list"), "the TestFlight envelope already names the cookbook feedback-read form");
+    assert(cookbook.includes("asc testflight feedback list"), "cookbook records the native TestFlight feedback-read form");
     for (const row of rejected) {
       assert(
         ALWAYS_FORBIDDEN_APP_REVIEW_COMMANDS.some((command) => command.includes(row.nativeCapability)),
@@ -376,6 +383,19 @@ export function register(harness: Harness): void {
       coverageLimits: "Cookbook records only the dry-run form from local --help on 2026-09-08. No live TestFlight JSON and no live App Store Connect.",
       sample: "asc workflow run --dry-run testflight_beta VERSION:1.2.3",
     });
+    const testflightFeedback = provenance({
+      provider: "apple-asc",
+      transport: "cli",
+      reviewedVersion: RORK_REVIEWED_VERSION,
+      reviewedRevision: "unknown",
+      sourceSelector: COOKBOOK_SOURCE,
+      nativeOperation: "asc testflight feedback list",
+      canonicalOperation: "workflow.store.apple-testflight-standing-envelope",
+      evidenceKind: "official-example",
+      establishes: ["request-shape"],
+      coverageLimits: "Cookbook argv stem from local --help on 2026-09-08. No live TestFlight feedback JSON and no live App Store Connect.",
+      sample: 'asc testflight feedback list --app "123456789" --paginate',
+    });
     const submit = provenance({
       provider: "apple-asc",
       transport: "cli",
@@ -406,12 +426,14 @@ export function register(harness: Harness): void {
     assert(isIndependentEvidence(screenshotUpload.evidenceKind), describeConformanceCoverage(screenshotUpload));
     assert(isIndependentEvidence(metadataPush.evidenceKind), describeConformanceCoverage(metadataPush));
     assert(isIndependentEvidence(testflightBeta.evidenceKind), describeConformanceCoverage(testflightBeta));
+    assert(isIndependentEvidence(testflightFeedback.evidenceKind), describeConformanceCoverage(testflightFeedback));
     assert(isIndependentEvidence(submit.evidenceKind), describeConformanceCoverage(submit));
     assert(isIndependentEvidence(generated.evidenceKind) === false, describeConformanceCoverage(generated));
     assert(cookbook.includes(String(observeStatus.sample)), "observe sample must be the cookbook line");
     assert(cookbook.includes(String(screenshotUpload.sample)), "screenshot upload sample must be the cookbook line");
     assert(cookbook.includes(String(metadataPush.sample)), "metadata push sample must be the cookbook dry-run line");
     assert(cookbook.includes(String(testflightBeta.sample)), "TestFlight beta sample must be the cookbook dry-run line");
+    assert(cookbook.includes(String(testflightFeedback.sample)), "TestFlight feedback sample must be the cookbook line");
   });
 
   harness.check("asc-conformance: independent review-status response envelope is the 5.1.0 CLI object", () => {

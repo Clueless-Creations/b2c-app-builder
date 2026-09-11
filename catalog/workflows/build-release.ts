@@ -450,11 +450,7 @@ export const workflows = [
   }),
   workflow({
     id: "workflow.store.apple-testflight-standing-envelope",
-    founderPhrasings: [
-      "upload this build to TestFlight",
-      "ship the build to TestFlight testers",
-      "push this build to the approved TestFlight group",
-    ],
+    founderPhrasings: ["upload this build to TestFlight", "ship the build to TestFlight testers", "push this build to the approved TestFlight group"],
     title: "Apple TestFlight standing envelope",
     domainId: "domain.store",
     areaIds: ["area.build-release"],

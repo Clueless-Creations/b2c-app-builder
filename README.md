@@ -45,6 +45,12 @@ testing businesses. Produce one excellent consumer business first. Then reuse
 its foundations for a different approach to the same market, with comparable
 evidence.
 
+## Choose how to use it
+
+Use [a focused task skill](agents/skills/README.md) for research, an onboarding review, or a monetization question. Read and apply the expertise without creating a workspace. Use the main business skill when you need coordinated, durable creation or operation through status, plan, execution, and evidence. Both use the same catalog and knowledge.
+
+[Browse the knowledge by business area](knowledge/README.md).
+
 ## Get started
 
 Use Node.js 24.
@@ -124,14 +130,16 @@ package recipe, use the separate revision-checked
 
 ## What it covers
 
-| Area                    | Station                    | What the system helps an agent do                                                   |
-| ----------------------- | -------------------------- | ----------------------------------------------------------------------------------- |
-| Opportunity             | Prep & design, menu planning | Research users, competitors, demand, and a defensible product hypothesis            |
-| Product                 | Prep & design               | Define the promise, first value, core loop, complete scope, and success measures    |
-| Experience              | Prep & design               | Develop a distinct identity, onboarding, interaction, motion, and accessible states |
-| Engineering             | The hot line               | Build native and web surfaces with explicit contracts and runtime verification      |
-| Revenue and growth      | Front of house             | Establish subscriptions, acquisition, funnels, attribution, and lifecycle work      |
-| Learning and operations | The pass and the office    | Inspect evidence, plan improvements, support users, and maintain the business       |
+<!-- catalog-generated:start business-areas -->
+| Area | Station | What the system helps an agent do |
+| --- | --- | --- |
+| [Opportunity](knowledge/README.md#opportunity) | Prep & design, menu planning | Research users, competitors, demand, and a defensible product hypothesis. |
+| [Product](knowledge/README.md#product) | Prep & design | Define the promise, first value, core loop, complete scope, and success measures. |
+| [Experience](knowledge/README.md#experience) | Prep & design | Develop a distinct identity, onboarding, interaction, motion, accessible states, and user-facing words. |
+| [Engineering](knowledge/README.md#engineering) | The hot line | Build and release native and web surfaces with explicit contracts, runtime verification, privacy, and security. |
+| [Revenue and growth](knowledge/README.md#revenue-and-growth) | Front of house | Establish subscriptions, acquisition, funnels, attribution, and lifecycle work. |
+| [Learning and operations](knowledge/README.md#learning-and-operations) | The pass and the office | Inspect evidence, plan improvements, support users, coordinate work, and maintain the business. |
+<!-- catalog-generated:end business-areas -->
 
 Each area has workflow and knowledge coverage. See [Status](#status) for what
 is implemented today.

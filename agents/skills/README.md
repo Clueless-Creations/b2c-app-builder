@@ -1,24 +1,29 @@
 # Skills
 
-The canonical source of each skill is the `SKILL.md` under this directory or at the
-repository root. Installation is the operator's explicit action: a symlink from
-`~/.claude/skills/<name>` or `~/.codex/skills/<name>` to the skill directory. The builder
-never installs a skill automatically. Route by intended target and effect, not by title.
+Use the main business entrypoint by default. Focused task skills are optional, generated views of existing workflow contracts and supporting knowledge. They do not create another scheduler or authority model.
 
-| Skill             | Scope        | Source                                                       | Installed into business workspaces |
-| ----------------- | ------------ | ------------------------------------------------------------ | ---------------------------------- |
-| `b2c-app-builder` | business     | [`../../SKILL.md`](../../SKILL.md)                           | yes                                |
-| `b2c-contributor` | contribution | [`b2c-contributor/SKILL.md`](b2c-contributor/SKILL.md)       | opt-in only                        |
-| `b2c-maintainer`  | maintenance  | [`b2c-maintainer/SKILL.md`](b2c-maintainer/SKILL.md)         | no; repository-local               |
+| Skill | Scope | Source | Business use |
+| --- | --- | --- | --- |
+| `b2c-app-builder` | business | [Main entrypoint](../../SKILL.md) | default |
+| `b2c-contributor` | contribution | [Contributor](b2c-contributor/SKILL.md) | explicit contribution work only |
+| `b2c-maintainer` | maintenance | [Maintainer](b2c-maintainer/SKILL.md) | repository-local, not a business installation |
 
-## Route by intent
+## Focused tasks
 
-The root [`AGENTS.md`](../../AGENTS.md) opens with the routing table. Decide the
-target first: one business, reusable builder material, or the builder itself.
-The three routers converge on the same architecture documents.
+<!-- catalog-generated:start task-skills -->
+| Task | Use when |
+| --- | --- |
+| [Research an opportunity](b2c-research-opportunity/SKILL.md) | Research whether a consumer-app idea is worth building. Compare demand, competitors, distribution, offer evidence, and product scope; recommend Go, Pivot, or Kill. Use for opportunity validation or delegated idea selection, not a narrow code fix or execution of an entire launch. |
+| [Design or review onboarding](b2c-design-onboarding/SKILL.md) | Design, review, or improve a consumer app's onboarding and first-value journey. Classify a focused audit, incremental change, or full redesign before selecting the relevant research, flow, state, accessibility, and verification guidance. Do not start a full rebuild for a small signup fix. |
+| [Review monetization](b2c-review-monetization/SKILL.md) | Review a consumer app's offer, pricing proposal, paywall, purchases, entitlements, restore behavior, and billing evidence. Use for a monetization audit or explicitly requested implementation. A review does not authorize live product changes, pricing changes, payments, or provider selection. |
+<!-- catalog-generated:end task-skills -->
 
-Ownership of an upstream relationship moves with the lifecycle. The contributor
-proposes `catalog/upstreams/<id>.yaml` when an accepted unit reuses repository
-material. Maintenance owns the manifest after the release that ships it.
-[ADR-0007](../../docs/decisions/0007-upstream-lifecycle-and-agent-scopes.md)
-records the handoff.
+These three task entrypoints are the initial set. [Browse all six business areas](../../knowledge/README.md) for the remaining workflows and references. Internal onboarding stages remain behind one task skill, not 23 installations.
+
+## Installation and ownership
+
+Read [Use task skills](../../docs/guides/task-skills.md) to export a relocatable task directory and install it explicitly in a supported host. Keep its references and notices with SKILL.md. The builder never installs a skill or edits agent configuration automatically.
+
+The root [AGENTS.md](../../AGENTS.md) separates business, contribution, and maintenance work. Business work exits to the relevant task or business lifecycle; it does not read maintainer architecture first. Contributor and maintainer routers remain canonical authored guides. Business task skills are generated from the catalog, not authored duplicates.
+
+Upstream relationship ownership still moves from contribution intake to maintenance after release, as defined in [ADR-0007](../../docs/decisions/0007-upstream-lifecycle-and-agent-scopes.md).

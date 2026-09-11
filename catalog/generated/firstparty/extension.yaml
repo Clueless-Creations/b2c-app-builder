@@ -1,7 +1,7 @@
 apiVersion: b2c.extension/v1
 hostApiVersion: b2c/v1
 id: b2c/consumer-business
-version: 0.219.150
+version: 0.220.0
 title: Consumer business
 dependencies: []
 imports: []
@@ -958,6 +958,10 @@ resources:
     path: checks/validation/business/store/check-store-screenshots.ts
     kind: gate
     mediaType: text/plain
+  - id: b2c/resource-a6169c1d28ed3bd4dfdcda1193c9f96394c44c9b878ce9849e210d351d239c0a
+    path: checks/validation/repository/check-task-skills.ts
+    kind: gate
+    mediaType: text/plain
   - id: b2c/resource-95c9160c5db97e45ee675963ca962c9a992bc63cb9066e58b9212624adc44922
     path: checks/validation/business/engineering/check-template-safety.ts
     kind: gate
@@ -1004,6 +1008,10 @@ resources:
     mediaType: text/plain
   - id: b2c/resource-9f3f33e355281aa6a81f456067572756dca66e96947c9292165d5397463f9228
     path: tooling/render-product.ts
+    kind: gate
+    mediaType: text/plain
+  - id: b2c/resource-8b361795a71bed9b00cba62a64727cf9b7f97c6985a742890a4a6609d9a9d484
+    path: tooling/render-task-skills.ts
     kind: gate
     mediaType: text/plain
   - id: b2c/resource-3f3ea04135c2049a7d32637154e39a74c3b7cd2f26b891c527d3abb3fc990837
@@ -4399,9 +4407,9 @@ implementations:
     maturity: implemented
     workerContext:
       workflowId: workflow.research.research-backed-spec
-      instructions: "When no idea exists, compare three safe, feasible consumer-app opportunities before committing an app identity or build. Judge economics, recurring pain, reachable distribution, transformation clarity, complete-product feasibility, and sensitivity risk. If the opening request delegates product selection, choose the strongest candidate that clears the evidence bar and record `Founder opening mandate` as the decision authority. Otherwise, recommend one candidate for Go, Pivot, or Kill. Return no candidate instead of forcing a weak idea. Before a paid research request, use research-lookup with its provider/version, connection, operation and non-secret arguments under an explicit freshness limit. Reuse saved current results. In a registered planning workspace, checkpoint pending through research-record before dispatch, then checkpoint the actual observed, failed or uncertain result immediately; read back uncertain requests before replay. Use AppKittie, XPOZ, and Firecrawl from the bound research-intelligence recipe when those names appear; if intake deferred them, continue the evidence lane as labeled fallback rather than parking it. Use the bound research references to write dated source evidence, category economics, demand, wedge, distribution, offer response, transformation demo, paying niche, signal provenance, conflicts, and the decision into strategy/RESEARCH.md, strategy/SIGNAL_CORPUS.md, and strategy/OFFER_TEST.md. Use the default category bar only when the work has not set a better one: top-ten gross of at least $5M per year with two apps above $1M each. Author accepted product facts in product.yaml, then render PRODUCT.md. Do not hand-edit PRODUCT.md. Before the product is accepted, define its core loop, Complete product scope, moat path, and beat moment. Run check:research-workflow-output. Do not harden a direction that fails it."
+      instructions: "When no idea exists, compare three safe, feasible consumer-app opportunities before committing an app identity or build. Judge economics, recurring pain, reachable distribution, transformation clarity, complete-product feasibility, and sensitivity risk. If the opening request delegates product selection, choose the strongest candidate that clears the evidence bar and record `Founder opening mandate` as the decision authority. Otherwise, recommend one candidate for Go, Pivot, or Kill. Return no candidate instead of forcing a weak idea. Before a paid research request, use research-lookup with its provider/version, connection, operation and non-secret arguments under an explicit freshness limit. Reuse saved current results. In a registered planning workspace, checkpoint pending through research-record before dispatch, then checkpoint the actual observed, failed or uncertain result immediately; read back uncertain requests before replay. Use the selected research implementations and their current reference procedures. Honor explicit provider bindings. If an unavailable source has an authorized fallback, label its evidence limits; do not silently replace the selected source or infer unavailable evidence. Use the bound research references to write dated source evidence, category economics, demand, wedge, distribution, offer response, transformation demo, paying niche, signal provenance, conflicts, and the decision into strategy/RESEARCH.md, strategy/SIGNAL_CORPUS.md, and strategy/OFFER_TEST.md. Use the default category bar only when the work has not set a better one: top-ten gross of at least $5M per year with two apps above $1M each. Author accepted product facts in product.yaml, then render PRODUCT.md. Do not hand-edit PRODUCT.md. Before the product is accepted, define its core loop, Complete product scope, moat path, and beat moment. Run check:research-workflow-output. Do not harden a direction that fails it."
       providerIds: []
-      contextFingerprint: sha256:50c82c8329b85220ba165fb660f2589815f926ca88f4ce3011162ca5e1de341f
+      contextFingerprint: sha256:f27186a43578cd846464b9082e1164a81af8695ddd6992fa344210c98bb32fa9
   - id: b2c/worker.research.spec-red-team-audit
     version: 1.0.0
     provider: b2c/consumer-business-worker
@@ -8356,11 +8364,11 @@ implementations:
     maturity: implemented
     workerContext:
       workflowId: workflow.money.revenue-monetization
-      instructions: "Read the current strategy/OFFER_TEST.md before locking a production price. Distinguish proposals from exact founder-approved price decisions; a competitor contrast or opening build mandate is not price approval. Write revenue/REVENUE_OPS.md across all four spokes: RevenueCat project/entitlement/offering setup with the App Store container price held at Free (a Lifetime offer is a NON_CONSUMABLE IAP, never the container price), Stripe/web-billing setup when a web funnel is in scope, and the Price-Point Decision Procedure's competitor anchor table (5-10 rows from strategy/RESEARCH.md, dated) under a 'Pricing Decision' heading. Resolve the three named paywall-breaking gaps before calling any paywall ready: Apple MISSING_METADATA subscription-group localization, RevenueCat product-type reconciliation against the App Store counterpart, and a Release-scheme (not debug-preview) smoke check confirming currentOffering.packages is non-empty. Stand up the billing-health recovery system (grace period/account hold, billing-issue webhook to dunning push/email, one-tap update-payment) — roughly 31% of Play cancellations and 14% of App Store cancellations are involuntary billing failures, not churn. Record the Paywall Experiment Backlog with Surface and Engine columns (revenuecat_experiments default for monetization; bandit for creatives/ASA/UA; posthog for non-offering UX) and the Surface To Engine Matrix. Creating live products, changing any price/trial/renewal term, or enabling live checkout is a founder-only gate; check:revenue is the pass signal. When deriving territory prices from another subscription, write revenue/PRICE_DERIVATION.md, run `asc subscriptions pricing derive --dry-run` first, keep unavailable territories as blockers, and never infer approval from the multiplier."
+      instructions: Read the current strategy/OFFER_TEST.md before proposing a production price. Distinguish proposals from exact founder-approved decisions; a competitor contrast or opening build mandate is not price approval. For requested implementation, write revenue/REVENUE_OPS.md with the accepted offer, dated competitor price anchors, price disclosure, product types, purchase and restore behavior, entitlement owner, cross-platform identity, web billing when in scope, webhook reconciliation, and billing-failure recovery. Resolve the selected capability bindings before any provider action. Load only the selected implementation procedures for store-product metadata, product-type reconciliation, offering availability, sandbox and release-like smoke checks, and territory-price derivation. Preserve all applicable provider-specific requirements in those references; provider selection does not change purchase or entitlement meaning. A payment, paywall display, and entitlement grant are separate observations. Record recovery for failed payments, cancellation, refund, and restore, with an observable path back to useful access. Record the Paywall Experiment Backlog and Surface To Engine Matrix using the selected experiment implementation and its actual supported semantics; do not assume different engines are interchangeable. Judge results on cohort economics and renewal evidence, not a mock success or vendor declaration. Creating live products, changing prices, trials, discounts or renewal terms, and enabling checkout require exact founder approval. Run applicable check:revenue and check:price-derivation checks; unavailable live proof remains unresolved. A review-only request returns findings against this contract without changing products, providers, prices, or runtime state.
       providerIds:
         - provider.revenuecat
         - provider.stripe
-      contextFingerprint: sha256:fca7f0c2b05cf71deecba0c4c2dddc0df4919f742ff49d53eaf0ddb63217a92a
+      contextFingerprint: sha256:0a01d6522c120aed1985e2b9f4ef87ae52ebe786d823622f6c5a1735974264a7
     validationContract:
       id: revenuecat
       version: 1.0.0

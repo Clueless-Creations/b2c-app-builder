@@ -15,8 +15,14 @@ export function register(harness: Harness): void {
     const readme = readFileSync(path.join(repoRoot, "README.md"), "utf8");
     const ethos = readFileSync(path.join(repoRoot, "docs", "ethos.md"), "utf8");
     const svg = readFileSync(path.join(repoRoot, "docs", "assets", "business-primitives.svg"), "utf8");
-    assert(readme.includes("| Product                 | Prep & design"), "README coverage table must use Prep & design for Product");
-    assert(readme.includes("| Experience              | Prep & design"), "README coverage table must use Prep & design for Experience");
+    assert(
+      /^\|\s*\[Product\]\(knowledge\/README\.md#product\)\s*\|\s*Prep & design\s*\|/m.test(readme),
+      "README coverage table must use Prep & design for Product",
+    );
+    assert(
+      /^\|\s*\[Experience\]\(knowledge\/README\.md#experience\)\s*\|\s*Prep & design\s*\|/m.test(readme),
+      "README coverage table must use Prep & design for Experience",
+    );
     assert(ethos.includes("| **Prep & design**"), "ethos station table must use Prep & design");
     assert(ethos.includes("Product and Experience"), "ethos must keep the catalog identity beside the display label");
     assert(svg.includes("PREP &amp; DESIGN"), "Sheet 1 must label station 2 Prep &amp; design");
@@ -47,9 +53,7 @@ export function register(harness: Harness): void {
 
   kitchenCase("kitchen-vocabulary: Sheet 1 Prep & design fits the station 2 band", () => {
     const svg = readFileSync(path.join(repoRoot, "docs", "assets", "business-primitives.svg"), "utf8");
-    const label = svg.match(
-      /<text x="(\d+(?:\.\d+)?)" y="(\d+(?:\.\d+)?)" class="mono ink" font-size="(\d+(?:\.\d+)?)">PREP &amp; DESIGN<\/text>/,
-    );
+    const label = svg.match(/<text x="(\d+(?:\.\d+)?)" y="(\d+(?:\.\d+)?)" class="mono ink" font-size="(\d+(?:\.\d+)?)">PREP &amp; DESIGN<\/text>/);
     assert(label !== null, "Sheet 1 must keep a single PREP &amp; DESIGN station-2 label");
     const x = Number(label[1]);
     const y = Number(label[2]);

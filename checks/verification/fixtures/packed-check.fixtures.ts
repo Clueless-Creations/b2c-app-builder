@@ -51,7 +51,11 @@ export function register(h: Harness): void {
     );
     assert(!remaining.some((entry) => entry.id === "check:package-parity"), "check:package-parity must leave remaining-tsx once its compiled twin is eligible");
     assert(!remaining.some((entry) => entry.id === "check:validator-docs"), "check:validator-docs must leave remaining-tsx once its compiled twin is eligible");
-    assert(remaining.length === 115, `remaining-tsx count drifted: ${remaining.length}`);
+    assert(remaining.length === 116, `remaining-tsx count drifted: ${remaining.length}`);
+    assert(
+      remaining.some((entry) => entry.id === "check:task-skills" && entry.sourcePath === "checks/validation/repository/check-task-skills.ts"),
+      "the repository-only task-skill test runner must remain explicit in the uncompiled inventory",
+    );
     assert(
       remaining.some((entry) => entry.id === "check:design-md" && entry.sourcePath === "checks/validation/business/design/check-design-md.ts"),
       "remaining-tsx inventory lost a representative checks/ gate",

@@ -42,6 +42,7 @@ const knownValidators = new Set([
   "check-scrollytelling-contract",
   "check-agent-operations",
   "check-agent-entrypoints",
+  "check-task-skills",
   "check-founder-operator-bootstrap",
   "check-paid-tool-intake",
   "check-asc-command-contract",

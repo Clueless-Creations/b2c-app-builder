@@ -43,6 +43,7 @@ export const PRESUBMIT_CORE_IDS: ReadonlySet<string> = new Set([
   "check:package-parity",
   "check:repository-boundary",
   "check:agent-entrypoints",
+  "check:task-skills",
   "check:architecture",
   "check:version-discipline",
   "launchbench:lint",
@@ -396,6 +397,7 @@ export function buildAuditPlan(layout: AuditLayout, roots?: { businessRoot?: str
     // inside the agent-documentation contract. Repo-only because the root adapters and
     // agents/skills/ are not part of the installed runtime package.
     { id: "check:agent-entrypoints", kind: "script", args: ["--repo-root", "."], repoOnly: true },
+    { id: "check:task-skills", kind: "script", repoOnly: true },
     { id: "check:agent-evals", kind: "script" },
     { id: "launchbench:lint", kind: "script" },
     // U9's v2 verification surface (fixture suites, capability-boundary suites, cross-runtime

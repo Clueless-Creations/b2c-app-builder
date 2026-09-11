@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { composeAuthoredCatalog } from "../../../catalog/authoring.js";
 import { FIRSTPARTY_WORKER_TARGET, firstpartyWorkerResponsibilities } from "../../../catalog/firstparty-recipes.js";
 import { assert, skillRoot, type Harness } from "./_harness.js";
@@ -25,9 +27,18 @@ export function register(h: Harness): void {
     );
     const money = responsibilities.find((entry) => entry.workflow.id === "workflow.money.revenue-monetization")!;
     assert(
-      money.workflow.instructions.includes("RevenueCat") && money.workflow.providerIds.includes("provider.revenuecat"),
-      "actual default guidance was falsely made provider-neutral",
+      money.workflow.providerIds.includes("provider.revenuecat") && money.workflow.providerIds.includes("provider.stripe"),
+      "neutral task wording must not remove the default recipe's provider choices",
     );
+    assert(
+      money.workflow.instructions.includes("Load only the selected implementation procedures") &&
+        money.workflow.instructions.includes("Preserve all applicable provider-specific requirements"),
+      "task guidance must route selected implementation requirements instead of losing them",
+    );
+    const providerReference = catalog.references.find((entry) => entry.id === "reference.money.revenuecat-and-store-products");
+    assert(providerReference && money.workflow.referenceIds.includes(providerReference.id), "default RevenueCat procedure is no longer bound");
+    const providerGuidance = readFileSync(path.join(skillRoot, providerReference.path), "utf8");
+    assert(providerGuidance.includes("MISSING_METADATA") && providerGuidance.includes("RevenueCat"), "provider-specific product requirements disappeared");
     assert(FIRSTPARTY_WORKER_TARGET.platform === "host" && FIRSTPARTY_WORKER_TARGET.runtime === "agent-cli", "worker support must not claim an app SDK target");
   });
   h.check("new or moved work requires an explicit authored responsibility decision", () => {

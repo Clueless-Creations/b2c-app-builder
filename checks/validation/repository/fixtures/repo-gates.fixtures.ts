@@ -167,7 +167,11 @@ export function register(h: Harness): void {
     path.join(autopilotStripped, "checks", "validation", "repository", "evals", "triggering", "autopilot-triggering.yaml"),
   );
   const shippedSkill = readFileSync(path.join(skillRoot, "SKILL.md"), "utf8");
-  const strippedSkill = shippedSkill.replace("Keep the MCP read-only by default", "Let the MCP write by default");
+  const procedureDirectory = "agents/skills/b2c-app-builder/references";
+  cpSync(path.join(skillRoot, procedureDirectory), path.join(autopilotStripped, procedureDirectory), { recursive: true });
+  writeFileSync(path.join(autopilotStripped, "SKILL.md"), shippedSkill, "utf8");
+  runScriptArgs("autopilot root and linked procedures pass before mutation", "check-autopilot-contract.ts", ["--skill-root", autopilotStripped], 0);
+  const strippedSkill = shippedSkill.replace("Keep MCP read-only by default", "Let the MCP write by default");
   assert.notEqual(strippedSkill, shippedSkill, "autopilot fixture must strip a term SKILL.md still contains");
   writeFileSync(path.join(autopilotStripped, "SKILL.md"), strippedSkill, "utf8");
   runScriptArgs(
@@ -186,6 +190,7 @@ export function register(h: Harness): void {
     path.join(skillRoot, "checks", "validation", "repository", "evals", "triggering", "autopilot-triggering.yaml"),
     path.join(autopilotForbidden, "checks", "validation", "repository", "evals", "triggering", "autopilot-triggering.yaml"),
   );
+  cpSync(path.join(skillRoot, procedureDirectory), path.join(autopilotForbidden, procedureDirectory), { recursive: true });
   const shippedSkillBody = readFileSync(path.join(skillRoot, "SKILL.md"), "utf8");
   assert.ok(
     !shippedSkillBody.toLowerCase().includes(autopilotForbiddenTerm.toLowerCase()),

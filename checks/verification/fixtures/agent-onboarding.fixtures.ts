@@ -339,29 +339,38 @@ export function register(h: Harness): void {
 
   h.check("onboarding: business entry reaches create/status/plan before composition and maintainer architecture", () => {
     const skill = readFileSync(path.join(skillRoot, "SKILL.md"), "utf8");
-    const connectAt = skill.indexOf("## Connect");
-    const buildAt = skill.indexOf("## Build a business");
-    const composeAt = skill.indexOf("## Customize composition");
-    const mobileAt = skill.indexOf("## Mobile app operation");
+    const buildAt = skill.indexOf("## Managed business");
+    const composeAt = skill.indexOf("[composition](");
+    const mobileAt = skill.indexOf("[mobile app operation](");
     assert(buildAt >= 0 && composeAt > buildAt, "skill teaches composition before the ordinary business path");
     assert(mobileAt > composeAt, "mobile capture precedes composition customization");
     assert(!/docs\/north-star-architecture|ARCH-\d+|docs\/architecture-conformance/.test(skill), "business skill requires maintainer architecture");
-    const connect = connectAt >= 0 && buildAt > connectAt ? skill.slice(connectAt, buildAt) : "";
+    const setupPath = "agents/skills/b2c-app-builder/references/setup.md";
+    const lifecyclePath = "agents/skills/b2c-app-builder/references/business-lifecycle.md";
+    assert(skill.includes(`](${setupPath})`) && skill.includes(`](${lifecyclePath})`), "skill lost a direct procedure route");
+    const connect = readFileSync(path.join(skillRoot, setupPath), "utf8");
     assert(!/b2c_catalog|b2c_knowledge_search/.test(connect), "Connect still presents catalog/search as the start path");
-    const build = skill.slice(buildAt, composeAt);
+    const build = readFileSync(path.join(skillRoot, lifecyclePath), "utf8");
     const createAt = build.indexOf("business-create");
     const statusCommandAt = build.indexOf("business-status");
     const planCommandAt = build.indexOf("business-plan");
     assert(createAt >= 0 && statusCommandAt > createAt && planCommandAt > statusCommandAt, "skill still resumes with plan and skips status");
-    const statusAt = skill.indexOf("b2c_business_status");
-    const catalogAt = skill.indexOf("only for a specific goal");
+    const statusAt = build.indexOf("b2c_business_status");
+    const catalogAt = build.indexOf("only for a specific goal");
     assert(statusAt >= 0 && catalogAt > statusAt, "skill still sends a registered business through catalog before status/plan");
-    assert(!skill.includes("Load `workflow.orchestration.full-launch-program` first"), "skill still opens the complete-business path on the whole program packet");
+    assert(Buffer.byteLength(skill, "utf8") <= 6500, "root activation exceeded its context budget");
+    assert(
+      !skill.includes("Load `workflow.orchestration.full-launch-program` first"),
+      "skill still opens the complete-business path on the whole program packet",
+    );
     const agents = readFileSync(path.join(skillRoot, "AGENTS.md"), "utf8");
     assert(agents.includes("Business is an early exit"), "root guide lost the business early-exit");
     const contributionAt = agents.indexOf("### Contribution");
     const businessSlice = contributionAt >= 0 ? agents.slice(0, contributionAt) : agents;
-    assert(!/docs\/north-star-architecture|docs\/architecture-conformance|docs\/decisions/.test(businessSlice), "business start path still names maintainer architecture");
+    assert(
+      !/docs\/north-star-architecture|docs\/architecture-conformance|docs\/decisions/.test(businessSlice),
+      "business start path still names maintainer architecture",
+    );
     assert(
       businessSlice.includes("business-status") && businessSlice.indexOf("business-status") < businessSlice.indexOf("business-plan"),
       "root guide still resumes with plan and skips status",
@@ -388,10 +397,7 @@ export function register(h: Harness): void {
       const conflictAt = text.indexOf("business.registration_conflict");
       const slice = conflictAt >= 0 ? text.slice(conflictAt, text.indexOf("business.target_occupied", conflictAt)) : "";
       assert(slice.includes("business-status"), `${label} still omits status`);
-      assert(
-        slice.indexOf("business-status") < slice.indexOf("business-plan"),
-        `${label} still resumes with plan only`,
-      );
+      assert(slice.indexOf("business-status") < slice.indexOf("business-plan"), `${label} still resumes with plan only`);
     }
     const guide = readFileSync(path.join(skillRoot, "docs/guides/build-a-business.md"), "utf8");
     const guideCreate = guide.slice(guide.indexOf("## Create a planning workspace"), guide.indexOf("## Knowledge tools"));

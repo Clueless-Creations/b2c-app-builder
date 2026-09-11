@@ -6,7 +6,7 @@
  * npm script: check:autopilot
  * Usage: tsx checks/validation/repository/check-autopilot-contract.ts [--skill-root /path/to/skill]
  */
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, lstatSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { parse as parseYaml } from "yaml";
 import { asArray, asString, flagString, isRecord, issue, parseFlags, reportAndExit } from "../../../tooling/lib/launch-state.js";
@@ -199,6 +199,59 @@ if (existsSync(skillPath) && existsSync(evalPath)) {
 
   if (isRecord(evals)) {
     const bodyContract = isRecord(evals.body_contract) ? evals.body_contract : {};
+    const maxBytes = typeof bodyContract.max_bytes === "number" ? bodyContract.max_bytes : 6500;
+    if (Buffer.byteLength(skillText, "utf8") > maxBytes) {
+      issues.push(
+        issue(
+          "error",
+          "autopilot.body.context_budget",
+          `SKILL.md exceeds the ${maxBytes}-byte routing budget. Move conditional procedures to linked references.`,
+          "SKILL.md",
+        ),
+      );
+    }
+    // Moving a procedure out of the root must not drop its contract. Only directly linked,
+    // package-local files can satisfy these checks; missing guidance stays an error.
+    for (const reference of asArray(evals.reference_contracts)) {
+      const relative = isRecord(reference) ? asString(reference.path) : undefined;
+      if (!relative || !/^agents\/skills\/b2c-app-builder\/references\/[a-z0-9-]+\.md$/u.test(relative)) {
+        issues.push(issue("error", "autopilot.reference.invalid", "Reference contracts must name a local business procedure.", "SKILL.md"));
+        continue;
+      }
+      const target = path.join(skillRoot, relative);
+      const parts = relative.split("/");
+      if (
+        parts.some((_, index) => {
+          const candidate = path.join(skillRoot, ...parts.slice(0, index + 1));
+          return existsSync(candidate) && lstatSync(candidate).isSymbolicLink();
+        }) ||
+        !existsSync(target) ||
+        !lstatSync(target).isFile()
+      ) {
+        issues.push(issue("error", "autopilot.reference.missing", `Required procedure is missing or symlinked: ${relative}.`, relative));
+        continue;
+      }
+      if (!parsedSkill.body.includes(`](${relative})`)) {
+        issues.push(issue("error", "autopilot.reference.unlinked", `SKILL.md must link directly to ${relative}.`, "SKILL.md"));
+      }
+      const content = readFileSync(target, "utf8");
+      if (!isRecord(reference)) continue;
+      for (const term of asArray(reference.required_terms)
+        .map(asString)
+        .filter((value): value is string => Boolean(value))) {
+        if (!includesCaseInsensitive(content, term)) {
+          issues.push(issue("error", "autopilot.reference.required_term_missing", `Procedure must preserve contract term: ${term}.`, relative));
+        }
+      }
+      for (const term of asArray(reference.forbidden_terms)
+        .map(asString)
+        .filter((value): value is string => Boolean(value))) {
+        if (includesCaseInsensitive(content, term)) {
+          issues.push(issue("error", "autopilot.reference.forbidden_term_present", `Procedure must not contain: ${term}.`, relative));
+        }
+      }
+    }
+
     for (const term of asArray(bodyContract.required_terms)
       .map(asString)
       .filter((item): item is string => Boolean(item))) {

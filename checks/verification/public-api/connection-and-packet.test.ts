@@ -52,13 +52,8 @@ import { buildHostedKnowledgeBundle } from "../../../tooling/render-hosted-bundl
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 
-function leftoverNameProse(
-  leftover: ReturnType<typeof interpretConfiguredConnection>,
-  capability: string,
-): string {
-  return leftover.guidance.endsWith(capability)
-    ? leftover.guidance.slice(0, leftover.guidance.length - capability.length).trim()
-    : leftover.guidance;
+function leftoverNameProse(leftover: ReturnType<typeof interpretConfiguredConnection>, capability: string): string {
+  return leftover.guidance.endsWith(capability) ? leftover.guidance.slice(0, leftover.guidance.length - capability.length).trim() : leftover.guidance;
 }
 
 function assertSingleCapability(text: string, receipt: ConnectionReceipt, label: string) {
@@ -270,10 +265,7 @@ test("leftover-name client matrix covers Claude, Cursor, and Codex without silen
     for (const row of leftoverNameClientMatrix) {
       assert(result.stdout.includes(row.freshLocal), `${row.client} fresh local snippet missing from setup`);
       assert(guidance.includes(row.leftoverLocal), `${row.client} leftover name missing from migration guidance`);
-      assert(
-        hostedPages.includes(row.hosted) || hostedReadme.includes(row.hosted),
-        `${row.client} hosted snippet missing from hosted setup surfaces`,
-      );
+      assert(hostedPages.includes(row.hosted) || hostedReadme.includes(row.hosted), `${row.client} hosted snippet missing from hosted setup surfaces`);
     }
     assert(hostedReadme.includes("Keep the local `b2c-local` entry"), "hosted README lost the local recommended name");
     assert(hostedReadme.includes("leftover `b2c-app-builder` client name is not this hosted connection"));
@@ -283,19 +275,16 @@ test("leftover-name client matrix covers Claude, Cursor, and Codex without silen
     assert(packageGuide.includes("hosted knowledge uses `b2c-hosted`"), "package guide omitted hosted surface selection");
     assert(packageGuide.includes("not a third surface"), "package guide omitted leftover-is-not-third-surface");
     assert(packageGuide.includes("Duplicate names are a collision"), "package guide omitted duplicate-name collision");
-    assert(
-      packageGuide.includes("A local receipt reports worker-runtime health separately"),
-      "package guide omitted worker-runtime health",
-    );
+    assert(packageGuide.includes("A local receipt reports worker-runtime health separately"), "package guide omitted worker-runtime health");
     assert(hostedReadme.includes("A missing local worker CLI is local execution health"), "hosted README omitted worker-runtime health");
-    const skill = readFileSync(path.join(root, "SKILL.md"), "utf8");
+    const rootSkill = readFileSync(path.join(root, "SKILL.md"), "utf8");
+    const setupPath = "agents/skills/b2c-app-builder/references/setup.md";
+    assert(rootSkill.includes(`](${setupPath})`), "root skill omitted its conditional connection procedure");
+    const skill = readFileSync(path.join(root, setupPath), "utf8");
     assert(skill.includes("When both are configured, select by that capability"), "skill omitted both-configured selection");
     assert(skill.includes("Duplicate names are a collision"), "skill omitted duplicate-name collision");
     assert(skill.includes("A missing worker CLI degrades local execution health"), "skill omitted worker-runtime health");
-    assert(
-      packageGuide.includes("degraded execution still selects `b2c-local`"),
-      "package guide omitted degraded execution surface selection",
-    );
+    assert(packageGuide.includes("degraded execution still selects `b2c-local`"), "package guide omitted degraded execution surface selection");
     assert(hostedReadme.includes("degraded execution still selects `b2c-local`"), "hosted README omitted degraded execution surface selection");
     assert(skill.includes("Degraded execution still selects b2c-local"), "skill omitted degraded execution surface selection");
     assert(packageGuide.includes("leftover contributor names"), "package guide omitted leftover contributor wrong-surface names");
@@ -370,7 +359,10 @@ test("leftover client names take capability from the handshake, including both-c
     workspaceExecution: "available",
   });
   assert(leftoverLocalHandshake.includes(leftoverLocal.guidance));
-  assert.doesNotMatch(leftoverLocalHandshake, /The leftover client name b2c-app-builder is the legacy local registration.*The leftover client name b2c-app-builder is the legacy local registration/);
+  assert.doesNotMatch(
+    leftoverLocalHandshake,
+    /The leftover client name b2c-app-builder is the legacy local registration.*The leftover client name b2c-app-builder is the legacy local registration/,
+  );
   assertSingleCapability(leftoverLocalHandshake, local, "leftover local handshake");
 });
 
@@ -490,20 +482,9 @@ test("hosted local-only MCP names fail as wrong-surface with receipt guidance", 
   const hosted = connectionReceipt({ mode: "hosted_knowledge", engineVersion: service.metadata.engineVersion });
   const expected = interpretConfiguredConnection({ clientName: "b2c-hosted", receipt: hosted });
   const publicMcp = PUBLIC_OPERATIONS.flatMap((operation) => (operation.mcp === null ? [] : [operation.mcp]));
-  const leftoverCliOnlyPublicMcp = PUBLIC_OPERATIONS.flatMap((operation) =>
-    operation.mcp === null ? [`b2c_${operation.cli.replaceAll("-", "_")}`] : [],
-  );
+  const leftoverCliOnlyPublicMcp = PUBLIC_OPERATIONS.flatMap((operation) => (operation.mcp === null ? [`b2c_${operation.cli.replaceAll("-", "_")}`] : []));
   const contributionMcp = CONTRIBUTION_OPERATIONS.flatMap((operation) => (operation.mcp === null ? [] : [operation.mcp]));
-  const localWorkspaceTools = [
-    "b2c_plan",
-    "b2c_status",
-    "b2c_operate",
-    "b2c_bootstrap",
-    "b2c_run",
-    "b2c_approvals",
-    "b2c_verify",
-    "b2c_schedule",
-  ] as const;
+  const localWorkspaceTools = ["b2c_plan", "b2c_status", "b2c_operate", "b2c_bootstrap", "b2c_run", "b2c_approvals", "b2c_verify", "b2c_schedule"] as const;
   assert.deepEqual(
     [...HOSTED_WRONG_SURFACE_LEFTOVER_CLI_ONLY_TOOL_NAMES].sort(),
     [...leftoverCliOnlyPublicMcp].sort(),
@@ -533,10 +514,7 @@ test("hosted local-only MCP names fail as wrong-surface with receipt guidance", 
   assert.equal(isHostedWrongSurfaceTool("b2c_not_a_tool"), false);
   for (const toolName of HOSTED_WRONG_SURFACE_TOOL_NAMES) {
     assert.equal(isHostedWrongSurfaceTool(toolName), true, toolName);
-    const response = await handleApi(
-      new Request(`https://knowledge.test/api/v1/tools/${toolName}`, { method: "POST", body: "{}" }),
-      service,
-    );
+    const response = await handleApi(new Request(`https://knowledge.test/api/v1/tools/${toolName}`, { method: "POST", body: "{}" }), service);
     assert.equal(response.status, 400, toolName);
     const body = (await response.json()) as HostedWrongSurfaceRefusal;
     const refusal = hostedWrongSurfaceRefusal({ engineVersion: service.metadata.engineVersion, toolName });
@@ -555,19 +533,13 @@ test("hosted local-only MCP names fail as wrong-surface with receipt guidance", 
   assert.equal(leftover.connection.leftoverName, true);
   assert.match(leftover.connection.guidance, /not a capability/);
   assertSingleCapability(leftover.connection.guidance, hosted, "leftover hosted CLI-only public wrong-surface");
-  const unknown = await handleApi(
-    new Request("https://knowledge.test/api/v1/tools/b2c_not_a_tool", { method: "POST", body: "{}" }),
-    service,
-  );
+  const unknown = await handleApi(new Request("https://knowledge.test/api/v1/tools/b2c_not_a_tool", { method: "POST", body: "{}" }), service);
   assert.equal(unknown.status, 404);
   const unknownBody = await unknown.text();
   assert.match(unknownBody, /not_found/);
   assert.doesNotMatch(unknownBody, /wrong_surface/);
   assert.doesNotMatch(unknownBody, /cannot access or run this local business/);
-  const evaluate = await handleApi(
-    new Request("https://knowledge.test/api/v1/tools/b2c_contribute_evaluate", { method: "POST", body: "{}" }),
-    service,
-  );
+  const evaluate = await handleApi(new Request("https://knowledge.test/api/v1/tools/b2c_contribute_evaluate", { method: "POST", body: "{}" }), service);
   assert.equal(evaluate.status, 404);
   assert.match(await evaluate.text(), /not_found/);
   for (const toolName of ["b2c_run", "b2c_discover", "b2c_compose", "b2c_market_report", "b2c_contribute_plan", "b2c_business_create"] as const) {
@@ -576,10 +548,7 @@ test("hosted local-only MCP names fail as wrong-surface with receipt guidance", 
       service.metadata.engineVersion,
     ) as { result?: { isError?: boolean; structuredContent?: HostedWrongSurfaceRefusal } };
     assert.equal(mcp.result?.isError, true, toolName);
-    assert.deepEqual(
-      mcp.result?.structuredContent,
-      hostedWrongSurfaceRefusal({ engineVersion: service.metadata.engineVersion, toolName }),
-    );
+    assert.deepEqual(mcp.result?.structuredContent, hostedWrongSurfaceRefusal({ engineVersion: service.metadata.engineVersion, toolName }));
   }
   assert.equal(
     hostedWrongSurfaceMcpResponse(
@@ -889,18 +858,12 @@ test("connection receipt never treats handshake or leftover names as provider re
   const hosted = connectionReceipt({ mode: "hosted_knowledge", engineVersion: "0.219.40" });
   assert.equal(local.providerObservation, "not_tested");
   assert.equal(hosted.providerObservation, "not_tested");
-  assert.equal(
-    connectionCapabilityGuidance({ ...local, identity: { recommended: "b2c-hosted" } } as ConnectionReceipt),
-    connectionCapabilityGuidance(local),
-  );
+  assert.equal(connectionCapabilityGuidance({ ...local, identity: { recommended: "b2c-hosted" } } as ConnectionReceipt), connectionCapabilityGuidance(local));
   assert.equal(
     connectionCapabilityGuidance({ ...hosted, identity: { recommended: "b2c-local", legacy: ["b2c-app-builder"] } } as ConnectionReceipt),
     connectionCapabilityGuidance(hosted),
   );
-  assert.throws(
-    () => connectionReceiptSchema.parse({ ...local, providerObservation: "ready" }),
-    /invalid_literal|invalid_value/,
-  );
+  assert.throws(() => connectionReceiptSchema.parse({ ...local, providerObservation: "ready" }), /invalid_literal|invalid_value/);
 });
 
 test("worker packet keeps current-task guidance and accounts deferred later load", () => {
@@ -909,7 +872,11 @@ test("worker packet keeps current-task guidance and accounts deferred later load
   assert.equal(isLaterGuidance("later, after launch"), true);
   assert.equal(isLaterGuidance("After launch"), true);
   assert.equal(
-    isLaterGuidance("before accessibility declarations, beta readiness, or store submission", { workflowId: "workflow.engineering.accessibility-common-task-proof" }, { path: "knowledge/engineering/accessibility-readiness.md" }),
+    isLaterGuidance(
+      "before accessibility declarations, beta readiness, or store submission",
+      { workflowId: "workflow.engineering.accessibility-common-task-proof" },
+      { path: "knowledge/engineering/accessibility-readiness.md" },
+    ),
     false,
   );
   assert.equal(
@@ -923,18 +890,26 @@ test("worker packet keeps current-task guidance and accounts deferred later load
   const paidToolRoutingWhen =
     "at workflow start for the one tool-intake question, before using or replacing any paid/account-gated tool, before running a free fallback, or when a service is missing from the runtime";
   assert.equal(
-    isLaterGuidance(paidToolRoutingWhen, { workflowId: "workflow.orchestration.full-launch-program" }, {
-      path: "knowledge/operations/paid-tool-routing.md",
-      referenceId: "reference.operations.paid-tool-routing",
-    }),
+    isLaterGuidance(
+      paidToolRoutingWhen,
+      { workflowId: "workflow.orchestration.full-launch-program" },
+      {
+        path: "knowledge/operations/paid-tool-routing.md",
+        referenceId: "reference.operations.paid-tool-routing",
+      },
+    ),
     true,
     "program packets must not load the operator tool-intake book because its loadWhen says at workflow start",
   );
   assert.equal(
-    isLaterGuidance(paidToolRoutingWhen, { workflowId: "workflow.operations.paid-tool-routing-and-fallback" }, {
-      path: "knowledge/operations/paid-tool-routing.md",
-      referenceId: "reference.operations.paid-tool-routing",
-    }),
+    isLaterGuidance(
+      paidToolRoutingWhen,
+      { workflowId: "workflow.operations.paid-tool-routing-and-fallback" },
+      {
+        path: "knowledge/operations/paid-tool-routing.md",
+        referenceId: "reference.operations.paid-tool-routing",
+      },
+    ),
     false,
     "paid-tool-routing stays current on its own action",
   );
@@ -1065,15 +1040,26 @@ function catalogProjection(workflowId: string) {
     const reference = refs.get(id)!;
     return { path: reference.path, title: reference.title, loadWhen: reference.loadWhen, referenceId: id };
   });
-  return { workflow, load, projected: projectReadyBrief(readyBrief({ workflowId: workflow.id, title: workflow.title, instructions: workflow.instructions, approvals: [...workflow.founderOnlyActions], load })) };
+  return {
+    workflow,
+    load,
+    projected: projectReadyBrief(
+      readyBrief({ workflowId: workflow.id, title: workflow.title, instructions: workflow.instructions, approvals: [...workflow.founderOnlyActions], load }),
+    ),
+  };
 }
 
 test("full-launch-program packet defers real catalog later-horizon loads", () => {
   const { workflow, load, projected } = catalogProjection("workflow.orchestration.full-launch-program");
   assert(projected.context && projected.context.deferredLoadCount > 0, "a real full-launch-program packet must defer later-horizon catalog loadWhen");
-  assert(projected.load.some((entry) => /full-launch-program/.test(entry.path)), "program-open guidance must remain current");
   assert(
-    !projected.load.some((entry) => /paid-tool-routing|security-release-hardening|doppler-organization|founder-zero-operator|secrets-management/.test(entry.path)),
+    projected.load.some((entry) => /full-launch-program/.test(entry.path)),
+    "program-open guidance must remain current",
+  );
+  assert(
+    !projected.load.some((entry) =>
+      /paid-tool-routing|security-release-hardening|doppler-organization|founder-zero-operator|secrets-management/.test(entry.path),
+    ),
     "operator and security procedures must not be current reading on the program packet",
   );
   assert.equal(projected.effectBoundary, "read_and_produce");
@@ -1099,12 +1085,24 @@ test("specialist workflows keep their own current books that a program packet de
   assert.equal(accessibility.projected.context?.deferredLoadCount, 0);
 
   const designRoom = catalogProjection("workflow.design.design-room");
-  assert(designRoom.projected.load.some((entry) => /design-evidence-stack/.test(entry.path)), "Design Room must keep design-evidence-stack");
-  assert(designRoom.projected.load.some((entry) => /mobile-flow-craft/.test(entry.path)), "Design Room must keep mobile-flow-craft");
+  assert(
+    designRoom.projected.load.some((entry) => /design-evidence-stack/.test(entry.path)),
+    "Design Room must keep design-evidence-stack",
+  );
+  assert(
+    designRoom.projected.load.some((entry) => /mobile-flow-craft/.test(entry.path)),
+    "Design Room must keep mobile-flow-craft",
+  );
 
   const premium = catalogProjection("workflow.design.premium-mobile-craft");
-  assert(premium.projected.load.some((entry) => /design-evidence-stack/.test(entry.path)), "premium-mobile-craft must keep design-evidence-stack");
-  assert(premium.projected.load.some((entry) => /mobile-flow-craft/.test(entry.path)), "premium-mobile-craft must keep mobile-flow-craft");
+  assert(
+    premium.projected.load.some((entry) => /design-evidence-stack/.test(entry.path)),
+    "premium-mobile-craft must keep design-evidence-stack",
+  );
+  assert(
+    premium.projected.load.some((entry) => /mobile-flow-craft/.test(entry.path)),
+    "premium-mobile-craft must keep mobile-flow-craft",
+  );
 
   const crossDomainCurrent = [
     { workflowId: "workflow.experience.onboarding-system.onb-16-journey-graph", keep: ["design-evidence-stack"] },
@@ -1117,7 +1115,10 @@ test("specialist workflows keep their own current books that a program packet de
   for (const { workflowId, keep } of crossDomainCurrent) {
     const { projected } = catalogProjection(workflowId);
     for (const needle of keep) {
-      assert(projected.load.some((entry) => entry.path.includes(needle)), `${workflowId} must keep current ${needle}`);
+      assert(
+        projected.load.some((entry) => entry.path.includes(needle)),
+        `${workflowId} must keep current ${needle}`,
+      );
     }
   }
 
@@ -1125,18 +1126,33 @@ test("specialist workflows keep their own current books that a program packet de
   assert(!program.projected.load.some((entry) => /design-evidence-stack|mobile-flow-craft|accessibility-readiness|paid-tool-routing/.test(entry.path)));
 
   const paidTools = catalogProjection("workflow.operations.paid-tool-routing-and-fallback");
-  assert(paidTools.projected.load.some((entry) => /paid-tool-routing/.test(entry.path)), "paid-tool-routing-and-fallback must keep its operator book");
+  assert(
+    paidTools.projected.load.some((entry) => /paid-tool-routing/.test(entry.path)),
+    "paid-tool-routing-and-fallback must keep its operator book",
+  );
   assert.equal(paidTools.projected.context?.deferredLoadCount, 0);
 
   const secrets = catalogProjection("workflow.operations.secrets-baseline-and-routing");
-  assert(secrets.projected.load.some((entry) => /doppler-organization/.test(entry.path)), "secrets-baseline-and-routing must keep doppler-organization");
-  assert(secrets.projected.load.some((entry) => /secrets-management/.test(entry.path)), "secrets-baseline-and-routing must keep secrets-management");
+  assert(
+    secrets.projected.load.some((entry) => /doppler-organization/.test(entry.path)),
+    "secrets-baseline-and-routing must keep doppler-organization",
+  );
+  assert(
+    secrets.projected.load.some((entry) => /secrets-management/.test(entry.path)),
+    "secrets-baseline-and-routing must keep secrets-management",
+  );
 
   const security = catalogProjection("workflow.trust.security-architecture-and-release-gate");
-  assert(security.projected.load.some((entry) => /security-release-hardening/.test(entry.path)), "security-architecture-and-release-gate must keep its security book");
+  assert(
+    security.projected.load.some((entry) => /security-release-hardening/.test(entry.path)),
+    "security-architecture-and-release-gate must keep its security book",
+  );
 
   const founderZero = catalogProjection("workflow.operations.founder-zero-operator-bootstrap");
-  assert(founderZero.projected.load.some((entry) => /founder-zero-operator/.test(entry.path)), "founder-zero-operator-bootstrap must keep its operator book");
+  assert(
+    founderZero.projected.load.some((entry) => /founder-zero-operator/.test(entry.path)),
+    "founder-zero-operator-bootstrap must keep its operator book",
+  );
 });
 
 test("live compose and dispatch packets keep program deferred counts and fastlane's own book", () => {
@@ -1152,7 +1168,11 @@ test("live compose and dispatch packets keep program deferred counts and fastlan
   for (const packet of [composedProgram, dispatchedProgram]) {
     assert((packet.deferredLoad?.length ?? 0) > 0, `${packet.workflowId} live packet lost deferred later-horizon binds`);
     assert(packet.load.some((entry) => /full-launch-program/.test(entry.path)));
-    assert(!packet.load.some((entry) => /design-evidence-stack|mobile-flow-craft|paid-tool-routing|security-release-hardening|doppler-organization|founder-zero-operator/.test(entry.path)));
+    assert(
+      !packet.load.some((entry) =>
+        /design-evidence-stack|mobile-flow-craft|paid-tool-routing|security-release-hardening|doppler-organization|founder-zero-operator/.test(entry.path),
+      ),
+    );
     assert(
       (packet.deferredLoad ?? []).some((entry) => /paid-tool-routing/.test(entry.path)),
       `${packet.workflowId} live packet must defer paid-tool-routing until that operator action is current`,
@@ -1176,7 +1196,10 @@ test("live compose and dispatch packets keep program deferred counts and fastlan
     );
     assert(!(packet.deferredLoad ?? []).some((entry) => entry.referenceId === "reference.growth.fastlane-growth-ops"));
     const projected = projectReadyBrief(packet);
-    assert(projected.load.some((entry) => /fastlane-growth-ops/.test(entry.path)), `${packet.workflowId} live worker packet must keep its own book`);
+    assert(
+      projected.load.some((entry) => /fastlane-growth-ops/.test(entry.path)),
+      `${packet.workflowId} live worker packet must keep its own book`,
+    );
     const prompt = buildWorkerPrompt(packet, "/tmp/business", "/tmp/skill");
     const mandatory = prompt.split("DEFERRED LATER KNOWLEDGE")[0] ?? prompt;
     assert.match(mandatory, /fastlane-growth-ops/);

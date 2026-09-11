@@ -972,9 +972,11 @@ export function register(h: Harness): void {
     mkdirSync(path.join(root, "docs"), { recursive: true });
     writeFileSync(path.join(root, "kernel", "a.ts"), "export const a = 1;\n", "utf8");
     writeFileSync(path.join(root, "docs", "note.md"), "# note\n", "utf8");
-    versionGit(root, ["init", "-q"]);
+    versionGit(root, ["init", "-q", "-b", "main"]);
     versionGit(root, ["add", "-A"]);
     versionGit(root, ["commit", "-q", "--no-verify", "-m", "baseline"]);
+    // Give strict CI a real comparison base inside this synthetic repository.
+    versionGit(root, ["checkout", "-q", "-b", "feature"]);
     writeFileSync(path.join(root, followUpFile), followUpContent, "utf8");
     versionGit(root, ["add", "-A"]);
     versionGit(root, ["commit", "-q", "--no-verify", "-m", "follow-up"]);

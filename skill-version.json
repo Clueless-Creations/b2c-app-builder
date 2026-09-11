@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.132",
+  "version": "0.219.133",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Refuse leftover contributor MCP names as hosted wrong-surface.",
-    "Hosted leftover contributor names fail as wrong_surface with the hosted interpretConfiguredConnection reading. Knowledge names stay on the hosted surface."
+    "Forward an explicit runtimeObserved token from MCP b2c_verify into operator verify --runtime-observed.",
+    "true and workspace record runtime=checked on a workspace-proof attempt. Omitting the field stays runtime=unknown. A live-device word still cannot invent it."
   ]
 }

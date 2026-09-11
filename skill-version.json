@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.148",
+  "version": "0.219.149",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Prefer the compiled capability-delta check once package-root resolution walks from dist.",
-    "Remaining-tsx inventory for check scripts moves from 116 to 115."
+    "Refuse leftover write-gated MCP names as local cli_only when writes are mcp_readonly.",
+    "Those leftover names stay unlisted on read-only local MCP. Handshake stays b2c-local."
   ]
 }

@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.121",
+  "version": "0.219.122",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Map asc review submit onto workflow.store.app-review-resubmit as implement.",
-    "Keep TestFlight feedback read deferred."
+    "Prefer compiled pack-composition once package-root resolution walks from dist.",
+    "Keep the remaining uncompiled checks graph on remaining-tsx."
   ]
 }

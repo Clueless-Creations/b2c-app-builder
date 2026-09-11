@@ -274,6 +274,14 @@ export function register(harness: Harness): void {
     assert(!text.includes("`b2c doctor` checks"), "utterance router must not keep doctor as the named catalog-bundle check");
   });
 
+  harness.check("doctor-asc: inspect findings footer prefers inspect", () => {
+    const text = readFileSync(path.join(skillRoot, "kernel", "session", "doctor.ts"), "utf8");
+    assert(text.includes("inspect: healthy"), "printFindings must prefer inspect in the diagnostic footer");
+    assert(text.includes("`b2c doctor` is a supported equivalent"), "printFindings must keep doctor supported");
+    assert(text.includes("doctor.node"), "finding codes stay doctor.*");
+    assert(!text.includes("doctor: healthy"), "printFindings must not keep doctor as the named diagnostic footer");
+  });
+
   harness.check("doctor-asc: sanitizeExecutablePath rewrites only the home prefix", () => {
     assert(sanitizeExecutablePath("/Users/fixture-operator/bin/asc", "/Users/fixture-operator") === "~/bin/asc", "home prefix must become ~");
     assert(sanitizeExecutablePath("/opt/homebrew/bin/asc", "/Users/fixture-operator") === "/opt/homebrew/bin/asc", "non-home paths stay absolute");

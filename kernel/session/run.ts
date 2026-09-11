@@ -26,6 +26,7 @@ import { observeAppSourceFingerprint } from "../engine/source-fingerprint.js";
 import { buildDispatchBatches, checkBatchBoundary, type BatchHaltReason, type DispatchHooks } from "../engine/dispatch.js";
 import {
   acceptVerification,
+  recordRejectedVerification,
   fingerprintInputs,
   abandonDependencyRefreshesForConsumer,
   beginAttempt,
@@ -1401,8 +1402,7 @@ async function runSessionCore(args: Record<string, string | undefined>, host: In
               ...attempt!.deterministicVerification!.evidence,
               outcome.evidence,
             ];
-            attempt!.evidence.push(...evidence);
-            attempt!.independentVerification = { ...reviewReceipt, verdict: "rejected", checkedAt: judgedAt, evidence };
+            recordRejectedVerification(plan, run, nodeId, evidence, judgedAt, reviewReceipt, "failed");
             state.blocker = VERIFICATION_REJECTED_BLOCKER;
             const repaired = requestVerificationRepair(plan, run, nodeId, evidence, judgedAt);
             progressCount += repaired.length;
@@ -1434,8 +1434,15 @@ async function runSessionCore(args: Record<string, string | undefined>, host: In
             advanced.push({ nodeId, title: node.title, unit: domainBusinessUnit(node.domainId, catalog.authority) });
             progressCount += 1;
           } else if (outcome.status === "rejected") {
-            attempt?.evidence.push(outcome.evidence);
-            if (attempt) attempt.independentVerification = { ...reviewReceipt, verdict: "rejected", checkedAt: judgedAt, evidence: [outcome.evidence] };
+            recordRejectedVerification(
+              plan,
+              run,
+              nodeId,
+              [outcome.evidence],
+              judgedAt,
+              reviewReceipt,
+              rejectionOnly ? "failed" : "checked",
+            );
             state.blocker = VERIFICATION_REJECTED_BLOCKER;
             const repaired = requestVerificationRepair(plan, run, nodeId, [outcome.evidence], judgedAt, outcome.repairWorkflowIds);
             progressCount += repaired.length;

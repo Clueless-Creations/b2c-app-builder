@@ -42,6 +42,7 @@ import {
   connectionReceipt,
   interpretConfiguredConnection,
   leftoverCliOnlyLocalMcpResponse,
+  leftoverWriteGatedLocalMcpResponse,
   LOCAL_CLIENT_NAME,
   localMcpInstructions,
   observedLocalWorkspaceHealth,
@@ -779,10 +780,15 @@ const start = transport.start.bind(transport);
 transport.start = async () => {
   const inner = transport.onmessage;
   transport.onmessage = (message) => {
-    const intercepted = leftoverCliOnlyLocalMcpResponse(message, {
-      engineVersion: skillVersion(),
-      observed: leftoverCliOnlyObserved,
-    });
+    const intercepted =
+      leftoverCliOnlyLocalMcpResponse(message, {
+        engineVersion: skillVersion(),
+        observed: leftoverCliOnlyObserved,
+      }) ??
+      leftoverWriteGatedLocalMcpResponse(message, {
+        engineVersion: skillVersion(),
+        observed: leftoverCliOnlyObserved,
+      });
     if (intercepted) {
       void transport.send(intercepted as Parameters<StdioServerTransport["send"]>[0]);
       return;

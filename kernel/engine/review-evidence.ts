@@ -110,6 +110,9 @@ export type ProofStrengthLevel = "checked" | "failed" | "unknown";
 
 export type ProofStrengthReviewOrigin = IndependentVerificationReceipt["mode"] | "none";
 
+/** Typed workspace runtime observation. A review sentence cannot invent this. */
+export type WorkspaceRuntimeObservation = { readonly origin: "workspace" };
+
 export interface ComposedProofStrength {
   readonly structural: ProofStrengthLevel;
   readonly semantic: ProofStrengthLevel;
@@ -127,7 +130,7 @@ export function composeProofStrength(input: {
   readonly structural: "checked" | "failed";
   readonly review?: Pick<IndependentVerificationReceipt, "mode" | "verdict" | "evidence">;
   readonly attempt?: { proofSource?: "workspace" | "synthetic" };
-  readonly runtimeObservation?: { origin: "workspace" };
+  readonly runtimeObservation?: WorkspaceRuntimeObservation;
 }): ComposedProofStrength {
   const reviewIssues = input.review ? classifyProofStrengthIssues(input.review.evidence, input.attempt ?? {}, input.review.mode) : [];
   const workspaceReview =

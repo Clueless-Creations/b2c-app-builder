@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.108",
+  "version": "0.219.109",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Refuse hosted HTTP and MCP calls for local workspace planning or execution names as wrong_surface with the hosted interpretConfiguredConnection reading.",
-    "Keep unknown knowledge-tool names as not_found, leave auth failures unauthorized, and keep the live local handshake as b2c-local."
+    "Refuse static screenshots of a required navigation flow as independent review or interactive runtime proof.",
+    "Keep a reviewer sentence next to a screenshot path as a screenshot, and leave packet-gate and gate-receipt leftovers unchanged."
   ]
 }

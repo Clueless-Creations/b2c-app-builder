@@ -159,7 +159,7 @@ export function register(harness: Harness): void {
 
   harness.check("hosted discovery: leftover screenshot-upload goldens target the Apple media envelope, not generic ASC CLI", () => {
     const corpus = loadCorpus();
-    const screenshotUploadIds = ["store-015", "store-027", "store-028", "store-042", "store-050"];
+    const screenshotUploadIds = ["store-015", "store-027", "store-028", "store-042", "store-048", "store-050"];
     for (const id of screenshotUploadIds) {
       const entry = corpus.entries.find((item) => item.id === id);
       assert(entry !== undefined, `store corpus is missing ${id}`);
@@ -172,12 +172,6 @@ export function register(harness: Harness): void {
         `${id} is screenshot upload, not generic ASC CLI / TestFlight / metadata`,
       );
     }
-    const cliNamed = corpus.entries.find((item) => item.id === "store-048");
-    assert(cliNamed !== undefined, "store-048 must stay in the frozen corpus");
-    assert(
-      cliNamed.needs.includes("workflow.store.asc-cli-automation"),
-      "store-048 names 'asc cli'; the strict-match partition still requires the CLI automation node",
-    );
     const metadataPush = corpus.entries.find((item) => item.id === "store-016");
     assert(metadataPush !== undefined, "store-016 must stay in the frozen corpus");
     assert(

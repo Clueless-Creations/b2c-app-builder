@@ -438,7 +438,7 @@
       "utterance": "asc cli screenshot upload",
       "shape": "casual",
       "needs": [
-        "workflow.store.asc-cli-automation",
+        "workflow.store.apple-store-media-standing-envelope",
         "workflow.store.store-screenshots-production"
       ]
     },

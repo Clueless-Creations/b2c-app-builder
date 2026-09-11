@@ -14331,7 +14331,7 @@
         "publish the media assets we already approved for app store connect",
         "update app store connect with new screenshots plus previews"
       ],
-      "instructions": "Upload only the locale, device-well, screenshot, and app-preview assets covered by the exact current standing envelope. Verify every file digest, App Store Connect version-localization ID, and device type from SCREENSHOTS.md immediately before upload. Use `asc screenshots sizes`, `asc screenshots validate`, and `asc screenshots upload` as the selected-provider cookbook forms; probe `--help` before the first live call. Capture before-state and read back the resulting media set. Write store/proof/apple-store-media-apply.json with approval ID, per-file digest, locale, device well, version-localization ID, provider operation IDs, readback state, and timestamps. Do not apply listing text, products, TestFlight, review submission, or release state.",
+      "instructions": "Upload only the locale, device-well, screenshot, and app-preview assets covered by the exact current standing envelope. Verify every file digest, App Store Connect version-localization ID, and device type from SCREENSHOTS.md immediately before upload. Use `asc screenshots sizes`, `asc screenshots validate`, and `asc screenshots upload` as the selected-provider ASC CLI cookbook forms; probe `--help` before the first live call. Capture before-state and read back the resulting media set. Write store/proof/apple-store-media-apply.json with approval ID, per-file digest, locale, device well, version-localization ID, provider operation IDs, readback state, and timestamps. Do not apply listing text, products, TestFlight, review submission, or release state.",
       "reads": [
         "store/STORE_CONSOLE.md",
         "store/app-store-listing/SCREENSHOTS.md",
@@ -18740,14 +18740,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "db32a4e1cee809956abde003dce9c71fa47f2c3fcd7da8edc939f21624de7dcf",
+    "fingerprint": "fe340f0e2903e2c95e1cd8959c388b74a8b0c1fb39e3cece00376e6da0fc7ec8",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
         "version": "0.219.96",
         "revision": "0.219.96",
-        "contentDigest": "a2d85ad610ffb4893130fd6b36fa3cc34274575c73912567e25b0f909e45bd4c"
+        "contentDigest": "0dc05dc90f29aeaade739fe6a4bb271325661fb7d9422c993ba37414480488f9"
       }
     ],
     "base": {

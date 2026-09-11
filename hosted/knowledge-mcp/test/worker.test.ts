@@ -8,8 +8,10 @@ import { sha256 } from "../auth.js";
 import {
   connectionReceipt,
   hostedMcpInstructionsSuffix,
+  hostedWrongSurfaceRefusal,
   interpretConfiguredConnection,
   parseConnectionReceipt,
+  type HostedWrongSurfaceRefusal,
 } from "../../../contracts/public-api/connection-receipt.js";
 import { HOSTED_INSTRUCTIONS } from "../instructions.js";
 import type { HostedCatalogResult, HostedKnowledgeGetResult, HostedKnowledgeSearchResult } from "../../../kernel/knowledge-service/types.js";
@@ -172,7 +174,10 @@ test("health and OAuth discovery are public; content requires authentication on 
     assert.equal(response.headers.get("cache-control"), "no-store");
     assert.equal(response.headers.get("referrer-policy"), "no-referrer");
     assert.ok(response.headers.get("www-authenticate"));
-    assert.ok(!(await response.text()).includes("workflows"));
+    const unauthorized = await response.text();
+    assert.ok(!unauthorized.includes("workflows"));
+    assert.doesNotMatch(unauthorized, /cannot access or run this local business/);
+    assert.doesNotMatch(unauthorized, /wrong_surface/);
   }
   for (const token of ["wrong", deniedKey]) {
     const expected = token === deniedKey ? 403 : 401;
@@ -225,8 +230,26 @@ test("real MCP initialization and tool discovery expose only the four read-only 
   assert.equal(stream.status, 405);
   assert.equal(stream.headers.get("allow"), "POST");
   const local = await mcpCall("b2c_run", { workspace: "/tmp/private", asFounder: true });
-  const localBody = (await local.json()) as { result?: { isError?: boolean }; error?: unknown };
-  assert.ok(localBody.error || localBody.result?.isError);
+  assert.equal(local.status, 200);
+  const localBody = (await local.json()) as {
+    result?: {
+      isError?: boolean;
+      content?: Array<{ type: string; text: string }>;
+      structuredContent?: HostedWrongSurfaceRefusal;
+    };
+    error?: unknown;
+  };
+  const expected = interpretConfiguredConnection({
+    clientName: "b2c-hosted",
+    receipt: connectionReceipt({ mode: "hosted_knowledge", engineVersion: hostedKnowledge.engineVersion }),
+  });
+  const refusal = hostedWrongSurfaceRefusal({ engineVersion: hostedKnowledge.engineVersion, toolName: "b2c_run" });
+  assert.equal(localBody.error, undefined);
+  assert.equal(localBody.result?.isError, true);
+  assert.deepEqual(localBody.result?.structuredContent, refusal);
+  assert.deepEqual(localBody.result?.structuredContent?.connection, expected);
+  assert.deepEqual(JSON.parse(localBody.result?.content?.[0]?.text ?? ""), refusal);
+  assert.equal((JSON.stringify(localBody.result?.structuredContent).match(/cannot access or run this local business/g) ?? []).length, 1);
 });
 
 test("MCP rejects batches promptly and still accepts individual notifications", { timeout: 5_000 }, async () => {

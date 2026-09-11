@@ -187,7 +187,7 @@ Register the absolute Node command and the `entrypoints/mcp/b2c-app-builder-mcp.
 
 ### Leftover names
 
-The leftover client name is not a capability. The handshake receipt decides local execution versus hosted knowledge. Handshake instructions, local plan routing, and hosted discovery take capability from that receipt, including a leftover name that points at hosted knowledge.
+The leftover client name is not a capability. The handshake receipt decides local execution versus hosted knowledge. Handshake instructions, local plan routing, and hosted discovery take capability from that receipt, including a leftover name that points at hosted knowledge. A local workspace planning or execution tool name on hosted knowledge fails as `wrong_surface` with that same receipt reading.
 
 | Client | Fresh local | Leftover name still in config | Hosted |
 | --- | --- | --- | --- |

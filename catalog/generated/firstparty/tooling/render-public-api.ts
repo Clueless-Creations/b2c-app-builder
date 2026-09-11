@@ -1,11 +1,11 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { z } from "zod";
 import { extensionSchema } from "../contracts/extensions/contract.js";
 import { compositionSchema, PUBLIC_OPERATIONS } from "../contracts/public-api/contract.js";
 import { issue, reportAndExit, type Issue } from "./lib/launch-state.js";
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../contracts/public-api");
+import { resolveSkillRoot } from "./lib/skill-root.js";
+const root = path.join(resolveSkillRoot(import.meta.url), "contracts/public-api");
 const check = process.argv.slice(2).includes("--check");
 const issues: Issue[] = [];
 function emit(name: string, content: string): void {

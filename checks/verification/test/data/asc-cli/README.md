@@ -17,6 +17,8 @@ Reviewed revision: `ca759a3b6ab88c8c39aed13325461248436615ca` (tag 5.1.0, 2026-0
 | `screenshots-sizes-mistaken-jsonapi.json` | mistaken Apple JSON:API document | not an `asc screenshots sizes` envelope                                                                                | JSON:API `data`/`attributes` is not the CLI `ScreenshotSizesResult` object                                              |
 | `screenshots-validate-object.json`  | `asc screenshots validate --output json` | `internal/cli/assets/assets_screenshots_validate.go` `screenshotValidateResult`                                      | One high-level CLI object for the ready branch. `displayType` is `APP_IPHONE_65`. Nested `files` has one `ok` PNG. Empty `issues` and `apiDisplayType` stay omitted. This is not Apple JSON:API. |
 | `screenshots-validate-mistaken-jsonapi.json` | mistaken Apple JSON:API document | not an `asc screenshots validate` envelope                                                                              | JSON:API `data`/`attributes` is not the CLI `screenshotValidateResult` object                                             |
+| `screenshots-upload-dry-run-object.json` | `asc screenshots upload --dry-run --output json` | `internal/cli/assets/assets_screenshots_upload.go` dry-run `would-upload` plus `internal/cli/assets/assets_screenshots_resume.go` `buildAppScreenshotUploadResult` plus `internal/asc/assets_output.go` `AppScreenshotUploadResult` | One high-level CLI object for the dry-run branch. Nested `results` has one `would-upload` PNG. Empty `uploaded`, `skipped`, `pending`, `failed`, `resumed`, `failures`, and `failureArtifactPath` stay omitted. Nested `assetId` is the empty string. This is not Apple JSON:API. |
+| `screenshots-upload-mistaken-jsonapi.json` | mistaken Apple JSON:API document | not an `asc screenshots upload` envelope                                                                                | JSON:API `data`/`attributes` is not the CLI `AppScreenshotUploadResult` object                                              |
 
 `reviewState` and `nextAction` for `WAITING_FOR_REVIEW` come from
 `buildReviewStatusResult` in that same file. Empty `blockers` are omitted
@@ -57,6 +59,21 @@ prefixes ShortUsage `IPHONE_65`. `apiDisplayType` stays omitted because
 `CanonicalScreenshotDisplayTypeForAPI` returns the same value. Empty
 `issues` stay omitted because the field is `json:"issues,omitempty"`. Nested
 file `hidden` stays omitted because it is false.
+
+The screenshots-upload dry-run object follows `AppScreenshotUploadResult` after
+`uploadScreenshotsWithConfig` records one `would-upload` item and
+`buildAppScreenshotUploadResult` calls `finalizeAppScreenshotUploadResult`,
+matching `TestUploadScreenshotsDryRunReportsWouldUpload` at 5.1.0.
+`versionLocalizationId` is the cookbook `LOC_ID`, not a live capture.
+`displayType` is `APP_IPHONE_65` because `normalizeScreenshotDisplayType`
+prefixes ShortUsage `IPHONE_65`. `filePath` joins the cookbook path
+`./screenshots` with the dry-run test file `01-home.png`. Nested `assetId`
+is encoded as `""` because the field has no `omitempty` and the dry-run
+branch leaves it empty. `uploaded` stays 0, so it is omitted. `total` is 1
+because `finalizeAppScreenshotUploadResult` sets it from `len(results)`
+when `Total` is still 0. Empty `resumed`, `skipped`, `pending`, `failed`,
+`failures`, and `failureArtifactPath` stay omitted because those fields
+are `json:",omitempty"`. The live upload branch is not this envelope.
 
 Ids are synthetic. They are not live App Store Connect apps, versions, or
 submissions. No host `asc` binary and no App Store Connect account were used to

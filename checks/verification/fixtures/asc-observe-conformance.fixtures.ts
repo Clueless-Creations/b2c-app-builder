@@ -11,7 +11,9 @@
  * response envelope is the 5.1.0 CLI `ValidateResult` object. The independent
  * screenshots-sizes response envelope is the 5.1.0 CLI `ScreenshotSizesResult`
  * default focused object. The independent screenshots-validate response
- * envelope is the 5.1.0 CLI `screenshotValidateResult` ready object. `asc review submit`
+ * envelope is the 5.1.0 CLI `screenshotValidateResult` ready object. The independent
+ * screenshots-upload response envelope is the 5.1.0 CLI `AppScreenshotUploadResult`
+ * dry-run object. `asc review submit`
  * maps to `workflow.store.app-review-resubmit`. `asc testflight feedback list` and
  * `asc testflight crashes list` map to
  * `workflow.store.apple-testflight-standing-envelope`. Adapter-built resubmit argv and canned
@@ -55,6 +57,8 @@ const SCREENSHOTS_SIZES_SOURCE =
   "rork-app-store-connect-cli 5.1.0 internal/cli/assets/assets_screenshots.go focusedScreenshotSizeCatalog / internal/asc/screenshot_sizes.go ScreenshotSizesResult";
 const SCREENSHOTS_VALIDATE_SOURCE =
   "rork-app-store-connect-cli 5.1.0 internal/cli/assets/assets_screenshots_validate.go screenshotValidateResult";
+const SCREENSHOTS_UPLOAD_SOURCE =
+  "rork-app-store-connect-cli 5.1.0 internal/cli/assets/assets_screenshots_upload.go dry-run would-upload / internal/cli/assets/assets_screenshots_resume.go buildAppScreenshotUploadResult / internal/asc/assets_output.go AppScreenshotUploadResult";
 const APPLE_STORE_MEDIA_STANDING_ENVELOPE = "workflow.store.apple-store-media-standing-envelope";
 const REVIEW_STATUS_OBJECT_KEYS = ["appId", "version", "reviewDetailConfigured", "reviewDetailId", "latestSubmission", "reviewState", "nextAction"] as const;
 const REVIEW_VERSION_KEYS = ["id", "version", "platform", "state", "createdDate"] as const;
@@ -86,6 +90,10 @@ const SCREENSHOTS_VALIDATE_FILE_KEYS = ["order", "filePath", "fileName", "width"
 const SCREENSHOTS_VALIDATE_OMITTED_KEYS = ["apiDisplayType", "issues"] as const;
 const SCREENSHOTS_VALIDATE_FILE_OMITTED_KEYS = ["hidden"] as const;
 const SCREENSHOTS_VALIDATE_ISSUE_OMITTED_KEYS = ["code", "severity", "filePath", "fileName", "duplicateOf", "match", "message", "remediation"] as const;
+const SCREENSHOTS_UPLOAD_OBJECT_KEYS = ["versionLocalizationId", "setId", "displayType", "dryRun", "total", "results"] as const;
+const SCREENSHOTS_UPLOAD_RESULT_KEYS = ["fileName", "filePath", "assetId", "state"] as const;
+const SCREENSHOTS_UPLOAD_OMITTED_KEYS = ["resumed", "uploaded", "skipped", "pending", "failed", "failureArtifactPath", "failures"] as const;
+const SCREENSHOTS_UPLOAD_RESULT_OMITTED_KEYS = ["skipped"] as const;
 
 type SemanticFit = "exact" | "partial" | "none";
 type MappingEffect = "read" | "mutation" | "publish" | "credential";
@@ -954,6 +962,102 @@ export function register(harness: Harness): void {
     }
     assert(thrown instanceof AscProviderReadError, "screenshots-validate object is not a review-status envelope");
     assert(thrown instanceof Error && thrown.message.includes("no valid app-version layer"), "screenshotValidateResult path/files are not the status nested object");
+    thrown = undefined;
+    try {
+      createAscAppReviewProvider({
+        appId: "123456789",
+        runner: reviewStatusRunner(mistaken),
+      }).readSnapshot();
+    } catch (error) {
+      thrown = error;
+    }
+    assert(thrown instanceof AscProviderReadError, "JSON:API screenshot document fails closed");
+    assert(thrown instanceof Error && thrown.message.includes("no valid app-version layer"), "JSON:API document is not the CLI object");
+  });
+
+  harness.check("asc-conformance: independent screenshots-upload response envelope is the 5.1.0 dry-run CLI object", () => {
+    const nativeSource = readFileSync(path.join(ASC_CLI_NATIVE_DIR, "screenshots-upload-dry-run-object.json"), "utf8");
+    const mistakenSource = readFileSync(path.join(ASC_CLI_NATIVE_DIR, "screenshots-upload-mistaken-jsonapi.json"), "utf8");
+    const buildRelease = readFileSync(BUILD_RELEASE, "utf8");
+    const native = loadNativeJson("screenshots-upload-dry-run-object.json");
+    const mistaken = loadNativeJson("screenshots-upload-mistaken-jsonapi.json");
+    assert(isRecord(native), "native screenshots-upload envelope must be one object");
+    for (const key of SCREENSHOTS_UPLOAD_OBJECT_KEYS) {
+      assert(key in native, `native envelope missing ${key}`);
+    }
+    for (const key of SCREENSHOTS_UPLOAD_OMITTED_KEYS) {
+      assert(!(key in native), `dry-run envelope must omit empty ${key}`);
+    }
+    assert(native.versionLocalizationId === "LOC_ID", "versionLocalizationId is the cookbook id, not a live capture");
+    assert(native.setId === "set-native-1", "setId is synthetic, not a live screenshot set");
+    assert(native.displayType === "APP_IPHONE_65", "IPHONE_65 normalizes to APP_IPHONE_65");
+    assert(native.dryRun === true, "dry-run branch sets dryRun");
+    assert(native.total === 1, "finalizeAppScreenshotUploadResult sets total from one result");
+    assert(Array.isArray(native.results) && native.results.length === 1, "dry-run envelope encodes one result");
+    const item = native.results[0];
+    assert(isRecord(item), "nested result must be one object");
+    for (const key of SCREENSHOTS_UPLOAD_RESULT_KEYS) {
+      assert(key in item, `nested result missing ${key}`);
+    }
+    for (const key of SCREENSHOTS_UPLOAD_RESULT_OMITTED_KEYS) {
+      assert(!(key in item), `dry-run result must omit empty ${key}`);
+    }
+    assert(item.fileName === "01-home.png", "fileName is the dry-run test PNG");
+    assert(item.filePath === "./screenshots/01-home.png", "filePath joins the cookbook path");
+    assert(item.assetId === "", "dry-run would-upload leaves assetId empty");
+    assert(item.state === "would-upload", "dry-run branch records would-upload");
+    assert(!("data" in native) && !("attributes" in native), "CLI envelope is not Apple JSON:API");
+    assert(isRecord(mistaken) && isRecord(mistaken.data) && "attributes" in mistaken.data, "mistaken document is Apple JSON:API");
+    assert(
+      adapterGeneratedMentions(nativeSource, ["buildResubmitCommand", "liveReviewStatusJson", "createAscAppReviewProvider"]).length === 0,
+      "native envelope must not name adapter helpers",
+    );
+    assert(
+      adapterGeneratedMentions(mistakenSource, ["buildResubmitCommand", "liveReviewStatusJson"]).length === 0,
+      "mistaken envelope must not name adapter helpers",
+    );
+    assert(buildRelease.includes("asc screenshots upload"), "media standing envelope still names the cookbook upload form");
+    assert(!buildRelease.includes("test/data/asc-cli"), "workflow cookbook form is not this envelope");
+    const record = provenance({
+      provider: "apple-asc",
+      transport: "cli",
+      reviewedVersion: RORK_REVIEWED_VERSION,
+      reviewedRevision: RORK_REVIEWED_REVISION,
+      sourceSelector: SCREENSHOTS_UPLOAD_SOURCE,
+      nativeOperation: "asc screenshots upload",
+      canonicalOperation: APPLE_STORE_MEDIA_STANDING_ENVELOPE,
+      evidenceKind: "upstream-source-test",
+      establishes: ["response-shape"],
+      coverageLimits:
+        "CLI AppScreenshotUploadResult dry-run object at 5.1.0 only. One would-upload APP_IPHONE_65 PNG. Empty uploaded omitted. Not Apple JSON:API. Not a live App Store Connect capture. Observe adapter does not execute upload.",
+      sample: native,
+    });
+    const generated: ProviderConformanceProvenance = {
+      provider: "apple-asc",
+      transport: "cli",
+      reviewedVersion: RORK_REVIEWED_VERSION,
+      reviewedRevision: "unknown",
+      sourceSelector: "catalog/workflows/build-release.ts apple-store-media-standing-envelope cookbook form",
+      nativeOperation: "asc screenshots upload",
+      canonicalOperation: APPLE_STORE_MEDIA_STANDING_ENVELOPE,
+      evidenceKind: "adapter-generated",
+      establishes: ["request-shape"],
+      coverageLimits: "Echo of the workflow cookbook string. Not independent native evidence.",
+      sample: "asc screenshots upload",
+    };
+    assert(isIndependentEvidence(record.evidenceKind), describeConformanceCoverage(record));
+    assert(isIndependentEvidence(generated.evidenceKind) === false, describeConformanceCoverage(generated));
+    let thrown: unknown;
+    try {
+      createAscAppReviewProvider({
+        appId: "123456789",
+        runner: reviewStatusRunner(native),
+      }).readSnapshot();
+    } catch (error) {
+      thrown = error;
+    }
+    assert(thrown instanceof AscProviderReadError, "screenshots-upload dry-run object is not a review-status envelope");
+    assert(thrown instanceof Error && thrown.message.includes("no valid app-version layer"), "AppScreenshotUploadResult results are not the status nested object");
     thrown = undefined;
     try {
       createAscAppReviewProvider({

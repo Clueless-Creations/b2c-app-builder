@@ -270,9 +270,10 @@ export function createStatKeyedCache<T>(load: (filePath: string) => T): (filePat
 // that memoizing purely on "have we ever loaded this" bought nothing worth that staleness risk.
 const loadCachedCatalogBundle = createStatKeyedCache((bundlePath: string): CatalogData => {
   // A missing or corrupt generated bundle is a real repository integrity failure (the same
-  // artifact `npm run render:catalog` produces and `b2c doctor` checks), not a per-utterance
-  // business outcome — so this throws rather than returning a routed-around outcome, exactly like
-  // entrypoints/mcp/server.ts treats a bad bundle as unavailable rather than silently degrading routing.
+  // artifact `npm run render:catalog` produces and `b2c inspect` checks; `b2c doctor` is a supported equivalent),
+  // not a per-utterance business outcome — so this throws rather than returning a routed-around
+  // outcome, exactly like entrypoints/mcp/server.ts treats a bad bundle as unavailable rather than
+  // silently degrading routing.
   const bundle = JSON.parse(readFileSync(bundlePath, "utf8")) as HostedKnowledgeBundle;
   const workflows: RoutableWorkflow[] = bundle.catalog.workflows.map((workflow) => ({
     workflowId: workflow.id,

@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.92",
+  "version": "0.219.93",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Keep leftover MCP names from implying a third capability.",
-    "Document Claude, Cursor, and Codex leftover-name migration without rewriting agent config."
+    "Store a proof-strength line when independent review rejects.",
+    "Keep graph and synthetic rejects from claiming workspace semantic failure."
   ]
 }

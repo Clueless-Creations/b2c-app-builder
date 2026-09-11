@@ -38,10 +38,12 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { resolveSkillRoot } from "../../tooling/lib/skill-root.js";
 import {
+  anyWorkerRuntimeFound,
   connectionReceipt,
   interpretConfiguredConnection,
   LOCAL_CLIENT_NAME,
   localMcpInstructions,
+  observedLocalWorkspaceHealth,
 } from "../../contracts/public-api/connection-receipt.js";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -54,6 +56,7 @@ import type { HostedKnowledgeBundle, KnowledgeService } from "../../kernel/knowl
 import { routeUtterance } from "../../kernel/session/route-utterance.js";
 import { withOnboardingStepper } from "../../kernel/session/stepper.js";
 import { appendDoctorHostBlock } from "../../kernel/session/doctor-host.js";
+import { detectWorkerRuntimes } from "../../kernel/session/executor.js";
 import { readWorkspaceStatus, renderWorkspaceStatus, resolveCwdWorkspaceState } from "../../kernel/session/status.js";
 
 const skillRoot = resolveSkillRoot(import.meta.url);
@@ -126,6 +129,10 @@ try {
   );
 }
 
+const localWorkspaceHealth = observedLocalWorkspaceHealth({
+  workerRuntimeFound: anyWorkerRuntimeFound(detectWorkerRuntimes()),
+});
+
 function localRuntimeConnection() {
   return interpretConfiguredConnection({
     clientName: LOCAL_CLIENT_NAME,
@@ -135,6 +142,7 @@ function localRuntimeConnection() {
       observed: {
         knowledge: knowledgeService ? "available" : "unavailable",
         writes: readOnly ? "mcp_readonly" : "mcp_write_enabled",
+        ...localWorkspaceHealth,
       },
     }),
   });
@@ -147,6 +155,7 @@ const server = new McpServer(
       knowledge: knowledgeService ? "available" : "unavailable",
       engineVersion: skillVersion(),
       writes: readOnly ? "mcp_readonly" : "mcp_write_enabled",
+      workspaceExecution: localWorkspaceHealth.workspaceExecution,
     }),
   },
 );

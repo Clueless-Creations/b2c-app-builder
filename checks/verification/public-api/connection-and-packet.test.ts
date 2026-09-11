@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import {
+  anyWorkerRuntimeFound,
   bothConfiguredRoutingGuidance,
   configuredConnectionSet,
   connectionCapabilityGuidance,
@@ -22,6 +23,7 @@ import {
   leftoverNameClientMatrix,
   leftoverNameMigrationGuidance,
   localMcpInstructions,
+  observedLocalWorkspaceHealth,
   parseConnectionReceipt,
   selectConfiguredSurface,
   type ConnectionReceipt,
@@ -121,7 +123,17 @@ test("setup prints a local connection receipt and distinct b2c-local registratio
     assert.equal(parsed.declares.workspaceExecution, "local_cli");
     assert.equal(parsed.declares.writes, "cli_default");
     assert.equal(parsed.providerObservation, "not_tested");
-    assert.equal(parsed.observed, undefined);
+    assert.equal(parsed.observed?.workspacePlanning, "available");
+    assert.ok(
+      parsed.observed?.workspaceExecution === "available" || parsed.observed?.workspaceExecution === "unavailable",
+      "setup omitted observed.workspaceExecution",
+    );
+    if (parsed.observed?.workspaceExecution === "unavailable") {
+      assert.match(result.stdout, /Execution health is separately degraded/);
+      assert.doesNotMatch(result.stdout, /cannot access or run this local business/);
+    } else {
+      assert.match(result.stdout, /CLI-backed execution/);
+    }
     assert.match(result.stdout, /Provider readiness is not implied by this receipt/);
     assert.match(result.stdout, /claude mcp add --scope user b2c-local/);
     assert.match(result.stdout, /\[mcp_servers\.b2c-local\]/);
@@ -157,6 +169,15 @@ test("local MCP handshake name is b2c-local and leftover names stay on the recei
     assert.deepEqual(receipt.identity.legacy, ["b2c-app-builder"]);
     assert.equal(receipt.providerObservation, "not_tested");
     assert.notEqual(receipt.observed?.knowledge, undefined);
+    assert.equal(receipt.observed?.workspacePlanning, "available");
+    assert.ok(
+      receipt.observed?.workspaceExecution === "available" || receipt.observed?.workspaceExecution === "unavailable",
+      "live handshake omitted observed.workspaceExecution",
+    );
+    if (receipt.observed?.workspaceExecution === "unavailable") {
+      assert.match(instructions, /Execution health is separately degraded/);
+      assert.doesNotMatch(instructions, /cannot access or run this local business/);
+    }
     const recommended = interpretConfiguredConnection({ clientName: "b2c-local", receipt });
     const leftover = interpretConfiguredConnection({ clientName: "b2c-app-builder", receipt });
     assertRecommendedHandshakeGuidance(instructions, receipt, recommended, leftover, "live local handshake");
@@ -176,7 +197,12 @@ test("local MCP handshake name is b2c-local and leftover names stay on the recei
 });
 
 test("local MCP instructions name local execution and refuse hosted-as-local", () => {
-  const text = localMcpInstructions({ knowledge: "available", engineVersion: "0.219.40", writes: "mcp_write_enabled" });
+  const text = localMcpInstructions({
+    knowledge: "available",
+    engineVersion: "0.219.40",
+    writes: "mcp_write_enabled",
+    workspaceExecution: "available",
+  });
   assert.match(text, /b2c-local/);
   assert.match(text, /b2c-hosted/);
   const receipt = parseConnectionReceipt(text);
@@ -186,6 +212,8 @@ test("local MCP instructions name local execution and refuse hosted-as-local", (
   assert.equal(receipt.providerObservation, "not_tested");
   assert.equal(receipt.observed?.knowledge, "available");
   assert.equal(receipt.observed?.writes, "mcp_write_enabled");
+  assert.equal(receipt.observed?.workspacePlanning, "available");
+  assert.equal(receipt.observed?.workspaceExecution, "available");
   assert.match(connectionCapabilityGuidance(receipt), /Provider readiness is not implied/);
   const leftover = interpretConfiguredConnection({ clientName: "b2c-app-builder", receipt });
   const recommended = interpretConfiguredConnection({ clientName: "b2c-local", receipt });
@@ -247,9 +275,15 @@ test("leftover-name client matrix covers Claude, Cursor, and Codex without silen
     assert(packageGuide.includes("hosted knowledge uses `b2c-hosted`"), "package guide omitted hosted surface selection");
     assert(packageGuide.includes("not a third surface"), "package guide omitted leftover-is-not-third-surface");
     assert(packageGuide.includes("Duplicate names are a collision"), "package guide omitted duplicate-name collision");
+    assert(
+      packageGuide.includes("A local receipt reports worker-runtime health separately"),
+      "package guide omitted worker-runtime health",
+    );
+    assert(hostedReadme.includes("A missing local worker CLI is local execution health"), "hosted README omitted worker-runtime health");
     const skill = readFileSync(path.join(root, "SKILL.md"), "utf8");
     assert(skill.includes("When both are configured, select by that capability"), "skill omitted both-configured selection");
     assert(skill.includes("Duplicate names are a collision"), "skill omitted duplicate-name collision");
+    assert(skill.includes("A missing worker CLI degrades local execution health"), "skill omitted worker-runtime health");
   } finally {
     rmSync(temp, { recursive: true, force: true });
   }
@@ -299,6 +333,7 @@ test("leftover client names take capability from the handshake, including both-c
     engineVersion: "0.219.89",
     writes: "mcp_readonly",
     clientName: "b2c-app-builder",
+    workspaceExecution: "available",
   });
   assert(leftoverLocalHandshake.includes(leftoverLocal.guidance));
   assert.doesNotMatch(leftoverLocalHandshake, /The leftover client name b2c-app-builder is the legacy local registration.*The leftover client name b2c-app-builder is the legacy local registration/);
@@ -493,11 +528,70 @@ test("hosted local-only MCP names fail as wrong-surface with receipt guidance", 
   );
 });
 
+test("missing local worker CLI degrades execution health without hosted wrong-surface", () => {
+  assert.equal(anyWorkerRuntimeFound([]), false);
+  assert.equal(anyWorkerRuntimeFound([{ available: false }, { available: false }]), false);
+  assert.equal(anyWorkerRuntimeFound([{ available: false }, { available: true }]), true);
+  const missing = observedLocalWorkspaceHealth({ workerRuntimeFound: false });
+  const present = observedLocalWorkspaceHealth({ workerRuntimeFound: true });
+  assert.deepEqual(missing, { workspacePlanning: "available", workspaceExecution: "unavailable" });
+  assert.deepEqual(present, { workspacePlanning: "available", workspaceExecution: "available" });
+  const degraded = connectionReceipt({
+    mode: "local_execution",
+    engineVersion: "0.219.121",
+    observed: missing,
+  });
+  const healthy = connectionReceipt({
+    mode: "local_execution",
+    engineVersion: "0.219.121",
+    observed: present,
+  });
+  const hosted = connectionReceipt({ mode: "hosted_knowledge", engineVersion: "0.219.121" });
+  assert.equal(degraded.declares.workspaceExecution, "local_cli");
+  assert.equal(degraded.observed?.workspacePlanning, "available");
+  assert.equal(degraded.observed?.workspaceExecution, "unavailable");
+  assert.equal(degraded.providerObservation, "not_tested");
+  assert.match(connectionCapabilityGuidance(degraded), /Execution health is separately degraded/);
+  assert.match(connectionCapabilityGuidance(degraded), /Fixture sessions still run/);
+  assert.doesNotMatch(connectionCapabilityGuidance(degraded), /cannot access or run this local business/);
+  assert.match(connectionCapabilityGuidance(healthy), /CLI-backed execution/);
+  assert.doesNotMatch(connectionCapabilityGuidance(healthy), /separately degraded/);
+  assert.equal(hosted.observed?.workspaceExecution, undefined);
+  assert.match(connectionCapabilityGuidance(hosted), /cannot access or run this local business/);
+  assert.doesNotMatch(connectionCapabilityGuidance(hosted), /separately degraded/);
+  const omitted = connectionReceipt({ mode: "local_execution", engineVersion: "0.219.121" });
+  assert.equal(omitted.observed?.workspaceExecution, undefined);
+  const instructions = localMcpInstructions({
+    knowledge: "available",
+    engineVersion: "0.219.121",
+    writes: "mcp_readonly",
+    workspaceExecution: "unavailable",
+  });
+  const parsed = parseConnectionReceipt(instructions);
+  assert.equal(parsed.observed?.workspacePlanning, "available");
+  assert.equal(parsed.observed?.workspaceExecution, "unavailable");
+  assert.match(instructions, /Execution health is separately degraded/);
+  assert.doesNotMatch(instructions, /cannot access or run this local business/);
+  assert.equal(parsed.identity.recommended, "b2c-local");
+  assert.equal(parsed.providerObservation, "not_tested");
+  const omittedInstructions = localMcpInstructions({
+    knowledge: "available",
+    engineVersion: "0.219.121",
+    writes: "mcp_readonly",
+    workspaceExecution: "available",
+  });
+  assert.notEqual(
+    parseConnectionReceipt(omittedInstructions).observed?.workspaceExecution,
+    undefined,
+    "local handshake helper omitted observed.workspaceExecution",
+  );
+});
+
 test("connection receipt never treats handshake or leftover names as provider readiness", () => {
   const local = connectionReceipt({
     mode: "local_execution",
     engineVersion: "0.219.40",
-    observed: { knowledge: "available", writes: "mcp_write_enabled" },
+    observed: { knowledge: "available", writes: "mcp_write_enabled", ...observedLocalWorkspaceHealth({ workerRuntimeFound: false }) },
   });
   const hosted = connectionReceipt({ mode: "hosted_knowledge", engineVersion: "0.219.40" });
   assert.equal(local.providerObservation, "not_tested");

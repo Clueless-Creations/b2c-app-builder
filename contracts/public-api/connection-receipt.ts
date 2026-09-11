@@ -146,10 +146,18 @@ export function interpretConfiguredConnection(input: {
   };
 }
 
+function leftoverNameProse(receipt: ConnectionReceipt, capability: string): string {
+  const leftover = interpretConfiguredConnection({ clientName: LEFTOVER_LOCAL_CLIENT_NAME, receipt });
+  return leftover.guidance.endsWith(capability)
+    ? leftover.guidance.slice(0, leftover.guidance.length - capability.length).trim()
+    : leftover.guidance;
+}
+
 function handshakeGuidance(clientName: string, receipt: ConnectionReceipt): string {
   const bound = interpretConfiguredConnection({ clientName, receipt });
-  if (clientName === LEFTOVER_LOCAL_CLIENT_NAME) return bound.guidance;
-  return `${bound.guidance} ${interpretConfiguredConnection({ clientName: LEFTOVER_LOCAL_CLIENT_NAME, receipt }).guidance}`;
+  if (bound.leftoverName) return bound.guidance;
+  const leftoverProse = leftoverNameProse(receipt, bound.guidance);
+  return leftoverProse.length > 0 ? `${bound.guidance} ${leftoverProse}` : bound.guidance;
 }
 
 export function localMcpInstructions(input: {

@@ -146,10 +146,10 @@ Passive registered-workspace frontier from existing compiler and autonomy owner.
 
 ## business.run
 
-CLI-only bounded execution through the existing runner, exact revision and durable request identity. Uses existing grants. Notifications disabled. Selected operations require trusted host routes. A successful bounded session is not delivery; inspect completion.deliveryAccepted. liveLaunchProven stays false without provider-native proof.
+CLI-only bounded execution through the existing runner, exact revision and durable request identity. Uses existing grants. Notifications disabled. Selected operations require trusted host routes. Runtime proof still requires an explicit workspace observation; a live-device word cannot invent it. A successful bounded session is not delivery; inspect completion.deliveryAccepted. liveLaunchProven stays false without provider-native proof.
 
 - CLI: `b2c business-run`
-- Accepted CLI flags: `--workspace`, `--revision`, `--request`, `--scope`, `--seconds`, `--concurrency`, `--json`. See `b2c business-run --help` for usage.
+- Accepted CLI flags: `--workspace`, `--revision`, `--request`, `--scope`, `--seconds`, `--concurrency`, `--runtime-observed`, `--json`. See `b2c business-run --help` for usage.
 - MCP: unavailable (CLI operator only)
 - [Input schema](schemas/business.run.input.schema.json)
 - [Result schema](schemas/business.run.result.schema.json)

@@ -22,6 +22,7 @@ const inputFieldForFlag: Readonly<Record<string, string>> = {
   preview: "previewDigest",
   experiment: "experimentId",
   "max-age": "maxAgeSeconds",
+  "runtime-observed": "runtimeObserved",
 };
 function usageFlag(flag: string): string {
   const schema = z.toJSONSchema(operation!.inputSchema, { io: "input" });
@@ -112,7 +113,14 @@ try {
     const key = token.slice(2);
     if (!token.startsWith("--") || !allowed.includes(key) || flags.has(key)) throw new Error("flag");
     if (["json", "schema", "apply"].includes(key)) flags.set(key, true);
-    else {
+    else if (key === "runtime-observed") {
+      const value = argv[index + 1];
+      if (!value || value.startsWith("--")) flags.set(key, true);
+      else {
+        index += 1;
+        flags.set(key, value);
+      }
+    } else {
       const value = argv[++index];
       if (!value || value.startsWith("--")) throw new Error("value");
       flags.set(key, value);
@@ -176,6 +184,7 @@ try {
         ...(flags.has("scope") ? { scope: String(flags.get("scope")).split(",") } : {}),
         ...(flags.has("seconds") ? { wallClockSeconds: Number(flags.get("seconds")) } : {}),
         ...(flags.has("concurrency") ? { maxConcurrency: Number(flags.get("concurrency")) } : {}),
+        ...(flags.has("runtime-observed") ? { runtimeObserved: flags.get("runtime-observed") === true ? true : flags.get("runtime-observed") } : {}),
       });
       break;
     case "catalog.list":

@@ -36,6 +36,12 @@
       "type": "integer",
       "minimum": 1,
       "maximum": 8
+    },
+    "runtimeObserved": {
+      "type": [
+        "boolean",
+        "string"
+      ]
     }
   },
   "required": [

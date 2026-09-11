@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.117",
+  "version": "0.219.118",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Pin the reviewed App Store Connect CLI 5.1.0 reviewSubmitResult dry-run object as independent response-shape evidence for asc review submit.",
-    "Keep nested buildAttachment on wouldAttach, fail closed on a mistaken Apple JSON:API document, and leave review submit mapping deferred."
+    "Name inspect as the leftover utterance-router catalog-bundle check.",
+    "Keep doctor as a supported equivalent for that generated-bundle check."
   ]
 }

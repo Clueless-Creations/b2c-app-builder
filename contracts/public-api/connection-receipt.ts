@@ -350,7 +350,7 @@ export function leftoverNameMigrationGuidance(): string {
   ].join("\n");
 }
 
-/** Local workspace planning and execution names. Hosted knowledge refuses these without listing them as tools. */
+/** Local-only MCP names. Hosted knowledge refuses these without listing them as tools. */
 export const HOSTED_WRONG_SURFACE_TOOL_NAMES = [
   "b2c_plan",
   "b2c_status",
@@ -366,6 +366,9 @@ export const HOSTED_WRONG_SURFACE_TOOL_NAMES = [
   "b2c_packages",
   "b2c_composition_plan",
   "b2c_research_lookup",
+  "b2c_discover",
+  "b2c_compose",
+  "b2c_market_report",
 ] as const;
 
 export type HostedWrongSurfaceToolName = (typeof HOSTED_WRONG_SURFACE_TOOL_NAMES)[number];

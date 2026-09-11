@@ -229,27 +229,29 @@ test("real MCP initialization and tool discovery expose only the four read-only 
   const stream = await fetchPath("/mcp", { headers: { ...authorization, Accept: "text/event-stream" } });
   assert.equal(stream.status, 405);
   assert.equal(stream.headers.get("allow"), "POST");
-  const local = await mcpCall("b2c_run", { workspace: "/tmp/private", asFounder: true });
-  assert.equal(local.status, 200);
-  const localBody = (await local.json()) as {
-    result?: {
-      isError?: boolean;
-      content?: Array<{ type: string; text: string }>;
-      structuredContent?: HostedWrongSurfaceRefusal;
-    };
-    error?: unknown;
-  };
   const expected = interpretConfiguredConnection({
     clientName: "b2c-hosted",
     receipt: connectionReceipt({ mode: "hosted_knowledge", engineVersion: hostedKnowledge.engineVersion }),
   });
-  const refusal = hostedWrongSurfaceRefusal({ engineVersion: hostedKnowledge.engineVersion, toolName: "b2c_run" });
-  assert.equal(localBody.error, undefined);
-  assert.equal(localBody.result?.isError, true);
-  assert.deepEqual(localBody.result?.structuredContent, refusal);
-  assert.deepEqual(localBody.result?.structuredContent?.connection, expected);
-  assert.deepEqual(JSON.parse(localBody.result?.content?.[0]?.text ?? ""), refusal);
-  assert.equal((JSON.stringify(localBody.result?.structuredContent).match(/cannot access or run this local business/g) ?? []).length, 1);
+  for (const toolName of ["b2c_run", "b2c_discover", "b2c_compose", "b2c_market_report"] as const) {
+    const local = await mcpCall(toolName, {});
+    assert.equal(local.status, 200, toolName);
+    const localBody = (await local.json()) as {
+      result?: {
+        isError?: boolean;
+        content?: Array<{ type: string; text: string }>;
+        structuredContent?: HostedWrongSurfaceRefusal;
+      };
+      error?: unknown;
+    };
+    const refusal = hostedWrongSurfaceRefusal({ engineVersion: hostedKnowledge.engineVersion, toolName });
+    assert.equal(localBody.error, undefined, toolName);
+    assert.equal(localBody.result?.isError, true, toolName);
+    assert.deepEqual(localBody.result?.structuredContent, refusal, toolName);
+    assert.deepEqual(localBody.result?.structuredContent?.connection, expected, toolName);
+    assert.deepEqual(JSON.parse(localBody.result?.content?.[0]?.text ?? ""), refusal, toolName);
+    assert.equal((JSON.stringify(localBody.result?.structuredContent).match(/cannot access or run this local business/g) ?? []).length, 1, toolName);
+  }
 });
 
 test("MCP rejects batches promptly and still accepts individual notifications", { timeout: 5_000 }, async () => {

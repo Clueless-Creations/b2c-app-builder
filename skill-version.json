@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.103",
+  "version": "0.219.104",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Author the Apple TestFlight standing envelope as the Apple sibling of Play testing-track.",
-    "Retarget store-005 and store-047 onto that envelope so TestFlight no longer uses generic ASC CLI."
+    "Treat a deterministic gate:check or gate_issue receipt as structural chrome, not independent review.",
+    "Keep packet-gate shape-pass leftovers so a reviewer sentence beside a gate receipt still counts."
   ]
 }

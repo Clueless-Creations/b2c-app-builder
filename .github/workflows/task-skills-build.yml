@@ -16,20 +16,13 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .node-version
-          cache: npm
-      - run: npm ci
-      - run: npm ci --prefix hosted/knowledge-mcp
-      - run: npm ci --prefix hosted/builder-console
-      - name: Public source and dependency snapshot
+      - name: Recover public source for review
         run: |
           mkdir -p /tmp/task-skill-inputs
           git bundle create /tmp/task-skill-inputs/source.bundle --all
-          tar -czf /tmp/task-skill-inputs/dependencies.tgz node_modules hosted/knowledge-mcp/node_modules hosted/builder-console/node_modules
+          cp tooling/task-skills-integration.patch.gz.b64 /tmp/task-skill-inputs/
       - uses: actions/upload-artifact@v4
         with:
-          name: task-skill-integration-inputs
+          name: task-skill-recovered-source
           path: /tmp/task-skill-inputs
           retention-days: 1

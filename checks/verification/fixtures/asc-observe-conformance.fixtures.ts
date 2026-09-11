@@ -7,8 +7,9 @@
  * beta distribution maps to the Apple TestFlight standing envelope. The independent
  * review-status response envelope is the 5.1.0 CLI `reviewStatusResult` object.
  * The independent review-submit response envelope is the 5.1.0 CLI
- * `reviewSubmitResult` dry-run object. `asc review submit` maps to
- * `workflow.store.app-review-resubmit`. `asc testflight feedback list` and
+ * `reviewSubmitResult` dry-run object. The independent metadata-validate
+ * response envelope is the 5.1.0 CLI `ValidateResult` object. `asc review submit`
+ * maps to `workflow.store.app-review-resubmit`. `asc testflight feedback list` and
  * `asc testflight crashes list` map to
  * `workflow.store.apple-testflight-standing-envelope`. Adapter-built resubmit argv and canned
  * live-provider snapshots are not independent evidence.
@@ -36,6 +37,7 @@ const COOKBOOK = path.join(skillRoot, "knowledge/store/app-store-connect-cli.md"
 const APPLE_ASC = path.join(skillRoot, "catalog/providers/apple-asc.yaml");
 const RORK = path.join(skillRoot, "catalog/upstreams/rork-app-store-connect-cli.yaml");
 const RESUBMIT = path.join(skillRoot, "adapters/app-review/resubmit.ts");
+const REMEDIATE_PLAN = path.join(skillRoot, "adapters/app-review/plan.ts");
 const BUILD_RELEASE = path.join(skillRoot, "catalog/workflows/build-release.ts");
 const APP_REVIEW_FIXTURES = path.join(skillRoot, "checks/verification/fixtures/app-review.fixtures.ts");
 const ASC_CLI_NATIVE_DIR = path.join(skillRoot, "checks/verification/test/data/asc-cli");
@@ -45,6 +47,7 @@ const COOKBOOK_SOURCE = "knowledge/store/app-store-connect-cli.md Verified Comma
 const REVIEW_STATUS_SOURCE = "rork-app-store-connect-cli 5.1.0 internal/cli/reviews/review_overview.go reviewStatusResult";
 const REVIEW_SUBMIT_SOURCE =
   "rork-app-store-connect-cli 5.1.0 internal/cli/reviews/review_submit.go reviewSubmitResult / internal/cli/submit/submit_flow.go BuildAttachmentResult";
+const METADATA_VALIDATE_SOURCE = "rork-app-store-connect-cli 5.1.0 internal/cli/metadata/validate.go ValidateResult";
 const REVIEW_STATUS_OBJECT_KEYS = ["appId", "version", "reviewDetailConfigured", "reviewDetailId", "latestSubmission", "reviewState", "nextAction"] as const;
 const REVIEW_VERSION_KEYS = ["id", "version", "platform", "state", "createdDate"] as const;
 const REVIEW_SUBMISSION_KEYS = ["id", "state", "platform", "submittedDate"] as const;
@@ -52,6 +55,8 @@ const REVIEW_SUBMIT_OBJECT_KEYS = ["appId", "version", "versionId", "buildId", "
 const REVIEW_SUBMIT_ATTACHMENT_KEYS = ["versionId", "buildId", "wouldAttach"] as const;
 const REVIEW_SUBMIT_OMITTED_KEYS = ["submissionId", "submittedDate", "alreadySubmitted", "messages"] as const;
 const REVIEW_SUBMIT_ATTACHMENT_OMITTED_KEYS = ["currentBuildId", "attached", "alreadyAttached"] as const;
+const METADATA_VALIDATE_OBJECT_KEYS = ["dir", "filesScanned", "issues", "errorCount", "warningCount", "valid"] as const;
+const METADATA_VALIDATE_ISSUE_OMITTED_KEYS = ["locale", "version", "length", "limit"] as const;
 
 type SemanticFit = "exact" | "partial" | "none";
 type MappingEffect = "read" | "mutation" | "publish" | "credential";
@@ -638,5 +643,89 @@ export function register(harness: Harness): void {
     }
     assert(thrown instanceof AscProviderReadError, "review-submit dry-run object is not a review-status envelope");
     assert(thrown instanceof Error && thrown.message.includes("no valid app-version layer"), "submit version string is not the status nested object");
+  });
+
+  harness.check("asc-conformance: independent metadata-validate response envelope is the 5.1.0 CLI object", () => {
+    const nativeSource = readFileSync(path.join(ASC_CLI_NATIVE_DIR, "metadata-validate-object.json"), "utf8");
+    const mistakenSource = readFileSync(path.join(ASC_CLI_NATIVE_DIR, "metadata-validate-mistaken-jsonapi.json"), "utf8");
+    const plan = readFileSync(REMEDIATE_PLAN, "utf8");
+    const native = loadNativeJson("metadata-validate-object.json");
+    const mistaken = loadNativeJson("metadata-validate-mistaken-jsonapi.json");
+    assert(isRecord(native), "native metadata-validate envelope must be one object");
+    for (const key of METADATA_VALIDATE_OBJECT_KEYS) {
+      assert(key in native, `native envelope missing ${key}`);
+    }
+    assert(Array.isArray(native.issues) && native.issues.length === 0, "valid envelope encodes empty issues as an array");
+    for (const key of METADATA_VALIDATE_ISSUE_OMITTED_KEYS) {
+      assert(!(key in native), `valid envelope must omit empty ValidateIssue ${key}`);
+    }
+    assert(!("field" in native) && !("scope" in native) && !("message" in native), "ValidateIssue keys are not top-level");
+    assert(!("data" in native) && !("attributes" in native), "CLI envelope is not Apple JSON:API");
+    assert(native.dir === "./metadata", "dir is the cookbook path, not a live capture");
+    assert(native.filesScanned === 2, "valid branch scanned two localization files");
+    assert(native.errorCount === 0 && native.warningCount === 0, "valid branch has no counted issues");
+    assert(native.valid === true, "errorCount 0 sets valid");
+    assert(isRecord(mistaken) && isRecord(mistaken.data) && "attributes" in mistaken.data, "mistaken document is Apple JSON:API");
+    assert(
+      adapterGeneratedMentions(nativeSource, ["buildResubmitCommand", "liveReviewStatusJson", "createAscAppReviewProvider"]).length === 0,
+      "native envelope must not name adapter helpers",
+    );
+    assert(
+      adapterGeneratedMentions(mistakenSource, ["buildResubmitCommand", "liveReviewStatusJson"]).length === 0,
+      "mistaken envelope must not name adapter helpers",
+    );
+    assert(plan.includes("asc metadata validate"), "remediate plan still owns the preflight command string");
+    assert(!plan.includes("test/data/asc-cli"), "adapter preflight list is not this envelope");
+    const record = provenance({
+      provider: "apple-asc",
+      transport: "cli",
+      reviewedVersion: RORK_REVIEWED_VERSION,
+      reviewedRevision: RORK_REVIEWED_REVISION,
+      sourceSelector: METADATA_VALIDATE_SOURCE,
+      nativeOperation: "asc metadata validate",
+      canonicalOperation: APP_REVIEW_REMEDIATE_WORKFLOW_ID,
+      evidenceKind: "upstream-source-test",
+      establishes: ["response-shape"],
+      coverageLimits:
+        "CLI ValidateResult object at 5.1.0 only. Offline valid branch with empty issues. Not Apple JSON:API. Not a live App Store Connect capture. Observe adapter does not execute validate.",
+      sample: native,
+    });
+    const generated: ProviderConformanceProvenance = {
+      provider: "apple-asc",
+      transport: "cli",
+      reviewedVersion: RORK_REVIEWED_VERSION,
+      reviewedRevision: "unknown",
+      sourceSelector: "adapters/app-review/plan.ts metadata_rejected preflight list",
+      nativeOperation: "asc metadata validate",
+      canonicalOperation: APP_REVIEW_REMEDIATE_WORKFLOW_ID,
+      evidenceKind: "adapter-generated",
+      establishes: ["request-shape"],
+      coverageLimits: "Echo of the adapter preflight command list. Not independent native evidence.",
+      sample: "asc metadata validate",
+    };
+    assert(isIndependentEvidence(record.evidenceKind), describeConformanceCoverage(record));
+    assert(isIndependentEvidence(generated.evidenceKind) === false, describeConformanceCoverage(generated));
+    let thrown: unknown;
+    try {
+      createAscAppReviewProvider({
+        appId: "123456789",
+        runner: reviewStatusRunner(native),
+      }).readSnapshot();
+    } catch (error) {
+      thrown = error;
+    }
+    assert(thrown instanceof AscProviderReadError, "metadata-validate object is not a review-status envelope");
+    assert(thrown instanceof Error && thrown.message.includes("no valid app-version layer"), "ValidateResult dir/issues are not the status nested object");
+    thrown = undefined;
+    try {
+      createAscAppReviewProvider({
+        appId: "123456789",
+        runner: reviewStatusRunner(mistaken),
+      }).readSnapshot();
+    } catch (error) {
+      thrown = error;
+    }
+    assert(thrown instanceof AscProviderReadError, "JSON:API metadata document fails closed");
+    assert(thrown instanceof Error && thrown.message.includes("no valid app-version layer"), "JSON:API document is not the CLI object");
   });
 }

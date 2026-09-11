@@ -1,0 +1,14 @@
+{
+  "appId": "123456789",
+  "version": "1.2.3",
+  "versionId": "asv-native-1",
+  "buildId": "build-native-1",
+  "platform": "IOS",
+  "dryRun": true,
+  "wouldSubmit": true,
+  "buildAttachment": {
+    "versionId": "asv-native-1",
+    "buildId": "build-native-1",
+    "wouldAttach": true
+  }
+}

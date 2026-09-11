@@ -737,6 +737,12 @@ export interface SessionInvocation {
   requestDigest: string;
   maxConcurrency: number;
   wallClockSeconds: number;
+  /** Explicit workspace runtime observation. Omit stays unobserved. A live-device word cannot invent it. */
+  runtimeObserved?: boolean | string;
+  /** Diagnostic executor for the public wrapper. Omit keeps the real auto session. */
+  executor?: "auto" | "fixture" | "noop";
+  /** Diagnostic verifier for the public wrapper. Omit follows the executor. */
+  verifier?: "cli" | "fixture" | "off";
 }
 export interface SessionHost {
   operationRoutes?: import("./operation-routes.js").OperationRouteRegistry;
@@ -767,6 +773,13 @@ export async function runSession(
       "max-concurrency": String(input.maxConcurrency),
       "wall-clock-seconds": String(input.wallClockSeconds),
       "lock-retries": "0",
+      ...(input.runtimeObserved === true
+        ? { "runtime-observed": "true" }
+        : input.runtimeObserved !== undefined && input.runtimeObserved !== false
+          ? { "runtime-observed": String(input.runtimeObserved) }
+          : {}),
+      ...(input.executor ? { executor: input.executor } : {}),
+      ...(input.verifier ? { verifier: input.verifier } : {}),
     },
     host,
   );

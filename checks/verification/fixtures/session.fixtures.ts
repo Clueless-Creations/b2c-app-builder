@@ -4758,4 +4758,15 @@ main().catch((error) => { console.error(String(error)); process.exit(1); });
 }
 
 // Shared execution fixtures reuse the same reducer-owned workspace setup and trust binding.
-export { bootstrapWorkspace, slowSilentCatalog, grant, waiver, runSession, readRunState, cleanEnv, fixtureFounderTrustEnvironment };
+export {
+  bootstrapWorkspace,
+  slowSilentCatalog,
+  grant,
+  waiver,
+  runSession,
+  readRunState,
+  cleanEnv,
+  fixtureFounderTrustEnvironment,
+  researchScanCatalog,
+  seedWorkspacePendingResearch,
+};

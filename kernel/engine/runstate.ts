@@ -29,6 +29,7 @@ import {
   formatProofStrength,
   validateReviewReceipt,
   workflowContractFingerprint,
+  type WorkspaceRuntimeObservation,
 } from "./review-evidence.js";
 import { DESIGN_TASTE_DELEGATION_APPROVAL_ID } from "./founder-decision-receipt.js";
 
@@ -529,9 +530,10 @@ function bindProofStrength(
   now: string,
   verdict: "accepted" | "rejected",
   structural: "checked" | "failed",
+  runtimeObservation?: WorkspaceRuntimeObservation,
 ): string {
   const stored = { ...structuredClone(receipt), verdict, checkedAt: now, evidence: [...evidence] };
-  const line = formatProofStrength(composeProofStrength({ structural, review: stored, attempt }));
+  const line = formatProofStrength(composeProofStrength({ structural, review: stored, attempt, runtimeObservation }));
   stored.evidence = [...stored.evidence, line];
   attempt.independentVerification = stored;
   return line;
@@ -547,6 +549,7 @@ export function acceptVerification(
   verifiedBySessionId?: string,
   reviewReceipt?: IndependentVerificationReceipt,
   workspaceRoot?: string,
+  runtimeObservation?: WorkspaceRuntimeObservation,
 ): void {
   const node = plan.nodes.find((candidate) => candidate.id === nodeId);
   const state = run.nodes[nodeId];
@@ -567,7 +570,7 @@ export function acceptVerification(
       reviewReceipt ?? captureReviewEvidence(plan, run, nodeId, "", verifiedBySessionId!, now, attempt.proofSource === "synthetic" ? "synthetic" : "graph");
     const issues = [...classifyProofStrengthIssues(evidence, attempt, receipt.mode), ...validateReviewReceipt(plan, run, nodeId, receipt, workspaceRoot)];
     if (issues.length) throw new Error(`Independent review does not match current work: ${issues.join(", ")}`);
-    evidence = [...evidence, bindProofStrength(attempt, receipt, evidence, now, "accepted", "checked")];
+    evidence = [...evidence, bindProofStrength(attempt, receipt, evidence, now, "accepted", "checked", runtimeObservation)];
   }
   if (attempt.workOrderOccurrenceId) {
     const proof = recordWorkOrderProof(run, attempt.workOrderOccurrenceId, evidence, now);
@@ -602,13 +605,14 @@ export function recordRejectedVerification(
   now: string,
   reviewReceipt: IndependentVerificationReceipt,
   structural: "checked" | "failed" = "checked",
+  runtimeObservation?: WorkspaceRuntimeObservation,
 ): string {
   const node = plan.nodes.find((candidate) => candidate.id === nodeId);
   const state = run.nodes[nodeId];
   const attempt = state?.attempts.at(-1);
   if (!node || !state || !attempt) throw new Error(`No attempt to verify for ${nodeId}`);
   if (!evidence.some((entry) => entry.trim().length > 0)) throw new Error(`Verification for ${nodeId} requires evidence`);
-  const line = bindProofStrength(attempt, reviewReceipt, evidence, now, "rejected", structural);
+  const line = bindProofStrength(attempt, reviewReceipt, evidence, now, "rejected", structural, runtimeObservation);
   attempt.evidence.push(...evidence, line);
   run.updatedAt = now;
   return line;

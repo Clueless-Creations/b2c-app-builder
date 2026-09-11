@@ -85,6 +85,35 @@ function blockedResearchScan() {
   return { plan, run, attempt };
 }
 
+function workspaceResearchScan(harness: Harness, label: string) {
+  const root = harness.makeTempDir(label);
+  mkdirSync(path.join(root, "research"), { recursive: true });
+  writeFileSync(path.join(root, "research/brief.md"), "Workspace research brief.\n", "utf8");
+  const plan = compilePlan(strengthCatalog(), now);
+  const run = seedRunState(plan, businessState(), { ownerSessionId: "session-1", ttlSeconds: 600, wallClockCapSeconds: 3600, now });
+  const attempt = beginAttempt(plan, run, nodeId("research-scan"), "session-producer", now);
+  attempt.proofSource = "workspace";
+  reconcilePatch(
+    plan,
+    run,
+    {
+      nodeId: nodeId("research-scan"),
+      attemptId: attempt.id,
+      outputs: [
+        {
+          artifactId: "artifact.research-brief",
+          path: "research/brief.md",
+          fingerprint: workspaceArtifactFingerprint(root, "research/brief.md"),
+          evidence: ["workspace bytes produced"],
+        },
+      ],
+    },
+    now,
+  );
+  const snapshot = captureReviewEvidence(plan, run, nodeId("research-scan"), root, "session-reviewer", now);
+  return { plan, run, attempt, snapshot, root };
+}
+
 function thrownMessage(fn: () => unknown): string {
   try {
     fn();
@@ -392,5 +421,71 @@ export function register(harness: Harness): void {
     });
     assert(produced.semantic === "checked", `reviewer sentence may still produce semantic proof, got semantic=${produced.semantic}`);
     assert(produced.runtime === "unknown", "a screenshot cannot satisfy interactive or runtime proof");
+  });
+
+  harness.check("proof-strength: acceptVerification records runtime=checked from an explicit workspace observation", () => {
+    const { plan, run, attempt, snapshot, root } = workspaceResearchScan(harness, "proof-strength-runtime-accept");
+    acceptVerification(plan, run, nodeId("research-scan"), ["fresh-context reviewer signed off"], now, "session-reviewer", snapshot, root, {
+      origin: "workspace",
+    });
+    const produced = attempt.independentVerification?.evidence.find((line) => line.startsWith("Proof strength:"));
+    assert(
+      Boolean(produced?.includes("semantic=checked") && produced.includes("runtime=checked")),
+      `acceptVerification must consume the workspace observation, got ${produced ?? "none"}`,
+    );
+    assert(
+      Boolean(produced?.includes("Independent workspace review and workspace runtime observation recorded")),
+      `runtime-checked note must name the observation, got ${produced ?? "none"}`,
+    );
+    assert(run.nodes[nodeId("research-scan")]!.status === "succeeded", "workspace review with an observation may still promote the node");
+  });
+
+  harness.check("proof-strength: acceptVerification cannot turn a graph receipt plus an observation into runtime proof", () => {
+    const { plan, run, attempt } = blockedResearchScan();
+    acceptVerification(plan, run, nodeId("research-scan"), ["fresh-context reviewer signed off"], now, "session-reviewer", undefined, undefined, {
+      origin: "workspace",
+    });
+    const produced = attempt.independentVerification?.evidence.find((line) => line.startsWith("Proof strength:"));
+    assert(
+      Boolean(produced?.includes("semantic=unknown") && produced.includes("runtime=unknown")),
+      `graph accept must not consume a runtime observation, got ${produced ?? "none"}`,
+    );
+    assert(!produced?.includes("runtime=checked"), "a graph receipt cannot become runtime proof");
+  });
+
+  harness.check("proof-strength: recordRejectedVerification does not record runtime=checked from an observation", () => {
+    const { plan, run, attempt, snapshot } = workspaceResearchScan(harness, "proof-strength-runtime-reject");
+    recordRejectedVerification(plan, run, nodeId("research-scan"), ["fresh-context reviewer rejected the claim"], now, snapshot, "checked", {
+      origin: "workspace",
+    });
+    const produced = attempt.independentVerification?.evidence.find((line) => line.startsWith("Proof strength:"));
+    assert(attempt.independentVerification?.verdict === "rejected", "reject must keep the rejected verdict");
+    assert(
+      Boolean(produced?.includes("semantic=failed") && produced.includes("runtime=unknown")),
+      `rejected review cannot become runtime proof, got ${produced ?? "none"}`,
+    );
+    assert(!produced?.includes("runtime=checked"), "a rejected review cannot record runtime observation");
+    assert(run.nodes[nodeId("research-scan")]!.status !== "succeeded", "reject must not promote the node");
+  });
+
+  harness.check("proof-strength: acceptVerification with a screenshot and an observation still leaves runtime unknown", () => {
+    const { plan, run, attempt, snapshot, root } = workspaceResearchScan(harness, "proof-strength-runtime-screenshot");
+    acceptVerification(
+      plan,
+      run,
+      nodeId("research-scan"),
+      [SCREENSHOT_FLOW_LINE, "fresh-context reviewer signed off"],
+      now,
+      "session-reviewer",
+      snapshot,
+      root,
+      { origin: "workspace" },
+    );
+    const produced = attempt.independentVerification?.evidence.find((line) => line.startsWith("Proof strength:"));
+    assert(
+      Boolean(produced?.includes("semantic=checked") && produced.includes("runtime=unknown")),
+      `a screenshot cannot satisfy runtime proof on the accept path, got ${produced ?? "none"}`,
+    );
+    assert(!produced?.includes("runtime=checked"), "a screenshot cannot become runtime proof through acceptVerification");
   });
 }

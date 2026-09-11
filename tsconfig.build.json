@@ -30,6 +30,7 @@
     "checks/validation/repository/check-pack-composition.ts",
     "checks/validation/repository/check-package-parity.ts",
     "checks/validation/repository/check-provider-contracts.ts",
+    "checks/validation/repository/check-upstreams.ts",
     "checks/validation/repository/check-validator-docs.ts"
   ],
   "exclude": [

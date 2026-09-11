@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 /**
+ * Default skill root walks from this file so packed omit-dev can launch the compiled twin
+ * under `dist/checks/validation/repository/` without treating `dist/` as the package root.
+ *
  * check-upstreams.ts — repository validator for the authored upstream manifests under
  * catalog/upstreams/ (ADR-0005).
  *
@@ -25,15 +28,14 @@
  */
 import { existsSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { loadKnowledgePackages } from "../../../catalog/knowledge-packages.js";
 import { loadRegistrySourceIds } from "../../../adapters/providers/load.js";
 import { loadUpstreams, UPSTREAMS_DIRECTORY } from "../../../kernel/contribution/upstreams-load.js";
 import { loadPinnedKnowledgeFreshnessNow } from "../../../tooling/lib/knowledge-freshness-pin.js";
 import { flagString, issue, parseFlags, reportAndExit, type Issue } from "../../../tooling/lib/launch-state.js";
+import { resolveSkillRoot } from "../../../tooling/lib/skill-root.js";
 
-const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-const defaultSkillRoot = path.resolve(scriptDir, "../../..");
+const defaultSkillRoot = resolveSkillRoot(import.meta.url);
 const SOURCE_REGISTRY_RELATIVE = "checks/validation/repository/source-registry.yaml";
 
 const flags = parseFlags(process.argv.slice(2), [{ flags: ["--skill-root"], key: "skillRoot" }]);

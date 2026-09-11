@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.104",
+  "version": "0.219.105",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Treat a deterministic gate:check or gate_issue receipt as structural chrome, not independent review.",
-    "Keep packet-gate shape-pass leftovers so a reviewer sentence beside a gate receipt still counts."
+    "Name the engine-home host observation that b2c inspect records in leftover RevenueCat knowledge.",
+    "Keep b2c doctor as a supported equivalent and leave historical ADR-0010 unchanged."
   ]
 }

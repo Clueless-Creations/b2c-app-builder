@@ -1,15 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.0",
+  "version": "0.220.1",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Expose catalog-backed task skills for research, onboarding, and monetization with one public business-area map.",
-    "Keep the root skill bounded and preserve lifecycle, setup, composition, and mobile procedures through tested direct references.",
-    "Package create-only portable guidance with source hashes, notices, and fail-closed reference checks.",
-    "Verify public and engine startup routes through conditional procedures without loading them for unrelated tasks.",
-    "Keep task-skill verification machine-readable and preserve positive and negative controls across the routing refactor.",
-    "Preserve selected provider requirements and verify the completed navigation, packaging, and MCP fixture updates.",
-    "Integrate the latest independent ASC metadata-push dry-run fixtures without changing task-skill runtime behavior."
+    "Prefer compiled provider-contracts once package-root resolution is dist-safe; leftover inspect help and contributor MCP names stay honest.",
+    "Keep producer and verifier prompts on the verified pin after activate-then-edit. Omit still cannot invent a pin."
   ]
 }

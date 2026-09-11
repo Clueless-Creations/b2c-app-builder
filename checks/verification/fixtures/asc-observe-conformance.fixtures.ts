@@ -13,7 +13,8 @@
  * default focused object. The independent screenshots-validate response
  * envelope is the 5.1.0 CLI `screenshotValidateResult` ready object. The independent
  * screenshots-upload response envelope is the 5.1.0 CLI `AppScreenshotUploadResult`
- * dry-run object. `asc review submit`
+ * dry-run object. The independent metadata-push response envelope is the 5.1.0 CLI
+ * `PushPlanResult` dry-run object. `asc review submit`
  * maps to `workflow.store.app-review-resubmit`. `asc testflight feedback list` and
  * `asc testflight crashes list` map to
  * `workflow.store.apple-testflight-standing-envelope`. Adapter-built resubmit argv and canned
@@ -59,6 +60,8 @@ const SCREENSHOTS_VALIDATE_SOURCE =
   "rork-app-store-connect-cli 5.1.0 internal/cli/assets/assets_screenshots_validate.go screenshotValidateResult";
 const SCREENSHOTS_UPLOAD_SOURCE =
   "rork-app-store-connect-cli 5.1.0 internal/cli/assets/assets_screenshots_upload.go dry-run would-upload / internal/cli/assets/assets_screenshots_resume.go buildAppScreenshotUploadResult / internal/asc/assets_output.go AppScreenshotUploadResult";
+const METADATA_PUSH_SOURCE =
+  "rork-app-store-connect-cli 5.1.0 internal/cli/metadata/execute_push.go dry-run PushPlanResult / internal/cli/metadata/push.go PlanItem PlanAPICall";
 const APPLE_STORE_MEDIA_STANDING_ENVELOPE = "workflow.store.apple-store-media-standing-envelope";
 const REVIEW_STATUS_OBJECT_KEYS = ["appId", "version", "reviewDetailConfigured", "reviewDetailId", "latestSubmission", "reviewState", "nextAction"] as const;
 const REVIEW_VERSION_KEYS = ["id", "version", "platform", "state", "createdDate"] as const;
@@ -94,6 +97,22 @@ const SCREENSHOTS_UPLOAD_OBJECT_KEYS = ["versionLocalizationId", "setId", "displ
 const SCREENSHOTS_UPLOAD_RESULT_KEYS = ["fileName", "filePath", "assetId", "state"] as const;
 const SCREENSHOTS_UPLOAD_OMITTED_KEYS = ["resumed", "uploaded", "skipped", "pending", "failed", "failureArtifactPath", "failures"] as const;
 const SCREENSHOTS_UPLOAD_RESULT_OMITTED_KEYS = ["skipped"] as const;
+const METADATA_PUSH_OBJECT_KEYS = ["appId", "appInfoId", "version", "versionId", "dir", "dryRun", "includes", "adds", "updates", "deletes", "apiCalls"] as const;
+const METADATA_PUSH_OMITTED_KEYS = ["applied", "actions", "total", "succeeded", "failed", "failureArtifactPath", "failureArtifactError"] as const;
+const METADATA_PUSH_PLAN_ITEM_KEYS = ["key", "scope", "locale", "field", "reason"] as const;
+const METADATA_PUSH_ADD_OMITTED_KEYS = ["from"] as const;
+const METADATA_PUSH_APP_INFO_OMITTED_KEYS = ["version"] as const;
+const METADATA_PUSH_DELETE_OMITTED_KEYS = ["to"] as const;
+const METADATA_PUSH_API_CALL_KEYS = ["operation", "scope", "count"] as const;
+const METADATA_PUSH_ADD_KEYS = ["version:1.2.3:en-US:keywords", "version:1.2.3:ja:description"] as const;
+const METADATA_PUSH_UPDATE_KEYS = ["app-info:en-US:subtitle", "version:1.2.3:en-US:description"] as const;
+const METADATA_PUSH_DELETE_KEYS = ["app-info:fr:name"] as const;
+const METADATA_PUSH_API_CALLS = [
+  { operation: "delete_localization", scope: "app-info", count: 1 },
+  { operation: "update_localization", scope: "app-info", count: 1 },
+  { operation: "create_localization", scope: "version", count: 1 },
+  { operation: "update_localization", scope: "version", count: 1 },
+] as const;
 
 type SemanticFit = "exact" | "partial" | "none";
 type MappingEffect = "read" | "mutation" | "publish" | "credential";
@@ -1068,6 +1087,158 @@ export function register(harness: Harness): void {
       thrown = error;
     }
     assert(thrown instanceof AscProviderReadError, "JSON:API screenshot document fails closed");
+    assert(thrown instanceof Error && thrown.message.includes("no valid app-version layer"), "JSON:API document is not the CLI object");
+  });
+
+  harness.check("asc-conformance: independent metadata-push response envelope is the 5.1.0 dry-run CLI object", () => {
+    const nativeSource = readFileSync(path.join(ASC_CLI_NATIVE_DIR, "metadata-push-dry-run-object.json"), "utf8");
+    const mistakenSource = readFileSync(path.join(ASC_CLI_NATIVE_DIR, "metadata-push-mistaken-jsonapi.json"), "utf8");
+    const plan = readFileSync(REMEDIATE_PLAN, "utf8");
+    const native = loadNativeJson("metadata-push-dry-run-object.json");
+    const mistaken = loadNativeJson("metadata-push-mistaken-jsonapi.json");
+    assert(isRecord(native), "native metadata-push envelope must be one object");
+    for (const key of METADATA_PUSH_OBJECT_KEYS) {
+      assert(key in native, `native envelope missing ${key}`);
+    }
+    for (const key of METADATA_PUSH_OMITTED_KEYS) {
+      assert(!(key in native), `dry-run envelope must omit empty ${key}`);
+    }
+    assert(native.appId === "123456789", "appId is the cookbook id, not a live capture");
+    assert(native.appInfoId === "appinfo-native-1", "appInfoId is synthetic, not a live app-info");
+    assert(native.version === "1.2.3", "version is the cookbook string, not the status nested object");
+    assert(native.versionId === "asv-native-1", "versionId is synthetic, not a live version");
+    assert(native.dir === "./metadata", "dir is the cookbook path, not a live capture");
+    assert(native.dryRun === true, "dry-run branch sets dryRun");
+    assert(Array.isArray(native.includes) && native.includes.length === 1 && native.includes[0] === "localizations", "default include is localizations");
+    assert(Array.isArray(native.adds) && native.adds.length === 2, "dry-run plan encodes two adds");
+    assert(Array.isArray(native.updates) && native.updates.length === 2, "dry-run plan encodes two updates");
+    assert(Array.isArray(native.deletes) && native.deletes.length === 1, "dry-run plan encodes one delete");
+    assert(Array.isArray(native.apiCalls) && native.apiCalls.length === 4, "dry-run plan encodes four apiCalls");
+    const addKeys = native.adds.map((item) => (isRecord(item) ? item.key : undefined));
+    const updateKeys = native.updates.map((item) => (isRecord(item) ? item.key : undefined));
+    const deleteKeys = native.deletes.map((item) => (isRecord(item) ? item.key : undefined));
+    for (const [index, key] of METADATA_PUSH_ADD_KEYS.entries()) {
+      assert(addKeys[index] === key, `adds stay sorted by key: expected ${key}`);
+    }
+    for (const [index, key] of METADATA_PUSH_UPDATE_KEYS.entries()) {
+      assert(updateKeys[index] === key, `updates stay sorted by key: expected ${key}`);
+    }
+    for (const [index, key] of METADATA_PUSH_DELETE_KEYS.entries()) {
+      assert(deleteKeys[index] === key, `deletes stay sorted by key: expected ${key}`);
+    }
+    const keywordsAdd = native.adds[0];
+    assert(isRecord(keywordsAdd), "nested keywords add must be one object");
+    for (const key of METADATA_PUSH_PLAN_ITEM_KEYS) {
+      assert(key in keywordsAdd, `nested add missing ${key}`);
+    }
+    for (const key of METADATA_PUSH_ADD_OMITTED_KEYS) {
+      assert(!(key in keywordsAdd), `keywords add must omit empty ${key}`);
+    }
+    assert(keywordsAdd.scope === "version" && keywordsAdd.locale === "en-US", "keywords add is the en-US version locale");
+    assert(keywordsAdd.version === "1.2.3", "version plan items keep the version string");
+    assert(keywordsAdd.field === "keywords" && keywordsAdd.to === "one,two", "keywords add uses the local value");
+    assert(keywordsAdd.reason === "field exists locally but not remotely", "local-only field is an add");
+    const jaAdd = native.adds[1];
+    assert(isRecord(jaAdd), "nested ja add must be one object");
+    assert(jaAdd.locale === "ja" && jaAdd.field === "description" && jaAdd.to === "日本語説明", "ja add is the local description create");
+    const subtitleUpdate = native.updates[0];
+    assert(isRecord(subtitleUpdate), "nested subtitle update must be one object");
+    for (const key of METADATA_PUSH_PLAN_ITEM_KEYS) {
+      assert(key in subtitleUpdate, `nested update missing ${key}`);
+    }
+    for (const key of METADATA_PUSH_APP_INFO_OMITTED_KEYS) {
+      assert(!(key in subtitleUpdate), `app-info update must omit empty ${key}`);
+    }
+    assert(subtitleUpdate.scope === "app-info" && subtitleUpdate.locale === "en-US", "subtitle update is the en-US app-info locale");
+    assert(subtitleUpdate.field === "subtitle" && subtitleUpdate.from === "Remote subtitle" && subtitleUpdate.to === "Local subtitle", "subtitle update diffs remote to local");
+    assert(subtitleUpdate.reason === "field value differs", "changed local field is an update");
+    const descriptionUpdate = native.updates[1];
+    assert(isRecord(descriptionUpdate), "nested description update must be one object");
+    assert(descriptionUpdate.version === "1.2.3" && descriptionUpdate.from === "Remote description" && descriptionUpdate.to === "Local description", "description update diffs remote to local");
+    const frDelete = native.deletes[0];
+    assert(isRecord(frDelete), "nested fr delete must be one object");
+    for (const key of METADATA_PUSH_PLAN_ITEM_KEYS) {
+      assert(key in frDelete, `nested delete missing ${key}`);
+    }
+    for (const key of METADATA_PUSH_APP_INFO_OMITTED_KEYS) {
+      assert(!(key in frDelete), `app-info delete must omit empty ${key}`);
+    }
+    for (const key of METADATA_PUSH_DELETE_OMITTED_KEYS) {
+      assert(!(key in frDelete), `delete must omit empty ${key}`);
+    }
+    assert(frDelete.scope === "app-info" && frDelete.locale === "fr" && frDelete.field === "name", "fr delete is the remote-only app-info name");
+    assert(frDelete.from === "App FR" && frDelete.reason === "localization missing locally", "missing local locale is a delete");
+    assert(!deleteKeys.includes("version:1.2.3:en-US:marketingUrl"), "omitted local marketingUrl stays a no-op");
+    for (const [index, expected] of METADATA_PUSH_API_CALLS.entries()) {
+      const call = native.apiCalls[index];
+      assert(isRecord(call), `apiCall ${index} must be one object`);
+      for (const key of METADATA_PUSH_API_CALL_KEYS) {
+        assert(key in call, `apiCall missing ${key}`);
+      }
+      assert(call.operation === expected.operation && call.scope === expected.scope && call.count === expected.count, `apiCalls stay sorted by scope then operation: expected ${expected.operation} ${expected.scope}`);
+    }
+    assert(!("data" in native) && !("attributes" in native), "CLI envelope is not Apple JSON:API");
+    assert(isRecord(mistaken) && isRecord(mistaken.data) && "attributes" in mistaken.data, "mistaken document is Apple JSON:API");
+    assert(
+      adapterGeneratedMentions(nativeSource, ["buildResubmitCommand", "liveReviewStatusJson", "createAscAppReviewProvider"]).length === 0,
+      "native envelope must not name adapter helpers",
+    );
+    assert(
+      adapterGeneratedMentions(mistakenSource, ["buildResubmitCommand", "liveReviewStatusJson"]).length === 0,
+      "mistaken envelope must not name adapter helpers",
+    );
+    assert(plan.includes("asc metadata push --dry-run"), "remediate plan still owns the dry-run command string");
+    assert(!plan.includes("test/data/asc-cli"), "adapter preflight list is not this envelope");
+    const record = provenance({
+      provider: "apple-asc",
+      transport: "cli",
+      reviewedVersion: RORK_REVIEWED_VERSION,
+      reviewedRevision: RORK_REVIEWED_REVISION,
+      sourceSelector: METADATA_PUSH_SOURCE,
+      nativeOperation: "asc metadata push --dry-run",
+      canonicalOperation: APP_REVIEW_REMEDIATE_WORKFLOW_ID,
+      evidenceKind: "upstream-source-test",
+      establishes: ["response-shape"],
+      coverageLimits:
+        "CLI PushPlanResult dry-run object at 5.1.0 only. Two adds, two updates, one delete. Empty applied omitted. Not Apple JSON:API. Not a live App Store Connect capture. Observe adapter does not execute push.",
+      sample: native,
+    });
+    const generated: ProviderConformanceProvenance = {
+      provider: "apple-asc",
+      transport: "cli",
+      reviewedVersion: RORK_REVIEWED_VERSION,
+      reviewedRevision: "unknown",
+      sourceSelector: "adapters/app-review/plan.ts metadata_rejected preflight list",
+      nativeOperation: "asc metadata push --dry-run",
+      canonicalOperation: APP_REVIEW_REMEDIATE_WORKFLOW_ID,
+      evidenceKind: "adapter-generated",
+      establishes: ["request-shape"],
+      coverageLimits: "Echo of the adapter preflight command list. Not independent native evidence.",
+      sample: "asc metadata push --dry-run",
+    };
+    assert(isIndependentEvidence(record.evidenceKind), describeConformanceCoverage(record));
+    assert(isIndependentEvidence(generated.evidenceKind) === false, describeConformanceCoverage(generated));
+    let thrown: unknown;
+    try {
+      createAscAppReviewProvider({
+        appId: "123456789",
+        runner: reviewStatusRunner(native),
+      }).readSnapshot();
+    } catch (error) {
+      thrown = error;
+    }
+    assert(thrown instanceof AscProviderReadError, "metadata-push dry-run object is not a review-status envelope");
+    assert(thrown instanceof Error && thrown.message.includes("no valid app-version layer"), "PushPlanResult adds/updates are not the status nested object");
+    thrown = undefined;
+    try {
+      createAscAppReviewProvider({
+        appId: "123456789",
+        runner: reviewStatusRunner(mistaken),
+      }).readSnapshot();
+    } catch (error) {
+      thrown = error;
+    }
+    assert(thrown instanceof AscProviderReadError, "JSON:API metadata document fails closed");
     assert(thrown instanceof Error && thrown.message.includes("no valid app-version layer"), "JSON:API document is not the CLI object");
   });
 }

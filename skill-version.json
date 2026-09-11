@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.115",
+  "version": "0.219.116",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Select b2c-local for workspace planning and execution when both local and hosted surfaces are configured.",
-    "Select b2c-hosted for knowledge in that same set, and treat leftover b2c-app-builder as a name, not a third surface."
+    "Prefer compiled operating-graph check once package-root resolution is dist-safe.",
+    "Keep the rest of the uncompiled checks graph on remaining-tsx after the packed wrapper ships."
   ]
 }

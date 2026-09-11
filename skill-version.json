@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.144",
+  "version": "0.219.145",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Prefer compiled autopilot check once package-root resolution is dist-safe.",
-    "Remaining-tsx inventory goes from 117 to 116. The rest of the uncompiled checks graph stays on remaining-tsx."
+    "Forward workspace runtime observation through MCP b2c_run and public runSession.",
+    "Omit stays runtime=unknown. A live-device word is refused. A fixture loop cannot invent runtime=checked."
   ]
 }

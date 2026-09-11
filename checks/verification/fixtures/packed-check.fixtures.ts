@@ -11,7 +11,7 @@ export function register(h: Harness): void {
     const compiled = inventory.filter((entry) => !entry.remainingTsx).map((entry) => entry.id);
     const remaining = inventory.filter((entry) => entry.remainingTsx);
     assert(
-      compiled.join(",") === "check:catalog,check:credits,check:hosted-bundle,check:public-api",
+      compiled.join(",") === "check:catalog,check:credits,check:hosted-bundle,check:hub-spoke,check:public-api",
       `compiled-eligible check scripts drifted: ${compiled.join(",")}`,
     );
     assert(remaining.length > 0, "remaining-tsx inventory must still name the uncompiled checks graph");
@@ -22,6 +22,10 @@ export function register(h: Harness): void {
     assert(
       !remaining.some((entry) => entry.id === "check:catalog"),
       "check:catalog must leave remaining-tsx once its compiled twin is eligible",
+    );
+    assert(
+      !remaining.some((entry) => entry.id === "check:hub-spoke"),
+      "check:hub-spoke must leave remaining-tsx once its compiled twin is eligible",
     );
     assert(
       remaining.some((entry) => entry.id === "check:design-md" && entry.sourcePath === "checks/validation/business/design/check-design-md.ts"),
@@ -111,5 +115,27 @@ export function register(h: Harness): void {
     assert(observed.compiled === true && observed.args?.join(" ") === "--json", "compiled catalog arguments changed");
     const source = readFileSync(path.join(skillRoot, "checks/validation/repository/check-catalog.ts"), "utf8");
     assert(source.includes("resolveSkillRoot(import.meta.url)"), "catalog check default skill root must walk from compiled dist");
+  });
+
+  h.check("packed-check: check:hub-spoke prefers compiled dist without tsx", () => {
+    const root = h.makeTempDir("packed-check-hub-spoke");
+    mkdirSync(path.join(root, "checks/validation/repository"), { recursive: true });
+    mkdirSync(path.join(root, "dist", "checks/validation/repository"), { recursive: true });
+    writeFileSync(
+      path.join(root, "dist", "checks/validation/repository/check-hub-spoke.js"),
+      "console.log(JSON.stringify({ compiled: true, args: process.argv.slice(2) }));",
+    );
+    writeFileSync(path.join(root, "checks/validation/repository/check-hub-spoke.ts"), 'console.error("source ts fallback should not run"); process.exit(9);');
+    const command = resolvePackedCheckCommand(root, "tsx checks/validation/repository/check-hub-spoke.ts", ["--json"]);
+    assert(
+      command?.executable === process.execPath && command.args[0] === path.join(root, "dist", "checks/validation/repository/check-hub-spoke.js"),
+      "packed check:hub-spoke must exec dist/checks/validation/repository/check-hub-spoke.js, not bare tsx",
+    );
+    const result = spawnSync(command.executable, command.args, { env: { ...process.env, PATH: "" }, encoding: "utf8" });
+    assert(result.status === 0, `compiled hub-spoke launch failed: ${result.stderr}`);
+    const observed = JSON.parse(result.stdout) as { compiled?: boolean; args?: string[] };
+    assert(observed.compiled === true && observed.args?.join(" ") === "--json", "compiled hub-spoke arguments changed");
+    const source = readFileSync(path.join(skillRoot, "checks/validation/repository/check-hub-spoke.ts"), "utf8");
+    assert(source.includes("resolveSkillRoot(import.meta.url)"), "hub-spoke check default skill root must walk from compiled dist");
   });
 }

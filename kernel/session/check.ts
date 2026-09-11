@@ -20,6 +20,7 @@
  * gives a maintainer.
  *
  * Packed omit-dev prefers `dist/` for `check:catalog` (`checks/validation/repository/check-catalog.ts`),
+ * `check:hub-spoke` (`checks/validation/repository/check-hub-spoke.ts`),
  * `check:credits` (`tooling/render-credits.ts`), `check:hosted-bundle` (`tooling/render-hosted-bundle.ts`),
  * and `check:public-api` (`tooling/render-public-api.ts`). Every other `check:*` stays on the
  * remaining-tsx inventory — the rest of the uncompiled `checks/` graph.

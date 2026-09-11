@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.87",
+  "version": "0.219.88",
   "updatedAt": "2026-09-10",
   "sourcePath": ".",
   "releaseNotes": [
-    "Map mixed screenshot-and-version goldens onto the Apple media and metadata standing envelopes.",
-    "Keep store-048 and store-040 on generic ASC CLI until those rows rank the envelopes."
+    "Launch check:hosted-bundle from compiled dist once package-root resolution walks from dist.",
+    "Keep render-public-api and the uncompiled checks graph on remaining-tsx."
   ]
 }

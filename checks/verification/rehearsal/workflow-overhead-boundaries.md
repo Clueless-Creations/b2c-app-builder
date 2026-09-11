@@ -19,6 +19,9 @@ measured interval exists.
 - `workflow.design.design-room` and `workflow.design.design-system-audit`
 - `workflow.store.apple-store-media-standing-envelope`
 
+The authored ONB-16 comment in `catalog/workflows/product-experience.ts` matches
+those `reads` / `dependencies`.
+
 Do not merge to reduce workflow count.
 
 ## Boundary table

@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.100",
+  "version": "0.219.101",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Collapse the leftover RevenueCat probe Test Store catalog log onto one Prettier line.",
-    "Leave probe behavior unchanged after the wrap-only leftover."
+    "Call interpretConfiguredConnection from handshake and routing so leftover leftover-name capability comes from the receipt.",
+    "Fresh local handshake stays b2c-local; recommended-name copy emits one capability sentence plus leftover-name prose."
   ]
 }

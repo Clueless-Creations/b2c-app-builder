@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.112",
+  "version": "0.219.113",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Pin the reviewed App Store Connect CLI 5.1.0 reviewStatusResult object as independent response-shape evidence for asc review status.",
-    "Keep nested version and latestSubmission on id and state, fail closed on a mistaken Apple JSON:API document, and leave adapter canned snapshots wiring-only."
+    "Record runtime=checked only from an explicit workspace observation on accepted workspace review.",
+    "Keep graph receipt, reject, and screenshot from inventing runtime proof."
   ]
 }

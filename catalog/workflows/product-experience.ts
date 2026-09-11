@@ -490,8 +490,9 @@ const onboardingGraphWorkflows = [
     phaseIds: ["phase.2"],
     dependencies: ["workflow.experience.onboarding-system.onb-15-architecture-decision"],
     outputPaths: ["product/onboarding/graph/ONB-16-journey-graph.md"],
-    // Same production-verification rationale as ONB-10 above -- ONB-17, ONB-18, ONB-19, and
-    // ONB-20's own gate all depend on this node without ever reading its file directly.
+    // Same production-verification rationale as ONB-10 above -- ONB-17, ONB-18, and ONB-19
+    // read and depend on this node's file, but their gates inspect only their own packets.
+    // ONB-20 does not read or depend on ONB-16.
     gates: ["check:onboarding-evidence-onb-16"],
     actionClass: "draft",
     idempotent: true,

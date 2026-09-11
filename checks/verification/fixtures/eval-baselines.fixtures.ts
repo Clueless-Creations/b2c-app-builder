@@ -623,6 +623,17 @@ export function register(harness: Harness): void {
     assert(table.includes("ONB-17 and ONB-18") && table.includes("`reads` / `dependencies`"), table);
     assert(table.includes("ONB-19 also `reads` and `depends on` ONB-16"), table);
     assert(table.includes("ONB-20 does not read or depend on ONB-16"), table);
+    assert(table.includes("authored ONB-16 comment"), table);
+    const productExperience = readFileSync(path.join(skillRoot, "catalog/workflows/product-experience.ts"), "utf8");
+    const onb16Start = productExperience.indexOf('id: "workflow.experience.onboarding-system.onb-16-journey-graph"');
+    const onb17Start = productExperience.indexOf('id: "workflow.experience.onboarding-system.onb-17-screen-control-paywall-contract"');
+    assert(onb16Start >= 0 && onb17Start > onb16Start, "ONB-16 workflow block must exist");
+    const onb16Block = productExperience.slice(onb16Start, onb17Start);
+    assert(!productExperience.includes("ONB-20's own gate all depend"), productExperience);
+    assert(!onb16Block.includes("without ever reading its file directly"), onb16Block);
+    assert(onb16Block.includes("ONB-17, ONB-18, and ONB-19"), onb16Block);
+    assert(onb16Block.includes("read and depend on this node's file"), onb16Block);
+    assert(onb16Block.includes("ONB-20 does not read or depend on ONB-16"), onb16Block);
     assert(table.includes("ONB-20 `reviewOf` and `reads` this contract"), table);
     assert(table.includes("ONB-20 `reviewOf` those three"), table);
     assert(table.includes("Catalog `reviewOf` is design-room → design-system-audit"), table);
@@ -641,6 +652,7 @@ export function register(harness: Harness): void {
     assert(table.includes("independent-effect boundary"), table);
     assert(protocol.includes("retain the current graph"), protocol);
     assert(protocol.includes("Leave #73 open"), protocol);
+    assert(protocol.includes("authored ONB-16 comment"), protocol);
     assert(protocol.includes("Closed on main via #189"), protocol);
     assert(!protocol.includes("Leave #39 open"), protocol);
     assert(

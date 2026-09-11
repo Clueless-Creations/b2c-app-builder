@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.138",
+  "version": "0.219.139",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Refuse leftover CLI-only public MCP names as hosted wrong-surface.",
-    "Hosted leftover CLI-only public names fail as wrong_surface with the hosted interpretConfiguredConnection reading. Knowledge names stay on the hosted surface."
+    "Forward `--runtime-observed` and `--runtime-observed workspace` from session auto-verify into acceptVerification, recording runtime=checked on a workspace-proof attempt.",
+    "Omitting the token stays runtime=unknown. A live-device word and a fixture or synthetic loop still cannot invent runtime proof."
   ]
 }

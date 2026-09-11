@@ -110,7 +110,10 @@ export function register(harness: Harness): void {
 
   check("rules 10 and 11 reuse the document's declared tiers and severities", () => {
     assert.ok(MAPPED_WORTHINESS_RULES.includes(10) && MAPPED_WORTHINESS_RULES.includes(11), "rules 10 and 11 must be mapped");
-    assert.ok(!KNOWN_UNMAPPED_WORTHINESS_RULES.includes(10) && !KNOWN_UNMAPPED_WORTHINESS_RULES.includes(11), "rules 10 and 11 must not stay in the unmapped hole");
+    assert.ok(
+      !KNOWN_UNMAPPED_WORTHINESS_RULES.includes(10) && !KNOWN_UNMAPPED_WORTHINESS_RULES.includes(11),
+      "rules 10 and 11 must not stay in the unmapped hole",
+    );
     const nativeFlow = findRubricDimension("worthiness.native_flow_semantics");
     assert.equal(nativeFlow?.tier, "attested");
     assert.equal(nativeFlow?.severity, "warning");

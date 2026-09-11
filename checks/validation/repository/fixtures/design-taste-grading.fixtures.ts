@@ -149,18 +149,8 @@ export function register(harness: Harness): void {
   const undeclaredColorRoot = makeEmptyFixture("grade-design-undeclared-color");
   cpSync(path.join(skillRoot, "examples", "workspace", "business", "DESIGN.md"), path.join(undeclaredColorRoot, "DESIGN.md"));
   mkdirSync(path.join(undeclaredColorRoot, "design", "proofs"), { recursive: true });
-  writeFileSync(
-    path.join(undeclaredColorRoot, "design", "proofs", "home.html"),
-    '<html><body style="color:#ff00aa">Drift</body></html>\n',
-    "utf8",
-  );
-  runFixture(
-    "undeclared proof hex is a mechanical rule-11 finding",
-    undeclaredColorRoot,
-    SCRIPT,
-    0,
-    '"code": "worthiness.anti_generic_undeclared_color"',
-  );
+  writeFileSync(path.join(undeclaredColorRoot, "design", "proofs", "home.html"), '<html><body style="color:#ff00aa">Drift</body></html>\n', "utf8");
+  runFixture("undeclared proof hex is a mechanical rule-11 finding", undeclaredColorRoot, SCRIPT, 0, '"code": "worthiness.anti_generic_undeclared_color"');
   runFixture(
     "undeclared proof hex is tagged mechanical with its dimension key",
     undeclaredColorRoot,

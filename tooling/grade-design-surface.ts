@@ -51,7 +51,11 @@
  */
 import { existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { checkContrastMechanical, checkTokenScaleMechanical, checkUndeclaredProofColors } from "../checks/validation/business/design/lib/worthiness-mechanical.js";
+import {
+  checkContrastMechanical,
+  checkTokenScaleMechanical,
+  checkUndeclaredProofColors,
+} from "../checks/validation/business/design/lib/worthiness-mechanical.js";
 import { ALL_EXTENSIONS, TELLS } from "../checks/validation/business/design/lib/vibecode-tells.js";
 import { loadDesignSystem } from "./lib/design-md.js";
 import { DESIGN_TASTE_RUBRIC, findRubricDimension } from "./lib/design-taste-rubric.js";

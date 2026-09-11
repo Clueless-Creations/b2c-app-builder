@@ -1,0 +1,84 @@
+{
+  "appId": "123456789",
+  "appInfoId": "appinfo-native-1",
+  "version": "1.2.3",
+  "versionId": "asv-native-1",
+  "dir": "./metadata",
+  "dryRun": true,
+  "includes": [
+    "localizations"
+  ],
+  "adds": [
+    {
+      "key": "version:1.2.3:en-US:keywords",
+      "scope": "version",
+      "locale": "en-US",
+      "version": "1.2.3",
+      "field": "keywords",
+      "reason": "field exists locally but not remotely",
+      "to": "one,two"
+    },
+    {
+      "key": "version:1.2.3:ja:description",
+      "scope": "version",
+      "locale": "ja",
+      "version": "1.2.3",
+      "field": "description",
+      "reason": "field exists locally but not remotely",
+      "to": "日本語説明"
+    }
+  ],
+  "updates": [
+    {
+      "key": "app-info:en-US:subtitle",
+      "scope": "app-info",
+      "locale": "en-US",
+      "field": "subtitle",
+      "reason": "field value differs",
+      "from": "Remote subtitle",
+      "to": "Local subtitle"
+    },
+    {
+      "key": "version:1.2.3:en-US:description",
+      "scope": "version",
+      "locale": "en-US",
+      "version": "1.2.3",
+      "field": "description",
+      "reason": "field value differs",
+      "from": "Remote description",
+      "to": "Local description"
+    }
+  ],
+  "deletes": [
+    {
+      "key": "app-info:fr:name",
+      "scope": "app-info",
+      "locale": "fr",
+      "field": "name",
+      "reason": "localization missing locally",
+      "from": "App FR"
+    }
+  ],
+  "apiCalls": [
+    {
+      "operation": "delete_localization",
+      "scope": "app-info",
+      "count": 1
+    },
+    {
+      "operation": "update_localization",
+      "scope": "app-info",
+      "count": 1
+    },
+    {
+      "operation": "create_localization",
+      "scope": "version",
+      "count": 1
+    },
+    {
+      "operation": "update_localization",
+      "scope": "version",
+      "count": 1
+    }
+  ]
+}

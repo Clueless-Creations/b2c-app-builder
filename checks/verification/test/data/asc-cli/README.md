@@ -19,6 +19,8 @@ Reviewed revision: `ca759a3b6ab88c8c39aed13325461248436615ca` (tag 5.1.0, 2026-0
 | `screenshots-validate-mistaken-jsonapi.json` | mistaken Apple JSON:API document | not an `asc screenshots validate` envelope                                                                              | JSON:API `data`/`attributes` is not the CLI `screenshotValidateResult` object                                             |
 | `screenshots-upload-dry-run-object.json` | `asc screenshots upload --dry-run --output json` | `internal/cli/assets/assets_screenshots_upload.go` dry-run `would-upload` plus `internal/cli/assets/assets_screenshots_resume.go` `buildAppScreenshotUploadResult` plus `internal/asc/assets_output.go` `AppScreenshotUploadResult` | One high-level CLI object for the dry-run branch. Nested `results` has one `would-upload` PNG. Empty `uploaded`, `skipped`, `pending`, `failed`, `resumed`, `failures`, and `failureArtifactPath` stay omitted. Nested `assetId` is the empty string. This is not Apple JSON:API. |
 | `screenshots-upload-mistaken-jsonapi.json` | mistaken Apple JSON:API document | not an `asc screenshots upload` envelope                                                                                | JSON:API `data`/`attributes` is not the CLI `AppScreenshotUploadResult` object                                              |
+| `metadata-push-dry-run-object.json` | `asc metadata push --dry-run --output json` | `internal/cli/metadata/execute_push.go` dry-run `PushPlanResult` plus `internal/cli/metadata/push.go` `PlanItem` / `PlanAPICall` | One high-level CLI object for the dry-run branch. Nested `adds` has two items, `updates` has two, and `deletes` has one. Empty `applied`, `actions`, `total`, `succeeded`, `failed`, `failureArtifactPath`, and `failureArtifactError` stay omitted. This is not Apple JSON:API. |
+| `metadata-push-mistaken-jsonapi.json` | mistaken Apple JSON:API document | not an `asc metadata push` envelope                                                                                   | JSON:API `data`/`attributes` is not the CLI `PushPlanResult` object                                                           |
 
 `reviewState` and `nextAction` for `WAITING_FOR_REVIEW` come from
 `buildReviewStatusResult` in that same file. Empty `blockers` are omitted
@@ -74,6 +76,23 @@ because `finalizeAppScreenshotUploadResult` sets it from `len(results)`
 when `Total` is still 0. Empty `resumed`, `skipped`, `pending`, `failed`,
 `failures`, and `failureArtifactPath` stay omitted because those fields
 are `json:",omitempty"`. The live upload branch is not this envelope.
+
+The metadata-push dry-run object follows `PushPlanResult` after
+`ExecutePushWithWarnings` returns with `DryRun` set, matching
+`TestMetadataPushDryRunBuildsPlanWithoutMutations` at 5.1.0. `appId` is the
+cookbook `123456789` and `dir` is the cookbook path `./metadata`, not a live
+capture. Nested `appInfoId` and `versionId` are synthetic. Default
+`--include` is `localizations`. Nested `adds` has the version `keywords` add
+and the `ja` description create. Nested `updates` has the app-info
+`subtitle` diff and the version `description` diff. Nested `deletes` has the
+remote `fr` name whose locale is missing locally. Empty `applied`, `actions`,
+`total`, `succeeded`, `failed`, `failureArtifactPath`, and
+`failureArtifactError` stay omitted because those fields are
+`json:",omitempty"` and the dry-run branch does not apply. Nested app-info
+`version` stays omitted because the app-info plan key has no version string.
+Omitted local fields such as remote `marketingUrl` stay no-ops, matching
+`TestMetadataPushDryRunOmittedFieldsDoNotPlanDeletes`. The live apply branch
+is not this envelope.
 
 Ids are synthetic. They are not live App Store Connect apps, versions, or
 submissions. No host `asc` binary and no App Store Connect account were used to

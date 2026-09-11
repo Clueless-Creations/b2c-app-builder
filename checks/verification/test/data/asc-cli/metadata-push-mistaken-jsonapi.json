@@ -1,0 +1,10 @@
+{
+  "data": {
+    "type": "appStoreVersionLocalizations",
+    "id": "loc-ver-native-1",
+    "attributes": {
+      "locale": "en-US",
+      "description": "Remote description"
+    }
+  }
+}

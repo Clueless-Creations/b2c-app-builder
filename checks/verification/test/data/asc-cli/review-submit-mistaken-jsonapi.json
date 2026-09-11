@@ -1,0 +1,10 @@
+{
+  "data": {
+    "type": "reviewSubmissions",
+    "id": "rs-native-1",
+    "attributes": {
+      "platform": "IOS",
+      "state": "WAITING_FOR_REVIEW"
+    }
+  }
+}

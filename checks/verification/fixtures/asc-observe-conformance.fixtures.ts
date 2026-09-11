@@ -6,8 +6,9 @@
  * Screenshot upload maps to the Apple store-media standing envelope (#38). TestFlight
  * beta distribution maps to the Apple TestFlight standing envelope. The independent
  * review-status response envelope is the 5.1.0 CLI `reviewStatusResult` object.
- * Adapter-built resubmit argv and canned live-provider snapshots are not independent
- * evidence.
+ * The independent review-submit response envelope is the 5.1.0 CLI
+ * `reviewSubmitResult` dry-run object. Adapter-built resubmit argv and canned
+ * live-provider snapshots are not independent evidence.
  */
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -38,9 +39,15 @@ const RORK_REVIEWED_VERSION = "5.1.0";
 const RORK_REVIEWED_REVISION = "ca759a3b6ab88c8c39aed13325461248436615ca";
 const COOKBOOK_SOURCE = "knowledge/store/app-store-connect-cli.md Verified Command Cookbook (local --help, 2026-09-08)";
 const REVIEW_STATUS_SOURCE = "rork-app-store-connect-cli 5.1.0 internal/cli/reviews/review_overview.go reviewStatusResult";
+const REVIEW_SUBMIT_SOURCE =
+  "rork-app-store-connect-cli 5.1.0 internal/cli/reviews/review_submit.go reviewSubmitResult / internal/cli/submit/submit_flow.go BuildAttachmentResult";
 const REVIEW_STATUS_OBJECT_KEYS = ["appId", "version", "reviewDetailConfigured", "reviewDetailId", "latestSubmission", "reviewState", "nextAction"] as const;
 const REVIEW_VERSION_KEYS = ["id", "version", "platform", "state", "createdDate"] as const;
 const REVIEW_SUBMISSION_KEYS = ["id", "state", "platform", "submittedDate"] as const;
+const REVIEW_SUBMIT_OBJECT_KEYS = ["appId", "version", "versionId", "buildId", "platform", "dryRun", "wouldSubmit", "buildAttachment"] as const;
+const REVIEW_SUBMIT_ATTACHMENT_KEYS = ["versionId", "buildId", "wouldAttach"] as const;
+const REVIEW_SUBMIT_OMITTED_KEYS = ["submissionId", "submittedDate", "alreadySubmitted", "messages"] as const;
+const REVIEW_SUBMIT_ATTACHMENT_OMITTED_KEYS = ["currentBuildId", "attached", "alreadyAttached"] as const;
 
 type SemanticFit = "exact" | "partial" | "none";
 type MappingEffect = "read" | "mutation" | "publish" | "credential";
@@ -476,5 +483,83 @@ export function register(harness: Harness): void {
     }
     assert(thrown instanceof AscProviderReadError, "JSON:API review-status document fails closed");
     assert(thrown instanceof Error && thrown.message.includes("no valid app-version layer"), "JSON:API document is not the CLI object");
+  });
+
+  harness.check("asc-conformance: independent review-submit response envelope is the 5.1.0 dry-run CLI object", () => {
+    const nativeSource = readFileSync(path.join(ASC_CLI_NATIVE_DIR, "review-submit-dry-run-object.json"), "utf8");
+    const mistakenSource = readFileSync(path.join(ASC_CLI_NATIVE_DIR, "review-submit-mistaken-jsonapi.json"), "utf8");
+    const resubmit = readFileSync(RESUBMIT, "utf8");
+    const native = loadNativeJson("review-submit-dry-run-object.json");
+    const mistaken = loadNativeJson("review-submit-mistaken-jsonapi.json");
+    assert(isRecord(native), "native review-submit envelope must be one object");
+    assert(isRecord(native.buildAttachment), "native envelope nests buildAttachment");
+    for (const key of REVIEW_SUBMIT_OBJECT_KEYS) {
+      assert(key in native, `native envelope missing ${key}`);
+    }
+    for (const key of REVIEW_SUBMIT_ATTACHMENT_KEYS) {
+      assert(key in native.buildAttachment, `native buildAttachment missing ${key}`);
+    }
+    for (const key of REVIEW_SUBMIT_OMITTED_KEYS) {
+      assert(!(key in native), `dry-run envelope must omit empty ${key}`);
+    }
+    for (const key of REVIEW_SUBMIT_ATTACHMENT_OMITTED_KEYS) {
+      assert(!(key in native.buildAttachment), `dry-run attachment must omit empty ${key}`);
+    }
+    assert(typeof native.version === "string", "submit version is a marketing-version string, not the status nested object");
+    assert(!("data" in native) && !("attributes" in native), "CLI envelope is not Apple JSON:API");
+    assert(native.dryRun === true, "dry-run branch sets dryRun");
+    assert(native.wouldSubmit === true, "dry-run SubmitResolvedVersion sets wouldSubmit");
+    assert(native.buildAttachment.wouldAttach === true, "dry-run EnsureBuildAttached sets wouldAttach");
+    assert(isRecord(mistaken) && isRecord(mistaken.data) && "attributes" in mistaken.data, "mistaken document is Apple JSON:API");
+    assert(
+      adapterGeneratedMentions(nativeSource, ["buildResubmitCommand", "liveReviewStatusJson", "createAscAppReviewProvider"]).length === 0,
+      "native envelope must not name adapter helpers",
+    );
+    assert(
+      adapterGeneratedMentions(mistakenSource, ["buildResubmitCommand", "liveReviewStatusJson"]).length === 0,
+      "mistaken envelope must not name adapter helpers",
+    );
+    assert(resubmit.includes("buildResubmitCommand"), "adapter still owns the recorded submit argv");
+    assert(!resubmit.includes("test/data/asc-cli"), "adapter argv builder is not this envelope");
+    const record = provenance({
+      provider: "apple-asc",
+      transport: "cli",
+      reviewedVersion: RORK_REVIEWED_VERSION,
+      reviewedRevision: RORK_REVIEWED_REVISION,
+      sourceSelector: REVIEW_SUBMIT_SOURCE,
+      nativeOperation: "asc review submit",
+      canonicalOperation: APP_REVIEW_RESUBMIT_WORKFLOW_ID,
+      evidenceKind: "upstream-source-test",
+      establishes: ["response-shape"],
+      coverageLimits:
+        "CLI reviewSubmitResult dry-run object at 5.1.0 only. wouldSubmit and buildAttachment.wouldAttach. Not Apple JSON:API. Not a live submit capture. Observe adapter does not execute submit.",
+      sample: native,
+    });
+    const generated: ProviderConformanceProvenance = {
+      provider: "apple-asc",
+      transport: "cli",
+      reviewedVersion: RORK_REVIEWED_VERSION,
+      reviewedRevision: "unknown",
+      sourceSelector: "adapters/app-review/resubmit.ts buildResubmitCommand",
+      nativeOperation: "asc review submit",
+      canonicalOperation: APP_REVIEW_RESUBMIT_WORKFLOW_ID,
+      evidenceKind: "adapter-generated",
+      establishes: ["request-shape"],
+      coverageLimits: "Echo of the adapter string builder. Not independent native evidence.",
+      sample: "asc review submit --app ${envelope.appId} --version-id ${envelope.appStoreVersionId} --confirm",
+    };
+    assert(isIndependentEvidence(record.evidenceKind), describeConformanceCoverage(record));
+    assert(isIndependentEvidence(generated.evidenceKind) === false, describeConformanceCoverage(generated));
+    let thrown: unknown;
+    try {
+      createAscAppReviewProvider({
+        appId: "123456789",
+        runner: reviewStatusRunner(native),
+      }).readSnapshot();
+    } catch (error) {
+      thrown = error;
+    }
+    assert(thrown instanceof AscProviderReadError, "review-submit dry-run object is not a review-status envelope");
+    assert(thrown instanceof Error && thrown.message.includes("no valid app-version layer"), "submit version string is not the status nested object");
   });
 }

@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.99",
+  "version": "0.219.100",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Map all twelve design-worthiness rules onto frozen taste rubric 1.3.0.",
-    "Keep rule 10 as attested native-flow semantics, and split rule 11 into mechanical undeclared-color drift and attested remainder."
+    "Collapse the leftover RevenueCat probe Test Store catalog log onto one Prettier line.",
+    "Leave probe behavior unchanged after the wrap-only leftover."
   ]
 }

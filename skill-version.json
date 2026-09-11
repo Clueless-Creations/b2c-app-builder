@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.1",
+  "version": "0.220.2",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Prefer compiled provider-contracts once package-root resolution is dist-safe; leftover inspect help and contributor MCP names stay honest.",
-    "Keep producer and verifier prompts on the verified pin after activate-then-edit. Omit still cannot invent a pin."
+    "Prefer compiled check:upstreams once package-root resolution walks from dist.",
+    "Remaining-tsx inventory moves from 115 to 114. Pin and snapshot re-rendered from source."
   ]
 }

@@ -1,0 +1,18 @@
+{
+  "path": "./screenshots",
+  "displayType": "APP_IPHONE_65",
+  "totalFiles": 1,
+  "readyFiles": 1,
+  "errorCount": 0,
+  "warningCount": 0,
+  "files": [
+    {
+      "order": 1,
+      "filePath": "./screenshots/01-home.png",
+      "fileName": "01-home.png",
+      "width": 1242,
+      "height": 2688,
+      "status": "ok"
+    }
+  ]
+}

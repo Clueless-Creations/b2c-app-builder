@@ -14,6 +14,7 @@ import {
   connectionCapabilityGuidance,
   connectionReceipt,
   connectionReceiptSchema,
+  HOSTED_WRONG_SURFACE_TOOL_NAMES,
   hostedMcpInstructionsSuffix,
   hostedWrongSurfaceRefusal,
   interpretConfiguredConnection,
@@ -26,6 +27,8 @@ import {
   type ConnectionReceipt,
   type HostedWrongSurfaceRefusal,
 } from "../../../contracts/public-api/connection-receipt.js";
+import { PUBLIC_OPERATIONS } from "../../../contracts/public-api/contract.js";
+import { KNOWLEDGE_TOOL_DEFINITIONS } from "../../../kernel/knowledge-service/tools.js";
 import { toCatalogInput } from "../../../catalog/bridge.js";
 import type { Catalog } from "../../../catalog/types.js";
 import { compilePlan } from "../../../kernel/engine/compile.js";
@@ -413,14 +416,31 @@ test("hosted API discovery includes interpretConfiguredConnection reading", asyn
   assert.deepEqual(body.connection, expected);
 });
 
-test("hosted local-workspace tool names fail as wrong-surface with receipt guidance", async () => {
+test("hosted local-only MCP names fail as wrong-surface with receipt guidance", async () => {
   const service = createKnowledgeService(buildHostedKnowledgeBundle(root));
   const hosted = connectionReceipt({ mode: "hosted_knowledge", engineVersion: service.metadata.engineVersion });
   const expected = interpretConfiguredConnection({ clientName: "b2c-hosted", receipt: hosted });
-  assert.equal(isHostedWrongSurfaceTool("b2c_catalog"), false);
-  assert.equal(isHostedWrongSurfaceTool("b2c_workflow"), false);
+  const publicMcp = PUBLIC_OPERATIONS.flatMap((operation) => (operation.mcp === null ? [] : [operation.mcp]));
+  const localWorkspaceTools = [
+    "b2c_plan",
+    "b2c_status",
+    "b2c_operate",
+    "b2c_bootstrap",
+    "b2c_run",
+    "b2c_approvals",
+    "b2c_verify",
+    "b2c_schedule",
+  ] as const;
+  assert.deepEqual(
+    [...HOSTED_WRONG_SURFACE_TOOL_NAMES].sort(),
+    [...new Set([...publicMcp, ...localWorkspaceTools])].sort(),
+    "hosted wrong-surface names must cover every local-only public MCP name",
+  );
+  for (const tool of KNOWLEDGE_TOOL_DEFINITIONS) {
+    assert.equal(isHostedWrongSurfaceTool(tool.name), false, tool.name);
+  }
   assert.equal(isHostedWrongSurfaceTool("b2c_not_a_tool"), false);
-  for (const toolName of ["b2c_plan", "b2c_run", "b2c_business_plan"] as const) {
+  for (const toolName of HOSTED_WRONG_SURFACE_TOOL_NAMES) {
     assert.equal(isHostedWrongSurfaceTool(toolName), true, toolName);
     const response = await handleApi(
       new Request(`https://knowledge.test/api/v1/tools/${toolName}`, { method: "POST", body: "{}" }),
@@ -438,7 +458,7 @@ test("hosted local-workspace tool names fail as wrong-surface with receipt guida
   }
   const leftover = hostedWrongSurfaceRefusal({
     engineVersion: service.metadata.engineVersion,
-    toolName: "b2c_plan",
+    toolName: "b2c_discover",
     clientName: "b2c-app-builder",
   });
   assert.equal(leftover.connection.leftoverName, true);
@@ -453,12 +473,17 @@ test("hosted local-workspace tool names fail as wrong-surface with receipt guida
   assert.match(unknownBody, /not_found/);
   assert.doesNotMatch(unknownBody, /wrong_surface/);
   assert.doesNotMatch(unknownBody, /cannot access or run this local business/);
-  const mcp = hostedWrongSurfaceMcpResponse(
-    JSON.stringify({ jsonrpc: "2.0", id: 7, method: "tools/call", params: { name: "b2c_run", arguments: { workspace: "/tmp" } } }),
-    service.metadata.engineVersion,
-  ) as { result?: { isError?: boolean; structuredContent?: HostedWrongSurfaceRefusal } };
-  assert.equal(mcp.result?.isError, true);
-  assert.deepEqual(mcp.result?.structuredContent, hostedWrongSurfaceRefusal({ engineVersion: service.metadata.engineVersion, toolName: "b2c_run" }));
+  for (const toolName of ["b2c_run", "b2c_discover", "b2c_compose", "b2c_market_report"] as const) {
+    const mcp = hostedWrongSurfaceMcpResponse(
+      JSON.stringify({ jsonrpc: "2.0", id: 7, method: "tools/call", params: { name: toolName, arguments: {} } }),
+      service.metadata.engineVersion,
+    ) as { result?: { isError?: boolean; structuredContent?: HostedWrongSurfaceRefusal } };
+    assert.equal(mcp.result?.isError, true, toolName);
+    assert.deepEqual(
+      mcp.result?.structuredContent,
+      hostedWrongSurfaceRefusal({ engineVersion: service.metadata.engineVersion, toolName }),
+    );
+  }
   assert.equal(
     hostedWrongSurfaceMcpResponse(
       JSON.stringify({ jsonrpc: "2.0", id: 8, method: "tools/call", params: { name: "b2c_catalog", arguments: { limit: 1 } } }),

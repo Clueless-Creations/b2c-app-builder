@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.90",
+  "version": "0.219.91",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Prefer compiled public-api check once package-root resolution is dist-safe.",
-    "Keep the uncompiled checks graph on remaining-tsx for packed omit-dev installs."
+    "Align the ONB-16 production-verification comment with catalog reads.",
+    "Record that ONB-20 does not read or depend on the journey graph."
   ]
 }

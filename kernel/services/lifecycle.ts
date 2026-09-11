@@ -89,8 +89,38 @@ export function planBusiness(input: { workspaceId: string; maxConcurrency: numbe
     founderIntent: readFounderIntent(workspace),
   });
 }
+function publicRunRequestIdentity(input: {
+  workspaceId: string;
+  expectedRevision: string;
+  requestId: string;
+  scope: string[];
+  wallClockSeconds: number;
+  maxConcurrency: number;
+  runtimeObserved?: boolean | string;
+}) {
+  if (input.runtimeObserved === undefined || input.runtimeObserved === false) {
+    return {
+      workspaceId: input.workspaceId,
+      expectedRevision: input.expectedRevision,
+      requestId: input.requestId,
+      scope: input.scope,
+      wallClockSeconds: input.wallClockSeconds,
+      maxConcurrency: input.maxConcurrency,
+    };
+  }
+  return input;
+}
+
 export async function runBusiness(
-  input: { workspaceId: string; expectedRevision: string; requestId: string; scope: string[]; wallClockSeconds: number; maxConcurrency: number },
+  input: {
+    workspaceId: string;
+    expectedRevision: string;
+    requestId: string;
+    scope: string[];
+    wallClockSeconds: number;
+    maxConcurrency: number;
+    runtimeObserved?: boolean | string;
+  },
   host: SessionHost = {},
 ) {
   const workspace = registeredWorkspace(input.workspaceId);
@@ -103,9 +133,16 @@ export async function runBusiness(
       brief: { schemaVersion: "1.0.0", businessSlug: control.businessSlug, scopeHints: input.scope },
       expectedRevision: input.expectedRevision,
       requestId: input.requestId,
-      requestDigest: `sha256:${createHash("sha256").update(stableJson(input)).digest("hex")}`,
+      requestDigest: `sha256:${createHash("sha256")
+        .update(stableJson(publicRunRequestIdentity(input)))
+        .digest("hex")}`,
       maxConcurrency: input.maxConcurrency,
       wallClockSeconds: input.wallClockSeconds,
+      ...(input.runtimeObserved === true || (input.runtimeObserved !== undefined && input.runtimeObserved !== false)
+        ? { runtimeObserved: input.runtimeObserved }
+        : {}),
+      ...(host.executor ? { executor: host.executor } : {}),
+      ...(host.verifier ? { verifier: host.verifier } : {}),
     },
     host,
   );

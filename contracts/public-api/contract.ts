@@ -429,6 +429,7 @@ export const businessRunInputSchema = businessStatusInputSchema.extend({
   scope: z.array(z.string().min(1).max(160)).max(50).default([]),
   wallClockSeconds: z.number().int().min(1).max(3600).default(300),
   maxConcurrency: z.number().int().min(1).max(8).default(1),
+  runtimeObserved: z.union([z.boolean(), z.string()]).optional(),
 });
 export const businessRecoverInputSchema = businessStatusInputSchema.extend({
   expectedRevision: lifecycleRevisionSchema,
@@ -713,10 +714,10 @@ export const PUBLIC_OPERATIONS = [
     mcp: null,
     title: "Run one authorized business session",
     description:
-      "CLI-only bounded execution through the existing runner, exact revision and durable request identity. Uses existing grants. Notifications disabled. Selected operations require trusted host routes. A successful bounded session is not delivery; inspect completion.deliveryAccepted. liveLaunchProven stays false without provider-native proof.",
+      "CLI-only bounded execution through the existing runner, exact revision and durable request identity. Uses existing grants. Notifications disabled. Selected operations require trusted host routes. Runtime proof still requires an explicit workspace observation; a live-device word cannot invent it. A successful bounded session is not delivery; inspect completion.deliveryAccepted. liveLaunchProven stays false without provider-native proof.",
     inputSchema: businessRunInputSchema,
     outputSchema: resultSchema(businessRunSchema),
-    flags: ["workspace", "revision", "request", "scope", "seconds", "concurrency", "json"],
+    flags: ["workspace", "revision", "request", "scope", "seconds", "concurrency", "runtime-observed", "json"],
   },
   {
     id: "business.recover",

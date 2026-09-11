@@ -31,7 +31,7 @@ test("business plan and run help mark schema defaults and optional fields as opt
   assert.equal(help("business-plan"), "Usage: b2c business-plan --workspace <value> [--concurrency <value>] [--json]");
   assert.equal(
     help("business-run"),
-    "Usage: b2c business-run --workspace <value> --revision <value> --request <value> [--scope <value>] [--seconds <value>] [--concurrency <value>] [--json]",
+    "Usage: b2c business-run --workspace <value> --revision <value> --request <value> [--scope <value>] [--seconds <value>] [--concurrency <value>] [--runtime-observed <value>] [--json]",
   );
 });
 
@@ -51,6 +51,7 @@ test("business plan, run, and evidence help keep delivery distinct from store su
   const evidence = helpBody("business-evidence");
   assert.match(plan, /completion\.deliveryAccepted is current closeout evidence, not store submission or release/);
   assert.match(run, /A successful bounded session is not delivery/);
+  assert.match(run, /Runtime proof still requires an explicit workspace observation/);
   assert.match(run, /liveLaunchProven stays false without provider-native proof/);
   assert.match(evidence, /liveLaunchProven stays false until separately granted provider-native proof/);
 });

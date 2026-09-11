@@ -15,6 +15,7 @@ const suites = [
   "connection-and-packet",
   "after-credits-start",
   "run-session-runtime-observed",
+  "business-run-runtime-observed",
 ];
 let failed = false;
 

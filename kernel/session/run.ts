@@ -746,6 +746,10 @@ export interface SessionInvocation {
 }
 export interface SessionHost {
   operationRoutes?: import("./operation-routes.js").OperationRouteRegistry;
+  /** Diagnostic executor for tests and the public wrapper. Omit keeps the real auto session. */
+  executor?: "auto" | "fixture" | "noop";
+  /** Diagnostic verifier for tests and the public wrapper. Omit follows the executor. */
+  verifier?: "cli" | "fixture" | "off";
 }
 interface InternalSessionHost extends SessionHost {
   brief?: SessionBrief;

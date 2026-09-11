@@ -113,6 +113,18 @@ export type ProofStrengthReviewOrigin = IndependentVerificationReceipt["mode"] |
 /** Typed workspace runtime observation. A review sentence cannot invent this. */
 export type WorkspaceRuntimeObservation = { readonly origin: "workspace" };
 
+/**
+ * Parse an explicit operator/CLI observation token. Absent or empty stays unobserved.
+ * Only `workspace` (or the boolean flag form `true`) is accepted. A live-device word
+ * cannot invent this token.
+ */
+export function parseWorkspaceRuntimeObservation(value: string | undefined): WorkspaceRuntimeObservation | undefined {
+  const token = value?.trim().toLowerCase();
+  if (!token) return undefined;
+  if (token === "workspace" || token === "true") return { origin: "workspace" };
+  throw new Error("runtime observation must be an explicit workspace token");
+}
+
 export interface ComposedProofStrength {
   readonly structural: ProofStrengthLevel;
   readonly semantic: ProofStrengthLevel;

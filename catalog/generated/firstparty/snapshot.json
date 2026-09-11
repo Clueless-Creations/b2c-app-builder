@@ -15946,7 +15946,7 @@
     "checks/validation/business/operations/check-founder-operator-bootstrap.ts": "f971a2ab37b72b7c295e662e07bd93926ac1b59b7af6787fbcaf4cc7c4bc581b",
     "checks/validation/repository/check-gates-layout.ts": "e5cb7fc21aa5fe0cc6dd8f9f10de13ee4525990241ef482923ec1e3bcfc66480",
     "checks/validation/business/process/check-generated-pages.ts": "ce061e8c22491f04d3d3eff55392c7300c03af2a72a574d65b4fed53db892f53",
-    "checks/validation/repository/check-graph-foundations.ts": "7fcf85053ab148d60b723a38fb14fe93f0680818236fa02c0e354022004ea7a9",
+    "checks/validation/repository/check-graph-foundations.ts": "58d7908282c4f0e8f4a5ad4f4e924fbb2728455b797eb7711a3a30fa07b3c489",
     "tooling/render-hosted-bundle.ts": "cb7845d2bda23c408c01eb048d4ec4750440526ea2add4b2c40d50ceec772876",
     "checks/validation/repository/check-hub-spoke.ts": "9d6b07927cff533f90cb3d6b5bd30db75edf834f0dbe67e75d704455654af247",
     "checks/validation/business/growth/check-landing-funnel.ts": "a2813bfb35afcc32f2647f94d0c74d1b21ed2730f5a646436e2ae6a15190adbd",
@@ -16211,5 +16211,5 @@
     "catalog/upstreams/notices/parth-app-store-screenshots.txt": "a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a"
   },
   "dependencies": [],
-  "digest": "sha256:70dd376f768630829f3adfaed747bdfa21f8ffc26c84f616836430ab999af61c"
+  "digest": "sha256:5207e4fb6f254e62044869e8f00f0e76a620fb3eb1ae164e03dfa1d124805df7"
 }

@@ -11,7 +11,7 @@ export function register(h: Harness): void {
     const compiled = inventory.filter((entry) => !entry.remainingTsx).map((entry) => entry.id);
     const remaining = inventory.filter((entry) => entry.remainingTsx);
     assert(
-      compiled.join(",") === "check:catalog,check:credits,check:gates-layout,check:hosted-bundle,check:hub-spoke,check:public-api",
+      compiled.join(",") === "check:catalog,check:credits,check:gates-layout,check:graph-foundations,check:hosted-bundle,check:hub-spoke,check:public-api",
       `compiled-eligible check scripts drifted: ${compiled.join(",")}`,
     );
     assert(remaining.length > 0, "remaining-tsx inventory must still name the uncompiled checks graph");
@@ -26,6 +26,10 @@ export function register(h: Harness): void {
     assert(
       !remaining.some((entry) => entry.id === "check:gates-layout"),
       "check:gates-layout must leave remaining-tsx once its compiled twin is eligible",
+    );
+    assert(
+      !remaining.some((entry) => entry.id === "check:graph-foundations"),
+      "check:graph-foundations must leave remaining-tsx once its compiled twin is eligible",
     );
     assert(
       !remaining.some((entry) => entry.id === "check:hub-spoke"),
@@ -163,5 +167,27 @@ export function register(h: Harness): void {
     assert(observed.compiled === true && observed.args?.join(" ") === "--skill-root . --json", "compiled gates-layout arguments changed");
     const source = readFileSync(path.join(skillRoot, "checks/validation/repository/check-gates-layout.ts"), "utf8");
     assert(source.includes("resolveSkillRoot(import.meta.url)"), "gates-layout check default skill root must walk from compiled dist");
+  });
+
+  h.check("packed-check: check:graph-foundations prefers compiled dist without tsx", () => {
+    const root = h.makeTempDir("packed-check-graph-foundations");
+    mkdirSync(path.join(root, "checks/validation/repository"), { recursive: true });
+    mkdirSync(path.join(root, "dist", "checks/validation/repository"), { recursive: true });
+    writeFileSync(
+      path.join(root, "dist", "checks/validation/repository/check-graph-foundations.js"),
+      "console.log(JSON.stringify({ compiled: true, args: process.argv.slice(2) }));",
+    );
+    writeFileSync(path.join(root, "checks/validation/repository/check-graph-foundations.ts"), 'console.error("source ts fallback should not run"); process.exit(9);');
+    const command = resolvePackedCheckCommand(root, "tsx checks/validation/repository/check-graph-foundations.ts --skill-root .", ["--json"]);
+    assert(
+      command?.executable === process.execPath && command.args[0] === path.join(root, "dist", "checks/validation/repository/check-graph-foundations.js"),
+      "packed check:graph-foundations must exec dist/checks/validation/repository/check-graph-foundations.js, not bare tsx",
+    );
+    const result = spawnSync(command.executable, command.args, { env: { ...process.env, PATH: "" }, encoding: "utf8" });
+    assert(result.status === 0, `compiled graph-foundations launch failed: ${result.stderr}`);
+    const observed = JSON.parse(result.stdout) as { compiled?: boolean; args?: string[] };
+    assert(observed.compiled === true && observed.args?.join(" ") === "--skill-root . --json", "compiled graph-foundations arguments changed");
+    const source = readFileSync(path.join(skillRoot, "checks/validation/repository/check-graph-foundations.ts"), "utf8");
+    assert(source.includes("resolveSkillRoot(import.meta.url)"), "graph-foundations check default skill root must walk from compiled dist");
   });
 }

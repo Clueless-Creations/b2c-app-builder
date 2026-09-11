@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.149",
+  "version": "0.219.150",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Refuse leftover write-gated MCP names as local cli_only when writes are mcp_readonly.",
-    "Those leftover names stay unlisted on read-only local MCP. Handshake stays b2c-local."
+    "Public business.run and CLI business-run forward explicit runtimeObserved into runSession.",
+    "Omit stays runtime=unknown. A live-device word is refused and leaves run-state bytes unchanged."
   ]
 }

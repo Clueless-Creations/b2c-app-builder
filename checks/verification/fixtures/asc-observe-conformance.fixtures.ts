@@ -14,7 +14,8 @@
  * envelope is the 5.1.0 CLI `screenshotValidateResult` ready object. The independent
  * screenshots-upload response envelope is the 5.1.0 CLI `AppScreenshotUploadResult`
  * dry-run object. The independent metadata-push response envelope is the 5.1.0 CLI
- * `PushPlanResult` dry-run object. `asc review submit`
+ * `PushPlanResult` dry-run object. The independent screenshots-download response
+ * envelope is the 5.1.0 CLI `screenshotDownloadResult` object. `asc review submit`
  * maps to `workflow.store.app-review-resubmit`. `asc testflight feedback list` and
  * `asc testflight crashes list` map to
  * `workflow.store.apple-testflight-standing-envelope`. Adapter-built resubmit argv and canned
@@ -62,6 +63,8 @@ const SCREENSHOTS_UPLOAD_SOURCE =
   "rork-app-store-connect-cli 5.1.0 internal/cli/assets/assets_screenshots_upload.go dry-run would-upload / internal/cli/assets/assets_screenshots_resume.go buildAppScreenshotUploadResult / internal/asc/assets_output.go AppScreenshotUploadResult";
 const METADATA_PUSH_SOURCE =
   "rork-app-store-connect-cli 5.1.0 internal/cli/metadata/execute_push.go dry-run PushPlanResult / internal/cli/metadata/push.go PlanItem PlanAPICall";
+const SCREENSHOTS_DOWNLOAD_SOURCE =
+  "rork-app-store-connect-cli 5.1.0 internal/cli/assets/assets_screenshots_download.go screenshotDownloadResult screenshotDownloadItem";
 const APPLE_STORE_MEDIA_STANDING_ENVELOPE = "workflow.store.apple-store-media-standing-envelope";
 const REVIEW_STATUS_OBJECT_KEYS = ["appId", "version", "reviewDetailConfigured", "reviewDetailId", "latestSubmission", "reviewState", "nextAction"] as const;
 const REVIEW_VERSION_KEYS = ["id", "version", "platform", "state", "createdDate"] as const;
@@ -99,6 +102,27 @@ const SCREENSHOTS_UPLOAD_OMITTED_KEYS = ["resumed", "uploaded", "skipped", "pend
 const SCREENSHOTS_UPLOAD_RESULT_OMITTED_KEYS = ["skipped"] as const;
 const METADATA_PUSH_OBJECT_KEYS = ["appId", "appInfoId", "version", "versionId", "dir", "dryRun", "includes", "adds", "updates", "deletes", "apiCalls"] as const;
 const METADATA_PUSH_OMITTED_KEYS = ["applied", "actions", "total", "succeeded", "failed", "failureArtifactPath", "failureArtifactError"] as const;
+const SCREENSHOTS_DOWNLOAD_OBJECT_KEYS = [
+  "versionLocalizationId",
+  "outputDir",
+  "overwrite",
+  "total",
+  "downloaded",
+  "unchanged",
+  "failed",
+  "items",
+] as const;
+const SCREENSHOTS_DOWNLOAD_OMITTED_KEYS = ["failures"] as const;
+const SCREENSHOTS_DOWNLOAD_ITEM_KEYS = [
+  "id",
+  "displayType",
+  "fileName",
+  "url",
+  "outputPath",
+  "unchanged",
+  "contentType",
+  "bytesWritten",
+] as const;
 const METADATA_PUSH_PLAN_ITEM_KEYS = ["key", "scope", "locale", "field", "reason"] as const;
 const METADATA_PUSH_ADD_OMITTED_KEYS = ["from"] as const;
 const METADATA_PUSH_APP_INFO_OMITTED_KEYS = ["version"] as const;
@@ -1239,6 +1263,98 @@ export function register(harness: Harness): void {
       thrown = error;
     }
     assert(thrown instanceof AscProviderReadError, "JSON:API metadata document fails closed");
+    assert(thrown instanceof Error && thrown.message.includes("no valid app-version layer"), "JSON:API document is not the CLI object");
+  });
+
+  harness.check("asc-conformance: independent screenshots-download response envelope is the 5.1.0 CLI object", () => {
+    const nativeSource = readFileSync(path.join(ASC_CLI_NATIVE_DIR, "screenshots-download-object.json"), "utf8");
+    const mistakenSource = readFileSync(path.join(ASC_CLI_NATIVE_DIR, "screenshots-download-mistaken-jsonapi.json"), "utf8");
+    const native = loadNativeJson("screenshots-download-object.json");
+    const mistaken = loadNativeJson("screenshots-download-mistaken-jsonapi.json");
+    assert(isRecord(native), "native screenshots-download envelope must be one object");
+    for (const key of SCREENSHOTS_DOWNLOAD_OBJECT_KEYS) {
+      assert(key in native, `native envelope missing ${key}`);
+    }
+    for (const key of SCREENSHOTS_DOWNLOAD_OMITTED_KEYS) {
+      assert(!(key in native), `successful download envelope must omit empty ${key}`);
+    }
+    assert(native.versionLocalizationId === "LOC_ID", "versionLocalizationId is the cookbook id, not a live capture");
+    assert(native.outputDir === "./screenshots", "outputDir is the cookbook path, not a live capture");
+    assert(native.overwrite === false, "overwrite stays encoded because the bool has no omitempty");
+    assert(native.total === 1 && native.downloaded === 1 && native.unchanged === 0 && native.failed === 0, "successful branch counts one downloaded item");
+    assert(Array.isArray(native.items) && native.items.length === 1, "successful branch encodes one item");
+    const item = native.items[0];
+    assert(isRecord(item), "nested download item must be one object");
+    for (const key of SCREENSHOTS_DOWNLOAD_ITEM_KEYS) {
+      assert(key in item, `nested item missing ${key}`);
+    }
+    assert(item.id === "shot-native-1", "item id is synthetic, not a live screenshot");
+    assert(item.displayType === "APP_IPHONE_65", "item displayType is APP_IPHONE_65");
+    assert(item.fileName === "01-home.png", "item fileName is the cookbook PNG name");
+    assert(typeof item.url === "string" && item.url.includes("example.invalid"), "item url is synthetic, not a live Apple CDN capture");
+    assert(item.outputPath === "./screenshots/APP_IPHONE_65/01_shot-native-1_01-home.png", "item outputPath follows the localization-download naming");
+    assert(item.unchanged === false, "nested unchanged stays encoded because the bool has no omitempty");
+    assert(item.contentType === "image/png" && item.bytesWritten === 2048, "successful download records contentType and bytesWritten");
+    assert(!("data" in native) && !("attributes" in native), "CLI envelope is not Apple JSON:API");
+    assert(isRecord(mistaken) && isRecord(mistaken.data) && "attributes" in mistaken.data, "mistaken document is Apple JSON:API");
+    assert(
+      adapterGeneratedMentions(nativeSource, ["buildResubmitCommand", "liveReviewStatusJson", "createAscAppReviewProvider"]).length === 0,
+      "native envelope must not name adapter helpers",
+    );
+    assert(
+      adapterGeneratedMentions(mistakenSource, ["buildResubmitCommand", "liveReviewStatusJson"]).length === 0,
+      "mistaken envelope must not name adapter helpers",
+    );
+    const record = provenance({
+      provider: "apple-asc",
+      transport: "cli",
+      reviewedVersion: RORK_REVIEWED_VERSION,
+      reviewedRevision: RORK_REVIEWED_REVISION,
+      sourceSelector: SCREENSHOTS_DOWNLOAD_SOURCE,
+      nativeOperation: "asc screenshots download",
+      canonicalOperation: APPLE_STORE_MEDIA_STANDING_ENVELOPE,
+      evidenceKind: "upstream-source-test",
+      establishes: ["response-shape"],
+      coverageLimits:
+        "CLI screenshotDownloadResult object at 5.1.0 only. One successful localization download item. Empty failures omitted. Not Apple JSON:API. Not a live App Store Connect capture.",
+      sample: native,
+    });
+    const generated: ProviderConformanceProvenance = {
+      provider: "apple-asc",
+      transport: "cli",
+      reviewedVersion: RORK_REVIEWED_VERSION,
+      reviewedRevision: "unknown",
+      sourceSelector: "adapters/app-review canned screenshot helper",
+      nativeOperation: "asc screenshots download",
+      canonicalOperation: APPLE_STORE_MEDIA_STANDING_ENVELOPE,
+      evidenceKind: "adapter-generated",
+      establishes: ["request-shape"],
+      coverageLimits: "Echo of an adapter helper. Not independent native evidence.",
+      sample: "asc screenshots download",
+    };
+    assert(isIndependentEvidence(record.evidenceKind), describeConformanceCoverage(record));
+    assert(isIndependentEvidence(generated.evidenceKind) === false, describeConformanceCoverage(generated));
+    let thrown: unknown;
+    try {
+      createAscAppReviewProvider({
+        appId: "123456789",
+        runner: reviewStatusRunner(native),
+      }).readSnapshot();
+    } catch (error) {
+      thrown = error;
+    }
+    assert(thrown instanceof AscProviderReadError, "screenshots-download object is not a review-status envelope");
+    assert(thrown instanceof Error && thrown.message.includes("no valid app-version layer"), "download items are not the status nested object");
+    thrown = undefined;
+    try {
+      createAscAppReviewProvider({
+        appId: "123456789",
+        runner: reviewStatusRunner(mistaken),
+      }).readSnapshot();
+    } catch (error) {
+      thrown = error;
+    }
+    assert(thrown instanceof AscProviderReadError, "JSON:API screenshot document fails closed");
     assert(thrown instanceof Error && thrown.message.includes("no valid app-version layer"), "JSON:API document is not the CLI object");
   });
 }

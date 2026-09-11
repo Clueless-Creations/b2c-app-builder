@@ -1,0 +1,15 @@
+{
+  "data": {
+    "type": "appScreenshots",
+    "id": "shot-native-1",
+    "attributes": {
+      "fileName": "01-home.png",
+      "sourceFileChecksum": "deadbeef",
+      "imageAsset": {
+        "templateUrl": "https://example.invalid/{w}x{h}bb.{f}",
+        "width": 1242,
+        "height": 2688
+      }
+    }
+  }
+}

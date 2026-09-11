@@ -21,6 +21,8 @@ Reviewed revision: `ca759a3b6ab88c8c39aed13325461248436615ca` (tag 5.1.0, 2026-0
 | `screenshots-upload-mistaken-jsonapi.json` | mistaken Apple JSON:API document | not an `asc screenshots upload` envelope                                                                                | JSON:API `data`/`attributes` is not the CLI `AppScreenshotUploadResult` object                                              |
 | `metadata-push-dry-run-object.json` | `asc metadata push --dry-run --output json` | `internal/cli/metadata/execute_push.go` dry-run `PushPlanResult` plus `internal/cli/metadata/push.go` `PlanItem` / `PlanAPICall` | One high-level CLI object for the dry-run branch. Nested `adds` has two items, `updates` has two, and `deletes` has one. Empty `applied`, `actions`, `total`, `succeeded`, `failed`, `failureArtifactPath`, and `failureArtifactError` stay omitted. This is not Apple JSON:API. |
 | `metadata-push-mistaken-jsonapi.json` | mistaken Apple JSON:API document | not an `asc metadata push` envelope                                                                                   | JSON:API `data`/`attributes` is not the CLI `PushPlanResult` object                                                           |
+| `screenshots-download-object.json` | `asc screenshots download --version-localization … --output-dir … --output json` | `internal/cli/assets/assets_screenshots_download.go` `screenshotDownloadResult` / `screenshotDownloadItem` | One high-level CLI object for the successful localization-download branch. Nested `items` has one downloaded PNG. Empty `failures` stay omitted. This is not Apple JSON:API. |
+| `screenshots-download-mistaken-jsonapi.json` | mistaken Apple JSON:API document | not an `asc screenshots download` envelope                                                                              | JSON:API `data`/`attributes` is not the CLI `screenshotDownloadResult` object                                             |
 
 `reviewState` and `nextAction` for `WAITING_FOR_REVIEW` come from
 `buildReviewStatusResult` in that same file. Empty `blockers` are omitted
@@ -93,6 +95,20 @@ remote `fr` name whose locale is missing locally. Empty `applied`, `actions`,
 Omitted local fields such as remote `marketingUrl` stay no-ops, matching
 `TestMetadataPushDryRunOmittedFieldsDoNotPlanDeletes`. The live apply branch
 is not this envelope.
+
+The screenshots-download object follows `screenshotDownloadResult` after the
+`--version-localization` branch records one successful download and assigns
+`Items` / `Total` / `Downloaded` / `Failed`, matching the struct tags in
+`assets_screenshots_download.go` at 5.1.0. `versionLocalizationId` is the
+cookbook `LOC_ID` and `outputDir` is the cookbook path `./screenshots`, not a
+live capture. Nested `displayType` is `APP_IPHONE_65`. Nested `outputPath`
+joins the cleaned output directory with the display-type folder and the
+`01_<id>_<fileName>` naming from that branch. `overwrite`, `unchanged`, and
+nested `unchanged` stay encoded because those bool fields have no
+`omitempty`. Empty `failures` stay omitted because the field is
+`json:"failures,omitempty"`. Nested `url` is a synthetic example host, not a
+live Apple CDN capture. The single-id download branch and the failure branch
+are not this envelope.
 
 Ids are synthetic. They are not live App Store Connect apps, versions, or
 submissions. No host `asc` binary and no App Store Connect account were used to

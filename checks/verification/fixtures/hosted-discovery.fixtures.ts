@@ -210,6 +210,22 @@ export function register(harness: Harness): void {
     );
   });
 
+  harness.check("hosted discovery: leftover TestFlight goldens target the Apple TestFlight envelope, not generic ASC CLI", () => {
+    const corpus = loadCorpus();
+    for (const id of ["store-005", "store-047"]) {
+      const entry = corpus.entries.find((item) => item.id === id);
+      assert(entry !== undefined, `store corpus is missing ${id}`);
+      assert(
+        entry.needs.includes("workflow.store.apple-testflight-standing-envelope"),
+        `${id} must need the Apple TestFlight standing envelope after that node shipped`,
+      );
+      assert(
+        !entry.needs.includes("workflow.store.asc-cli-automation"),
+        `${id} is TestFlight distribution, not generic ASC CLI / media / metadata`,
+      );
+    }
+  });
+
   harness.check("hosted discovery: the ASC command reference reaches the workflow whose outputs it uploads", () => {
     const route = service().workflow({ workflowId: "workflow.store.store-screenshots-production" });
     const bound = route.workflow.referenceIds;

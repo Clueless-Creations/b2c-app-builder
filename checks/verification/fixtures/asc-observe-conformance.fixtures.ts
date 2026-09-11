@@ -3,7 +3,8 @@
  *
  * Reuses the observe command list, apple-asc.yaml, rork unsupported operations, and the
  * verified command cookbook (local --help, 2026-09-08). Does not live-call `asc`.
- * Screenshot upload maps to the Apple store-media standing envelope (#38). Adapter-built
+ * Screenshot upload maps to the Apple store-media standing envelope (#38). TestFlight
+ * beta distribution maps to the Apple TestFlight standing envelope. Adapter-built
  * resubmit argv is not independent evidence.
  */
 import { readFileSync } from "node:fs";
@@ -149,6 +150,14 @@ const ASC_NATIVE_MAPPING: readonly AscNativeMappingRow[] = [
     disposition: "defer",
     owner: "knowledge/store/app-store-connect-cli.md",
   },
+  {
+    nativeCapability: "asc workflow run testflight_beta",
+    canonicalOperation: "workflow.store.apple-testflight-standing-envelope",
+    semanticFit: "partial",
+    effects: "mutation",
+    disposition: "implement",
+    owner: "catalog/workflows/build-release.ts",
+  },
 ];
 
 /** Cookbook stems that are independent request-shape evidence, not adapter argv builders. */
@@ -165,6 +174,7 @@ const INDEPENDENT_COOKBOOK_STEMS = [
   "asc screenshots validate",
   "asc screenshots upload",
   "asc testflight feedback list",
+  "asc workflow run",
   "asc web agreements accept",
 ] as const;
 
@@ -203,7 +213,7 @@ export function register(harness: Harness): void {
     const implemented = ASC_NATIVE_MAPPING.filter((row) => mappingDisposition(row) === "implement");
     const deferred = ASC_NATIVE_MAPPING.filter((row) => mappingDisposition(row) === "defer");
     const rejected = ASC_NATIVE_MAPPING.filter((row) => mappingDisposition(row) === "reject");
-    assert(implemented.length === 8, `observe/remediate/media/metadata implement rows: ${implemented.length}`);
+    assert(implemented.length === 9, `observe/remediate/media/metadata/testflight implement rows: ${implemented.length}`);
     assert(
       deferred.some((row) => row.nativeCapability === "asc review submit" && row.canonicalOperation === APP_REVIEW_RESUBMIT_WORKFLOW_ID),
       "review submit maps to the existing resubmit workflow and stays deferred",
@@ -227,8 +237,17 @@ export function register(harness: Harness): void {
       "live metadata push maps to the Apple store-metadata standing envelope",
     );
     assert(
+      implemented.some(
+        (row) =>
+          row.nativeCapability === "asc workflow run testflight_beta" &&
+          row.canonicalOperation === "workflow.store.apple-testflight-standing-envelope" &&
+          row.owner === "catalog/workflows/build-release.ts",
+      ),
+      "TestFlight beta workflow maps to the Apple TestFlight standing envelope",
+    );
+    assert(
       deferred.some((row) => row.nativeCapability === "asc testflight feedback list" && row.canonicalOperation === "none"),
-      "TestFlight read stays knowledge-only",
+      "TestFlight feedback read stays knowledge-only",
     );
     for (const row of rejected) {
       assert(ALWAYS_FORBIDDEN_APP_REVIEW_COMMANDS.some((command) => command.includes(row.nativeCapability)), row.nativeCapability);
@@ -292,6 +311,20 @@ export function register(harness: Harness): void {
         "Cookbook records only the dry-run form from local --help on 2026-09-08. No live metadata-apply JSON and no live App Store Connect.",
       sample: 'asc metadata push --app "123456789" --version "1.2.3" --platform IOS --dir "./metadata" --dry-run --output table',
     });
+    const testflightBeta = provenance({
+      provider: "apple-asc",
+      transport: "cli",
+      reviewedVersion: RORK_REVIEWED_VERSION,
+      reviewedRevision: "unknown",
+      sourceSelector: COOKBOOK_SOURCE,
+      nativeOperation: "asc workflow run testflight_beta",
+      canonicalOperation: "workflow.store.apple-testflight-standing-envelope",
+      evidenceKind: "official-example",
+      establishes: ["request-shape"],
+      coverageLimits:
+        "Cookbook records only the dry-run form from local --help on 2026-09-08. No live TestFlight JSON and no live App Store Connect.",
+      sample: "asc workflow run --dry-run testflight_beta VERSION:1.2.3",
+    });
     const submit = provenance({
       provider: "apple-asc",
       transport: "cli",
@@ -321,10 +354,12 @@ export function register(harness: Harness): void {
     assert(isIndependentEvidence(observeStatus.evidenceKind), describeConformanceCoverage(observeStatus));
     assert(isIndependentEvidence(screenshotUpload.evidenceKind), describeConformanceCoverage(screenshotUpload));
     assert(isIndependentEvidence(metadataPush.evidenceKind), describeConformanceCoverage(metadataPush));
+    assert(isIndependentEvidence(testflightBeta.evidenceKind), describeConformanceCoverage(testflightBeta));
     assert(isIndependentEvidence(submit.evidenceKind), describeConformanceCoverage(submit));
     assert(isIndependentEvidence(generated.evidenceKind) === false, describeConformanceCoverage(generated));
     assert(cookbook.includes(String(observeStatus.sample)), "observe sample must be the cookbook line");
     assert(cookbook.includes(String(screenshotUpload.sample)), "screenshot upload sample must be the cookbook line");
     assert(cookbook.includes(String(metadataPush.sample)), "metadata push sample must be the cookbook dry-run line");
+    assert(cookbook.includes(String(testflightBeta.sample)), "TestFlight beta sample must be the cookbook dry-run line");
   });
 }

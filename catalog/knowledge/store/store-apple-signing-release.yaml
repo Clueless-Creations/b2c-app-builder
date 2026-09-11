@@ -8,6 +8,7 @@ lifecycle: active
 bindings:
   workflow_ids:
     - workflow.store.apple-signing-and-release-readiness
+    - workflow.store.apple-testflight-standing-envelope
     - workflow.store.app-review-remediate
     - workflow.store.app-review-resubmit
     - workflow.store.store-console-workflow

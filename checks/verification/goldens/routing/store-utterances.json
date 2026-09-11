@@ -60,7 +60,7 @@
       "shape": "terse",
       "needs": [
         "workflow.store.apple-signing-and-release-readiness",
-        "workflow.store.asc-cli-automation"
+        "workflow.store.apple-testflight-standing-envelope"
       ]
     },
     {
@@ -430,7 +430,7 @@
       "shape": "casual",
       "needs": [
         "workflow.store.apple-signing-and-release-readiness",
-        "workflow.store.asc-cli-automation"
+        "workflow.store.apple-testflight-standing-envelope"
       ]
     },
     {

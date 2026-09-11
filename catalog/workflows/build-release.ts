@@ -449,6 +449,32 @@ export const workflows = [
     idempotent: false,
   }),
   workflow({
+    id: "workflow.store.apple-testflight-standing-envelope",
+    founderPhrasings: [
+      "upload this build to TestFlight",
+      "ship the build to TestFlight testers",
+      "push this build to the approved TestFlight group",
+    ],
+    title: "Apple TestFlight standing envelope",
+    domainId: "domain.store",
+    areaIds: ["area.build-release"],
+    trigger: "A signed iOS build is proven and an exact TestFlight group standing envelope is current",
+    instructions:
+      "Assign the exact build digest only to the named TestFlight group covered by the current standing envelope. Verify app ID, build ID, group ID, tester cohort, internal versus external distribution, and test notes immediately before mutation. Use `asc testflight feedback list`, `asc testflight crashes list`, and `asc workflow run --dry-run testflight_beta` as the selected-provider cookbook forms; live group assignment and external distribution are founder-gated and the cookbook records only the dry-run and read forms. Probe `--help` before the first live call. Capture before-state and read back processing and tester availability. Write store/proof/apple-testflight-apply.json with approval ID, build digest, app ID, group ID, provider operation IDs, processing/readback state, tester cohort, and timestamps. Do not apply listing text, upload screenshots, submit for review, or change public release state.",
+    reads: ["store/APPLE_SIGNING.md", "store/STORE_CONSOLE.md", "state/business-state.json"],
+    roleId: "role.engineering-leader",
+    laneIds: ["store_console", "engineering"],
+    phaseIds: ["phase.3"],
+    dependencies: ["workflow.store.apple-signing-and-release-readiness", "workflow.store.store-console-workflow"],
+    gates: ["check:provider-proof"],
+    outputPaths: ["store/proof/apple-testflight-apply.json"],
+    providers: ["provider.app-store-connect"],
+    founderOnlyActions: ["approve TestFlight distribution when no exact standing envelope exists"],
+    actionClass: "release",
+    protectedCategory: "release",
+    idempotent: false,
+  }),
+  workflow({
     id: "workflow.store.google-play-testing-track-standing-envelope",
     founderPhrasings: [
       "roll the build out to our play store testing track",

@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.138",
+  "version": "0.219.140",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Refuse leftover CLI-only public MCP names as hosted wrong-surface.",
-    "Hosted leftover CLI-only public names fail as wrong_surface with the hosted interpretConfiguredConnection reading. Knowledge names stay on the hosted surface."
+    "Prefer the compiled architecture check once package-root resolution walks from dist.",
+    "Remaining-tsx inventory for check scripts moves from 118 to 117."
   ]
 }

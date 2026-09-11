@@ -366,6 +366,33 @@ export function register(harness: Harness): void {
       !report.includes("b2c doctor records local CLI identity only"),
       "support-report must not keep the retired doctor-only identity sentence",
     );
+    const knowledge = readFileSync(path.join(skillRoot, "knowledge/money/revenuecat-agent-tooling.md"), "utf8");
+    const generated = readFileSync(
+      path.join(skillRoot, "catalog/generated/firstparty/knowledge/money/revenuecat-agent-tooling.md"),
+      "utf8",
+    );
+    assert(
+      knowledge.includes("engine-home host observation"),
+      "knowledge source must name the inspect host observation",
+    );
+    assert(
+      knowledge.includes("`b2c doctor` is a supported equivalent"),
+      "knowledge must keep doctor supported",
+    );
+    assert(
+      !knowledge.includes("engine-home doctor snapshot"),
+      "knowledge source must not keep the retired doctor-snapshot name",
+    );
+    assert(generated === knowledge, "generated firstparty knowledge must re-render from the source");
+    const hosted = readFileSync(path.join(skillRoot, "catalog/generated/hosted-knowledge.json"), "utf8");
+    assert(
+      hosted.includes("engine-home host observation"),
+      "hosted knowledge must re-render the inspect host observation",
+    );
+    assert(
+      !hosted.includes("engine-home doctor snapshot"),
+      "hosted knowledge must not keep the retired doctor-snapshot name",
+    );
   });
 
   harness.check("revenuecat-cli-doctor: doctor adapter and hosted knowledge do not import mutating execute", () => {

@@ -91,8 +91,8 @@ simulate-purchase` is refused when that readback is App Store, Play, web
 billing, or unresolved.
 
 `b2c inspect` records the winning local `rc`/`revenuecat` identity in the
-engine-home doctor snapshot. `b2c doctor` is a supported equivalent. Status
-reprints that snapshot. It is not a live PATH probe and not live catalog proof. When a workspace selects RevenueCat,
+engine-home host observation. `b2c doctor` is a supported equivalent. Status
+reprints that observation. It is not a live PATH probe and not live catalog proof. When a workspace selects RevenueCat,
 selected-project and app checks fail closed without host authority. They do not
 spawn authenticated commands, mutate, install, log in, or refresh OAuth.
 

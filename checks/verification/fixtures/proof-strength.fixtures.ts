@@ -8,7 +8,7 @@ import {
   formatProofStrength,
   workspaceArtifactFingerprint,
 } from "../../../kernel/engine/review-evidence.js";
-import { acceptVerification, beginAttempt, reconcilePatch, seedRunState } from "../../../kernel/engine/runstate.js";
+import { acceptVerification, beginAttempt, recordRejectedVerification, reconcilePatch, seedRunState } from "../../../kernel/engine/runstate.js";
 import { laneKeys, type BusinessStateV2 } from "../../../kernel/schema/types.js";
 import { assert, type Harness } from "./_harness.js";
 
@@ -235,6 +235,69 @@ export function register(harness: Harness): void {
     assert(produced.includes("semantic=failed"), `rejected workspace review must produce semantic=failed, got ${produced}`);
     assert(produced.includes("Independent workspace review rejected"), `rejected review must say rejected, got ${produced}`);
     assert(!produced.includes("review accepted"), "a rejected review cannot be formatted as accepted");
+  });
+
+  harness.check("proof-strength: recordRejectedVerification emits semantic=failed for a workspace reject", () => {
+    const root = harness.makeTempDir("proof-strength-reject");
+    mkdirSync(path.join(root, "research"), { recursive: true });
+    writeFileSync(path.join(root, "research/brief.md"), "Workspace research brief.\n", "utf8");
+    const plan = compilePlan(strengthCatalog(), now);
+    const run = seedRunState(plan, businessState(), { ownerSessionId: "session-1", ttlSeconds: 600, wallClockCapSeconds: 3600, now });
+    const attempt = beginAttempt(plan, run, nodeId("research-scan"), "session-producer", now);
+    attempt.proofSource = "workspace";
+    reconcilePatch(
+      plan,
+      run,
+      {
+        nodeId: nodeId("research-scan"),
+        attemptId: attempt.id,
+        outputs: [
+          {
+            artifactId: "artifact.research-brief",
+            path: "research/brief.md",
+            fingerprint: workspaceArtifactFingerprint(root, "research/brief.md"),
+            evidence: ["workspace bytes produced"],
+          },
+        ],
+      },
+      now,
+    );
+    const snapshot = captureReviewEvidence(plan, run, nodeId("research-scan"), root, "session-reviewer", now);
+    recordRejectedVerification(plan, run, nodeId("research-scan"), ["fresh-context reviewer rejected the claim"], now, snapshot);
+    const produced = attempt.independentVerification?.evidence.find((line) => line.startsWith("Proof strength:"));
+    assert(attempt.independentVerification?.verdict === "rejected", "reject must keep the rejected verdict");
+    assert(
+      Boolean(produced?.includes("semantic=failed") && produced.includes("Independent workspace review rejected")),
+      `live workspace reject must emit semantic=failed, got ${produced ?? "none"}`,
+    );
+    assert(!produced?.includes("review accepted"), "a rejected review cannot be formatted as accepted");
+    assert(run.nodes[nodeId("research-scan")]!.status !== "succeeded", "reject must not promote the node");
+    assert(
+      run.artifactBindings.every((binding) => !binding.accepted),
+      "reject must not accept artifacts",
+    );
+  });
+
+  harness.check("proof-strength: recordRejectedVerification still emits a line for graph and synthetic reject", () => {
+    const { plan, run, attempt } = blockedResearchScan();
+    const graphReceipt = captureReviewEvidence(plan, run, nodeId("research-scan"), "", "session-reviewer", now, "graph");
+    recordRejectedVerification(plan, run, nodeId("research-scan"), ["fresh-context reviewer rejected the claim"], now, graphReceipt);
+    const graphLine = attempt.independentVerification?.evidence.find((line) => line.startsWith("Proof strength:"));
+    assert(
+      Boolean(graphLine?.includes("semantic=unknown") && graphLine.includes("Graph review is not workspace semantic proof")),
+      `graph reject must emit a strength line without workspace semantic proof, got ${graphLine ?? "none"}`,
+    );
+    assert(!graphLine?.includes("semantic=failed"), "graph reject cannot become workspace semantic=failed");
+
+    attempt.proofSource = "synthetic";
+    const syntheticReceipt = captureReviewEvidence(plan, run, nodeId("research-scan"), "", "session-reviewer", now, "synthetic");
+    recordRejectedVerification(plan, run, nodeId("research-scan"), ["fixture verifier rejected the claim"], now, syntheticReceipt);
+    const syntheticLine = attempt.independentVerification?.evidence.find((line) => line.startsWith("Proof strength:"));
+    assert(
+      Boolean(syntheticLine?.includes("semantic=unknown") && syntheticLine.includes("Synthetic review is not workspace semantic proof")),
+      `synthetic reject must emit a strength line without workspace semantic proof, got ${syntheticLine ?? "none"}`,
+    );
+    assert(!syntheticLine?.includes("semantic=failed"), "synthetic reject cannot become workspace semantic=failed");
   });
 
   harness.check("proof-strength: synthetic accept does not reuse the packet no-review sentence", () => {

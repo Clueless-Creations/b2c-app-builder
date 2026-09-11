@@ -522,6 +522,21 @@ export function reconcilePatch(plan: CompiledPlan, run: RunStateDocument, patch:
   }
 }
 
+function bindProofStrength(
+  attempt: AttemptRecordV2,
+  receipt: IndependentVerificationReceipt,
+  evidence: string[],
+  now: string,
+  verdict: "accepted" | "rejected",
+  structural: "checked" | "failed",
+): string {
+  const stored = { ...structuredClone(receipt), verdict, checkedAt: now, evidence: [...evidence] };
+  const line = formatProofStrength(composeProofStrength({ structural, review: stored, attempt }));
+  stored.evidence = [...stored.evidence, line];
+  attempt.independentVerification = stored;
+  return line;
+}
+
 /** Producer never verifies its own work (R15): a separate acceptance step promotes a reconciled-but-blocked node to succeeded. */
 export function acceptVerification(
   plan: CompiledPlan,
@@ -552,11 +567,7 @@ export function acceptVerification(
       reviewReceipt ?? captureReviewEvidence(plan, run, nodeId, "", verifiedBySessionId!, now, attempt.proofSource === "synthetic" ? "synthetic" : "graph");
     const issues = [...classifyProofStrengthIssues(evidence, attempt, receipt.mode), ...validateReviewReceipt(plan, run, nodeId, receipt, workspaceRoot)];
     if (issues.length) throw new Error(`Independent review does not match current work: ${issues.join(", ")}`);
-    const stored = { ...structuredClone(receipt), verdict: "accepted" as const, checkedAt: now, evidence: [...evidence] };
-    const produced = formatProofStrength(composeProofStrength({ structural: "checked", review: stored, attempt }));
-    stored.evidence = [...stored.evidence, produced];
-    attempt.independentVerification = stored;
-    evidence = [...evidence, produced];
+    evidence = [...evidence, bindProofStrength(attempt, receipt, evidence, now, "accepted", "checked")];
   }
   if (attempt.workOrderOccurrenceId) {
     const proof = recordWorkOrderProof(run, attempt.workOrderOccurrenceId, evidence, now);
@@ -577,6 +588,30 @@ export function acceptVerification(
   if (verifiedBySessionId) state.verifiedBySessionId = verifiedBySessionId;
   state.repairInstructions = undefined;
   run.updatedAt = now;
+}
+
+/**
+ * Record a rejected independent review with the same proof-strength line acceptance stores.
+ * This does not promote the node, accept artifacts, or choose repair targets.
+ */
+export function recordRejectedVerification(
+  plan: CompiledPlan,
+  run: RunStateDocument,
+  nodeId: RunNodeId,
+  evidence: string[],
+  now: string,
+  reviewReceipt: IndependentVerificationReceipt,
+  structural: "checked" | "failed" = "checked",
+): string {
+  const node = plan.nodes.find((candidate) => candidate.id === nodeId);
+  const state = run.nodes[nodeId];
+  const attempt = state?.attempts.at(-1);
+  if (!node || !state || !attempt) throw new Error(`No attempt to verify for ${nodeId}`);
+  if (!evidence.some((entry) => entry.trim().length > 0)) throw new Error(`Verification for ${nodeId} requires evidence`);
+  const line = bindProofStrength(attempt, reviewReceipt, evidence, now, "rejected", structural);
+  attempt.evidence.push(...evidence, line);
+  run.updatedAt = now;
+  return line;
 }
 
 /** Changed artifacts or rubrics reopen accepted work before it can satisfy another dependency. */

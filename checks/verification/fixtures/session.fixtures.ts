@@ -2956,13 +2956,26 @@ main().catch((error) => { console.error(String(error)); process.exit(1); });
         assert(attempt.deterministicVerification?.passed === true, "passing mechanical gates must be retained");
       }
       if (scenario.accepted) assert(state.verifiedBySessionId === `${producer}.verifier`, "acceptance must identify the independent reviewer, not gate runner");
-      if (scenario.name === "rejected")
+      if (scenario.name === "rejected") {
         assert(state.blocker?.includes("repair attempts exhausted"), "repeated rejection must end incomplete after bounded repair");
+        assert(
+          state.attempts.some(
+            (entry) =>
+              entry.independentVerification?.verdict === "rejected" &&
+              Boolean(entry.independentVerification.evidence.find((line) => line.startsWith("Proof strength:"))),
+          ),
+          "a live session reject must store a proof-strength line on the rejected receipt",
+        );
+      }
       if (scenario.name === "repaired") {
         assert(state.attempts.length === 2, "one mandate must run the initial producer and its repair");
         assert(
           state.attempts[0]!.independentVerification?.verdict === "rejected" && state.attempts[1]!.independentVerification?.verdict === "accepted",
           "durable receipts must retain rejection and acceptance",
+        );
+        assert(
+          Boolean(state.attempts[0]!.independentVerification?.evidence.find((line) => line.startsWith("Proof strength:"))),
+          "the rejected attempt must carry a proof-strength line before the later accept",
         );
         assert(
           state.attempts.every((entry) => entry.proofSource === "synthetic"),

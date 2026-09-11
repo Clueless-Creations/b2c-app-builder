@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.123",
+  "version": "0.219.124",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Print inspect: healthy or inspect: N error(s) from the shared findings footer.",
-    "Keep b2c doctor as a supported equivalent and leave doctor.* finding codes unchanged."
+    "Record worker-runtime health separately from declared local_cli support.",
+    "Degrade execution when a worker CLI is missing while planning and packaged knowledge stay available."
   ]
 }

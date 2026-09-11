@@ -19,10 +19,10 @@
  * the skill's own shipped reference business — the same target an unmodified `npm run check:<name>`
  * gives a maintainer.
  *
- * Packed omit-dev prefers `dist/` for `check:credits` (`tooling/render-credits.ts`),
- * `check:hosted-bundle` (`tooling/render-hosted-bundle.ts`), and `check:public-api`
- * (`tooling/render-public-api.ts`). Every other `check:*` stays on the remaining-tsx
- * inventory — the uncompiled `checks/` graph.
+ * Packed omit-dev prefers `dist/` for `check:catalog` (`checks/validation/repository/check-catalog.ts`),
+ * `check:credits` (`tooling/render-credits.ts`), `check:hosted-bundle` (`tooling/render-hosted-bundle.ts`),
+ * and `check:public-api` (`tooling/render-public-api.ts`). Every other `check:*` stays on the
+ * remaining-tsx inventory — the rest of the uncompiled `checks/` graph.
  *
  * A child gate inherits this process's environment and the target workspace's content, so its raw
  * stdout/stderr must never be forwarded into a retained `--json` result — it may carry credentials,

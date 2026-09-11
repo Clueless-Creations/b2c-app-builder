@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { composeCatalog } from "../../../catalog/index.js";
 import { operators } from "../../../catalog/operators.js";
 import { validateCatalog } from "../../../catalog/validate.js";
@@ -10,6 +9,7 @@ import { domains } from "../../../catalog/domains.js";
 import { workflows } from "../../../catalog/workflows/index.js";
 import { contextPacks } from "../../../catalog/context-packs.js";
 import { loadPinnedKnowledgeFreshnessNow } from "../../../tooling/lib/knowledge-freshness-pin.js";
+import { resolveSkillRoot } from "../../../tooling/lib/skill-root.js";
 import { validateDefinitionOverlays } from "../../../catalog/overlays.js";
 
 /**
@@ -22,9 +22,11 @@ import { validateDefinitionOverlays } from "../../../catalog/overlays.js";
  * v2 definition-graph-as-data tree (R20) and intentionally sits outside that split as authored
  * data plus its own directly-runnable validator/renderer, so this wrapper is the seam between
  * the two conventions rather than a reason to fold all of catalog/ into SCRIPT_ROOTS.
+ *
+ * Default skill root walks from this file so packed omit-dev can launch the compiled twin
+ * under `dist/checks/validation/repository/` without treating `dist/` as the package root.
  */
-const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-const defaultSkillRoot = path.resolve(scriptDir, "../../..");
+const defaultSkillRoot = resolveSkillRoot(import.meta.url);
 const { skillRoot, sourceSnapshot } = parseArgs(process.argv.slice(2));
 const catalog = composeCatalog(skillRoot);
 const knowledgeNow = loadPinnedKnowledgeFreshnessNow(skillRoot, sourceSnapshot);

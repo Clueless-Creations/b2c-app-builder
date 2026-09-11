@@ -10,7 +10,15 @@
     "resolveJsonModule": true,
     "types": ["node"]
   },
-  "include": ["tooling/**/*.ts", "kernel/**/*.ts", "contracts/**/*.ts", "adapters/**/*.ts", "entrypoints/**/*.ts", "catalog/**/*.ts"],
+  "include": [
+    "tooling/**/*.ts",
+    "kernel/**/*.ts",
+    "contracts/**/*.ts",
+    "adapters/**/*.ts",
+    "entrypoints/**/*.ts",
+    "catalog/**/*.ts",
+    "checks/validation/repository/check-catalog.ts"
+  ],
   "exclude": [
     "catalog/generated/firstparty/**",
     "catalog/stacks/expo-starter-fixture/modules/b2c-native-capability/src/index.ts",
@@ -19,7 +27,6 @@
     "surfaces/**",
     "examples/**",
     "node_modules/**",
-    "dist/**",
-    "checks/**"
+    "dist/**"
   ]
 }

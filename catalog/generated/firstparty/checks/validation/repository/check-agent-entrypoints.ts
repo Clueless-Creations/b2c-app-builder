@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /**
  * check-agent-entrypoints — the three-scope routing and thin-adapter contract for agent-facing
  * files (ADR-0007).
@@ -16,16 +17,18 @@
  * This is a repository-only check. An installed skill does not contain the root adapters or
  * agents/skills/, so the runtime audit must not run it.
  *
+ * Default repo root walks from this file so packed omit-dev can launch the compiled twin
+ * under `dist/checks/validation/repository/` without treating `dist/` as the package root.
+ *
  * npm script: check:agent-entrypoints
  * Usage: tsx checks/validation/repository/check-agent-entrypoints.ts --repo-root /path/to/repo
  */
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { flagString, issue, parseFlags, reportAndExit, type Issue } from "../../../tooling/lib/launch-state.js";
+import { resolveSkillRoot } from "../../../tooling/lib/skill-root.js";
 
-const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-const defaultRepoRoot = path.resolve(scriptDir, "../../..");
+const defaultRepoRoot = resolveSkillRoot(import.meta.url);
 
 const flags = parseFlags(process.argv.slice(2), [{ flags: ["--repo-root"], key: "repoRoot" }]);
 const repoRoot = flagString(flags, "repoRoot") ?? defaultRepoRoot;

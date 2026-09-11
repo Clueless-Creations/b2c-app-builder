@@ -958,8 +958,8 @@ resources:
     path: checks/validation/business/store/check-store-screenshots.ts
     kind: gate
     mediaType: text/plain
-  - id: b2c/resource-8b361795a71bed9b00cba62a64727cf9b7f97c6985a742890a4a6609d9a9d484
-    path: tooling/render-task-skills.ts
+  - id: b2c/resource-a6169c1d28ed3bd4dfdcda1193c9f96394c44c9b878ce9849e210d351d239c0a
+    path: checks/validation/repository/check-task-skills.ts
     kind: gate
     mediaType: text/plain
   - id: b2c/resource-95c9160c5db97e45ee675963ca962c9a992bc63cb9066e58b9212624adc44922
@@ -1008,6 +1008,10 @@ resources:
     mediaType: text/plain
   - id: b2c/resource-9f3f33e355281aa6a81f456067572756dca66e96947c9292165d5397463f9228
     path: tooling/render-product.ts
+    kind: gate
+    mediaType: text/plain
+  - id: b2c/resource-8b361795a71bed9b00cba62a64727cf9b7f97c6985a742890a4a6609d9a9d484
+    path: tooling/render-task-skills.ts
     kind: gate
     mediaType: text/plain
   - id: b2c/resource-3f3ea04135c2049a7d32637154e39a74c3b7cd2f26b891c527d3abb3fc990837

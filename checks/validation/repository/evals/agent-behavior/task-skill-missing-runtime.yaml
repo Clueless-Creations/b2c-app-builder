@@ -1,0 +1,17 @@
+id: task-skill-missing-runtime
+title: Missing execution tooling does not block advisory expertise
+prompt: Evaluate this consumer app idea. I do not have the B2C CLI installed, and I am not asking you to install anything.
+expected_route: Use b2c-research-opportunity with available authorized evidence. Do not require setup or claim unavailable provider
+  evidence.
+must_use:
+- b2c-research-opportunity
+- research
+must_catch:
+- do not install software
+- unavailable evidence stays unverified
+should_say:
+- opportunity
+- evidence
+forbidden:
+- install the CLI before I can evaluate
+- I installed the runtime

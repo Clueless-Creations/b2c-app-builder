@@ -19,12 +19,18 @@
  * the skill's own shipped reference business — the same target an unmodified `npm run check:<name>`
  * gives a maintainer.
  *
- * Packed omit-dev prefers `dist/` for `check:catalog` (`checks/validation/repository/check-catalog.ts`),
+ * Packed omit-dev prefers `dist/` for `check:agent-entrypoints` (`checks/validation/repository/check-agent-entrypoints.ts`),
+ * `check:architecture` (`checks/validation/repository/check-architecture.ts`),
+ * `check:autopilot` (`checks/validation/repository/check-autopilot-contract.ts`),
+ * `check:catalog` (`checks/validation/repository/check-catalog.ts`),
  * `check:gates-layout` (`checks/validation/repository/check-gates-layout.ts`),
  * `check:graph-foundations` (`checks/validation/repository/check-graph-foundations.ts`),
  * `check:hub-spoke` (`checks/validation/repository/check-hub-spoke.ts`),
  * `check:learning-grounding` (`checks/validation/repository/check-learning-grounding.ts`),
  * `check:operating-graph` (`checks/validation/repository/check-operating-graph.ts`),
+ * `check:pack-composition` (`checks/validation/repository/check-pack-composition.ts`),
+ * `check:package-parity` (`checks/validation/repository/check-package-parity.ts`),
+ * `check:validator-docs` (`checks/validation/repository/check-validator-docs.ts`),
  * `check:credits` (`tooling/render-credits.ts`), `check:hosted-bundle` (`tooling/render-hosted-bundle.ts`),
  * and `check:public-api` (`tooling/render-public-api.ts`). Every other `check:*` stays on the
  * remaining-tsx inventory — the rest of the uncompiled `checks/` graph.

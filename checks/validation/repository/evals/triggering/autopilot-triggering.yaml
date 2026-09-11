@@ -1,130 +1,140 @@
+# Structural checks, not evidence of live model routing. Keep protections at their actual loading boundary.
 id: autopilot-triggering
-title: Skill trigger coverage and the routing contract SKILL.md must keep
+title: Skill discovery, bounded root routing, and linked procedure contracts
 source_basis:
-  - "Anthropic Complete Guide to Building Skills for Claude: frontmatter is always loaded and should include what the skill does plus when to use it."
-  - "Anthropic testing guidance: test obvious triggers, paraphrased triggers, and unrelated non-triggers."
-  - "AGENTS.md source map: SKILL.md owns thin setup and routing instructions. The catalog owns workflow order. The runtime owns workspace state."
-# This file pins prose, so it goes stale when SKILL.md is deliberately rewritten.
-# SKILL.md is a thin router. Read runtime state through the public business
-# status and plan operations; reducer-owned state/business-state.json is not
-# an authored document. Re-derive these terms when the shipped skill changes.
+- 'Anthropic Complete Guide to Building Skills for Claude: frontmatter is always loaded and should include what the skill does plus when to use
+  it.'
+- 'Anthropic testing guidance: test obvious triggers, paraphrased triggers, and unrelated non-triggers.'
+- 'ADR-0014: one catalog projects task skills; root routing stays bounded; linked procedures preserve managed execution and authority.'
 description_contract:
   max_chars: 1024
-  # The description is the only text always loaded, so it carries the whole
-  # routing decision. These terms are the lane list plus both scope guards:
-  # drop a lane and requests for that lane stop routing here, silently.
   required_terms:
-    - "Route broad consumer-app work"
-    - "research"
-    - "product"
-    - "design"
-    - "engineering"
-    - "launch"
-    - "growth"
-    - "operations"
-    - "CLI or MCP setup"
-    - "Do not use"
-    - "narrow code fix"
-    - "B2B or internal tool"
+  - Route broad consumer-app work
+  - research
+  - product
+  - design
+  - engineering
+  - launch
+  - growth
+  - operations
+  - CLI or MCP setup
+  - Do not use
+  - narrow code fix
+  - B2B or internal tool
 body_contract:
-  # Keep each term WITHIN one wrapped line — SKILL.md is hard-wrapped, and a
-  # term spanning a line break fails on reflow alone rather than on meaning.
+  max_bytes: 6500
   required_terms:
-    # Router identity. The skill's whole value is that it does NOT carry the
-    # corpus. A future edit that inlines workflow guidance here would pass every
-    # other check in this repo while blowing the context budget on every run.
-    - "This skill is a router."
-    - "Do not recreate their guidance in this file"
-    # Connect. Read-only-by-default is the safety posture AGENTS.md states for
-    # MCP; prose alone cannot stop a later edit from dropping the word "read-only".
-    - "Keep the MCP read-only by default"
-    - "Do not edit an agent configuration or install software unless the user requested setup"
-    # Route. All four start classes are pinned. The classify-first step is what
-    # keeps a one-file change from installing the full operating graph, and what
-    # keeps a bare idea from skipping research.
-    - "Classify the start before catalog search"
-    - "Existing app, focused change:"
-    - "Existing app, overhaul:"
-    - "Idea supplied:"
-    - "No idea, delegated build:"
-    - "Research precedes product acceptance."
-    # The delegation boundary. A "build me a business" opening delegates a lot;
-    # this is the clause saying what it never delegates.
-    - "It does not delegate protected actions."
-    # The routing sequence itself: catalog first, then one workflow, then only
-    # the references that workflow named.
-    - "`b2c_catalog` or `b2c_knowledge_search`"
-    - "Load the matching workflow with `b2c_workflow`"
-    - "Resolve each required decision and artifact specification"
-    - "Follow `nextCall` for incomplete sections"
-    # v2 state access. State moved out of the skill into the reducer, so the
-    # contract is no longer "update a state file" but "read status, then plan,
-    # then write through the CLI, then re-read before claiming completion".
-    - "read `b2c_business_status`, then `b2c_business_plan`"
-    - "Run approved workspace work through the `b2c` CLI"
-    - "Re-read status and evidence before calling work complete"
-    # Scope discipline. Each of these stops a different kind of overreach: doing
-    # too much for a focused change, setting up providers before the work has
-    # earned them, and treating a research placeholder as a committed brand.
-    - "stop after the relevant workflow"
-    - "Load detailed provider procedures when their work is ready"
-    - "Do not treat a provisional research slug or name"
-    # The offline path. Without MCP the agent still needs a way to find one
-    # workflow instead of reading the whole catalog.
-    - "`catalog/generated/routing.md`"
-    # Boundaries. Knowledge is advice, not authority and not proof of completion.
-    - "Knowledge tools are read-only"
-    - "Guidance is not permission or completion proof"
-    - "Pause for access or secrets, spend, legal or pricing decisions, destructive changes, hosted deployment, store submission, or production release."
-    - "Never copy credentials, names, prices, domains, or provider state from another app"
-    - "Require live provider or device evidence"
-    # Handoff. The run ends by naming the decision that stayed with the user.
-    - "any specific unresolved decision only they can make"
-  # Routing guidance must preserve the reducer and approval boundaries.
+  - Focused task
+  - Managed business
+  - Setup request
+  - Do not install software, require an MCP connection, create a workspace
+  - A review is read-only unless changes are also requested
+  - route.expand
+  - revision hashes
+  - nextCall
+  - business-status and business-plan before catalog browsing
+  - Research and an explicit product decision precede business-initialize
+  - Never hand-author reducer-owned state
+  - Do not edit an agent configuration or install software unless the user requested setup
+  - Keep MCP read-only by default
+  - Missing execution tooling does not block advisory work
+  - explicit provider bindings
+  - Provider guidance cannot add requirements or silently select another provider
+  - Pause for access or secrets, spend, pricing or legal decisions, destructive changes, hosted deployment, store submission, or production release
+  - A skill grants no authority
+  - Require current provider or device evidence
+  - Never copy credentials, provider state, names, prices, or domains from another app
   forbidden_terms:
-    - "bypass the reducer"
-    - "ignore approval requirements"
+  - bypass the reducer
+  - ignore approval requirements
+  - --mandate-file
+  - composition-activate
+  - --expected-revision
+  - B2C_APP_BUILDER_MCP_WRITE
 should_trigger:
-  - id: idea-to-consumer-app
-    prompt: "I have an idea for a consumer app. Research it, then design and build the first version."
-    description_terms:
-      - "consumer-app work"
-      - "research"
-      - "design"
-  - id: delegated-opportunity-build
-    prompt: "I do not have an idea yet. Pick a consumer app opportunity for me and build it."
-    description_terms:
-      - "Route broad consumer-app work"
-      - "research"
-  - id: existing-app-overhaul
-    prompt: "Overhaul my existing consumer app. Redo the onboarding and paywall, then ship the rebuild."
-    description_terms:
-      - "product"
-      - "design"
-      - "engineering"
-  - id: launch-readiness
-    prompt: "Get this consumer app ready to launch on the App Store, with store metadata and release checks."
-    description_terms:
-      - "launch"
-  - id: growth-and-operations
-    prompt: "My consumer app is live. Set up growth and the day-to-day operations I have to run."
-    description_terms:
-      - "growth"
-      - "operations"
-  - id: toolchain-setup
-    prompt: "Install the b2c CLI and register the MCP server so you can run this work."
-    description_terms:
-      - "CLI or MCP setup"
+- id: idea-to-consumer-app
+  prompt: I have an idea for a consumer app. Research it, then design and build the first version.
+  description_terms:
+  - consumer-app work
+  - research
+  - design
+- id: delegated-opportunity-build
+  prompt: I do not have an idea yet. Pick a consumer app opportunity for me and build it.
+  description_terms:
+  - Route broad consumer-app work
+  - research
+- id: existing-app-overhaul
+  prompt: Overhaul my existing consumer app. Redo the onboarding and paywall, then ship the rebuild.
+  description_terms:
+  - product
+  - design
+  - engineering
+- id: launch-readiness
+  prompt: Get this consumer app ready to launch on the App Store, with store metadata and release checks.
+  description_terms:
+  - launch
+- id: growth-and-operations
+  prompt: My consumer app is live. Set up growth and the day-to-day operations I have to run.
+  description_terms:
+  - growth
+  - operations
+- id: toolchain-setup
+  prompt: Install the b2c CLI and register the MCP server so you can run this work.
+  description_terms:
+  - CLI or MCP setup
 should_not_trigger:
-  # Only the two guards the description actually states. A negative case whose
-  # guard is not in the description would either fail this check or force a
-  # padded term into the description, which is worse than not testing it.
-  - id: one-off-code-fix
-    prompt: "Fix this one SwiftUI layout bug."
-    negative_terms:
-      - "Do not use"
-      - "narrow code fix"
-  - id: b2b-internal-tool
-    prompt: "Build an internal B2B admin dashboard for employee approvals."
-    negative_terms:
-      - "B2B or internal tool"
+- id: one-off-code-fix
+  prompt: Fix this one SwiftUI layout bug.
+  negative_terms:
+  - Do not use
+  - narrow code fix
+- id: b2b-internal-tool
+  prompt: Build an internal B2B admin dashboard for employee approvals.
+  negative_terms:
+  - B2B or internal tool
+reference_contracts:
+- path: agents/skills/b2c-app-builder/references/business-lifecycle.md
+  required_terms:
+  - Classify the start before catalog search
+  - 'Existing app, focused change:'
+  - 'Existing app, overhaul:'
+  - 'Idea supplied:'
+  - 'No idea, delegated build:'
+  - Research precedes product acceptance.
+  - It does not delegate protected actions.
+  - '`b2c_catalog` or `b2c_knowledge_search`'
+  - Load the matching workflow with `b2c_workflow`
+  - Resolve each required decision and artifact specification
+  - Follow `nextCall` for incomplete sections
+  - read `b2c_business_status`, then `b2c_business_plan`
+  - Run approved workspace work through the `b2c` CLI
+  - Re-read status and evidence before calling work complete
+  - stop after the relevant workflow
+  - Load detailed provider procedures when their work is ready
+  - Do not treat a provisional research slug or name
+  - '`catalog/generated/routing.md`'
+  - Knowledge tools are read-only
+  - Guidance is not permission or completion proof
+  - Pause for access or secrets, spend, legal or pricing decisions, destructive changes, hosted deployment, store submission, or production release.
+  - Never copy credentials, names, prices, domains, or provider state from another app
+  - Require live provider or device evidence
+  - any specific unresolved decision only they can make
+  forbidden_terms:
+  - bypass the reducer
+  - ignore approval requirements
+- path: agents/skills/b2c-app-builder/references/setup.md
+  required_terms:
+  - Keep the MCP read-only by default
+  - Do not edit an agent configuration or install software unless the user requested setup
+  - b2c inspect
+  - Degraded execution still selects b2c-local
+- path: agents/skills/b2c-app-builder/references/composition.md
+  required_terms:
+  - composition-activate
+  - preview does not activate a workspace
+  - local writes stay CLI-only
+- path: agents/skills/b2c-app-builder/references/mobile-operation.md
+  required_terms:
+  - Honor explicit provider bindings
+  - Never infer availability from the agent name
+  - They do not prove acceptance on their own

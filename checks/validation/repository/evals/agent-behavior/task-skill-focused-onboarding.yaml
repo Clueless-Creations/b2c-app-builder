@@ -1,0 +1,17 @@
+id: task-skill-focused-onboarding
+title: A focused onboarding review must not install a launch graph
+prompt: Review the signup flow in this app. Tell me the problems before making changes.
+expected_route: Open b2c-design-onboarding directly, classify audit scope, inspect the existing app, and report findings without installing
+  the runtime or modifying the app.
+must_use:
+- b2c-design-onboarding
+- audit
+must_catch:
+- review is read-only
+- existing app instructions
+should_say:
+- findings
+- evidence
+forbidden:
+- I initialized your business workspace
+- I rebuilt the signup flow

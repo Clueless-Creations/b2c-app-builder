@@ -38,10 +38,13 @@ adjacency reference is returned as fenced Markdown with separate source and cont
 
 This service does not run the engine remotely. It cannot access local files, business state,
 approvals, schedules, provider credentials, or execution commands. Those workspace
-operations remain local. A local workspace planning or execution tool name fails as
-`wrong_surface` with the hosted connection receipt reading; it is not a missing knowledge
-tool. The local and hosted MCP servers use the same knowledge
-implementation.
+operations remain local. A local-only MCP name fails as `wrong_surface` with the hosted
+connection receipt reading; it is not a missing knowledge tool. That includes workspace
+planning and execution, public discovery, composition preview, market reports, leftover
+contributor names, and leftover CLI-only public names. Leftover CLI-only public names stay
+hosted `wrong_surface`. On the local MCP they fail as `cli_only` with the local receipt
+reading, not as hosted `wrong_surface`. The local
+and hosted MCP servers use the same knowledge implementation.
 If the local knowledge bundle is missing or invalid, the local MCP keeps its execution
 tools available. It omits the four knowledge tools and emits a fixed recovery warning.
 
@@ -59,7 +62,9 @@ The authorization page asks for an entitled API key and explicit read permission
 receives an OAuth token, not an entitled API key. Keep the local `b2c-local` entry if you use local
 execution. When both are configured, this hosted connection is knowledge-only and `b2c-local` is the
 workspace surface. A leftover `b2c-app-builder` client name is not this hosted connection. Duplicate
-names are a collision, not a third surface. Configure other
+names are a collision, not a third surface. A missing local worker CLI is local execution health, not
+this hosted wrong-surface. Surface selection still uses `b2c-local`;
+degraded execution still selects `b2c-local`. Configure other
 clients with the same remote URL and OAuth authorization.
 
 ChatGPT can use dynamic client registration. The default HTTPS callback is its documented

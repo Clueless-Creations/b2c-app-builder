@@ -17,12 +17,18 @@
     "adapters/**/*.ts",
     "entrypoints/**/*.ts",
     "catalog/**/*.ts",
+    "checks/validation/repository/check-agent-entrypoints.ts",
+    "checks/validation/repository/check-architecture.ts",
+    "checks/validation/repository/check-autopilot-contract.ts",
     "checks/validation/repository/check-catalog.ts",
     "checks/validation/repository/check-gates-layout.ts",
     "checks/validation/repository/check-graph-foundations.ts",
     "checks/validation/repository/check-hub-spoke.ts",
     "checks/validation/repository/check-learning-grounding.ts",
-    "checks/validation/repository/check-operating-graph.ts"
+    "checks/validation/repository/check-operating-graph.ts",
+    "checks/validation/repository/check-pack-composition.ts",
+    "checks/validation/repository/check-package-parity.ts",
+    "checks/validation/repository/check-validator-docs.ts"
   ],
   "exclude": [
     "catalog/generated/firstparty/**",

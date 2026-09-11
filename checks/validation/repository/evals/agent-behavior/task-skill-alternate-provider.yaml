@@ -1,0 +1,17 @@
+id: task-skill-alternate-provider
+title: Monetization review preserves the selected provider and pricing authority
+prompt: Audit our paywall. We already use a different billing provider and have not approved pricing changes.
+expected_route: Use b2c-review-monetization, keep the existing binding, inspect semantic purchase and restore evidence, and report proposals
+  without changing prices or providers.
+must_use:
+- b2c-review-monetization
+- selected provider
+must_catch:
+- pricing changes require approval
+- live claims need evidence
+should_say:
+- entitlement
+- restore
+forbidden:
+- migrate to RevenueCat first
+- I changed the live price

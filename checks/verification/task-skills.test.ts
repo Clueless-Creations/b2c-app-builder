@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -143,6 +144,52 @@ void test("export refuses unknown skills, escaping resources, and symlinked dest
     assert.equal(readFileSync(sentinel, "utf8"), "unchanged");
     symlinkSync(temporary, path.join(temporary, "alias"));
     assert.throws(() => writeTaskSkillPackage(path.join(temporary, "alias"), name, { files: {}, sourcePaths: [], supplementalLinks: [] }), /symlinks/);
+  } finally {
+    rmSync(temporary, { recursive: true, force: true });
+  }
+});
+
+void test("moving procedures preserves authority and fails on missing, unlinked, or oversized guidance", () => {
+  const temporary = mkdtempSync(path.join(os.tmpdir(), "b2c-routing-contract-"));
+  const procedure = "agents/skills/b2c-app-builder/references/business-lifecycle.md";
+  const fixture = "checks/validation/repository/evals/triggering/autopilot-triggering.yaml";
+  const original = readFileSync(path.join(root, "SKILL.md"), "utf8");
+  const run = () =>
+    spawnSync(process.execPath, ["--import", "tsx", path.join(root, "checks/validation/repository/check-autopilot-contract.ts"), "--skill-root", temporary], {
+      cwd: root,
+      encoding: "utf8",
+      timeout: 30_000,
+    });
+  try {
+    mkdirSync(path.dirname(path.join(temporary, fixture)), { recursive: true });
+    cpSync(path.join(root, fixture), path.join(temporary, fixture));
+    cpSync(path.join(root, "agents/skills/b2c-app-builder/references"), path.join(temporary, "agents/skills/b2c-app-builder/references"), { recursive: true });
+    writeFileSync(path.join(temporary, "SKILL.md"), original);
+    assert.equal(run().status, 0, "the complete linked contract must pass");
+    const content = readFileSync(path.join(temporary, procedure), "utf8");
+    rmSync(path.join(temporary, procedure));
+    let result = run();
+    assert.equal(result.status, 1);
+    assert.match(result.stdout, /autopilot.reference.missing/);
+    writeFileSync(path.join(temporary, procedure), content.replace("It does not delegate protected actions.", ""));
+    result = run();
+    assert.equal(result.status, 1);
+    assert.match(result.stdout, /autopilot.reference.required_term_missing/);
+    writeFileSync(path.join(temporary, procedure), content);
+    writeFileSync(path.join(temporary, "SKILL.md"), original.replace(`](${procedure})`, "](missing.md)"));
+    result = run();
+    assert.equal(result.status, 1);
+    assert.match(result.stdout, /autopilot.reference.unlinked/);
+    writeFileSync(path.join(temporary, "SKILL.md"), original + "x".repeat(6500));
+    result = run();
+    assert.equal(result.status, 1);
+    assert.match(result.stdout, /autopilot.body.context_budget/);
+    writeFileSync(path.join(temporary, "SKILL.md"), original);
+    rmSync(path.join(temporary, procedure));
+    symlinkSync(path.join(root, procedure), path.join(temporary, procedure));
+    result = run();
+    assert.equal(result.status, 1);
+    assert.match(result.stdout, /autopilot.reference.missing/);
   } finally {
     rmSync(temporary, { recursive: true, force: true });
   }

@@ -173,6 +173,47 @@ export function register(harness: Harness): void {
     assert(result.liveEasProven === false, "trusted local identity is not live EAS proof");
   });
 
+  harness.check("expo-eas-doctor: finding messages prefer inspect as the diagnostic actor", () => {
+    const source = readFileSync(path.join(skillRoot, "adapters/providers/expo/doctor.ts"), "utf8");
+    const missing = assessExpoEasHostDoctor({
+      discovery: discovery("missing", "eas"),
+      latestObserved: DOCUMENTED,
+      sanitizePath: (executablePath) => executablePath,
+    });
+    const unrelated = assessExpoEasHostDoctor({
+      discovery: discovery("unrelated-executable", "eas", "/usr/bin/eas", "1.2.3"),
+      latestObserved: DOCUMENTED,
+      sanitizePath: (executablePath) => executablePath,
+    });
+    const trusted = assessExpoEasHostDoctor({
+      discovery: identity("/opt/fake/bin/eas", DOCUMENTED, ["/usr/local/bin/eas"]),
+      latestObserved: DOCUMENTED,
+      sanitizePath: (executablePath) => executablePath,
+    });
+    const trustedFinding = trusted.findings.find((item) => item.code === "doctor.eas_cli");
+    const shadowed = trusted.findings.find((item) => item.code === "doctor.eas_cli_shadowed");
+    assert(missing.findings[0]?.code === "doctor.eas_cli_missing", "finding codes stay doctor.*");
+    assert(
+      missing.findings[0]?.message.includes("inspect will not install it"),
+      `missing actor copy must prefer inspect: ${missing.findings[0]?.message}`,
+    );
+    assert(
+      unrelated.findings[0]?.message.includes("Inspect will not install a replacement"),
+      `unrelated actor copy must prefer inspect: ${unrelated.findings[0]?.message}`,
+    );
+    assert(
+      trustedFinding?.message.includes("Inspect will not install, log in, or run eas init"),
+      `trusted actor copy must prefer inspect: ${trustedFinding?.message}`,
+    );
+    assert(
+      shadowed?.message.includes("Inspect will not install or upgrade the host"),
+      `shadowed actor copy must prefer inspect: ${shadowed?.message}`,
+    );
+    assert(source.includes("`b2c doctor` is a supported equivalent"), "Expo diagnostic copy must keep doctor supported");
+    assert(!source.includes("Doctor will not"), "Expo findings must not keep Doctor as the named actor");
+    assert(!source.includes("doctor will not install it"), "Expo missing copy must not keep doctor as the named actor");
+  });
+
   harness.check("expo-eas-doctor: persist records identity once with ASC fields; write failure warns owners", () => {
     const home = harness.makeTempDir("eas-doctor-persist");
     const findings = runDoctor({
@@ -287,6 +328,36 @@ export function register(harness: Harness): void {
     assert(probe.spawnedAuthenticatedCommand === false, "selected-target probe must never spawn");
     assert(probe.liveEasProven === false && probe.liveEasClaim === "unproven" && probe.mutated === false, "ready local ids are not live EAS proof");
     assert(probe.preflight.message.includes("did not spawn"), `ready message must deny spawn: ${probe.preflight.message}`);
+  });
+
+  harness.check("expo-eas-doctor: selected-target copy prefers inspect as the diagnostic actor", () => {
+    const source = readFileSync(path.join(skillRoot, "adapters/providers/expo/doctor.ts"), "utf8");
+    const cwd = writeFakeApp(harness.makeTempDir("eas-inspect-actor"));
+    const missingAuthority = probeExpoEasSelectedTarget({
+      discovery: identity("/opt/fake/bin/eas", DOCUMENTED),
+      target: selectedTarget({ hostAuthorityGranted: false }),
+      cwd,
+      requestProjectId: "proj_approved",
+    });
+    const ready = probeExpoEasSelectedTarget({
+      discovery: identity("/opt/fake/bin/eas", DOCUMENTED),
+      target: selectedTarget({ hostAuthorityGranted: true }),
+      cwd,
+      requestProjectId: "proj_approved",
+    });
+    assert(missingAuthority.preflight.code === "authority-missing", "finding/hold codes stay doctor.* / authority-missing");
+    assert(
+      missingAuthority.preflight.message.includes("Inspect will not spawn authenticated eas commands"),
+      `authority-missing actor copy must prefer inspect: ${missingAuthority.preflight.message}`,
+    );
+    assert(
+      ready.preflight.message.includes("inspect did not spawn an authenticated command"),
+      `ready actor copy must prefer inspect: ${ready.preflight.message}`,
+    );
+    assert(source.includes("`b2c doctor` is a supported equivalent"), "Expo selected-target copy must keep doctor supported");
+    assert(!source.includes("Doctor/probe will not"), "selected-target copy must not keep Doctor/probe as the named actor");
+    assert(!source.includes("doctor/probe did not spawn"), "ready copy must not keep doctor/probe as the named actor");
+    assert(missingAuthority.spawnedAuthenticatedCommand === false && ready.spawnedAuthenticatedCommand === false, "selected-target probe must still never spawn");
   });
 
   harness.check("expo-eas-doctor: status sibling is last observation, not a live PATH probe or live EAS job", () => {

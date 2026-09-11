@@ -7,7 +7,14 @@
  * beta distribution maps to the Apple TestFlight standing envelope. The independent
  * review-status response envelope is the 5.1.0 CLI `reviewStatusResult` object.
  * The independent review-submit response envelope is the 5.1.0 CLI
- * `reviewSubmitResult` dry-run object. Adapter-built resubmit argv and canned
+ * `reviewSubmitResult` dry-run object. The independent metadata-validate
+ * response envelope is the 5.1.0 CLI `ValidateResult` object. The independent
+ * screenshots-sizes response envelope is the 5.1.0 CLI `ScreenshotSizesResult`
+ * default focused object. The independent screenshots-validate response
+ * envelope is the 5.1.0 CLI `screenshotValidateResult` ready object. `asc review submit`
+ * maps to `workflow.store.app-review-resubmit`. `asc testflight feedback list` and
+ * `asc testflight crashes list` map to
+ * `workflow.store.apple-testflight-standing-envelope`. Adapter-built resubmit argv and canned
  * live-provider snapshots are not independent evidence.
  */
 import { readFileSync } from "node:fs";
@@ -33,6 +40,8 @@ const COOKBOOK = path.join(skillRoot, "knowledge/store/app-store-connect-cli.md"
 const APPLE_ASC = path.join(skillRoot, "catalog/providers/apple-asc.yaml");
 const RORK = path.join(skillRoot, "catalog/upstreams/rork-app-store-connect-cli.yaml");
 const RESUBMIT = path.join(skillRoot, "adapters/app-review/resubmit.ts");
+const REMEDIATE_PLAN = path.join(skillRoot, "adapters/app-review/plan.ts");
+const BUILD_RELEASE = path.join(skillRoot, "catalog/workflows/build-release.ts");
 const APP_REVIEW_FIXTURES = path.join(skillRoot, "checks/verification/fixtures/app-review.fixtures.ts");
 const ASC_CLI_NATIVE_DIR = path.join(skillRoot, "checks/verification/test/data/asc-cli");
 const RORK_REVIEWED_VERSION = "5.1.0";
@@ -41,6 +50,12 @@ const COOKBOOK_SOURCE = "knowledge/store/app-store-connect-cli.md Verified Comma
 const REVIEW_STATUS_SOURCE = "rork-app-store-connect-cli 5.1.0 internal/cli/reviews/review_overview.go reviewStatusResult";
 const REVIEW_SUBMIT_SOURCE =
   "rork-app-store-connect-cli 5.1.0 internal/cli/reviews/review_submit.go reviewSubmitResult / internal/cli/submit/submit_flow.go BuildAttachmentResult";
+const METADATA_VALIDATE_SOURCE = "rork-app-store-connect-cli 5.1.0 internal/cli/metadata/validate.go ValidateResult";
+const SCREENSHOTS_SIZES_SOURCE =
+  "rork-app-store-connect-cli 5.1.0 internal/cli/assets/assets_screenshots.go focusedScreenshotSizeCatalog / internal/asc/screenshot_sizes.go ScreenshotSizesResult";
+const SCREENSHOTS_VALIDATE_SOURCE =
+  "rork-app-store-connect-cli 5.1.0 internal/cli/assets/assets_screenshots_validate.go screenshotValidateResult";
+const APPLE_STORE_MEDIA_STANDING_ENVELOPE = "workflow.store.apple-store-media-standing-envelope";
 const REVIEW_STATUS_OBJECT_KEYS = ["appId", "version", "reviewDetailConfigured", "reviewDetailId", "latestSubmission", "reviewState", "nextAction"] as const;
 const REVIEW_VERSION_KEYS = ["id", "version", "platform", "state", "createdDate"] as const;
 const REVIEW_SUBMISSION_KEYS = ["id", "state", "platform", "submittedDate"] as const;
@@ -48,6 +63,29 @@ const REVIEW_SUBMIT_OBJECT_KEYS = ["appId", "version", "versionId", "buildId", "
 const REVIEW_SUBMIT_ATTACHMENT_KEYS = ["versionId", "buildId", "wouldAttach"] as const;
 const REVIEW_SUBMIT_OMITTED_KEYS = ["submissionId", "submittedDate", "alreadySubmitted", "messages"] as const;
 const REVIEW_SUBMIT_ATTACHMENT_OMITTED_KEYS = ["currentBuildId", "attached", "alreadyAttached"] as const;
+const METADATA_VALIDATE_OBJECT_KEYS = ["dir", "filesScanned", "issues", "errorCount", "warningCount", "valid"] as const;
+const METADATA_VALIDATE_ISSUE_OMITTED_KEYS = ["locale", "version", "length", "limit"] as const;
+const SCREENSHOTS_SIZES_OBJECT_KEYS = ["sizes"] as const;
+const SCREENSHOTS_SIZE_ENTRY_KEYS = ["displayType", "family", "dimensions"] as const;
+const SCREENSHOTS_SIZE_DIMENSION_KEYS = ["width", "height"] as const;
+const SCREENSHOTS_SIZES_FOCUSED_TYPES = ["APP_IPHONE_65", "APP_IPAD_PRO_3GEN_129"] as const;
+const SCREENSHOTS_SIZES_IPHONE_65_DIMENSIONS = [
+  { width: 1242, height: 2688 },
+  { width: 1284, height: 2778 },
+  { width: 2688, height: 1242 },
+  { width: 2778, height: 1284 },
+] as const;
+const SCREENSHOTS_SIZES_IPAD_PRO_3GEN_129_DIMENSIONS = [
+  { width: 2048, height: 2732 },
+  { width: 2064, height: 2752 },
+  { width: 2732, height: 2048 },
+  { width: 2752, height: 2064 },
+] as const;
+const SCREENSHOTS_VALIDATE_OBJECT_KEYS = ["path", "displayType", "totalFiles", "readyFiles", "errorCount", "warningCount", "files"] as const;
+const SCREENSHOTS_VALIDATE_FILE_KEYS = ["order", "filePath", "fileName", "width", "height", "status"] as const;
+const SCREENSHOTS_VALIDATE_OMITTED_KEYS = ["apiDisplayType", "issues"] as const;
+const SCREENSHOTS_VALIDATE_FILE_OMITTED_KEYS = ["hidden"] as const;
+const SCREENSHOTS_VALIDATE_ISSUE_OMITTED_KEYS = ["code", "severity", "filePath", "fileName", "duplicateOf", "match", "message", "remediation"] as const;
 
 type SemanticFit = "exact" | "partial" | "none";
 type MappingEffect = "read" | "mutation" | "publish" | "credential";
@@ -109,7 +147,7 @@ const ASC_NATIVE_MAPPING: readonly AscNativeMappingRow[] = [
     canonicalOperation: APP_REVIEW_RESUBMIT_WORKFLOW_ID,
     semanticFit: "exact",
     effects: "mutation",
-    disposition: "defer",
+    disposition: "implement",
     owner: "adapters/app-review/resubmit.ts",
   },
   {
@@ -138,7 +176,7 @@ const ASC_NATIVE_MAPPING: readonly AscNativeMappingRow[] = [
   },
   {
     nativeCapability: "asc screenshots sizes",
-    canonicalOperation: "workflow.store.apple-store-media-standing-envelope",
+    canonicalOperation: APPLE_STORE_MEDIA_STANDING_ENVELOPE,
     semanticFit: "partial",
     effects: "read",
     disposition: "implement",
@@ -146,7 +184,7 @@ const ASC_NATIVE_MAPPING: readonly AscNativeMappingRow[] = [
   },
   {
     nativeCapability: "asc screenshots validate",
-    canonicalOperation: "workflow.store.apple-store-media-standing-envelope",
+    canonicalOperation: APPLE_STORE_MEDIA_STANDING_ENVELOPE,
     semanticFit: "partial",
     effects: "read",
     disposition: "implement",
@@ -154,7 +192,7 @@ const ASC_NATIVE_MAPPING: readonly AscNativeMappingRow[] = [
   },
   {
     nativeCapability: "asc screenshots upload",
-    canonicalOperation: "workflow.store.apple-store-media-standing-envelope",
+    canonicalOperation: APPLE_STORE_MEDIA_STANDING_ENVELOPE,
     semanticFit: "exact",
     effects: "mutation",
     disposition: "implement",
@@ -162,11 +200,19 @@ const ASC_NATIVE_MAPPING: readonly AscNativeMappingRow[] = [
   },
   {
     nativeCapability: "asc testflight feedback list",
-    canonicalOperation: "none",
-    semanticFit: "none",
+    canonicalOperation: "workflow.store.apple-testflight-standing-envelope",
+    semanticFit: "partial",
     effects: "read",
-    disposition: "defer",
-    owner: "knowledge/store/app-store-connect-cli.md",
+    disposition: "implement",
+    owner: "catalog/workflows/build-release.ts",
+  },
+  {
+    nativeCapability: "asc testflight crashes list",
+    canonicalOperation: "workflow.store.apple-testflight-standing-envelope",
+    semanticFit: "partial",
+    effects: "read",
+    disposition: "implement",
+    owner: "catalog/workflows/build-release.ts",
   },
   {
     nativeCapability: "asc workflow run testflight_beta",
@@ -192,6 +238,7 @@ const INDEPENDENT_COOKBOOK_STEMS = [
   "asc screenshots validate",
   "asc screenshots upload",
   "asc testflight feedback list",
+  "asc testflight crashes list",
   "asc workflow run",
   "asc web agreements accept",
 ] as const;
@@ -216,6 +263,34 @@ function provenance(record: ProviderConformanceProvenance): ProviderConformanceP
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isDimension(value: unknown): value is { width: number; height: number } {
+  return isRecord(value) && typeof value.width === "number" && typeof value.height === "number";
+}
+
+function assertFocusedSizeEntry(
+  entry: unknown,
+  displayType: string,
+  dimensions: readonly { readonly width: number; readonly height: number }[],
+): void {
+  assert(isRecord(entry), `size entry ${displayType} must be an object`);
+  for (const key of SCREENSHOTS_SIZE_ENTRY_KEYS) {
+    assert(key in entry, `size entry ${displayType} missing ${key}`);
+  }
+  assert(entry.displayType === displayType, `expected displayType ${displayType}`);
+  assert(entry.family === "APP", `${displayType} family is APP`);
+  assert(Array.isArray(entry.dimensions) && entry.dimensions.length === dimensions.length, `${displayType} dimension count`);
+  for (const [index, dim] of entry.dimensions.entries()) {
+    assert(isDimension(dim), `${displayType} dimension ${index} must be an object`);
+    for (const key of SCREENSHOTS_SIZE_DIMENSION_KEYS) {
+      assert(key in dim, `${displayType} dimension ${index} missing ${key}`);
+    }
+    assert(
+      dim.width === dimensions[index]?.width && dim.height === dimensions[index]?.height,
+      `${displayType} dimension ${index} must match catalog order`,
+    );
+  }
 }
 
 function loadNativeJson(fileName: string): unknown {
@@ -245,19 +320,53 @@ export function register(harness: Harness): void {
   harness.check("asc-conformance: non-observe mapping names deferral and rejection without a generic encoder", () => {
     const rork = readFileSync(RORK, "utf8");
     const cookbook = readFileSync(COOKBOOK, "utf8");
+    const buildRelease = readFileSync(BUILD_RELEASE, "utf8");
     const implemented = ASC_NATIVE_MAPPING.filter((row) => mappingDisposition(row) === "implement");
     const deferred = ASC_NATIVE_MAPPING.filter((row) => mappingDisposition(row) === "defer");
     const rejected = ASC_NATIVE_MAPPING.filter((row) => mappingDisposition(row) === "reject");
-    assert(implemented.length === 9, `observe/remediate/media/metadata/testflight implement rows: ${implemented.length}`);
+    assert(implemented.length === 12, `observe/remediate/media/metadata/testflight/review-submit implement rows: ${implemented.length}`);
     assert(
-      deferred.some((row) => row.nativeCapability === "asc review submit" && row.canonicalOperation === APP_REVIEW_RESUBMIT_WORKFLOW_ID),
-      "review submit maps to the existing resubmit workflow and stays deferred",
+      implemented.some(
+        (row) =>
+          row.nativeCapability === "asc review submit" &&
+          row.canonicalOperation === APP_REVIEW_RESUBMIT_WORKFLOW_ID &&
+          row.owner === "adapters/app-review/resubmit.ts",
+      ),
+      "review submit maps to the existing resubmit workflow",
     );
     assert(
       implemented.some(
         (row) =>
+          row.nativeCapability === "asc testflight feedback list" &&
+          row.canonicalOperation === "workflow.store.apple-testflight-standing-envelope" &&
+          row.owner === "catalog/workflows/build-release.ts",
+      ),
+      "TestFlight feedback read maps to the existing TestFlight standing envelope",
+    );
+    assert(
+      implemented.some(
+        (row) =>
+          row.nativeCapability === "asc testflight crashes list" &&
+          row.canonicalOperation === "workflow.store.apple-testflight-standing-envelope" &&
+          row.owner === "catalog/workflows/build-release.ts",
+      ),
+      "TestFlight crashes read maps to the existing TestFlight standing envelope",
+    );
+    assert(
+      deferred.every(
+        (row) =>
+          row.nativeCapability !== "asc review submit" &&
+          row.nativeCapability !== "asc testflight feedback list" &&
+          row.nativeCapability !== "asc testflight crashes list",
+      ),
+      "review submit and TestFlight feedback and crashes reads are no longer deferred",
+    );
+    assert(deferred.length === 0, `no native mapping row stays deferred: ${deferred.map((row) => row.nativeCapability).join(", ")}`);
+    assert(
+      implemented.some(
+        (row) =>
           row.nativeCapability === "asc screenshots upload" &&
-          row.canonicalOperation === "workflow.store.apple-store-media-standing-envelope" &&
+          row.canonicalOperation === APPLE_STORE_MEDIA_STANDING_ENVELOPE &&
           row.owner === "catalog/workflows/build-release.ts",
       ),
       "screenshot upload maps to the Apple store-media standing envelope",
@@ -280,10 +389,10 @@ export function register(harness: Harness): void {
       ),
       "TestFlight beta workflow maps to the Apple TestFlight standing envelope",
     );
-    assert(
-      deferred.some((row) => row.nativeCapability === "asc testflight feedback list" && row.canonicalOperation === "none"),
-      "TestFlight feedback read stays knowledge-only",
-    );
+    assert(buildRelease.includes("asc testflight feedback list"), "the TestFlight envelope already names the cookbook feedback-read form");
+    assert(cookbook.includes("asc testflight feedback list"), "cookbook records the native TestFlight feedback-read form");
+    assert(buildRelease.includes("asc testflight crashes list"), "the TestFlight envelope already names the cookbook crashes-read form");
+    assert(cookbook.includes("asc testflight crashes list"), "cookbook records the native TestFlight crashes-read form");
     for (const row of rejected) {
       assert(
         ALWAYS_FORBIDDEN_APP_REVIEW_COMMANDS.some((command) => command.includes(row.nativeCapability)),
@@ -362,6 +471,32 @@ export function register(harness: Harness): void {
       coverageLimits: "Cookbook records only the dry-run form from local --help on 2026-09-08. No live TestFlight JSON and no live App Store Connect.",
       sample: "asc workflow run --dry-run testflight_beta VERSION:1.2.3",
     });
+    const testflightFeedback = provenance({
+      provider: "apple-asc",
+      transport: "cli",
+      reviewedVersion: RORK_REVIEWED_VERSION,
+      reviewedRevision: "unknown",
+      sourceSelector: COOKBOOK_SOURCE,
+      nativeOperation: "asc testflight feedback list",
+      canonicalOperation: "workflow.store.apple-testflight-standing-envelope",
+      evidenceKind: "official-example",
+      establishes: ["request-shape"],
+      coverageLimits: "Cookbook argv stem from local --help on 2026-09-08. No live TestFlight feedback JSON and no live App Store Connect.",
+      sample: 'asc testflight feedback list --app "123456789" --paginate',
+    });
+    const testflightCrashes = provenance({
+      provider: "apple-asc",
+      transport: "cli",
+      reviewedVersion: RORK_REVIEWED_VERSION,
+      reviewedRevision: "unknown",
+      sourceSelector: COOKBOOK_SOURCE,
+      nativeOperation: "asc testflight crashes list",
+      canonicalOperation: "workflow.store.apple-testflight-standing-envelope",
+      evidenceKind: "official-example",
+      establishes: ["request-shape"],
+      coverageLimits: "Cookbook argv stem from local --help on 2026-09-08. No live TestFlight crash JSON and no live App Store Connect.",
+      sample: 'asc testflight crashes list --app "123456789" --sort -createdDate --limit 10',
+    });
     const submit = provenance({
       provider: "apple-asc",
       transport: "cli",
@@ -392,12 +527,16 @@ export function register(harness: Harness): void {
     assert(isIndependentEvidence(screenshotUpload.evidenceKind), describeConformanceCoverage(screenshotUpload));
     assert(isIndependentEvidence(metadataPush.evidenceKind), describeConformanceCoverage(metadataPush));
     assert(isIndependentEvidence(testflightBeta.evidenceKind), describeConformanceCoverage(testflightBeta));
+    assert(isIndependentEvidence(testflightFeedback.evidenceKind), describeConformanceCoverage(testflightFeedback));
+    assert(isIndependentEvidence(testflightCrashes.evidenceKind), describeConformanceCoverage(testflightCrashes));
     assert(isIndependentEvidence(submit.evidenceKind), describeConformanceCoverage(submit));
     assert(isIndependentEvidence(generated.evidenceKind) === false, describeConformanceCoverage(generated));
     assert(cookbook.includes(String(observeStatus.sample)), "observe sample must be the cookbook line");
     assert(cookbook.includes(String(screenshotUpload.sample)), "screenshot upload sample must be the cookbook line");
     assert(cookbook.includes(String(metadataPush.sample)), "metadata push sample must be the cookbook dry-run line");
     assert(cookbook.includes(String(testflightBeta.sample)), "TestFlight beta sample must be the cookbook dry-run line");
+    assert(cookbook.includes(String(testflightFeedback.sample)), "TestFlight feedback sample must be the cookbook line");
+    assert(cookbook.includes(String(testflightCrashes.sample)), "TestFlight crashes sample must be the cookbook line");
   });
 
   harness.check("asc-conformance: independent review-status response envelope is the 5.1.0 CLI object", () => {
@@ -561,5 +700,270 @@ export function register(harness: Harness): void {
     }
     assert(thrown instanceof AscProviderReadError, "review-submit dry-run object is not a review-status envelope");
     assert(thrown instanceof Error && thrown.message.includes("no valid app-version layer"), "submit version string is not the status nested object");
+  });
+
+  harness.check("asc-conformance: independent metadata-validate response envelope is the 5.1.0 CLI object", () => {
+    const nativeSource = readFileSync(path.join(ASC_CLI_NATIVE_DIR, "metadata-validate-object.json"), "utf8");
+    const mistakenSource = readFileSync(path.join(ASC_CLI_NATIVE_DIR, "metadata-validate-mistaken-jsonapi.json"), "utf8");
+    const plan = readFileSync(REMEDIATE_PLAN, "utf8");
+    const native = loadNativeJson("metadata-validate-object.json");
+    const mistaken = loadNativeJson("metadata-validate-mistaken-jsonapi.json");
+    assert(isRecord(native), "native metadata-validate envelope must be one object");
+    for (const key of METADATA_VALIDATE_OBJECT_KEYS) {
+      assert(key in native, `native envelope missing ${key}`);
+    }
+    assert(Array.isArray(native.issues) && native.issues.length === 0, "valid envelope encodes empty issues as an array");
+    for (const key of METADATA_VALIDATE_ISSUE_OMITTED_KEYS) {
+      assert(!(key in native), `valid envelope must omit empty ValidateIssue ${key}`);
+    }
+    assert(!("field" in native) && !("scope" in native) && !("message" in native), "ValidateIssue keys are not top-level");
+    assert(!("data" in native) && !("attributes" in native), "CLI envelope is not Apple JSON:API");
+    assert(native.dir === "./metadata", "dir is the cookbook path, not a live capture");
+    assert(native.filesScanned === 2, "valid branch scanned two localization files");
+    assert(native.errorCount === 0 && native.warningCount === 0, "valid branch has no counted issues");
+    assert(native.valid === true, "errorCount 0 sets valid");
+    assert(isRecord(mistaken) && isRecord(mistaken.data) && "attributes" in mistaken.data, "mistaken document is Apple JSON:API");
+    assert(
+      adapterGeneratedMentions(nativeSource, ["buildResubmitCommand", "liveReviewStatusJson", "createAscAppReviewProvider"]).length === 0,
+      "native envelope must not name adapter helpers",
+    );
+    assert(
+      adapterGeneratedMentions(mistakenSource, ["buildResubmitCommand", "liveReviewStatusJson"]).length === 0,
+      "mistaken envelope must not name adapter helpers",
+    );
+    assert(plan.includes("asc metadata validate"), "remediate plan still owns the preflight command string");
+    assert(!plan.includes("test/data/asc-cli"), "adapter preflight list is not this envelope");
+    const record = provenance({
+      provider: "apple-asc",
+      transport: "cli",
+      reviewedVersion: RORK_REVIEWED_VERSION,
+      reviewedRevision: RORK_REVIEWED_REVISION,
+      sourceSelector: METADATA_VALIDATE_SOURCE,
+      nativeOperation: "asc metadata validate",
+      canonicalOperation: APP_REVIEW_REMEDIATE_WORKFLOW_ID,
+      evidenceKind: "upstream-source-test",
+      establishes: ["response-shape"],
+      coverageLimits:
+        "CLI ValidateResult object at 5.1.0 only. Offline valid branch with empty issues. Not Apple JSON:API. Not a live App Store Connect capture. Observe adapter does not execute validate.",
+      sample: native,
+    });
+    const generated: ProviderConformanceProvenance = {
+      provider: "apple-asc",
+      transport: "cli",
+      reviewedVersion: RORK_REVIEWED_VERSION,
+      reviewedRevision: "unknown",
+      sourceSelector: "adapters/app-review/plan.ts metadata_rejected preflight list",
+      nativeOperation: "asc metadata validate",
+      canonicalOperation: APP_REVIEW_REMEDIATE_WORKFLOW_ID,
+      evidenceKind: "adapter-generated",
+      establishes: ["request-shape"],
+      coverageLimits: "Echo of the adapter preflight command list. Not independent native evidence.",
+      sample: "asc metadata validate",
+    };
+    assert(isIndependentEvidence(record.evidenceKind), describeConformanceCoverage(record));
+    assert(isIndependentEvidence(generated.evidenceKind) === false, describeConformanceCoverage(generated));
+    let thrown: unknown;
+    try {
+      createAscAppReviewProvider({
+        appId: "123456789",
+        runner: reviewStatusRunner(native),
+      }).readSnapshot();
+    } catch (error) {
+      thrown = error;
+    }
+    assert(thrown instanceof AscProviderReadError, "metadata-validate object is not a review-status envelope");
+    assert(thrown instanceof Error && thrown.message.includes("no valid app-version layer"), "ValidateResult dir/issues are not the status nested object");
+    thrown = undefined;
+    try {
+      createAscAppReviewProvider({
+        appId: "123456789",
+        runner: reviewStatusRunner(mistaken),
+      }).readSnapshot();
+    } catch (error) {
+      thrown = error;
+    }
+    assert(thrown instanceof AscProviderReadError, "JSON:API metadata document fails closed");
+    assert(thrown instanceof Error && thrown.message.includes("no valid app-version layer"), "JSON:API document is not the CLI object");
+  });
+
+  harness.check("asc-conformance: independent screenshots-sizes response envelope is the 5.1.0 default focused CLI object", () => {
+    const nativeSource = readFileSync(path.join(ASC_CLI_NATIVE_DIR, "screenshots-sizes-object.json"), "utf8");
+    const mistakenSource = readFileSync(path.join(ASC_CLI_NATIVE_DIR, "screenshots-sizes-mistaken-jsonapi.json"), "utf8");
+    const buildRelease = readFileSync(BUILD_RELEASE, "utf8");
+    const native = loadNativeJson("screenshots-sizes-object.json");
+    const mistaken = loadNativeJson("screenshots-sizes-mistaken-jsonapi.json");
+    assert(isRecord(native), "native screenshots-sizes envelope must be one object");
+    for (const key of SCREENSHOTS_SIZES_OBJECT_KEYS) {
+      assert(key in native, `native envelope missing ${key}`);
+    }
+    assert(Array.isArray(native.sizes) && native.sizes.length === 2, "default focused catalog has two entries");
+    assertFocusedSizeEntry(native.sizes[0], SCREENSHOTS_SIZES_FOCUSED_TYPES[0], SCREENSHOTS_SIZES_IPHONE_65_DIMENSIONS);
+    assertFocusedSizeEntry(native.sizes[1], SCREENSHOTS_SIZES_FOCUSED_TYPES[1], SCREENSHOTS_SIZES_IPAD_PRO_3GEN_129_DIMENSIONS);
+    assert(
+      !native.sizes.some((entry) => isRecord(entry) && entry.displayType === "APP_DESKTOP"),
+      "default focused catalog omits APP_DESKTOP",
+    );
+    assert(!("data" in native) && !("attributes" in native), "CLI envelope is not Apple JSON:API");
+    assert(isRecord(mistaken) && isRecord(mistaken.data) && "attributes" in mistaken.data, "mistaken document is Apple JSON:API");
+    assert(
+      adapterGeneratedMentions(nativeSource, ["buildResubmitCommand", "liveReviewStatusJson", "createAscAppReviewProvider"]).length === 0,
+      "native envelope must not name adapter helpers",
+    );
+    assert(
+      adapterGeneratedMentions(mistakenSource, ["buildResubmitCommand", "liveReviewStatusJson"]).length === 0,
+      "mistaken envelope must not name adapter helpers",
+    );
+    assert(buildRelease.includes("asc screenshots sizes"), "media standing envelope still names the cookbook sizes form");
+    assert(!buildRelease.includes("test/data/asc-cli"), "workflow cookbook form is not this envelope");
+    const record = provenance({
+      provider: "apple-asc",
+      transport: "cli",
+      reviewedVersion: RORK_REVIEWED_VERSION,
+      reviewedRevision: RORK_REVIEWED_REVISION,
+      sourceSelector: SCREENSHOTS_SIZES_SOURCE,
+      nativeOperation: "asc screenshots sizes",
+      canonicalOperation: APPLE_STORE_MEDIA_STANDING_ENVELOPE,
+      evidenceKind: "upstream-source-test",
+      establishes: ["response-shape"],
+      coverageLimits:
+        "CLI ScreenshotSizesResult default focused object at 5.1.0 only. APP_IPHONE_65 then APP_IPAD_PRO_3GEN_129. Not Apple JSON:API. Not the --all catalog. Not a live App Store Connect capture. Observe adapter does not execute sizes.",
+      sample: native,
+    });
+    const generated: ProviderConformanceProvenance = {
+      provider: "apple-asc",
+      transport: "cli",
+      reviewedVersion: RORK_REVIEWED_VERSION,
+      reviewedRevision: "unknown",
+      sourceSelector: "catalog/workflows/build-release.ts apple-store-media-standing-envelope cookbook form",
+      nativeOperation: "asc screenshots sizes",
+      canonicalOperation: APPLE_STORE_MEDIA_STANDING_ENVELOPE,
+      evidenceKind: "adapter-generated",
+      establishes: ["request-shape"],
+      coverageLimits: "Echo of the workflow cookbook string. Not independent native evidence.",
+      sample: "asc screenshots sizes",
+    };
+    assert(isIndependentEvidence(record.evidenceKind), describeConformanceCoverage(record));
+    assert(isIndependentEvidence(generated.evidenceKind) === false, describeConformanceCoverage(generated));
+    let thrown: unknown;
+    try {
+      createAscAppReviewProvider({
+        appId: "123456789",
+        runner: reviewStatusRunner(native),
+      }).readSnapshot();
+    } catch (error) {
+      thrown = error;
+    }
+    assert(thrown instanceof AscProviderReadError, "screenshots-sizes object is not a review-status envelope");
+    assert(thrown instanceof Error && thrown.message.includes("no valid app-version layer"), "ScreenshotSizesResult sizes are not the status nested object");
+    thrown = undefined;
+    try {
+      createAscAppReviewProvider({
+        appId: "123456789",
+        runner: reviewStatusRunner(mistaken),
+      }).readSnapshot();
+    } catch (error) {
+      thrown = error;
+    }
+    assert(thrown instanceof AscProviderReadError, "JSON:API screenshot-set document fails closed");
+    assert(thrown instanceof Error && thrown.message.includes("no valid app-version layer"), "JSON:API document is not the CLI object");
+  });
+
+  harness.check("asc-conformance: independent screenshots-validate response envelope is the 5.1.0 ready CLI object", () => {
+    const nativeSource = readFileSync(path.join(ASC_CLI_NATIVE_DIR, "screenshots-validate-object.json"), "utf8");
+    const mistakenSource = readFileSync(path.join(ASC_CLI_NATIVE_DIR, "screenshots-validate-mistaken-jsonapi.json"), "utf8");
+    const buildRelease = readFileSync(BUILD_RELEASE, "utf8");
+    const native = loadNativeJson("screenshots-validate-object.json");
+    const mistaken = loadNativeJson("screenshots-validate-mistaken-jsonapi.json");
+    assert(isRecord(native), "native screenshots-validate envelope must be one object");
+    for (const key of SCREENSHOTS_VALIDATE_OBJECT_KEYS) {
+      assert(key in native, `native envelope missing ${key}`);
+    }
+    for (const key of SCREENSHOTS_VALIDATE_OMITTED_KEYS) {
+      assert(!(key in native), `ready envelope must omit empty ${key}`);
+    }
+    for (const key of SCREENSHOTS_VALIDATE_ISSUE_OMITTED_KEYS) {
+      assert(!(key in native), `screenshotValidateIssue keys are not top-level`);
+    }
+    assert(native.path === "./screenshots", "path is the cookbook path, not a live capture");
+    assert(native.displayType === "APP_IPHONE_65", "IPHONE_65 normalizes to APP_IPHONE_65");
+    assert(native.totalFiles === 1 && native.readyFiles === 1, "ready branch records one file");
+    assert(native.errorCount === 0 && native.warningCount === 0, "ready branch has no counted issues");
+    assert(Array.isArray(native.files) && native.files.length === 1, "ready envelope encodes one file");
+    const file = native.files[0];
+    assert(isRecord(file), "nested file must be one object");
+    for (const key of SCREENSHOTS_VALIDATE_FILE_KEYS) {
+      assert(key in file, `nested file missing ${key}`);
+    }
+    for (const key of SCREENSHOTS_VALIDATE_FILE_OMITTED_KEYS) {
+      assert(!(key in file), `ready file must omit empty ${key}`);
+    }
+    assert(file.order === 1, "first collected file is order 1");
+    assert(file.filePath === "./screenshots/01-home.png", "filePath joins the cookbook path");
+    assert(file.fileName === "01-home.png", "fileName is the render-test ready PNG");
+    assert(file.width === 1242 && file.height === 2688, "ready PNG uses the first APP_IPHONE_65 size");
+    assert(file.status === "ok", "ready file status is ok");
+    assert(!("data" in native) && !("attributes" in native), "CLI envelope is not Apple JSON:API");
+    assert(isRecord(mistaken) && isRecord(mistaken.data) && "attributes" in mistaken.data, "mistaken document is Apple JSON:API");
+    assert(
+      adapterGeneratedMentions(nativeSource, ["buildResubmitCommand", "liveReviewStatusJson", "createAscAppReviewProvider"]).length === 0,
+      "native envelope must not name adapter helpers",
+    );
+    assert(
+      adapterGeneratedMentions(mistakenSource, ["buildResubmitCommand", "liveReviewStatusJson"]).length === 0,
+      "mistaken envelope must not name adapter helpers",
+    );
+    assert(buildRelease.includes("asc screenshots validate"), "media standing envelope still names the cookbook validate form");
+    assert(!buildRelease.includes("test/data/asc-cli"), "workflow cookbook form is not this envelope");
+    const record = provenance({
+      provider: "apple-asc",
+      transport: "cli",
+      reviewedVersion: RORK_REVIEWED_VERSION,
+      reviewedRevision: RORK_REVIEWED_REVISION,
+      sourceSelector: SCREENSHOTS_VALIDATE_SOURCE,
+      nativeOperation: "asc screenshots validate",
+      canonicalOperation: APPLE_STORE_MEDIA_STANDING_ENVELOPE,
+      evidenceKind: "upstream-source-test",
+      establishes: ["response-shape"],
+      coverageLimits:
+        "CLI screenshotValidateResult ready object at 5.1.0 only. One ok APP_IPHONE_65 PNG. Empty issues omitted. Not Apple JSON:API. Not a live App Store Connect capture. Observe adapter does not execute validate.",
+      sample: native,
+    });
+    const generated: ProviderConformanceProvenance = {
+      provider: "apple-asc",
+      transport: "cli",
+      reviewedVersion: RORK_REVIEWED_VERSION,
+      reviewedRevision: "unknown",
+      sourceSelector: "catalog/workflows/build-release.ts apple-store-media-standing-envelope cookbook form",
+      nativeOperation: "asc screenshots validate",
+      canonicalOperation: APPLE_STORE_MEDIA_STANDING_ENVELOPE,
+      evidenceKind: "adapter-generated",
+      establishes: ["request-shape"],
+      coverageLimits: "Echo of the workflow cookbook string. Not independent native evidence.",
+      sample: "asc screenshots validate",
+    };
+    assert(isIndependentEvidence(record.evidenceKind), describeConformanceCoverage(record));
+    assert(isIndependentEvidence(generated.evidenceKind) === false, describeConformanceCoverage(generated));
+    let thrown: unknown;
+    try {
+      createAscAppReviewProvider({
+        appId: "123456789",
+        runner: reviewStatusRunner(native),
+      }).readSnapshot();
+    } catch (error) {
+      thrown = error;
+    }
+    assert(thrown instanceof AscProviderReadError, "screenshots-validate object is not a review-status envelope");
+    assert(thrown instanceof Error && thrown.message.includes("no valid app-version layer"), "screenshotValidateResult path/files are not the status nested object");
+    thrown = undefined;
+    try {
+      createAscAppReviewProvider({
+        appId: "123456789",
+        runner: reviewStatusRunner(mistaken),
+      }).readSnapshot();
+    } catch (error) {
+      thrown = error;
+    }
+    assert(thrown instanceof AscProviderReadError, "JSON:API screenshot document fails closed");
+    assert(thrown instanceof Error && thrown.message.includes("no valid app-version layer"), "JSON:API document is not the CLI object");
   });
 }

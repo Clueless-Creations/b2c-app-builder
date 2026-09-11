@@ -38,10 +38,13 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { resolveSkillRoot } from "../../tooling/lib/skill-root.js";
 import {
+  anyWorkerRuntimeFound,
   connectionReceipt,
   interpretConfiguredConnection,
+  leftoverCliOnlyLocalMcpResponse,
   LOCAL_CLIENT_NAME,
   localMcpInstructions,
+  observedLocalWorkspaceHealth,
 } from "../../contracts/public-api/connection-receipt.js";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -54,6 +57,7 @@ import type { HostedKnowledgeBundle, KnowledgeService } from "../../kernel/knowl
 import { routeUtterance } from "../../kernel/session/route-utterance.js";
 import { withOnboardingStepper } from "../../kernel/session/stepper.js";
 import { appendDoctorHostBlock } from "../../kernel/session/doctor-host.js";
+import { detectWorkerRuntimes } from "../../kernel/session/executor.js";
 import { readWorkspaceStatus, renderWorkspaceStatus, resolveCwdWorkspaceState } from "../../kernel/session/status.js";
 
 const skillRoot = resolveSkillRoot(import.meta.url);
@@ -126,6 +130,10 @@ try {
   );
 }
 
+const localWorkspaceHealth = observedLocalWorkspaceHealth({
+  workerRuntimeFound: anyWorkerRuntimeFound(detectWorkerRuntimes()),
+});
+
 function localRuntimeConnection() {
   return interpretConfiguredConnection({
     clientName: LOCAL_CLIENT_NAME,
@@ -135,6 +143,7 @@ function localRuntimeConnection() {
       observed: {
         knowledge: knowledgeService ? "available" : "unavailable",
         writes: readOnly ? "mcp_readonly" : "mcp_write_enabled",
+        ...localWorkspaceHealth,
       },
     }),
   });
@@ -147,6 +156,7 @@ const server = new McpServer(
       knowledge: knowledgeService ? "available" : "unavailable",
       engineVersion: skillVersion(),
       writes: readOnly ? "mcp_readonly" : "mcp_write_enabled",
+      workspaceExecution: localWorkspaceHealth.workspaceExecution,
     }),
   },
 );
@@ -671,19 +681,33 @@ if (!readOnly) {
     "b2c_verify",
     {
       description:
-        "List work parked pending fresh-context verification on a registered workspace, or accept one node with evidence. Producer never verifies its own work — a session that produced the attempt is refused mechanically.",
+        "List work parked pending fresh-context verification on a registered workspace, or accept one node with evidence. Producer never verifies its own work — a session that produced the attempt is refused mechanically. Runtime proof still requires an explicit workspace observation; a live-device word cannot invent it.",
       inputSchema: {
         workspace: WORKSPACE_ARG,
         node: z.string().optional().describe("Workflow or run-node id to accept (omit to list pending)"),
         session: z.string().optional().describe("Verifying session id (must not have produced the work)"),
         evidence: z.string().optional().describe("What was checked and why it holds (required to accept)"),
+        runtimeObserved: z
+          .union([z.boolean(), z.string()])
+          .optional()
+          .describe(
+            'Explicit workspace runtime observation forwarded to verify --runtime-observed. Pass true or "workspace". A live-device word cannot invent it.',
+          ),
       },
     },
-    async ({ workspace, node, session, evidence }) => {
+    async ({ workspace, node, session, evidence, runtimeObserved }) => {
       const resolved = workspaceOr(workspace);
       if (!resolved.ok) return resolved.result;
       return node
-        ? runCli("kernel/session/verify.ts", ["--workspace", resolved.path, "--node", node, ...flag("session", session), ...flag("evidence", evidence)])
+        ? runCli("kernel/session/verify.ts", [
+            "--workspace",
+            resolved.path,
+            "--node",
+            node,
+            ...flag("session", session),
+            ...flag("evidence", evidence),
+            ...flag("runtime-observed", runtimeObserved),
+          ])
         : runCli("kernel/session/verify.ts", ["--workspace", resolved.path, "--list"]);
     },
   );
@@ -737,4 +761,26 @@ if (!readOnly) {
 // Never registered by default, so business sessions do not see maintenance inventories.
 if (contributorToolsEnabled()) registerContributorTools(server, { skillRoot });
 
-await server.connect(new StdioServerTransport());
+const leftoverCliOnlyObserved = {
+  knowledge: knowledgeService ? ("available" as const) : ("unavailable" as const),
+  writes: readOnly ? ("mcp_readonly" as const) : ("mcp_write_enabled" as const),
+  ...localWorkspaceHealth,
+};
+const transport = new StdioServerTransport();
+const start = transport.start.bind(transport);
+transport.start = async () => {
+  const inner = transport.onmessage;
+  transport.onmessage = (message) => {
+    const intercepted = leftoverCliOnlyLocalMcpResponse(message, {
+      engineVersion: skillVersion(),
+      observed: leftoverCliOnlyObserved,
+    });
+    if (intercepted) {
+      void transport.send(intercepted as Parameters<StdioServerTransport["send"]>[0]);
+      return;
+    }
+    inner?.(message);
+  };
+  return start();
+};
+await server.connect(transport);

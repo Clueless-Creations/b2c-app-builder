@@ -18514,10 +18514,10 @@
     {
       "id": "gate.check-task-skills",
       "command": "check:task-skills",
-      "scriptPath": "tooling/render-task-skills.ts",
+      "scriptPath": "checks/validation/repository/check-task-skills.ts",
       "commandManifestPath": "package.json",
-      "ownerDomainId": "domain.process",
-      "audit": "manual"
+      "ownerDomainId": "domain.machine",
+      "audit": "required"
     },
     {
       "id": "gate.check-template-safety",
@@ -18823,14 +18823,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "6fd816b9aafa4ceb5b2b85f5262e8f67c4701831b283cdc57eacf92f74d95e68",
+    "fingerprint": "0a7d8b50105dbdda65a5d509dab9c4856c91d669266b73dde7bf38345ac4ffde",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
         "version": "0.220.0",
         "revision": "0.220.0",
-        "contentDigest": "bfb69ce00ed43c3df82858b03f0c9b0db4ab8a85f50a0be68e43d22ea18817d8"
+        "contentDigest": "6a8979b497c51e042a56416dedf820473c790974bccc39d9b84daec2bd107b91"
       }
     ],
     "base": {

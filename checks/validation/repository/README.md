@@ -16,6 +16,7 @@ The same line decides where a validator lives. **`checks/validation/business/` g
 | `check-reference-size.ts`      | no knowledge file blows the per-file context budget, and every folder indexes its children                                                         |
 | `check-autopilot-contract.ts`  | `SKILL.md`'s frontmatter still triggers, against the triggering eval                                                                               |
 | `check-catalog.ts`             | stable catalog identities, edges, workflow contracts, and generated-projection drift (`catalog/validate.ts` + `catalog/render-routing.ts --check`) |
+| `check-task-skills.ts` | catalog-backed task skills, public navigation, portable reference closure, source hashes, and create-only exports |
 | `check-upstreams.ts`           | every manifest in `catalog/upstreams/` parses under `b2c.contribution/v1`, names its retained notice, and agrees with its recorded observation     |
 
 Everything else that grades an app lives in [`../validation/business/`](../business), mirroring the knowledge areas. Nothing may hardcode either directory: `../tooling/lib/script-paths.ts` resolves a script by basename and throws on an unknown or ambiguous name.

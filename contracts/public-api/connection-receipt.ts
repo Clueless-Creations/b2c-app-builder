@@ -18,6 +18,8 @@ export const connectionReceiptSchema = z.strictObject({
   observed: z
     .strictObject({
       knowledge: z.enum(["available", "unavailable"]).optional(),
+      workspacePlanning: z.enum(["available", "unavailable"]).optional(),
+      workspaceExecution: z.enum(["available", "unavailable"]).optional(),
       writes: z.enum(["mcp_readonly", "mcp_write_enabled"]).optional(),
     })
     .optional(),
@@ -135,10 +137,28 @@ export function connectionReceipt(input: {
   };
 }
 
+/** Declared local support is not live worker-runtime health. Hosted-by-design stays on declares.none. */
+export function anyWorkerRuntimeFound(runtimes: readonly { available: boolean }[]): boolean {
+  return runtimes.some((entry) => entry.available);
+}
+
+export function observedLocalWorkspaceHealth(input: { workerRuntimeFound: boolean }): {
+  workspacePlanning: "available";
+  workspaceExecution: "available" | "unavailable";
+} {
+  return {
+    workspacePlanning: "available",
+    workspaceExecution: input.workerRuntimeFound ? "available" : "unavailable",
+  };
+}
+
 /** Wrong-surface and provider claims come from declared capabilities, not the leftover server name. */
 export function connectionCapabilityGuidance(receipt: ConnectionReceipt): string {
   if (receipt.declares.workspaceExecution === "none" || receipt.declares.workspacePlanning === "none") {
     return "Hosted knowledge is connected. It can return maintained guidance, but it cannot access or run this local business. Connect the local builder as b2c-local for workspace execution.";
+  }
+  if (receipt.observed?.workspaceExecution === "unavailable") {
+    return "Use this local builder for workspace status, planning, and packaged knowledge. Execution health is separately degraded: no worker CLI was found. Fixture sessions still run. Provider readiness is not implied by this receipt.";
   }
   return "Use this local builder for workspace status, planning, and CLI-backed execution. Provider readiness is not implied by this receipt.";
 }
@@ -195,6 +215,7 @@ export function localMcpInstructions(input: {
   engineVersion: string;
   writes?: "mcp_readonly" | "mcp_write_enabled";
   clientName?: string;
+  workspaceExecution: "available" | "unavailable";
 }): string {
   const receipt = connectionReceipt({
     mode: "local_execution",
@@ -202,6 +223,7 @@ export function localMcpInstructions(input: {
     observed: {
       knowledge: input.knowledge,
       writes: input.writes ?? "mcp_readonly",
+      ...observedLocalWorkspaceHealth({ workerRuntimeFound: input.workspaceExecution === "available" }),
     },
   });
   return [
@@ -259,6 +281,17 @@ function configuredSurfaceNeedLabel(need: ConfiguredSurfaceNeed, mode: Connectio
   return mode === "hosted_knowledge" ? "hosted knowledge" : "packaged knowledge";
 }
 
+function selectedSurfaceGuidance(
+  need: ConfiguredSurfaceNeed,
+  connection: ConfiguredConnectionReading,
+  receipt: ConnectionReceipt,
+): string {
+  if (need === "workspace_execution" && receipt.observed?.workspaceExecution === "unavailable") {
+    return connection.guidance;
+  }
+  return `Use ${connection.clientName} for ${configuredSurfaceNeedLabel(need, connection.mode)}.`;
+}
+
 /** Pick local vs hosted from declared receipts. Duplicate names are a collision, not a leftover third surface. */
 export function selectConfiguredSurface(input: {
   entries: readonly ConfiguredConnectionEntry[];
@@ -283,7 +316,7 @@ export function selectConfiguredSurface(input: {
         need: input.need,
         set,
         connection,
-        guidance: `Use ${connection.clientName} for ${configuredSurfaceNeedLabel(input.need, connection.mode)}.`,
+        guidance: selectedSurfaceGuidance(input.need, connection, local.receipt),
       };
     }
     if (hosted) {
@@ -333,6 +366,7 @@ export function bothConfiguredRoutingGuidance(): string {
     `A leftover ${LEFTOVER_LOCAL_CLIENT_NAME} name is not a third surface.`,
     "Duplicate names are a collision, not a capability.",
     "Local packaged knowledge stays available when hosted knowledge is absent.",
+    "A missing worker CLI degrades local execution health. It does not select hosted knowledge for execution.",
   ].join(" ");
 }
 
@@ -350,7 +384,23 @@ export function leftoverNameMigrationGuidance(): string {
   ].join("\n");
 }
 
-/** Local workspace planning and execution names. Hosted knowledge refuses these without listing them as tools. */
+/**
+ * Leftover MCP names for CLI-only public operations. Local MCP never registers these;
+ * leftover agents still call them. Hosted knowledge refuses them as wrong-surface.
+ * Local MCP refuses them as cli_only with the local receipt reading, not as missing tools.
+ */
+export const HOSTED_WRONG_SURFACE_LEFTOVER_CLI_ONLY_TOOL_NAMES = [
+  "b2c_research_record",
+  "b2c_package_import",
+  "b2c_composition_activate",
+  "b2c_composition_recover",
+  "b2c_business_create",
+  "b2c_business_initialize",
+  "b2c_business_run",
+  "b2c_business_recover",
+] as const;
+
+/** Local-only MCP names. Hosted knowledge refuses these without listing them as tools. */
 export const HOSTED_WRONG_SURFACE_TOOL_NAMES = [
   "b2c_plan",
   "b2c_status",
@@ -366,6 +416,16 @@ export const HOSTED_WRONG_SURFACE_TOOL_NAMES = [
   "b2c_packages",
   "b2c_composition_plan",
   "b2c_research_lookup",
+  "b2c_discover",
+  "b2c_compose",
+  "b2c_market_report",
+  "b2c_contribute_plan",
+  "b2c_contribute_check",
+  "b2c_contribute_preview",
+  "b2c_contribute_upstreams",
+  "b2c_contribute_upstream_check",
+  "b2c_contribute_upgrade_plan",
+  ...HOSTED_WRONG_SURFACE_LEFTOVER_CLI_ONLY_TOOL_NAMES,
 ] as const;
 
 export type HostedWrongSurfaceToolName = (typeof HOSTED_WRONG_SURFACE_TOOL_NAMES)[number];
@@ -380,7 +440,7 @@ export function isHostedWrongSurfaceTool(name: string): name is HostedWrongSurfa
   return (HOSTED_WRONG_SURFACE_TOOL_NAMES as readonly string[]).includes(name);
 }
 
-/** Wrong-surface local workspace requests take capability from the hosted receipt, not a missing-tool guess. */
+/** Wrong-surface local-only MCP names take capability from the hosted receipt, not a missing-tool guess. */
 export function hostedWrongSurfaceRefusal(input: {
   engineVersion: string;
   toolName: string;
@@ -393,5 +453,78 @@ export function hostedWrongSurfaceRefusal(input: {
       clientName: input.clientName ?? HOSTED_CLIENT_NAME,
       receipt: connectionReceipt({ mode: "hosted_knowledge", engineVersion: input.engineVersion }),
     }),
+  };
+}
+
+export type LeftoverCliOnlyPublicToolName = (typeof HOSTED_WRONG_SURFACE_LEFTOVER_CLI_ONLY_TOOL_NAMES)[number];
+
+export function isLeftoverCliOnlyPublicTool(name: string): name is LeftoverCliOnlyPublicToolName {
+  return (HOSTED_WRONG_SURFACE_LEFTOVER_CLI_ONLY_TOOL_NAMES as readonly string[]).includes(name);
+}
+
+export type LeftoverCliOnlyLocalRefusal = {
+  error: "cli_only";
+  toolName: string;
+  connection: ConfiguredConnectionReading;
+};
+
+/** Leftover CLI-only public MCP names stay on the local surface. They are not hosted wrong-surface. */
+export function leftoverCliOnlyLocalRefusal(input: {
+  engineVersion: string;
+  toolName: string;
+  clientName?: string;
+  observed?: ConnectionReceipt["observed"];
+}): LeftoverCliOnlyLocalRefusal {
+  return {
+    error: "cli_only",
+    toolName: input.toolName,
+    connection: interpretConfiguredConnection({
+      clientName: input.clientName ?? LOCAL_CLIENT_NAME,
+      receipt: connectionReceipt({
+        mode: "local_execution",
+        engineVersion: input.engineVersion,
+        observed: input.observed,
+      }),
+    }),
+  };
+}
+
+/** MCP tools/call for a leftover CLI-only public name becomes cli_only, not a missing-tool guess. */
+export function leftoverCliOnlyLocalMcpResponse(
+  payload: unknown,
+  input: {
+    engineVersion: string;
+    clientName?: string;
+    observed?: ConnectionReceipt["observed"];
+  },
+): unknown {
+  let message = payload;
+  if (typeof message === "string") {
+    try {
+      message = JSON.parse(message);
+    } catch {
+      return null;
+    }
+  }
+  if (!message || typeof message !== "object" || Array.isArray(message)) return null;
+  const call = message as { jsonrpc?: unknown; id?: unknown; method?: unknown; params?: unknown };
+  if (call.method !== "tools/call") return null;
+  if (!call.params || typeof call.params !== "object" || Array.isArray(call.params)) return null;
+  const name = (call.params as { name?: unknown }).name;
+  if (typeof name !== "string" || !isLeftoverCliOnlyPublicTool(name)) return null;
+  const refusal = leftoverCliOnlyLocalRefusal({
+    engineVersion: input.engineVersion,
+    toolName: name,
+    clientName: input.clientName,
+    observed: input.observed,
+  });
+  return {
+    jsonrpc: "2.0",
+    id: "id" in call ? call.id : null,
+    result: {
+      content: [{ type: "text", text: JSON.stringify(refusal) }],
+      structuredContent: refusal,
+      isError: true,
+    },
   };
 }

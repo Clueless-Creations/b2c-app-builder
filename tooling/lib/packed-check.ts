@@ -3,17 +3,24 @@ import { resolveCompiledScript } from "./tsx-launcher.mjs";
 
 /**
  * Scripts this increment may launch from `dist/` without tsx. `tsconfig.build.json` already
- * emits `tooling/**` plus the catalog, gates-layout, graph-foundations, hub-spoke,
- * learning-grounding, and operating-graph wrappers. The rest of the uncompiled `checks/` graph
+ * emits `tooling/**` plus the agent-entrypoints, architecture, autopilot, catalog, gates-layout,
+ * graph-foundations, hub-spoke, learning-grounding, operating-graph, pack-composition,
+ * package-parity, and validator-docs wrappers. The rest of the uncompiled `checks/` graph
  * stays on tsx.
  */
 export const PACKED_CHECK_COMPILED_SOURCES = [
+  "checks/validation/repository/check-agent-entrypoints.ts",
+  "checks/validation/repository/check-architecture.ts",
+  "checks/validation/repository/check-autopilot-contract.ts",
   "checks/validation/repository/check-catalog.ts",
   "checks/validation/repository/check-gates-layout.ts",
   "checks/validation/repository/check-graph-foundations.ts",
   "checks/validation/repository/check-hub-spoke.ts",
   "checks/validation/repository/check-learning-grounding.ts",
   "checks/validation/repository/check-operating-graph.ts",
+  "checks/validation/repository/check-pack-composition.ts",
+  "checks/validation/repository/check-package-parity.ts",
+  "checks/validation/repository/check-validator-docs.ts",
   "tooling/render-credits.ts",
   "tooling/render-hosted-bundle.ts",
   "tooling/render-public-api.ts",

@@ -1,6 +1,6 @@
 ---
 name: b2c-app-builder
-description: "Route consumer-app work: focused expertise, managed business creation or continuation, and explicit B2C setup. Prefer a matching task skill for scoped research, onboarding, or monetization work. Do not use for an unrelated B2B/internal tool or a narrow code fix."
+description: "Route broad consumer-app work across research, product, design, engineering, launch, growth, operations, and B2C CLI or MCP setup. Use focused task skills for scoped expertise or the managed lifecycle for a complete business. Do not use for a narrow code fix or an unrelated B2B or internal tool."
 metadata:
   short-description: Build and improve a consumer business
 ---
@@ -33,7 +33,7 @@ Author accepted product intent in product.yaml and global design in DESIGN.md; P
 
 ## Setup request
 
-Only when setup is requested or a managed execution path actually needs connectivity, open [connection setup](agents/skills/b2c-app-builder/references/setup.md). Local b2c-local supports registered workspace work; hosted b2c-hosted supplies read-only knowledge and cannot execute a local business. A leftover b2c-app-builder connection name is not a third capability.
+Only when setup is requested or a managed execution path actually needs connectivity, open [connection setup](agents/skills/b2c-app-builder/references/setup.md). Local b2c-local supports registered workspace work; hosted b2c-hosted supplies read-only knowledge and cannot execute a local business. A leftover b2c-app-builder connection name is not a third capability. A missing worker CLI degrades local execution health; it does not turn this connection into hosted knowledge. Degraded execution still selects b2c-local. Leftover CLI-only public MCP names stay CLI-only on this local connection. Hosted leftover names stay wrong-surface.
 
 Do not edit an agent configuration or install software unless the user requested setup. Keep MCP read-only by default and use the CLI for approved writes. Missing execution tooling does not block advisory work.
 

@@ -8,6 +8,68 @@ import { assert, skillRoot, type Harness } from "./_harness.js";
 import { resolveTsxBin } from "../../../tooling/lib/tsx-bin.js";
 import { createKnowledgeService } from "../../../kernel/knowledge-service/service.js";
 import type { HostedKnowledgeBundle } from "../../../kernel/knowledge-service/types.js";
+import { compilePlan, type CatalogInput, type RunNodeId } from "../../../kernel/engine/compile.js";
+import { beginAttempt, reconcilePatch, seedRunState, writeRunState } from "../../../kernel/engine/runstate.js";
+import { workspaceArtifactFingerprint } from "../../../kernel/engine/review-evidence.js";
+import type { BusinessStateV2 } from "../../../kernel/schema/types.js";
+import { bootstrapWorkspace, readRunState } from "./session.fixtures.js";
+
+const workspaceRuntimeObservedCatalog: CatalogInput = {
+  version: "catalog.mcp-fixture.workspace-runtime-observed",
+  artifacts: [{ id: "artifact.research-scan", path: "research/scan.md" }],
+  workflows: [
+    {
+      id: "workflow.research-scan",
+      title: "Research what people need",
+      domainId: "domain.research",
+      actionClass: "draft",
+      dependencies: [],
+      outputPaths: ["research/scan.md"],
+      providerIds: [],
+      laneIds: [],
+      founderOnlyActions: [],
+      gateCommands: [],
+      idempotent: true,
+    },
+  ],
+};
+
+function seedPendingWorkspaceProof(harness: Harness, name: string) {
+  const handle = bootstrapWorkspace(harness, name, workspaceRuntimeObservedCatalog);
+  mkdirSync(path.join(handle.dir, "research"), { recursive: true });
+  writeFileSync(path.join(handle.dir, "research/scan.md"), "Workspace research scan.\n", "utf8");
+  const plan = compilePlan(workspaceRuntimeObservedCatalog, "2026-09-11T18:00:00.000Z");
+  const businessState = JSON.parse(readFileSync(handle.statePath, "utf8")) as BusinessStateV2;
+  const run = seedRunState(plan, businessState, {
+    ownerSessionId: "sess-workspace-producer",
+    ttlSeconds: 600,
+    wallClockCapSeconds: 3600,
+    now: "2026-09-11T18:00:00.000Z",
+  });
+  const nodeId = "run.research-scan" as RunNodeId;
+  const attempt = beginAttempt(plan, run, nodeId, "sess-workspace-producer", "2026-09-11T18:00:01.000Z");
+  attempt.proofSource = "workspace";
+  reconcilePatch(
+    plan,
+    run,
+    {
+      nodeId,
+      attemptId: attempt.id,
+      outputs: [
+        {
+          artifactId: "artifact.research-scan",
+          path: "research/scan.md",
+          fingerprint: workspaceArtifactFingerprint(handle.dir, "research/scan.md"),
+          evidence: ["workspace bytes produced"],
+        },
+      ],
+    },
+    "2026-09-11T18:00:02.000Z",
+  );
+  mkdirSync(path.join(handle.dir, "run"), { recursive: true });
+  writeRunState(path.join(handle.dir, "run/run-state.json"), run);
+  return handle;
+}
 
 /**
  * The engine's MCP surface (entrypoints/mcp/server.ts): real client conversations over stdio — local
@@ -979,4 +1041,134 @@ main().catch((error) => { console.error(error instanceof Error ? error.message :
       );
     },
   );
+
+  harness.check("mcp: b2c_verify forwards an explicit workspace runtime observation", () => {
+    const omit = seedPendingWorkspaceProof(harness, "mcp-verify-omit");
+    const booleanFlag = seedPendingWorkspaceProof(harness, "mcp-verify-boolean");
+    const workspaceToken = seedPendingWorkspaceProof(harness, "mcp-verify-workspace");
+    const liveDevice = seedPendingWorkspaceProof(harness, "mcp-verify-live-device");
+    const liveDeviceBytes = readFileSync(path.join(liveDevice.dir, "run", "run-state.json"), "utf8");
+    const temp = harness.makeTempDir("mcp-verify-runtime-home");
+    const b2cAppBuilderHome = path.join(temp, "b2c-home");
+    for (const [id, handle] of [
+      ["mcp-verify-omit", omit],
+      ["mcp-verify-boolean", booleanFlag],
+      ["mcp-verify-workspace", workspaceToken],
+      ["mcp-verify-live-device", liveDevice],
+    ] as const) {
+      const registered = spawnSync(resolveTsxBin(skillRoot), [path.join(skillRoot, "kernel/session/workspaces.ts"), "register", id, handle.dir], {
+        cwd: skillRoot,
+        encoding: "utf8",
+        env: { ...process.env, B2C_APP_BUILDER_HOME: b2cAppBuilderHome },
+      });
+      assert(registered.status === 0, `workspace registration failed for ${id}: ${registered.stdout}\n${registered.stderr}`);
+    }
+    const driverPath = path.join(temp, "drive-verify-runtime.mts");
+    const driverSource = `
+import { spawn } from "node:child_process";
+import readline from "node:readline";
+
+const server = spawn(${JSON.stringify(resolveTsxBin(skillRoot))}, [${JSON.stringify(path.join(skillRoot, "entrypoints/mcp/server.ts"))}], {
+  cwd: ${JSON.stringify(skillRoot)},
+  env: { ...process.env, B2C_APP_BUILDER_HOME: ${JSON.stringify(b2cAppBuilderHome)}, B2C_APP_BUILDER_MCP_WRITE: "1" },
+  stdio: ["pipe", "pipe", "inherit"],
+});
+const lines = readline.createInterface({ input: server.stdout });
+const pending = new Map();
+lines.on("line", (line) => {
+  try {
+    const message = JSON.parse(line);
+    if (message.id !== undefined && pending.has(message.id)) {
+      pending.get(message.id)(message);
+      pending.delete(message.id);
+    }
+  } catch { /* non-JSON noise is not part of the protocol */ }
+});
+let nextId = 1;
+function request(method, params) {
+  const id = nextId++;
+  return new Promise((resolve, reject) => {
+    pending.set(id, resolve);
+    setTimeout(() => reject(new Error("timeout waiting for " + method)), 120_000).unref?.();
+    server.stdin.write(JSON.stringify({ jsonrpc: "2.0", id, method, params }) + "\\n");
+  });
+}
+async function main() {
+  const init = await request("initialize", {
+    protocolVersion: "2025-06-18",
+    capabilities: {},
+    clientInfo: { name: "verify-runtime-driver", version: "0.0.0" },
+  });
+  if (init.result?.serverInfo?.name !== "b2c-local") throw new Error("handshake failed: " + JSON.stringify(init.result?.serverInfo));
+  server.stdin.write(JSON.stringify({ jsonrpc: "2.0", method: "notifications/initialized" }) + "\\n");
+
+  const listedTools = (await request("tools/list", {})).result?.tools ?? [];
+  const verifyTool = listedTools.find((tool) => tool.name === "b2c_verify");
+  const fields = verifyTool?.inputSchema?.properties ?? {};
+  if (!("runtimeObserved" in fields)) throw new Error("b2c_verify schema is missing runtimeObserved");
+  if (!String(verifyTool?.description ?? "").includes("live-device")) {
+    throw new Error("b2c_verify must say a live-device word cannot invent runtime proof");
+  }
+
+  const evidence = "fresh-context review: brief matches the category evidence and names sources";
+  const omit = await request("tools/call", {
+    name: "b2c_verify",
+    arguments: { workspace: "mcp-verify-omit", node: "workflow.research-scan", session: "sess-workspace-reviewer", evidence },
+  });
+  if (omit.result?.isError) throw new Error("omitted runtimeObserved must still accept review: " + JSON.stringify(omit.result).slice(0, 400));
+  const booleanFlag = await request("tools/call", {
+    name: "b2c_verify",
+    arguments: { workspace: "mcp-verify-boolean", node: "workflow.research-scan", session: "sess-workspace-reviewer", evidence, runtimeObserved: true },
+  });
+  if (booleanFlag.result?.isError) throw new Error("runtimeObserved true must accept: " + JSON.stringify(booleanFlag.result).slice(0, 400));
+  const workspaceToken = await request("tools/call", {
+    name: "b2c_verify",
+    arguments: { workspace: "mcp-verify-workspace", node: "workflow.research-scan", session: "sess-workspace-reviewer", evidence, runtimeObserved: "workspace" },
+  });
+  if (workspaceToken.result?.isError) throw new Error("runtimeObserved workspace must accept: " + JSON.stringify(workspaceToken.result).slice(0, 400));
+  const liveDevice = await request("tools/call", {
+    name: "b2c_verify",
+    arguments: { workspace: "mcp-verify-live-device", node: "workflow.research-scan", session: "sess-workspace-reviewer", evidence, runtimeObserved: "live-device" },
+  });
+  if (!liveDevice.result?.isError) throw new Error("live-device must be refused");
+  const liveDeviceText = (liveDevice.result?.content ?? []).map((entry) => entry.text).join("");
+  if (!liveDeviceText.includes("verify.runtime_observation_invalid")) {
+    throw new Error("live-device must keep the CLI refusal, got: " + liveDeviceText.slice(0, 300));
+  }
+
+  console.log("mcp-verify-runtime ok");
+  server.kill();
+}
+main().catch((error) => { console.error(error instanceof Error ? error.message : String(error)); server.kill(); process.exit(1); });
+`;
+    writeFileSync(driverPath, driverSource, "utf8");
+    const result = spawnSync(resolveTsxBin(skillRoot), [driverPath], { cwd: skillRoot, encoding: "utf8", timeout: 180_000 });
+    assert(
+      result.status === 0 && (result.stdout ?? "").includes("mcp-verify-runtime ok"),
+      `verify-runtime driver failed (exit ${result.status}):\n${(result.stdout ?? "").slice(-400)}\n${(result.stderr ?? "").slice(-400)}`,
+    );
+    const omitProof = readRunState(omit)
+      .nodes["run.research-scan"]!.attempts.at(-1)
+      ?.independentVerification?.evidence.find((line) => line.startsWith("Proof strength:"));
+    assert(
+      Boolean(omitProof?.includes("semantic=checked") && omitProof.includes("runtime=unknown") && !omitProof.includes("runtime=checked")),
+      `omitted MCP runtimeObserved cannot invent runtime proof, got ${omitProof ?? "none"}`,
+    );
+    for (const [label, handle] of [
+      ["boolean", booleanFlag],
+      ["workspace", workspaceToken],
+    ] as const) {
+      const proof = readRunState(handle)
+        .nodes["run.research-scan"]!.attempts.at(-1)
+        ?.independentVerification?.evidence.find((line) => line.startsWith("Proof strength:"));
+      assert(
+        Boolean(proof?.includes("semantic=checked") && proof.includes("runtime=checked") && !proof.includes("runtime=unknown")),
+        `MCP runtimeObserved ${label} must record workspace runtime proof, got ${proof ?? "none"}`,
+      );
+    }
+    assert(
+      readFileSync(path.join(liveDevice.dir, "run", "run-state.json"), "utf8") === liveDeviceBytes,
+      "live-device MCP verify must leave run-state bytes unchanged",
+    );
+  });
 }

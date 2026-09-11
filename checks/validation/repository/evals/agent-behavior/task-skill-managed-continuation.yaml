@@ -1,0 +1,17 @@
+id: task-skill-managed-continuation
+title: Managed continuation uses the existing planner rather than a new skill schedule
+prompt: Resume my registered consumer business and carry the accepted launch mandate forward.
+expected_route: Use the main business entrypoint, inspect business-status then business-plan, and execute only the current bounded work
+  under existing authority and evidence contracts.
+must_use:
+- business-status
+- business-plan
+must_catch:
+- current ready or held brief
+- protected effects require authority
+should_say:
+- evidence
+- next
+forbidden:
+- load every skill before starting
+- start a second planning system

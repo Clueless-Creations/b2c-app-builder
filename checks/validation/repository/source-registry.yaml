@@ -2778,3 +2778,23 @@ sources:
       - catalog/upstreams/last30days-skill.yaml
     notes: Immutable license evidence reviewed with the selected upstream commit. A new adoption must review and
       retain its own license; this entry is not live executable verification.
+  - id: openai-codex-skills
+    name: OpenAI skill installation documentation
+    source_type: website
+    url: https://developers.openai.com/codex/skills/
+    refresh_cadence_days: 30
+    owner: maintainer
+    locations:
+    - docs/guides/task-skills.md
+    notes: Informational host installation reference. Directory format does not establish runtime compatibility; no
+      external skill text is incorporated.
+  - id: claude-code-skills
+    name: Claude Code skill installation documentation
+    source_type: website
+    url: https://code.claude.com/docs/en/skills
+    refresh_cadence_days: 30
+    owner: maintainer
+    locations:
+    - docs/guides/task-skills.md
+    notes: Informational host installation reference. Directory format does not establish runtime compatibility; no
+      external skill text is incorporated.

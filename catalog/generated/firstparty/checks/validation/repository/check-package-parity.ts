@@ -1,11 +1,16 @@
 #!/usr/bin/env node
+/**
+ * Default skill root walks from this file so packed omit-dev can launch the compiled twin
+ * under `dist/checks/validation/repository/` without treating `dist/` as the package root.
+ */
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
 import { flagString, isRecord, issue, parseFlags, reportAndExit, type Issue } from "../../../tooling/lib/launch-state.js";
 import { auditExcludedScripts, buildAuditPlan, type AuditLayout } from "../../../tooling/lib/audit-plan.js";
+import { skillDirectory, taskSkills } from "../../../catalog/task-skills.js";
 import { SCRIPT_ROOTS, findScriptPath, scriptBasenameFromCommand } from "../../../tooling/lib/script-paths.js";
+import { resolveSkillRoot } from "../../../tooling/lib/skill-root.js";
 
 interface PackageJson {
   name?: string;
@@ -23,8 +28,7 @@ interface Args {
   skillRoot: string;
 }
 
-const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-const defaultSkillRoot = path.resolve(scriptDir, "../../..");
+const defaultSkillRoot = resolveSkillRoot(import.meta.url);
 const defaultRepoRoot = defaultSkillRoot;
 
 /** Workspace-template entrypoints the installer copies. Must be tracked, not merely on disk. */
@@ -234,6 +238,11 @@ function checkPackStandalone(runtimePkg: PackageJson): void {
     "dist/kernel/session/onboard.js",
     "dist/tooling/render-credits.js",
     "SKILL.md",
+    "agents/skills/b2c-app-builder/references/setup.md",
+    "agents/skills/b2c-app-builder/references/business-lifecycle.md",
+    "agents/skills/b2c-app-builder/references/composition.md",
+    "agents/skills/b2c-app-builder/references/mobile-operation.md",
+    ...taskSkills.flatMap((skill) => [`${skillDirectory(skill)}/SKILL.md`, `${skillDirectory(skill)}/references/task.md`]),
     "skill-version.json",
     "tsconfig.json",
     "catalog/generated/catalog.json",
@@ -281,7 +290,10 @@ function checkPackStandalone(runtimePkg: PackageJson): void {
 
   // Development-only surfaces must never ride along.
   for (const prefix of ["checks/verification/", "content/", "business/", "agents/", "node_modules/"]) {
-    const leaked = packed.find((file) => file.startsWith(prefix));
+    const businessSkillPrefixes = ["agents/skills/b2c-app-builder/references/", ...taskSkills.map((skill) => `${skillDirectory(skill)}/`)];
+    const leaked = packed.find(
+      (file) => file.startsWith(prefix) && !(prefix === "agents/" && businessSkillPrefixes.some((allowed) => file.startsWith(allowed))),
+    );
     if (leaked) {
       issues.push(
         issue("error", "package_parity.pack_dev_leak", `npm pack would ship development-only ${leaked} — tighten the files manifest.`, "package.json"),

@@ -71,7 +71,7 @@
     "audit:links": "tsx checks/validation/repository/audit-skill-links.ts --skill-root .",
     "catalog:add-workflow": "tsx tooling/catalog-scaffold.ts add-workflow",
     "catalog:render-routing": "tsx catalog/render-routing.ts",
-    "check:agent-entrypoints": "tsx checks/validation/repository/check-agent-entrypoints.ts --repo-root . && npm run check:task-skills",
+    "check:agent-entrypoints": "tsx checks/validation/repository/check-agent-entrypoints.ts --repo-root .",
     "check:agent-evals": "tsx checks/validation/repository/run-agent-evals.ts",
     "check:agent-operations": "tsx checks/validation/business/operations/check-agent-operations.ts",
     "check:agent-roster": "tsx checks/validation/business/engineering/check-roster-overlap.ts",
@@ -258,7 +258,7 @@
     "test:browser-proof-chrome": "tsx checks/verification/fixtures/browser-proof.chrome-smoke.ts",
     "render:task-skills": "tsx tooling/render-task-skills.ts",
     "skills:export": "tsx tooling/export-task-skill.ts",
-    "check:task-skills": "tsx tooling/render-task-skills.ts --check && tsx --test checks/verification/task-skills.test.ts"
+    "check:task-skills": "tsx checks/validation/repository/check-task-skills.ts"
   },
   "dependencies": {
     "@babel/parser": "8.0.4",

@@ -14,9 +14,9 @@
  * the host `asc`. RevenueCat CLI identity uses trusted discovery (`--version` and `commands --json`)
  * because a generic `rc --version` probe cannot distinguish an unrelated binary. Expo/EAS CLI
  * identity uses `--version` only and never claims a live EAS job. A missing or stale
- * winner is a warning, same as a missing worker CLI. Doctor never authenticates or mutates
- * host CLIs, and never claims live catalog or live EAS proof. The diagnostic itself writes a
- * sanitized host observation under engine home.
+ * winner is a warning, same as a missing worker CLI. Inspect never authenticates or mutates
+ * host CLIs, and never claims live catalog or live EAS proof. `b2c doctor` is a supported
+ * equivalent. The diagnostic itself writes a sanitized host observation under engine home.
  */
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
@@ -303,7 +303,7 @@ function probeAsc(
   const latest = facts?.latestObserved ?? null;
 
   if (!facts) {
-    finding("warn", "doctor.asc_observation_unreadable", "could not load the App Store Connect CLI upstream observation — doctor still did not install anything");
+    finding("warn", "doctor.asc_observation_unreadable", "could not load the App Store Connect CLI upstream observation — inspect still did not install anything");
     return { latestObserved: latest, path: null, version: null };
   }
 
@@ -319,7 +319,7 @@ function probeAsc(
     finding(
       "warn",
       "doctor.asc_missing",
-      `no asc on PATH. Latest observed ${latest ?? "(unknown)"}. Store lanes need the App Store Connect CLI; doctor will not install it.`,
+      `no asc on PATH. Latest observed ${latest ?? "(unknown)"}. Store lanes need the App Store Connect CLI; inspect will not install it.`,
     );
     return { latestObserved: latest, path: null, version: null };
   }
@@ -350,7 +350,7 @@ function probeAsc(
     finding(
       "warn",
       "doctor.asc_unsupported",
-      `winning ${winnerPath} is ${winner.version}, which is outside the builder's supported range. Latest observed ${latest ?? "(unknown)"}. Doctor will not upgrade the host.`,
+      `winning ${winnerPath} is ${winner.version}, which is outside the builder's supported range. Latest observed ${latest ?? "(unknown)"}. Inspect will not upgrade the host.`,
     );
     return { latestObserved: latest, path: winnerPath, version: winner.version };
   }
@@ -361,7 +361,7 @@ function probeAsc(
       finding(
         "warn",
         "doctor.asc_stale",
-        `winning ${winnerPath} is ${winner.version}; latest observed is ${latest}. Prefer the latest App Store Connect CLI. Doctor will not upgrade the host.`,
+        `winning ${winnerPath} is ${winner.version}; latest observed is ${latest}. Prefer the latest App Store Connect CLI. Inspect will not upgrade the host.`,
       );
       return { latestObserved: latest, path: winnerPath, version: winner.version };
     }
@@ -375,8 +375,9 @@ export function printFindings(findings: readonly DoctorFinding[]): number {
   for (const item of findings) console.log(`${item.severity.toUpperCase().padEnd(5)} ${item.code} — ${item.message}`);
   const errors = findings.filter((item) => item.severity === "error").length;
   const warns = findings.filter((item) => item.severity === "warn").length;
+  // Shared inspect/doctor footer. Prefer inspect; `b2c doctor` is a supported equivalent. Finding codes stay `doctor.*`.
   console.log(
-    errors > 0 ? `\ndoctor: ${errors} error(s), ${warns} warning(s) — this install cannot run businesses yet.` : `\ndoctor: healthy (${warns} warning(s)).`,
+    errors > 0 ? `\ninspect: ${errors} error(s), ${warns} warning(s) — this install cannot run businesses yet.` : `\ninspect: healthy (${warns} warning(s)).`,
   );
   return errors > 0 ? 1 : 0;
 }

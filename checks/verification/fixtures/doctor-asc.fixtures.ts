@@ -126,7 +126,7 @@ export function register(harness: Harness): void {
       stale.message.includes("/usr/local/bin/asc") && stale.message.includes("5.0.0") && stale.message.includes(LATEST),
       `stale finding must name winner path, winner version, and latest: ${stale.message}`,
     );
-    assert(stale.message.includes("will not upgrade"), `stale finding must refuse a host upgrade: ${stale.message}`);
+    assert(stale.message.includes("Inspect will not upgrade the host"), `stale finding must refuse a host upgrade in inspect copy: ${stale.message}`);
   });
 
   harness.check("doctor-asc: two PATH entries report the winner and a shadowed warn", () => {
@@ -260,6 +260,54 @@ export function register(harness: Harness): void {
       !northStar.includes("written only by CLI `doctor`/`setup`"),
       "ARCH-07 must not keep doctor as the only named CLI writer",
     );
+    assert(adr.includes("CLI `doctor` / `setup` write it"), "ADR-0010 historical writer sentence stays");
+    assert(
+      adr.includes("A doctor snapshot and a `run/` receipt are stored observations"),
+      "ADR-0010 historical doctor snapshot wording stays",
+    );
+  });
+
+  harness.check("doctor-asc: utterance router catalog-bundle comment prefers inspect", () => {
+    const text = readFileSync(path.join(skillRoot, "kernel", "session", "route-utterance.ts"), "utf8");
+    assert(text.includes("`b2c inspect` checks"), "utterance router must prefer inspect for catalog-bundle checks");
+    assert(text.includes("`b2c doctor` is a supported equivalent"), "utterance router must keep doctor supported");
+    assert(!text.includes("`b2c doctor` checks"), "utterance router must not keep doctor as the named catalog-bundle check");
+  });
+
+  harness.check("doctor-asc: inspect findings footer prefers inspect", () => {
+    const text = readFileSync(path.join(skillRoot, "kernel", "session", "doctor.ts"), "utf8");
+    assert(text.includes("inspect: healthy"), "printFindings must prefer inspect in the diagnostic footer");
+    assert(text.includes("`b2c doctor` is a supported equivalent"), "printFindings must keep doctor supported");
+    assert(text.includes("doctor.node"), "finding codes stay doctor.*");
+    assert(!text.includes("doctor: healthy"), "printFindings must not keep doctor as the named diagnostic footer");
+  });
+
+  harness.check("doctor-asc: ASC finding messages prefer inspect as the diagnostic actor", () => {
+    const text = readFileSync(path.join(skillRoot, "kernel", "session", "doctor.ts"), "utf8");
+    const { findings } = runIsolated(harness, "doctor-asc-inspect-actor", fakeFacts([{ path: "/usr/local/bin/asc", version: "5.0.0" }]));
+    const stale = finding(findings, "doctor.asc_stale");
+    const missingFinding = finding(runIsolated(harness, "doctor-asc-inspect-actor-missing", fakeFacts([])).findings, "doctor.asc_missing");
+    const unsupported = finding(
+      runIsolated(harness, "doctor-asc-inspect-actor-floor", fakeFacts([{ path: "/usr/local/bin/asc", version: "4.11.0" }])).findings,
+      "doctor.asc_unsupported",
+    );
+    assert(stale?.code === "doctor.asc_stale", "finding codes stay doctor.*");
+    assert(stale.message.includes("Inspect will not upgrade the host"), `stale actor copy must prefer inspect: ${stale.message}`);
+    assert(unsupported?.message.includes("Inspect will not upgrade the host"), `unsupported actor copy must prefer inspect: ${unsupported?.message}`);
+    assert(missingFinding?.message.includes("inspect will not install it"), `missing actor copy must prefer inspect: ${missingFinding?.message}`);
+    assert(text.includes("inspect still did not install anything"), "unreadable observation copy must prefer inspect");
+    assert(text.includes("`b2c doctor` is a supported equivalent"), "ASC diagnostic copy must keep doctor supported");
+    assert(!text.includes("Doctor will not"), "ASC findings must not keep Doctor as the named actor");
+    assert(!text.includes("doctor will not install it"), "ASC missing copy must not keep doctor as the named actor");
+    assert(!text.includes("doctor still did not install anything"), "ASC unreadable copy must not keep doctor as the named actor");
+  });
+
+  harness.check("doctor-asc: ASC reviewed-guidance note prefers inspect as the host-upgrade actor", () => {
+    const text = readFileSync(path.join(skillRoot, "catalog", "upstreams", "rork-app-store-connect-cli.yaml"), "utf8");
+    const adr = readFileSync(path.join(skillRoot, "docs", "decisions", "0010-first-run-honesty-owners.md"), "utf8");
+    assert(text.includes("inspect does not upgrade the host"), "ASC reviewed-guidance must prefer inspect");
+    assert(text.includes("`b2c doctor` is a supported equivalent"), "ASC reviewed-guidance must keep doctor supported");
+    assert(!text.includes("doctor does not upgrade the host"), "ASC reviewed-guidance must not keep doctor as the named host-upgrade actor");
     assert(adr.includes("CLI `doctor` / `setup` write it"), "ADR-0010 historical writer sentence stays");
     assert(
       adr.includes("A doctor snapshot and a `run/` receipt are stored observations"),

@@ -4,8 +4,8 @@
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Expose catalog-generated task skills for research, onboarding, and monetization review.",
-    "Align public navigation across six business areas and move root procedures behind conditional references.",
-    "Export create-only portable guidance snapshots with bound knowledge, source hashes, and notices."
+    "Expose catalog-backed task skills for research, onboarding, and monetization with one public business-area map.",
+    "Keep the root skill bounded and preserve lifecycle, setup, composition, and mobile procedures through tested direct references.",
+    "Package create-only portable guidance with source hashes, notices, and fail-closed reference checks."
   ]
 }

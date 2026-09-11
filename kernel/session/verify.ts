@@ -13,7 +13,7 @@
  * Usage:
  *   tsx kernel/session/verify.ts --workspace <id-or-path> --list
  *   tsx kernel/session/verify.ts --workspace <id-or-path> --node <workflow-or-run-node-id> \
- *     --session <id> --evidence <text>
+ *     --session <id> --evidence <text> [--runtime-observed]
  *
  * Exit codes: 0 = accepted (or list printed); 1 = unknown node/invalid input/refused.
  */
@@ -22,7 +22,7 @@ import { isMainModule, parseArgs } from "../lib/cli.js";
 import { appendAuditEntry } from "../reducer/audit.js";
 import { compilePlan, type RunNodeId } from "../engine/compile.js";
 import { acceptVerification, loadRunState, writeRunState } from "../engine/runstate.js";
-import { captureReviewEvidence } from "../engine/review-evidence.js";
+import { captureReviewEvidence, parseWorkspaceRuntimeObservation } from "../engine/review-evidence.js";
 import { listPendingFreshContext, refuseFreshContextAcceptance } from "../engine/verification.js";
 import type { RunStateDocument } from "../schema/types.js";
 import { loadWorkspaceCatalog, renderCatalogRefusal } from "./catalog-contract.js";
@@ -31,7 +31,7 @@ import { resolveCliWorkspace } from "./status.js";
 function main(): number {
   const args = parseArgs(process.argv.slice(2));
   if (!args.workspace) {
-    console.error("Usage: tsx kernel/session/verify.ts --workspace <id-or-path> [--list] --node <id> --session <id> --evidence <text>");
+    console.error("Usage: tsx kernel/session/verify.ts --workspace <id-or-path> [--list] --node <id> --session <id> --evidence <text> [--runtime-observed]");
     return 1;
   }
   const resolvedWorkspace = resolveCliWorkspace(args.workspace!);
@@ -74,6 +74,15 @@ function main(): number {
     console.error("ISSUE verify.evidence_required: --evidence must state what was checked and why it holds; empty acceptance is the auto-accept hole again");
     return 1;
   }
+  let runtimeObservation;
+  try {
+    runtimeObservation = parseWorkspaceRuntimeObservation(args["runtime-observed"]);
+  } catch {
+    console.error(
+      "ISSUE verify.runtime_observation_invalid: --runtime-observed accepts only an explicit workspace token; a sentence or live-device word cannot invent it",
+    );
+    return 1;
+  }
   const nodeId = (rawNodeId.startsWith("workflow.") ? `run.${rawNodeId.slice("workflow.".length)}` : rawNodeId) as RunNodeId;
   // The acceptance rules (pending-only, required independent review, producer≠verifier across every
   // attempt) live in kernel/engine/verification.ts, shared with the session runner's own verifier
@@ -102,7 +111,7 @@ function main(): number {
       now,
       run.nodes[nodeId]?.attempts.at(-1)?.proofSource === "synthetic" ? "synthetic" : "workspace",
     );
-    acceptVerification(plan, run, nodeId, [evidence], now, sessionId, receipt, workspace);
+    acceptVerification(plan, run, nodeId, [evidence], now, sessionId, receipt, workspace, runtimeObservation);
   } catch {
     console.error("ISSUE verify.current_evidence: current artifacts and criteria must match the produced output before independent acceptance");
     return 1;

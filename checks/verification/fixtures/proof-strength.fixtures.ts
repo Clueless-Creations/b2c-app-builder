@@ -6,6 +6,7 @@ import {
   classifyProofStrengthIssues,
   composeProofStrength,
   formatProofStrength,
+  parseWorkspaceRuntimeObservation,
   workspaceArtifactFingerprint,
 } from "../../../kernel/engine/review-evidence.js";
 import { acceptVerification, beginAttempt, recordRejectedVerification, reconcilePatch, seedRunState } from "../../../kernel/engine/runstate.js";
@@ -487,5 +488,16 @@ export function register(harness: Harness): void {
       `a screenshot cannot satisfy runtime proof on the accept path, got ${produced ?? "none"}`,
     );
     assert(!produced?.includes("runtime=checked"), "a screenshot cannot become runtime proof through acceptVerification");
+  });
+
+  harness.check("proof-strength: parseWorkspaceRuntimeObservation accepts only an explicit workspace token", () => {
+    assert(parseWorkspaceRuntimeObservation(undefined) === undefined, "an omitted token stays unobserved");
+    assert(parseWorkspaceRuntimeObservation("") === undefined, "an empty token stays unobserved");
+    assert(parseWorkspaceRuntimeObservation("workspace")?.origin === "workspace", "workspace is the accepted origin");
+    assert(parseWorkspaceRuntimeObservation("true")?.origin === "workspace", "the boolean flag form is the same workspace token");
+    const liveDevice = thrownMessage(() => parseWorkspaceRuntimeObservation("live-device"));
+    assert(liveDevice.includes("explicit workspace token"), `a live-device word cannot invent observation, got ${liveDevice}`);
+    const sentence = thrownMessage(() => parseWorkspaceRuntimeObservation("fresh-context reviewer signed off"));
+    assert(sentence.includes("explicit workspace token"), `a reviewer sentence cannot invent observation, got ${sentence}`);
   });
 }

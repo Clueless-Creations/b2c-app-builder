@@ -12255,9 +12255,9 @@ gates:
   - id: gate.check-task-skills
     command: check:task-skills
     command_manifest_path: package.json
-    script_path: tooling/render-task-skills.ts
-    owner_domain_id: domain.process
-    audit: manual
+    script_path: checks/validation/repository/check-task-skills.ts
+    owner_domain_id: domain.machine
+    audit: required
   - id: gate.check-template-safety
     command: check:template-safety
     command_manifest_path: package.json

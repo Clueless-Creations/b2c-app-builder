@@ -12,7 +12,7 @@ export function register(h: Harness): void {
     const remaining = inventory.filter((entry) => entry.remainingTsx);
     assert(
       compiled.join(",") ===
-        "check:catalog,check:credits,check:gates-layout,check:graph-foundations,check:hosted-bundle,check:hub-spoke,check:learning-grounding,check:operating-graph,check:public-api",
+        "check:agent-entrypoints,check:architecture,check:autopilot,check:catalog,check:credits,check:gates-layout,check:graph-foundations,check:hosted-bundle,check:hub-spoke,check:learning-grounding,check:operating-graph,check:pack-composition,check:package-parity,check:public-api,check:validator-docs",
       `compiled-eligible check scripts drifted: ${compiled.join(",")}`,
     );
     assert(remaining.length > 0, "remaining-tsx inventory must still name the uncompiled checks graph");
@@ -20,6 +20,12 @@ export function register(h: Harness): void {
       remaining.every((entry) => entry.sourcePath === undefined || entry.sourcePath.startsWith("checks/")),
       "remaining-tsx entries must stay under the uncompiled checks/ graph",
     );
+    assert(
+      !remaining.some((entry) => entry.id === "check:agent-entrypoints"),
+      "check:agent-entrypoints must leave remaining-tsx once its compiled twin is eligible",
+    );
+    assert(!remaining.some((entry) => entry.id === "check:architecture"), "check:architecture must leave remaining-tsx once its compiled twin is eligible");
+    assert(!remaining.some((entry) => entry.id === "check:autopilot"), "check:autopilot must leave remaining-tsx once its compiled twin is eligible");
     assert(!remaining.some((entry) => entry.id === "check:catalog"), "check:catalog must leave remaining-tsx once its compiled twin is eligible");
     assert(!remaining.some((entry) => entry.id === "check:gates-layout"), "check:gates-layout must leave remaining-tsx once its compiled twin is eligible");
     assert(
@@ -35,6 +41,13 @@ export function register(h: Harness): void {
       !remaining.some((entry) => entry.id === "check:operating-graph"),
       "check:operating-graph must leave remaining-tsx once its compiled twin is eligible",
     );
+    assert(
+      !remaining.some((entry) => entry.id === "check:pack-composition"),
+      "check:pack-composition must leave remaining-tsx once its compiled twin is eligible",
+    );
+    assert(!remaining.some((entry) => entry.id === "check:package-parity"), "check:package-parity must leave remaining-tsx once its compiled twin is eligible");
+    assert(!remaining.some((entry) => entry.id === "check:validator-docs"), "check:validator-docs must leave remaining-tsx once its compiled twin is eligible");
+    assert(remaining.length === 116, `remaining-tsx count drifted: ${remaining.length}`);
     assert(
       remaining.some((entry) => entry.id === "check:design-md" && entry.sourcePath === "checks/validation/business/design/check-design-md.ts"),
       "remaining-tsx inventory lost a representative checks/ gate",
@@ -245,5 +258,155 @@ export function register(h: Harness): void {
     assert(observed.compiled === true && observed.args?.join(" ") === "--skill-root . --json", "compiled operating-graph arguments changed");
     const source = readFileSync(path.join(skillRoot, "checks/validation/repository/check-operating-graph.ts"), "utf8");
     assert(source.includes("resolveSkillRoot(import.meta.url)"), "operating-graph check default skill root must walk from compiled dist");
+  });
+
+  h.check("packed-check: check:pack-composition prefers compiled dist without tsx", () => {
+    const root = h.makeTempDir("packed-check-pack-composition");
+    mkdirSync(path.join(root, "checks/validation/repository"), { recursive: true });
+    mkdirSync(path.join(root, "dist", "checks/validation/repository"), { recursive: true });
+    writeFileSync(
+      path.join(root, "dist", "checks/validation/repository/check-pack-composition.js"),
+      "console.log(JSON.stringify({ compiled: true, args: process.argv.slice(2) }));",
+    );
+    writeFileSync(
+      path.join(root, "checks/validation/repository/check-pack-composition.ts"),
+      'console.error("source ts fallback should not run"); process.exit(9);',
+    );
+    const command = resolvePackedCheckCommand(root, "tsx checks/validation/repository/check-pack-composition.ts --skill-root .", ["--json"]);
+    assert(
+      command?.executable === process.execPath && command.args[0] === path.join(root, "dist", "checks/validation/repository/check-pack-composition.js"),
+      "packed check:pack-composition must exec dist/checks/validation/repository/check-pack-composition.js, not bare tsx",
+    );
+    const result = spawnSync(command.executable, command.args, { env: { ...process.env, PATH: "" }, encoding: "utf8" });
+    assert(result.status === 0, `compiled pack-composition launch failed: ${result.stderr}`);
+    const observed = JSON.parse(result.stdout) as { compiled?: boolean; args?: string[] };
+    assert(observed.compiled === true && observed.args?.join(" ") === "--skill-root . --json", "compiled pack-composition arguments changed");
+    const source = readFileSync(path.join(skillRoot, "checks/validation/repository/check-pack-composition.ts"), "utf8");
+    assert(source.includes("resolveSkillRoot(import.meta.url)"), "pack-composition check default skill root must walk from compiled dist");
+  });
+
+  h.check("packed-check: check:package-parity prefers compiled dist without tsx", () => {
+    const root = h.makeTempDir("packed-check-package-parity");
+    mkdirSync(path.join(root, "checks/validation/repository"), { recursive: true });
+    mkdirSync(path.join(root, "dist", "checks/validation/repository"), { recursive: true });
+    writeFileSync(
+      path.join(root, "dist", "checks/validation/repository/check-package-parity.js"),
+      "console.log(JSON.stringify({ compiled: true, args: process.argv.slice(2) }));",
+    );
+    writeFileSync(
+      path.join(root, "checks/validation/repository/check-package-parity.ts"),
+      'console.error("source ts fallback should not run"); process.exit(9);',
+    );
+    const command = resolvePackedCheckCommand(root, "tsx checks/validation/repository/check-package-parity.ts --repo-root . --skill-root .", ["--json"]);
+    assert(
+      command?.executable === process.execPath && command.args[0] === path.join(root, "dist", "checks/validation/repository/check-package-parity.js"),
+      "packed check:package-parity must exec dist/checks/validation/repository/check-package-parity.js, not bare tsx",
+    );
+    const result = spawnSync(command.executable, command.args, { env: { ...process.env, PATH: "" }, encoding: "utf8" });
+    assert(result.status === 0, `compiled package-parity launch failed: ${result.stderr}`);
+    const observed = JSON.parse(result.stdout) as { compiled?: boolean; args?: string[] };
+    assert(observed.compiled === true && observed.args?.join(" ") === "--repo-root . --skill-root . --json", "compiled package-parity arguments changed");
+    const source = readFileSync(path.join(skillRoot, "checks/validation/repository/check-package-parity.ts"), "utf8");
+    assert(source.includes("resolveSkillRoot(import.meta.url)"), "package-parity check default skill root must walk from compiled dist");
+  });
+
+  h.check("packed-check: check:agent-entrypoints prefers compiled dist without tsx", () => {
+    const root = h.makeTempDir("packed-check-agent-entrypoints");
+    mkdirSync(path.join(root, "checks/validation/repository"), { recursive: true });
+    mkdirSync(path.join(root, "dist", "checks/validation/repository"), { recursive: true });
+    writeFileSync(
+      path.join(root, "dist", "checks/validation/repository/check-agent-entrypoints.js"),
+      "console.log(JSON.stringify({ compiled: true, args: process.argv.slice(2) }));",
+    );
+    writeFileSync(
+      path.join(root, "checks/validation/repository/check-agent-entrypoints.ts"),
+      'console.error("source ts fallback should not run"); process.exit(9);',
+    );
+    const command = resolvePackedCheckCommand(root, "tsx checks/validation/repository/check-agent-entrypoints.ts --repo-root .", ["--json"]);
+    assert(
+      command?.executable === process.execPath && command.args[0] === path.join(root, "dist", "checks/validation/repository/check-agent-entrypoints.js"),
+      "packed check:agent-entrypoints must exec dist/checks/validation/repository/check-agent-entrypoints.js, not bare tsx",
+    );
+    const result = spawnSync(command.executable, command.args, { env: { ...process.env, PATH: "" }, encoding: "utf8" });
+    assert(result.status === 0, `compiled agent-entrypoints launch failed: ${result.stderr}`);
+    const observed = JSON.parse(result.stdout) as { compiled?: boolean; args?: string[] };
+    assert(observed.compiled === true && observed.args?.join(" ") === "--repo-root . --json", "compiled agent-entrypoints arguments changed");
+    const source = readFileSync(path.join(skillRoot, "checks/validation/repository/check-agent-entrypoints.ts"), "utf8");
+    assert(source.includes("resolveSkillRoot(import.meta.url)"), "agent-entrypoints check default skill root must walk from compiled dist");
+  });
+
+  h.check("packed-check: check:validator-docs prefers compiled dist without tsx", () => {
+    const root = h.makeTempDir("packed-check-validator-docs");
+    mkdirSync(path.join(root, "checks/validation/repository"), { recursive: true });
+    mkdirSync(path.join(root, "dist", "checks/validation/repository"), { recursive: true });
+    writeFileSync(
+      path.join(root, "dist", "checks/validation/repository/check-validator-docs.js"),
+      "console.log(JSON.stringify({ compiled: true, args: process.argv.slice(2) }));",
+    );
+    writeFileSync(
+      path.join(root, "checks/validation/repository/check-validator-docs.ts"),
+      'console.error("source ts fallback should not run"); process.exit(9);',
+    );
+    const command = resolvePackedCheckCommand(root, "tsx checks/validation/repository/check-validator-docs.ts --repo-root .", ["--json"]);
+    assert(
+      command?.executable === process.execPath && command.args[0] === path.join(root, "dist", "checks/validation/repository/check-validator-docs.js"),
+      "packed check:validator-docs must exec dist/checks/validation/repository/check-validator-docs.js, not bare tsx",
+    );
+    const result = spawnSync(command.executable, command.args, { env: { ...process.env, PATH: "" }, encoding: "utf8" });
+    assert(result.status === 0, `compiled validator-docs launch failed: ${result.stderr}`);
+    const observed = JSON.parse(result.stdout) as { compiled?: boolean; args?: string[] };
+    assert(observed.compiled === true && observed.args?.join(" ") === "--repo-root . --json", "compiled validator-docs arguments changed");
+    const source = readFileSync(path.join(skillRoot, "checks/validation/repository/check-validator-docs.ts"), "utf8");
+    assert(source.includes("resolveSkillRoot(import.meta.url)"), "validator-docs check default skill root must walk from compiled dist");
+  });
+
+  h.check("packed-check: check:architecture prefers compiled dist without tsx", () => {
+    const root = h.makeTempDir("packed-check-architecture");
+    mkdirSync(path.join(root, "checks/validation/repository"), { recursive: true });
+    mkdirSync(path.join(root, "dist", "checks/validation/repository"), { recursive: true });
+    writeFileSync(
+      path.join(root, "dist", "checks/validation/repository/check-architecture.js"),
+      "console.log(JSON.stringify({ compiled: true, args: process.argv.slice(2) }));",
+    );
+    writeFileSync(
+      path.join(root, "checks/validation/repository/check-architecture.ts"),
+      'console.error("source ts fallback should not run"); process.exit(9);',
+    );
+    const command = resolvePackedCheckCommand(root, "tsx checks/validation/repository/check-architecture.ts --repo-root .", ["--json"]);
+    assert(
+      command?.executable === process.execPath && command.args[0] === path.join(root, "dist", "checks/validation/repository/check-architecture.js"),
+      "packed check:architecture must exec dist/checks/validation/repository/check-architecture.js, not bare tsx",
+    );
+    const result = spawnSync(command.executable, command.args, { env: { ...process.env, PATH: "" }, encoding: "utf8" });
+    assert(result.status === 0, `compiled architecture launch failed: ${result.stderr}`);
+    const observed = JSON.parse(result.stdout) as { compiled?: boolean; args?: string[] };
+    assert(observed.compiled === true && observed.args?.join(" ") === "--repo-root . --json", "compiled architecture arguments changed");
+    const source = readFileSync(path.join(skillRoot, "checks/validation/repository/check-architecture.ts"), "utf8");
+    assert(source.includes("resolveSkillRoot(import.meta.url)"), "architecture check default skill root must walk from compiled dist");
+  });
+
+  h.check("packed-check: check:autopilot prefers compiled dist without tsx", () => {
+    const root = h.makeTempDir("packed-check-autopilot");
+    mkdirSync(path.join(root, "checks/validation/repository"), { recursive: true });
+    mkdirSync(path.join(root, "dist", "checks/validation/repository"), { recursive: true });
+    writeFileSync(
+      path.join(root, "dist", "checks/validation/repository/check-autopilot-contract.js"),
+      "console.log(JSON.stringify({ compiled: true, args: process.argv.slice(2) }));",
+    );
+    writeFileSync(
+      path.join(root, "checks/validation/repository/check-autopilot-contract.ts"),
+      'console.error("source ts fallback should not run"); process.exit(9);',
+    );
+    const command = resolvePackedCheckCommand(root, "tsx checks/validation/repository/check-autopilot-contract.ts", ["--json"]);
+    assert(
+      command?.executable === process.execPath && command.args[0] === path.join(root, "dist", "checks/validation/repository/check-autopilot-contract.js"),
+      "packed check:autopilot must exec dist/checks/validation/repository/check-autopilot-contract.js, not bare tsx",
+    );
+    const result = spawnSync(command.executable, command.args, { env: { ...process.env, PATH: "" }, encoding: "utf8" });
+    assert(result.status === 0, `compiled autopilot launch failed: ${result.stderr}`);
+    const observed = JSON.parse(result.stdout) as { compiled?: boolean; args?: string[] };
+    assert(observed.compiled === true && observed.args?.join(" ") === "--json", "compiled autopilot arguments changed");
+    const source = readFileSync(path.join(skillRoot, "checks/validation/repository/check-autopilot-contract.ts"), "utf8");
+    assert(source.includes("resolveSkillRoot(import.meta.url)"), "autopilot check default skill root must walk from compiled dist");
   });
 }

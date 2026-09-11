@@ -1,6 +1,7 @@
 import { researchQuerySchema, researchObservationInputSchema, savedResearchObservationSchema } from "../research/observation.js";
 import { z } from "zod";
 export {
+  anyWorkerRuntimeFound,
   bothConfiguredRoutingGuidance,
   configuredConnectionSet,
   connectionCapabilityGuidance,
@@ -8,16 +9,21 @@ export {
   connectionReceiptSchema,
   formatConnectionReceipt,
   HOSTED_CLIENT_NAME,
+  HOSTED_WRONG_SURFACE_LEFTOVER_CLI_ONLY_TOOL_NAMES,
   HOSTED_WRONG_SURFACE_TOOL_NAMES,
   hostedMcpInstructionsSuffix,
   hostedWrongSurfaceRefusal,
   interpretConfiguredConnection,
   isHostedWrongSurfaceTool,
+  isLeftoverCliOnlyPublicTool,
+  leftoverCliOnlyLocalMcpResponse,
+  leftoverCliOnlyLocalRefusal,
   LEFTOVER_LOCAL_CLIENT_NAME,
   leftoverNameClientMatrix,
   leftoverNameMigrationGuidance,
   LOCAL_CLIENT_NAME,
   localMcpInstructions,
+  observedLocalWorkspaceHealth,
   parseConnectionReceipt,
   selectConfiguredSurface,
 } from "./connection-receipt.js";
@@ -30,6 +36,8 @@ export type {
   ConnectionReceipt,
   HostedWrongSurfaceRefusal,
   HostedWrongSurfaceToolName,
+  LeftoverCliOnlyLocalRefusal,
+  LeftoverCliOnlyPublicToolName,
   LeftoverNameClientRow,
 } from "./connection-receipt.js";
 

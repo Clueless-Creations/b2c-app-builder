@@ -71,7 +71,7 @@ baselines:
     revision: "5.1.0"
     observed_at: "2026-09-08"
     by: b2c-maintainers
-    note: 5.0.0 is the hard break (`apps view --id`, `--build-id`, `auth logout --confirm`). 5.1.0 adds web-session deadline renewal after 2FA and `--session-from-env` on selected web reads. Reviewed guidance tracks this latest stable; it is not a workspace pin and doctor does not upgrade the host.
+    note: 5.0.0 is the hard break (`apps view --id`, `--build-id`, `auth logout --confirm`). 5.1.0 adds web-session deadline renewal after 2FA and `--session-from-env` on selected web reads. Reviewed guidance tracks this latest stable; it is not a workspace pin and inspect does not upgrade the host. `b2c doctor` is a supported equivalent.
 support:
   policy: Executable guidance is stored per exact reviewed revision. Any other installed version re-verifies each command with `asc <cmd> --help` before first use (Verified Command Cookbook rule). A passing live probe proves the probed tokens on the probed binary only, never a version range. Support is `>= 5.0.0 < 6.0.0`. Major versions below 5 are unsupported. Web-login handoff is refused unless the winning binary is `>= 5.1.0`.
   versions:

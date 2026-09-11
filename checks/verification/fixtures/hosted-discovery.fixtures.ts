@@ -242,6 +242,64 @@ export function register(harness: Harness): void {
     );
   });
 
+  harness.check("hosted discovery: leftover review-submit goldens target the App Review resubmit workflow, not generic ASC CLI", () => {
+    const corpus = loadCorpus();
+    for (const id of ["store-006", "store-020", "store-030"]) {
+      const entry = corpus.entries.find((item) => item.id === id);
+      assert(entry !== undefined, `store corpus is missing ${id}`);
+      assert(
+        entry.needs.includes("workflow.store.app-review-resubmit"),
+        `${id} must need the App Review resubmit workflow after that mapping shipped`,
+      );
+      assert(
+        !entry.needs.includes("workflow.store.asc-cli-automation"),
+        `${id} is review submit, not generic ASC CLI / TestFlight / media`,
+      );
+    }
+  });
+
+  harness.check("hosted discovery: leftover TestFlight feedback read maps to the Apple TestFlight envelope, not generic ASC CLI", () => {
+    const route = service().workflow({
+      workflowId: "workflow.store.apple-testflight-standing-envelope",
+      include: "instructions",
+    });
+    assert(
+      route.workflow.instructions.includes("asc testflight feedback list"),
+      "the TestFlight envelope must keep the cookbook feedback-read form after that mapping shipped",
+    );
+    const ranked = rankedIds(service(), "testflight feedback");
+    assert(
+      ranked.includes("workflow.store.apple-testflight-standing-envelope"),
+      `testflight feedback must reach the Apple TestFlight standing envelope: ${ranked.join(", ") || "none"}`,
+    );
+    assert(
+      !ranked.includes("workflow.store.asc-cli-automation") ||
+        ranked.indexOf("workflow.store.apple-testflight-standing-envelope") < ranked.indexOf("workflow.store.asc-cli-automation"),
+      "TestFlight feedback read is the standing envelope, not generic ASC CLI",
+    );
+  });
+
+  harness.check("hosted discovery: leftover TestFlight crashes read maps to the Apple TestFlight envelope, not generic ASC CLI", () => {
+    const route = service().workflow({
+      workflowId: "workflow.store.apple-testflight-standing-envelope",
+      include: "instructions",
+    });
+    assert(
+      route.workflow.instructions.includes("asc testflight crashes list"),
+      "the TestFlight envelope must keep the cookbook crashes-read form after that mapping shipped",
+    );
+    const ranked = rankedIds(service(), "testflight crashes");
+    assert(
+      ranked.includes("workflow.store.apple-testflight-standing-envelope"),
+      `testflight crashes must reach the Apple TestFlight standing envelope: ${ranked.join(", ") || "none"}`,
+    );
+    assert(
+      !ranked.includes("workflow.store.asc-cli-automation") ||
+        ranked.indexOf("workflow.store.apple-testflight-standing-envelope") < ranked.indexOf("workflow.store.asc-cli-automation"),
+      "TestFlight crashes read is the standing envelope, not generic ASC CLI",
+    );
+  });
+
   harness.check("hosted discovery: the ASC command reference reaches the workflow whose outputs it uploads", () => {
     const route = service().workflow({ workflowId: "workflow.store.store-screenshots-production" });
     const bound = route.workflow.referenceIds;

@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.105",
+  "version": "0.219.106",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Name the engine-home host observation that b2c inspect records in leftover RevenueCat knowledge.",
-    "Keep b2c doctor as a supported equivalent and leave historical ADR-0010 unchanged."
+    "Prefer compiled graph-foundations check once package-root resolution is dist-safe.",
+    "Keep the rest of the uncompiled checks graph on remaining-tsx after the packed wrapper ships."
   ]
 }

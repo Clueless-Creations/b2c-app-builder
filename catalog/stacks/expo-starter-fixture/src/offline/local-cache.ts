@@ -10,7 +10,6 @@ export interface LocalCacheNote {
 
 const seam = boundLocalCacheSeam();
 const notes = new Map<string, LocalCacheNote>();
-let persisted: readonly LocalCacheNote[] = [];
 
 function isNote(value: unknown): value is LocalCacheNote {
   if (typeof value !== "object" || value === null) return false;
@@ -24,8 +23,7 @@ function isNote(value: unknown): value is LocalCacheNote {
 }
 
 function persistNotes(): void {
-  persisted = [...notes.values()];
-  void seam.persist(persisted);
+  void seam.persist([...notes.values()]);
 }
 
 export function listLocalCacheNotes(owner: string | null): readonly LocalCacheNote[] {
@@ -60,12 +58,14 @@ export function writeLocalCacheNote(input: { id: string; owner: string; body: st
 }
 
 /**
- * In-process reopen from the last payload handed to the bound seam.
+ * In-process reopen from the bound seam's last persisted payload.
  * Not SQLite, not SecureStore, not a backend, and not a live process restart.
  */
 export function reopenLocalCache(): readonly LocalCacheNote[] {
   notes.clear();
-  for (const item of persisted) {
+  const snapshot = seam.peek();
+  const items = Array.isArray(snapshot) ? snapshot : [];
+  for (const item of items) {
     if (isNote(item)) notes.set(item.id, { ...item });
   }
   return [...notes.values()];

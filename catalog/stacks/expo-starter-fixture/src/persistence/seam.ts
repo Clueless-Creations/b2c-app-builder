@@ -4,6 +4,7 @@ export const PERSISTENCE_STORE_KIND = "local-cache" as const;
 export interface PersistenceSeam {
   restore(): Promise<unknown>;
   persist(value: unknown): Promise<void>;
+  peek(): unknown;
 }
 
 /**
@@ -19,6 +20,9 @@ export function boundLocalCacheSeam(): PersistenceSeam {
     persist(value: unknown) {
       stored = value;
       return Promise.resolve();
+    },
+    peek() {
+      return stored;
     },
   };
 }

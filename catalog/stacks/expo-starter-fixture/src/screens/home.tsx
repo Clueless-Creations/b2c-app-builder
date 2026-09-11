@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Text, View } from "react-native";
 import { nativeCapabilityStatus } from "../native/capability-status";
 import { notificationRestoreHref } from "../notifications/handoff";
-import { listLocalCacheNotes, writeLocalCacheNote } from "../offline/local-cache";
+import { listLocalCacheNotes, reopenLocalCache, writeLocalCacheNote } from "../offline/local-cache";
 import { ROUTE_HREFS } from "../navigation/route-graph";
 import { permissionSafeState } from "../permissions/safe-state";
 import { currentLocalSession } from "../session/local-session";
@@ -54,6 +54,15 @@ export function HomeScreen() {
           <Text>Add local note</Text>
         </PressFeedback>
       ) : null}
+      <PressFeedback
+        onPress={() => {
+          void playSemanticHaptic("selection");
+          reopenLocalCache();
+          setTick((value) => value + 1);
+        }}
+      >
+        <Text>Reopen local cache</Text>
+      </PressFeedback>
       <Text>{permission.message}</Text>
       <Text>{capability.message}</Text>
       {restore ? (

@@ -4,7 +4,7 @@
  * Local session/cache/permission fixtures plus fake in-app purchase transport.
  * Live App Store, Play, RevenueCat mutations, paid EAS, and production hosting stay not-run.
  */
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import {
   EMPTY_AUTH_SESSION,
@@ -49,7 +49,7 @@ import {
   localStaticExportIsFixtureTested,
   scanStaticExportArtifacts,
 } from "../../../catalog/stacks/expo-web-static.js";
-import { assert, type Harness } from "./_harness.js";
+import { assert, skillRoot, type Harness } from "./_harness.js";
 
 const CANARIES = [
   { name: "EXPO_PUBLIC_API_URL", value: "https://example.invalid/public" },
@@ -645,5 +645,10 @@ export function register(harness: Harness): void {
       "interrupted write stays incomplete after reopen",
     );
     assert(listLocalCacheNotes("user-b").length === 0, "another owner must not see the restored notes");
+    const cacheSource = readFileSync(path.join(skillRoot, "catalog/stacks/expo-starter-fixture/src/offline/local-cache.ts"), "utf8");
+    const homeSource = readFileSync(path.join(skillRoot, "catalog/stacks/expo-starter-fixture/src/screens/home.tsx"), "utf8");
+    assert(cacheSource.includes("seam.peek()"), "reopen must read the bound seam payload, not a parallel copy");
+    assert(!cacheSource.includes("let persisted"), "the parallel persisted copy must not remain beside the seam");
+    assert(homeSource.includes("reopenLocalCache()"), "Home must expose in-process reopen through the bound helper");
   });
 }

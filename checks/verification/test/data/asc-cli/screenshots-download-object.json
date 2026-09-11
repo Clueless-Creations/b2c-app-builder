@@ -1,0 +1,21 @@
+{
+  "versionLocalizationId": "LOC_ID",
+  "outputDir": "./screenshots",
+  "overwrite": false,
+  "total": 1,
+  "downloaded": 1,
+  "unchanged": 0,
+  "failed": 0,
+  "items": [
+    {
+      "id": "shot-native-1",
+      "displayType": "APP_IPHONE_65",
+      "fileName": "01-home.png",
+      "url": "https://example.invalid/asc-cli/01-home.png",
+      "outputPath": "./screenshots/APP_IPHONE_65/01_shot-native-1_01-home.png",
+      "unchanged": false,
+      "contentType": "image/png",
+      "bytesWritten": 2048
+    }
+  ]
+}

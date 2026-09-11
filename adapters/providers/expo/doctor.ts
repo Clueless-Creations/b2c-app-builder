@@ -87,7 +87,7 @@ export function assessExpoEasHostDoctor(input: {
     extras.push({
       severity: "warn",
       code: `${findingPrefix}_shadowed`,
-      message: `PATH also has ${extrasCandidates.map((entry) => input.sanitizePath(entry.path)).join(", ")}; winner is ${selectedPath}. Doctor will not install or upgrade the host.`,
+      message: `PATH also has ${extrasCandidates.map((entry) => input.sanitizePath(entry.path)).join(", ")}; winner is ${selectedPath}. Inspect will not install or upgrade the host.`,
     });
   }
 
@@ -99,7 +99,7 @@ export function assessExpoEasHostDoctor(input: {
           {
             severity: "ok",
             code: findingPrefix,
-            message: `winning ${selectedPath} ${version ?? "(unparseable)"} (documented ${tool} ${latest} is a docs page, not this binary). Local identity only — not a live EAS job, paid build, OTA, or credential proof. Doctor will not install, log in, or run eas init.`,
+            message: `winning ${selectedPath} ${version ?? "(unparseable)"} (documented ${tool} ${latest} is a docs page, not this binary). Local identity only — not a live EAS job, paid build, OTA, or credential proof. Inspect will not install, log in, or run eas init.`,
           },
           ...extras,
         ],
@@ -112,7 +112,7 @@ export function assessExpoEasHostDoctor(input: {
           {
             severity: "warn",
             code: `${findingPrefix}_missing`,
-            message: `no ${kind === "eas" ? "eas" : "expo"} on PATH. Documented ${tool} ${latest} is not this host. Lanes that select ${tool} need that binary; doctor will not install it. This is not live EAS proof.`,
+            message: `no ${kind === "eas" ? "eas" : "expo"} on PATH. Documented ${tool} ${latest} is not this host. Lanes that select ${tool} need that binary; inspect will not install it. This is not live EAS proof.`,
           },
         ],
         liveEasProven: false,
@@ -124,7 +124,7 @@ export function assessExpoEasHostDoctor(input: {
           {
             severity: "warn",
             code: `${findingPrefix}_unrelated`,
-            message: `found executable(s) named ${kind === "eas" ? "eas/eas-cli" : "expo"} that did not identify as ${tool}${selectedPath ? ` (winner ${selectedPath})` : ""}. An unrelated binary is not the provider. Doctor will not install a replacement.`,
+            message: `found executable(s) named ${kind === "eas" ? "eas/eas-cli" : "expo"} that did not identify as ${tool}${selectedPath ? ` (winner ${selectedPath})` : ""}. An unrelated binary is not the provider. Inspect will not install a replacement.`,
           },
         ],
         liveEasProven: false,

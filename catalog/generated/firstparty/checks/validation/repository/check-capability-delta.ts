@@ -1,11 +1,16 @@
 #!/usr/bin/env node
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+/**
+ * Default skill root walks from this file so packed omit-dev can launch the compiled twin
+ * under `dist/checks/validation/repository/` without treating `dist/` as the package root.
+ *
+ * npm script: check:capability-delta
+ * Usage: tsx checks/validation/repository/check-capability-delta.ts [--skill-root /path/to/skill]
+ */
 import { defaultSnapshotPath, evaluateCapabilityDelta } from "../../../adapters/providers/evaluate.js";
 import { flagString, issue, parseFlags, reportAndExit, type Issue } from "../../../tooling/lib/launch-state.js";
+import { resolveSkillRoot } from "../../../tooling/lib/skill-root.js";
 
-const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-const defaultSkillRoot = path.resolve(scriptDir, "../../..");
+const defaultSkillRoot = resolveSkillRoot(import.meta.url);
 const defaultRepoRoot = defaultSkillRoot;
 
 const flags = parseFlags(process.argv.slice(2), [

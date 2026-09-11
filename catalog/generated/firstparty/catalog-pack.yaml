@@ -3455,6 +3455,7 @@ workflows:
       - upload the approved app store screenshots and previews
       - push the app store screenshot wells and app previews live
       - publish the media assets we already approved for app store connect
+      - update app store connect with new screenshots plus previews
     instructions: Upload only the locale, device-well, screenshot, and app-preview assets covered by the exact current standing envelope. Verify every file digest, App Store Connect version-localization ID, and device type from SCREENSHOTS.md immediately before upload. Use `asc screenshots sizes`, `asc screenshots validate`, and `asc screenshots upload` as the selected-provider cookbook forms; probe `--help` before the first live call. Capture before-state and read back the resulting media set. Write store/proof/apple-store-media-apply.json with approval ID, per-file digest, locale, device well, version-localization ID, provider operation IDs, readback state, and timestamps. Do not apply listing text, products, TestFlight, review submission, or release state.
     reads:
       - store/STORE_CONSOLE.md
@@ -3499,6 +3500,7 @@ workflows:
       - push the approved metadata live
       - metadata update
       - bump the listing version
+      - new screenshots plus a metadata update
     instructions: Apply only the approved App Store listing text, localized metadata, and promotional content covered by the exact current standing envelope. Verify account, version, locale, and payload digest immediately before mutation. Use `asc metadata pull`, `asc metadata validate`, and `asc metadata push` as the selected-provider cookbook forms; the live push is founder-gated and the cookbook records only the `--dry-run` observe form. Probe `--help` before the first live call. Capture before-state and read back every locale. Write store/proof/apple-store-metadata-apply.json with approval ID, request digest, before state, provider operation IDs, readback state, and timestamps. Do not upload media, change products, open TestFlight, submit for review, or change release state.
     reads:
       - store/STORE_CONSOLE.md

@@ -14328,7 +14328,8 @@
       "founderPhrasings": [
         "upload the approved app store screenshots and previews",
         "push the app store screenshot wells and app previews live",
-        "publish the media assets we already approved for app store connect"
+        "publish the media assets we already approved for app store connect",
+        "update app store connect with new screenshots plus previews"
       ],
       "instructions": "Upload only the locale, device-well, screenshot, and app-preview assets covered by the exact current standing envelope. Verify every file digest, App Store Connect version-localization ID, and device type from SCREENSHOTS.md immediately before upload. Use `asc screenshots sizes`, `asc screenshots validate`, and `asc screenshots upload` as the selected-provider cookbook forms; probe `--help` before the first live call. Capture before-state and read back the resulting media set. Write store/proof/apple-store-media-apply.json with approval ID, per-file digest, locale, device well, version-localization ID, provider operation IDs, readback state, and timestamps. Do not apply listing text, products, TestFlight, review submission, or release state.",
       "reads": [
@@ -14386,7 +14387,8 @@
         "apply the localized metadata we already signed off on",
         "push the approved metadata live",
         "metadata update",
-        "bump the listing version"
+        "bump the listing version",
+        "new screenshots plus a metadata update"
       ],
       "instructions": "Apply only the approved App Store listing text, localized metadata, and promotional content covered by the exact current standing envelope. Verify account, version, locale, and payload digest immediately before mutation. Use `asc metadata pull`, `asc metadata validate`, and `asc metadata push` as the selected-provider cookbook forms; the live push is founder-gated and the cookbook records only the `--dry-run` observe form. Probe `--help` before the first live call. Capture before-state and read back every locale. Write store/proof/apple-store-metadata-apply.json with approval ID, request digest, before state, provider operation IDs, readback state, and timestamps. Do not upload media, change products, open TestFlight, submit for review, or change release state.",
       "reads": [
@@ -18738,14 +18740,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "395910e944effa9339281634124f17f1e86334336c7478d8c1c2ed230e789583",
+    "fingerprint": "04ffac6cfd1f18189ebbc6df04a629ac453f363cac3dc7f497e5d9c2c56d04a1",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
         "version": "0.219.93",
         "revision": "0.219.93",
-        "contentDigest": "3647725f68e47c53f8351233b7b426cdffdb59bf20eb9efda3028dc36c3b4a4a"
+        "contentDigest": "d3d4c6b4cf1ce2edb52a94b64966aa4df4dc6d1d0d8f581e96ec1e0b46233303"
       }
     ],
     "base": {

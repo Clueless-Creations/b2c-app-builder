@@ -1,24 +1,19 @@
-name: Task skill projections (temporary branch integration)
+name: Task skill integration inputs (temporary)
 
-# Branch-only support, removed before merge. No deployment or release actions.
+# Read-only branch tooling. Removed before merge; no deployment or release.
 on:
   push:
     branches: [feat/task-skills-navigation]
-  workflow_dispatch:
 permissions:
   contents: read
-concurrency:
-  group: task-skills-branch-integration
-  cancel-in-progress: false
 jobs:
-  capture:
+  snapshot:
     if: github.repository == 'Clueless-Creations/b2c-app-builder' && github.ref == 'refs/heads/feat/task-skills-navigation'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: feat/task-skills-navigation
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@v4
@@ -26,16 +21,15 @@ jobs:
           node-version-file: .node-version
           cache: npm
       - run: npm ci
-      - name: Capture public source and installed toolchain only
+      - run: npm ci --prefix hosted/knowledge-mcp
+      - run: npm ci --prefix hosted/builder-console
+      - name: Public source and dependency snapshot
         run: |
-          mkdir -p "$RUNNER_TEMP/task-skill-checkout"
-          git bundle create "$RUNNER_TEMP/task-skill-checkout/source.bundle" HEAD refs/heads/feat/task-skills-navigation refs/remotes/origin/main
-          tar -czf "$RUNNER_TEMP/task-skill-checkout/dependencies.tgz" node_modules
-          NODE_ROOT="$(dirname "$(dirname "$(command -v node)")")"
-          tar -czf "$RUNNER_TEMP/task-skill-checkout/node-toolchain.tgz" -C "$NODE_ROOT" bin lib/node_modules/npm
+          mkdir -p /tmp/task-skill-inputs
+          git bundle create /tmp/task-skill-inputs/source.bundle --all
+          tar -czf /tmp/task-skill-inputs/dependencies.tgz node_modules hosted/knowledge-mcp/node_modules hosted/builder-console/node_modules
       - uses: actions/upload-artifact@v4
         with:
-          name: task-skill-checkout
-          path: ${{ runner.temp }}/task-skill-checkout
+          name: task-skill-integration-inputs
+          path: /tmp/task-skill-inputs
           retention-days: 1
-          compression-level: 0

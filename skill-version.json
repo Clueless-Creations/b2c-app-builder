@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.125",
+  "version": "0.219.126",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Map asc testflight feedback list onto workflow.store.apple-testflight-standing-envelope as implement.",
-    "Keep hosted-discovery slot count at 89 and do not invent TestFlight JSON."
+    "Name inspect as the diagnostic actor in leftover ASC inspect/doctor finding messages.",
+    "Keep b2c doctor as a supported equivalent and leave doctor.* finding codes unchanged."
   ]
 }

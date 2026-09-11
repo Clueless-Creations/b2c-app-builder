@@ -52,6 +52,31 @@ function claimsRuntimeObservation(line: string): boolean {
   return /\b(live[- ]device|device observation|runtime observation|observed on (?:a |the )?device|ran on (?:a |the )?device)\b/i.test(line);
 }
 
+function deniesScreenshotAsProof(line: string): boolean {
+  return /\bnot\b.{0,80}\b(screenshot|interaction|navigation flow|runtime proof)\b/i.test(line);
+}
+
+function isScreenshotAssetLine(line: string): boolean {
+  if (isStructuralChrome(line) || deniesScreenshotAsProof(line)) return false;
+  return /\bscreenshot(?:s)?\b/i.test(line) || /\.(png|jpe?g)\b/i.test(line);
+}
+
+function claimsScreenshotAsInteraction(line: string): boolean {
+  if (deniesScreenshotAsProof(line) || !isScreenshotAssetLine(line)) return false;
+  return /\b(navigation flow|interaction proof|runtime proof|interactive proof|proves (?:the )?(?:navigation|interaction|flow))\b/i.test(line);
+}
+
+function isIndependentReviewSentence(line: string): boolean {
+  return !isStructuralChrome(line) && !isScreenshotAssetLine(line);
+}
+
+function screenshotCannotSatisfyRuntime(evidence: readonly string[]): boolean {
+  const lines = trimmedEvidence(evidence);
+  if (lines.some(claimsScreenshotAsInteraction)) return true;
+  const nonChrome = lines.filter((line) => !isStructuralChrome(line));
+  return nonChrome.length > 0 && nonChrome.every(isScreenshotAssetLine);
+}
+
 function trimmedEvidence(evidence: readonly string[]): string[] {
   return evidence.map((entry) => entry.trim()).filter((entry) => entry.length > 0);
 }
@@ -63,7 +88,8 @@ function isStructuralOnlyEvidence(evidence: readonly string[]): boolean {
 
 /**
  * Shape-pass, packet chrome, and deterministic gate receipts are not semantic review. A
- * synthetic or graph receipt cannot become live-device or runtime observation.
+ * synthetic or graph receipt cannot become live-device or runtime observation. A static
+ * screenshot can exist as an asset; it is not independent review or interactive proof.
  */
 export function classifyProofStrengthIssues(
   evidence: readonly string[],
@@ -73,6 +99,7 @@ export function classifyProofStrengthIssues(
   const lines = trimmedEvidence(evidence);
   const issues: string[] = [];
   if (isStructuralOnlyEvidence(lines)) issues.push("review.structural_only");
+  if (screenshotCannotSatisfyRuntime(lines) && !lines.some(isIndependentReviewSentence)) issues.push("review.screenshot_not_interaction");
   if (lines.some(claimsRuntimeObservation) && (attempt.proofSource === "synthetic" || receiptMode === "synthetic" || receiptMode === "graph")) {
     issues.push("review.runtime_unobserved");
   }
@@ -93,7 +120,8 @@ export interface ComposedProofStrength {
 /**
  * Produce structural, semantic, and runtime strength from current proofs. Packet shape-pass
  * supplies structural only. Semantic requires accepted workspace review. Runtime requires an
- * explicit workspace observation — a sentence or graph receipt cannot invent one.
+ * explicit workspace observation — a sentence, graph receipt, or static screenshot cannot
+ * invent one.
  */
 export function composeProofStrength(input: {
   readonly structural: "checked" | "failed";
@@ -114,7 +142,8 @@ export function composeProofStrength(input: {
     input.attempt?.proofSource === "workspace" &&
     input.review?.mode === "workspace" &&
     workspaceReview &&
-    input.review.verdict === "accepted"
+    input.review.verdict === "accepted" &&
+    !screenshotCannotSatisfyRuntime(input.review.evidence)
       ? "checked"
       : "unknown";
   return { structural: input.structural, semantic, runtime, reviewOrigin: input.review?.mode ?? "none" };

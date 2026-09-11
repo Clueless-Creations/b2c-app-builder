@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.110",
+  "version": "0.219.111",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Name CLI inspect and setup as the writers of the engine-home host snapshot on current ARCH-07.",
-    "Keep doctor as a supported equivalent and leave historical ADR-0010 unchanged."
+    "Prefer compiled learning-grounding check once package-root resolution is dist-safe.",
+    "Keep the rest of the uncompiled checks graph on remaining-tsx after the packed wrapper ships."
   ]
 }

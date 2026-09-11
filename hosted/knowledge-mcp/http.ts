@@ -105,7 +105,7 @@ export function readBearer(request: Request): string {
   return match[1];
 }
 
-/** MCP tools/call for a local workspace name becomes an isError result, not a protocol missing-tool guess. */
+/** MCP tools/call for a local-only name becomes an isError result, not a protocol missing-tool guess. */
 export function hostedWrongSurfaceMcpResponse(body: string, engineVersion: string): unknown {
   let payload: unknown;
   try {

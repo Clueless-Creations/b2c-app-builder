@@ -403,6 +403,12 @@ export const HOSTED_WRONG_SURFACE_TOOL_NAMES = [
   "b2c_discover",
   "b2c_compose",
   "b2c_market_report",
+  "b2c_contribute_plan",
+  "b2c_contribute_check",
+  "b2c_contribute_preview",
+  "b2c_contribute_upstreams",
+  "b2c_contribute_upstream_check",
+  "b2c_contribute_upgrade_plan",
 ] as const;
 
 export type HostedWrongSurfaceToolName = (typeof HOSTED_WRONG_SURFACE_TOOL_NAMES)[number];
@@ -417,7 +423,7 @@ export function isHostedWrongSurfaceTool(name: string): name is HostedWrongSurfa
   return (HOSTED_WRONG_SURFACE_TOOL_NAMES as readonly string[]).includes(name);
 }
 
-/** Wrong-surface local workspace requests take capability from the hosted receipt, not a missing-tool guess. */
+/** Wrong-surface local-only MCP names take capability from the hosted receipt, not a missing-tool guess. */
 export function hostedWrongSurfaceRefusal(input: {
   engineVersion: string;
   toolName: string;

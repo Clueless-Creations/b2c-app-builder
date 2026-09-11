@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.144",
+  "version": "0.219.146",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Prefer compiled autopilot check once package-root resolution is dist-safe.",
-    "Remaining-tsx inventory goes from 117 to 116. The rest of the uncompiled checks graph stays on remaining-tsx."
+    "Pin the independent App Store Connect CLI 5.1.0 AppScreenshotUploadResult dry-run envelope.",
+    "One would-upload APP_IPHONE_65 PNG. Empty omitempty fields stay omitted. Nested assetId is empty. JSON:API is rejected."
   ]
 }

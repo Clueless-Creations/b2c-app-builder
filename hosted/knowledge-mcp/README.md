@@ -41,7 +41,9 @@ approvals, schedules, provider credentials, or execution commands. Those workspa
 operations remain local. A local-only MCP name fails as `wrong_surface` with the hosted
 connection receipt reading; it is not a missing knowledge tool. That includes workspace
 planning and execution, public discovery, composition preview, market reports, leftover
-contributor names, and leftover CLI-only public names. The local
+contributor names, and leftover CLI-only public names. Leftover CLI-only public names stay
+hosted `wrong_surface`. On the local MCP they fail as `cli_only` with the local receipt
+reading, not as hosted `wrong_surface`. The local
 and hosted MCP servers use the same knowledge implementation.
 If the local knowledge bundle is missing or invalid, the local MCP keeps its execution
 tools available. It omits the four knowledge tools and emits a fixed recovery warning.

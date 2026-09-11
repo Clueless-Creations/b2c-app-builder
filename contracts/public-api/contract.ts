@@ -15,6 +15,9 @@ export {
   hostedWrongSurfaceRefusal,
   interpretConfiguredConnection,
   isHostedWrongSurfaceTool,
+  isLeftoverCliOnlyPublicTool,
+  leftoverCliOnlyLocalMcpResponse,
+  leftoverCliOnlyLocalRefusal,
   LEFTOVER_LOCAL_CLIENT_NAME,
   leftoverNameClientMatrix,
   leftoverNameMigrationGuidance,
@@ -33,6 +36,8 @@ export type {
   ConnectionReceipt,
   HostedWrongSurfaceRefusal,
   HostedWrongSurfaceToolName,
+  LeftoverCliOnlyLocalRefusal,
+  LeftoverCliOnlyPublicToolName,
   LeftoverNameClientRow,
 } from "./connection-receipt.js";
 

@@ -386,7 +386,8 @@ export function leftoverNameMigrationGuidance(): string {
 
 /**
  * Leftover MCP names for CLI-only public operations. Local MCP never registers these;
- * leftover agents still call them. Hosted knowledge refuses them as wrong-surface, not missing tools.
+ * leftover agents still call them. Hosted knowledge refuses them as wrong-surface.
+ * Local MCP refuses them as cli_only with the local receipt reading, not as missing tools.
  */
 export const HOSTED_WRONG_SURFACE_LEFTOVER_CLI_ONLY_TOOL_NAMES = [
   "b2c_research_record",
@@ -452,5 +453,78 @@ export function hostedWrongSurfaceRefusal(input: {
       clientName: input.clientName ?? HOSTED_CLIENT_NAME,
       receipt: connectionReceipt({ mode: "hosted_knowledge", engineVersion: input.engineVersion }),
     }),
+  };
+}
+
+export type LeftoverCliOnlyPublicToolName = (typeof HOSTED_WRONG_SURFACE_LEFTOVER_CLI_ONLY_TOOL_NAMES)[number];
+
+export function isLeftoverCliOnlyPublicTool(name: string): name is LeftoverCliOnlyPublicToolName {
+  return (HOSTED_WRONG_SURFACE_LEFTOVER_CLI_ONLY_TOOL_NAMES as readonly string[]).includes(name);
+}
+
+export type LeftoverCliOnlyLocalRefusal = {
+  error: "cli_only";
+  toolName: string;
+  connection: ConfiguredConnectionReading;
+};
+
+/** Leftover CLI-only public MCP names stay on the local surface. They are not hosted wrong-surface. */
+export function leftoverCliOnlyLocalRefusal(input: {
+  engineVersion: string;
+  toolName: string;
+  clientName?: string;
+  observed?: ConnectionReceipt["observed"];
+}): LeftoverCliOnlyLocalRefusal {
+  return {
+    error: "cli_only",
+    toolName: input.toolName,
+    connection: interpretConfiguredConnection({
+      clientName: input.clientName ?? LOCAL_CLIENT_NAME,
+      receipt: connectionReceipt({
+        mode: "local_execution",
+        engineVersion: input.engineVersion,
+        observed: input.observed,
+      }),
+    }),
+  };
+}
+
+/** MCP tools/call for a leftover CLI-only public name becomes cli_only, not a missing-tool guess. */
+export function leftoverCliOnlyLocalMcpResponse(
+  payload: unknown,
+  input: {
+    engineVersion: string;
+    clientName?: string;
+    observed?: ConnectionReceipt["observed"];
+  },
+): unknown {
+  let message = payload;
+  if (typeof message === "string") {
+    try {
+      message = JSON.parse(message);
+    } catch {
+      return null;
+    }
+  }
+  if (!message || typeof message !== "object" || Array.isArray(message)) return null;
+  const call = message as { jsonrpc?: unknown; id?: unknown; method?: unknown; params?: unknown };
+  if (call.method !== "tools/call") return null;
+  if (!call.params || typeof call.params !== "object" || Array.isArray(call.params)) return null;
+  const name = (call.params as { name?: unknown }).name;
+  if (typeof name !== "string" || !isLeftoverCliOnlyPublicTool(name)) return null;
+  const refusal = leftoverCliOnlyLocalRefusal({
+    engineVersion: input.engineVersion,
+    toolName: name,
+    clientName: input.clientName,
+    observed: input.observed,
+  });
+  return {
+    jsonrpc: "2.0",
+    id: "id" in call ? call.id : null,
+    result: {
+      content: [{ type: "text", text: JSON.stringify(refusal) }],
+      structuredContent: refusal,
+      isError: true,
+    },
   };
 }

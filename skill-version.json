@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.219.111",
+  "version": "0.219.112",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Prefer compiled learning-grounding check once package-root resolution is dist-safe.",
-    "Keep the rest of the uncompiled checks graph on remaining-tsx after the packed wrapper ships."
+    "Pin the reviewed App Store Connect CLI 5.1.0 reviewStatusResult object as independent response-shape evidence for asc review status.",
+    "Keep nested version and latestSubmission on id and state, fail closed on a mistaken Apple JSON:API document, and leave adapter canned snapshots wiring-only."
   ]
 }

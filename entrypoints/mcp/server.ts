@@ -37,7 +37,12 @@ import { runProcess } from "./run-process.js";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { resolveSkillRoot } from "../../tooling/lib/skill-root.js";
-import { localMcpInstructions } from "../../contracts/public-api/connection-receipt.js";
+import {
+  connectionReceipt,
+  interpretConfiguredConnection,
+  LOCAL_CLIENT_NAME,
+  localMcpInstructions,
+} from "../../contracts/public-api/connection-receipt.js";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
@@ -120,6 +125,21 @@ try {
     "b2c-app-builder-mcp: Knowledge tools are unavailable. The local knowledge bundle could not be loaded or validated. Workspace tools remain available.",
   );
 }
+
+function localRuntimeConnection() {
+  return interpretConfiguredConnection({
+    clientName: LOCAL_CLIENT_NAME,
+    receipt: connectionReceipt({
+      mode: "local_execution",
+      engineVersion: skillVersion(),
+      observed: {
+        knowledge: knowledgeService ? "available" : "unavailable",
+        writes: readOnly ? "mcp_readonly" : "mcp_write_enabled",
+      },
+    }),
+  });
+}
+
 const server = new McpServer(
   { name: "b2c-local", version: skillVersion() },
   {
@@ -238,7 +258,8 @@ server.registerTool(
         );
       }
       const outcome = withOnboardingStepper(routeUtterance({ utterance, cwd, mandateScope }), cwd);
-      return { content: [{ type: "text", text: JSON.stringify(outcome) }], structuredContent: { kind: "route", outcome } };
+      const connection = localRuntimeConnection();
+      return { content: [{ type: "text", text: JSON.stringify({ ...outcome, connection }) }], structuredContent: { kind: "route", outcome, connection } };
     }
     const resolved = workspaceOr(workspace!);
     if (!resolved.ok) return resolved.result;

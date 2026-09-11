@@ -5,7 +5,12 @@ import { createHash } from "node:crypto";
 import { Miniflare, Log, LogLevel, convertV4MiniflareOptions, type V4WorkerOptions } from "miniflare";
 import { attachD1, seedAccountInto, revokeSeedKey } from "./support/d1.js";
 import { sha256 } from "../auth.js";
-import { hostedMcpInstructionsSuffix, parseConnectionReceipt } from "../../../contracts/public-api/connection-receipt.js";
+import {
+  connectionReceipt,
+  hostedMcpInstructionsSuffix,
+  interpretConfiguredConnection,
+  parseConnectionReceipt,
+} from "../../../contracts/public-api/connection-receipt.js";
 import { HOSTED_INSTRUCTIONS } from "../instructions.js";
 import type { HostedCatalogResult, HostedKnowledgeGetResult, HostedKnowledgeSearchResult } from "../../../kernel/knowledge-service/types.js";
 import hostedKnowledge from "../../../catalog/generated/hosted-knowledge.json" with { type: "json" };
@@ -296,6 +301,7 @@ test("API discovery, workflow paths, and paged knowledge match MCP results", asy
   const discoveryResponse = await fetchPath("/api/v1", { headers: authorization });
   assert.equal(discoveryResponse.status, 200);
   const discovery = (await discoveryResponse.json()) as {
+    connection?: ReturnType<typeof interpretConfiguredConnection>;
     tools: Array<{
       name: string;
       inputSchema: {
@@ -306,6 +312,13 @@ test("API discovery, workflow paths, and paged knowledge match MCP results", asy
       };
     }>;
   };
+  assert.deepEqual(
+    discovery.connection,
+    interpretConfiguredConnection({
+      clientName: "b2c-hosted",
+      receipt: connectionReceipt({ mode: "hosted_knowledge", engineVersion: hostedKnowledge.engineVersion }),
+    }),
+  );
   assert.deepEqual(discovery.tools.map((tool) => tool.name).sort(), ["b2c_catalog", "b2c_knowledge_get", "b2c_knowledge_search", "b2c_workflow"]);
   assert.ok(discovery.tools.every((tool) => tool.inputSchema.type === "object" && tool.inputSchema.additionalProperties === false));
   const toolsResponse = await fetchPath("/mcp", {

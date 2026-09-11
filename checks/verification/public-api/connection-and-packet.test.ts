@@ -29,6 +29,7 @@ import { createKnowledgeService } from "../../../kernel/knowledge-service/servic
 import { projectHeldWork, projectInitializedBusinessPlan, projectReadyBrief, isLaterGuidance } from "../../../kernel/services/plan-projection.js";
 import { buildWorkerPrompt } from "../../../kernel/session/worker-prompt.js";
 import type { HeldNode, PlanReport } from "../../../kernel/session/plan.js";
+import { handleApi } from "../../../hosted/knowledge-mcp/http.js";
 import { buildHostedKnowledgeBundle } from "../../../tooling/render-hosted-bundle.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
@@ -108,11 +109,26 @@ test("local MCP handshake name is b2c-local and leftover names stay on the recei
   );
   try {
     assert.equal(client.getServerVersion()?.name, "b2c-local");
-    const receipt = parseConnectionReceipt(client.getInstructions() ?? "");
+    const instructions = client.getInstructions() ?? "";
+    const receipt = parseConnectionReceipt(instructions);
     assert.equal(receipt.identity.recommended, "b2c-local");
     assert.deepEqual(receipt.identity.legacy, ["b2c-app-builder"]);
     assert.equal(receipt.providerObservation, "not_tested");
     assert.notEqual(receipt.observed?.knowledge, undefined);
+    const recommended = interpretConfiguredConnection({ clientName: "b2c-local", receipt });
+    const leftover = interpretConfiguredConnection({ clientName: "b2c-app-builder", receipt });
+    assert(instructions.includes(recommended.guidance), "handshake omitted recommended interpretConfiguredConnection guidance");
+    assert(instructions.includes(leftover.guidance), "handshake omitted leftover interpretConfiguredConnection guidance");
+    const cwd = mkdtempSync(path.join(tmpdir(), "b2c-connection-plan-"));
+    try {
+      const routed = await client.callTool({ name: "b2c_plan", arguments: { utterance: "plan the app's onboarding flow", cwd } });
+      assert.equal(routed.isError, undefined);
+      const structured = routed.structuredContent as { kind?: string; connection?: typeof recommended };
+      assert.equal(structured.kind, "route");
+      assert.deepEqual(structured.connection, recommended);
+    } finally {
+      rmSync(cwd, { recursive: true, force: true });
+    }
   } finally {
     await client.close();
   }
@@ -130,6 +146,10 @@ test("local MCP instructions name local execution and refuse hosted-as-local", (
   assert.equal(receipt.observed?.knowledge, "available");
   assert.equal(receipt.observed?.writes, "mcp_write_enabled");
   assert.match(connectionCapabilityGuidance(receipt), /Provider readiness is not implied/);
+  const leftover = interpretConfiguredConnection({ clientName: "b2c-app-builder", receipt });
+  const recommended = interpretConfiguredConnection({ clientName: "b2c-local", receipt });
+  assert(text.includes(recommended.guidance), "local handshake omitted interpretConfiguredConnection guidance");
+  assert(text.includes(leftover.guidance), "local handshake omitted leftover interpretConfiguredConnection guidance");
 });
 
 test("hosted receipt declares hosted mode and omits the leftover local name", () => {
@@ -141,8 +161,13 @@ test("hosted receipt declares hosted mode and omits the leftover local name", ()
   assert.equal(receipt.observed, undefined);
   assert.match(connectionCapabilityGuidance(receipt), /cannot access or run this local business/);
   const suffix = hostedMcpInstructionsSuffix("0.219.40");
-  assert.match(suffix, /legacy local name/);
+  const leftover = interpretConfiguredConnection({ clientName: "b2c-app-builder", receipt });
+  const recommended = interpretConfiguredConnection({ clientName: "b2c-hosted", receipt });
+  assert(suffix.includes(recommended.guidance), "hosted handshake omitted interpretConfiguredConnection guidance");
+  assert(suffix.includes(leftover.guidance), "hosted handshake omitted leftover interpretConfiguredConnection guidance");
+  assert.match(suffix, /not a capability/);
   assert.match(suffix, /cannot access or run this local business/);
+  assert.doesNotMatch(suffix, /legacy local name, not this hosted handshake/);
   assert.equal(parseConnectionReceipt(suffix).identity.legacy, undefined);
   assert.equal(parseConnectionReceipt(suffix).providerObservation, "not_tested");
 });
@@ -217,6 +242,29 @@ test("leftover client names take capability from the handshake, including both-c
   const leftoverNamedHosted = configuredConnectionSet([{ clientName: "b2c-app-builder", receipt: hosted }]);
   assert.equal(leftoverNamedHosted.leftoverPointsAtHosted, true);
   assert.equal(leftoverNamedHosted.bothConfigured, false);
+  const leftoverHostedHandshake = hostedMcpInstructionsSuffix("0.219.89", "b2c-app-builder");
+  assert(leftoverHostedHandshake.includes(leftoverHosted.guidance));
+  assert.equal((leftoverHostedHandshake.match(/not a capability/g) ?? []).length, 1);
+  const leftoverLocalHandshake = localMcpInstructions({
+    knowledge: "available",
+    engineVersion: "0.219.89",
+    writes: "mcp_readonly",
+    clientName: "b2c-app-builder",
+  });
+  assert(leftoverLocalHandshake.includes(leftoverLocal.guidance));
+  assert.doesNotMatch(leftoverLocalHandshake, /The leftover client name b2c-app-builder is the legacy local registration.*The leftover client name b2c-app-builder is the legacy local registration/);
+});
+
+test("hosted API discovery includes interpretConfiguredConnection reading", async () => {
+  const service = createKnowledgeService(buildHostedKnowledgeBundle(root));
+  const response = await handleApi(new Request("https://knowledge.test/api/v1"), service);
+  assert.equal(response.status, 200);
+  const body = (await response.json()) as { connection?: ReturnType<typeof interpretConfiguredConnection> };
+  const expected = interpretConfiguredConnection({
+    clientName: "b2c-hosted",
+    receipt: connectionReceipt({ mode: "hosted_knowledge", engineVersion: service.metadata.engineVersion }),
+  });
+  assert.deepEqual(body.connection, expected);
 });
 
 test("connection receipt never treats handshake or leftover names as provider readiness", () => {

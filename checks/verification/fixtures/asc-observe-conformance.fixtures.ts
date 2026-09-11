@@ -8,7 +8,8 @@
  * review-status response envelope is the 5.1.0 CLI `reviewStatusResult` object.
  * The independent review-submit response envelope is the 5.1.0 CLI
  * `reviewSubmitResult` dry-run object. `asc review submit` maps to
- * `workflow.store.app-review-resubmit`. `asc testflight feedback list` maps to
+ * `workflow.store.app-review-resubmit`. `asc testflight feedback list` and
+ * `asc testflight crashes list` map to
  * `workflow.store.apple-testflight-standing-envelope`. Adapter-built resubmit argv and canned
  * live-provider snapshots are not independent evidence.
  */
@@ -172,6 +173,14 @@ const ASC_NATIVE_MAPPING: readonly AscNativeMappingRow[] = [
     owner: "catalog/workflows/build-release.ts",
   },
   {
+    nativeCapability: "asc testflight crashes list",
+    canonicalOperation: "workflow.store.apple-testflight-standing-envelope",
+    semanticFit: "partial",
+    effects: "read",
+    disposition: "implement",
+    owner: "catalog/workflows/build-release.ts",
+  },
+  {
     nativeCapability: "asc workflow run testflight_beta",
     canonicalOperation: "workflow.store.apple-testflight-standing-envelope",
     semanticFit: "partial",
@@ -195,6 +204,7 @@ const INDEPENDENT_COOKBOOK_STEMS = [
   "asc screenshots validate",
   "asc screenshots upload",
   "asc testflight feedback list",
+  "asc testflight crashes list",
   "asc workflow run",
   "asc web agreements accept",
 ] as const;
@@ -252,7 +262,7 @@ export function register(harness: Harness): void {
     const implemented = ASC_NATIVE_MAPPING.filter((row) => mappingDisposition(row) === "implement");
     const deferred = ASC_NATIVE_MAPPING.filter((row) => mappingDisposition(row) === "defer");
     const rejected = ASC_NATIVE_MAPPING.filter((row) => mappingDisposition(row) === "reject");
-    assert(implemented.length === 11, `observe/remediate/media/metadata/testflight/review-submit implement rows: ${implemented.length}`);
+    assert(implemented.length === 12, `observe/remediate/media/metadata/testflight/review-submit implement rows: ${implemented.length}`);
     assert(
       implemented.some(
         (row) =>
@@ -272,8 +282,22 @@ export function register(harness: Harness): void {
       "TestFlight feedback read maps to the existing TestFlight standing envelope",
     );
     assert(
-      deferred.every((row) => row.nativeCapability !== "asc review submit" && row.nativeCapability !== "asc testflight feedback list"),
-      "review submit and TestFlight feedback read are no longer deferred",
+      implemented.some(
+        (row) =>
+          row.nativeCapability === "asc testflight crashes list" &&
+          row.canonicalOperation === "workflow.store.apple-testflight-standing-envelope" &&
+          row.owner === "catalog/workflows/build-release.ts",
+      ),
+      "TestFlight crashes read maps to the existing TestFlight standing envelope",
+    );
+    assert(
+      deferred.every(
+        (row) =>
+          row.nativeCapability !== "asc review submit" &&
+          row.nativeCapability !== "asc testflight feedback list" &&
+          row.nativeCapability !== "asc testflight crashes list",
+      ),
+      "review submit and TestFlight feedback and crashes reads are no longer deferred",
     );
     assert(deferred.length === 0, `no native mapping row stays deferred: ${deferred.map((row) => row.nativeCapability).join(", ")}`);
     assert(
@@ -305,6 +329,8 @@ export function register(harness: Harness): void {
     );
     assert(buildRelease.includes("asc testflight feedback list"), "the TestFlight envelope already names the cookbook feedback-read form");
     assert(cookbook.includes("asc testflight feedback list"), "cookbook records the native TestFlight feedback-read form");
+    assert(buildRelease.includes("asc testflight crashes list"), "the TestFlight envelope already names the cookbook crashes-read form");
+    assert(cookbook.includes("asc testflight crashes list"), "cookbook records the native TestFlight crashes-read form");
     for (const row of rejected) {
       assert(
         ALWAYS_FORBIDDEN_APP_REVIEW_COMMANDS.some((command) => command.includes(row.nativeCapability)),
@@ -396,6 +422,19 @@ export function register(harness: Harness): void {
       coverageLimits: "Cookbook argv stem from local --help on 2026-09-08. No live TestFlight feedback JSON and no live App Store Connect.",
       sample: 'asc testflight feedback list --app "123456789" --paginate',
     });
+    const testflightCrashes = provenance({
+      provider: "apple-asc",
+      transport: "cli",
+      reviewedVersion: RORK_REVIEWED_VERSION,
+      reviewedRevision: "unknown",
+      sourceSelector: COOKBOOK_SOURCE,
+      nativeOperation: "asc testflight crashes list",
+      canonicalOperation: "workflow.store.apple-testflight-standing-envelope",
+      evidenceKind: "official-example",
+      establishes: ["request-shape"],
+      coverageLimits: "Cookbook argv stem from local --help on 2026-09-08. No live TestFlight crash JSON and no live App Store Connect.",
+      sample: 'asc testflight crashes list --app "123456789" --sort -createdDate --limit 10',
+    });
     const submit = provenance({
       provider: "apple-asc",
       transport: "cli",
@@ -427,6 +466,7 @@ export function register(harness: Harness): void {
     assert(isIndependentEvidence(metadataPush.evidenceKind), describeConformanceCoverage(metadataPush));
     assert(isIndependentEvidence(testflightBeta.evidenceKind), describeConformanceCoverage(testflightBeta));
     assert(isIndependentEvidence(testflightFeedback.evidenceKind), describeConformanceCoverage(testflightFeedback));
+    assert(isIndependentEvidence(testflightCrashes.evidenceKind), describeConformanceCoverage(testflightCrashes));
     assert(isIndependentEvidence(submit.evidenceKind), describeConformanceCoverage(submit));
     assert(isIndependentEvidence(generated.evidenceKind) === false, describeConformanceCoverage(generated));
     assert(cookbook.includes(String(observeStatus.sample)), "observe sample must be the cookbook line");
@@ -434,6 +474,7 @@ export function register(harness: Harness): void {
     assert(cookbook.includes(String(metadataPush.sample)), "metadata push sample must be the cookbook dry-run line");
     assert(cookbook.includes(String(testflightBeta.sample)), "TestFlight beta sample must be the cookbook dry-run line");
     assert(cookbook.includes(String(testflightFeedback.sample)), "TestFlight feedback sample must be the cookbook line");
+    assert(cookbook.includes(String(testflightCrashes.sample)), "TestFlight crashes sample must be the cookbook line");
   });
 
   harness.check("asc-conformance: independent review-status response envelope is the 5.1.0 CLI object", () => {

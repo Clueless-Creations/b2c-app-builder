@@ -16,12 +16,16 @@ export {
   interpretConfiguredConnection,
   isHostedWrongSurfaceTool,
   isLeftoverCliOnlyPublicTool,
+  isLeftoverWriteGatedLocalTool,
   leftoverCliOnlyLocalMcpResponse,
   leftoverCliOnlyLocalRefusal,
+  leftoverWriteGatedLocalMcpResponse,
+  leftoverWriteGatedLocalRefusal,
   LEFTOVER_LOCAL_CLIENT_NAME,
   leftoverNameClientMatrix,
   leftoverNameMigrationGuidance,
   LOCAL_CLIENT_NAME,
+  LOCAL_WRITE_GATED_LEFTOVER_TOOL_NAMES,
   localMcpInstructions,
   observedLocalWorkspaceHealth,
   parseConnectionReceipt,
@@ -39,6 +43,7 @@ export type {
   LeftoverCliOnlyLocalRefusal,
   LeftoverCliOnlyPublicToolName,
   LeftoverNameClientRow,
+  LeftoverWriteGatedLocalToolName,
 } from "./connection-receipt.js";
 
 /** Public compatibility is independent of engine and provider SDK versions. */

@@ -8,7 +8,9 @@
  * review-status response envelope is the 5.1.0 CLI `reviewStatusResult` object.
  * The independent review-submit response envelope is the 5.1.0 CLI
  * `reviewSubmitResult` dry-run object. The independent metadata-validate
- * response envelope is the 5.1.0 CLI `ValidateResult` object. `asc review submit`
+ * response envelope is the 5.1.0 CLI `ValidateResult` object. The independent
+ * screenshots-sizes response envelope is the 5.1.0 CLI `ScreenshotSizesResult`
+ * default focused object. `asc review submit`
  * maps to `workflow.store.app-review-resubmit`. `asc testflight feedback list` and
  * `asc testflight crashes list` map to
  * `workflow.store.apple-testflight-standing-envelope`. Adapter-built resubmit argv and canned
@@ -48,6 +50,9 @@ const REVIEW_STATUS_SOURCE = "rork-app-store-connect-cli 5.1.0 internal/cli/revi
 const REVIEW_SUBMIT_SOURCE =
   "rork-app-store-connect-cli 5.1.0 internal/cli/reviews/review_submit.go reviewSubmitResult / internal/cli/submit/submit_flow.go BuildAttachmentResult";
 const METADATA_VALIDATE_SOURCE = "rork-app-store-connect-cli 5.1.0 internal/cli/metadata/validate.go ValidateResult";
+const SCREENSHOTS_SIZES_SOURCE =
+  "rork-app-store-connect-cli 5.1.0 internal/cli/assets/assets_screenshots.go focusedScreenshotSizeCatalog / internal/asc/screenshot_sizes.go ScreenshotSizesResult";
+const APPLE_STORE_MEDIA_STANDING_ENVELOPE = "workflow.store.apple-store-media-standing-envelope";
 const REVIEW_STATUS_OBJECT_KEYS = ["appId", "version", "reviewDetailConfigured", "reviewDetailId", "latestSubmission", "reviewState", "nextAction"] as const;
 const REVIEW_VERSION_KEYS = ["id", "version", "platform", "state", "createdDate"] as const;
 const REVIEW_SUBMISSION_KEYS = ["id", "state", "platform", "submittedDate"] as const;
@@ -57,6 +62,22 @@ const REVIEW_SUBMIT_OMITTED_KEYS = ["submissionId", "submittedDate", "alreadySub
 const REVIEW_SUBMIT_ATTACHMENT_OMITTED_KEYS = ["currentBuildId", "attached", "alreadyAttached"] as const;
 const METADATA_VALIDATE_OBJECT_KEYS = ["dir", "filesScanned", "issues", "errorCount", "warningCount", "valid"] as const;
 const METADATA_VALIDATE_ISSUE_OMITTED_KEYS = ["locale", "version", "length", "limit"] as const;
+const SCREENSHOTS_SIZES_OBJECT_KEYS = ["sizes"] as const;
+const SCREENSHOTS_SIZE_ENTRY_KEYS = ["displayType", "family", "dimensions"] as const;
+const SCREENSHOTS_SIZE_DIMENSION_KEYS = ["width", "height"] as const;
+const SCREENSHOTS_SIZES_FOCUSED_TYPES = ["APP_IPHONE_65", "APP_IPAD_PRO_3GEN_129"] as const;
+const SCREENSHOTS_SIZES_IPHONE_65_DIMENSIONS = [
+  { width: 1242, height: 2688 },
+  { width: 1284, height: 2778 },
+  { width: 2688, height: 1242 },
+  { width: 2778, height: 1284 },
+] as const;
+const SCREENSHOTS_SIZES_IPAD_PRO_3GEN_129_DIMENSIONS = [
+  { width: 2048, height: 2732 },
+  { width: 2064, height: 2752 },
+  { width: 2732, height: 2048 },
+  { width: 2752, height: 2064 },
+] as const;
 
 type SemanticFit = "exact" | "partial" | "none";
 type MappingEffect = "read" | "mutation" | "publish" | "credential";
@@ -147,7 +168,7 @@ const ASC_NATIVE_MAPPING: readonly AscNativeMappingRow[] = [
   },
   {
     nativeCapability: "asc screenshots sizes",
-    canonicalOperation: "workflow.store.apple-store-media-standing-envelope",
+    canonicalOperation: APPLE_STORE_MEDIA_STANDING_ENVELOPE,
     semanticFit: "partial",
     effects: "read",
     disposition: "implement",
@@ -155,7 +176,7 @@ const ASC_NATIVE_MAPPING: readonly AscNativeMappingRow[] = [
   },
   {
     nativeCapability: "asc screenshots validate",
-    canonicalOperation: "workflow.store.apple-store-media-standing-envelope",
+    canonicalOperation: APPLE_STORE_MEDIA_STANDING_ENVELOPE,
     semanticFit: "partial",
     effects: "read",
     disposition: "implement",
@@ -163,7 +184,7 @@ const ASC_NATIVE_MAPPING: readonly AscNativeMappingRow[] = [
   },
   {
     nativeCapability: "asc screenshots upload",
-    canonicalOperation: "workflow.store.apple-store-media-standing-envelope",
+    canonicalOperation: APPLE_STORE_MEDIA_STANDING_ENVELOPE,
     semanticFit: "exact",
     effects: "mutation",
     disposition: "implement",
@@ -234,6 +255,34 @@ function provenance(record: ProviderConformanceProvenance): ProviderConformanceP
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isDimension(value: unknown): value is { width: number; height: number } {
+  return isRecord(value) && typeof value.width === "number" && typeof value.height === "number";
+}
+
+function assertFocusedSizeEntry(
+  entry: unknown,
+  displayType: string,
+  dimensions: readonly { readonly width: number; readonly height: number }[],
+): void {
+  assert(isRecord(entry), `size entry ${displayType} must be an object`);
+  for (const key of SCREENSHOTS_SIZE_ENTRY_KEYS) {
+    assert(key in entry, `size entry ${displayType} missing ${key}`);
+  }
+  assert(entry.displayType === displayType, `expected displayType ${displayType}`);
+  assert(entry.family === "APP", `${displayType} family is APP`);
+  assert(Array.isArray(entry.dimensions) && entry.dimensions.length === dimensions.length, `${displayType} dimension count`);
+  for (const [index, dim] of entry.dimensions.entries()) {
+    assert(isDimension(dim), `${displayType} dimension ${index} must be an object`);
+    for (const key of SCREENSHOTS_SIZE_DIMENSION_KEYS) {
+      assert(key in dim, `${displayType} dimension ${index} missing ${key}`);
+    }
+    assert(
+      dim.width === dimensions[index]?.width && dim.height === dimensions[index]?.height,
+      `${displayType} dimension ${index} must match catalog order`,
+    );
+  }
 }
 
 function loadNativeJson(fileName: string): unknown {
@@ -309,7 +358,7 @@ export function register(harness: Harness): void {
       implemented.some(
         (row) =>
           row.nativeCapability === "asc screenshots upload" &&
-          row.canonicalOperation === "workflow.store.apple-store-media-standing-envelope" &&
+          row.canonicalOperation === APPLE_STORE_MEDIA_STANDING_ENVELOPE &&
           row.owner === "catalog/workflows/build-release.ts",
       ),
       "screenshot upload maps to the Apple store-media standing envelope",
@@ -726,6 +775,88 @@ export function register(harness: Harness): void {
       thrown = error;
     }
     assert(thrown instanceof AscProviderReadError, "JSON:API metadata document fails closed");
+    assert(thrown instanceof Error && thrown.message.includes("no valid app-version layer"), "JSON:API document is not the CLI object");
+  });
+
+  harness.check("asc-conformance: independent screenshots-sizes response envelope is the 5.1.0 default focused CLI object", () => {
+    const nativeSource = readFileSync(path.join(ASC_CLI_NATIVE_DIR, "screenshots-sizes-object.json"), "utf8");
+    const mistakenSource = readFileSync(path.join(ASC_CLI_NATIVE_DIR, "screenshots-sizes-mistaken-jsonapi.json"), "utf8");
+    const buildRelease = readFileSync(BUILD_RELEASE, "utf8");
+    const native = loadNativeJson("screenshots-sizes-object.json");
+    const mistaken = loadNativeJson("screenshots-sizes-mistaken-jsonapi.json");
+    assert(isRecord(native), "native screenshots-sizes envelope must be one object");
+    for (const key of SCREENSHOTS_SIZES_OBJECT_KEYS) {
+      assert(key in native, `native envelope missing ${key}`);
+    }
+    assert(Array.isArray(native.sizes) && native.sizes.length === 2, "default focused catalog has two entries");
+    assertFocusedSizeEntry(native.sizes[0], SCREENSHOTS_SIZES_FOCUSED_TYPES[0], SCREENSHOTS_SIZES_IPHONE_65_DIMENSIONS);
+    assertFocusedSizeEntry(native.sizes[1], SCREENSHOTS_SIZES_FOCUSED_TYPES[1], SCREENSHOTS_SIZES_IPAD_PRO_3GEN_129_DIMENSIONS);
+    assert(
+      !native.sizes.some((entry) => isRecord(entry) && entry.displayType === "APP_DESKTOP"),
+      "default focused catalog omits APP_DESKTOP",
+    );
+    assert(!("data" in native) && !("attributes" in native), "CLI envelope is not Apple JSON:API");
+    assert(isRecord(mistaken) && isRecord(mistaken.data) && "attributes" in mistaken.data, "mistaken document is Apple JSON:API");
+    assert(
+      adapterGeneratedMentions(nativeSource, ["buildResubmitCommand", "liveReviewStatusJson", "createAscAppReviewProvider"]).length === 0,
+      "native envelope must not name adapter helpers",
+    );
+    assert(
+      adapterGeneratedMentions(mistakenSource, ["buildResubmitCommand", "liveReviewStatusJson"]).length === 0,
+      "mistaken envelope must not name adapter helpers",
+    );
+    assert(buildRelease.includes("asc screenshots sizes"), "media standing envelope still names the cookbook sizes form");
+    assert(!buildRelease.includes("test/data/asc-cli"), "workflow cookbook form is not this envelope");
+    const record = provenance({
+      provider: "apple-asc",
+      transport: "cli",
+      reviewedVersion: RORK_REVIEWED_VERSION,
+      reviewedRevision: RORK_REVIEWED_REVISION,
+      sourceSelector: SCREENSHOTS_SIZES_SOURCE,
+      nativeOperation: "asc screenshots sizes",
+      canonicalOperation: APPLE_STORE_MEDIA_STANDING_ENVELOPE,
+      evidenceKind: "upstream-source-test",
+      establishes: ["response-shape"],
+      coverageLimits:
+        "CLI ScreenshotSizesResult default focused object at 5.1.0 only. APP_IPHONE_65 then APP_IPAD_PRO_3GEN_129. Not Apple JSON:API. Not the --all catalog. Not a live App Store Connect capture. Observe adapter does not execute sizes.",
+      sample: native,
+    });
+    const generated: ProviderConformanceProvenance = {
+      provider: "apple-asc",
+      transport: "cli",
+      reviewedVersion: RORK_REVIEWED_VERSION,
+      reviewedRevision: "unknown",
+      sourceSelector: "catalog/workflows/build-release.ts apple-store-media-standing-envelope cookbook form",
+      nativeOperation: "asc screenshots sizes",
+      canonicalOperation: APPLE_STORE_MEDIA_STANDING_ENVELOPE,
+      evidenceKind: "adapter-generated",
+      establishes: ["request-shape"],
+      coverageLimits: "Echo of the workflow cookbook string. Not independent native evidence.",
+      sample: "asc screenshots sizes",
+    };
+    assert(isIndependentEvidence(record.evidenceKind), describeConformanceCoverage(record));
+    assert(isIndependentEvidence(generated.evidenceKind) === false, describeConformanceCoverage(generated));
+    let thrown: unknown;
+    try {
+      createAscAppReviewProvider({
+        appId: "123456789",
+        runner: reviewStatusRunner(native),
+      }).readSnapshot();
+    } catch (error) {
+      thrown = error;
+    }
+    assert(thrown instanceof AscProviderReadError, "screenshots-sizes object is not a review-status envelope");
+    assert(thrown instanceof Error && thrown.message.includes("no valid app-version layer"), "ScreenshotSizesResult sizes are not the status nested object");
+    thrown = undefined;
+    try {
+      createAscAppReviewProvider({
+        appId: "123456789",
+        runner: reviewStatusRunner(mistaken),
+      }).readSnapshot();
+    } catch (error) {
+      thrown = error;
+    }
+    assert(thrown instanceof AscProviderReadError, "JSON:API screenshot-set document fails closed");
     assert(thrown instanceof Error && thrown.message.includes("no valid app-version layer"), "JSON:API document is not the CLI object");
   });
 }

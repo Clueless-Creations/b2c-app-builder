@@ -1,0 +1,24 @@
+{
+  "sizes": [
+    {
+      "displayType": "APP_IPHONE_65",
+      "family": "APP",
+      "dimensions": [
+        { "width": 1242, "height": 2688 },
+        { "width": 1284, "height": 2778 },
+        { "width": 2688, "height": 1242 },
+        { "width": 2778, "height": 1284 }
+      ]
+    },
+    {
+      "displayType": "APP_IPAD_PRO_3GEN_129",
+      "family": "APP",
+      "dimensions": [
+        { "width": 2048, "height": 2732 },
+        { "width": 2064, "height": 2752 },
+        { "width": 2732, "height": 2048 },
+        { "width": 2752, "height": 2064 }
+      ]
+    }
+  ]
+}

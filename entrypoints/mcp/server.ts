@@ -680,19 +680,33 @@ if (!readOnly) {
     "b2c_verify",
     {
       description:
-        "List work parked pending fresh-context verification on a registered workspace, or accept one node with evidence. Producer never verifies its own work — a session that produced the attempt is refused mechanically.",
+        "List work parked pending fresh-context verification on a registered workspace, or accept one node with evidence. Producer never verifies its own work — a session that produced the attempt is refused mechanically. Runtime proof still requires an explicit workspace observation; a live-device word cannot invent it.",
       inputSchema: {
         workspace: WORKSPACE_ARG,
         node: z.string().optional().describe("Workflow or run-node id to accept (omit to list pending)"),
         session: z.string().optional().describe("Verifying session id (must not have produced the work)"),
         evidence: z.string().optional().describe("What was checked and why it holds (required to accept)"),
+        runtimeObserved: z
+          .union([z.boolean(), z.string()])
+          .optional()
+          .describe(
+            'Explicit workspace runtime observation forwarded to verify --runtime-observed. Pass true or "workspace". A live-device word cannot invent it.',
+          ),
       },
     },
-    async ({ workspace, node, session, evidence }) => {
+    async ({ workspace, node, session, evidence, runtimeObserved }) => {
       const resolved = workspaceOr(workspace);
       if (!resolved.ok) return resolved.result;
       return node
-        ? runCli("kernel/session/verify.ts", ["--workspace", resolved.path, "--node", node, ...flag("session", session), ...flag("evidence", evidence)])
+        ? runCli("kernel/session/verify.ts", [
+            "--workspace",
+            resolved.path,
+            "--node",
+            node,
+            ...flag("session", session),
+            ...flag("evidence", evidence),
+            ...flag("runtime-observed", runtimeObserved),
+          ])
         : runCli("kernel/session/verify.ts", ["--workspace", resolved.path, "--list"]);
     },
   );

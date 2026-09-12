@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.14",
+  "version": "0.220.15",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Make scheduled autonomy explicitly conditional and keep optional scope questions off the foreground ready path.",
     "Bind research decision finding IDs to the current red-team artifact before authoring.",
     "Explain the research contract through the read-only check surface with checkpoint and safety boundaries.",
     "Add a revision-bound research decision preview/apply action with replay, stale-input, duplicate-key, and recoverable mirror guards.",

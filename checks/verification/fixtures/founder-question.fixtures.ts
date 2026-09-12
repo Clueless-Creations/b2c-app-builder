@@ -248,6 +248,13 @@ export function register(harness: Harness): void {
     assert(result!.skippable === true && result!.deferrable === true, "expected a scope-question to be soft");
   });
 
+  harness.check("pickFounderQuestion: optional scope does not interrupt independent ready work", () => {
+    const byId = new Map<RunNodeId, FounderQuestionNode>([["run.scope.node" as RunNodeId, planNode({ title: "Scope node" })]]);
+    const held: HeldNode[] = [heldNode("run.scope.node" as RunNodeId, "founder_approval", "Scope answer needed: Is this optional?", "Scope node")];
+    const result = pickFounderQuestion(byId, held, false, true);
+    assert(result === null, `expected no global question while ready work exists, got ${JSON.stringify(result)}`);
+  });
+
   harness.check("pickFounderQuestion: returns null when nothing is held and autonomy is already set", () => {
     const result = pickFounderQuestion(new Map(), [], false);
     assert(result === null, `expected null when there is nothing to ask, got ${JSON.stringify(result)}`);

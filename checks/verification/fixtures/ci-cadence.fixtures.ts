@@ -16,7 +16,11 @@ export function register(harness: Harness): void {
   const publishYml = readFileSync(path.join(skillRoot, ".github/workflows/publish.yml"), "utf8");
 
   const runLane = (args: string[], env: NodeJS.ProcessEnv = {}) =>
-    spawnSync(process.execPath, [laneScript, ...args], { cwd: repoRoot, encoding: "utf8", env: { ...process.env, ...env } });
+    spawnSync(process.execPath, [laneScript, ...args], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      env: { ...process.env, EVENT_NAME: "", VERIFICATION: "", GITHUB_OUTPUT: "", ...env },
+    });
 
   const runAggregate = (env: NodeJS.ProcessEnv) =>
     spawnSync(process.execPath, [aggregateScript], { cwd: repoRoot, encoding: "utf8", env: { ...process.env, ...env } });
@@ -42,7 +46,10 @@ export function register(harness: Harness): void {
     assert(knowledge.stdout.includes("heavy=false"), `knowledge must not auto-run serial suites:\n${knowledge.stdout}`);
 
     const contracts = runLane(["--files", "contracts/public-api/service.ts"]);
-    assert(contracts.status === 0 && contracts.stdout.includes("scopes=") && contracts.stdout.includes("public-api"), `contracts select public-api extras:\n${contracts.stdout}`);
+    assert(
+      contracts.status === 0 && contracts.stdout.includes("scopes=") && contracts.stdout.includes("public-api"),
+      `contracts select public-api extras:\n${contracts.stdout}`,
+    );
 
     const kernel = runLane(["--files", "kernel/session/run.ts"]);
     assert(kernel.status === 0 && kernel.stdout.includes("heavy=true"), `kernel is in full-suite scope:\n${kernel.stdout}`);
@@ -52,7 +59,10 @@ export function register(harness: Harness): void {
 
     const full = runLane(["--verification", "full", "--files", "docs/validators.md"]);
     assert(full.status === 0 && full.stdout.includes("verification=full"), `explicit full must not stay presubmit:\n${full.stdout}`);
-    assert(full.stdout.includes("hosted=true") && full.stdout.includes("app=true") && full.stdout.includes("heavy=true"), `full expands every job:\n${full.stdout}`);
+    assert(
+      full.stdout.includes("hosted=true") && full.stdout.includes("app=true") && full.stdout.includes("heavy=true"),
+      `full expands every job:\n${full.stdout}`,
+    );
   });
 
   harness.check("presubmit vs full: workflow_dispatch defaults to full; an unknown diff expands extras", () => {
@@ -115,7 +125,10 @@ export function register(harness: Harness): void {
       SCOPE_RESULT: "success",
     });
     assert(cancelled.status === 1, `cancelled presubmit must fail:\n${cancelled.stdout}`);
-    assert(cancelled.stderr.includes("Cancelled") || cancelled.stdout.includes("cancelled"), `must distinguish cancelled:\n${cancelled.stdout}\n${cancelled.stderr}`);
+    assert(
+      cancelled.stderr.includes("Cancelled") || cancelled.stdout.includes("cancelled"),
+      `must distinguish cancelled:\n${cancelled.stdout}\n${cancelled.stderr}`,
+    );
 
     const missing = runAggregate({
       JOB_PRESUBMIT: "skipped",

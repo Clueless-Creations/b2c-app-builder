@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.65",
+  "version": "0.220.66",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Reject duplicate research finding IDs before decision preview or apply writes any product artifact.",
     "Name the first invalid Derived Outputs, Transformation Demo, or Distribution-First Niche field in bounded research diagnostics.",
     "Keep scheduled wrappers on the canonical workspace catalog compatibility guard before spawning any worker runtime.",
     "Make rendered Design Room exploration prove reference access, inspection, tangible draft, critique, revision, chosen target, and runtime comparison.",

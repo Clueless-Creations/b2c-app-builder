@@ -45,6 +45,18 @@ test("research decision previews, applies once, and replays without duplicating 
     const unresolved = callPublicOperation("business.research.decision", { ...input, findingIds: ["finding-missing"] });
     assert(!unresolved.ok && unresolved.error.message.includes("finding_id_unresolved"), JSON.stringify(unresolved));
     assert.equal(readFileSync(path.join(env.directory, "product.yaml"), "utf8"), productBefore);
+    writeFileSync(
+      path.join(env.directory, "strategy/RED_TEAM_FINDINGS.md"),
+      "# Red-team findings\n\n| Finding ID | Severity | Finding |\n| --- | --- | --- |\n| finding-a | medium | Narrow the audience. |\n| finding-a | high | The same ID was authored twice. |\n",
+    );
+    const ambiguous = callPublicOperation("business.research.decision", { ...input, expectedRevision: workspaceRevision(env.directory) });
+    assert(!ambiguous.ok && ambiguous.error.message.includes("finding_id_ambiguous"), JSON.stringify(ambiguous));
+    assert.equal(readFileSync(path.join(env.directory, "product.yaml"), "utf8"), productBefore);
+    assert.equal(readFileSync(path.join(env.directory, "PRODUCT.md"), "utf8"), renderedBefore);
+    writeFileSync(
+      path.join(env.directory, "strategy/RED_TEAM_FINDINGS.md"),
+      "# Red-team findings\n\n| Finding ID | Severity | Finding |\n| --- | --- | --- |\n| finding-a | medium | Narrow the audience. |\n",
+    );
     const preview = callPublicOperation("business.research.decision", input);
     assert(preview.ok, JSON.stringify(preview));
     assert.equal(preview.data.applied, false);

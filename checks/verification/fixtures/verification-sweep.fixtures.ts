@@ -249,6 +249,42 @@ export function register(harness: Harness): void {
     assert((node.blocker ?? "").startsWith("Scope answer needed"), `blocker must restate the question, got "${node.blocker}"`);
   });
 
+  harness.check("applicability: a declined optional scope survives resume and reopens only when explicitly required", () => {
+    const plan = compilePlan(testCatalog(), now);
+    const run = seedRunState(plan, emptyBusinessState(), { ownerSessionId: "s1", ttlSeconds: 60, wallClockCapSeconds: 600, now });
+    const declined: BusinessStateV2 = {
+      ...emptyBusinessState(),
+      workflowApplicability: {
+        "workflow.maybe-note": {
+          verdict: "not-needed",
+          reason: "The current manual workflow does not need recurring operation.",
+          evidence: [],
+          updatedAt: later,
+        },
+      },
+    } as BusinessStateV2;
+    reconcileWorkflowApplicability(plan, run, declined, later);
+    assert(run.nodes["run.maybe-note"]!.status === "not_needed", "declined optional work must stay inactive");
+    reconcileWorkflowApplicability(plan, run, declined, "2026-08-19T09:10:00.000Z");
+    assert(run.nodes["run.maybe-note"]!.status === "not_needed", "ordinary resume must not repeat the optional question");
+
+    const required: BusinessStateV2 = {
+      ...declined,
+      workflowApplicability: {
+        ...declined.workflowApplicability,
+        "workflow.maybe-note": {
+          ...declined.workflowApplicability!["workflow.maybe-note"]!,
+          verdict: "required",
+          reason: "The founder selected recurring operation for this workflow.",
+          updatedAt: "2026-08-19T09:15:00.000Z",
+        },
+      },
+    } as BusinessStateV2;
+    reconcileWorkflowApplicability(plan, run, required, "2026-08-19T09:15:00.000Z");
+    const reopenedStatus = run.nodes["run.maybe-note"]!.status as string;
+    assert(reopenedStatus === "pending", "explicit selection must reopen the conditional workflow");
+  });
+
   // ---------------------------------------------------------------------
   // calendar reopening (reopenRecurringNodes) — the operating loop
   // ---------------------------------------------------------------------

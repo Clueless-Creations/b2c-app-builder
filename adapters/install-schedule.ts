@@ -90,6 +90,10 @@ export function crontabSignature(options: Pick<ScheduleOptions, "workspaceSlug" 
   return `b2c:${options.workspaceSlug}:${options.runtime}`;
 }
 
+function workspaceCrontabSignature(workspaceSlug: string): string {
+  return `b2c:${workspaceSlug}:`;
+}
+
 /** Read-only state check for the managed entry; foreign crontab lines are ignored. */
 export function crontabHasSignature(existingContent: string, signature: string): boolean {
   return existingContent.split(/\r?\n/u).some((line) => line.includes(`# ${signature}`));
@@ -106,17 +110,17 @@ export function filterCrontabLines(existingLines: readonly string[], signature: 
 
 export function applyCrontabInstall(existingContent: string, options: ScheduleOptions): { nextContent: string; line: string } {
   const lines = existingContent.split("\n").filter((line) => line.length > 0);
-  const withoutOurs = filterCrontabLines(lines, crontabSignature(options));
+  const withoutOurs = lines.filter((line) => !line.includes(`# ${workspaceCrontabSignature(options.workspaceSlug)}`));
   const line = renderCrontabLine(options);
   return { nextContent: `${[...withoutOurs, line].join("\n")}\n`, line };
 }
 
-/** The exact reverse of applyCrontabInstall for the same options: removes our line, leaves everything else (order and all) untouched. */
+/** The exact reverse of applyCrontabInstall for the workspace: removes managed runtime variants, leaves foreign lines untouched. */
 export function applyCrontabUninstall(existingContent: string, options: ScheduleOptions): { nextContent: string; removed: string[] } {
-  const signatures = [crontabSignature(options)];
   const lines = existingContent.split("\n").filter((line) => line.length > 0);
-  const removed = lines.filter((line) => signatures.some((signature) => line.includes(`# ${signature}`)));
-  const kept = signatures.reduce((acc, signature) => filterCrontabLines(acc, signature), lines as string[]);
+  const signature = workspaceCrontabSignature(options.workspaceSlug);
+  const removed = lines.filter((line) => line.includes(`# ${signature}`));
+  const kept = lines.filter((line) => !line.includes(`# ${signature}`));
   return { nextContent: kept.length > 0 ? `${kept.join("\n")}\n` : "", removed };
 }
 

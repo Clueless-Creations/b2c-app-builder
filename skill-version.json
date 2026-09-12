@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.44",
+  "version": "0.220.45",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Add authored row locations and bounded repair hints for Category Revenue and Distribution Proof failures.",
     "Require exact managed schedule-line readback and reject leftover workspace runtime variants.",
     "Repair a worker knowledge receipt once without rerunning the business task, while rejecting changed candidate outputs.",
     "Refresh the Astra A0 deterministic baseline to the current integrated source revision and measured standing files.",

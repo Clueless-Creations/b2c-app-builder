@@ -44,6 +44,7 @@ const state = loaded.state;
 const projectOwner = state ? (asString(getPath(state, "project.owner")) ?? "").trim() : "";
 const FOUNDER_OPENING_MANDATE = "Founder opening mandate";
 const AUTOMATION_IDENTITY = /\b(agent|codex|claude|gpt|assistant|bot|automation|autopilot|ai)\b/i;
+const VERDICT_EVIDENCE_LABELS = ["Category revenue reality", "Wedge", "Demand signal", "Distribution proof", "Offer test"] as const;
 
 export const SIGNAL_CORPUS_HEADERS = {
   inputs: [
@@ -433,6 +434,7 @@ if (text) {
       }
       const parsedRows = verdictSection.rows.map((row) => ({
         cells: row.cells,
+        sourceLine: row.sourceLine,
         widthValid: row.rawCellCount === verdictSection.width,
         date: dateColumn >= 0 && /^\d{4}-\d{2}-\d{2}$/.test(row.cells[dateColumn]?.trim() ?? "") ? (row.cells[dateColumn]?.trim() ?? "") : undefined,
         verdict:
@@ -501,6 +503,22 @@ if (text) {
               "strategy/RESEARCH.md",
             ),
           );
+          evidenceCells.forEach((cell, index) => {
+            if (cell.trim().length > 0 && !PLACEHOLDER_TEXT.test(cell)) return;
+            const label = VERDICT_EVIDENCE_LABELS[index] ?? "named evidence";
+            issues.push(
+              issue(
+                "error",
+                "research.go_pivot_kill_evidence_field_invalid",
+                `The latest Go, Pivot, Or Kill row has an empty or placeholder-only "${label}" cell; this decision input is not authored yet.`,
+                "strategy/RESEARCH.md",
+                {
+                  line: latest.sourceLine,
+                  fixHint: `Fill the "${label}" cell with the current evidence or record the applicable checkpoint hold; do not replace uncertainty with a fabricated result.`,
+                },
+              ),
+            );
+          });
         }
         if (latest.verdict !== "go") {
           issues.push(

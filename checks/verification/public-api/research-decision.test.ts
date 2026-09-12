@@ -52,7 +52,17 @@ test("research decision previews, applies once, and replays without duplicating 
     assert.equal(readFileSync(path.join(env.directory, "product.yaml"), "utf8"), productBefore);
     assert.equal(readFileSync(path.join(env.directory, "PRODUCT.md"), "utf8"), renderedBefore);
 
-    const applied = callPublicOperation("business.research.decision", { ...input, apply: true });
+    writeFileSync(
+      path.join(env.directory, "strategy/RED_TEAM_FINDINGS.md"),
+      "# Red-team findings\n\n| Finding ID | Severity | Finding |\n| --- | --- | --- |\n| finding-a | high | The audience claim changed after review. |\n",
+    );
+    const staleFindingApply = callPublicOperation("business.research.decision", { ...input, apply: true });
+    assert(!staleFindingApply.ok && staleFindingApply.error.message.includes("stale_revision"), JSON.stringify(staleFindingApply));
+    assert.equal(readFileSync(path.join(env.directory, "product.yaml"), "utf8"), productBefore);
+    assert.equal(readFileSync(path.join(env.directory, "PRODUCT.md"), "utf8"), renderedBefore);
+
+    const currentInput = { ...input, expectedRevision: workspaceRevision(env.directory) };
+    const applied = callPublicOperation("business.research.decision", { ...currentInput, apply: true });
     assert(applied.ok, JSON.stringify(applied));
     assert.equal(applied.data.applied, true);
     assert.equal(applied.data.replayed, false);

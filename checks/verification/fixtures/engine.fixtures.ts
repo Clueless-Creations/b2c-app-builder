@@ -28,6 +28,7 @@ import { buildDispatchBatches, checkBatchBoundary, neverHaltDispatchHooks } from
 import { composeNodeBrief, renderNodeBrief } from "../../../kernel/engine/node-brief.js";
 import {
   buildVerifierCommand,
+  buildReceiptRepairPrompt,
   buildWorkerCommand,
   postWorkerWorkspaceDigestRefreshPaths,
   receiptFileDigest,
@@ -2894,6 +2895,12 @@ export function register(harness: Harness): void {
     );
     const expectations = { fileDigests };
     const prompt = buildWorkerPrompt(brief, "/tmp/business", "/tmp/skill", expectations);
+    const repairPrompt = buildReceiptRepairPrompt(prompt, [
+      { artifactId: "artifact.research-brief", path: "research/brief.md", fingerprint: "sha256:candidate" },
+    ]);
+    assert(repairPrompt.includes("RECEIPT-ONLY REPAIR"), "receipt repair must be an explicit protocol-only continuation");
+    assert(repairPrompt.includes("Do not edit, delete, regenerate, overwrite"), "receipt repair must forbid task mutation");
+    assert(repairPrompt.includes("artifact.research-brief: research/brief.md fingerprint=sha256:candidate"), "receipt repair must bind the existing candidate");
     assert(
       prompt.includes("QUALITY PRINCIPLE: Deliver the user's intended outcome with specific, coherent, trustworthy behavior."),
       "every managed worker must receive the scope-bounded continuous quality principle",

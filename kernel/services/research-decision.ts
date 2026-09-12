@@ -72,17 +72,22 @@ function resolvedFindingIds(root: string): Set<string> {
   let tableHasFindingId = false;
   for (const line of text.split(/\r?\n/)) {
     const labeled = line.match(/^\s*(?:[-*]\s*)?Finding ID\s*[:|]\s*([^|\s]+)\s*\|?\s*$/i);
-    if (labeled?.[1] && DECISION_ID.test(labeled[1])) ids.add(labeled[1]);
+    if (labeled?.[1] && DECISION_ID.test(labeled[1])) addFindingId(ids, labeled[1]);
     if (line.trim().startsWith("|") && /finding\s+id/i.test(line)) {
       tableHasFindingId = true;
       continue;
     }
     if (tableHasFindingId && line.trim().startsWith("|")) {
       const firstCell = line.split("|")[1]?.trim();
-      if (firstCell && !/^[-:]+$/.test(firstCell) && DECISION_ID.test(firstCell)) ids.add(firstCell);
+      if (firstCell && !/^[-:]+$/.test(firstCell) && DECISION_ID.test(firstCell)) addFindingId(ids, firstCell);
     }
   }
   return ids;
+}
+
+function addFindingId(ids: Set<string>, findingId: string): void {
+  if (ids.has(findingId)) throw new Error("business.research_decision_finding_id_ambiguous");
+  ids.add(findingId);
 }
 
 function parseProduct(root: string, text: string) {

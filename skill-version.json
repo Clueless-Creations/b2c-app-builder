@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.41",
+  "version": "0.220.42",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Refresh the Astra A0 deterministic baseline to the current integrated source revision and measured standing files.",
     "Refresh task-skill host-discovery provenance to the current integrated artifact revision.",
     "Record native Codex task-skill discovery and the authenticated Claude discovery hold with revision-bound evidence.",
     "Carry a scope-bounded continuous quality principle through every managed worker prompt without imposing a universal 11-star exercise.",

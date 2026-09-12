@@ -1,9 +1,11 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.32",
+  "version": "0.220.33",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Align the post-Brigade public API start-path regression with the shipped agent guide heading.",
+    "Keep the lifecycle audit green after the product-facing Brigade terminology update.",
     "Reject distinct completed knowledge receipts across transport envelopes while allowing an echoed prompt skeleton.",
     "Verify managed launchd schedule installation and removal through exact label and file readback.",
     "Refresh the evidence-schema fingerprint after rendering the authority-matrix projections.",

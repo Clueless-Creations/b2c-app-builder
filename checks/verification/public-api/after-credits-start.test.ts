@@ -127,7 +127,7 @@ test("After Credits start reaches status/plan without a maintainer tour or whole
     assert(Buffer.byteLength(skill, "utf8") <= 6500, "root activation exceeded the bounded routing budget");
     assert(!/--mandate-file|composition-activate|--expected-revision/.test(skill), "root activation still carries conditional procedures");
     const guideCreate = headingSlice(guide, "## Create a planning workspace", "## Knowledge tools");
-    const startPath = [headingSlice(agents, "# B2C App Builder Agent Guide", "### Contribution"), managed, skillStart].join("\n");
+    const startPath = [headingSlice(agents, "# Brigade Agent Guide", "### Contribution"), managed, skillStart].join("\n");
     assert(startPath.includes("Business is an early exit"));
     assert(startPath.includes("b2c_business_status"));
     assert(

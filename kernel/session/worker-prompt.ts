@@ -42,6 +42,8 @@ export interface KnowledgeReceiptExpectations {
   /** Independently computed immediately before dispatch. Keys are workspace- or skill-relative paths. */
   readonly fileDigests?: Readonly<Record<string, string>>;
   readonly authorization?: WorkerAuthorization;
+  /** Engine package version captured by the dispatcher for worker-protocol compatibility. */
+  readonly engineVersion?: string;
 }
 
 interface ReceiptFile {
@@ -57,6 +59,7 @@ interface RouteDecision {
 }
 interface KnowledgeReceipt {
   schemaVersion: "2.0.0";
+  engineVersion?: string;
   workflowId: string;
   tokenBudget: number;
   authorizationDigest: string;
@@ -161,6 +164,7 @@ export function buildWorkerPrompt(brief: NodeBrief, workspaceDir: string, skillR
     KNOWLEDGE_RECEIPT_BEGIN,
     JSON.stringify({
       schemaVersion: "2.0.0",
+      engineVersion: expectations.engineVersion ?? "<dispatcher engine version>",
       workflowId: brief.workflowId,
       tokenBudget: brief.tokenBudget,
       authorizationDigest: authorityDigest,
@@ -485,6 +489,8 @@ export function validateKnowledgeReceipt(output: string, brief: NodeBrief, expec
   const receipt = computed[0] ?? parsedReceipts.at(-1);
   if (!receipt) return [`receipt must contain exactly one valid structured ${KNOWLEDGE_RECEIPT_BEGIN}/${KNOWLEDGE_RECEIPT_END} pair; found 0`];
   if (receipt.schemaVersion !== "2.0.0") issues.push('receipt schemaVersion must be "2.0.0"');
+  if (expectations.engineVersion !== undefined && receipt.engineVersion !== expectations.engineVersion)
+    issues.push(`receipt engineVersion must equal ${expectations.engineVersion}`);
   if (receipt.workflowId !== brief.workflowId) issues.push(`receipt workflowId must equal ${brief.workflowId}`);
   if (receipt.tokenBudget !== brief.tokenBudget) issues.push(`receipt tokenBudget must equal ${brief.tokenBudget}`);
   if (receipt.authorizationDigest !== authorizationDigest(expectations.authorization))

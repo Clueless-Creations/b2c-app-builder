@@ -3026,7 +3026,7 @@ export function register(harness: Harness): void {
         `sha256:${String(index + 1).padStart(64, "a")}`,
       ]),
     );
-    const expectations = { fileDigests };
+    const expectations = { fileDigests, engineVersion: "0.220.70" };
     const prompt = buildWorkerPrompt(brief, "/tmp/business", "/tmp/skill", expectations);
     const repairPrompt = buildReceiptRepairPrompt(prompt, [
       { artifactId: "artifact.research-brief", path: "research/brief.md", fingerprint: "sha256:candidate" },
@@ -3131,6 +3131,7 @@ export function register(harness: Harness): void {
     assert(validateKnowledgeReceipt("finished", brief).length > 0, "a conclusion without a knowledge receipt must fail");
     const receiptBody = {
       schemaVersion: "2.0.0",
+      engineVersion: "0.220.70",
       workflowId: brief.workflowId,
       tokenBudget: brief.tokenBudget,
       authorizationDigest: "none",
@@ -3158,6 +3159,12 @@ export function register(harness: Harness): void {
     };
     const receipt = `BEGIN_KNOWLEDGE_RECEIPT\n${JSON.stringify(receiptBody)}\nEND_KNOWLEDGE_RECEIPT`;
     assert(validateKnowledgeReceipt(receipt, brief, expectations).length === 0, "an exact structured knowledge receipt must pass");
+    assert(
+      validateKnowledgeReceipt(receipt.replace('"engineVersion":"0.220.70"', '"engineVersion":"0.220.69"'), brief, expectations).includes(
+        "receipt engineVersion must equal 0.220.70",
+      ),
+      "a worker receipt from an older engine must fail closed with the expected engine version",
+    );
     const placeholderReceipt = {
       ...receiptBody,
       conditionalKnowledge: brief.route.map((entry) => ({

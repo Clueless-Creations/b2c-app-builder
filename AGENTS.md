@@ -12,7 +12,19 @@ Route by the target of the request, not the agent host or the person's title.
 | Reusable knowledge, source adoption, provider intake, recipes, examples | [Contribution](agents/skills/b2c-contributor/SKILL.md) |
 | Builder contracts, runtime, architecture, agent guidance, provider implementation, maintained upstreams | [Maintenance](agents/skills/b2c-maintainer/SKILL.md) |
 
-For a narrow app code fix, follow that app's own instructions and affected tests without activating a business lifecycle. Focused business expertise does not require setup. Managed business work follows the business router's status, plan, authority, and evidence path. Business workers do not load maintainer architecture, migration plans, contributor machinery, unrelated providers, or operator procedures merely to start. README is product documentation, not a prerequisite to routing.
+Business is an early exit: after selecting the business router, reach the current status/plan and bounded task, then stop reading unless that task requires more guidance. For a narrow app code fix, follow that app's own instructions and affected tests without activating a business lifecycle. Focused business expertise does not require setup. Managed business work follows the business router's status, plan, authority, and evidence path. Business workers do not load maintainer architecture, migration plans, contributor machinery, unrelated providers, or operator procedures merely to start. README is product documentation, not a prerequisite to routing.
+
+### Business
+
+Use `SKILL.md`; for managed work, start with `business-status`, then `business-plan`, then the current bounded task. Load only the guidance that applies.
+
+### Contribution
+
+Use `agents/skills/b2c-contributor/SKILL.md`; load contribution, rights, provenance, and source-adoption procedure only for that work.
+
+### Maintenance
+
+Use `agents/skills/b2c-maintainer/SKILL.md`; load architecture, provider, upstream, and repository procedures only for the selected maintenance task.
 
 ## Public and private boundary
 

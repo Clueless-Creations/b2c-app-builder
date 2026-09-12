@@ -24,6 +24,16 @@ Record a bounded non-secret planning observation in a registered workspace at an
 - [Input schema](schemas/business.research.record.input.schema.json)
 - [Result schema](schemas/business.research.record.result.schema.json)
 
+## business.research.decision
+
+Preview by default or apply one revision-bound planning checkpoint to product.yaml and rendered PRODUCT.md. It never grants authority or makes initialization eligible; replay, stale inputs, duplicate YAML keys, and inconsistent product mirrors refuse before writes.
+
+- CLI: `b2c research-decision`
+- Accepted CLI flags: `--workspace`, `--revision`, `--decision-id`, `--verdict`, `--rationale`, `--finding-ids`, `--apply`, `--json`. See `b2c research-decision --help` for usage.
+- MCP: unavailable (CLI operator only)
+- [Input schema](schemas/business.research.decision.input.schema.json)
+- [Result schema](schemas/business.research.decision.result.schema.json)
+
 ## catalog.list
 
 List versioned capabilities, provider declarations, and recipes. Declaration is distinct from executable support. Reads bundled metadata only; no workspace or provider access.

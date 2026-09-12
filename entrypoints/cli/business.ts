@@ -22,6 +22,8 @@ const inputFieldForFlag: Readonly<Record<string, string>> = {
   preview: "previewDigest",
   experiment: "experimentId",
   "max-age": "maxAgeSeconds",
+  "decision-id": "decisionId",
+  "finding-ids": "findingIds",
   "runtime-observed": "runtimeObserved",
 };
 function usageFlag(flag: string): string {
@@ -149,6 +151,17 @@ try {
         workspaceId: flags.get("workspace"),
         expectedRevision: flags.get("revision"),
         observation: JSON.parse(boundedFileBytes(resolveCallerPath(String(flags.get("observation"))), 32000).toString("utf8")),
+      });
+      break;
+    case "business.research.decision":
+      result = callPublicOperation(operation.id, {
+        workspaceId: flags.get("workspace"),
+        expectedRevision: flags.get("revision"),
+        decisionId: flags.get("decision-id"),
+        verdict: flags.get("verdict"),
+        rationale: flags.get("rationale"),
+        findingIds: typeof flags.get("finding-ids") === "string" ? String(flags.get("finding-ids")).split(",").filter(Boolean) : [],
+        apply: flags.has("apply"),
       });
       break;
     case "business.create":

@@ -6,6 +6,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const suites = [
   "public-api",
   "lifecycle",
+  "research-decision",
   "recovery",
   "initialization",
   "installed-composition",

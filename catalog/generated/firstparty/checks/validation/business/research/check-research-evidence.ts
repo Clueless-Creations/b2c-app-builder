@@ -609,6 +609,10 @@ function emptySignalCorpusIndex(): SignalCorpusIndex {
   return { signalLifecycles: new Map(), eligibleSignalIds: new Set() };
 }
 
+function firstInvalidField(fields: readonly (readonly [string, boolean])[]): string {
+  return fields.find(([, valid]) => !valid)?.[0] ?? "row shape";
+}
+
 function validateSignalCorpus(value: string | undefined, target: ReturnType<typeof issue>[], strict: boolean): SignalCorpusIndex {
   const index = emptySignalCorpusIndex();
   if (!value) {
@@ -725,6 +729,22 @@ function validateSignalCorpus(value: string | undefined, target: ReturnType<type
           !declaredInputIds.has(inputId)
         );
       });
+      const invalidField = invalidRow
+        ? (() => {
+            const cells = inputColumnIndexes.map((column) => (invalidRow.cells[column] ?? "").trim());
+            const inputId = (cells[0] ?? "").toUpperCase();
+            return firstInvalidField([
+              ["Input ID", /^INPUT-[A-Z0-9][A-Z0-9-]*$/.test(inputId) && !declaredInputIds.has(inputId)],
+              ["Source type", cells[1]!.length > 0 && !isPlaceholderOnly(cells[1]!)],
+              ["Owner or creator", cells[2]!.length > 0 && !isPlaceholderOnly(cells[2]!)],
+              ["Scope", cells[3]!.length > 0 && !isPlaceholderOnly(cells[3]!)],
+              ["Date range", isValidPastIsoDateRange(cells[4]!)],
+              ["Collection route", cells[5]!.length > 0 && !isPlaceholderOnly(cells[5]!)],
+              ["Permission or public basis", cells[6]!.length > 0 && !isPlaceholderOnly(cells[6]!)],
+              ["Limits", cells[7]!.length > 0 && !isPlaceholderOnly(cells[7]!)],
+            ]);
+          })()
+        : "row shape";
       target.push(
         issue(
           "error",
@@ -735,7 +755,7 @@ function validateSignalCorpus(value: string | undefined, target: ReturnType<type
           invalidRow
             ? {
                 line: invalidRow.sourceLine,
-                fixHint: "Repair the named row's first invalid field; use one INPUT-* ID and a real YYYY-MM-DD date or date range.",
+                fixHint: `Repair the Corpus Inputs row's ${invalidField} field first; use one INPUT-* ID and a real YYYY-MM-DD date or date range.`,
               }
             : undefined,
         ),
@@ -848,6 +868,25 @@ function validateSignalCorpus(value: string | undefined, target: ReturnType<type
           [cells[1] ?? "", cells[5] ?? "", cells[9] ?? ""].every((cell) => cell.length > 0 && !isPlaceholderOnly(cell))
         );
       });
+      const invalidField = invalidRow
+        ? (() => {
+            const cells = recordColumns.map((column) => (invalidRow.cells[column] ?? "").trim());
+            const id = (cells[0] ?? "").toUpperCase();
+            const sourceIds = parsePrefixedIdList(cells[3] ?? "", "INPUT");
+            return firstInvalidField([
+              ["Signal ID", /^SIG-[A-Z0-9][A-Z0-9-]*$/.test(id) && !seenSignalIds.has(id)],
+              ["Type", cells[1]!.length > 0 && !isPlaceholderOnly(cells[1]!)],
+              ["Claim or phrase", cells[2]!.length > 0 && !isPlaceholderOnly(cells[2]!)],
+              ["Source IDs", sourceIds.validSyntax && sourceIds.ids.length > 0 && sourceIds.ids.every((sourceId) => declaredInputIds.has(sourceId))],
+              ["Observed at", isValidPastIsoDate(cells[4]!)],
+              ["Applies to", cells[5]!.length > 0 && !isPlaceholderOnly(cells[5]!)],
+              ["Confidence", /^(low|medium|high)$/i.test(cells[6]!)],
+              ["Status", /^(current|dated|superseded|rejected|unverified)$/.test(cells[7]!.toLowerCase())],
+              ["Supersedes", cells[7]!.toLowerCase() !== "superseded" || !invalidSupersessionIds.has(id)],
+              ["Artifact or trace", cells[9]!.length > 0 && !isPlaceholderOnly(cells[9]!)],
+            ]);
+          })()
+        : "row shape";
       target.push(
         issue(
           "error",
@@ -861,8 +900,7 @@ function validateSignalCorpus(value: string | undefined, target: ReturnType<type
           invalidRow
             ? {
                 line: invalidRow.sourceLine,
-                fixHint:
-                  "Keep narrative claims as prose; replace only a placeholder-only value, malformed ID/date, unsupported confidence/lifecycle, or unresolved INPUT-* reference.",
+                fixHint: `Repair the Signal Records row's ${invalidField} field first; keep narrative claims as prose and replace only a placeholder-only value, malformed ID/date, unsupported confidence/lifecycle, or unresolved INPUT-* reference.`,
               }
             : undefined,
         ),

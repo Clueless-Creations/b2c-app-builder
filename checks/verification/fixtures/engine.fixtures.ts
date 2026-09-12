@@ -866,6 +866,17 @@ export function register(harness: Harness): void {
     state.status = "pending";
     assert(computeFrontier(plan, run, businessState, evaluator).ready.includes(fullLaunch!.id), "approved local mandate must reach the frontier");
 
+    // Persist the approved mandate and re-enter through a fresh run-state load. The approval
+    // remains bound to the same compiled node and is not duplicated or silently re-requested.
+    const persistedRunPath = path.join(harness.makeTempDir("full-launch-authority-reentry"), "run-state.json");
+    writeRunState(persistedRunPath, run);
+    const resumed = loadRunState(persistedRunPath);
+    const resumedState = resumed.nodes[fullLaunch!.id]!;
+    assert(resumed.approvals[fullLaunch!.approvals[0]!.id] === "approved", "restart must preserve the approved mandate decision");
+    assert(resumedState.status === "ready", "restart must preserve the ready re-entry state");
+    assert(computeFrontier(plan, resumed, businessState, evaluator).ready.includes(fullLaunch!.id), "approved mandate must re-enter after restart");
+    assert(Object.keys(resumed.approvals).filter((id) => id === fullLaunch!.approvals[0]!.id).length === 1, "re-entry must not duplicate the mandate approval");
+
     run.approvals[fullLaunch!.approvals[0]!.id] = "rejected";
     state.status = "pending";
     const rejected = computeFrontier(plan, run, businessState, evaluator);

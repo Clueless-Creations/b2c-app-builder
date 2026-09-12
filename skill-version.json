@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.60",
+  "version": "0.220.61",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Name the first invalid Corpus Inputs or Signal Records field in bounded research diagnostics.",
     "Reject research-decision apply when the reviewed finding artifact changes after preview, before any product write.",
     "Verify remote-effect uncertainty survives fresh-process resume without duplicating the effect or reopening the frontier.",
     "Verify unselected scheduling stays parked across resume while explicit selection reaches only the approved effect boundary.",

@@ -772,6 +772,13 @@ export function register(h: Harness): void {
     writeFileSync(signalPath, signal, "utf8");
   }
   runFixture("signal corpus with an unknown lifecycle fails", researchSignalLifecycle, "check-research-evidence.ts", 1, "research.signal_corpus_row_missing");
+  runFixture(
+    "signal record diagnostics name the first invalid field",
+    researchSignalLifecycle,
+    "check-research-evidence.ts",
+    1,
+    "Signal Records row's Status field",
+  );
 
   const researchSignalImpossibleDate = makeCompletedResearch("research-signal-impossible-date");
   {
@@ -846,6 +853,13 @@ export function register(h: Harness): void {
     "check-research-evidence.ts",
     1,
     "research.signal_corpus_input_row_invalid",
+  );
+  runFixture(
+    "corpus input diagnostics name the first invalid field",
+    researchSignalInputImpossibleDate,
+    "check-research-evidence.ts",
+    1,
+    "Corpus Inputs row's Date range field",
   );
 
   const researchSignalInputReversedRange = makeCompletedResearch("research-signal-input-reversed-range");

@@ -160,7 +160,7 @@ async function prove(): Promise<void> {
     const registry = new OperationRouteRegistry([route]);
     const good = context("good");
     const result = await registry.execute(node, good);
-    assert.equal(result.status, "succeeded", result.error);
+    assert.equal(result.status, "succeeded", result.error ?? "");
     const noticePath = path.join(good.workspaceDir, "support/notices.md");
     assert(readFileSync(noticePath, "utf8").includes("Synthetic fixture license and copyright. Preserve this exact text."));
     assert.equal(result.outputs.length, 3);
@@ -210,7 +210,7 @@ async function prove(): Promise<void> {
     ]);
     const importContext = context("valid-import");
     const importedResult = await imported.execute(node, importContext);
-    assert.equal(importedResult.status, "succeeded", importedResult.error);
+    assert.equal(importedResult.status, "succeeded", importedResult.error ?? "");
     assert(readFileSync(path.join(importContext.workspaceDir, "support/notices.md"), "utf8").includes("Imported synthetic notice."));
 
     const extra = new OperationRouteRegistry([

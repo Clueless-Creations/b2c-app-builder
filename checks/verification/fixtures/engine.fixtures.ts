@@ -2894,6 +2894,10 @@ export function register(harness: Harness): void {
     );
     const expectations = { fileDigests };
     const prompt = buildWorkerPrompt(brief, "/tmp/business", "/tmp/skill", expectations);
+    assert(
+      prompt.includes("QUALITY PRINCIPLE: Deliver the user's intended outcome with specific, coherent, trustworthy behavior."),
+      "every managed worker must receive the scope-bounded continuous quality principle",
+    );
     assert(prompt.includes("standard SHA-256 of the file bytes only"), "the worker must receive the exact reproducible receipt digest algorithm");
     assert(
       prompt.includes("Task artifacts that also appear under PRODUCE are mutable"),

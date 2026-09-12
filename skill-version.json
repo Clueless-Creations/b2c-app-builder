@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.38",
+  "version": "0.220.39",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Carry a scope-bounded continuous quality principle through every managed worker prompt without imposing a universal 11-star exercise.",
     "Replace workspace-managed cron entries when the selected runtime changes, preserving foreign jobs and exact uninstall behavior.",
     "Retain safely observed worker output candidates when a knowledge receipt fails, without accepting or replaying the work.",
     "Extend full-launch authority coverage across scope, draft-agreement, and rejected-mandate boundaries.",

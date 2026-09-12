@@ -12,3 +12,13 @@ This section is a connectivity gate, not the business start path. If the local M
 4. Keep the MCP read-only by default. Use the CLI for approved writes.
 
 Do not edit an agent configuration or install software unless the user requested setup. The ordinary start is in Build a business: create or resume, then status, then plan.
+## Surface diagnostics
+
+`b2c-local` supports registered workspace work. `b2c-hosted` supplies
+read-only knowledge and cannot execute a local business. A leftover
+`b2c-app-builder` connection name is not a third capability. A missing worker
+CLI degrades local execution health; it does not turn the connection into
+hosted knowledge, and degraded execution still selects `b2c-local`. Leftover
+CLI-only public MCP names remain CLI-only on the local connection. Leftover
+write-gated MCP names remain CLI-only when writes are `mcp_readonly`; hosted
+leftover names are the wrong surface.

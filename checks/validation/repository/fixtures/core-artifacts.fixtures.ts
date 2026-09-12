@@ -237,6 +237,23 @@ export function register(h: Harness): void {
     return root;
   };
 
+  const researchNarrativeMentionsPending = makeCompletedResearch("research-narrative-mentions-pending");
+  {
+    const researchPath = path.join(researchNarrativeMentionsPending, "strategy/RESEARCH.md");
+    const research = readFileSync(researchPath, "utf8").replace(
+      "top 10 revenue apps use a first-session paywall",
+      "the pending reminder step is being collected in the next sample; top 10 revenue apps use a first-session paywall",
+    );
+    writeFileSync(researchPath, research, "utf8");
+    const signalPath = path.join(researchNarrativeMentionsPending, "strategy/SIGNAL_CORPUS.md");
+    const signal = readFileSync(signalPath, "utf8").replace(
+      "I lose the streak and stop opening the app",
+      "Customers describe a pending reminder as the reason they return after a missed day",
+    );
+    writeFileSync(signalPath, signal, "utf8");
+  }
+  runFixture("research narrative may describe pending work without becoming a placeholder", researchNarrativeMentionsPending, "check-research-evidence.ts", 0);
+
   for (const status of ["pending", "running"] as const) {
     const root = makeCompletedResearch(`research-workflow-complete-${status}`);
     const state = readState(root);
@@ -860,6 +877,13 @@ export function register(h: Harness): void {
     "check-research-evidence.ts",
     1,
     "research.signal_corpus_source_unresolved",
+  );
+  h.runScriptArgs(
+    "unresolved signal source reports a repair hint and source line in JSON",
+    "check-research-evidence.ts",
+    ["--root", researchSignalSourceUnresolved, "--json"],
+    1,
+    '"fixHint":"Declare each cited INPUT-* row in Corpus Inputs, or correct the reference syntax."',
   );
 
   const researchSignalUnverifiedCoexists = makeCompletedResearch("research-signal-unverified-coexists");

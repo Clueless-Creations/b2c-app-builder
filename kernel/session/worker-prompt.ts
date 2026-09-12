@@ -415,6 +415,13 @@ function uniqueComputedReceipts(receipts: readonly KnowledgeReceipt[]): Knowledg
   return uniqueByJson(receipts.filter(receiptHasComputedDigests));
 }
 
+/** The prompt's echoed skeleton is transport noise; a worker's distinct completed receipt is not. */
+function receiptLooksLikePromptSkeleton(receipt: KnowledgeReceipt): boolean {
+  return /<compute sha256|<specific reason>|used\|fallback\|not_applicable|<SKILL\.md or fallback source>|<capability check or invocation>/u.test(
+    JSON.stringify(receipt),
+  );
+}
+
 function exactSection<T extends Record<string, unknown>>(
   issues: string[],
   name: string,
@@ -464,6 +471,11 @@ export function validateKnowledgeReceipt(output: string, brief: NodeBrief, expec
       const parsed = parseMarkerObject<KnowledgeReceipt>(raw);
       if (parsed) parsedReceipts.push(parsed);
     }
+  }
+  const distinctParsed = uniqueByJson(parsedReceipts);
+  const completedParsed = distinctParsed.filter((receipt) => !receiptLooksLikePromptSkeleton(receipt));
+  if (completedParsed.length > 1) {
+    return [`receipt must contain exactly one distinct structured ${KNOWLEDGE_RECEIPT_BEGIN}/${KNOWLEDGE_RECEIPT_END} pair; found ${String(completedParsed.length)}`];
   }
   const computed = uniqueComputedReceipts(parsedReceipts);
   if (computed.length > 1) {

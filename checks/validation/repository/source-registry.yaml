@@ -2825,3 +2825,33 @@ sources:
     locations:
       - examples/extensions/postiz-social/integration.md
     notes: License and transport comparison only. AGPL-3.0 CLI code is not vendored or executed.
+  - id: quabble-official-site
+    name: Quabble Official Product Site
+    source_type: website
+    url: https://quabble.app/
+    refresh_cadence_days: 90
+    owner: b2c-maintainers
+    locations:
+      - knowledge/design/consumer-craft-benchmarks.md
+      - catalog/knowledge/design/design-consumer-craft-benchmarks.yaml
+    notes: Founder-selected design reference. Product descriptions and public imagery inform transferable craft principles; no proprietary assets or clinical claims are adopted.
+  - id: quabble-app-store
+    name: Quabble App Store listing
+    source_type: app_store
+    url: https://apps.apple.com/us/app/quabble-daily-mental-health/id6445948886
+    refresh_cadence_days: 90
+    owner: b2c-maintainers
+    locations:
+      - knowledge/design/consumer-craft-benchmarks.md
+      - catalog/knowledge/design/design-consumer-craft-benchmarks.yaml
+    notes: First-party store description, developer identity, platform metadata, and promotional-image availability; no installed-app or runtime claim.
+  - id: quabble-google-play
+    name: Quabble Google Play listing
+    source_type: app_store
+    url: https://play.google.com/store/apps/details?id=com.museLIVE.quabbleapp
+    refresh_cadence_days: 90
+    owner: b2c-maintainers
+    locations:
+      - knowledge/design/consumer-craft-benchmarks.md
+      - catalog/knowledge/design/design-consumer-craft-benchmarks.yaml
+    notes: First-party Android listing used to corroborate product scope and identity; no installed-app or cross-platform parity claim.

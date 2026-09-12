@@ -4,10 +4,10 @@ Status: deterministic package proof passed; Codex native discovery verified; Cla
 
 ## Tested artifact
 
-- Source revision: `923e25e73e0f8ac917fd16f8dd1b3d7d179b913`
-- Package: `b2c-app-builder@0.220.39`
+- Source revision: `bdccdaf96a9d9b365808035b7747c1bb865f590e`
+- Package: `b2c-app-builder@0.220.40`
 - Artifact mode: `npm pack --dry-run`
-- Packed file count: 2,619
+- Packed file count: 2,625
 - Task-skill contract: 19 passed, 0 failed
 - Package parity: 0 errors, 0 warnings
 

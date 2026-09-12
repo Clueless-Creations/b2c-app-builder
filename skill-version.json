@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.31",
+  "version": "0.220.32",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Reject distinct completed knowledge receipts across transport envelopes while allowing an echoed prompt skeleton.",
     "Verify managed launchd schedule installation and removal through exact label and file readback.",
     "Refresh the evidence-schema fingerprint after rendering the authority-matrix projections.",
     "Reject denied founder mandates before a full-launch dispatch can reach the execution frontier.",

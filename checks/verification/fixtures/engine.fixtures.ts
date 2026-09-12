@@ -3054,6 +3054,15 @@ export function register(harness: Harness): void {
       validateKnowledgeReceipt(`${receipt}\n${receipt}`, brief, expectations).length === 0,
       "transport-duplicated copies of the same computed receipt must still count as one receipt",
     );
+    const malformedCompetingReceipt = { ...receiptBody, contractFiles: { not: "an array" } };
+    assert(
+      validateKnowledgeReceipt(
+        `${receipt}\nBEGIN_KNOWLEDGE_RECEIPT\n${JSON.stringify(malformedCompetingReceipt)}\nEND_KNOWLEDGE_RECEIPT`,
+        brief,
+        expectations,
+      ).some((issue) => issue.includes("found 2")),
+      "a valid receipt must not silently win over a distinct malformed receipt from another transport envelope",
+    );
     const competingReceipt = {
       ...receiptBody,
       outputEvidence: brief.produce.map((entry) => ({

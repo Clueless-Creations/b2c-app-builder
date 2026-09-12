@@ -2711,6 +2711,13 @@ export function register(h: Harness): void {
     ...goPivotKillSection("| 2026-07-21 | pass | strong wedge | unverified | r/habits reached 840 visits | 31 visitors joined | Go | founder |"),
   ]);
   runFixture("Go verdict over placeholder demand evidence fails", researchVerdictThin, "check-research-evidence.ts", 1, "research.go_pivot_kill_evidence_thin");
+  runFixture(
+    "Go verdict over placeholder demand evidence names the affected field",
+    researchVerdictThin,
+    "check-research-evidence.ts",
+    1,
+    'The latest Go, Pivot, Or Kill row has an empty or placeholder-only "Demand signal" cell',
+  );
 
   const researchDoneEmptyLedger = makeFixture("research-done-empty-ledger");
   setLaneDone(researchDoneEmptyLedger, "research", ["strategy/RESEARCH.md"]);

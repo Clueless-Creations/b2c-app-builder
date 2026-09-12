@@ -95,6 +95,31 @@ export function register(h: Harness): void {
       else process.env.B2C_APP_BUILDER_HOME = previous;
     }
   });
+  h.check("Porchwatch F6: research diagnostics identify invalid confidence at the authored row", () => {
+    const home = h.makeTempDir("porchwatch-confidence-home");
+    const root = path.join(h.makeTempDir("porchwatch-confidence-business"), "research-confidence-001");
+    const previous = process.env.B2C_APP_BUILDER_HOME;
+    process.env.B2C_APP_BUILDER_HOME = home;
+    try {
+      createBusiness({ workspaceId: "research-confidence-001", directory: root, name: "Confidence fixture", hypothesis: "A consumer utility" });
+      writeFileSync(
+        path.join(root, "strategy/RESEARCH.md"),
+        "# Research\n\n## Source Ledger\n\n| Source | Platform / type | URL / source ID | Observed at | Tool / backend / query | Transcript / visual / sample limit | Observation | Inference | Confidence | Artifact / trace |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| Fixture source | review | INPUT-001 | 2026-09-01T00:00:00Z | fixture query | one synthetic sample | A follow-up experiment is pending approval. | The evidence is directional. | medium, estimate | TRACE-001 |\n",
+      );
+      const result = spawnSync(
+        process.execPath,
+        ["--import", "tsx", "checks/validation/business/research/check-research-evidence.ts", "--root", root, "--json"],
+        { cwd: skillRoot, encoding: "utf8" },
+      );
+      const output = `${result.stdout}${result.stderr}`;
+      assert(output.includes("research.source_ledger_confidence_invalid"), "invalid confidence must have a stable field diagnostic");
+      assert(output.includes('"location":"7"'), "confidence diagnostic must preserve the authored row line");
+      assert(output.includes("Use low, medium, or high"), "confidence diagnostic must give a bounded repair hint");
+    } finally {
+      if (previous === undefined) delete process.env.B2C_APP_BUILDER_HOME;
+      else process.env.B2C_APP_BUILDER_HOME = previous;
+    }
+  });
   h.check("Porchwatch: absent-directory creation preserves the founder brief losslessly", () => {
     const home = h.makeTempDir("porchwatch-brief-home"),
       root = path.join(h.makeTempDir("porchwatch-brief-business"), "after-credits");

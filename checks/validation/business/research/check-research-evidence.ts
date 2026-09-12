@@ -114,15 +114,15 @@ export const VERDICT_HEADERS = {
 } as const;
 
 assertResearchContractHeaders({
-  sourceLedger: Object.values(SOURCE_LEDGER_HEADERS).flat(),
+  sourceLedger: Object.values(SOURCE_LEDGER_HEADERS).map(([canonical]) => canonical),
   signalCorpus: {
-    inputs: SIGNAL_CORPUS_HEADERS.inputs.flat(),
-    records: SIGNAL_CORPUS_HEADERS.records.flat(),
-    conflicts: SIGNAL_CORPUS_HEADERS.conflicts.flat(),
-    derived: SIGNAL_CORPUS_HEADERS.derived.flat(),
+    inputs: SIGNAL_CORPUS_HEADERS.inputs.map(([canonical]) => canonical),
+    records: SIGNAL_CORPUS_HEADERS.records.map(([canonical]) => canonical),
+    conflicts: SIGNAL_CORPUS_HEADERS.conflicts.map(([canonical]) => canonical),
+    derived: SIGNAL_CORPUS_HEADERS.derived.map(([canonical]) => canonical),
   },
-  distributionProof: DISTRIBUTION_PROOF_HEADERS.flat(),
-  verdict: Object.values(VERDICT_HEADERS).flat(),
+  distributionProof: DISTRIBUTION_PROOF_HEADERS.map(([canonical]) => canonical),
+  verdict: Object.values(VERDICT_HEADERS).map(([canonical]) => canonical),
 });
 
 const laneStatus = state ? asString(getPath(state, "lanes.research.status"))?.toLowerCase() : undefined;
@@ -150,6 +150,25 @@ const offerText = readText(args.root, "strategy/OFFER_TEST.md");
 const sourceLedgerResult = text ? parseRequiredTableSection(text, "Source Ledger") : undefined;
 const sourceLedgerSection = sourceLedgerResult?.ok ? sourceLedgerResult.section : undefined;
 const sourceLedgerEvidence = buildSourceLedgerEvidence(sourceLedgerSection);
+if (sourceLedgerSection) {
+  const confidenceColumn = tableColumnAny(sourceLedgerSection, SOURCE_LEDGER_HEADERS.confidence);
+  if (confidenceColumn >= 0) {
+    for (const row of sourceLedgerSection.rows) {
+      const confidence = (row.cells[confidenceColumn] ?? "").trim();
+      if (confidence && !/^(low|medium|high)$/i.test(confidence)) {
+        issues.push(
+          issue(
+            "error",
+            "research.source_ledger_confidence_invalid",
+            "Source Ledger Confidence must be exactly low, medium, or high; keep qualifiers such as estimates in the row's narrative fields.",
+            "strategy/RESEARCH.md",
+            { line: row.sourceLine, fixHint: "Use low, medium, or high in Confidence and move any qualifier to Observation or Inference." },
+          ),
+        );
+      }
+    }
+  }
+}
 const signalEvidence = verdictRequired ? validateSignalCorpus(signalText, issues, strictResearch) : emptySignalCorpusIndex();
 
 // A deferred/not_needed research lane suppresses the missing-file error only
@@ -715,6 +734,31 @@ function validateSignalCorpus(value: string | undefined, target: ReturnType<type
         supersessionValid &&
         !seenSignalIds.has(id);
       if (!sourcesResolve) unresolvedSource = true;
+      if (!sourcesResolve) {
+        const sourceMessage = !sourceIds.validSyntax
+          ? "Source IDs must be an explicit list of INPUT-* IDs; do not use ranges or mixed prose."
+          : "Every referenced INPUT-* ID must resolve to a complete Corpus Inputs row.";
+        target.push(
+          issue(
+            "error",
+            "research.signal_corpus_source_reference_invalid",
+            `Signal Records row ${id || "(unidentified)"}: ${sourceMessage}`,
+            "strategy/SIGNAL_CORPUS.md",
+            { line: row.sourceLine, fixHint: sourceMessage },
+          ),
+        );
+      }
+      if (confidence && !/^(low|medium|high)$/i.test(confidence)) {
+        target.push(
+          issue(
+            "error",
+            "research.signal_corpus_confidence_invalid",
+            `Signal Records row ${id || "(unidentified)"}: Confidence must be exactly low, medium, or high.`,
+            "strategy/SIGNAL_CORPUS.md",
+            { line: row.sourceLine, fixHint: "Use low, medium, or high; keep qualifiers in Claim or Phrase, Observation, or Inference." },
+          ),
+        );
+      }
       if (!rowComplete || !sourcesResolve) {
         rowsComplete = false;
         continue;

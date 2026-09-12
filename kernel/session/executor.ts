@@ -662,9 +662,12 @@ function createCliWorkerExecutor(requestedRuntime: WorkerRuntime): NodeExecutor 
         if (changedCandidate) {
           return {
             status: "failed",
-            outputs: [],
+            // Preserve the pre-repair candidate snapshot so run-state can retain it as an
+            // unaccepted stale candidate. Returning no outputs would lose the failed attempt's
+            // provenance and skip the normal receipt-rejection reconciliation path.
+            outputs: candidateOutputs,
             evidence: [],
-            error: `receipt-only repair changed candidate output ${changedCandidate.path}; real rework is required`,
+            error: `worker knowledge receipt rejected: receipt-only repair changed candidate output ${changedCandidate.path}; real rework is required`,
           };
         }
         receiptText = `${repairResult.stdout}\n${repairResult.stderr}`;

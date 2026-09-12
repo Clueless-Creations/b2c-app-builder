@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.51",
+  "version": "0.220.52",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Preserve the original unaccepted candidate provenance when receipt-only repair mutates output bytes, forcing real rework instead of losing reconciliation state.",
     "Serialize real cron schedule mutations with a user-level lock and fail clearly when another installer owns the lock.",
     "Add authored row locations and bounded repair hints for Go, Pivot, Or Kill and Derived Outputs failures.",
     "Add authored row locations and bounded repair hints for Transformation Demo and Distribution-First Niche failures.",

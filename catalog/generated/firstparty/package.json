@@ -1,6 +1,6 @@
 {
   "name": "b2c-app-builder",
-  "version": "0.220.70",
+  "version": "0.220.71",
   "description": "Brigade gives AI agents consumer-business primitives: capabilities, providers, recipes, and evidence through a CLI, MCP, and skill.",
   "keywords": [
     "mcp",

@@ -576,7 +576,13 @@ function createCliWorkerExecutor(requestedRuntime: WorkerRuntime): NodeExecutor 
       } catch (error) {
         return { status: "failed", outputs: [], evidence: [], error: error instanceof Error ? error.message : String(error) };
       }
-      const expectations = { fileDigests, authorization: context.authorization };
+      let engineVersion: string | undefined;
+      try {
+        engineVersion = (JSON.parse(readFileSync(path.join(context.skillRootDir, "skill-version.json"), "utf8")) as { version?: string }).version;
+      } catch {
+        engineVersion = undefined;
+      }
+      const expectations = { fileDigests, authorization: context.authorization, engineVersion };
       const prompt = buildWorkerPrompt(brief, context.workspaceDir, context.skillRootDir, expectations);
       let runtime = runtimes[0]!;
       let result: Awaited<ReturnType<typeof runWorker>> | undefined;

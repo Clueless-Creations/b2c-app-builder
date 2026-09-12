@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.70",
+  "version": "0.220.71",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Bind worker knowledge receipts to the dispatcher engine version and reject stale worker protocol results.",
     "Keep unresolved scheduling intent at the founder boundary while independent design work remains available for dispatch.",
     "Report configured cross-client engine-version mismatches without changing capability-based local versus hosted routing.",
     "Verify the packed runtime contains every canonical task skill and required root procedure without leaking maintainer, contributor, or environment files.",

@@ -163,6 +163,46 @@ export function register(harness: Harness): void {
     );
   });
 
+  harness.check("authority: a current mandate cannot cross its domain, action, or draft agreement scope", () => {
+    const grants = makeGrants([["domain.engineering", "full"]]);
+    const agreement = standingFounderAgreement(NOW);
+    const mandate = standingFounderMandate(agreement, "domain.engineering", "mutate", NOW);
+
+    const wrongDomain = authorizeResponsibility({
+      grants,
+      domainId: "domain.growth",
+      actionClass: "mutate",
+      agreement,
+      mandate,
+      envelope: envelopeFor(mandate.id, agreement.revision),
+      now: NOW,
+    });
+    assert(!wrongDomain.ok && wrongDomain.reasonCode === "authority.mandate_required", "a mandate must not authorize another domain");
+
+    const wrongAction = authorizeResponsibility({
+      grants,
+      domainId: "domain.engineering",
+      actionClass: "publish",
+      agreement,
+      mandate,
+      envelope: envelopeFor(mandate.id, agreement.revision),
+      now: NOW,
+    });
+    assert(!wrongAction.ok && wrongAction.reasonCode === "authority.mandate_required", "a mutate mandate must not authorize publish");
+
+    const draftAgreement = { ...agreement, revision: `${agreement.revision}.draft` };
+    const draft = authorizeResponsibility({
+      grants,
+      domainId: "domain.engineering",
+      actionClass: "mutate",
+      agreement: draftAgreement,
+      mandate,
+      envelope: envelopeFor(mandate.id, draftAgreement.revision),
+      now: NOW,
+    });
+    assert(!draft.ok && draft.reasonCode === "authority.agreement_revision_mismatch", "a mandate from the current agreement must not authorize a draft revision");
+  });
+
   harness.check("authority: a revoked mandate blocks the action at effect time after route-time readiness", () => {
     const grants = makeGrants([["domain.engineering", "full"]]);
     const agreement = standingFounderAgreement(NOW);

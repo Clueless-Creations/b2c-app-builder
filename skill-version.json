@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.35",
+  "version": "0.220.36",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Extend full-launch authority coverage across scope, draft-agreement, and rejected-mandate boundaries.",
     "Explain the affected Go, Pivot, Or Kill evidence column when a verdict cell is empty or placeholder-only.",
     "Preserve aggregate verdict evidence failures while adding authored row locations and safe repair hints.",
     "Verify Pivot checkpoints hold initialization until an explicit Go continuation is accepted.",

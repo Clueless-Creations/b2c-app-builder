@@ -5,7 +5,7 @@ metadata:
   short-description: Build and improve a consumer business
 ---
 
-# B2C App Builder
+# Brigade
 
 Start with the user's job, not the framework. This is the default business entrypoint. Task skills project the same workflow and knowledge owners; they are not another execution system. Do not load the whole corpus.
 

@@ -1,8 +1,8 @@
 # Let your agents cook
 
-_The station ethos of B2C App Builder. Written by a founder who came up in restaurants before building app businesses._
+_The station ethos of Brigade. Written by a founder who came up in restaurants before building app businesses._
 
-B2C App Builder is the full layout of a kitchen that turns out consumer-app businesses, and the way that kitchen runs. Contributors build it. You are the executive chef, your agents are the brigade, and how you run service is yours.
+Brigade is the full layout of a kitchen that turns out consumer-app businesses, and the way that kitchen runs. Contributors build it. You are the executive chef, your agents are the brigade, and how you run service is yours.
 
 ## The station is the unit
 
@@ -10,7 +10,7 @@ A restaurant runs on stations. Garde manger, sauté, grill, fry, pastry, the pas
 
 Consumer-app businesses have the same shape. Every one of them has to research a market, decide what it is, make it feel like something, build it, get through App Store review, price it, get found, measure what happens, stay legal, and run day after day. That list does not change with the app. Those are the stations.
 
-Most app tooling works one level down, on the recipe. It helps you build a feature faster, ship a screen, wire a paywall. A feature is one dish at one station. B2C App Builder works at the level above. It is the layout of the whole kitchen and the way service moves across it, so you can hand the layout to your agents and let them cook.
+Most app tooling works one level down, on the recipe. It helps you build a feature faster, ship a screen, wire a paywall. A feature is one dish at one station. Brigade works at the level above. It is the layout of the whole kitchen and the way service moves across it, so you can hand the layout to your agents and let them cook.
 
 ## The stations
 
@@ -66,7 +66,7 @@ The path to stars is already half built. Today, every required piece of work sta
 
 | In the restaurant                        | In the catalog                                                   |
 | ---------------------------------------- | ---------------------------------------------------------------- |
-| The kitchen layout, and how service runs | B2C App Builder                                                  |
+| The kitchen layout, and how service runs | Brigade                                                          |
 | The people who build the kitchen         | Contributors                                                     |
 | A station                                | An area. Six today.                                              |
 | What a station owns                      | A domain. Fourteen today.                                        |

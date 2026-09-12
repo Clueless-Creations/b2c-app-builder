@@ -1,4 +1,4 @@
-# B2C App Builder Agent Guide
+# Brigade Agent Guide
 
 ## Scope and routing
 

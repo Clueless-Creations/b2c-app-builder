@@ -1,6 +1,6 @@
-# Documentation
+# Brigade documentation
 
-B2C App Builder supplies consumer-business primitives through a skill, CLI, and MCP.
+Brigade supplies consumer-business primitives through a skill, CLI, and MCP.
 
 | I want to…                            | Start here                                                                                                                                                           |
 | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

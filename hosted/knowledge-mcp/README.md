@@ -1,6 +1,6 @@
-# Hosted B2C App Builder knowledge service
+# Hosted Brigade knowledge service
 
-This Cloudflare Worker exposes the read-only B2C App Builder knowledge service through two
+This Cloudflare Worker exposes the read-only Brigade knowledge service through two
 remote transports:
 
 - MCP: `https://mcp.clueless-creations.com/mcp`
@@ -280,7 +280,7 @@ bindings after rollback; an old code version is not authority to restore an old 
 
 ## Hosted scope
 
-This Worker serves the versioned B2C App Builder knowledge bundle to authorized agents through
+This Worker serves the versioned Brigade knowledge bundle to authorized agents through
 HTTP and MCP. It returns catalog and reference content. It does not expose local workspace
 execution, reducer writes, business records, uploads, payments, or public publishing.
 

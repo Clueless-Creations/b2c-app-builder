@@ -15,7 +15,7 @@ There are no installed users to migrate. Keep one current contract per responsib
 
 ## Purpose and success
 
-B2C App Builder supplies the primitives for creating, launching, measuring, and
+Brigade supplies the primitives for creating, launching, measuring, and
 improving consumer-app businesses. A builder can use the opinionated default
 recipe, replace a provider, change a product approach, or author a different
 creation or operating loop. Those choices reuse the same execution and evidence

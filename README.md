@@ -1,6 +1,6 @@
 <div align="center">
 
-# B2C App Builder
+# Brigade
 
 **Build the business around the app.**
 
@@ -16,7 +16,7 @@ A consumer business needs more than an app that compiles. It needs a product
 people want, a distinctive experience, a working funnel, and reliable
 monetization. It needs a way to learn what works and improve.
 
-B2C App Builder gives AI agents a shared foundation for that whole business.
+Brigade gives AI agents a shared foundation for that whole business.
 It is laid out like a restaurant kitchen. Stations are the responsibilities
 every consumer-app business has, and they do not change with the app.
 Capabilities define what each station must produce. Providers implement them.

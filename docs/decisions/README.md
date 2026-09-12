@@ -30,6 +30,7 @@ roadmap's decision text in place.
 | [0012](0012-context-first-agent-routing.md)                         | Context-first agent routing and thin host adapters                 | accepted | ARCH-02, 07, 09, 11                             |
 | [0013](0013-provider-integration-boundary.md)                       | Provider integrations implement canonical operations               | accepted | ARCH-03, 04, 06, 10, 11; #109                   |
 | [0014](0014-research-checkpoints-and-initialization-eligibility.md) | Research checkpoints do not grant initialization eligibility       | accepted | ARCH-07, 09, 10, 11, 15; #395, #397             |
+| [0015](0015-brigade-display-name.md)                             | Brigade as the human-facing product name                           | accepted | Human-facing identity; #8                       |
 
 ## Write a record
 

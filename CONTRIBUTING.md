@@ -1,6 +1,6 @@
 # Contributing
 
-B2C App Builder gives agents primitives for building and operating consumer-app
+Brigade gives agents primitives for building and operating consumer-app
 businesses. A contribution earns its place by making the workflows, knowledge,
 execution, or evidence more useful for that job.
 
@@ -202,7 +202,7 @@ failed or deferred suite.
 Keep one concern per pull request. Explain:
 
 - what changed
-- why it improves B2C App Builder
+- why it improves Brigade
 - which files own the new contract
 - which checks ran
 - what remains unverified

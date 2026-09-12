@@ -360,8 +360,10 @@ export function register(harness: Harness): void {
     assert(line.includes(`# ${crontabSignature(options)}`), `expected the signature comment, got: ${line}`);
 
     const foreignLine = "0 3 * * * /usr/bin/some-other-job.sh # unrelated";
-    const installed = applyCrontabInstall(`${foreignLine}\n`, options);
+    const foreignContainsManagedText = `0 4 * * * echo "# ${crontabSignature(options)}" # unrelated`;
+    const installed = applyCrontabInstall(`${foreignLine}\n${foreignContainsManagedText}\n`, options);
     assert(installed.nextContent.includes(foreignLine), "install must preserve a pre-existing foreign crontab line");
+    assert(installed.nextContent.includes(foreignContainsManagedText), "install must preserve managed-looking text inside a foreign command");
     assert(installed.nextContent.includes(line), "install must add our line");
     assert(crontabHasSignature(installed.nextContent, crontabSignature(options)), "readback must recognize the managed entry by its exact signature");
     assert(crontabHasExactLine(installed.nextContent, line), "readback must recognize the exact requested cadence/runtime/target line");
@@ -371,7 +373,7 @@ export function register(harness: Harness): void {
     // Reinstalling with a different schedule replaces (never duplicates) our own line.
     const changedOptions: ScheduleOptions = { ...options, schedule: "0 * * * *" };
     const reinstalled = applyCrontabInstall(installed.nextContent, changedOptions);
-    const ourLines = reinstalled.nextContent.split("\n").filter((entry) => entry.includes(crontabSignature(options)));
+    const ourLines = reinstalled.nextContent.split("\n").filter((entry) => crontabHasSignature(entry, crontabSignature(options)));
     assert(
       ourLines.length === 1,
       `expected exactly one of our lines after reinstalling with a changed schedule, got ${ourLines.length}: ${reinstalled.nextContent}`,
@@ -380,13 +382,15 @@ export function register(harness: Harness): void {
 
     const changedRuntime: ScheduleOptions = { ...changedOptions, runtime: "codex", wrapperPath: path.join(dir, "schedule", "run-codex.mts") };
     const runtimeReinstalled = applyCrontabInstall(reinstalled.nextContent, changedRuntime);
-    const managedLines = runtimeReinstalled.nextContent.split("\n").filter((entry) => entry.includes("# b2c:adapters-fixture-biz:"));
+    const managedLines = runtimeReinstalled.nextContent
+      .split("\n")
+      .filter((entry) => crontabHasSignature(entry, "b2c:adapters-fixture-biz:codex"));
     assert(managedLines.length === 1, `changing runtime must replace the prior managed entry, got ${managedLines.length}: ${runtimeReinstalled.nextContent}`);
     assert(managedLines[0]!.includes(":codex"), `changed runtime must be reflected in the managed signature, got ${managedLines[0]}`);
 
     const uninstalled = applyCrontabUninstall(installed.nextContent, options);
     assert(
-      uninstalled.nextContent === `${foreignLine}\n`,
+      uninstalled.nextContent === `${foreignLine}\n${foreignContainsManagedText}\n`,
       `expected uninstall to leave exactly the foreign line, got: ${JSON.stringify(uninstalled.nextContent)}`,
     );
     assert(uninstalled.removed.length === 1 && uninstalled.removed[0] === line, "expected uninstall to report exactly the one line it removed");

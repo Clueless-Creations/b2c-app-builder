@@ -30,8 +30,8 @@ export function register(harness: Harness): void {
     const template = readFileSync(path.join(repoRoot, ".github", "PULL_REQUEST_TEMPLATE.md"), "utf8");
     const ste100 = readFileSync(path.join(skillRoot, "knowledge", "engineering", "technical-documentation-ste100.md"), "utf8");
     const workspace = readFileSync(path.join(skillRoot, "surfaces", "workspace-template", "repo-agent-entrypoints", "AGENTS.md"), "utf8");
-    assert(agents.includes("## Writing and kitchen language"), "AGENTS must have one writing and kitchen-language section");
-    assert(agents.includes("Original: Builder house style"), "AGENTS must point at the house-style section");
+    assert(agents.includes("](knowledge/words/no-slop-writing.md)"), "AGENTS must link the canonical house-style owner");
+    assert(agents.includes("](knowledge/engineering/technical-documentation-ste100.md)"), "AGENTS must link the technical writing owner");
     assert(claude.includes("Read `AGENTS.md` first"), "CLAUDE adapter must keep routing to AGENTS");
     assert(!claude.includes("Kitchen-language boundary"), "CLAUDE must not copy the kitchen glossary");
     assert(contributing.includes("builder house style"), "CONTRIBUTING must remind reviewers of house style");
@@ -65,19 +65,10 @@ export function register(harness: Harness): void {
       assert(collapsed.includes("not a live agent run"), `${file} must say lint is not a live-agent run`);
       assert(collapsed.includes("not a fresh-context review"), `${file} must say lint is not a fresh-context review`);
     }
-    const harnessDoc = readFileSync(
-      path.join(skillRoot, "checks", "validation", "repository", "launchbench-evals.md"),
-      "utf8",
-    );
+    const harnessDoc = readFileSync(path.join(skillRoot, "checks", "validation", "repository", "launchbench-evals.md"), "utf8");
     assert(harnessDoc.includes("house-style-*.yaml"), "launchbench-evals.md must name the authored house-style examples");
     assert(harnessDoc.includes("must omit `behavioral: true`"), "launchbench-evals.md must keep house-style examples lint-only");
-    assert(
-      harnessDoc.includes("not proof that an agent followed"),
-      "launchbench-evals.md must say a green lint is not live-agent proof",
-    );
-    assert(
-      harnessDoc.includes("not a fresh-context review of representative outputs"),
-      "launchbench-evals.md must say lint is not a fresh-context review",
-    );
+    assert(harnessDoc.includes("not proof that an agent followed"), "launchbench-evals.md must say a green lint is not live-agent proof");
+    assert(harnessDoc.includes("not a fresh-context review of representative outputs"), "launchbench-evals.md must say lint is not a fresh-context review");
   });
 }

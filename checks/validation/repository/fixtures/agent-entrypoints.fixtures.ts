@@ -36,6 +36,23 @@ function edit(root: string, relative: string, transform: (text: string) => strin
 }
 
 export function register(harness: Harness): void {
+  const replayReport = path.join(harness.tempRoot, "guidance-replay.json");
+  harness.runScriptArgs(
+    "guidance replay treats a full revision as a git ref and reports missing history",
+    SCRIPT,
+    [
+      "--repo-root",
+      skillRoot,
+      "--guidance-baseline",
+      path.join(skillRoot, "docs/research/agent-guidance-a0.json"),
+      "--guidance-source-ref",
+      "0000000000000000000000000000000000000000",
+      "--guidance-report",
+      replayReport,
+    ],
+    1,
+    "Cannot read pinned source 0000000000000000000000000000000000000000",
+  );
   harness.runScriptArgs("agent entrypoints accept the shipped guides, routers, adapters, and templates", SCRIPT, ["--repo-root", skillRoot], 0);
   const control = seed(harness, "agent-entrypoints-control");
   harness.runScriptArgs("agent entrypoints accept an unmodified copy of the shipped files", SCRIPT, ["--repo-root", control], 0);

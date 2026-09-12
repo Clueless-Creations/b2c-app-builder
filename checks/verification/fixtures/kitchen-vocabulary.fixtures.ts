@@ -41,7 +41,10 @@ export function register(harness: Harness): void {
     assert(ethos.includes("Send it out"), "ethos must keep the bad deployment-label example");
     assert(ethos.includes("| Brigade | Coordinated agents in prose"), "ethos must keep Brigade as prose, not a product name");
     assert(agents.includes("docs/ethos.md#kitchen-language-boundary"), "AGENTS must link the ethos kitchen-language boundary");
-    assert(agents.includes("is not the shipped product name"), "AGENTS must keep B2C App Builder as the shipped product name");
+    assert(
+      agents.includes("Brigade is prose about coordinated agents, not a runtime entity or a new product name"),
+      "AGENTS must keep B2C App Builder as the shipped product name",
+    );
     assert(!agents.includes("## Kitchen vocabulary manifesto"), "AGENTS must not duplicate the glossary");
     const consolePages = readFileSync(path.join(repoRoot, "hosted", "builder-console", "console", "pages.ts"), "utf8");
     assert(consolePages.includes("Use plain labels"), "console must keep the utility-surface voice rule");

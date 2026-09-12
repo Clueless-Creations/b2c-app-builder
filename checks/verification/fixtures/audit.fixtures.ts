@@ -381,10 +381,7 @@ export function register(harness: Harness): void {
     assert(stepSkippedByLane(validators, "heavy") === undefined, "heavy lane must run test:validators");
     assert(stepSkippedByLane(lint, "heavy") === "fast lane (--lane heavy)", "heavy lane must skip launchbench:lint");
     assert(stepSkippedByLane(e2e, "all") === undefined, "lane all skips nothing");
-    assert(
-      stepSkippedByLane(validators, "presubmit") === "deferred until full verification (--lane presubmit)",
-      "presubmit must not run test:validators",
-    );
+    assert(stepSkippedByLane(validators, "presubmit") === "deferred until full verification (--lane presubmit)", "presubmit must not run test:validators");
     assert(stepSkippedByLane(tsc, "presubmit") === undefined, "presubmit still typechecks");
     assert(stepSkippedByLane(lint, "presubmit") === undefined, "presubmit runs launchbench:lint");
     const catalog = plan.find((step) => step.id === "check:catalog")!;
@@ -406,7 +403,11 @@ export function register(harness: Harness): void {
   harness.check("ci-lane: knowledge and docs stay on the fast lane; engine paths select heavy; dispatch fail-closes to heavy", () => {
     const script = path.join(skillRoot, "tooling/ci-lane.mjs");
     const run = (args: string[], env: NodeJS.ProcessEnv = {}) =>
-      spawnSync(process.execPath, [script, ...args], { cwd: repoRoot, encoding: "utf8", env: { ...process.env, ...env } });
+      spawnSync(process.execPath, [script, ...args], {
+        cwd: repoRoot,
+        encoding: "utf8",
+        env: { ...process.env, EVENT_NAME: "", VERIFICATION: "", GITHUB_OUTPUT: "", ...env },
+      });
 
     const knowledge = run(["--files", "knowledge/store/aso-apple-keyword-evidence.md", "docs/validators.md"]);
     assert(knowledge.status === 0 && knowledge.stdout.includes("heavy=false"), `knowledge/docs must be fast, got:\n${knowledge.stdout}\n${knowledge.stderr}`);

@@ -1,13 +1,11 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.6",
+  "version": "0.220.7",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
-    "Expand catalog-backed task skills with bounded method bindings across all six public areas.",
-    "Keep Apple JSON:API out of that decoder path. No live asc. Slot 89.",
-    "Simplify root agent guidance while preserving routing, authority, privacy, and conditional setup boundaries.",
-    "Add structural controls for retained standing rules and A0 guidance accounting.",
-    "Align the root-guidance foundation's package metadata, first-party projections, and evidence catalog fingerprint."
+    "Parse pinned guidance revisions as literal commit IDs for reproducible A0 replay.",
+    "Verify revision parsing and missing-history handling through the existing entrypoint fixture harness.",
+    "Keep scoped writing contracts and isolate CI scenario inputs from the workflow environment."
   ]
 }

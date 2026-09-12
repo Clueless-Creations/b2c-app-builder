@@ -808,6 +808,51 @@ export function register(harness: Harness): void {
     assert(machineRejected, "domain.machine maintenance must stay out of business execution plans");
   });
 
+  harness.check("compile/autonomy: approved full-launch mandate admits local coordination but not protected system work", () => {
+    const catalog = toCatalogInput(composeCatalog(skillRoot));
+    const plan = compilePlan(catalog, now);
+    const fullLaunch = plan.nodes.find((node) => node.workflowId === "workflow.orchestration.full-launch-program");
+    assert(fullLaunch, "the live catalog must compile the full-launch program");
+    assert(fullLaunch!.domainId === "domain.orchestration", "full-launch must retain its system domain");
+    assert(fullLaunch!.approvals.length === 1, "full-launch must retain its founder mandate approval");
+    assert(fullLaunch!.providerIds.length === 0 && !fullLaunch!.protectedCategory && !fullLaunch!.costEstimate, "full-launch must remain local coordination");
+
+    const evaluator = createAutonomyEvaluator({
+      grants: {},
+      waivers: [],
+      ledger: { schemaVersion: "1.0.0", updatedAt: now, balances: [], entries: [] },
+      prerequisiteVerifier: () => ({ status: "unverified" as const, detail: "fixture" }),
+      now: () => now,
+    });
+    assert(evaluator.evaluate(fullLaunch!).allowed, "the mandate node must pass autonomy before frontier approval admission");
+    assert(
+      !evaluator.evaluate({ ...fullLaunch!, protectedCategory: "release" }).allowed,
+      "a protected system-domain action must still fail closed",
+    );
+    assert(
+      !evaluator.evaluate({ ...fullLaunch!, providerIds: ["provider.external"] }).allowed,
+      "an external system-domain action must still fail closed",
+    );
+
+    const businessState = baseBusinessState();
+    businessState.workflowApplicability = {
+      "workflow.orchestration.full-launch-program": {
+        verdict: "required",
+        reason: "Founder selected the full launch scope.",
+        evidence: ["operations/FOUNDER_BRIEF.md"],
+        updatedAt: now,
+      },
+    };
+    const run = seedRunState(plan, businessState, { ownerSessionId: "full-launch-authority", ttlSeconds: 60, wallClockCapSeconds: 60, now });
+    const state = run.nodes[fullLaunch!.id]!;
+    state.status = "pending";
+    assert(!computeFrontier(plan, run, businessState, evaluator).ready.includes(fullLaunch!.id), "missing mandate approval must remain held");
+    assert(getStatus(run, fullLaunch!.id) === "waiting_founder", "missing mandate approval must be visible as a founder hold");
+    run.approvals[fullLaunch!.approvals[0]!.id] = "approved";
+    state.status = "pending";
+    assert(computeFrontier(plan, run, businessState, evaluator).ready.includes(fullLaunch!.id), "approved local mandate must reach the frontier");
+  });
+
   // ---------------------------------------------------------------------
   // frontier.ts
   // ---------------------------------------------------------------------

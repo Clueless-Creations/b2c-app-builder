@@ -799,7 +799,16 @@ export function register(harness: Harness): void {
       evaluator.evaluate({ ...system, actionClass: "observe", providerIds: ["provider.test"] }).allowed,
       "read-only provider proof must be allowed as internal observation",
     );
-    assert(!evaluator.evaluate({ ...system, actionClass: "publish", providerIds: ["provider.test"] }).allowed, "external system-domain work must fail closed");
+    for (const actionClass of ["spend", "publish", "release", "destructive"] as const) {
+      assert(
+        !evaluator.evaluate({ ...system, actionClass, providerIds: ["provider.test"] }).allowed,
+        `system-domain ${actionClass} work carrying a provider must fail closed`,
+      );
+    }
+    assert(
+      !evaluator.evaluate({ ...system, actionClass: "mutate", providerIds: ["provider.test"] }).allowed,
+      "a provider-bearing system mutation must fail closed even when the action class is not directly protected",
+    );
     let machineRejected = false;
     try {
       compilePlan({ ...catalog, workflows: [{ ...catalog.workflows[0]!, id: "workflow.machine-maintenance", domainId: "domain.machine" }] }, now);

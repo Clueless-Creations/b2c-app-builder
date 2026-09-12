@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.53",
+  "version": "0.220.54",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Extend the system-domain authority regression across protected effect classes and provider-bearing mutations.",
     "Exercise malformed receipt transport followed by a candidate-mutating repair and preserve the original candidate snapshot as rejected evidence.",
     "Preserve the original unaccepted candidate provenance when receipt-only repair mutates output bytes, forcing real rework instead of losing reconciliation state.",
     "Serialize real cron schedule mutations with a user-level lock and fail clearly when another installer owns the lock.",

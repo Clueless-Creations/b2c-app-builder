@@ -164,24 +164,25 @@ export function validateOfferTest(value: string | undefined, target: ReturnType<
   if (status === "waived") {
     const waiverResult = parseRequiredTableSection(value, "Founder Waiver", OFFER_TEST_HEADERS.waiver);
     let validWaiver = false;
+    let waiverDiagnostic = "A waived offer test needs a Founder Waiver section.";
+    let waiverLine: number | undefined;
+    let waiverFixHint = "Add a Founder Waiver table with a dated founder decision, a concrete reason, and the residual risk accepted.";
     if (waiverResult.ok) {
       const waiverDateColumn = tableColumn(waiverResult.section, "Date");
       const founderColumn = tableColumn(waiverResult.section, "Founder");
       const reasonColumn = tableColumn(waiverResult.section, "Reason");
       const riskColumn = tableColumn(waiverResult.section, "Residual risk accepted");
-      const rowsValid =
-        rowsMatchTableWidth(waiverResult.section) &&
-        waiverResult.section.rows.length > 0 &&
-        waiverResult.section.rows.every((row) => {
-          const founder = row.cells[founderColumn] ?? "";
-          return (
-            isValidPastIsoDate((row.cells[waiverDateColumn] ?? "").trim()) &&
-            isFounderDecider(founder) &&
-            [row.cells[reasonColumn] ?? "", row.cells[riskColumn] ?? ""].every(
-              (cell) => cell.trim().length > 0 && !placeholder.test(cell) && !isEmptyEquivalentEvidenceValue(cell),
-            )
-          );
-        });
+      const waiverRowValid = (row: (typeof waiverResult.section.rows)[number]): boolean => {
+        const founder = row.cells[founderColumn] ?? "";
+        return (
+          isValidPastIsoDate((row.cells[waiverDateColumn] ?? "").trim()) &&
+          isFounderDecider(founder) &&
+          [row.cells[reasonColumn] ?? "", row.cells[riskColumn] ?? ""].every(
+            (cell) => cell.trim().length > 0 && !placeholder.test(cell) && !isEmptyEquivalentEvidenceValue(cell),
+          )
+        );
+      };
+      const rowsValid = rowsMatchTableWidth(waiverResult.section) && waiverResult.section.rows.length > 0 && waiverResult.section.rows.every(waiverRowValid);
       const matchesFinalDecision =
         finalDecision !== undefined &&
         waiverResult.section.rows.some(
@@ -190,15 +191,29 @@ export function validateOfferTest(value: string | undefined, target: ReturnType<
             normalizeActorIdentity(row.cells[founderColumn] ?? "") === normalizeActorIdentity(finalDecision.decider),
         );
       validWaiver = rowsValid && matchesFinalDecision;
+      if (!rowsValid) {
+        const malformedRow = waiverResult.section.rows.find((row) => !waiverRowValid(row));
+        waiverDiagnostic =
+          "The Founder Waiver table is malformed: every row needs a valid past ISO date, an authorized founder or owner, a concrete reason, and non-empty residual risk.";
+        waiverLine = malformedRow?.sourceLine;
+        waiverFixHint = "Repair the named Founder Waiver row; do not use a placeholder, automation identity, or empty-equivalent risk value.";
+      } else if (!matchesFinalDecision) {
+        waiverDiagnostic = "The Founder Waiver is complete but does not match the final Decision row's date and actor.";
+        waiverLine = waiverResult.section.rows[0]?.sourceLine;
+        waiverFixHint = "Add or correct one waiver row whose Date and Founder normalize to the final Decision row's Date and Decided by values.";
+      }
+    } else {
+      const firstError = waiverResult.errors[0];
+      waiverDiagnostic =
+        firstError?.kind === "section-missing"
+          ? "A waived offer test needs a Founder Waiver section."
+          : "The Founder Waiver section could not be parsed as one simple pipe table.";
+      waiverLine = firstError?.sourceLine;
+      waiverFixHint = "Use exactly one H2 Founder Waiver section with one simple pipe table and the required four columns.";
     }
     if (!validWaiver) {
       target.push(
-        issue(
-          "error",
-          "research.offer_test_waiver_missing",
-          "A waived offer test needs complete founder, reason, and residual-risk records, including one whose date and actor match the final Decision row's Date and Decided by fields.",
-          "strategy/OFFER_TEST.md",
-        ),
+        issue("error", "research.offer_test_waiver_missing", waiverDiagnostic, "strategy/OFFER_TEST.md", { line: waiverLine, fixHint: waiverFixHint }),
       );
     }
   }

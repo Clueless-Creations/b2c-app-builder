@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.24",
+  "version": "0.220.25",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Verify managed cron schedule state after apply and uninstall readback.",
     "Preserve narrative research uncertainty while rejecting placeholder-only fields.",
     "Reject placeholder worker-receipt reasons while preserving typed explanations.",
     "Add source-ledger and signal-corpus field diagnostics with authored locations and bounded repair hints.",

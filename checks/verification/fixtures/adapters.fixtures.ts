@@ -17,6 +17,7 @@ import {
   applyCrontabInstall,
   applyCrontabUninstall,
   checkClaudeSandboxSetting,
+  crontabHasSignature,
   crontabSignature,
   launchdLabel,
   launchdPlistPath,
@@ -359,6 +360,8 @@ export function register(harness: Harness): void {
     const installed = applyCrontabInstall(`${foreignLine}\n`, options);
     assert(installed.nextContent.includes(foreignLine), "install must preserve a pre-existing foreign crontab line");
     assert(installed.nextContent.includes(line), "install must add our line");
+    assert(crontabHasSignature(installed.nextContent, crontabSignature(options)), "readback must recognize the managed entry by its exact signature");
+    assert(!crontabHasSignature(installed.nextContent, "b2c:other-workspace:claude"), "readback must not mistake another workspace's entry for ours");
 
     // Reinstalling with a different schedule replaces (never duplicates) our own line.
     const changedOptions: ScheduleOptions = { ...options, schedule: "0 * * * *" };
@@ -376,6 +379,7 @@ export function register(harness: Harness): void {
       `expected uninstall to leave exactly the foreign line, got: ${JSON.stringify(uninstalled.nextContent)}`,
     );
     assert(uninstalled.removed.length === 1 && uninstalled.removed[0] === line, "expected uninstall to report exactly the one line it removed");
+    assert(!crontabHasSignature(uninstalled.nextContent, crontabSignature(options)), "readback must confirm the managed entry is gone after uninstall");
 
     // Reversal with no foreign lines at all: install then uninstall nets back to empty.
     const cleanInstall = applyCrontabInstall("", options);

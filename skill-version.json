@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.10",
+  "version": "0.220.11",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Keep valid Pivot and Kill research checkpoints distinct from initialization eligibility.",
     "Explain missing, malformed, and mismatched offer-test waivers with source locations and safe repair hints.",
     "Make research diagnostics field-aware, preserve legitimate narrative uncertainty, and report source lines with safe repair hints.",
     "Parse pinned guidance revisions as literal commit IDs for reproducible A0 replay.",

@@ -2376,8 +2376,9 @@ export function register(h: Harness): void {
     "research.go_pivot_kill_row_missing",
   );
 
-  // A done research lane whose latest verdict is Kill or Pivot is a
-  // contradiction: Kill winds down pre-build, Pivot re-enters the phase.
+  // A valid non-Go verdict is a completed checkpoint, not a malformed
+  // research packet. Initialization remains held by the accepted-product
+  // status gate; the validator must not force a false Go.
   const researchNotGo = makeFixture("research-done-not-go");
   setLaneDone(researchNotGo, "research", ["strategy/RESEARCH.md"]);
   seedResearchEvidence(researchNotGo);
@@ -2388,7 +2389,19 @@ export function register(h: Harness): void {
       "| 2026-07-21 | fail — $180K top-10 | no defensible wedge found | no demand signal | no reachable channel | zero of 200 visitors responded | Kill | founder |",
     ),
   ]);
-  runFixture("done research whose latest verdict is Kill fails", researchNotGo, "check-research-evidence.ts", 1, "research.go_pivot_kill_not_go");
+  runFixture("done research whose latest verdict is Kill remains a held checkpoint", researchNotGo, "check-research-evidence.ts", 0);
+
+  const researchPivotCheckpoint = makeFixture("research-done-pivot-checkpoint");
+  setLaneDone(researchPivotCheckpoint, "research", ["strategy/RESEARCH.md"]);
+  seedResearchEvidence(researchPivotCheckpoint);
+  writeResearch(researchPivotCheckpoint, [
+    ...researchCoreSections,
+    ...categoryRevenueSection(revenueRow),
+    ...goPivotKillSection(
+      "| 2026-07-21 | mixed — $180K top-10 | narrow wedge needs a different audience | no measured demand yet | creator newsletter identified | offer test not run | Pivot | founder |",
+    ),
+  ]);
+  runFixture("done research whose latest verdict is Pivot remains a held checkpoint", researchPivotCheckpoint, "check-research-evidence.ts", 0);
 
   const researchV2OpeningMandate = makeCompletedResearch("research-v2-opening-mandate");
   writeResearch(researchV2OpeningMandate, [

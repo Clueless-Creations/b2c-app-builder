@@ -390,6 +390,7 @@ export function leftoverNameMigrationGuidance(): string {
  * Local MCP refuses them as cli_only with the local receipt reading, not as missing tools.
  */
 export const HOSTED_WRONG_SURFACE_LEFTOVER_CLI_ONLY_TOOL_NAMES = [
+  "b2c_research_decision",
   "b2c_research_record",
   "b2c_package_import",
   "b2c_composition_activate",

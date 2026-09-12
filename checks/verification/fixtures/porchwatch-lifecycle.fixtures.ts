@@ -145,6 +145,48 @@ export function register(h: Harness): void {
       else process.env.B2C_APP_BUILDER_HOME = previous;
     }
   });
+  h.check("Porchwatch F6: research diagnostics identify invalid transformation and niche rows", () => {
+    const cases = [
+      {
+        home: "porchwatch-transformation-home",
+        directory: "research-transformation-001",
+        research:
+          "# Research\n\n## Transformation Demo\n\n| Screenshot path | 15s script | Transformation shown | Why not a vitamin |\n| --- | --- | --- | --- |\n| pending | short | generic improvement | nice to have |\n",
+        code: "research.transb2c_demo_row_invalid",
+        hint: "Repair the named Transformation Demo row",
+      },
+      {
+        home: "porchwatch-niche-home",
+        directory: "research-niche-001",
+        research:
+          "# Research\n\n## Distribution-First Niche\n\n| Paying audience | Named channel | Purchases-as-validation |\n| --- | --- | --- |\n| curious people | social media | likes |\n",
+        code: "research.distribution_first_row_invalid",
+        hint: "Repair the named Distribution-First Niche row",
+      },
+    ];
+    for (const fixture of cases) {
+      const home = h.makeTempDir(fixture.home);
+      const root = path.join(h.makeTempDir(`${fixture.directory}-business`), fixture.directory);
+      const previous = process.env.B2C_APP_BUILDER_HOME;
+      process.env.B2C_APP_BUILDER_HOME = home;
+      try {
+        createBusiness({ workspaceId: fixture.directory, directory: root, name: "Table diagnostic fixture", hypothesis: "A consumer utility" });
+        writeFileSync(path.join(root, "strategy/RESEARCH.md"), fixture.research);
+        const result = spawnSync(
+          process.execPath,
+          ["--import", "tsx", "checks/validation/business/research/check-research-evidence.ts", "--root", root, "--require-workflow-outputs", "--json"],
+          { cwd: skillRoot, encoding: "utf8" },
+        );
+        const output = `${result.stdout}${result.stderr}`;
+        assert(output.includes(fixture.code), `${fixture.code} must remain stable`);
+        assert(output.includes('"location":"7"'), `${fixture.code} must preserve the authored row line`);
+        assert(output.includes(fixture.hint), `${fixture.code} must provide a bounded repair hint`);
+      } finally {
+        if (previous === undefined) delete process.env.B2C_APP_BUILDER_HOME;
+        else process.env.B2C_APP_BUILDER_HOME = previous;
+      }
+    }
+  });
   h.check("Porchwatch: absent-directory creation preserves the founder brief losslessly", () => {
     const home = h.makeTempDir("porchwatch-brief-home"),
       root = path.join(h.makeTempDir("porchwatch-brief-business"), "after-credits");
@@ -250,8 +292,14 @@ export function register(h: Harness): void {
         plan.resume?.researchQueries.some((entry) => entry.outcome === "uncertain"),
         "planning resume omitted the uncertain charged call",
       );
-      assert(lookupResearch({ workspaceId: "research-002", query: researchQuery, maxAgeSeconds: 3600 }).status === "needs_reconciliation", "uncertain request would be repeated");
-      assert(!existsSync(path.join(root, "catalog.json")) && !existsSync(path.join(root, "state/business-state.json")), "research resume fabricated runtime state");
+      assert(
+        lookupResearch({ workspaceId: "research-002", query: researchQuery, maxAgeSeconds: 3600 }).status === "needs_reconciliation",
+        "uncertain request would be repeated",
+      );
+      assert(
+        !existsSync(path.join(root, "catalog.json")) && !existsSync(path.join(root, "state/business-state.json")),
+        "research resume fabricated runtime state",
+      );
     } finally {
       if (previous === undefined) delete process.env.B2C_APP_BUILDER_HOME;
       else process.env.B2C_APP_BUILDER_HOME = previous;

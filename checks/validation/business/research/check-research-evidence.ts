@@ -1006,12 +1006,32 @@ function validateTransformationDemo(text: string, target: ReturnType<typeof issu
       );
     });
   if (!rowsValid) {
+    const invalidRow = demoSection.rows.find((row) => {
+      const cells = demoColumns.map((column) => (row.cells[column] ?? "").trim());
+      const screenshot = cells[0] ?? "";
+      const script = cells[1] ?? "";
+      const transformation = cells[2] ?? "";
+      const notVitamin = cells[3] ?? "";
+      return !(
+        cells.every((cell) => cell.length > 0 && !placeholder.test(cell)) &&
+        (screenshot.includes("/") || screenshotOk.test(screenshot)) &&
+        script.length >= 24 &&
+        transformation.length >= 16 &&
+        !vitamin.test(transformation) &&
+        notVitamin.length >= 16
+      );
+    });
     target.push(
       issue(
         "error",
         "research.transb2c_demo_row_invalid",
         "Transformation Demo needs one screenshot path, a 15s script, a concrete before-to-after transformation, and a painkiller reason. Vitamin features fail.",
         "strategy/RESEARCH.md",
+        {
+          line: invalidRow?.sourceLine ?? demoSection.headingLine,
+          fixHint:
+            "Repair the named Transformation Demo row's first failing field: use a real screenshot path, a concrete 15s script, a before-to-after transformation, and a painkiller reason.",
+        },
       ),
     );
   }
@@ -1052,12 +1072,30 @@ function validateDistributionFirstNiche(text: string, target: ReturnType<typeof 
       );
     });
   if (!rowsValid) {
+    const invalidRow = nicheSection.rows.find((row) => {
+      const cells = nicheColumns.map((column) => (row.cells[column] ?? "").trim());
+      const paying = cells[0] ?? "";
+      const channel = cells[1] ?? "";
+      const purchases = cells[2] ?? "";
+      return !(
+        cells.every((cell) => cell.length >= 12 && !placeholder.test(cell)) &&
+        /\b(pay|paid|price|iap|subscription|spend)\b/i.test(paying) &&
+        !genericChannel.test(channel) &&
+        /\b(purchase|paid|revenue|iap|subscribe)\b/i.test(purchases) &&
+        !compliment.test(purchases)
+      );
+    });
     target.push(
       issue(
         "error",
         "research.distribution_first_row_invalid",
         "Distribution-First Niche needs a paying audience, one named channel, and purchases as validation. Compliments and likes do not count.",
         "strategy/RESEARCH.md",
+        {
+          line: invalidRow?.sourceLine ?? nicheSection.headingLine,
+          fixHint:
+            "Repair the named Distribution-First Niche row's first failing field: name a paying audience, a specific channel, and purchase or revenue validation.",
+        },
       ),
     );
   }

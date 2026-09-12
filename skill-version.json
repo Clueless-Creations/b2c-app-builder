@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.16",
+  "version": "0.220.17",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Preserve worker output candidates as unaccepted evidence after knowledge-receipt failure.",
     "Allow founder-approved local full-launch coordination while keeping protected system actions fail-closed.",
     "Make scheduled autonomy explicitly conditional and keep optional scope questions off the foreground ready path.",
     "Bind research decision finding IDs to the current red-team artifact before authoring.",

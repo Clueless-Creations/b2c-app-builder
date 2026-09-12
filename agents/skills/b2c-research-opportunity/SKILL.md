@@ -21,6 +21,10 @@ For an existing managed business, read business-status then business-plan and us
 
 For a review, assess the existing evidence against this method and return findings; do not execute its authoring or mutation instructions. For requested creation or implementation, follow the method only within the accepted scope and authority.
 
+## Continuous experience principle
+
+Carry the accepted user's intended outcome through the work: make the result meaningfully better for that user, preserve relevant identity, hierarchy, accessibility, and recovery constraints, and verify behavior as well as presence. Apply this only where relevant; a narrow fix stays narrow. This principle does not require an 11-star exercise or a numeric taste score.
+
 Before the spec hardens, ask the question a good idea and a good business both answer
 differently: **is this market big enough to be worth building in at all?** Pull top-competitor
 revenue estimates (AppKittie, sorted by revenue) and judge them against a stated bar.

@@ -360,6 +360,19 @@ export function register(harness: Harness): void {
     }
   });
 
+  harness.check("catalog: reference-led design loop is explicit and portable", () => {
+    const catalog = composeCatalog(skillRoot);
+    const designRoom = catalog.workflows.find((workflow) => workflow.id === "workflow.design.design-room");
+    assert(designRoom !== undefined, "missing Design Room workflow");
+    for (const term of ["inspect the relevant references", "tangible draft", "critique concrete", "revise the candidate", "compare the revised candidate"]) {
+      assert(designRoom.instructions.includes(term), `Design Room must preserve the reference-led loop step: ${term}`);
+    }
+    const implementationSkill = readFileSync(path.join(skillRoot, "agents/skills/b2c-plan-implementation/SKILL.md"), "utf8");
+    assert(implementationSkill.includes("Continuous experience principle"), "portable implementation skill must carry the standing experience principle");
+    assert(implementationSkill.includes("narrow fix stays narrow"), "the standing principle must preserve focused-work exceptions");
+    assert(implementationSkill.includes("does not require an 11-star exercise or a numeric taste score"), "the standing principle must not turn taste into a numeric gate");
+  });
+
   harness.check("catalog: scheduled autonomy is conditional and remains founder-gated", () => {
     const catalog = composeCatalog(skillRoot);
     const schedule = catalog.workflows.find((workflow) => workflow.id === "workflow.operations.scheduled-autonomy-installation");

@@ -21,6 +21,10 @@ For an existing managed business, read business-status then business-plan and us
 
 For a review, assess the existing evidence against this method and return findings; do not execute its authoring or mutation instructions. For requested creation or implementation, follow the method only within the accepted scope and authority.
 
+## Continuous experience principle
+
+Carry the accepted user's intended outcome through the work: make the result meaningfully better for that user, preserve relevant identity, hierarchy, accessibility, and recovery constraints, and verify behavior as well as presence. Apply this only where relevant; a narrow fix stays narrow. This principle does not require an 11-star exercise or a numeric taste score.
+
 Load this reference when any of the following is true:
 
 - The project enters phase_6/phase_6b (post-launch growth and operations) or the first store approval lands on either store.

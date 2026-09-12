@@ -39,6 +39,7 @@ import {
   invalidateStaleReviews,
   invalidateDescendants,
   requestVerificationRepair,
+  retainUnacceptedCandidateOutputs,
   reconcileWorkflowApplicability,
   refreshHeartbeat,
   reopenRecurringNodes,
@@ -1924,6 +1925,9 @@ async function runSessionCore(args: Record<string, string | undefined>, host: In
               if (result.status === "failed") {
                 const failedState = run.nodes[nodeId];
                 const retryableAuditEvidenceFailure = isRetryableDesignAuditExecutorFailure(node, result.error);
+                if (result.error?.startsWith("worker knowledge receipt rejected:")) {
+                  retainUnacceptedCandidateOutputs(run, node, attempt.id, result.outputs);
+                }
                 attempt.status = "failed";
                 attempt.finishedAt = finishedAt;
                 attempt.error = result.error;

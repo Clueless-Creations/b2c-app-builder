@@ -40,7 +40,7 @@ import { pathToFileURL } from "node:url";
 import { resolveTsxBin } from "../../../tooling/lib/tsx-bin.js";
 import { composeCatalog } from "../../../catalog/index.js";
 import { toCatalogInput } from "../../../catalog/bridge.js";
-import { acceptVerification, beginAttempt, reconcilePatch, requestVerificationRepair } from "../../../kernel/engine/runstate.js";
+import { acceptVerification, beginAttempt, reconcilePatch, requestVerificationRepair, retainUnacceptedCandidateOutputs } from "../../../kernel/engine/runstate.js";
 import { workerEnvironment } from "../../../kernel/session/executor.js";
 import { stringify as stringifyYaml } from "yaml";
 import { DESIGN_FACETS, designArtifact } from "../../validation/business/design/design-acceptance.js";
@@ -1902,6 +1902,29 @@ function proofStrengthLine(handle: WorkspaceHandle): string | undefined {
 }
 
 export function register(harness: Harness): void {
+  harness.check("recovery: a rejected knowledge receipt preserves candidate outputs as unaccepted", () => {
+    const plan = compilePlan(singleNodeCatalog());
+    const businessState = JSON.parse(readFileSync(path.join(skillRoot, "examples/workspace/business/state/business-state.json"), "utf8")) as BusinessStateV2;
+    const run = seedRunState(plan, businessState, {
+      ownerSessionId: "receipt-recovery",
+      ttlSeconds: 60,
+      wallClockCapSeconds: 60,
+      now: "2026-09-12T15:00:00.000Z",
+    });
+    const node = plan.nodes[0]!;
+    const binding = run.artifactBindings.find((candidate) => candidate.artifactId === node.outputs[0]);
+    assert(binding, "fixture node must have a declared output binding");
+    retainUnacceptedCandidateOutputs(run, node, "attempt-receipt-1", [
+      {
+        artifactId: node.outputs[0]!,
+        fingerprint: "sha256:candidate-before-receipt-repair",
+      },
+    ]);
+    assert(binding!.accepted === false, "receipt repair candidates must stay unaccepted");
+    assert(binding!.fingerprint === "sha256:candidate-before-receipt-repair", "candidate fingerprint must remain inspectable");
+    assert(binding!.producedBy === node.id && binding!.attemptId === "attempt-receipt-1", "candidate provenance must bind to the failed attempt");
+  });
+
   // --- scenario 1: all nodes gated exits cleanly with a parked digest, not silence -----------
 
   harness.check("session: a session with all nodes gated exits cleanly with a populated 'parked' digest, not silence", () => {

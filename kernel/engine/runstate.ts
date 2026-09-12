@@ -33,6 +33,30 @@ import {
 } from "./review-evidence.js";
 import { DESIGN_TASTE_DELEGATION_APPROVAL_ID } from "./founder-decision-receipt.js";
 
+export interface UnacceptedCandidateOutput {
+  readonly artifactId: string;
+  readonly fingerprint: string;
+}
+
+/** Preserve worker-produced bytes after a receipt-only failure without making them usable inputs. */
+export function retainUnacceptedCandidateOutputs(
+  run: RunStateDocument,
+  node: Pick<CompiledRunNode, "id" | "outputs">,
+  attemptId: string,
+  outputs: readonly UnacceptedCandidateOutput[],
+): void {
+  const declared = new Set(node.outputs);
+  for (const output of outputs) {
+    if (!declared.has(output.artifactId as never)) continue;
+    const binding = run.artifactBindings.find((candidate) => candidate.artifactId === output.artifactId);
+    if (!binding) continue;
+    binding.accepted = false;
+    binding.fingerprint = output.fingerprint;
+    binding.producedBy = node.id;
+    binding.attemptId = attemptId;
+  }
+}
+
 /** A lane in one of these states means the workflows that own it are already done. */
 const DONE_LANE_STATUSES: readonly Status[] = ["succeeded", "not_needed", "skipped"];
 

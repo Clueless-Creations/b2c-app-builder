@@ -191,6 +191,16 @@ function renderStaticHtml(state: unknown, tokens: unknown, stateHash: string, li
         )
         .join("")
     : '<p class="empty">Direction exploration has not been recorded in DESIGN.md.</p>';
+  const process = exploration?.process;
+  const processCard = process
+    ? `<div class="direction processRecord">
+        <article><h3>Reference access</h3><p>${escapeHtml(process.referenceAccess)}</p><p>${escapeHtml(process.referenceAccessNote)}</p></article>
+        <article><h3>Inspection and draft</h3><p>${escapeHtml(process.referenceInspection)}</p><p>${escapeHtml(process.tangibleDraft)}</p></article>
+        <article><h3>Critique and revision</h3><p>${escapeHtml(process.critique)}</p><p>${escapeHtml(process.revision)}</p></article>
+        <article><h3>Chosen target</h3><p>${escapeHtml(process.chosenTarget)}</p></article>
+        <article><h3>Runtime comparison</h3><p>${escapeHtml(process.runtimeComparison)}</p></article>
+      </div>`
+    : '<p class="empty">The reference-led process record has not been recorded yet.</p>';
 
   return `<!doctype html>
 <html lang="en">
@@ -313,6 +323,8 @@ function renderStaticHtml(state: unknown, tokens: unknown, stateHash: string, li
       <p class="eyebrow">Direction exploration</p>
       <h2>Distinct concepts and the recorded choice</h2>
       <div class="grid">${explorationCards}</div>
+      <h2>Reference-led process</h2>
+      ${processCard}
     </section>
     <section>
       <p class="eyebrow">Mobile targets</p>

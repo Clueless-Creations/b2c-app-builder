@@ -124,6 +124,18 @@ function validateRoutesAndRender(state: unknown, stateHash: string, exploration:
       concept.treatments.desktopWeb,
       ...concept.referenceMappings.flatMap((mapping) => [mapping.referenceId, mapping.principle]),
     ]) ?? []),
+    ...(exploration
+      ? [
+          exploration.process.referenceAccess,
+          exploration.process.referenceAccessNote,
+          exploration.process.referenceInspection,
+          exploration.process.tangibleDraft,
+          exploration.process.critique,
+          exploration.process.revision,
+          exploration.process.chosenTarget,
+          exploration.process.runtimeComparison,
+        ]
+      : []),
     ...designLibraryLabels(),
   ].filter((value): value is string => Boolean(value));
   for (const value of expected) {

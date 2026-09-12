@@ -22,10 +22,24 @@ export interface DesignDirectionConcept {
   rationale: string;
 }
 
+export type DesignReferenceAccess = "figma-editable" | "figma-read-only" | "figma-unavailable" | "structured-source";
+
+export interface DesignProcessRecord {
+  referenceAccess: DesignReferenceAccess | "";
+  referenceAccessNote: string;
+  referenceInspection: string;
+  tangibleDraft: string;
+  critique: string;
+  revision: string;
+  chosenTarget: string;
+  runtimeComparison: string;
+}
+
 export interface DesignExploration {
   schemaVersion: number;
   selectedConceptId: string;
   concepts: DesignDirectionConcept[];
+  process: DesignProcessRecord;
 }
 
 export interface ParsedDesignExploration {
@@ -62,11 +76,35 @@ export function parseDesignExploration(frontmatter: Record<string, unknown> | un
   const schemaVersion = typeof raw.schemaVersion === "number" ? raw.schemaVersion : Number.NaN;
   const selectedConceptId = text(raw.selectedConceptId);
   const concepts = asArray(raw.concepts).filter(isRecord).map(normalizeConcept);
-  const exploration: DesignExploration = { schemaVersion, selectedConceptId, concepts };
+  const process = normalizeProcess(raw.process);
+  const exploration: DesignExploration = { schemaVersion, selectedConceptId, concepts, process };
 
   if (schemaVersion !== 1) fail(issues, "schema_version", "DESIGN.md exploration.schemaVersion must be 1.");
   if (!slug(selectedConceptId)) fail(issues, "selected_id", "DESIGN.md exploration.selectedConceptId must be a lowercase concept slug.");
   if (concepts.length < 3) fail(issues, "concept_count", "DESIGN.md exploration must preserve at least three developed directions.");
+
+  if (required) {
+    const processFields: Array<[keyof DesignProcessRecord, string]> = [
+      ["referenceInspection", "reference inspection"],
+      ["tangibleDraft", "tangible draft"],
+      ["critique", "concrete critique"],
+      ["revision", "revision record"],
+      ["chosenTarget", "chosen design target"],
+      ["runtimeComparison", "runtime comparison"],
+    ];
+    for (const [field, label] of processFields) {
+      if (!substantive(process[field])) fail(issues, "process_record", `A rendered Design Room needs a substantive ${label} in DESIGN.md exploration.process.`);
+    }
+    if (!process.referenceAccess)
+      fail(
+        issues,
+        "reference_access",
+        "A rendered Design Room must state whether the reference source was editable Figma, read-only Figma, unavailable Figma, or a structured source.",
+      );
+    if (!substantive(process.referenceAccessNote)) {
+      fail(issues, "reference_access_note", "A rendered Design Room must explain the reference-tool access and any permitted or refused substitution.");
+    }
+  }
 
   const ids = concepts.map((concept) => concept.id).filter(Boolean);
   if (new Set(ids).size !== ids.length) fail(issues, "concept_id_duplicate", "DESIGN.md exploration concept IDs must be unique.");
@@ -133,6 +171,22 @@ function normalizeConcept(raw: Record<string, unknown>): DesignDirectionConcept 
     distinguishingMechanic: text(raw.distinguishingMechanic),
     decision: raw.decision === "selected" || raw.decision === "rejected" ? raw.decision : "",
     rationale: text(raw.rationale),
+  };
+}
+
+function normalizeProcess(raw: unknown): DesignProcessRecord {
+  const process = isRecord(raw) ? raw : {};
+  const access = text(process.referenceAccess);
+  return {
+    referenceAccess:
+      access === "figma-editable" || access === "figma-read-only" || access === "figma-unavailable" || access === "structured-source" ? access : "",
+    referenceAccessNote: text(process.referenceAccessNote),
+    referenceInspection: text(process.referenceInspection),
+    tangibleDraft: text(process.tangibleDraft),
+    critique: text(process.critique),
+    revision: text(process.revision),
+    chosenTarget: text(process.chosenTarget),
+    runtimeComparison: text(process.runtimeComparison),
   };
 }
 

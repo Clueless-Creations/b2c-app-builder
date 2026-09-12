@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.62",
+  "version": "0.220.63",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Make rendered Design Room exploration prove reference access, inspection, tangible draft, critique, revision, chosen target, and runtime comparison.",
     "Verify schedule install and uninstall preserve another workspace's managed entry while changing only the selected workspace.",
     "Name the first invalid Corpus Inputs or Signal Records field in bounded research diagnostics.",
     "Reject research-decision apply when the reviewed finding artifact changes after preview, before any product write.",

@@ -186,7 +186,8 @@ function safeFounderQuestion(question: FounderQuestion): FounderQuestion | null 
  *    setting does not cover it, translated into plain language via `digest.ts`'s
  *    `translateParkReason`.
  * 5. A `founder_approval` node with NO real approval (`approvals.length===0`) — an unanswered
- *    conditional-applicability ("scope") question. Discriminated by the compiled node's actual
+ *    conditional-applicability ("scope") question when no independent ready work is available.
+ *    Discriminated by the compiled node's actual
  *    approval count rather than by string-matching `detail`: a workflow could in principle
  *    declare both `founderOnlyActions` and a conditional `applicability`, which would make
  *    `detail` read like an approval description even though the true block reason is scope. That
@@ -200,6 +201,7 @@ export function pickFounderQuestion(
   byId: ReadonlyMap<RunNodeId, FounderQuestionNode>,
   held: readonly HeldNode[],
   autonomyUnset: boolean,
+  hasReadyWork = false,
 ): FounderQuestion | null {
   const protectedCategoryFor = (nodeId: RunNodeId): ProtectedCategory | undefined => {
     const node = byId.get(nodeId);
@@ -258,7 +260,10 @@ export function pickFounderQuestion(
     );
   }
 
-  const scopeQuestion = approvalHeld.find((node) => (byId.get(node.nodeId)?.approvals.length ?? 0) === 0);
+  // A conditional scope question is optional setup until it gates all useful work. Keep
+  // independent manual work moving instead of turning an unanswered scheduler question into a
+  // global pause. Hard approvals and autonomy questions still outrank this branch.
+  const scopeQuestion = hasReadyWork ? undefined : approvalHeld.find((node) => (byId.get(node.nodeId)?.approvals.length ?? 0) === 0);
   if (scopeQuestion) {
     const prefix = "Scope answer needed: ";
     const prompt = scopeQuestion.detail.startsWith(prefix) ? scopeQuestion.detail.slice(prefix.length) : scopeQuestion.detail;
@@ -354,7 +359,7 @@ export function buildPlanReport(
     }),
   );
   const readyBriefs = batches.flat().map((entry) => composeNodeBrief(byId.get(entry.nodeId)!, plan, undefined, workspaceRoot));
-  const founderQuestion = pickFounderQuestion(byId, held, autonomyUnset);
+  const founderQuestion = pickFounderQuestion(byId, held, autonomyUnset, batches.length > 0);
 
   return {
     planId: plan.planId,

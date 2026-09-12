@@ -1,6 +1,6 @@
 {
   "schemaVersion": "2.0.0",
-  "skillVersion": "0.220.14",
+  "skillVersion": "0.220.15",
   "areas": [
     {
       "id": "area.operating-system",
@@ -11157,7 +11157,8 @@
       "actionClass": "mutate",
       "idempotent": true,
       "applicability": {
-        "mode": "always"
+        "mode": "conditional",
+        "question": "Is recurring scheduled operation selected for the current business?"
       }
     },
     {
@@ -18823,14 +18824,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "f2ab2b604def048f0690ca3430da76d4766023b3f07f1cbe484b1eda5cc4f08c",
+    "fingerprint": "6d1f50090306dfd3490ce374649f0ac795084ccaed4b0f0abf277afbabfc19bc",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
-        "version": "0.220.14",
-        "revision": "0.220.14",
-        "contentDigest": "fc9a6f86d6ac632db8b7610036e26f7c5d2e99df4d6f8766e2240b312fd3f55c"
+        "version": "0.220.15",
+        "revision": "0.220.15",
+        "contentDigest": "ae6763fb1cd47b2c8acc2cde8b35fb4bcc07fbb54c4fd4384128e73620bd8987"
       }
     ],
     "base": {

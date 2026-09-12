@@ -360,6 +360,16 @@ export function register(harness: Harness): void {
     }
   });
 
+  harness.check("catalog: scheduled autonomy is conditional and remains founder-gated", () => {
+    const catalog = composeCatalog(skillRoot);
+    const schedule = catalog.workflows.find((workflow) => workflow.id === "workflow.operations.scheduled-autonomy-installation");
+    assert(schedule !== undefined, "missing scheduled autonomy workflow");
+    assert(schedule.applicability?.mode === "conditional", "schedule installation must not be unconditional");
+    assert(schedule.applicability?.question.includes("recurring scheduled operation"), "schedule selection question must name the actual optional effect");
+    assert(schedule.founderOnlyActions.length === 1, "schedule installation must retain one explicit founder approval");
+    assert(schedule.founderOnlyActions[0]!.includes("installing, changing, or removing"), "schedule approval must cover every host mutation");
+  });
+
   harness.check("catalog: ONB-18 authors DESIGN.md and selected platforms, not a mutable Design Room", () => {
     const catalog = composeCatalog(skillRoot);
     const onb18 = catalog.workflows.find((workflow) => workflow.id === "workflow.experience.onboarding-system.onb-18-visual-design-prototype");

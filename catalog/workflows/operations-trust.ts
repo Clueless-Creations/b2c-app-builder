@@ -292,6 +292,10 @@ export const workflows = [
     founderOnlyActions: ["approve installing, changing, or removing the recurring session schedule on this machine"],
     actionClass: "mutate",
     idempotent: true,
+    applicability: {
+      mode: "conditional",
+      question: "Is recurring scheduled operation selected for the current business?",
+    },
   }),
   workflow({
     id: "workflow.operations.founder-zero-operator-bootstrap",

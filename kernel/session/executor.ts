@@ -588,9 +588,22 @@ function createCliWorkerExecutor(requestedRuntime: WorkerRuntime): NodeExecutor 
         ...verifySourceAccess(context.workspaceDir, sourceSnapshot),
       ];
       if (changedInputs.length) return { status: "failed", outputs: [], evidence: [], error: changedInputs.join("; ") };
+      const candidateOutputs: NodeExecutionOutput[] = [];
+      for (const artifactId of node.outputs) {
+        const relativePath = context.artifactPaths[artifactId];
+        if (!relativePath) continue;
+        const absolutePath = resolvedInside(context.workspaceDir, relativePath);
+        if (!absolutePath || !existsSync(absolutePath)) continue;
+        candidateOutputs.push({
+          artifactId,
+          path: relativePath,
+          fingerprint: outputFingerprintPath(absolutePath),
+          evidence: [`${runtime} worker produced ${relativePath}`, "candidate retained after knowledge-receipt failure"],
+        });
+      }
       const receiptIssues = validateKnowledgeReceipt(`${result.stdout}\n${result.stderr}`, brief, expectations);
       if (receiptIssues.length > 0)
-        return { status: "failed", outputs: [], evidence: [], error: `worker knowledge receipt rejected: ${receiptIssues.join("; ")}` };
+        return { status: "failed", outputs: candidateOutputs, evidence: [], error: `worker knowledge receipt rejected: ${receiptIssues.join("; ")}` };
       const outputs: NodeExecutionOutput[] = [];
       for (const artifactId of node.outputs) {
         const relativePath = context.artifactPaths[artifactId];

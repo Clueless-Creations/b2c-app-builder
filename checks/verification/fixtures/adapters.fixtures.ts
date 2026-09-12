@@ -6,6 +6,7 @@ import { assert, skillRoot, type Harness } from "./_harness.js";
 import { laneKeys, type BusinessStateV2, type Lane, type LaneKey } from "../../../kernel/schema/types.js";
 import { compilePlan, type CatalogInput } from "../../../kernel/engine/compile.js";
 import { seedRunState } from "../../../kernel/engine/runstate.js";
+import { acquireLock, releaseLock } from "../../../kernel/reducer/lock.js";
 import { computeFrontier, allowAllAutonomyEvaluator } from "../../../kernel/engine/frontier.js";
 import { buildDispatchBatches } from "../../../kernel/engine/dispatch.js";
 import { founderFacingRuntimeIds, wrapWithWallClock, type SessionInvocation, type SpawnResult } from "../../../adapters/profile.js";
@@ -27,7 +28,9 @@ import {
   renderCrontabLine,
   renderLaunchdPlist,
   renderWrapperScript,
+  scheduleMutationLockPath,
   translateCronToLaunchd,
+  withScheduleMutationLock,
   type ScheduleOptions,
 } from "../../../adapters/install-schedule.js";
 import {
@@ -367,7 +370,10 @@ export function register(harness: Harness): void {
     assert(installed.nextContent.includes(line), "install must add our line");
     assert(crontabHasSignature(installed.nextContent, crontabSignature(options)), "readback must recognize the managed entry by its exact signature");
     assert(crontabHasExactLine(installed.nextContent, line), "readback must recognize the exact requested cadence/runtime/target line");
-    assert(!crontabHasExactLine(installed.nextContent, renderCrontabLine({ ...options, schedule: "*/15 * * * *" })), "a concurrent cadence change must not pass exact-line readback");
+    assert(
+      !crontabHasExactLine(installed.nextContent, renderCrontabLine({ ...options, schedule: "*/15 * * * *" })),
+      "a concurrent cadence change must not pass exact-line readback",
+    );
     assert(!crontabHasSignature(installed.nextContent, "b2c:other-workspace:claude"), "readback must not mistake another workspace's entry for ours");
 
     // Reinstalling with a different schedule replaces (never duplicates) our own line.
@@ -382,9 +388,7 @@ export function register(harness: Harness): void {
 
     const changedRuntime: ScheduleOptions = { ...changedOptions, runtime: "codex", wrapperPath: path.join(dir, "schedule", "run-codex.mts") };
     const runtimeReinstalled = applyCrontabInstall(reinstalled.nextContent, changedRuntime);
-    const managedLines = runtimeReinstalled.nextContent
-      .split("\n")
-      .filter((entry) => crontabHasSignature(entry, "b2c:adapters-fixture-biz:codex"));
+    const managedLines = runtimeReinstalled.nextContent.split("\n").filter((entry) => crontabHasSignature(entry, "b2c:adapters-fixture-biz:codex"));
     assert(managedLines.length === 1, `changing runtime must replace the prior managed entry, got ${managedLines.length}: ${runtimeReinstalled.nextContent}`);
     assert(managedLines[0]!.includes(":codex"), `changed runtime must be reflected in the managed signature, got ${managedLines[0]}`);
 
@@ -396,7 +400,10 @@ export function register(harness: Harness): void {
     assert(uninstalled.removed.length === 1 && uninstalled.removed[0] === line, "expected uninstall to report exactly the one line it removed");
 
     const runtimeUninstalled = applyCrontabUninstall(runtimeReinstalled.nextContent, changedRuntime);
-    assert(runtimeUninstalled.removed.length === 1 && runtimeUninstalled.removed[0]!.includes(":codex"), "uninstall must remove the current managed runtime entry");
+    assert(
+      runtimeUninstalled.removed.length === 1 && runtimeUninstalled.removed[0]!.includes(":codex"),
+      "uninstall must remove the current managed runtime entry",
+    );
     assert(!crontabHasWorkspaceSignature(runtimeUninstalled.nextContent, options.workspaceSlug), "workspace readback must reject any leftover runtime variant");
     assert(!crontabHasSignature(uninstalled.nextContent, crontabSignature(options)), "readback must confirm the managed entry is gone after uninstall");
 
@@ -404,6 +411,33 @@ export function register(harness: Harness): void {
     const cleanInstall = applyCrontabInstall("", options);
     const cleanUninstall = applyCrontabUninstall(cleanInstall.nextContent, options);
     assert(cleanUninstall.nextContent === "", `expected uninstall to exactly reverse a clean install, got: ${JSON.stringify(cleanUninstall.nextContent)}`);
+  });
+
+  harness.check("adapters/install-schedule: concurrent cron mutation is refused by the user-level schedule lock", () => {
+    const home = harness.makeTempDir("schedule-lock");
+    const lockPath = scheduleMutationLockPath(home);
+    const holder = acquireLock(lockPath, { ownerSessionId: "other-schedule-installer", retries: 0, ttlSeconds: 120 });
+    assert(holder.ok, "fixture must acquire the competing schedule lock");
+    try {
+      let ran = false;
+      let message = "";
+      try {
+        withScheduleMutationLock(() => {
+          ran = true;
+        }, home);
+      } catch (error) {
+        message = error instanceof Error ? error.message : String(error);
+      }
+      assert(!ran, "a competing schedule mutation must not enter its critical section");
+      assert(message === "install-schedule.schedule_lock_held", `expected a held-lock refusal, got ${message}`);
+    } finally {
+      releaseLock(lockPath, "other-schedule-installer");
+    }
+    let completed = false;
+    withScheduleMutationLock(() => {
+      completed = true;
+    }, home);
+    assert(completed, "the schedule lock must be released after the competing owner exits");
   });
 
   harness.check("adapters/install-schedule: translates the two supported cron shapes into launchd content and cleanly reports what it cannot translate", () => {

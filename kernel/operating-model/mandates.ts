@@ -12,6 +12,8 @@ export interface Mandate {
   agreementRevision: string;
   domainId: string;
   actionClass: string;
+  /** Optional workspace binding for mandates that must not cross business contexts. */
+  workspaceId?: string;
   status: MandateStatus;
   issuedAt: string;
   /** Optional hard expiry for a bounded delegation; checked again at effect time. */

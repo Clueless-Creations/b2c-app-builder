@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.46",
+  "version": "0.220.47",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Bind workspace-scoped operating mandates and envelopes so authority cannot cross business contexts.",
     "Reject expired operating mandates at effect time with an explicit stale-authority outcome.",
     "Add authored row locations and bounded repair hints for Category Revenue and Distribution Proof failures.",
     "Require exact managed schedule-line readback and reject leftover workspace runtime variants.",

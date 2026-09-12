@@ -22,7 +22,7 @@ export function bindRegisteredWorkspace(input: OperateInput, workspace: string |
   const compatible = loadWorkspaceCatalog(resolved.path);
   const bound: OperateInput = {
     ...input,
-    world: { ...input.world, catalog: compatible.catalog, runStatePath: undefined },
+    world: { ...input.world, workspaceId: workspace, catalog: compatible.catalog, runStatePath: undefined },
     gates: { ...input.gates, workspaceRegistered: true },
   };
   if (!compatible.ok) return { input: bound, refusal: compatible.refusal };

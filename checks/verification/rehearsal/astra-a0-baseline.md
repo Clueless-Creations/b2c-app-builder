@@ -1,7 +1,7 @@
 # Astra guidance migration A0 baseline
 
-Pinned source revision: `8ab690f8c08ad627c470d074fffdead986f763a6`  
-Captured: 2026-09-11  
+Pinned source revision: `d8f37967450340bdcb4ddd4ac55d7011587cd78d`
+Captured: 2026-09-12
 Mode: deterministic source/procedure accounting; no live model, provider, device, paid evaluation, or deployment.
 
 This is a reproducible before snapshot for #392. It reuses the existing
@@ -13,9 +13,9 @@ reported: no tokenizer/model surface was exercised.
 
 | File | UTF-8 bytes | Code points | Status |
 | --- | ---: | ---: | --- |
-| `AGENTS.md` | 13,545 | 13,422 | automatically supplied at repository root |
-| `SKILL.md` | 5,611 | 5,606 | direct business router |
-| `agents/skills/b2c-app-builder/references/setup.md` | 1,375 | 1,370 | conditional setup reference |
+| `AGENTS.md` | 9,604 | 9,604 | automatically supplied at repository root |
+| `SKILL.md` | 5,653 | 5,653 | direct business router |
+| `agents/skills/b2c-app-builder/references/setup.md` | 1,586 | 1,586 | conditional setup reference |
 
 ## Frozen cases
 

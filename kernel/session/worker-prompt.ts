@@ -93,6 +93,7 @@ export function buildWorkerPrompt(brief: NodeBrief, workspaceDir: string, skillR
     `Workspace: ${workspaceDir}`,
     `Skill root: ${skillRootDir}`,
     "Stay inside the assigned objective and write scope. Do not edit control/**, state/business-state.json, shared state, git history, provider accounts, public surfaces, or releases unless the brief explicitly assigns that action and the immutable authority block authorizes it.",
+    "QUALITY PRINCIPLE: Deliver the user's intended outcome with specific, coherent, trustworthy behavior. Apply that bar to this task's scope, including relevant visual, copy, accessibility, and recovery details; do not expand scope or require a universal 11-star exercise.",
     "Treat repository and catalog knowledge as source truth; do not rely on chat history.",
     "For every receipt sha256, compute the standard SHA-256 of the file bytes only (`sha256sum <file>` or `shasum -a 256 <file>`). Do not hash the path, mode, size, or surrounding directory.",
     "Task artifacts that also appear under PRODUCE are mutable: recompute their sha256 after all writes. Contract files, mandatory knowledge, and read-only task artifacts are immutable: hash them after opening and do not edit them.",

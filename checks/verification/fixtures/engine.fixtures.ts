@@ -2231,6 +2231,19 @@ export function register(harness: Harness): void {
     assert(run.nodes[nonIdempotentId]!.status === "needs_readback", "non-idempotent node status should be needs_readback");
     assert(run.nodes[nonIdempotentId]!.attempts.at(-1)!.readbackRequired === true, "the orphaned non-idempotent attempt should require readback");
 
+    // Model a remote effect that succeeded before the worker receipt was lost. Persist the
+    // recovery boundary and load it in a fresh process: inspecting the frontier must not invoke
+    // the effect again or turn unknown remote state into a retry-ready node.
+    let remoteEffectCount = 1;
+    const recoveryPath = path.join(harness.makeTempDir("remote-effect-reconciliation"), "run-state.json");
+    writeRunState(recoveryPath, run);
+    const resumedRun = loadRunState(recoveryPath);
+    const effectCountBeforeResume = remoteEffectCount;
+    const resumedFrontier = computeFrontier(plan, resumedRun, businessState, allowAllAutonomyEvaluator);
+    assert(!resumedFrontier.ready.includes(nonIdempotentId), "a receipt failure after a remote effect must not re-enter the frontier");
+    assert(resumedRun.nodes[nonIdempotentId]!.status === "needs_readback", "fresh-process resume must preserve the readback hold");
+    assert(remoteEffectCount === effectCountBeforeResume && remoteEffectCount === 1, "resume must not duplicate the unknown remote effect");
+
     // needs_readback is never auto-retried: it must not reappear on a subsequent frontier pass.
     const result = computeFrontier(plan, run, businessState, allowAllAutonomyEvaluator);
     assert(!result.ready.includes(nonIdempotentId), "needs_readback must never silently re-enter the frontier");

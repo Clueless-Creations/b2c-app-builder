@@ -36,7 +36,7 @@ const defaultRepoRoot = resolveSkillRoot(import.meta.url);
 const flags = parseFlags(process.argv.slice(2), [
   { flags: ["--repo-root"], key: "repoRoot" },
   { flags: ["--guidance-baseline"], key: "guidanceBaseline" },
-  { flags: ["--guidance-source-ref"], key: "guidanceSourceRef" },
+  { flags: ["--guidance-source-ref"], key: "guidanceSourceRef", kind: "string" },
   { flags: ["--guidance-report"], key: "guidanceReport" },
 ]);
 const repoRoot = flagString(flags, "repoRoot") ?? defaultRepoRoot;

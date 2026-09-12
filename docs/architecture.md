@@ -1,4 +1,4 @@
-# B2C App Builder architecture
+# Brigade architecture
 
 The [public interface](public-interface.md) is the consumer contract.
 `contracts/public-api/` owns its versioned declarations and schemas.
@@ -13,7 +13,7 @@ target rules alone do not establish implemented support.
 
 ## Purpose
 
-B2C App Builder is a local expert system for consumer apps. It turns a product goal into a versioned workflow, plans the work, and supports CLI-approved execution with evidence.
+Brigade is a local expert system for consumer apps. It turns a product goal into a versioned workflow, plans the work, and supports CLI-approved execution with evidence.
 
 This repository is the live product. The skill, MCP server, and CLI live here. GitHub does not archive this repository. A later successor experiment named Planes is parked in `docs/timeouts/planes.md`. Do not route current work through that experiment.
 

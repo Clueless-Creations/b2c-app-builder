@@ -1,4 +1,4 @@
-# Skills
+# Brigade skills
 
 Use the main business entrypoint by default. Focused task skills are optional, generated views of existing workflow contracts and supporting knowledge. They do not create another scheduler or authority model.
 

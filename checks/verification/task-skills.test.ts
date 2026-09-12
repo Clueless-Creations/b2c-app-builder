@@ -28,12 +28,13 @@ function focusedMethodSnippet(skill: (typeof taskSkills)[number]): string {
   if (!reference) return "";
   const source = readFileSync(path.join(root, reference.path), "utf8");
   const lines = source.split(/\r?\n/gu);
-  const heading = lines.findIndex(
-    (line) => /^#{1,6} /u.test(line) && line.replace(/^#{1,6} /u, "").trim() === skill.method!.heading,
-  );
+  const heading = lines.findIndex((line) => /^#{1,6} /u.test(line) && line.replace(/^#{1,6} /u, "").trim() === skill.method!.heading);
   if (heading < 0) return "";
   const end = lines.findIndex((line, index) => index > heading && /^#{1,6} /u.test(line));
-  return lines.slice(heading + 1, end < 0 ? lines.length : end).join("\n").trim();
+  return lines
+    .slice(heading + 1, end < 0 ? lines.length : end)
+    .join("\n")
+    .trim();
 }
 
 void test("six public areas cover business domains without changing internal authority groups", () => {
@@ -120,6 +121,30 @@ void test("generated projections remain current and root routing stays bounded",
     assert.ok(files["README.md"]!.includes(`knowledge/README.md#${area.slug}`));
     assert.ok(readFileSync(path.join(root, "knowledge/README.md"), "utf8").includes(`## ${area.name}`));
   }
+});
+
+void test("the packed runtime contains the canonical nine-task library", () => {
+  const result = spawnSync("npm", ["pack", "--dry-run", "--json", "--ignore-scripts"], {
+    cwd: root,
+    encoding: "utf8",
+    maxBuffer: 20 * 1024 * 1024,
+    timeout: 60_000,
+  });
+  assert.equal(result.status, 0, result.stderr);
+  const report = JSON.parse(result.stdout) as Array<{ files?: Array<{ path?: string }> }>;
+  const files = new Set((report[0]?.files ?? []).map((entry) => entry.path).filter((entry): entry is string => typeof entry === "string"));
+  assert.ok(files.has("SKILL.md"));
+  assert.ok(files.has("agents/skills/b2c-app-builder/references/business-lifecycle.md"));
+  for (const skill of taskSkills) {
+    const prefix = `${skillDirectory(skill)}/`;
+    assert.ok(files.has(`${prefix}SKILL.md`), `${prefix}SKILL.md is missing from npm pack`);
+    assert.ok(files.has(`${prefix}references/task.md`), `${prefix}references/task.md is missing from npm pack`);
+    assert.ok(
+      [...files].some((file) => file.startsWith(prefix)),
+      `${prefix} has no packed files`,
+    );
+  }
+  assert.ok(![...files].some((file) => /(?:^|\/)(?:b2c-maintainer|b2c-contributor)(?:\/|$)|(?:^|\/)\.env(?:\/|$)/u.test(file)));
 });
 
 void test("generated block replacement refuses ambiguous ownership", () => {

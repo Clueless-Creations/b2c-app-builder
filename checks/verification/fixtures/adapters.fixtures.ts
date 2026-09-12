@@ -17,7 +17,9 @@ import {
   applyCrontabInstall,
   applyCrontabUninstall,
   checkClaudeSandboxSetting,
+  crontabHasExactLine,
   crontabHasSignature,
+  crontabHasWorkspaceSignature,
   crontabSignature,
   launchdLabel,
   launchdPlistHasLabel,
@@ -362,6 +364,8 @@ export function register(harness: Harness): void {
     assert(installed.nextContent.includes(foreignLine), "install must preserve a pre-existing foreign crontab line");
     assert(installed.nextContent.includes(line), "install must add our line");
     assert(crontabHasSignature(installed.nextContent, crontabSignature(options)), "readback must recognize the managed entry by its exact signature");
+    assert(crontabHasExactLine(installed.nextContent, line), "readback must recognize the exact requested cadence/runtime/target line");
+    assert(!crontabHasExactLine(installed.nextContent, renderCrontabLine({ ...options, schedule: "*/15 * * * *" })), "a concurrent cadence change must not pass exact-line readback");
     assert(!crontabHasSignature(installed.nextContent, "b2c:other-workspace:claude"), "readback must not mistake another workspace's entry for ours");
 
     // Reinstalling with a different schedule replaces (never duplicates) our own line.
@@ -389,6 +393,7 @@ export function register(harness: Harness): void {
 
     const runtimeUninstalled = applyCrontabUninstall(runtimeReinstalled.nextContent, changedRuntime);
     assert(runtimeUninstalled.removed.length === 1 && runtimeUninstalled.removed[0]!.includes(":codex"), "uninstall must remove the current managed runtime entry");
+    assert(!crontabHasWorkspaceSignature(runtimeUninstalled.nextContent, options.workspaceSlug), "workspace readback must reject any leftover runtime variant");
     assert(!crontabHasSignature(uninstalled.nextContent, crontabSignature(options)), "readback must confirm the managed entry is gone after uninstall");
 
     // Reversal with no foreign lines at all: install then uninstall nets back to empty.

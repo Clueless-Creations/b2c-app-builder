@@ -99,6 +99,16 @@ export function crontabHasSignature(existingContent: string, signature: string):
   return existingContent.split(/\r?\n/u).some((line) => line.includes(`# ${signature}`));
 }
 
+/** Exact managed-line readback; a matching workspace/runtime tag alone is not enough after a concurrent edit. */
+export function crontabHasExactLine(existingContent: string, expectedLine: string): boolean {
+  return existingContent.split(/\r?\n/u).some((line) => line === expectedLine);
+}
+
+/** Readback for every runtime variant owned by one workspace. */
+export function crontabHasWorkspaceSignature(existingContent: string, workspaceSlug: string): boolean {
+  return existingContent.split(/\r?\n/u).some((line) => line.includes(`# ${workspaceCrontabSignature(workspaceSlug)}`));
+}
+
 export function renderCrontabLine(options: ScheduleOptions): string {
   return `${options.schedule} /usr/bin/env tsx ${options.wrapperPath} >> ${options.logPath} 2>&1 # ${crontabSignature(options)}`;
 }
@@ -316,7 +326,10 @@ function runMain(): void {
     const result = uninstall ? applyCrontabUninstall(current, options) : applyCrontabInstall(current, options);
     if (!uninstall) writeFileSync(options.wrapperPath, renderWrapperScript(options), { mode: 0o755 });
     writeCrontab(result.nextContent);
-    const readBack = crontabHasSignature(readCrontab(), crontabSignature(options));
+    const readBackContent = readCrontab();
+    const readBack = uninstall
+      ? crontabHasWorkspaceSignature(readBackContent, options.workspaceSlug)
+      : crontabHasExactLine(readBackContent, "line" in result ? result.line : "");
     if (uninstall ? readBack : !readBack) {
       fail(`cron readback did not confirm the requested ${uninstall ? "removal" : "installation"} for ${options.workspaceSlug}/${options.runtime}`);
     }

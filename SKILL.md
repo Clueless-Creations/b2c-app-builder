@@ -13,6 +13,9 @@ Start with the user's job, not the framework. This is the default business entry
 
 Inspect the app's own instructions and affected surface. Open the matching task directly. Do not install software, require an MCP connection, create a workspace, or activate a full operating graph merely to apply the expertise. A review is read-only unless changes are also requested.
 
+<!-- Portable completion rule: equality with the standing contract is checked. -->
+An implementation request authorizes completing its in-scope, reversible repository work: inspect, edit, test, repair failures caused by the change, regenerate affected output, inspect the diff, and complete required checks without repeated intermediate approvals. Preserve unrelated work; this does not authorize unrelated fixes. Review-only and planning-only requests remain review and planning, not implementation.
+
 <!-- catalog-generated:start task-skills -->
 | Task | Use when |
 | --- | --- |
@@ -39,7 +42,7 @@ Author accepted product intent in product.yaml and global design in DESIGN.md; P
 
 ## Setup request
 
-Only when setup is requested or a managed execution path actually needs connectivity, open [connection setup](agents/skills/b2c-app-builder/references/setup.md). Focused advice needs no setup. Local execution and hosted read-only knowledge are different capabilities; unavailable tooling is not permission to install or invent a route. MCP is read-only by default. The setup reference contains the surface and degradation diagnostics.
+Only when setup is requested or managed execution needs connectivity, open [connection setup](agents/skills/b2c-app-builder/references/setup.md). Local b2c-local supports registered workspace execution; hosted b2c-hosted supplies read-only knowledge and cannot execute a local business.
 
 Do not edit an agent configuration or install software unless the user requested setup. Keep MCP read-only by default and use the CLI for approved writes. Missing execution tooling does not block advisory work.
 

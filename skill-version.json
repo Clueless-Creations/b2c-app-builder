@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.23",
+  "version": "0.220.24",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Preserve narrative research uncertainty while rejecting placeholder-only fields.",
     "Reject placeholder worker-receipt reasons while preserving typed explanations.",
     "Add source-ledger and signal-corpus field diagnostics with authored locations and bounded repair hints.",
     "Carry a continuous experience principle through portable task skills and make the reference-led design loop explicit.",

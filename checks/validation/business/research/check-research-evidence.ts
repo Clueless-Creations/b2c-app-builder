@@ -473,11 +473,11 @@ if (text) {
         if (latest.verdict !== "go") {
           issues.push(
             issue(
-              "error",
+              "warning",
               "research.go_pivot_kill_not_go",
-              `The latest Go, Pivot, Or Kill verdict is "${latest.verdict}", but the research lane is marked done. ` +
-                `A Kill winds the idea down pre-build; a Pivot re-enters Phase 1 with the wedge changed. Either way the lane is not done — ` +
-                `record the follow-up verdict once the founder decides to build.`,
+              `The latest Go, Pivot, Or Kill verdict is "${latest.verdict}". The research checkpoint is structurally valid, but initialization remains held until ` +
+                `the accepted product is eligible: a Kill winds the idea down pre-build, while a Pivot re-enters Phase 1 with the wedge changed. ` +
+                `Do not convert this checkpoint to Go or treat an unrun experiment as measured evidence.`,
               "strategy/RESEARCH.md",
             ),
           );

@@ -14,21 +14,22 @@ roadmap's decision text in place.
 
 ## Index
 
-| ID                                                            | Title                                                              | Status   | Affects                                         |
-| ------------------------------------------------------------- | ------------------------------------------------------------------ | -------- | ----------------------------------------------- |
-| [0001](0001-metric-contracts-validator-and-template-paths.md) | Metric-contracts validator and optional template paths             | accepted | U16, U20, U22                                   |
-| [0002](0002-repository-layout.md)                             | Repository layout: the repository root is the package root         | accepted | ARCH-01, ARCH-05, U1, U4, U5, U9, U15, U16, U18 |
-| [0003](0003-single-mandate-business-system.md)                | Single-mandate consumer-business system                            | accepted | ARCH-01–ARCH-15, U2–U26                         |
-| [0004](0004-porchwatch-continuation-and-knowledge.md)         | Preserve complete mandates and make required knowledge retrievable | accepted | ARCH-02, 03, 07, 09, 10, 11                     |
-| [0005](0005-source-adoption-and-upstream-maintenance.md)      | Source adoption and upstream maintenance                           | accepted | ARCH-05, 06, 07, 09, 10, 11, 15                 |
-| [0006](0006-onboarding-foundations-before-design.md)          | Onboarding research, identity and measurement precede design       | accepted | ARCH-02, 03, 07, 09, 10, 11, 12                 |
-| [0007](0007-upstream-lifecycle-and-agent-scopes.md)           | Upstream lifecycle handoff, relationship kinds, and agent scopes   | accepted | ADR-0005; ARCH-06, 07, 09                       |
-| [0008](0008-agent-onboarding-entry-path.md)                   | Distinguish business creation from workspace adoption              | accepted | ARCH-07, 09, 11; U25                            |
-| [0009](0009-bespoke-design-foundations.md)                    | Bespoke design foundations in existing authorities                 | accepted | ARCH-03–09, ARCH-11–15; U9, U13, U18, U19       |
-| [0010](0010-first-run-honesty-owners.md)                      | First-run honesty owners for doctor, portfolio, and exclusions     | accepted | ARCH-07, 09; ADR-0005, 0007; U1, U4             |
-| [0011](0011-additive-public-business-plan-projection.md)      | Additive public business-plan projection                         | accepted | ARCH-09; U25; public `business.plan`           |
-| [0012](0012-context-first-agent-routing.md)                   | Context-first agent routing and thin host adapters                 | accepted | ARCH-02, 07, 09, 11                             |
-| [0013](0013-provider-integration-boundary.md)                 | Provider integrations implement canonical operations               | accepted | ARCH-03, 04, 06, 10, 11; #109                   |
+| ID                                                                  | Title                                                              | Status   | Affects                                         |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------ | -------- | ----------------------------------------------- |
+| [0001](0001-metric-contracts-validator-and-template-paths.md)       | Metric-contracts validator and optional template paths             | accepted | U16, U20, U22                                   |
+| [0002](0002-repository-layout.md)                                   | Repository layout: the repository root is the package root         | accepted | ARCH-01, ARCH-05, U1, U4, U5, U9, U15, U16, U18 |
+| [0003](0003-single-mandate-business-system.md)                      | Single-mandate consumer-business system                            | accepted | ARCH-01–ARCH-15, U2–U26                         |
+| [0004](0004-porchwatch-continuation-and-knowledge.md)               | Preserve complete mandates and make required knowledge retrievable | accepted | ARCH-02, 03, 07, 09, 10, 11                     |
+| [0005](0005-source-adoption-and-upstream-maintenance.md)            | Source adoption and upstream maintenance                           | accepted | ARCH-05, 06, 07, 09, 10, 11, 15                 |
+| [0006](0006-onboarding-foundations-before-design.md)                | Onboarding research, identity and measurement precede design       | accepted | ARCH-02, 03, 07, 09, 10, 11, 12                 |
+| [0007](0007-upstream-lifecycle-and-agent-scopes.md)                 | Upstream lifecycle handoff, relationship kinds, and agent scopes   | accepted | ADR-0005; ARCH-06, 07, 09                       |
+| [0008](0008-agent-onboarding-entry-path.md)                         | Distinguish business creation from workspace adoption              | accepted | ARCH-07, 09, 11; U25                            |
+| [0009](0009-bespoke-design-foundations.md)                          | Bespoke design foundations in existing authorities                 | accepted | ARCH-03–09, ARCH-11–15; U9, U13, U18, U19       |
+| [0010](0010-first-run-honesty-owners.md)                            | First-run honesty owners for doctor, portfolio, and exclusions     | accepted | ARCH-07, 09; ADR-0005, 0007; U1, U4             |
+| [0011](0011-additive-public-business-plan-projection.md)            | Additive public business-plan projection                           | accepted | ARCH-09; U25; public `business.plan`            |
+| [0012](0012-context-first-agent-routing.md)                         | Context-first agent routing and thin host adapters                 | accepted | ARCH-02, 07, 09, 11                             |
+| [0013](0013-provider-integration-boundary.md)                       | Provider integrations implement canonical operations               | accepted | ARCH-03, 04, 06, 10, 11; #109                   |
+| [0014](0014-research-checkpoints-and-initialization-eligibility.md) | Research checkpoints do not grant initialization eligibility       | accepted | ARCH-07, 09, 10, 11, 15; #395, #397             |
 
 ## Write a record
 
@@ -44,4 +45,3 @@ roadmap's decision text in place.
 A record does not grant access, spend, deployment, store, or release authority.
 Founder-reserved decisions keep their existing boundary. A record can only note
 that such a decision is pending and who owns it.
-

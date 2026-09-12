@@ -389,6 +389,15 @@ function receiptSectionEntries(value: unknown): Array<{ sha256?: unknown }> {
   return value.filter((entry): entry is { sha256?: unknown } => Boolean(entry) && typeof entry === "object" && !Array.isArray(entry));
 }
 
+const RECEIPT_PLACEHOLDER_REASON = /^(?:<[^>]+>|specific reason|reason provided|as requested|not applicable|n\/a|none)$/iu;
+
+/** Length alone is not evidence: reject common receipt placeholders while allowing typed short explanations. */
+function hasSpecificReceiptReason(value: unknown): value is string {
+  if (typeof value !== "string") return false;
+  const reason = value.trim().replace(/\s+/gu, " ");
+  return reason.length >= 8 && !RECEIPT_PLACEHOLDER_REASON.test(reason);
+}
+
 function receiptHasComputedDigests(receipt: KnowledgeReceipt): boolean {
   if (!receipt || typeof receipt !== "object") return false;
   const files = [
@@ -491,7 +500,7 @@ export function validateKnowledgeReceipt(output: string, brief: NodeBrief, expec
   const usedKnowledge = new Set(mandatoryLoad.map((r) => r.path));
   for (const entry of conditional) {
     if (entry.decision !== "used" && entry.decision !== "not_applicable") issues.push(`conditionalKnowledge ${entry.id} has invalid decision`);
-    if (!entry.reason || entry.reason.trim().length < 8) issues.push(`conditionalKnowledge ${entry.id} needs a specific reason`);
+    if (!hasSpecificReceiptReason(entry.reason)) issues.push(`conditionalKnowledge ${entry.id} needs a specific reason, not a placeholder`);
     const route = brief.route.find((r) => `${r.packId}:${r.path}` === entry.id);
     if (entry.decision === "used") {
       if (route) usedKnowledge.add(route.path);
@@ -511,7 +520,7 @@ export function validateKnowledgeReceipt(output: string, brief: NodeBrief, expec
     );
     for (const entry of entries) {
       if (!["used", "fallback", "not_applicable"].includes(entry.decision)) issues.push(`${name} ${entry.id} has invalid decision`);
-      if (!entry.reason || entry.reason.trim().length < 8) issues.push(`${name} ${entry.id} needs a specific reason`);
+      if (!hasSpecificReceiptReason(entry.reason)) issues.push(`${name} ${entry.id} needs a specific reason, not a placeholder`);
       if ((entry.decision === "used" || entry.decision === "fallback") && (!entry.evidence || entry.evidence.trim().length < 4))
         issues.push(`${name} ${entry.id} ${entry.decision} needs concrete evidence`);
     }

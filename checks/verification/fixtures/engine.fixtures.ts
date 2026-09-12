@@ -3004,6 +3004,20 @@ export function register(harness: Harness): void {
     };
     const receipt = `BEGIN_KNOWLEDGE_RECEIPT\n${JSON.stringify(receiptBody)}\nEND_KNOWLEDGE_RECEIPT`;
     assert(validateKnowledgeReceipt(receipt, brief, expectations).length === 0, "an exact structured knowledge receipt must pass");
+    const placeholderReceipt = {
+      ...receiptBody,
+      conditionalKnowledge: brief.route.map((entry) => ({
+        id: `${entry.packId}:${entry.path}`,
+        decision: "not_applicable" as const,
+        reason: "<specific reason>",
+      })),
+    };
+    assert(
+      validateKnowledgeReceipt(`BEGIN_KNOWLEDGE_RECEIPT\n${JSON.stringify(placeholderReceipt)}\nEND_KNOWLEDGE_RECEIPT`, brief, expectations).some((issue) =>
+        issue.includes("needs a specific reason, not a placeholder"),
+      ),
+      "a placeholder that clears the legacy length threshold must still be rejected",
+    );
     const priorApprovedReceipt = `BEGIN_KNOWLEDGE_RECEIPT\n${JSON.stringify({
       ...receiptBody,
       authorizationDigest: authorizationDigest(approvedAuthorization),

@@ -3,9 +3,12 @@ import assert from "node:assert/strict";
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { tmpdir } from "node:os";
+import { parse, stringify } from "yaml";
 import { callPublicOperation } from "../../../kernel/services/business.js";
 import { recordResearchDecision } from "../../../kernel/services/research-decision.js";
 import { workspaceRevision } from "../../../kernel/session/workspace-revision.js";
+import { loadProductInstanceDocument, productYamlPath } from "../../../catalog/ontology/instance-load.js";
+import { renderProductMarkdown } from "../../../catalog/ontology/render-product.js";
 
 function setup() {
   const temp = mkdtempSync(path.join(tmpdir(), "b2c-research-decision-"));
@@ -117,6 +120,64 @@ test("research decision previews, applies once, and replays without duplicating 
     if (previousHome === undefined) delete process.env.B2C_APP_BUILDER_HOME;
     else process.env.B2C_APP_BUILDER_HOME = previousHome;
     assert(!existsSync(path.join(env.directory, "control", "control.json")));
+    rmSync(env.temp, { recursive: true, force: true });
+  }
+});
+
+test("a Pivot checkpoint holds initialization until an explicit Go continuation is accepted", () => {
+  const env = setup();
+  const previousHome = process.env.B2C_APP_BUILDER_HOME;
+  process.env.B2C_APP_BUILDER_HOME = env.home;
+  try {
+    const created = callPublicOperation("business.create", {
+      workspaceId: "app",
+      directory: env.directory,
+      name: "Useful Habit",
+      hypothesis: "A repeated consumer need",
+    });
+    assert(created.ok, JSON.stringify(created));
+
+    const pivot = callPublicOperation("business.research.decision", {
+      workspaceId: "app",
+      expectedRevision: workspaceRevision(env.directory),
+      decisionId: "pivot-hold",
+      verdict: "Pivot",
+      rationale: "Narrow the audience before accepting a build direction.",
+      findingIds: [],
+      apply: true,
+    });
+    assert(pivot.ok, JSON.stringify(pivot));
+    const held = callPublicOperation("business.plan", { workspaceId: "app" });
+    assert(held.ok, JSON.stringify(held));
+    assert.equal(held.data.status, "not_initialized");
+    assert.equal(held.data.completion.deliveryAccepted, false);
+    assert(!callPublicOperation("business.initialize", { workspaceId: "app", expectedRevision: held.data.revision }).ok);
+
+    const go = callPublicOperation("business.research.decision", {
+      workspaceId: "app",
+      expectedRevision: held.data.revision,
+      decisionId: "go-after-pivot",
+      verdict: "Go",
+      rationale: "The narrower audience now has a clear, testable wedge.",
+      findingIds: [],
+      apply: true,
+    });
+    assert(go.ok, JSON.stringify(go));
+    const productPath = productYamlPath(env.directory);
+    const product = parse(readFileSync(productPath, "utf8"));
+    product.meta.status = "accepted";
+    writeFileSync(productPath, stringify(product));
+    writeFileSync(path.join(env.directory, "PRODUCT.md"), renderProductMarkdown(loadProductInstanceDocument(productPath)));
+    const initialized = callPublicOperation("business.initialize", {
+      workspaceId: "app",
+      expectedRevision: workspaceRevision(env.directory),
+    });
+    assert(initialized.ok, JSON.stringify(initialized));
+    assert.equal(initialized.data.status, "initialized");
+  } finally {
+    if (previousHome === undefined) delete process.env.B2C_APP_BUILDER_HOME;
+    else process.env.B2C_APP_BUILDER_HOME = previousHome;
+    assert(existsSync(path.join(env.directory, "control", "control.json")));
     rmSync(env.temp, { recursive: true, force: true });
   }
 });

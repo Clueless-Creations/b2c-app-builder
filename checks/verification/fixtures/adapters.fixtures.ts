@@ -20,6 +20,7 @@ import {
   crontabHasSignature,
   crontabSignature,
   launchdLabel,
+  launchdPlistHasLabel,
   launchdPlistPath,
   renderCrontabLine,
   renderLaunchdPlist,
@@ -413,6 +414,8 @@ export function register(harness: Harness): void {
     assert(plist.ok, `expected a supported schedule to render, got: ${JSON.stringify(plist)}`);
     if (plist.ok) {
       assert(plist.xml.includes(launchdLabel(options)), "expected the plist to carry its own Label");
+      assert(launchdPlistHasLabel(plist.xml, launchdLabel(options)), "readback must recognize only the exact managed LaunchAgent label");
+      assert(!launchdPlistHasLabel(plist.xml, launchdLabel({ ...options, runtime: "cursor" })), "readback must not mistake another runtime's job for ours");
       assert(plist.xml.includes("StartInterval") && plist.xml.includes("900"), "expected a 900-second StartInterval");
       assert(plist.xml.includes(options.wrapperPath), "expected ProgramArguments to reference the wrapper script");
     }

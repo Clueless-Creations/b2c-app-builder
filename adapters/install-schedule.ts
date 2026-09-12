@@ -13,7 +13,7 @@
  *       --schedule "(every 30 min, 5-field cron)" --brief <path/to/brief.json> [--mechanism cron|launchd] \
  *       [--wall-clock-seconds 1800] [--skill-root <path>] [--apply] [--uninstall]
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import { spawnSync } from "node:child_process";
@@ -151,6 +151,11 @@ export function launchdLabel(options: Pick<ScheduleOptions, "workspaceSlug" | "r
 
 export function launchdPlistPath(options: Pick<ScheduleOptions, "workspaceSlug" | "runtime">, homeDir = os.homedir()): string {
   return path.join(homeDir, "Library", "LaunchAgents", `${launchdLabel(options)}.plist`);
+}
+
+/** Read-only readback for a managed LaunchAgent; does not accept a plist for another job. */
+export function launchdPlistHasLabel(xml: string, label: string): boolean {
+  return xml.includes(`<key>Label</key><string>${label}</string>`);
 }
 
 export type LaunchdPlistResult = { ok: true; xml: string } | { ok: false; error: string };
@@ -332,19 +337,26 @@ function runMain(): void {
   if (uninstall) {
     for (const target of [plistPath]) {
       if (existsSync(target)) {
-        spawnSync("launchctl", ["unload", target], { encoding: "utf8" });
-        spawnSync("rm", ["-f", target], { encoding: "utf8" });
+        const unloaded = spawnSync("launchctl", ["unload", target], { encoding: "utf8" });
+        if (unloaded.status !== 0) fail(`launchctl unload failed: ${unloaded.stderr || unloaded.stdout || `exit ${String(unloaded.status)}`}`);
+        unlinkSync(target);
       }
     }
-    console.log(`install-schedule: removed the launchd job for ${options.workspaceSlug}/${options.runtime}.`);
+    if (existsSync(plistPath)) fail(`launchd readback did not confirm removal for ${options.workspaceSlug}/${options.runtime}`);
+    console.log(`install-schedule: removed and verified the launchd job for ${options.workspaceSlug}/${options.runtime}.`);
     return;
   }
   mkdirSync(path.dirname(options.wrapperPath), { recursive: true });
   writeFileSync(options.wrapperPath, renderWrapperScript(options), { mode: 0o755 });
   mkdirSync(path.dirname(plistPath), { recursive: true });
   writeFileSync(plistPath, plist.xml);
-  spawnSync("launchctl", ["load", plistPath], { encoding: "utf8" });
-  console.log(`install-schedule: installed the launchd job for ${options.workspaceSlug}/${options.runtime}.${sandboxSuffix}`);
+  const loaded = spawnSync("launchctl", ["load", plistPath], { encoding: "utf8" });
+  if (loaded.status !== 0) fail(`launchctl load failed: ${loaded.stderr || loaded.stdout || `exit ${String(loaded.status)}`}`);
+  const installedXml = readFileSync(plistPath, "utf8");
+  if (!launchdPlistHasLabel(installedXml, launchdLabel(options))) {
+    fail(`launchd readback did not confirm the managed label for ${options.workspaceSlug}/${options.runtime}`);
+  }
+  console.log(`install-schedule: installed and verified the launchd job for ${options.workspaceSlug}/${options.runtime}.${sandboxSuffix}`);
 }
 
 if (isMainModule(import.meta.url)) {

@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.30",
+  "version": "0.220.31",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Verify managed launchd schedule installation and removal through exact label and file readback.",
     "Refresh the evidence-schema fingerprint after rendering the authority-matrix projections.",
     "Reject denied founder mandates before a full-launch dispatch can reach the execution frontier.",
     "Adopt Brigade as the human-facing product name while preserving stable technical identities.",

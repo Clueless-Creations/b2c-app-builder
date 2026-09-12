@@ -542,6 +542,17 @@ export const researchRecordInputSchema = businessStatusInputSchema.extend({
   expectedRevision: lifecycleRevisionSchema,
   observation: researchObservationInputSchema,
 });
+export const researchDecisionInputSchema = businessStatusInputSchema.extend({
+  expectedRevision: lifecycleRevisionSchema,
+  decisionId: z.string().regex(/^[a-z0-9][a-z0-9._-]{0,63}$/),
+  verdict: z.enum(["Go", "Pivot", "Kill"]),
+  rationale: z.string().min(1).max(8192),
+  findingIds: z
+    .array(z.string().regex(/^[a-z0-9][a-z0-9._-]{0,63}$/))
+    .max(64)
+    .default([]),
+  apply: z.boolean().default(false),
+});
 export const researchLookupSchema = z.strictObject({
   workspaceId: z.string(),
   revision: lifecycleRevisionSchema,
@@ -559,6 +570,20 @@ export const researchRecordedSchema = z.strictObject({
   sha256: z.string(),
   authorityGranted: z.literal(false),
   acceptedProof: z.literal(false),
+});
+export const researchDecisionSchema = z.strictObject({
+  workspaceId: z.string(),
+  revision: lifecycleRevisionSchema,
+  decisionId: z.string(),
+  proposalDigest: lifecycleRevisionSchema,
+  verdict: z.enum(["Go", "Pivot", "Kill"]),
+  findingIds: z.array(z.string()),
+  initializationEligible: z.literal(false),
+  authorityGranted: z.literal(false),
+  applied: z.boolean(),
+  replayed: z.boolean(),
+  affectedFiles: z.array(z.string()),
+  unresolvedObligations: z.array(z.string()),
 });
 
 export const PUBLIC_OPERATIONS = [
@@ -583,6 +608,17 @@ export const PUBLIC_OPERATIONS = [
     inputSchema: researchRecordInputSchema,
     outputSchema: resultSchema(researchRecordedSchema),
     flags: ["workspace", "revision", "observation", "json"],
+  },
+  {
+    id: "business.research.decision",
+    cli: "research-decision",
+    mcp: null,
+    title: "Preview or record a research decision",
+    description:
+      "Preview by default or apply one revision-bound planning checkpoint to product.yaml and rendered PRODUCT.md. It never grants authority or makes initialization eligible; replay, stale inputs, duplicate YAML keys, and inconsistent product mirrors refuse before writes.",
+    inputSchema: researchDecisionInputSchema,
+    outputSchema: resultSchema(researchDecisionSchema),
+    flags: ["workspace", "revision", "decision-id", "verdict", "rationale", "finding-ids", "apply", "json"],
   },
   {
     id: "catalog.list",

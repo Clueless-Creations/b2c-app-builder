@@ -1,4 +1,5 @@
 import { lookupResearch, recordResearch } from "./research.js";
+import { recordResearchDecision } from "./research-decision.js";
 import * as lifecycleService from "./lifecycle.js";
 import type { SessionHost } from "../session/run.js";
 import * as localComposition from "./installed-composition.js";
@@ -374,6 +375,8 @@ export function callPublicOperation(operation: OperationId, input: unknown, host
       return respond(() => publicSchemas.researchLookupSchema.parse(lookupResearch(publicSchemas.researchLookupInputSchema.parse(input))));
     case "business.research.record":
       return respond(() => publicSchemas.researchRecordedSchema.parse(recordResearch(publicSchemas.researchRecordInputSchema.parse(input))));
+    case "business.research.decision":
+      return respond(() => publicSchemas.researchDecisionSchema.parse(recordResearchDecision(publicSchemas.researchDecisionInputSchema.parse(input))));
     case "business.create":
       return createBusinessOperation(input);
     case "business.initialize":

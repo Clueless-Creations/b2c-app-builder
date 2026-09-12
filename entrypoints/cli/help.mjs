@@ -13,6 +13,10 @@ export const COMMANDS = new Map([
     "research-record",
     { script: "entrypoints/cli/business.ts", prefixArgs: ["research-record"], summary: "revision-checked checkpoint for registered planning research" },
   ],
+  [
+    "research-decision",
+    { script: "entrypoints/cli/business.ts", prefixArgs: ["research-decision"], summary: "preview or record one guarded planning decision" },
+  ],
   ["business-create", { script: "entrypoints/cli/business.ts", prefixArgs: ["business-create"], summary: "b2c/v1: create a registered hypothesis" }],
   ["business-initialize", { script: "entrypoints/cli/business.ts", prefixArgs: ["business-initialize"], summary: "b2c/v1: initialize accepted product" }],
   ["business-plan", { script: "entrypoints/cli/business.ts", prefixArgs: ["business-plan"], summary: "b2c/v1: passive authorized work preview" }],
@@ -148,7 +152,10 @@ export const HELP_SECTIONS = [
   {
     heading: "Build and run a business — product work and lifecycle",
     clusters: [
-      { label: "Business lifecycle (normal supported path)", commands: ["business-create", "business-initialize", "business-plan", "business-run", "business-status", "business-recover"] },
+      {
+        label: "Business lifecycle (normal supported path)",
+        commands: ["business-create", "business-initialize", "business-plan", "business-run", "business-status", "business-recover"],
+      },
       { label: "Research and operations", commands: ["research-lookup", "research-record", "operate", "market-report", "render-product"] },
       {
         label: "Advanced session controls (supported; not aliases of business-* commands)",
@@ -250,12 +257,6 @@ export function renderUsage(commands = COMMANDS) {
       HELP_WRAP_COLUMNS,
     ),
   );
-  lines.push(
-    wrapRow(
-      "",
-      "They do not install tools, approve a release, or accept --json or a command-specific --help flag.",
-      HELP_WRAP_COLUMNS,
-    ),
-  );
+  lines.push(wrapRow("", "They do not install tools, approve a release, or accept --json or a command-specific --help flag.", HELP_WRAP_COLUMNS));
   return lines.join("\n");
 }

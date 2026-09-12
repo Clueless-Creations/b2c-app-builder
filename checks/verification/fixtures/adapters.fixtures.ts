@@ -505,6 +505,8 @@ export function register(harness: Harness): void {
       assert(script.includes("createCursorProfile"), `expected the wrapper to import the cursor profile factory, got:\n${script}`);
       assert(script.includes("adapters/cursor.ts"), "expected the wrapper to import from the cursor adapter module, not a duplicated copy");
       assert(script.includes("wrapWithWallClock"), "expected the wrapper to reuse the shared wall-clock wrapper, not reimplement timeout logic");
+      assert(script.includes("kernel/session/catalog-contract.ts"), "expected the wrapper to use the canonical workspace catalog compatibility owner");
+      assert(script.indexOf("const compatible") < script.indexOf("const result = spawnSync"), "expected catalog compatibility to be checked before the scheduled worker is spawned");
       assert(script.includes(JSON.stringify(options.workspaceDir)), "expected the workspace dir to be baked into the wrapper");
       assert(script.includes(String(options.wallClockSeconds)), "expected the wall-clock cap to be baked into the wrapper");
     },

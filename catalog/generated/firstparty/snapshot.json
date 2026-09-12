@@ -15912,7 +15912,7 @@
     "knowledge/words/conversion-copy.md": "68739b91f0f977f28718f48dd2368bb8c59a03a3f3d44a30efa08d12eb2956ab",
     "knowledge/words/no-slop-writing.md": "4dcb9d8a78fcee18daa5b46ced399f8b41992853141ff3a9e9b1906d263a98cb",
     "checks/validation/repository/audit-skill-links.ts": "781b1715e075b59ce673fbefad9bacab29eceb93e9f96ef60944bfda884eaf5c",
-    "package.json": "73bf6164d3753741a7741af31970ca8d342dc71a10cee4c910a04163110030d7",
+    "package.json": "5aec3b5ed34f121c43372550774ad86bcc7bf6186c96e94f71ee9e47a8e1afc2",
     "tooling/catalog-scaffold.ts": "6a54386c9259c97834599249115b0dd82308c16e2c9bb35c02f3058280467077",
     "catalog/render-routing.ts": "938e29aaed5cf37c03afe8a2cf755af35b8921ad5ca86fd54968095291c2898c",
     "checks/validation/repository/check-agent-entrypoints.ts": "8a957ccc003419e861ecf655870c07b6b20eee27b6e55a6cdbe9824509450dd9",
@@ -16225,5 +16225,5 @@
     "catalog/upstreams/notices/parth-app-store-screenshots.txt": "a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a"
   },
   "dependencies": [],
-  "digest": "sha256:c6fcc9cdfe27dd2788376fc7ee9050aa421206b6c0b56dca3f585e6d9b079a80"
+  "digest": "sha256:814dfee0a1ad2b2f33ba6495a764799f5cd0419fd5df08525ce9a9468c6cbcca"
 }

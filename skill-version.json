@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.58",
+  "version": "0.220.59",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Verify remote-effect uncertainty survives fresh-process resume without duplicating the effect or reopening the frontier.",
     "Verify unselected scheduling stays parked across resume while explicit selection reaches only the approved effect boundary.",
     "Bound receipt-only repair to one continuation while preserving unaccepted candidate output provenance.",
     "Verify an approved full-launch mandate survives persisted run-state reload and re-enters without duplicate approval records.",

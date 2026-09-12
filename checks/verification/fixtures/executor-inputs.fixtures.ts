@@ -102,8 +102,14 @@ const prompt = process.argv.at(-1);
 const begin = 'BEGIN_KNOWLEDGE_RECEIPT';
 const end = 'END_KNOWLEDGE_RECEIPT';
 const receipt = JSON.parse(prompt.slice(prompt.lastIndexOf(begin) + begin.length, prompt.lastIndexOf(end)).trim());
+const receiptRepair = prompt.includes('RECEIPT-ONLY REPAIR');
+if (!receiptRepair && fs.existsSync(${JSON.stringify(path.join(workspace, "invalid-receipt"))})) {
+  console.log('worker completed the task, but its receipt transport was invalid');
+  process.exit(0);
+}
 for (const item of receipt.outputEvidence) {
   fs.writeFileSync(item.outputPath, 'Independent findings for the current candidate.');
+  if (receiptRepair) fs.appendFileSync(item.outputPath, '\\nreceipt repair mutation');
   item.knowledgePaths = receipt.mandatoryKnowledge.map(entry => entry.path);
   item.summary = 'Inspected all frozen reference and rubric files and wrote findings.';
 }
@@ -131,6 +137,14 @@ const context = { runId: 'run', attemptId: 'attempt', workspaceDir: ${JSON.strin
   writeFileSync(${JSON.stringify(path.join(workspace, "mutate-reference"))}, 'yes');
   const changed = await executor.execute(node, context);
   if (changed.status !== 'failed' || !changed.error?.includes('inventory changed')) throw new Error('Changed input was accepted: ' + JSON.stringify(changed));
+  writeFileSync(${JSON.stringify(path.join(workspace, "invalid-receipt"))}, 'yes');
+  const receiptFailure = await executor.execute(node, context);
+  if (
+    receiptFailure.status !== 'failed' ||
+    !receiptFailure.error?.startsWith('worker knowledge receipt rejected:') ||
+    receiptFailure.outputs.length !== 1
+  )
+    throw new Error('Receipt repair did not preserve the candidate snapshot: ' + JSON.stringify(receiptFailure));
   console.log('directory dispatch and stale refusal proved');
 })();
 `,

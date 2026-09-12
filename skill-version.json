@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.27",
+  "version": "0.220.28",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Route local planning capability through the canonical connection-surface selector before exposing it to MCP callers.",
     "Add Quabble as a founder-selected consumer craft reference with explicit evidence limits.",
     "Add a source-and-fixture-only Postiz API extension boundary without live provider access.",
     "Verify managed cron schedule state after apply and uninstall readback.",

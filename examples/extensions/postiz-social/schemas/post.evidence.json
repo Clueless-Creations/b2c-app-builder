@@ -1,0 +1,13 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "provider": { "const": "postiz" },
+    "transport": { "const": "api" },
+    "evidenceKind": { "enum": ["official-example", "fake-transport", "live-provider"] },
+    "requestShapeReviewed": { "type": "boolean" },
+    "responseShapeReviewed": { "type": "boolean" },
+    "liveVerified": { "type": "boolean" }
+  },
+  "required": ["provider", "transport", "evidenceKind", "requestShapeReviewed", "responseShapeReviewed", "liveVerified"]
+}

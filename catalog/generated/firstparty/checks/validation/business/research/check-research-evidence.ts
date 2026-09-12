@@ -643,7 +643,7 @@ function validateSignalCorpus(value: string | undefined, target: ReturnType<type
       const inputId = (cells[0] ?? "").toUpperCase();
       const complete =
         /^INPUT-[A-Z0-9][A-Z0-9-]*$/.test(inputId) &&
-        cells.slice(1).every((cell) => cell.length > 0 && !placeholder.test(cell)) &&
+        cells.slice(1).every((cell) => cell.length > 0 && !isPlaceholderOnly(cell)) &&
         isValidPastIsoDateRange(cells[4] ?? "") &&
         !declaredInputIds.has(inputId);
       if (!complete) {
@@ -658,7 +658,7 @@ function validateSignalCorpus(value: string | undefined, target: ReturnType<type
         const inputId = (cells[0] ?? "").toUpperCase();
         return !(
           /^INPUT-[A-Z0-9][A-Z0-9-]*$/.test(inputId) &&
-          cells.slice(1).every((cell) => cell.length > 0 && !placeholder.test(cell)) &&
+          cells.slice(1).every((cell) => cell.length > 0 && !isPlaceholderOnly(cell)) &&
           isValidPastIsoDateRange(cells[4] ?? "") &&
           !declaredInputIds.has(inputId)
         );
@@ -721,13 +721,13 @@ function validateSignalCorpus(value: string | undefined, target: ReturnType<type
       const rowComplete =
         /^SIG-[A-Z0-9][A-Z0-9-]*$/.test(id) &&
         type.length > 0 &&
-        !placeholder.test(type) &&
+        !isPlaceholderOnly(type) &&
         claim.length > 0 &&
         !isPlaceholderOnly(claim) &&
         appliesTo.length > 0 &&
-        !placeholder.test(appliesTo) &&
+        !isPlaceholderOnly(appliesTo) &&
         trace.length > 0 &&
-        !placeholder.test(trace) &&
+        !isPlaceholderOnly(trace) &&
         isValidPastIsoDate(observedAt) &&
         /^(low|medium|high)$/i.test(confidence) &&
         /^(current|dated|superseded|rejected|unverified)$/.test(lifecycle) &&
@@ -783,7 +783,7 @@ function validateSignalCorpus(value: string | undefined, target: ReturnType<type
           sourceIds.validSyntax &&
           sourceIds.ids.length > 0 &&
           sourceIds.ids.every((sourceId) => declaredInputIds.has(sourceId)) &&
-          [cells[1] ?? "", cells[5] ?? "", cells[9] ?? ""].every((cell) => cell.length > 0 && !placeholder.test(cell))
+          [cells[1] ?? "", cells[5] ?? "", cells[9] ?? ""].every((cell) => cell.length > 0 && !isPlaceholderOnly(cell))
         );
       });
       target.push(

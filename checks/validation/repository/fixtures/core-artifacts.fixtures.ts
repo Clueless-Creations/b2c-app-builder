@@ -891,7 +891,7 @@ export function register(h: Harness): void {
     const signalPath = path.join(researchSignalUnverifiedCoexists, "strategy/SIGNAL_CORPUS.md");
     const signal = readFileSync(signalPath, "utf8").replace(
       "| SIG-001 | customer language | I lose the streak and stop opening the app | INPUT-001 | 2026-07-20 | product promise and retention | high | current | none | strategy/RESEARCH.md / TRACE-002 |",
-      "| SIG-001 | customer language | I lose the streak and stop opening the app | INPUT-001 | 2026-07-20 | product promise and retention | high | current | none | strategy/RESEARCH.md / TRACE-002 |\n| SIG-002 | founder report | A weekly review may help recover a missed day | INPUT-001 | 2026-07-20 | later retention experiment | low | unverified | none | strategy/RESEARCH.md / TRACE-004 |",
+      "| SIG-001 | customer language | I lose the streak and stop opening the app | INPUT-001 | 2026-07-20 | product promise and retention | high | current | none | strategy/RESEARCH.md / TRACE-002 |\n| SIG-002 | founder report | A weekly review may help recover a missed day pending approval | INPUT-001 | 2026-07-20 | later retention experiment pending approval | low | unverified | none | strategy/RESEARCH.md / TRACE-004 |",
     );
     writeFileSync(signalPath, signal, "utf8");
   }
@@ -2559,7 +2559,7 @@ export function register(h: Harness): void {
   );
 
   // Later table rows win date ties: a same-day follow-up Kill supersedes the
-  // Go recorded above it, so a completed research lane must fail.
+  // Go recorded above it, so the completed lane reports a held non-Go checkpoint.
   const researchSameDayReversal = makeFixture("research-same-day-reversal");
   setLaneDone(researchSameDayReversal, "research", ["strategy/RESEARCH.md"]);
   seedResearchEvidence(researchSameDayReversal);
@@ -2573,7 +2573,7 @@ export function register(h: Harness): void {
     "same-day follow-up verdict supersedes the earlier row",
     researchSameDayReversal,
     "check-research-evidence.ts",
-    1,
+    0,
     "research.go_pivot_kill_not_go",
   );
 

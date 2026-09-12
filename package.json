@@ -1,6 +1,6 @@
 {
   "name": "b2c-app-builder",
-  "version": "0.220.23",
+  "version": "0.220.24",
   "description": "Consumer-business primitives for AI agents: capabilities, providers, recipes, and evidence through a CLI, MCP, and skill.",
   "keywords": [
     "mcp",

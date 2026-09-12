@@ -364,9 +364,12 @@ export function register(harness: Harness): void {
 
     const foreignLine = "0 3 * * * /usr/bin/some-other-job.sh # unrelated";
     const foreignContainsManagedText = `0 4 * * * echo "# ${crontabSignature(options)}" # unrelated`;
-    const installed = applyCrontabInstall(`${foreignLine}\n${foreignContainsManagedText}\n`, options);
+    const otherWorkspaceOptions: ScheduleOptions = { ...options, workspaceSlug: "other-workspace" };
+    const otherWorkspaceLine = renderCrontabLine(otherWorkspaceOptions);
+    const installed = applyCrontabInstall(`${foreignLine}\n${foreignContainsManagedText}\n${otherWorkspaceLine}\n`, options);
     assert(installed.nextContent.includes(foreignLine), "install must preserve a pre-existing foreign crontab line");
     assert(installed.nextContent.includes(foreignContainsManagedText), "install must preserve managed-looking text inside a foreign command");
+    assert(installed.nextContent.includes(otherWorkspaceLine), "install must preserve another workspace's managed entry");
     assert(installed.nextContent.includes(line), "install must add our line");
     assert(crontabHasSignature(installed.nextContent, crontabSignature(options)), "readback must recognize the managed entry by its exact signature");
     assert(crontabHasExactLine(installed.nextContent, line), "readback must recognize the exact requested cadence/runtime/target line");
@@ -374,7 +377,7 @@ export function register(harness: Harness): void {
       !crontabHasExactLine(installed.nextContent, renderCrontabLine({ ...options, schedule: "*/15 * * * *" })),
       "a concurrent cadence change must not pass exact-line readback",
     );
-    assert(!crontabHasSignature(installed.nextContent, "b2c:other-workspace:claude"), "readback must not mistake another workspace's entry for ours");
+    assert(crontabHasSignature(installed.nextContent, crontabSignature(otherWorkspaceOptions)), "readback must preserve another workspace's entry without treating it as ours");
 
     // Reinstalling with a different schedule replaces (never duplicates) our own line.
     const changedOptions: ScheduleOptions = { ...options, schedule: "0 * * * *" };
@@ -394,8 +397,8 @@ export function register(harness: Harness): void {
 
     const uninstalled = applyCrontabUninstall(installed.nextContent, options);
     assert(
-      uninstalled.nextContent === `${foreignLine}\n${foreignContainsManagedText}\n`,
-      `expected uninstall to leave exactly the foreign line, got: ${JSON.stringify(uninstalled.nextContent)}`,
+      uninstalled.nextContent === `${foreignLine}\n${foreignContainsManagedText}\n${otherWorkspaceLine}\n`,
+      `expected uninstall to leave unrelated and other-workspace entries, got: ${JSON.stringify(uninstalled.nextContent)}`,
     );
     assert(uninstalled.removed.length === 1 && uninstalled.removed[0] === line, "expected uninstall to report exactly the one line it removed");
 

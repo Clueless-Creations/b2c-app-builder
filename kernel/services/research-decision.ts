@@ -66,6 +66,25 @@ function readUtf8(root: string, relative: string): string {
   return readFileSync(file, "utf8");
 }
 
+function resolvedFindingIds(root: string): Set<string> {
+  const text = readUtf8(root, "strategy/RED_TEAM_FINDINGS.md");
+  const ids = new Set<string>();
+  let tableHasFindingId = false;
+  for (const line of text.split(/\r?\n/)) {
+    const labeled = line.match(/^\s*(?:[-*]\s*)?Finding ID\s*[:|]\s*([^|\s]+)\s*\|?\s*$/i);
+    if (labeled?.[1] && DECISION_ID.test(labeled[1])) ids.add(labeled[1]);
+    if (line.trim().startsWith("|") && /finding\s+id/i.test(line)) {
+      tableHasFindingId = true;
+      continue;
+    }
+    if (tableHasFindingId && line.trim().startsWith("|")) {
+      const firstCell = line.split("|")[1]?.trim();
+      if (firstCell && !/^[-:]+$/.test(firstCell) && DECISION_ID.test(firstCell)) ids.add(firstCell);
+    }
+  }
+  return ids;
+}
+
 function parseProduct(root: string, text: string) {
   let document: YAML.Document;
   try {
@@ -90,6 +109,11 @@ function prepare(root: string, input: DecisionInput): Proposal {
   if (!DECISION_ID.test(input.decisionId)) throw new Error("business.research_decision_id_invalid");
   if (!input.rationale.trim() || input.rationale.length > MAX_TEXT) throw new Error("business.research_decision_rationale_invalid");
   if (input.findingIds.some((id) => !DECISION_ID.test(id))) throw new Error("business.research_decision_finding_id_invalid");
+  if (input.findingIds.length > 0) {
+    const availableFindingIds = resolvedFindingIds(root);
+    const unknownFindingIds = [...new Set(input.findingIds)].filter((id) => !availableFindingIds.has(id));
+    if (unknownFindingIds.length > 0) throw new Error("business.research_decision_finding_id_unresolved");
+  }
   const productBefore = readUtf8(root, "product.yaml");
   const { document, product, rendered: renderedBefore } = parseProduct(root, productBefore);
   const canonical = JSON.stringify({

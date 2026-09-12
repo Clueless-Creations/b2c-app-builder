@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.13",
+  "version": "0.220.14",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Bind research decision finding IDs to the current red-team artifact before authoring.",
     "Explain the research contract through the read-only check surface with checkpoint and safety boundaries.",
     "Add a revision-bound research decision preview/apply action with replay, stale-input, duplicate-key, and recoverable mirror guards.",
     "Keep valid Pivot and Kill research checkpoints distinct from initialization eligibility.",

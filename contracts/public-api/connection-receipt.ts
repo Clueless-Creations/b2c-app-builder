@@ -64,6 +64,8 @@ export type ConfiguredConnectionReading = {
 
 export type ConfiguredConnectionSet = {
   names: readonly string[];
+  engineVersions: readonly string[];
+  versionMismatch: boolean;
   bothConfigured: boolean;
   leftoverPointsAtLocal: boolean;
   leftoverPointsAtHosted: boolean;
@@ -171,15 +173,16 @@ export function parseConnectionReceipt(text: string): ConnectionReceipt {
   const marker = "Connection receipt: ";
   const start = text.indexOf(marker);
   if (start < 0) throw new Error("connection_receipt.missing");
-  const encoded = text.slice(start + marker.length).trim().split(/\r?\n/, 1)[0] ?? "";
+  const encoded =
+    text
+      .slice(start + marker.length)
+      .trim()
+      .split(/\r?\n/, 1)[0] ?? "";
   return connectionReceiptSchema.parse(JSON.parse(encoded));
 }
 
 /** Capability comes from the handshake receipt, not the leftover client name. */
-export function interpretConfiguredConnection(input: {
-  clientName: string;
-  receipt: ConnectionReceipt;
-}): ConfiguredConnectionReading {
+export function interpretConfiguredConnection(input: { clientName: string; receipt: ConnectionReceipt }): ConfiguredConnectionReading {
   const leftoverName = input.clientName === LEFTOVER_LOCAL_CLIENT_NAME;
   const capability = connectionCapabilityGuidance(input.receipt);
   const guidance = leftoverName
@@ -198,9 +201,7 @@ export function interpretConfiguredConnection(input: {
 
 function leftoverNameProse(receipt: ConnectionReceipt, capability: string): string {
   const leftover = interpretConfiguredConnection({ clientName: LEFTOVER_LOCAL_CLIENT_NAME, receipt });
-  return leftover.guidance.endsWith(capability)
-    ? leftover.guidance.slice(0, leftover.guidance.length - capability.length).trim()
-    : leftover.guidance;
+  return leftover.guidance.endsWith(capability) ? leftover.guidance.slice(0, leftover.guidance.length - capability.length).trim() : leftover.guidance;
 }
 
 function handshakeGuidance(clientName: string, receipt: ConnectionReceipt): string {
@@ -236,12 +237,7 @@ export function localMcpInstructions(input: {
 
 export function hostedMcpInstructionsSuffix(engineVersion: string, clientName: string = HOSTED_CLIENT_NAME): string {
   const receipt = connectionReceipt({ mode: "hosted_knowledge", engineVersion });
-  return (
-    " This connection is hosted knowledge (b2c-hosted). " +
-    handshakeGuidance(clientName, receipt) +
-    " " +
-    formatConnectionReceipt(receipt)
-  );
+  return " This connection is hosted knowledge (b2c-hosted). " + handshakeGuidance(clientName, receipt) + " " + formatConnectionReceipt(receipt);
 }
 
 export type ConfiguredConnectionEntry = {
@@ -251,17 +247,14 @@ export type ConfiguredConnectionEntry = {
 
 export function configuredConnectionSet(entries: readonly ConfiguredConnectionEntry[]): ConfiguredConnectionSet {
   const names = entries.map((entry) => entry.clientName);
+  const engineVersions = [...new Set(entries.map((entry) => entry.receipt.engineVersion))];
   return {
     names,
-    bothConfigured:
-      entries.some((entry) => entry.receipt.mode === "local_execution") &&
-      entries.some((entry) => entry.receipt.mode === "hosted_knowledge"),
-    leftoverPointsAtLocal: entries.some(
-      (entry) => entry.clientName === LEFTOVER_LOCAL_CLIENT_NAME && entry.receipt.mode === "local_execution",
-    ),
-    leftoverPointsAtHosted: entries.some(
-      (entry) => entry.clientName === LEFTOVER_LOCAL_CLIENT_NAME && entry.receipt.mode === "hosted_knowledge",
-    ),
+    engineVersions,
+    versionMismatch: engineVersions.length > 1,
+    bothConfigured: entries.some((entry) => entry.receipt.mode === "local_execution") && entries.some((entry) => entry.receipt.mode === "hosted_knowledge"),
+    leftoverPointsAtLocal: entries.some((entry) => entry.clientName === LEFTOVER_LOCAL_CLIENT_NAME && entry.receipt.mode === "local_execution"),
+    leftoverPointsAtHosted: entries.some((entry) => entry.clientName === LEFTOVER_LOCAL_CLIENT_NAME && entry.receipt.mode === "hosted_knowledge"),
     duplicateNames: names.length !== new Set(names).size,
   };
 }
@@ -281,29 +274,30 @@ function configuredSurfaceNeedLabel(need: ConfiguredSurfaceNeed, mode: Connectio
   return mode === "hosted_knowledge" ? "hosted knowledge" : "packaged knowledge";
 }
 
-function selectedSurfaceGuidance(
-  need: ConfiguredSurfaceNeed,
-  connection: ConfiguredConnectionReading,
-  receipt: ConnectionReceipt,
-): string {
+function selectedSurfaceGuidance(need: ConfiguredSurfaceNeed, connection: ConfiguredConnectionReading, receipt: ConnectionReceipt): string {
   if (need === "workspace_execution" && receipt.observed?.workspaceExecution === "unavailable") {
     return connection.guidance;
   }
   return `Use ${connection.clientName} for ${configuredSurfaceNeedLabel(need, connection.mode)}.`;
 }
 
+function withVersionDiagnostic(guidance: string, set: ConfiguredConnectionSet): string {
+  if (!set.versionMismatch) return guidance;
+  return `${guidance} Configured B2C connections report different engine versions (${set.engineVersions.join(", ")}); refresh the stale client or runtime before relying on cross-surface results. This is a compatibility warning, not provider proof.`;
+}
+
 /** Pick local vs hosted from declared receipts. Duplicate names are a collision, not a leftover third surface. */
-export function selectConfiguredSurface(input: {
-  entries: readonly ConfiguredConnectionEntry[];
-  need: ConfiguredSurfaceNeed;
-}): ConfiguredSurfaceSelection {
+export function selectConfiguredSurface(input: { entries: readonly ConfiguredConnectionEntry[]; need: ConfiguredSurfaceNeed }): ConfiguredSurfaceSelection {
   const set = configuredConnectionSet(input.entries);
   if (set.duplicateNames) {
     return {
       status: "collision",
       need: input.need,
       set,
-      guidance: `Duplicate B2C connection names are a collision, not a capability. Keep ${LOCAL_CLIENT_NAME} and ${HOSTED_CLIENT_NAME} as distinct names.`,
+      guidance: withVersionDiagnostic(
+        `Duplicate B2C connection names are a collision, not a capability. Keep ${LOCAL_CLIENT_NAME} and ${HOSTED_CLIENT_NAME} as distinct names.`,
+        set,
+      ),
     };
   }
   const local = pickConfiguredEntry(input.entries, "local_execution", LOCAL_CLIENT_NAME);
@@ -316,18 +310,21 @@ export function selectConfiguredSurface(input: {
         need: input.need,
         set,
         connection,
-        guidance: selectedSurfaceGuidance(input.need, connection, local.receipt),
+        guidance: withVersionDiagnostic(selectedSurfaceGuidance(input.need, connection, local.receipt), set),
       };
     }
     if (hosted) {
       const connection = interpretConfiguredConnection(hosted);
-      return { status: "wrong_surface", need: input.need, set, connection, guidance: connection.guidance };
+      return { status: "wrong_surface", need: input.need, set, connection, guidance: withVersionDiagnostic(connection.guidance, set) };
     }
     return {
       status: "unavailable",
       need: input.need,
       set,
-      guidance: `No B2C connection is configured for workspace planning or execution. Connect the local builder as ${LOCAL_CLIENT_NAME}.`,
+      guidance: withVersionDiagnostic(
+        `No B2C connection is configured for workspace planning or execution. Connect the local builder as ${LOCAL_CLIENT_NAME}.`,
+        set,
+      ),
     };
   }
   if (hosted) {
@@ -337,7 +334,7 @@ export function selectConfiguredSurface(input: {
       need: input.need,
       set,
       connection,
-      guidance: `Use ${connection.clientName} for ${configuredSurfaceNeedLabel(input.need, connection.mode)}.`,
+      guidance: withVersionDiagnostic(`Use ${connection.clientName} for ${configuredSurfaceNeedLabel(input.need, connection.mode)}.`, set),
     };
   }
   if (local && local.receipt.declares.knowledge === "bundled") {
@@ -347,14 +344,14 @@ export function selectConfiguredSurface(input: {
       need: input.need,
       set,
       connection,
-      guidance: `Use ${connection.clientName} for ${configuredSurfaceNeedLabel(input.need, connection.mode)}.`,
+      guidance: withVersionDiagnostic(`Use ${connection.clientName} for ${configuredSurfaceNeedLabel(input.need, connection.mode)}.`, set),
     };
   }
   return {
     status: "unavailable",
     need: input.need,
     set,
-    guidance: "No B2C knowledge connection is configured.",
+    guidance: withVersionDiagnostic("No B2C knowledge connection is configured.", set),
   };
 }
 
@@ -442,11 +439,7 @@ export function isHostedWrongSurfaceTool(name: string): name is HostedWrongSurfa
 }
 
 /** Wrong-surface local-only MCP names take capability from the hosted receipt, not a missing-tool guess. */
-export function hostedWrongSurfaceRefusal(input: {
-  engineVersion: string;
-  toolName: string;
-  clientName?: string;
-}): HostedWrongSurfaceRefusal {
+export function hostedWrongSurfaceRefusal(input: { engineVersion: string; toolName: string; clientName?: string }): HostedWrongSurfaceRefusal {
   return {
     error: "wrong_surface",
     toolName: input.toolName,
@@ -496,13 +489,7 @@ export function leftoverCliOnlyLocalRefusal(input: {
  * Read-only local MCP refuses them as cli_only with the local receipt reading.
  * Write-enabled local MCP registers them and does not intercept.
  */
-export const LOCAL_WRITE_GATED_LEFTOVER_TOOL_NAMES = [
-  "b2c_bootstrap",
-  "b2c_run",
-  "b2c_approvals",
-  "b2c_verify",
-  "b2c_schedule",
-] as const;
+export const LOCAL_WRITE_GATED_LEFTOVER_TOOL_NAMES = ["b2c_bootstrap", "b2c_run", "b2c_approvals", "b2c_verify", "b2c_schedule"] as const;
 
 export type LeftoverWriteGatedLocalToolName = (typeof LOCAL_WRITE_GATED_LEFTOVER_TOOL_NAMES)[number];
 

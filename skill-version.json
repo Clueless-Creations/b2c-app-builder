@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.68",
+  "version": "0.220.69",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Report configured cross-client engine-version mismatches without changing capability-based local versus hosted routing.",
     "Verify the packed runtime contains every canonical task skill and required root procedure without leaking maintainer, contributor, or environment files.",
     "Record the reproducible ten-case A0 baseline versus current candidate guidance replay while preserving the live Astra evidence hold.",
     "Reject duplicate research finding IDs before decision preview or apply writes any product artifact.",

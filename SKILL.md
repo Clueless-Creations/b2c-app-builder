@@ -16,9 +16,15 @@ Inspect the app's own instructions and affected surface. Open the matching task 
 <!-- catalog-generated:start task-skills -->
 | Task | Use when |
 | --- | --- |
-| [Research an opportunity](agents/skills/b2c-research-opportunity/SKILL.md) | Research whether a consumer-app idea is worth building. Compare demand, competitors, distribution, offer evidence, and product scope; recommend Go, Pivot, or Kill. Use for opportunity validation or delegated idea selection, not a narrow code fix or execution of an entire launch. |
-| [Design or review onboarding](agents/skills/b2c-design-onboarding/SKILL.md) | Design, review, or improve a consumer app's onboarding and first-value journey. Classify a focused audit, incremental change, or full redesign before selecting the relevant research, flow, state, accessibility, and verification guidance. Do not start a full rebuild for a small signup fix. |
-| [Review monetization](agents/skills/b2c-review-monetization/SKILL.md) | Review a consumer app's offer, pricing proposal, paywall, purchases, entitlements, restore behavior, and billing evidence. Use for a monetization audit or explicitly requested implementation. A review does not authorize live product changes, pricing changes, payments, or provider selection. |
+| [Research an opportunity](agents/skills/b2c-research-opportunity/SKILL.md) | Validate an app opportunity |
+| [Design or review onboarding](agents/skills/b2c-design-onboarding/SKILL.md) | Design or review onboarding |
+| [Review monetization](agents/skills/b2c-review-monetization/SKILL.md) | Review monetization |
+| [Define or refine a product](agents/skills/b2c-define-product/SKILL.md) | Define product scope |
+| [Plan implementation](agents/skills/b2c-plan-implementation/SKILL.md) | Plan implementation |
+| [Review business performance](agents/skills/b2c-review-business-performance/SKILL.md) | Review business performance |
+| [Review the app experience](agents/skills/b2c-review-experience/SKILL.md) | Review the app experience |
+| [Plan a launch](agents/skills/b2c-plan-launch/SKILL.md) | Plan a launch |
+| [Verify release readiness](agents/skills/b2c-verify-release-readiness/SKILL.md) | Verify release readiness |
 <!-- catalog-generated:end task-skills -->
 
 For another focused goal, select one workflow through the available knowledge tools or the [reference index](catalog/generated/routing.md). Read only its current instructions and relevant reference sections. With b2c_workflow, expand through route.expand and follow exact section selectors, revision hashes, and nextCall when incomplete. A summary does not prove complete guidance delivery.

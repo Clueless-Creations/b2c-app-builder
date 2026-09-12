@@ -32,7 +32,10 @@ void test("six public areas cover business domains without changing internal aut
 void test("pilot tasks project real workflow contracts without mutating the catalog", () => {
   const before = JSON.stringify(catalog);
   const files = renderTaskSkillFiles(catalog);
-  assert.equal(taskSkills.length, 3);
+  assert.equal(taskSkills.length, 9);
+  for (const name of ["b2c-research-opportunity", "b2c-design-onboarding", "b2c-review-monetization"]) {
+    assert.ok(taskSkills.some((skill) => skill.name === name));
+  }
   for (const skill of taskSkills) {
     const body = files[`${skillDirectory(skill)}/SKILL.md`]!;
     const frontmatter = parse(body.split("---")[1]!);
@@ -43,7 +46,7 @@ void test("pilot tasks project real workflow contracts without mutating the cata
     assert.equal(frontmatter["allowed-tools"], undefined);
     assert.ok(body.split("\n").length < 150);
     assert.ok(Buffer.byteLength(body) < 8000, `${skill.name} startup context grew`);
-    assert.ok(body.includes(workflowsForTask(catalog, skill)[0]!.instructions));
+    if (!skill.method) assert.ok(body.includes(workflowsForTask(catalog, skill)[0]!.instructions));
     assert.doesNotMatch(body, /RevenueCat|Stripe|PostHog|AppKittie|XPOZ|Firecrawl|mcp__|claude -p|codex exec/u);
     assert.match(body, /A review is read-only/);
     assert.match(body, /business-status then business-plan/);

@@ -1,4 +1,5 @@
 import path from "node:path";
+import { readFileSync } from "node:fs";
 import { publicBusinessAreas } from "./areas.js";
 import type { Catalog, CatalogWorkflowDef } from "./types.js";
 
@@ -9,6 +10,11 @@ export interface TaskSkill {
   description: string;
   workflowId: string;
   groupId?: string;
+  /** Presentation-only placement; runtime domain and workflow ownership stay canonical. */
+  publicArea?: (typeof publicBusinessAreas)[number]["slug"];
+  routeCue?: string;
+  /** Exact, manifest-backed method selection for focused use. */
+  method?: { referenceId: string; heading: string };
 }
 
 export const taskSkills: readonly TaskSkill[] = [
@@ -18,6 +24,8 @@ export const taskSkills: readonly TaskSkill[] = [
     description:
       "Research whether a consumer-app idea is worth building. Compare demand, competitors, distribution, offer evidence, and product scope; recommend Go, Pivot, or Kill. Use for opportunity validation or delegated idea selection, not a narrow code fix or execution of an entire launch.",
     workflowId: "workflow.research.research-backed-spec",
+    publicArea: "opportunity",
+    routeCue: "Validate an app opportunity",
   },
   {
     name: "b2c-design-onboarding",
@@ -26,6 +34,8 @@ export const taskSkills: readonly TaskSkill[] = [
       "Design, review, or improve a consumer app's onboarding and first-value journey. Classify a focused audit, incremental change, or full redesign before selecting the relevant research, flow, state, accessibility, and verification guidance. Do not start a full rebuild for a small signup fix.",
     workflowId: "workflow.experience.onboarding-system.onb-00-resume-scope",
     groupId: "onboarding-system",
+    publicArea: "experience",
+    routeCue: "Design or review onboarding",
   },
   {
     name: "b2c-review-monetization",
@@ -33,6 +43,68 @@ export const taskSkills: readonly TaskSkill[] = [
     description:
       "Review a consumer app's offer, pricing proposal, paywall, purchases, entitlements, restore behavior, and billing evidence. Use for a monetization audit or explicitly requested implementation. A review does not authorize live product changes, pricing changes, payments, or provider selection.",
     workflowId: "workflow.money.revenue-monetization",
+    publicArea: "revenue-and-growth",
+    routeCue: "Review monetization",
+  },
+  {
+    name: "b2c-define-product",
+    title: "Define or refine a product",
+    description:
+      "Define or review a consumer product from supplied evidence and accepted constraints. Preserve complete scope without restarting opportunity research or scaffolding an app.",
+    workflowId: "workflow.research.research-backed-spec",
+    publicArea: "product",
+    routeCue: "Define product scope",
+    method: { referenceId: "reference.product.core-loop-and-complete-scope", heading: "Name the promise and core loop" },
+  },
+  {
+    name: "b2c-plan-implementation",
+    title: "Plan implementation",
+    description:
+      "Produce a bounded implementation plan with ownership, interfaces, dependencies, tests, review, and risks. Planning does not execute app work or declare release readiness.",
+    workflowId: "workflow.engineering.engineering-orchestration-ce-production-readiness",
+    publicArea: "engineering",
+    routeCue: "Plan implementation",
+    method: { referenceId: "reference.engineering.engineering-orchestration", heading: "6. `engineering/ENGINEERING_PLAN.md` Requirements" },
+  },
+  {
+    name: "b2c-review-business-performance",
+    title: "Review business performance",
+    description:
+      "Review supplied business performance evidence with honest period, cohort, denominator, and source limits. Recommend investigations without changing prices, spending money, or shipping an intervention.",
+    workflowId: "workflow.operations.post-launch-operations",
+    publicArea: "learning-and-operations",
+    routeCue: "Review business performance",
+    method: { referenceId: "reference.operations.post-launch-operations", heading: "1. When To Load" },
+  },
+  {
+    name: "b2c-review-experience",
+    title: "Review the app experience",
+    description:
+      "Review an app experience against supplied product, interaction, accessibility, and evidence requirements. Return findings without fabricating device proof or accepting implementation.",
+    workflowId: "workflow.experience.emotional-experience-design-producer",
+    publicArea: "experience",
+    routeCue: "Review the app experience",
+    method: { referenceId: "reference.experience.emotional-experience-design", heading: "Six-Lens Design Review Framework" },
+  },
+  {
+    name: "b2c-plan-launch",
+    title: "Plan a launch",
+    description:
+      "Plan a scoped launch narrative, channels, assets, measurement, and follow-up from current evidence. Drafting does not publish, connect accounts, enable campaigns, or spend money.",
+    workflowId: "workflow.growth.launch-narrative-and-cadence",
+    publicArea: "revenue-and-growth",
+    routeCue: "Plan a launch",
+    method: { referenceId: "reference.growth.launch-narrative-cadence", heading: "Why This Lane Exists" },
+  },
+  {
+    name: "b2c-verify-release-readiness",
+    title: "Verify release readiness",
+    description:
+      "Inspect target-specific release evidence and report supported, missing, stale, blocked, or inapplicable requirements. Inspection cannot certify acceptance or perform a release.",
+    workflowId: "workflow.orchestration.full-launch-closeout",
+    publicArea: "engineering",
+    routeCue: "Verify release readiness",
+    method: { referenceId: "reference.process.launch-coverage", heading: "Contents" },
   },
 ];
 
@@ -55,6 +127,9 @@ export function referencesForTask(catalog: Catalog, skill: TaskSkill): Catalog["
   const ids = new Set(workflowsForTask(catalog, skill).flatMap((workflow) => workflow.referenceIds));
   const references = catalog.references.filter((reference) => ids.has(reference.id));
   if (references.length !== ids.size) throw new Error(`Task skill ${skill.name} has unresolved knowledge bindings.`);
+  if (skill.method && !references.some((reference) => reference.id === skill.method!.referenceId)) {
+    throw new Error(`Task skill ${skill.name} method is not bound to a workflow reference.`);
+  }
   return references;
 }
 
@@ -70,7 +145,9 @@ export function renderTaskTable(from: string): string {
   return [
     "| Task | Use when |",
     "| --- | --- |",
-    ...taskSkills.map((skill) => `| [${skill.title}](${relativeLink(from, `${skillDirectory(skill)}/SKILL.md`)}) | ${cell(skill.description)} |`),
+    ...taskSkills.map(
+      (skill) => `| [${skill.title}](${relativeLink(from, `${skillDirectory(skill)}/SKILL.md`)}) | ${cell(skill.routeCue ?? skill.description)} |`,
+    ),
   ].join("\n");
 }
 
@@ -83,7 +160,7 @@ export function renderPublicKnowledgeReadme(catalog?: Catalog): string {
     });
     const skills = taskSkills.filter((skill) => {
       const domain = catalog?.workflows.find((workflow) => workflow.id === skill.workflowId)?.domainId ?? `domain.${skill.workflowId.split(".")[1]}`;
-      return area.domainIds.some((id) => id === domain);
+      return skill.publicArea === area.slug || (!skill.publicArea && area.domainIds.some((id) => id === domain));
     });
     return [
       `## ${area.name}`,
@@ -131,6 +208,29 @@ export function renderPublicKnowledgeReadme(catalog?: Catalog): string {
   ].join("\n");
 }
 
+function focusedMethod(catalog: Catalog, skill: TaskSkill, from: string): string | undefined {
+  if (!skill.method) return undefined;
+  const reference = catalog.references.find((candidate) => candidate.id === skill.method!.referenceId);
+  if (!reference) throw new Error(`Task skill ${skill.name} method reference is unresolved.`);
+  const sourcePath = reference.path;
+  const source = readFileSync(sourcePath, "utf8");
+  const lines = source.split(/\r?\n/u);
+  const heading = lines.findIndex((line) => /^#{1,6} /u.test(line) && line.replace(/^#{1,6} /u, "").trim() === skill.method!.heading);
+  if (heading < 0) throw new Error(`Task skill ${skill.name} method heading is missing or empty: ${skill.method.heading}`);
+  const end = lines.findIndex((line, index) => index > heading && /^#{1,6} /u.test(line));
+  const body = lines
+    .slice(heading + 1, end < 0 ? lines.length : end)
+    .join("\n")
+    .trim();
+  if (!body) throw new Error(`Task skill ${skill.name} method heading is missing or empty: ${skill.method.heading}`);
+  return body.replace(/\]\(([^)#][^)]*)\)/gu, (full, target: string) => {
+    if (/^(?:https?:|mailto:|\/)/u.test(target)) return full;
+    const [file = "", hash] = target.split("#", 2);
+    const resolved = path.posix.relative(path.posix.dirname(from), path.posix.join(path.posix.dirname(reference.path), file));
+    return `](${resolved}${hash ? `#${hash}` : ""})`;
+  });
+}
+
 function renderContract(catalog: Catalog, workflow: CatalogWorkflowDef, from: string, includeInstructions: boolean): string {
   const refs = workflow.referenceIds.map((id) => {
     const reference = catalog.references.find((candidate) => candidate.id === id);
@@ -175,6 +275,14 @@ function renderContract(catalog: Catalog, workflow: CatalogWorkflowDef, from: st
 }
 
 export function renderTaskSkillFiles(catalog: Catalog): Record<string, string> {
+  const names = new Set<string>();
+  for (const skill of taskSkills) {
+    if (names.has(skill.name)) throw new Error(`Duplicate task skill name: ${skill.name}`);
+    names.add(skill.name);
+    if (skill.publicArea && !publicBusinessAreas.some((area) => area.slug === skill.publicArea)) {
+      throw new Error(`Task skill ${skill.name} has an invalid public area: ${skill.publicArea}`);
+    }
+  }
   const files: Record<string, string> = {};
   for (const skill of taskSkills) {
     const workflows = workflowsForTask(catalog, skill);
@@ -226,7 +334,7 @@ export function renderTaskSkillFiles(catalog: Catalog): Record<string, string> {
       "",
       "For a review, assess the existing evidence against this method and return findings; do not execute its authoring or mutation instructions. For requested creation or implementation, follow the method only within the accepted scope and authority.",
       "",
-      entry.instructions,
+      focusedMethod(catalog, skill, `${base}/SKILL.md`) ?? entry.instructions,
       "",
       "## Load only what the task needs",
       "",

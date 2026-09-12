@@ -13,7 +13,7 @@ The README exposes six business areas, while knowledge folders and catalog autho
 
 Keep one canonical catalog and knowledge index. Add presentation-only task descriptors in `catalog/task-skills.ts`. Each descriptor names an existing workflow and, where appropriate, its existing authored group. Descriptors own only the task's public name, description, and binding. They cannot own instructions, outputs, gates, dependencies, providers, state, or completion rules.
 
-Render task `SKILL.md` files and conditional contract references from those owners under `agents/skills/`. The first release exposes opportunity research, onboarding design/review, and monetization review. ONB-00 through ONB-22 remain internal work units of one task skill. The main business skill remains the default entrypoint. Optional task installation does not introduce a fourth agent scope.
+Render task `SKILL.md` files and conditional contract references from those owners under `agents/skills/`. The release exposes nine focused jobs across the six public areas. ONB-00 through ONB-22 remain internal work units of one task skill. The main business skill remains the default entrypoint. Optional task installation does not introduce a fourth agent scope.
 
 `catalog/areas.ts` owns the six public business-area labels and their mapping to existing domains. Public navigation uses this presentation everywhere. Existing area/domain IDs remain unchanged because they also participate in authority and execution contracts. Physical knowledge paths do not need to move to provide coherent public navigation.
 

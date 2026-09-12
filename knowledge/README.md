@@ -24,7 +24,7 @@ Define the promise, first value, core loop, complete scope, and success measures
 
 Knowledge: [What you're building](product/).
 
-Use the existing workflows and references below. A dedicated task skill for this area is not yet shipped.
+Task skills: [Define or refine a product](../agents/skills/b2c-define-product/SKILL.md).
 
 Browse [What you're building](../catalog/generated/routing.md#what-youre-building) for task-specific load conditions.
 ## Experience
@@ -33,7 +33,7 @@ Develop a distinct identity, onboarding, interaction, motion, accessible states,
 
 Knowledge: [How the app feels](experience/) · [Look and feel](design/) · [Every word a user reads](words/).
 
-Task skills: [Design or review onboarding](../agents/skills/b2c-design-onboarding/SKILL.md).
+Task skills: [Design or review onboarding](../agents/skills/b2c-design-onboarding/SKILL.md) · [Review the app experience](../agents/skills/b2c-review-experience/SKILL.md).
 
 Browse [How the app feels](../catalog/generated/routing.md#how-the-app-feels) for task-specific load conditions.
 Browse [Look and feel](../catalog/generated/routing.md#look-and-feel) for task-specific load conditions.
@@ -44,7 +44,7 @@ Build and release native and web surfaces with explicit contracts, runtime verif
 
 Knowledge: [Building the app](engineering/) · [App Store and Google Play](store/) · [Privacy, security, and legal](trust/).
 
-Use the existing workflows and references below. A dedicated task skill for this area is not yet shipped.
+Task skills: [Plan implementation](../agents/skills/b2c-plan-implementation/SKILL.md) · [Verify release readiness](../agents/skills/b2c-verify-release-readiness/SKILL.md).
 
 Browse [Building the app](../catalog/generated/routing.md#building-the-app) for task-specific load conditions.
 Browse [App Store and Google Play](../catalog/generated/routing.md#app-store-and-google-play) for task-specific load conditions.
@@ -55,7 +55,7 @@ Establish subscriptions, acquisition, funnels, attribution, and lifecycle work.
 
 Knowledge: [Pricing and getting paid](money/) · [Marketing and growth](growth/) · [Analytics and tracking](data/).
 
-Task skills: [Review monetization](../agents/skills/b2c-review-monetization/SKILL.md).
+Task skills: [Review monetization](../agents/skills/b2c-review-monetization/SKILL.md) · [Plan a launch](../agents/skills/b2c-plan-launch/SKILL.md).
 
 Browse [Pricing and getting paid](../catalog/generated/routing.md#pricing-and-getting-paid) for task-specific load conditions.
 Browse [Marketing and growth](../catalog/generated/routing.md#marketing-and-growth) for task-specific load conditions.
@@ -66,7 +66,7 @@ Inspect evidence, plan improvements, support users, coordinate work, and maintai
 
 Knowledge: [Analytics and tracking](data/) · [Running the business](operations/) · [Running the launch](process/) · [Driving the work](orchestration/).
 
-Use the existing workflows and references below. A dedicated task skill for this area is not yet shipped.
+Task skills: [Review business performance](../agents/skills/b2c-review-business-performance/SKILL.md).
 
 Browse [Analytics and tracking](../catalog/generated/routing.md#analytics-and-tracking) for task-specific load conditions.
 Browse [Running the business](../catalog/generated/routing.md#running-the-business) for task-specific load conditions.

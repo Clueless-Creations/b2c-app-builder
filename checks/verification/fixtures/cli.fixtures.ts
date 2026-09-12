@@ -47,6 +47,20 @@ function fileSnapshot(root: string): Record<string, string> {
 }
 
 export function register(harness: Harness): void {
+  harness.check("cli: research check exposes a bounded read-only contract explanation", () => {
+    const text = runBin(["check", "research", "--explain"]);
+    assert(text.code === 0, `research explanation must exit 0, got ${text.code}: ${text.output}`);
+    assert(text.output.includes("Research contract 1.0.0"), "explanation must identify its contract version");
+    assert(text.output.includes("Go, Pivot, Or Kill"), "explanation must list the checkpoint section");
+    assert(text.output.includes("valid Pivot or Kill is a held checkpoint"), "explanation must preserve the non-Go hold meaning");
+    const json = runBin(["check", "research", "--explain", "--json"]);
+    assert(json.code === 0, `JSON research explanation must exit 0, got ${json.code}: ${json.output}`);
+    const parsed = JSON.parse(json.output.trim()) as { check?: string; explanation?: { sections?: unknown[]; safety?: string } };
+    assert(parsed.check === "research", "JSON explanation must identify the check");
+    assert(parsed.explanation?.sections?.length === 7, "JSON explanation must expose the seven bounded research sections");
+    assert(parsed.explanation?.safety?.includes("read-only"), "JSON explanation must state its safety boundary");
+  });
+
   harness.check("cli: the bin exists where the package.json bin field points", () => {
     assert(existsSync(binPath), `entrypoints/cli/b2c.mjs is missing at ${binPath}`);
     const manifest = JSON.parse(readFileSync(path.join(skillRoot, "package.json"), "utf8")) as { bin?: Record<string, string> };
@@ -124,10 +138,7 @@ export function register(harness: Harness): void {
     assert(help.output.includes("Supported equivalent of inspect"), "doctor must be annotated as the inspect equivalent");
     assert(help.output.includes("inspect runs the installation diagnostic"), "grouped help must prefer inspect as the diagnostic actor");
     assert(help.output.includes("b2c doctor is a supported equivalent"), "grouped help must keep doctor supported");
-    assert(
-      !help.output.includes("inspect and doctor run the same"),
-      "grouped help must not treat inspect and doctor as equal diagnostic actors",
-    );
+    assert(!help.output.includes("inspect and doctor run the same"), "grouped help must not treat inspect and doctor as equal diagnostic actors");
     assert(help.output.includes("sanitized local host observation"), "help must disclose the host observation write");
     assert(help.output.includes("command-specific --help flag"), "help must say inspect/doctor do not accept command-specific --help");
     assert(!help.output.includes("inspect --json"), "help must not advertise inspect --json");
@@ -138,10 +149,7 @@ export function register(harness: Harness): void {
     );
     for (const line of help.output.split("\n")) {
       const overflowingToken = line.length > HELP_WRAP_COLUMNS && !line.slice(0, HELP_WRAP_COLUMNS + 1).includes(" ");
-      assert(
-        line.length <= HELP_WRAP_COLUMNS || overflowingToken,
-        `help line must wrap at ${HELP_WRAP_COLUMNS} columns unless one token is longer: ${line}`,
-      );
+      assert(line.length <= HELP_WRAP_COLUMNS || overflowingToken, `help line must wrap at ${HELP_WRAP_COLUMNS} columns unless one token is longer: ${line}`);
     }
     for (const name of listed) {
       assert(help.output.includes(name), `help must keep the full command name ${name}`);
@@ -564,8 +572,7 @@ export function register(harness: Harness): void {
     const doctor = runBin(["doctor"], { env: { B2C_APP_BUILDER_HOME: path.join(harness.makeTempDir("cli-inspect-doctor"), "b2c-home") } });
     assert(inspect.code === 0, `inspect must exit 0 on a healthy install, got ${inspect.code}: ${inspect.output.slice(-400)}`);
     assert(inspect.code === doctor.code, "inspect and doctor must share exit status");
-    const codes = (output: string): string[] =>
-      [...output.matchAll(/^[A-Z]+\s+(doctor\.[^\s]+)/gm)].map((match) => match[1]!).sort();
+    const codes = (output: string): string[] => [...output.matchAll(/^[A-Z]+\s+(doctor\.[^\s]+)/gm)].map((match) => match[1]!).sort();
     assert(JSON.stringify(codes(inspect.output)) === JSON.stringify(codes(doctor.output)), "inspect and doctor must report the same finding codes");
     assert(inspect.output.includes("doctor.node"), "inspect must run the installation diagnostic, not workspace inspection");
     assert(!inspect.output.includes("productKind"), "inspect must not route to kernel/session/inspect.ts");
@@ -583,7 +590,10 @@ export function register(harness: Harness): void {
     assert(next.includes("business-plan"), "setup next steps omitted business-plan");
     assert(next.indexOf("business-status") < next.indexOf("business-plan"), "setup next steps lost status before plan");
     assert(next.indexOf("business-plan") < next.indexOf("b2c catalog --json"), "setup still leads with catalog before plan");
-    assert(!/first call is almost always b2c_catalog|first call is almost always b2c_knowledge_search/.test(first.output), "setup still tells Claude the first call is catalog/search");
+    assert(
+      !/first call is almost always b2c_catalog|first call is almost always b2c_knowledge_search/.test(first.output),
+      "setup still tells Claude the first call is catalog/search",
+    );
     assert(first.output.includes("b2c-app-builder-mcp.mjs"), "setup must print the MCP registration command with the real server path");
     // The three agent runtimes the engine dispatches are the three the machine owner will want
     // the MCP server registered with — setup prints each runtime's own config shape.

@@ -6,7 +6,7 @@
  * artifact from a failure, not have to memorize each validator's own text dialect.
  *
  *   b2c check --list
- *   b2c check <name> [--workspace <id-or-path>] [--json]
+ *   b2c check <name> [--workspace <id-or-path>] [--json] [--explain]
  *
  * `<name>` is a `check:*` npm script name with the `check:` prefix stripped (e.g. `product-md`,
  * `no-slop`, `onboarding-evidence-onb-05`) — see catalog/gates.ts's `checkNames()`, the live
@@ -52,6 +52,7 @@ import { spawnSync } from "node:child_process";
 import { checkNames } from "../../catalog/gates.js";
 import { buildAuditPlan, stripAuditOnlyFlags, GATE_TIMEOUT_MS, type AuditStep } from "../../tooling/lib/audit-plan.js";
 import { resolvePackedCheckCommand } from "../../tooling/lib/packed-check.js";
+import { RESEARCH_CONTRACT_EXPLANATION, renderResearchContractExplanation } from "../../contracts/public-api/research-contract.js";
 import { isMainModule } from "../lib/cli.js";
 import { skillRoot } from "./reducer-cli.js";
 import { resolveCliWorkspace } from "./status.js";
@@ -113,6 +114,7 @@ function parseGateJson(stdout: string): { pass: boolean; failures: unknown[] } |
 
 export function main(argv = process.argv.slice(2)): number {
   const json = argv.includes("--json");
+  const explain = argv.includes("--explain");
 
   if (argv.includes("--list")) {
     const names = checkNames(skillRoot());
@@ -134,6 +136,20 @@ export function main(argv = process.argv.slice(2)): number {
       reason: `"${name}" is not a known check. Run \`b2c check --list\` for the full set.`,
       field: "name",
     });
+  }
+
+  if (explain) {
+    if (name !== "research") {
+      failStructured({
+        actionStatus: "refused",
+        reasonCode: "check.explain_unsupported",
+        reason: "Only the research check currently exposes a bounded contract explanation.",
+        field: "name",
+      });
+    }
+    if (json) console.log(JSON.stringify({ check: name, explanation: RESEARCH_CONTRACT_EXPLANATION }));
+    else console.log(renderResearchContractExplanation());
+    return 0;
   }
 
   const workspaceRef = flagValue(argv, "--workspace");

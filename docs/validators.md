@@ -172,6 +172,11 @@ It resolves same-file component output and ignores code after a terminal return 
 | `check:evidence-schema-drift`    | `kernel/schema/evidence-schema-version.json` still matches the live catalog and the three evidence-dialect schemas (research-evidence, signal-corpus, offer-test). Stale after an unrendered schema or catalog edit, run `render:evidence-schema-version` and commit the result. |
 | `render:evidence-schema-version` | Regenerates `kernel/schema/evidence-schema-version.json` from the live catalog and evidence-dialect schemas                                                                                                                                                                      |
 
+The agent-facing contract map is available without reading a workspace or invoking a provider:
+`b2c check research --explain` prints the bounded sections, artifact selectors, relationships,
+checkpoint meaning, and safety boundary. Add `--json` for the versioned descriptor used by packed
+consumers.
+
 ## Design
 
 | Command                     | What it checks                                                                                                                                                                                                                                                                                                                                                                                             |

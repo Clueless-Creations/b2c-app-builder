@@ -16,6 +16,7 @@ import { isPlanningWorkspace } from "../../../../kernel/session/planning-context
 import { asString, getPath, issue, loadProjectState, parseCliArgs, readText, reportAndExit } from "../../../../tooling/lib/launch-state.js";
 import { isEmptyEquivalentEvidenceValue } from "../../../../kernel/lib/empty-equivalent-evidence.js";
 import { parseRenderedTopLevelStatus, parseRequiredTableSection, type RequiredTableSection } from "../../../../kernel/lib/required-table-section.js";
+import { assertResearchContractHeaders } from "../../../../contracts/public-api/research-contract.js";
 import {
   isValidNonFutureRfc3339Instant,
   isValidPastIsoDate,
@@ -111,6 +112,18 @@ export const VERDICT_HEADERS = {
   verdict: ["Verdict (Go / Pivot / Kill)", "Verdict"],
   decidedBy: ["Decided by"],
 } as const;
+
+assertResearchContractHeaders({
+  sourceLedger: Object.values(SOURCE_LEDGER_HEADERS).flat(),
+  signalCorpus: {
+    inputs: SIGNAL_CORPUS_HEADERS.inputs.flat(),
+    records: SIGNAL_CORPUS_HEADERS.records.flat(),
+    conflicts: SIGNAL_CORPUS_HEADERS.conflicts.flat(),
+    derived: SIGNAL_CORPUS_HEADERS.derived.flat(),
+  },
+  distributionProof: DISTRIBUTION_PROOF_HEADERS.flat(),
+  verdict: Object.values(VERDICT_HEADERS).flat(),
+});
 
 const laneStatus = state ? asString(getPath(state, "lanes.research.status"))?.toLowerCase() : undefined;
 const skip = laneStatus === "not_needed" || laneStatus === "deferred";

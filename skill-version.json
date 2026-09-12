@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.42",
+  "version": "0.220.43",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Repair a worker knowledge receipt once without rerunning the business task, while rejecting changed candidate outputs.",
     "Refresh the Astra A0 deterministic baseline to the current integrated source revision and measured standing files.",
     "Refresh task-skill host-discovery provenance to the current integrated artifact revision.",
     "Record native Codex task-skill discovery and the authenticated Claude discovery hold with revision-bound evidence.",

@@ -423,6 +423,32 @@ export function postWorkerWorkspaceDigestRefreshPaths(brief: Pick<NodeBrief, "op
   return mutableTaskArtifactPaths(brief);
 }
 
+/**
+ * A receipt-only continuation is deliberately narrower than a worker retry. The producer has
+ * already returned declared output bytes; this prompt lets one fresh context inspect those bytes
+ * and repair only the transport receipt. The caller still fingerprints every output before and
+ * after this continuation, so a worker that edits or redoes the task cannot turn the continuation
+ * into accepted work.
+ */
+export function buildReceiptRepairPrompt(
+  originalPrompt: string,
+  outputs: readonly Pick<NodeExecutionOutput, "artifactId" | "path" | "fingerprint">[],
+): string {
+  const manifest = outputs.map((output) => `- ${output.artifactId}: ${output.path} fingerprint=${output.fingerprint}`).join("\n");
+  return [
+    originalPrompt,
+    "",
+    "RECEIPT-ONLY REPAIR — the previous worker already completed the requested task.",
+    "Do not edit, delete, regenerate, overwrite, or otherwise mutate any file.",
+    "Do not rerun the business task, call a provider, spend, publish, deploy, or perform any external effect.",
+    "Read only the existing declared outputs and the exact required inputs needed to explain the work.",
+    "Return exactly one corrected knowledge receipt between the existing receipt markers, with no new task output.",
+    "The engine will reject this continuation if any declared output fingerprint changes.",
+    "Existing unaccepted candidate outputs:",
+    manifest || "- none; receipt-only repair is unavailable when no complete candidate exists.",
+  ].join("\n");
+}
+
 /** Real bounded worker executor used by scheduled sessions. */
 export function verifyPackageRolePrompts(node: Pick<CompiledRunNode, "role">, workspaceDir: string): void {
   for (const [relative, expected] of Object.entries(node.role?.promptResources ?? {})) {
@@ -601,7 +627,50 @@ function createCliWorkerExecutor(requestedRuntime: WorkerRuntime): NodeExecutor 
           evidence: [`${runtime} worker produced ${relativePath}`, "candidate retained after knowledge-receipt failure"],
         });
       }
-      const receiptIssues = validateKnowledgeReceipt(`${result.stdout}\n${result.stderr}`, brief, expectations);
+      let receiptText = `${result.stdout}\n${result.stderr}`;
+      let receiptIssues = validateKnowledgeReceipt(receiptText, brief, expectations);
+      let receiptRepairUsed = false;
+      if (receiptIssues.length > 0 && candidateOutputs.length === node.outputs.length) {
+        // One bounded same-dispatch continuation repairs only the receipt transport. A missing
+        // output cannot be repaired here: it must remain a real failed attempt and take the
+        // normal producer recovery path.
+        const repairResult = await runWorker(
+          buildWorkerCommand(runtime, buildReceiptRepairPrompt(prompt, candidateOutputs)),
+          context.workspaceDir,
+          node.ttlSeconds * 1000,
+        );
+        const repairScopeErrors = [
+          ...verifyTaskInputs(context.workspaceDir, taskInputs, postWorkerWorkspaceDigestRefreshPaths(brief), node.sourceAccess),
+          ...verifySourceAccess(context.workspaceDir, sourceSnapshot),
+          ...(workspaceSnapshot
+            ? verifyWorkspaceChanges(context.workspaceDir, workspaceSnapshot, node.sourceAccess ?? [], brief.produce, context.runtimeWrites)
+            : []),
+        ];
+        if (repairScopeErrors.length) return { status: "failed", outputs: candidateOutputs, evidence: [], error: repairScopeErrors.join("; ") };
+        if (repairResult.timedOut || repairResult.status !== 0) {
+          return {
+            status: "failed",
+            outputs: candidateOutputs,
+            evidence: [],
+            error: `receipt-only repair did not complete: ${repairResult.timedOut ? "worker timed out" : `worker exited ${String(repairResult.status)}`}`,
+          };
+        }
+        const changedCandidate = candidateOutputs.find((candidate) => {
+          const absolute = resolvedInside(context.workspaceDir, candidate.path);
+          return !absolute || !existsSync(absolute) || outputFingerprintPath(absolute) !== candidate.fingerprint;
+        });
+        if (changedCandidate) {
+          return {
+            status: "failed",
+            outputs: [],
+            evidence: [],
+            error: `receipt-only repair changed candidate output ${changedCandidate.path}; real rework is required`,
+          };
+        }
+        receiptText = `${repairResult.stdout}\n${repairResult.stderr}`;
+        receiptIssues = validateKnowledgeReceipt(receiptText, brief, expectations);
+        receiptRepairUsed = receiptIssues.length === 0;
+      }
       if (receiptIssues.length > 0)
         return { status: "failed", outputs: candidateOutputs, evidence: [], error: `worker knowledge receipt rejected: ${receiptIssues.join("; ")}` };
       const outputs: NodeExecutionOutput[] = [];
@@ -637,10 +706,22 @@ function createCliWorkerExecutor(requestedRuntime: WorkerRuntime): NodeExecutor 
           artifactId,
           path: relativePath,
           fingerprint,
-          evidence: [`${runtime} worker produced ${relativePath}`, `knowledge receipt accepted for ${node.workflowId}`],
+          evidence: [
+            `${runtime} worker produced ${relativePath}`,
+            ...(receiptRepairUsed ? ["knowledge receipt repaired without rerunning the task"] : []),
+            `knowledge receipt accepted for ${node.workflowId}`,
+          ],
         });
       }
-      return { status: "succeeded", outputs, evidence: [`${runtime} worker completed ${node.workflowId}`, `knowledge receipt accepted`] };
+      return {
+        status: "succeeded",
+        outputs,
+        evidence: [
+          `${runtime} worker completed ${node.workflowId}`,
+          ...(receiptRepairUsed ? ["knowledge receipt repaired without rerunning the task"] : []),
+          "knowledge receipt accepted",
+        ],
+      };
     },
   };
 }

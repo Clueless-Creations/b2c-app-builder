@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.18",
+  "version": "0.220.19",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Add source-ledger and signal-corpus field diagnostics with authored locations and bounded repair hints.",
     "Carry a continuous experience principle through portable task skills and make the reference-led design loop explicit.",
     "Preserve worker output candidates as unaccepted evidence after knowledge-receipt failure.",
     "Allow founder-approved local full-launch coordination while keeping protected system actions fail-closed.",

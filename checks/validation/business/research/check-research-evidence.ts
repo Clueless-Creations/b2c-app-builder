@@ -1003,16 +1003,24 @@ function validateSignalCorpus(value: string | undefined, target: ReturnType<type
         );
       }) ?? (!rowsMatchTableWidth(derived) || derived.rows.length === 0 ? { sourceLine: derived.headingLine } : undefined);
     if (invalidDerivedRow) {
+      const cells = "cells" in invalidDerivedRow ? derivedColumnIndexes.map((column) => (invalidDerivedRow.cells[column] ?? "").trim()) : [];
+      const signalIds = parsePrefixedIdList(cells[0] ?? "", "SIG");
+      const invalidField = firstInvalidField([
+        ["Signal IDs", signalIds.validSyntax && signalIds.ids.length > 0 && signalIds.ids.every((signalId) => index.eligibleSignalIds.has(signalId))],
+        ["Output", Boolean(cells[1]) && !placeholder.test(cells[1] ?? "")],
+        ["Decision changed", Boolean(cells[2]) && !placeholder.test(cells[2] ?? "")],
+        ["Trace ID", /\bTRACE-[A-Z0-9][A-Z0-9-]*\b/i.test(cells[3] ?? "") && !placeholder.test(cells[3] ?? "")],
+      ]);
       target.push(
         issue(
           "error",
           "research.signal_corpus_derived_output_invalid",
-          "Every Derived Outputs row must cite only current or dated Signal IDs. It must also name a real output, changed decision, and TRACE ID. " +
+          `Derived Outputs row's ${invalidField} field is invalid. Every row must cite only current or dated Signal IDs, name a real output and changed decision, and include a TRACE ID. ` +
             "Keep unverified, rejected, and superseded signals in the corpus, but do not use them to support an output.",
           "strategy/SIGNAL_CORPUS.md",
           {
             line: invalidDerivedRow.sourceLine,
-            fixHint: "Repair the named Derived Outputs row's first failing Signal ID, output, decision, or TRACE ID field.",
+            fixHint: `Repair the Derived Outputs row's ${invalidField} field first; use eligible SIG-* IDs and a real output, changed decision, and TRACE-* trace ID.`,
           },
         ),
       );
@@ -1074,16 +1082,22 @@ function validateTransformationDemo(text: string, target: ReturnType<typeof issu
         notVitamin.length >= 16
       );
     });
+    const demoCells = invalidRow ? demoColumns.map((column) => (invalidRow.cells[column] ?? "").trim()) : [];
+    const invalidField = firstInvalidField([
+      ["Screenshot path", Boolean(demoCells[0]) && (demoCells[0]!.includes("/") || screenshotOk.test(demoCells[0]!))],
+      ["15s script", Boolean(demoCells[1]) && demoCells[1]!.length >= 24 && !placeholder.test(demoCells[1]!)],
+      ["Transformation shown", Boolean(demoCells[2]) && demoCells[2]!.length >= 16 && !placeholder.test(demoCells[2]!) && !vitamin.test(demoCells[2]!)],
+      ["Why-not-a-vitamin", Boolean(demoCells[3]) && demoCells[3]!.length >= 16 && !placeholder.test(demoCells[3]!)],
+    ]);
     target.push(
       issue(
         "error",
         "research.transb2c_demo_row_invalid",
-        "Transformation Demo needs one screenshot path, a 15s script, a concrete before-to-after transformation, and a painkiller reason. Vitamin features fail.",
+        `Transformation Demo row's ${invalidField} field is invalid. The row needs one screenshot path, a 15s script, a concrete before-to-after transformation, and a painkiller reason. Vitamin features fail.`,
         "strategy/RESEARCH.md",
         {
           line: invalidRow?.sourceLine ?? demoSection.headingLine,
-          fixHint:
-            "Repair the named Transformation Demo row's first failing field: use a real screenshot path, a concrete 15s script, a before-to-after transformation, and a painkiller reason.",
+          fixHint: `Repair the Transformation Demo row's ${invalidField} field first; use a real screenshot path, a concrete 15s script, a before-to-after transformation, and a painkiller reason.`,
         },
       ),
     );
@@ -1138,16 +1152,34 @@ function validateDistributionFirstNiche(text: string, target: ReturnType<typeof 
         !compliment.test(purchases)
       );
     });
+    const nicheCells = invalidRow ? nicheColumns.map((column) => (invalidRow.cells[column] ?? "").trim()) : [];
+    const invalidField = firstInvalidField([
+      [
+        "Paying audience",
+        Boolean(nicheCells[0]) &&
+          nicheCells[0]!.length >= 12 &&
+          !placeholder.test(nicheCells[0]!) &&
+          /\b(pay|paid|price|iap|subscription|spend)\b/i.test(nicheCells[0]!),
+      ],
+      ["Named channel", Boolean(nicheCells[1]) && nicheCells[1]!.length >= 12 && !placeholder.test(nicheCells[1]!) && !genericChannel.test(nicheCells[1]!)],
+      [
+        "Purchases as validation",
+        Boolean(nicheCells[2]) &&
+          nicheCells[2]!.length >= 12 &&
+          !placeholder.test(nicheCells[2]!) &&
+          /\b(purchase|paid|revenue|iap|subscribe)\b/i.test(nicheCells[2]!) &&
+          !compliment.test(nicheCells[2]!),
+      ],
+    ]);
     target.push(
       issue(
         "error",
         "research.distribution_first_row_invalid",
-        "Distribution-First Niche needs a paying audience, one named channel, and purchases as validation. Compliments and likes do not count.",
+        `Distribution-First Niche row's ${invalidField} field is invalid. The row needs a paying audience, one named channel, and purchases as validation. Compliments and likes do not count.`,
         "strategy/RESEARCH.md",
         {
           line: invalidRow?.sourceLine ?? nicheSection.headingLine,
-          fixHint:
-            "Repair the named Distribution-First Niche row's first failing field: name a paying audience, a specific channel, and purchase or revenue validation.",
+          fixHint: `Repair the Distribution-First Niche row's ${invalidField} field first; name a paying audience, a specific channel, and purchase or revenue validation.`,
         },
       ),
     );

@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.56",
+  "version": "0.220.57",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Bound receipt-only repair to one continuation while preserving unaccepted candidate output provenance.",
     "Verify an approved full-launch mandate survives persisted run-state reload and re-enters without duplicate approval records.",
     "Prove that a protected authority hold leaves unrelated permitted frontier work visible and dispatchable.",
     "Extend the system-domain authority regression across protected effect classes and provider-bearing mutations.",

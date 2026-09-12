@@ -156,4 +156,52 @@ const context = { runId: 'run', attemptId: 'attempt', workspaceDir: ${JSON.strin
     0,
     "directory dispatch and stale refusal proved",
   );
+
+  const repairWorkspace = harness.makeTempDir("executor-receipt-repair-budget");
+  const repairBin = path.join(repairWorkspace, "bin");
+  mkdirSync(repairBin);
+  const repairCount = path.join(repairWorkspace, "invocations");
+  const repairCli = path.join(repairBin, "codex");
+  writeFileSync(
+    repairCli,
+    `#!/usr/bin/env node
+const fs = require('node:fs');
+const countPath = ${JSON.stringify(repairCount)};
+if (process.argv.includes('--version')) { console.log('fixture-runtime'); process.exit(0); }
+const count = Number(fs.existsSync(countPath) ? fs.readFileSync(countPath, 'utf8') : '0') + 1;
+fs.writeFileSync(countPath, String(count));
+const prompt = process.argv.at(-1);
+const begin = 'BEGIN_KNOWLEDGE_RECEIPT';
+const end = 'END_KNOWLEDGE_RECEIPT';
+if (count === 1) fs.writeFileSync(${JSON.stringify(path.join(repairWorkspace, "result.md"))}, 'candidate output');
+console.log(begin + '\\n{"taskArtifacts":[{"path":"not-declared.md","sha256":"sha256:bad"}]}\\n' + end);
+`,
+  );
+  chmodSync(repairCli, 0o755);
+  const repairIntegration = path.join(repairWorkspace, "integration.ts");
+  writeFileSync(
+    repairIntegration,
+    `
+import { createCliExecutor } from ${JSON.stringify(path.join(skillRoot, "kernel/session/executor.ts"))};
+import { readFileSync } from 'node:fs';
+process.env.PATH = ${JSON.stringify(repairBin)} + ':' + process.env.PATH;
+const node = { id: 'receipt-repair', workflowId: 'workflow.receipt-repair', title: 'Receipt repair', reads: [], references: [], outputs: ['result'], approvals: [], tokenBudget: 12000, ttlSeconds: 10, verification: { kind: 'deterministic', gateIds: [], failClosed: true } } as any;
+const context = { runId: 'run', attemptId: 'attempt', workspaceDir: ${JSON.stringify(repairWorkspace)}, skillRootDir: ${JSON.stringify(repairWorkspace)}, artifactPaths: { result: 'result.md' }, now: '2026-09-12T16:00:00Z', heartbeat() {} };
+(async () => {
+  const result = await createCliExecutor('codex').execute(node, context);
+  if (result.status !== 'failed' || !result.error?.includes('knowledge receipt rejected')) throw new Error('invalid receipt did not fail closed: ' + JSON.stringify(result));
+  if (result.outputs.length !== 1 || result.outputs[0]?.path !== 'result.md') throw new Error('candidate output provenance was lost: ' + JSON.stringify(result));
+  const invocations = readFileSync(${JSON.stringify(repairCount)}, 'utf8');
+  if (invocations !== '2') throw new Error('receipt repair exceeded its one-continuation bound: ' + invocations);
+  console.log('receipt repair bounded to one continuation with candidate preserved');
+})();
+`,
+  );
+  harness.runScript(
+    "executor receipts: invalid repair stops after one continuation and preserves the candidate",
+    repairIntegration,
+    [],
+    0,
+    "receipt repair bounded to one continuation with candidate preserved",
+  );
 }

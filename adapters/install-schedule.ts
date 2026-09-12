@@ -13,6 +13,7 @@
  *       --schedule "(every 30 min, 5-field cron)" --brief <path/to/brief.json> [--mechanism cron|launchd] \
  *       [--wall-clock-seconds 1800] [--skill-root <path>] [--apply] [--uninstall]
  */
+import { randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import os from "node:os";
@@ -23,6 +24,7 @@ import { resolveSkillRoot } from "../tooling/lib/skill-root.js";
 import { isMainModule } from "../kernel/lib/cli.js";
 import { founderFacingRuntimeIds, type RuntimeId } from "./profile.js";
 import { loadWorkspaceCatalog, renderCatalogRefusal } from "../kernel/session/catalog-contract.js";
+import { acquireLock, releaseLock } from "../kernel/reducer/lock.js";
 
 const defaultSkillRoot = resolveSkillRoot(import.meta.url);
 
@@ -312,7 +314,25 @@ function readCrontab(): string {
 
 function writeCrontab(content: string): void {
   const result = spawnSync("crontab", ["-"], { input: content, encoding: "utf8" });
-  if (result.status !== 0) fail(`crontab install failed: ${result.stderr || result.stdout || `exit ${String(result.status)}`}`);
+  if (result.status !== 0) throw new Error(`crontab install failed: ${result.stderr || result.stdout || `exit ${String(result.status)}`}`);
+}
+
+export function scheduleMutationLockPath(homeDir = os.homedir()): string {
+  return path.join(homeDir, ".config", "b2c-app-builder", "schedule.lock");
+}
+
+export function withScheduleMutationLock<T>(operation: () => T, homeDir = os.homedir()): T {
+  const ownerSessionId = `schedule:${process.pid}:${randomUUID()}`;
+  const lockPath = scheduleMutationLockPath(homeDir);
+  const acquired = acquireLock(lockPath, { ownerSessionId, retries: 0, ttlSeconds: 120 });
+  if (!acquired.ok) {
+    throw new Error(acquired.reason === "held" ? "install-schedule.schedule_lock_held" : "install-schedule.schedule_lock_stale_unverified");
+  }
+  try {
+    return operation();
+  } finally {
+    releaseLock(lockPath, ownerSessionId);
+  }
 }
 
 function runMain(): void {
@@ -336,19 +356,29 @@ function runMain(): void {
       if (sandboxCheck) console.log(`  sandboxed: ${String(sandboxCheck.sandboxed)}`);
       return;
     }
-    mkdirSync(path.dirname(options.wrapperPath), { recursive: true });
-    const current = readCrontab();
-    const result = uninstall ? applyCrontabUninstall(current, options) : applyCrontabInstall(current, options);
-    if (!uninstall) writeFileSync(options.wrapperPath, renderWrapperScript(options), { mode: 0o755 });
-    writeCrontab(result.nextContent);
-    const readBackContent = readCrontab();
-    const readBack = uninstall
-      ? crontabHasWorkspaceSignature(readBackContent, options.workspaceSlug)
-      : crontabHasExactLine(readBackContent, "line" in result ? result.line : "");
-    if (uninstall ? readBack : !readBack) {
-      fail(`cron readback did not confirm the requested ${uninstall ? "removal" : "installation"} for ${options.workspaceSlug}/${options.runtime}`);
+    try {
+      withScheduleMutationLock(() => {
+        mkdirSync(path.dirname(options.wrapperPath), { recursive: true });
+        const current = readCrontab();
+        const result = uninstall ? applyCrontabUninstall(current, options) : applyCrontabInstall(current, options);
+        if (!uninstall) writeFileSync(options.wrapperPath, renderWrapperScript(options), { mode: 0o755 });
+        writeCrontab(result.nextContent);
+        const readBackContent = readCrontab();
+        const readBack = uninstall
+          ? crontabHasWorkspaceSignature(readBackContent, options.workspaceSlug)
+          : crontabHasExactLine(readBackContent, "line" in result ? result.line : "");
+        if (uninstall ? readBack : !readBack) {
+          throw new Error(
+            `cron readback did not confirm the requested ${uninstall ? "removal" : "installation"} for ${options.workspaceSlug}/${options.runtime}`,
+          );
+        }
+      });
+    } catch (error) {
+      fail(error instanceof Error ? error.message : String(error));
     }
-    console.log(`install-schedule: ${uninstall ? "removed" : "installed"} and verified the cron entry for ${options.workspaceSlug}/${options.runtime}.${sandboxSuffix}`);
+    console.log(
+      `install-schedule: ${uninstall ? "removed" : "installed"} and verified the cron entry for ${options.workspaceSlug}/${options.runtime}.${sandboxSuffix}`,
+    );
     return;
   }
 

@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.66",
+  "version": "0.220.67",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Record the reproducible ten-case A0 baseline versus current candidate guidance replay while preserving the live Astra evidence hold.",
     "Reject duplicate research finding IDs before decision preview or apply writes any product artifact.",
     "Name the first invalid Derived Outputs, Transformation Demo, or Distribution-First Niche field in bounded research diagnostics.",
     "Keep scheduled wrappers on the canonical workspace catalog compatibility guard before spawning any worker runtime.",

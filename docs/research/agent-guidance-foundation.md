@@ -2,6 +2,25 @@
 
 Program #388; root contract #389; bounded Astra setup/router work #126; measurement #73; evaluation #75; acceptance #392.
 
+## Current A0 replay on integrated main
+
+Replayed on integrated main `7ad73d52b9d1bf80ced096fe0dc2726a5f20f555` with the existing `check:agent-entrypoints` consumer and the frozen `docs/research/agent-guidance-a0.json` corpus. Both the pinned baseline and current candidate reports completed with `0 error(s), 0 warning(s)` and 10/10 cases. The reports contain no `modelId`, `modelTokens`, `observedAgentTrace`, or `serviceResult`; this is deterministic packet evidence only, not live Astra or provider evidence.
+
+| Case | Files | A0 bytes | Current candidate bytes |
+| --- | ---: | ---: | ---: |
+| A0-01 | 3 | 22,668 | 19,176 |
+| A0-02 | 3 | 24,500 | 21,008 |
+| A0-03 | 1 | 13,545 | 9,604 |
+| A0-04 | 3 | 26,068 | 22,169 |
+| A0-05 | 3 | 22,668 | 19,176 |
+| A0-06 | 3 | 19,860 | 15,961 |
+| A0-07 | 3 | 26,068 | 22,169 |
+| A0-08 | 7 | 125,817 | 118,574 |
+| A0-09 | 6 | 63,062 | 55,843 |
+| A0-10 | 5 | 59,223 | 53,424 |
+
+Reproduce with the two commands in the verification section below, using distinct report paths. The comparison shows narrower declared packets for every frozen case. It does not prove routing quality, unnecessary pauses, actual procedure reads, model tokens, provider behavior, or protected-effect handling; #75 and #73 retain those observed-evidence responsibilities.
+
 ## Status and coordination
 
 This is a recoverable implementation candidate, not a verified merge. Do not close #389 or the parent issues on this document alone. Required version/generated integration, repository verification, and genuinely independent review remain open.

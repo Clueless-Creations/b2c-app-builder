@@ -21,6 +21,10 @@ For an existing managed business, read business-status then business-plan and us
 
 For a review, assess the existing evidence against this method and return findings; do not execute its authoring or mutation instructions. For requested creation or implementation, follow the method only within the accepted scope and authority.
 
+## Continuous experience principle
+
+Carry the accepted user's intended outcome through the work: make the result meaningfully better for that user, preserve relevant identity, hierarchy, accessibility, and recovery constraints, and verify behavior as well as presence. Apply this only where relevant; a narrow fix stays narrow. This principle does not require an 11-star exercise or a numeric taste score.
+
 Run this review per feature or per journey before build handoff. Each lens has an exact question, evidence to capture on a real device, and a sub-score (0–2). Total score: 0–12. The total is a discussion aid. It cannot establish readiness or override a material defect.
 
 These bands are canonical in [`emotional-design-system.md`](../../../knowledge/experience/emotional-design-system.md) §Emotional Review Framework. This file must not restate them differently.

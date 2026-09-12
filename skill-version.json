@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.17",
+  "version": "0.220.18",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Carry a continuous experience principle through portable task skills and make the reference-led design loop explicit.",
     "Preserve worker output candidates as unaccepted evidence after knowledge-receipt failure.",
     "Allow founder-approved local full-launch coordination while keeping protected system actions fail-closed.",
     "Make scheduled autonomy explicitly conditional and keep optional scope questions off the foreground ready path.",

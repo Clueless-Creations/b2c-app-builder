@@ -1917,6 +1917,13 @@ export function register(h: Harness): void {
     1,
     "research.offer_test_waiver_missing",
   );
+  h.runScriptArgs(
+    "waiver date and actor mismatch reports a targeted JSON repair hint",
+    "check-research-evidence.ts",
+    ["--root", researchOfferWaiverStaleDifferentActor, "--json"],
+    1,
+    '"fixHint":"Add or correct one waiver row whose Date and Founder normalize to the final Decision row\'s Date and Decided by values."',
+  );
 
   const researchOfferWaiverWrongActor = makeWaivedOfferFixture(
     "research-offer-test-waiver-wrong-actor",

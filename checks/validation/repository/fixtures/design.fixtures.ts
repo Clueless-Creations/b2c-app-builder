@@ -46,6 +46,15 @@ function writeValidDesignExploration(root: string): void {
   const exploration = `exploration:
   schemaVersion: 1
   selectedConceptId: focus-canvas
+  process:
+    referenceAccess: structured-source
+    referenceAccessNote: The supplied reference pack was available as structured source; no unavailable Figma edit was represented as complete.
+    referenceInspection: The reference pack was inspected for object geometry, hierarchy, motion cues, and responsive composition before drafting.
+    tangibleDraft: A low-hierarchy canvas draft was rendered with the three surface treatments and a first onboarding path.
+    critique: A concrete review found that the first draft hid omissions on narrow screens and did not carry the empty-state cue into onboarding.
+    revision: The selected canvas direction added empty silhouettes, clarified the primary action, and carried the same object model through onboarding.
+    chosenTarget: The chosen target is a calm, direct packing canvas whose object geometry remains recognizable across native and web surfaces.
+    runtimeComparison: The implementation was compared with the chosen target on the first viewport, onboarding path, and responsive desktop composition; drift was repaired before acceptance.
   concepts:
     - id: focus-canvas
       name: Focus canvas

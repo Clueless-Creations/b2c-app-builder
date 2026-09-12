@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.57",
+  "version": "0.220.58",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Verify unselected scheduling stays parked across resume while explicit selection reaches only the approved effect boundary.",
     "Bound receipt-only repair to one continuation while preserving unaccepted candidate output provenance.",
     "Verify an approved full-launch mandate survives persisted run-state reload and re-enters without duplicate approval records.",
     "Prove that a protected authority hold leaves unrelated permitted frontier work visible and dispatchable.",

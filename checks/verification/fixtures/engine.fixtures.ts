@@ -1721,6 +1721,60 @@ export function register(harness: Harness): void {
     assert(getStatus(notNeededRun, nodeId("growth-post")) === "not_needed", "not-needed conditional scope did not retire the workflow");
   });
 
+  harness.check("schedule applicability: unselected scheduling stays parked across resume while explicit selection reaches only its approval boundary", () => {
+    const plan = compilePlan(toCatalogInput(composeCatalog(skillRoot)), now);
+    const schedule = plan.nodes.find((node) => node.workflowId === "workflow.operations.scheduled-autonomy-installation");
+    assert(schedule, "the real catalog must compile scheduled autonomy installation");
+    assert(schedule!.applicability.mode === "conditional", "scheduled installation must remain explicitly conditional");
+    assert(schedule!.approvals.length === 1, "schedule installation must retain its founder effect approval");
+
+    const declinedState = baseBusinessState();
+    declinedState.workflowApplicability = {
+      [schedule!.workflowId]: {
+        verdict: "not-needed",
+        reason: "Manual foreground sessions are sufficient for this business.",
+        evidence: ["operations/FOUNDER_BRIEF.md#manual-operation"],
+        updatedAt: now,
+      },
+    };
+    const declinedRun = seedRunState(plan, declinedState, { ownerSessionId: "schedule-selection", ttlSeconds: 60, wallClockCapSeconds: 60, now });
+    assert(getStatus(declinedRun, schedule!.id) === "not_needed", "declined scheduling must be parked as not_needed");
+    const declinedPath = path.join(harness.makeTempDir("schedule-selection-resume"), "run-state.json");
+    writeRunState(declinedPath, declinedRun);
+    const resumedDeclined = loadRunState(declinedPath);
+    assert(
+      !computeFrontier(plan, resumedDeclined, declinedState, allowAllAutonomyEvaluator).ready.includes(schedule!.id) &&
+        getStatus(resumedDeclined, schedule!.id) === "not_needed",
+      "ordinary resume must not repeat a declined scheduling question or invent installation evidence",
+    );
+
+    const selectedState = baseBusinessState();
+    selectedState.workflowApplicability = {
+      [schedule!.workflowId]: {
+        verdict: "required",
+        reason: "Founder selected recurring operation for the next operating phase.",
+        evidence: ["operations/FOUNDER_BRIEF.md#recurring-operation"],
+        updatedAt: now,
+      },
+    };
+    const selectedRun = seedRunState(plan, selectedState, { ownerSessionId: "schedule-selection", ttlSeconds: 60, wallClockCapSeconds: 60, now });
+    const selectedStateNode = selectedRun.nodes[schedule!.id]!;
+    const scheduleInputs = new Set<string>(schedule!.inputs);
+    const scheduleInput = selectedRun.artifactBindings.find((binding) => scheduleInputs.has(binding.artifactId));
+    if (scheduleInput) scheduleInput.accepted = true;
+    assert(
+      !computeFrontier(plan, selectedRun, selectedState, allowAllAutonomyEvaluator).ready.includes(schedule!.id) &&
+        getStatus(selectedRun, schedule!.id) === "waiting_founder",
+      "explicit scheduling selection must ask for the schedule effect approval before readiness",
+    );
+    selectedRun.approvals[schedule!.approvals[0]!.id] = "approved";
+    selectedStateNode.status = "pending";
+    assert(
+      computeFrontier(plan, selectedRun, selectedState, allowAllAutonomyEvaluator).ready.includes(schedule!.id),
+      "an explicitly selected and approved schedule must reach the dispatch frontier",
+    );
+  });
+
   harness.check(
     "profiles: a business's launch profile parks whole-lane breadth work, the founder verdict overrides, and a profile switch reopens with invalidated proof",
     () => {

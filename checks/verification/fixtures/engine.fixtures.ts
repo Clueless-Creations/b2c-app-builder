@@ -1728,6 +1728,21 @@ export function register(harness: Harness): void {
     assert(schedule!.applicability.mode === "conditional", "scheduled installation must remain explicitly conditional");
     assert(schedule!.approvals.length === 1, "schedule installation must retain its founder effect approval");
 
+    const unknownState = baseBusinessState();
+    const unknownRun = seedRunState(plan, unknownState, { ownerSessionId: "schedule-selection", ttlSeconds: 60, wallClockCapSeconds: 60, now });
+    const independentDesign = plan.nodes.find((node) => node.workflowId === "workflow.design.brand-definition");
+    assert(independentDesign, "the real catalog must compile independent design work");
+    for (const dependency of independentDesign!.dependencies) unknownRun.nodes[dependency]!.status = "succeeded";
+    const independentInputs = new Set<string>(independentDesign!.inputs);
+    for (const binding of unknownRun.artifactBindings) {
+      if (independentInputs.has(binding.artifactId)) binding.accepted = true;
+    }
+    const unknownFrontier = computeFrontier(plan, unknownRun, unknownState, allowAllAutonomyEvaluator);
+    assert(unknownFrontier.ready.includes(independentDesign!.id), "unknown scheduling intent must leave independent design work available");
+    assert(!unknownFrontier.ready.includes(schedule!.id), "unknown scheduling intent must not make schedule installation ready");
+    assert(getStatus(unknownRun, schedule!.id) === "waiting_founder", "unknown scheduling intent must remain an explicit founder question");
+    assert(!unknownState.workflowApplicability?.[schedule!.workflowId], "unknown scheduling intent must not infer an applicability verdict");
+
     const declinedState = baseBusinessState();
     declinedState.workflowApplicability = {
       [schedule!.workflowId]: {

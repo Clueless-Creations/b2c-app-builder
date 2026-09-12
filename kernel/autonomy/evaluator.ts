@@ -85,7 +85,11 @@ export function createAutonomyEvaluator(deps: AutonomyDeps): AutonomyEvaluatorV2
         // provider mutation. Draft/mutate system work remains local-only and therefore cannot
         // name a provider at all.
         const providerSafe = node.actionClass === "observe" || node.providerIds.length === 0;
-        const safe = internalAction && providerSafe && !node.protectedCategory && node.approvals.length === 0 && !node.costEstimate;
+        // A founder approval on a system-domain node can be the mandate for local
+        // coordination (for example the full-launch program). Frontier still checks
+        // the approval status; this evaluator must only reject approvals when they
+        // are paired with an otherwise protected, external, or costed action.
+        const safe = internalAction && providerSafe && !node.protectedCategory && !node.costEstimate;
         return safe
           ? { ...base, allowed: true, reasonCode: "autonomy.system_internal", evidenceRefs: [`system-domain:${node.domainId}`, `node:${node.id}`] }
           : {

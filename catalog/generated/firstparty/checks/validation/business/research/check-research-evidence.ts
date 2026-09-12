@@ -621,6 +621,16 @@ function validateSignalCorpus(value: string | undefined, target: ReturnType<type
       declaredInputIds.add(inputId);
     }
     if (!inputRowsValid) {
+      const invalidRow = inputRows.find((row) => {
+        const cells = inputColumnIndexes.map((column) => (row.cells[column] ?? "").trim());
+        const inputId = (cells[0] ?? "").toUpperCase();
+        return !(
+          /^INPUT-[A-Z0-9][A-Z0-9-]*$/.test(inputId) &&
+          cells.slice(1).every((cell) => cell.length > 0 && !placeholder.test(cell)) &&
+          isValidPastIsoDateRange(cells[4] ?? "") &&
+          !declaredInputIds.has(inputId)
+        );
+      });
       target.push(
         issue(
           "error",
@@ -628,6 +638,12 @@ function validateSignalCorpus(value: string | undefined, target: ReturnType<type
           "Every Corpus Inputs row needs a unique stable INPUT ID and an ISO-dated range. " +
             "It also needs real source, ownership, collection route, permission or public basis, and limits values.",
           "strategy/SIGNAL_CORPUS.md",
+          invalidRow
+            ? {
+                line: invalidRow.sourceLine,
+                fixHint: "Repair the named row's first invalid field; use one INPUT-* ID and a real YYYY-MM-DD date or date range.",
+              }
+            : undefined,
         ),
       );
     }
@@ -672,7 +688,14 @@ function validateSignalCorpus(value: string | undefined, target: ReturnType<type
       const supersessionValid = lifecycle !== "superseded" || !invalidSupersessionIds.has(id);
       const rowComplete =
         /^SIG-[A-Z0-9][A-Z0-9-]*$/.test(id) &&
-        [type, claim, appliesTo, trace].every((cell) => cell.length > 0 && !placeholder.test(cell)) &&
+        type.length > 0 &&
+        !placeholder.test(type) &&
+        claim.length > 0 &&
+        !isPlaceholderOnly(claim) &&
+        appliesTo.length > 0 &&
+        !placeholder.test(appliesTo) &&
+        trace.length > 0 &&
+        !placeholder.test(trace) &&
         isValidPastIsoDate(observedAt) &&
         /^(low|medium|high)$/i.test(confidence) &&
         /^(current|dated|superseded|rejected|unverified)$/.test(lifecycle) &&
@@ -688,13 +711,41 @@ function validateSignalCorpus(value: string | undefined, target: ReturnType<type
       if (lifecycle === "current" || lifecycle === "dated") index.eligibleSignalIds.add(id);
     }
     if (!rowsComplete) {
+      const invalidRow = signalRows.find((row) => {
+        const cells = recordColumns.map((column) => (row.cells[column] ?? "").trim());
+        const id = (cells[0] ?? "").toUpperCase();
+        const claim = cells[2] ?? "";
+        const sourceIds = parsePrefixedIdList(cells[3] ?? "", "INPUT");
+        return !(
+          /^SIG-[A-Z0-9][A-Z0-9-]*$/.test(id) &&
+          claim.length > 0 &&
+          !isPlaceholderOnly(claim) &&
+          isValidPastIsoDate(cells[4] ?? "") &&
+          /^(low|medium|high)$/i.test(cells[6] ?? "") &&
+          /^(current|dated|superseded|rejected|unverified)$/.test((cells[7] ?? "").toLowerCase()) &&
+          sourceIds.validSyntax &&
+          sourceIds.ids.length > 0 &&
+          sourceIds.ids.every((sourceId) => declaredInputIds.has(sourceId)) &&
+          [cells[1] ?? "", cells[5] ?? "", cells[9] ?? ""].every((cell) => cell.length > 0 && !placeholder.test(cell))
+        );
+      });
       target.push(
         issue(
           "error",
           "research.signal_corpus_row_missing",
           "Every declared Signal Records row needs a unique stable ID, dated provenance, applicability, confidence, a documented lifecycle, valid supersession data, and a trace pointer. " +
-            "A supersession chain must be acyclic and end at a current or dated replacement.",
+            "A supersession chain must be acyclic and end at a current or dated replacement." +
+            (invalidRow
+              ? ` First invalid row: line ${invalidRow.sourceLine}; inspect its ID, claim, date, confidence, lifecycle, source IDs, and trace fields.`
+              : ""),
           "strategy/SIGNAL_CORPUS.md",
+          invalidRow
+            ? {
+                line: invalidRow.sourceLine,
+                fixHint:
+                  "Keep narrative claims as prose; replace only a placeholder-only value, malformed ID/date, unsupported confidence/lifecycle, or unresolved INPUT-* reference.",
+              }
+            : undefined,
         ),
       );
     }
@@ -705,6 +756,14 @@ function validateSignalCorpus(value: string | undefined, target: ReturnType<type
           "research.signal_corpus_source_unresolved",
           "Every Source ID in Signal Records must resolve to a complete row in Corpus Inputs. Use comma-separated INPUT IDs only.",
           "strategy/SIGNAL_CORPUS.md",
+          (() => {
+            const row = signalRows.find((candidate) => {
+              const cells = recordColumns.map((column) => (candidate.cells[column] ?? "").trim());
+              const sourceIds = parsePrefixedIdList(cells[3] ?? "", "INPUT");
+              return !sourceIds.validSyntax || sourceIds.ids.length === 0 || sourceIds.ids.some((sourceId) => !declaredInputIds.has(sourceId));
+            });
+            return row ? { line: row.sourceLine, fixHint: "Declare each cited INPUT-* row in Corpus Inputs, or correct the reference syntax." } : undefined;
+          })(),
         ),
       );
     }
@@ -978,11 +1037,26 @@ function isCompleteSourceLedgerRow(cells: readonly string[], columns: SourceLedg
   const placeholder = /\b(pending|todo|tbd|placeholder|replace with|n\/a without reason)\b|<[^>]+>/i;
   const requiredTextCells = [source, platform, identity, backendQuery, transcriptVisual, observation, inference, artifactTrace];
   return Boolean(
-    requiredTextCells.every((cell) => cell?.trim() && !placeholder.test(cell)) &&
+    requiredTextCells.every((cell) => cell?.trim()) &&
+    [source, platform, identity, backendQuery, artifactTrace].every((cell) => !placeholder.test(cell ?? "")) &&
+    [transcriptVisual, observation, inference].every((cell) => !isPlaceholderOnly(cell ?? "")) &&
     isValidNonFutureRfc3339Instant(observedAt) &&
-    /^(low|medium|high)$/i.test(confidence?.trim() ?? "") &&
-    !placeholder.test(cells.join(" ")),
+    /^(low|medium|high)$/i.test(confidence?.trim() ?? ""),
   );
+}
+
+/**
+ * A narrative field is incomplete when it is itself a template marker, not
+ * merely because it describes an unresolved or future action. This keeps
+ * evidence uncertainty visible without treating ordinary prose as a blank.
+ */
+function isPlaceholderOnly(value: string): boolean {
+  const normalized = value
+    .trim()
+    .replace(/^[`*_\s]+|[`*_\s]+$/gu, "")
+    .replace(/[.!?:;]+$/gu, "")
+    .trim();
+  return /^(?:todo|tbd|pending|unverified|placeholder|replace with|to be filled|yyyy-mm-dd|<[^>]+>)$/i.test(normalized);
 }
 
 interface ParsedIdList {

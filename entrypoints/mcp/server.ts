@@ -40,13 +40,13 @@ import { resolveSkillRoot } from "../../tooling/lib/skill-root.js";
 import {
   anyWorkerRuntimeFound,
   connectionReceipt,
-  interpretConfiguredConnection,
   leftoverCliOnlyLocalMcpResponse,
   leftoverContributorLocalMcpResponse,
   leftoverWriteGatedLocalMcpResponse,
   LOCAL_CLIENT_NAME,
   localMcpInstructions,
   observedLocalWorkspaceHealth,
+  selectConfiguredSurface,
 } from "../../contracts/public-api/connection-receipt.js";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -136,19 +136,21 @@ const localWorkspaceHealth = observedLocalWorkspaceHealth({
   workerRuntimeFound: anyWorkerRuntimeFound(detectWorkerRuntimes()),
 });
 
-function localRuntimeConnection() {
-  return interpretConfiguredConnection({
-    clientName: LOCAL_CLIENT_NAME,
-    receipt: connectionReceipt({
-      mode: "local_execution",
-      engineVersion: skillVersion(),
-      observed: {
-        knowledge: knowledgeService ? "available" : "unavailable",
-        writes: readOnly ? "mcp_readonly" : "mcp_write_enabled",
-        ...localWorkspaceHealth,
-      },
-    }),
+function localRuntimeConnection(need: "workspace_planning" | "workspace_execution" = "workspace_planning") {
+  const receipt = connectionReceipt({
+    mode: "local_execution",
+    engineVersion: skillVersion(),
+    observed: {
+      knowledge: knowledgeService ? "available" : "unavailable",
+      writes: readOnly ? "mcp_readonly" : "mcp_write_enabled",
+      ...localWorkspaceHealth,
+    },
   });
+  const selection = selectConfiguredSurface({ entries: [{ clientName: LOCAL_CLIENT_NAME, receipt }], need });
+  if (selection.status !== "selected") {
+    throw new Error(`local connection cannot satisfy ${need}: ${selection.guidance}`);
+  }
+  return selection.connection;
 }
 
 const server = new McpServer(

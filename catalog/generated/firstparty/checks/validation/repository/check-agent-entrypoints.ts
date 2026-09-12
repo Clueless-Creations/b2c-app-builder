@@ -23,14 +23,22 @@
  * npm script: check:agent-entrypoints
  * Usage: tsx checks/validation/repository/check-agent-entrypoints.ts --repo-root /path/to/repo
  */
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { spawnSync } from "node:child_process";
 import { flagString, issue, parseFlags, reportAndExit, type Issue } from "../../../tooling/lib/launch-state.js";
 import { resolveSkillRoot } from "../../../tooling/lib/skill-root.js";
 
+import { checkStandingGuidance, measureGuidancePackets, type GuidancePacket } from "./agent-guidance-contract.js";
+
 const defaultRepoRoot = resolveSkillRoot(import.meta.url);
 
-const flags = parseFlags(process.argv.slice(2), [{ flags: ["--repo-root"], key: "repoRoot" }]);
+const flags = parseFlags(process.argv.slice(2), [
+  { flags: ["--repo-root"], key: "repoRoot" },
+  { flags: ["--guidance-baseline"], key: "guidanceBaseline" },
+  { flags: ["--guidance-source-ref"], key: "guidanceSourceRef" },
+  { flags: ["--guidance-report"], key: "guidanceReport" },
+]);
 const repoRoot = flagString(flags, "repoRoot") ?? defaultRepoRoot;
 
 const TEMPLATE = "surfaces/workspace-template/repo-agent-entrypoints";
@@ -200,4 +208,51 @@ for (const relative of WORKSPACE_FACING) {
   });
 }
 
+// Gate 4: standing obligations and portable projection. Structural evidence, not model proof.
+for (const finding of checkStandingGuidance(read)) issues.push(issue("error", finding.code, finding.detail, finding.file));
+
+// Explicit repository rehearsal only. Reports are create-only to protect the frozen A0 output.
+const baselinePath = flagString(flags, "guidanceBaseline");
+const reportPath = flagString(flags, "guidanceReport");
+const sourceRef = flagString(flags, "guidanceSourceRef");
+if (baselinePath || reportPath || sourceRef) {
+  try {
+    if (!baselinePath || !reportPath) throw new Error("Supply both --guidance-baseline and --guidance-report.");
+    if (sourceRef && !/^[a-f0-9]{40}$/u.test(sourceRef)) throw new Error("--guidance-source-ref must be a full commit SHA.");
+    const baseline = JSON.parse(readFileSync(path.resolve(repoRoot, baselinePath), "utf8")) as {
+      sourceRevision: string;
+      automaticallySupplied: string[];
+      cases: GuidancePacket[];
+    };
+    if (
+      !/^[a-f0-9]{40}$/u.test(baseline.sourceRevision) ||
+      !Array.isArray(baseline.cases) ||
+      baseline.cases.length !== 10 ||
+      baseline.automaticallySupplied?.join() !== ROOT_GUIDE
+    ) {
+      throw new Error("Expected the frozen ten-case A0 packet manifest with full AGENTS.md injection.");
+    }
+    const historicalRead = (relative: string): string | undefined => {
+      const shown = spawnSync("git", ["show", `${sourceRef}:${relative}`], { cwd: repoRoot, encoding: "utf8", maxBuffer: 8 * 1024 * 1024 });
+      if (shown.status !== 0) throw new Error(`Cannot read pinned source ${sourceRef}:${relative}: ${shown.stderr.trim()}`);
+      return shown.stdout;
+    };
+    const cases = measureGuidancePackets(baseline.cases, sourceRef ? historicalRead : read);
+    const report = {
+      baselineRevision: baseline.sourceRevision,
+      measuredSource: sourceRef ?? "current files, not necessarily committed",
+      basis: "Full declared file packets only; not observed agent traces, complete reading paths, or model tokens.",
+      modelId: null,
+      modelTokens: null,
+      observedAgentTrace: null,
+      serviceResult: null,
+      cases,
+    };
+    writeFileSync(path.resolve(repoRoot, reportPath), `${JSON.stringify(report, null, 2)}\n`, { flag: "wx" });
+  } catch (error) {
+    issues.push(
+      issue("error", "agent_entrypoints.guidance_measurement_failed", error instanceof Error ? error.message : String(error), baselinePath ?? ROOT_GUIDE),
+    );
+  }
+}
 reportAndExit("Agent entrypoint contract check", issues);

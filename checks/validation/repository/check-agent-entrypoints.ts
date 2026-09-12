@@ -220,9 +220,16 @@ if (baselinePath || reportPath || sourceRef) {
     if (!baselinePath || !reportPath) throw new Error("Supply both --guidance-baseline and --guidance-report.");
     if (sourceRef && !/^[a-f0-9]{40}$/u.test(sourceRef)) throw new Error("--guidance-source-ref must be a full commit SHA.");
     const baseline = JSON.parse(readFileSync(path.resolve(repoRoot, baselinePath), "utf8")) as {
-      sourceRevision: string; automaticallySupplied: string[]; cases: GuidancePacket[];
+      sourceRevision: string;
+      automaticallySupplied: string[];
+      cases: GuidancePacket[];
     };
-    if (!/^[a-f0-9]{40}$/u.test(baseline.sourceRevision) || !Array.isArray(baseline.cases) || baseline.cases.length !== 10 || baseline.automaticallySupplied?.join() !== ROOT_GUIDE) {
+    if (
+      !/^[a-f0-9]{40}$/u.test(baseline.sourceRevision) ||
+      !Array.isArray(baseline.cases) ||
+      baseline.cases.length !== 10 ||
+      baseline.automaticallySupplied?.join() !== ROOT_GUIDE
+    ) {
       throw new Error("Expected the frozen ten-case A0 packet manifest with full AGENTS.md injection.");
     }
     const historicalRead = (relative: string): string | undefined => {
@@ -235,12 +242,17 @@ if (baselinePath || reportPath || sourceRef) {
       baselineRevision: baseline.sourceRevision,
       measuredSource: sourceRef ?? "current files, not necessarily committed",
       basis: "Full declared file packets only; not observed agent traces, complete reading paths, or model tokens.",
-      modelId: null, modelTokens: null, observedAgentTrace: null, serviceResult: null,
+      modelId: null,
+      modelTokens: null,
+      observedAgentTrace: null,
+      serviceResult: null,
       cases,
     };
     writeFileSync(path.resolve(repoRoot, reportPath), `${JSON.stringify(report, null, 2)}\n`, { flag: "wx" });
   } catch (error) {
-    issues.push(issue("error", "agent_entrypoints.guidance_measurement_failed", error instanceof Error ? error.message : String(error), baselinePath ?? ROOT_GUIDE));
+    issues.push(
+      issue("error", "agent_entrypoints.guidance_measurement_failed", error instanceof Error ? error.message : String(error), baselinePath ?? ROOT_GUIDE),
+    );
   }
 }
 reportAndExit("Agent entrypoint contract check", issues);

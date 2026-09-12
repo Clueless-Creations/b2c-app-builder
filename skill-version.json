@@ -1,11 +1,12 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.5",
-  "updatedAt": "2026-09-11",
+  "version": "0.220.6",
+  "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
     "Expand catalog-backed task skills with bounded method bindings across all six public areas.",
     "Keep Apple JSON:API out of that decoder path. No live asc. Slot 89.",
-    "Simplify root agent guidance while preserving routing, authority, privacy, and conditional setup boundaries."
+    "Simplify root agent guidance while preserving routing, authority, privacy, and conditional setup boundaries.",
+    "Add structural controls for retained standing rules and A0 guidance accounting."
   ]
 }

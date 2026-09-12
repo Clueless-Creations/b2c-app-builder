@@ -2798,3 +2798,30 @@ sources:
     - docs/guides/task-skills.md
     notes: Informational host installation reference. Directory format does not establish runtime compatibility; no
       external skill text is incorporated.
+  - id: postiz-public-api-create-post
+    name: Postiz public API create-post documentation
+    source_type: website
+    url: https://docs.postiz.com/public-api/posts/create
+    refresh_cadence_days: 30
+    owner: b2c-maintainers
+    locations:
+      - examples/extensions/postiz-social/integration.md
+    notes: Official request and response examples for draft and scheduled posts. Fixture qualification only; no live provider proof.
+  - id: postiz-public-api-index
+    name: Postiz public API documentation index
+    source_type: website
+    url: https://docs.postiz.com/public-api/introduction
+    refresh_cadence_days: 30
+    owner: b2c-maintainers
+    locations:
+      - examples/extensions/postiz-social/integration.md
+    notes: Official list/delete endpoint index and provider boundary context. No account or mutation was exercised.
+  - id: postiz-agent-cli
+    name: Postiz official agent CLI repository
+    source_type: github
+    url: https://github.com/gitroomhq/postiz-agent
+    refresh_cadence_days: 30
+    owner: b2c-maintainers
+    locations:
+      - examples/extensions/postiz-social/integration.md
+    notes: License and transport comparison only. AGPL-3.0 CLI code is not vendored or executed.

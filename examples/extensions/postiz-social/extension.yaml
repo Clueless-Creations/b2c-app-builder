@@ -1,0 +1,178 @@
+apiVersion: b2c.extension/v1
+id: postiz-social/package
+version: 1.0.0
+hostApiVersion: b2c/v1
+title: Postiz social post staging and scheduling (manual provider boundary)
+dependencies: []
+imports: []
+resources:
+  - id: postiz-social/post-input
+    path: schemas/post.input.json
+    kind: schema
+    mediaType: application/json
+  - id: postiz-social/post-output
+    path: schemas/post.output.json
+    kind: schema
+    mediaType: application/json
+  - id: postiz-social/post-evidence
+    path: schemas/post.evidence.json
+    kind: schema
+    mediaType: application/json
+  - id: postiz-social/integration
+    path: integration.md
+    kind: knowledge
+    mediaType: text/markdown
+providers:
+  - id: postiz-social/postiz-api
+    version: 1.0.0
+    title: Postiz public API
+    description: Postiz public API v1 for explicitly selected social-account targets. Authentication and account connection remain outside this package.
+capabilities:
+  - id: postiz-social/posts
+    version: 1.0.0
+    title: Social post staging, scheduling, reading, and removal
+    description: Provider-specific extension operations for Postiz. Drafting is reviewable; scheduling and deletion remain founder-gated effects.
+    targets:
+      - platform: host
+        runtime: node24
+    knowledge:
+      - postiz-social/integration
+    operations:
+      - id: postiz-social/posts.draft
+        title: Create a draft post
+        inputSchema: postiz-social/post-input
+        outputSchema: postiz-social/post-output
+        evidenceSchema: postiz-social/post-evidence
+        effect: draft
+        acceptance:
+          - The request uses type draft and never schedules or publishes content.
+          - The returned provider postId and integration identifiers are preserved as unaccepted provider observations.
+          - No account connection, credential write, or provider setup is performed by this operation.
+      - id: postiz-social/posts.schedule
+        title: Schedule a post
+        inputSchema: postiz-social/post-input
+        outputSchema: postiz-social/post-output
+        evidenceSchema: postiz-social/post-evidence
+        effect: publish
+        acceptance:
+          - The selected account, content, date, and founder approval envelope are bound before dispatch.
+          - An uncertain response is reconciled through a post read before any retry.
+          - This extension declares the effect but does not grant scheduling authority.
+      - id: postiz-social/posts.list
+        title: Read posts
+        inputSchema: postiz-social/post-input
+        outputSchema: postiz-social/post-output
+        evidenceSchema: postiz-social/post-evidence
+        effect: observe
+        acceptance:
+          - The observation is read-only and preserves provider post identifiers and status.
+          - Missing or ambiguous target identity stays unresolved.
+      - id: postiz-social/posts.delete
+        title: Delete a post
+        inputSchema: postiz-social/post-input
+        outputSchema: postiz-social/post-output
+        evidenceSchema: postiz-social/post-evidence
+        effect: destructive
+        acceptance:
+          - The exact provider post identifier and founder approval envelope are bound before dispatch.
+          - An uncertain response is reconciled by listing the target before any retry.
+          - This extension never treats a failed local request as proof that the remote post was untouched.
+implementations:
+  - id: postiz-social/posts-draft
+    version: 1.0.0
+    operation: postiz-social/posts.draft
+    provider: postiz-social/postiz-api
+    description: Manual or future host-controlled API implementation for the Postiz draft endpoint. Repository fixtures use an injected fake transport only.
+    targets:
+      - platform: host
+        runtime: node24
+    mode: manual
+    sdkRange: "public-api-v1"
+    limitations:
+      - No live Postiz account, credential, or transport is connected.
+      - The Postiz agent CLI is AGPL-3.0 and is not vendored or used as this implementation.
+      - Provider settings vary by platform and are not normalized by this package.
+      - Draft output is not product acceptance or permission to publish.
+    knowledge:
+      - postiz-social/integration
+    connectionRequired: true
+    maturity: experimental
+  - id: postiz-social/posts-schedule
+    version: 1.0.0
+    operation: postiz-social/posts.schedule
+    provider: postiz-social/postiz-api
+    description: Manual or future host-controlled API implementation for scheduling after a separate founder approval.
+    targets:
+      - platform: host
+        runtime: node24
+    mode: manual
+    sdkRange: "public-api-v1"
+    limitations:
+      - No live scheduling is implemented or verified.
+      - Scheduling remains a founder-only effect and requires independent readback.
+    knowledge:
+      - postiz-social/integration
+    connectionRequired: true
+    maturity: experimental
+  - id: postiz-social/posts-list
+    version: 1.0.0
+    operation: postiz-social/posts.list
+    provider: postiz-social/postiz-api
+    description: Manual or future host-controlled API implementation for read-only post listing.
+    targets:
+      - platform: host
+        runtime: node24
+    mode: manual
+    sdkRange: "public-api-v1"
+    limitations:
+      - No live read has been performed; fixtures use an injected fake transport only.
+    knowledge:
+      - postiz-social/integration
+    connectionRequired: true
+    maturity: experimental
+  - id: postiz-social/posts-delete
+    version: 1.0.0
+    operation: postiz-social/posts.delete
+    provider: postiz-social/postiz-api
+    description: Manual or future host-controlled API implementation for deletion after separate founder approval.
+    targets:
+      - platform: host
+        runtime: node24
+    mode: manual
+    sdkRange: "public-api-v1"
+    limitations:
+      - No live deletion is implemented or verified.
+      - Deletion is destructive and never automatically retried.
+    knowledge:
+      - postiz-social/integration
+    connectionRequired: true
+    maturity: experimental
+recipes:
+  - id: postiz-social/post-review
+    version: 1.0.0
+    title: Stage and review a Postiz social post
+    description: Stage a draft for review. Scheduling and deletion are separate founder-gated operations.
+    maturity: experimental
+    targets:
+      - platform: host
+        runtime: node24
+    workflows:
+      - workflow.postiz-social-draft
+    operations:
+      - operation: postiz-social/posts.draft
+        implementation: postiz-social/posts-draft
+        required: true
+        workflowIds:
+          - workflow.postiz-social-draft
+        workflowContexts:
+          - workflowId: workflow.postiz-social-draft
+            instructions: implementation
+            roleInstructions: implementation
+            neutralReferenceIds: []
+            providerReferenceIds:
+              - postiz-social/integration
+            neutralContextPackIds: []
+            providerContextPackIds: []
+    policy:
+      maxRepairAttempts: 1
+      independentReview: true

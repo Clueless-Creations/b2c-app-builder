@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.25",
+  "version": "0.220.26",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Add a source-and-fixture-only Postiz API extension boundary without live provider access.",
     "Verify managed cron schedule state after apply and uninstall readback.",
     "Preserve narrative research uncertainty while rejecting placeholder-only fields.",
     "Reject placeholder worker-receipt reasons while preserving typed explanations.",

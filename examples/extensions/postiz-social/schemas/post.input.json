@@ -1,0 +1,13 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "postId": { "type": "string", "minLength": 1 },
+    "integrationId": { "type": "string", "minLength": 1 },
+    "type": { "enum": ["draft", "schedule"] },
+    "date": { "type": "string", "format": "date-time" },
+    "content": { "type": "string", "minLength": 1 },
+    "platform": { "type": "string", "minLength": 1 }
+  },
+  "required": ["content", "platform"]
+}

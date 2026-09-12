@@ -310,6 +310,7 @@ if (text) {
           /\d{4}-\d{2}-\d{2}/.test(sourceCell)
         );
       };
+      const invalidRevenueRow = revenueRows.find((row) => !sourcedRow(row));
       if (revenueColumn < 0 || sourceColumn < 0 || !rowsMatchTableWidth(revenueSection) || !revenueRows.some(sourcedRow)) {
         issues.push(
           issue(
@@ -319,6 +320,10 @@ if (text) {
               "column AND a dated, non-placeholder source in the source column. Collecting AppKittie data is not the gate — the judged, " +
               "sourced number is: a category whose top apps gross too little cannot become a real business however well the launch executes.",
             "strategy/RESEARCH.md",
+            {
+              line: invalidRevenueRow?.sourceLine ?? revenueSection.headingLine,
+              fixHint: "Repair the cited Category Revenue Reality row with a dollar estimate and a dated, non-placeholder source in the named columns.",
+            },
           ),
         );
       }
@@ -381,6 +386,29 @@ if (text) {
           );
         });
       if (!rowsValid) {
+        const invalidDistributionRow = rows.find((row) => {
+          const cells = distributionColumnIndexes.map((column) => (row.cells[column] ?? "").trim());
+          const audience = cells[0] ?? "";
+          const location = cells[1] ?? "";
+          const format = cells[2] ?? "";
+          const ownedRoute = cells[3] ?? "";
+          const measuredSignal = cells[4] ?? "";
+          const evidenceIds = cells[5] ?? "";
+          const parsedEvidenceIds = parseStableIdList(evidenceIds);
+          const evidenceResolved =
+            parsedEvidenceIds.validSyntax &&
+            parsedEvidenceIds.ids.length > 0 &&
+            parsedEvidenceIds.ids.every((evidenceId) => sourceLedgerIds.has(evidenceId) || signalEvidence.eligibleSignalIds.has(evidenceId));
+          return !(
+            [audience, location, format, ownedRoute, measuredSignal, evidenceIds].every(
+              (cell) => cell.length > 0 && !PLACEHOLDER_TEXT.test(cell) && !/\breplace with\b/i.test(cell),
+            ) &&
+            !isAbsentOwnedRelationship(ownedRoute) &&
+            !genericLocation.test(location) &&
+            /\d/.test(measuredSignal) &&
+            evidenceResolved
+          );
+        });
         issues.push(
           issue(
             "error",
@@ -388,6 +416,10 @@ if (text) {
             "Every Distribution Proof row needs a specific audience, discovery location, native format, owned route, and numeric measured signal. " +
               "Each Evidence ID must resolve through a complete Source Ledger row's URL/source-ID or Artifact/trace cell, or through a current/dated Signal Record.",
             "strategy/RESEARCH.md",
+            {
+              line: invalidDistributionRow?.sourceLine ?? distributionSection.headingLine,
+              fixHint: "Repair the cited Distribution Proof row's first failing field and resolve every Evidence ID before rerunning the check.",
+            },
           ),
         );
       }

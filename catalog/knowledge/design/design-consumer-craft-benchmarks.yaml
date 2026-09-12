@@ -13,7 +13,7 @@ bindings:
     - workflow.design.implementation-craft-audit
     - workflow.orchestration.full-launch-program
   context_pack_ids: []
-applicability_notes: Select relevant principles; the eight examples span mobile, desktop, games, and spatial products. Public image inspection is not installed-app interaction proof. This reference adds no default context bundle.
+applicability_notes: Select relevant principles; the nine examples span mobile, desktop, games, wellness, and spatial products. Public image or product-page inspection is not installed-app interaction proof. Quabble is founder-selected and source-described here; no clinical, retention, accessibility, or runtime claim is adopted. This reference adds no default context bundle.
 sources:
   - id: craft-apple-design-awards-2026
     name: Apple Design Awards 2026
@@ -102,4 +102,28 @@ sources:
     review_cadence_days: 90
     claim_scope: Inspected official phone imagery showing timeline, duration, labels, icons, and completion affordances. No installed-app performance or accessibility proof.
     last_review_date: 2026-09-04
+    reviewer: b2c-maintainers
+  - id: craft-quabble-official-site
+    name: Quabble Official Product Site
+    source_type: inspiration_benchmark
+    url: https://quabble.app/
+    review_cadence_days: 90
+    claim_scope: Founder-selected source description of the duck companion, virtual park, daily routines, named mind workouts, First Bloom journey, and official product imagery. No installed-app interaction, clinical efficacy, retention, or accessibility claim.
+    last_review_date: 2026-09-12
+    reviewer: b2c-maintainers
+  - id: craft-quabble-app-store
+    name: Quabble App Store Listing
+    source_type: inspiration_benchmark
+    url: https://apps.apple.com/us/app/quabble-daily-mental-health/id6445948886
+    review_cadence_days: 90
+    claim_scope: Current first-party store description, developer identity, platform metadata, named activities, and promotional image availability. Store copy and images do not prove runtime behavior or therapeutic benefit.
+    last_review_date: 2026-09-12
+    reviewer: b2c-maintainers
+  - id: craft-quabble-google-play
+    name: Quabble Google Play Listing
+    source_type: inspiration_benchmark
+    url: https://play.google.com/store/apps/details?id=com.museLIVE.quabbleapp
+    review_cadence_days: 90
+    claim_scope: Current first-party store description and Android listing identity used to corroborate product scope. No installed-app interaction or cross-platform parity claim.
+    last_review_date: 2026-09-12
     reviewer: b2c-maintainers

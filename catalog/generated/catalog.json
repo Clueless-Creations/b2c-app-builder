@@ -1,6 +1,6 @@
 {
   "schemaVersion": "2.0.0",
-  "skillVersion": "0.220.26",
+  "skillVersion": "0.220.27",
   "areas": [
     {
       "id": "area.operating-system",
@@ -2371,7 +2371,7 @@
       "title": "Consumer Craft Benchmarks",
       "loadWhen": "calibrating complete consumer-business mobile and landing craft against primary-source product examples before production and independent review",
       "lifecycle": "active",
-      "applicabilityNotes": "Select relevant principles; the eight examples span mobile, desktop, games, and spatial products. Public image inspection is not installed-app interaction proof. This reference adds no default context bundle.",
+      "applicabilityNotes": "Select relevant principles; the nine examples span mobile, desktop, games, wellness, and spatial products. Public image or product-page inspection is not installed-app interaction proof. Quabble is founder-selected and source-described here; no clinical, retention, accessibility, or runtime claim is adopted. This reference adds no default context bundle.",
       "sources": [
         {
           "id": "craft-apple-design-awards-2026",
@@ -2482,12 +2482,42 @@
           "claimScope": "Inspected official phone imagery showing timeline, duration, labels, icons, and completion affordances. No installed-app performance or accessibility proof.",
           "lastReviewDate": "2026-09-04",
           "reviewer": "b2c-maintainers"
+        },
+        {
+          "id": "craft-quabble-official-site",
+          "name": "Quabble Official Product Site",
+          "sourceType": "inspiration_benchmark",
+          "url": "https://quabble.app/",
+          "reviewCadenceDays": 90,
+          "claimScope": "Founder-selected source description of the duck companion, virtual park, daily routines, named mind workouts, First Bloom journey, and official product imagery. No installed-app interaction, clinical efficacy, retention, or accessibility claim.",
+          "lastReviewDate": "2026-09-12",
+          "reviewer": "b2c-maintainers"
+        },
+        {
+          "id": "craft-quabble-app-store",
+          "name": "Quabble App Store Listing",
+          "sourceType": "inspiration_benchmark",
+          "url": "https://apps.apple.com/us/app/quabble-daily-mental-health/id6445948886",
+          "reviewCadenceDays": 90,
+          "claimScope": "Current first-party store description, developer identity, platform metadata, named activities, and promotional image availability. Store copy and images do not prove runtime behavior or therapeutic benefit.",
+          "lastReviewDate": "2026-09-12",
+          "reviewer": "b2c-maintainers"
+        },
+        {
+          "id": "craft-quabble-google-play",
+          "name": "Quabble Google Play Listing",
+          "sourceType": "inspiration_benchmark",
+          "url": "https://play.google.com/store/apps/details?id=com.museLIVE.quabbleapp",
+          "reviewCadenceDays": 90,
+          "claimScope": "Current first-party store description and Android listing identity used to corroborate product scope. No installed-app interaction or cross-platform parity claim.",
+          "lastReviewDate": "2026-09-12",
+          "reviewer": "b2c-maintainers"
         }
       ],
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/design/consumer-craft-benchmarks.md",
-        "sha256": "sha256:b98aa7bd752f8877eafd22eaf80b765981d1266bd6c90befbecddf9042b28142",
+        "sha256": "sha256:31c718cfa67c770ff32fef11d9305df94e9de206318baa59022c8d0efda2a273",
         "origin": "skill"
       }
     },
@@ -18824,14 +18854,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "7d623089b649d9d1f55499753b421376ce55300bc1caa9adf419449e5ffcb503",
+    "fingerprint": "5ed2858a85b0108ffee5b0d2361d7e3ac8e972791f56486b0d1738811f38b2ca",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
-        "version": "0.220.26",
-        "revision": "0.220.26",
-        "contentDigest": "9c3a151e73ab5fcdacedc0a043afc1aaa0167cc4f1705d15e029c857c5f91004"
+        "version": "0.220.27",
+        "revision": "0.220.27",
+        "contentDigest": "56c3f0f95bd9dfb40d6b0ec5804a36b9150ed082f20007bf155fa334db5f66f5"
       }
     ],
     "base": {

@@ -25,6 +25,14 @@ export function register(h: Harness): void {
 
   const researchBaseline = makeFixture("research-baseline");
   runFixture("shipped research template passes before the lane is claimed", researchBaseline, "check-research-evidence.ts", 0);
+  runFixture(
+    "research check exposes a read-only contract explanation without validating or mutating the workspace",
+    researchBaseline,
+    "check-research-evidence.ts",
+    0,
+    '"check":"research-workflow-output"',
+    ["--explain"],
+  );
 
   const researchWorkflowStarter = makeFixture("research-workflow-starter");
   runFixture(

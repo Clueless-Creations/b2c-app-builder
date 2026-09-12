@@ -598,6 +598,37 @@ if (verdictRequired) {
   validateOfferTest(offerText, issues, isFounderDecider);
 }
 
+if (process.argv.includes("--explain")) {
+  console.log(
+    JSON.stringify({
+      check: "research-workflow-output",
+      description: "Read-only structural and evidence contract for the research artifacts.",
+      artifacts: {
+        research: {
+          path: "strategy/RESEARCH.md",
+          requiredSections: ["Source Ledger", "Decision Inputs", "Decision Log", "Category Revenue Reality", "Go, Pivot, Or Kill"],
+          confidence: ["low", "medium", "high"],
+          dates: "past ISO/RFC3339 dates; future observations are invalid",
+        },
+        signalCorpus: {
+          path: "strategy/SIGNAL_CORPUS.md",
+          requiredSections: ["Corpus Inputs", "Signal Records", "Conflicts And Supersession", "Derived Outputs"],
+          ids: "explicit INPUT-* and SIG-* identifiers; supported separators remain valid",
+          status: ["current", "superseded", "rejected", "unverified"],
+        },
+        offerTest: {
+          path: "strategy/OFFER_TEST.md",
+          requiredSections: ["Test Contract", "Measurement", "Decision"],
+          waiver: "a waiver must bind to the final decision date and actor",
+        },
+      },
+      lifecycle: "Go, Pivot, or Kill is an authored checkpoint; explanation does not initialize a lane or certify a claim.",
+      limits: "This explains the enforced contract. It does not replace validation, independent review, or runtime/provider proof.",
+    }),
+  );
+  process.exit(0);
+}
+
 reportAndExit("Research evidence check", issues);
 
 interface SignalCorpusIndex {

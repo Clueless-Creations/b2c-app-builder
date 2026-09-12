@@ -855,6 +855,12 @@ export function register(harness: Harness): void {
     run.approvals[fullLaunch!.approvals[0]!.id] = "approved";
     state.status = "pending";
     assert(computeFrontier(plan, run, businessState, evaluator).ready.includes(fullLaunch!.id), "approved local mandate must reach the frontier");
+
+    run.approvals[fullLaunch!.approvals[0]!.id] = "rejected";
+    state.status = "pending";
+    const rejected = computeFrontier(plan, run, businessState, evaluator);
+    assert(!rejected.ready.includes(fullLaunch!.id), "a rejected mandate must not reach the frontier");
+    assert(getStatus(run, fullLaunch!.id) === "blocked", "a rejected mandate must settle as blocked");
   });
 
   // ---------------------------------------------------------------------

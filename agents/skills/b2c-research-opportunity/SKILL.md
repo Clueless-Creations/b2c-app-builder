@@ -21,7 +21,28 @@ For an existing managed business, read business-status then business-plan and us
 
 For a review, assess the existing evidence against this method and return findings; do not execute its authoring or mutation instructions. For requested creation or implementation, follow the method only within the accepted scope and authority.
 
-When no idea exists, compare three safe, feasible consumer-app opportunities before committing an app identity or build. Judge economics, recurring pain, reachable distribution, transformation clarity, complete-product feasibility, and sensitivity risk. If the opening request delegates product selection, choose the strongest candidate that clears the evidence bar and record `Founder opening mandate` as the decision authority. Otherwise, recommend one candidate for Go, Pivot, or Kill. Return no candidate instead of forcing a weak idea. Before a paid research request, use research-lookup with its provider/version, connection, operation and non-secret arguments under an explicit freshness limit. Reuse saved current results. In a registered planning workspace, checkpoint pending through research-record before dispatch, then checkpoint the actual observed, failed or uncertain result immediately; read back uncertain requests before replay. Use the selected research implementations and their current reference procedures. Honor explicit provider bindings. If an unavailable source has an authorized fallback, label its evidence limits; do not silently replace the selected source or infer unavailable evidence. Use the bound research references to write dated source evidence, category economics, demand, wedge, distribution, offer response, transformation demo, paying niche, signal provenance, conflicts, and the decision into strategy/RESEARCH.md, strategy/SIGNAL_CORPUS.md, and strategy/OFFER_TEST.md. Use the default category bar only when the work has not set a better one: top-ten gross of at least $5M per year with two apps above $1M each. Author accepted product facts in product.yaml, then render PRODUCT.md. Do not hand-edit PRODUCT.md. Before the product is accepted, define its core loop, Complete product scope, moat path, and beat moment. Run check:research-workflow-output. Do not harden a direction that fails it.
+Before the spec hardens, ask the question a good idea and a good business both answer
+differently: **is this market big enough to be worth building in at all?** Pull top-competitor
+revenue estimates (AppKittie, sorted by revenue) and judge them against a stated bar.
+
+Default bar: the top 10 apps in the target category gross at least **$5M/year combined**, with
+at least **two independent apps each clearing $1M/year**. A category whose leaders gross too
+little cannot become a real business however well the launch executes — no amount of good
+onboarding, ASO, or paid UA fixes a market that is not there. Adjust the bar with the founder
+for a deliberate niche play, and record why the adjustment is legitimate rather than a way to
+pass a category that would otherwise fail.
+
+`check:research` reads the `## Category Revenue Reality` section's table, not the phrase in
+prose, and requires:
+
+- at least one competitor row with a real dollar estimate in the revenue column AND a dated
+  (`YYYY-MM-DD`), non-placeholder source in the source column — collecting the AppKittie data
+  is not the gate, the sourced number judged against the bar is
+- a "stated bar" line carrying an actual number, not a blank or placeholder
+- an explicit `pass or fail:` judgment line against that bar
+
+A pass verdict over no stated threshold, or a table with rows but no judgment line, is data
+collection wearing a gate's clothes.
 
 ## Load only what the task needs
 

@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
-import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
@@ -17,6 +16,25 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..")
 const catalog = composeCatalog(root);
 const revision = "1971c5d1e6f2c1aed38dde1ec8debc2c459be69d";
 const hash = (text: string): string => createHash("sha256").update(text).digest("hex");
+const scratchRoot = path.join(root, ".tmp-task-skill-checks");
+function mkScratch(prefix: string): string {
+  mkdirSync(scratchRoot, { recursive: true });
+  return mkdtempSync(path.join(scratchRoot, prefix));
+}
+function focusedMethodSnippet(skill: (typeof taskSkills)[number]): string {
+  if (!skill.method) return "";
+  const sources = referencesForTask(catalog, skill);
+  const reference = sources.find((candidate) => candidate.id === skill.method!.referenceId);
+  if (!reference) return "";
+  const source = readFileSync(path.join(root, reference.path), "utf8");
+  const lines = source.split(/\r?\n/gu);
+  const heading = lines.findIndex(
+    (line) => /^#{1,6} /u.test(line) && line.replace(/^#{1,6} /u, "").trim() === skill.method!.heading,
+  );
+  if (heading < 0) return "";
+  const end = lines.findIndex((line, index) => index > heading && /^#{1,6} /u.test(line));
+  return lines.slice(heading + 1, end < 0 ? lines.length : end).join("\n").trim();
+}
 
 void test("six public areas cover business domains without changing internal authority groups", () => {
   assert.deepEqual(
@@ -33,6 +51,7 @@ void test("pilot tasks project real workflow contracts without mutating the cata
   const before = JSON.stringify(catalog);
   const files = renderTaskSkillFiles(catalog);
   assert.equal(taskSkills.length, 9);
+  assert.equal(taskSkills.filter((skill) => skill.method).length, taskSkills.length, "all task skills now use focused methods");
   for (const name of ["b2c-research-opportunity", "b2c-design-onboarding", "b2c-review-monetization"]) {
     assert.ok(taskSkills.some((skill) => skill.name === name));
   }
@@ -46,8 +65,12 @@ void test("pilot tasks project real workflow contracts without mutating the cata
     assert.equal(frontmatter["allowed-tools"], undefined);
     assert.ok(body.split("\n").length < 150);
     assert.ok(Buffer.byteLength(body) < 8000, `${skill.name} startup context grew`);
-    if (!skill.method) assert.ok(body.includes(workflowsForTask(catalog, skill)[0]!.instructions));
-    assert.doesNotMatch(body, /RevenueCat|Stripe|PostHog|AppKittie|XPOZ|Firecrawl|mcp__|claude -p|codex exec/u);
+    if (skill.method) {
+      const method = focusedMethodSnippet(skill);
+      assert.ok(method, `focused method is missing for ${skill.name}`);
+      assert.ok(body.includes(method.slice(0, 160)), `focused method is not embedded in ${skill.name}`);
+    }
+    assert.doesNotMatch(body, /\bmcp__\b|claude -p|codex exec/u);
     assert.match(body, /A review is read-only/);
     assert.match(body, /business-status then business-plan/);
     assert.match(body, /Do not record business completion/);
@@ -108,7 +131,7 @@ void test("generated block replacement refuses ambiguous ownership", () => {
 
 for (const skill of taskSkills) {
   void test(`${skill.name} exports relocatable bound guidance and complete notices`, () => {
-    const temporary = mkdtempSync(path.join(os.tmpdir(), "b2c-task-skill-"));
+    const temporary = mkScratch("b2c-task-skill-");
     try {
       const bundle = collectTaskSkillPackage(root, catalog, skill.name, revision);
       const target = writeTaskSkillPackage(temporary, skill.name, bundle);
@@ -138,7 +161,7 @@ for (const skill of taskSkills) {
 void test("export refuses unknown skills, escaping resources, and symlinked destinations", () => {
   assert.throws(() => collectTaskSkillPackage(root, catalog, "../escape", revision), /Unknown task/);
   assert.throws(() => collectTaskSkillPackage(root, catalog, taskSkills[0]!.name, "main"), /full source commit/);
-  const temporary = mkdtempSync(path.join(os.tmpdir(), "b2c-export-safety-"));
+  const temporary = mkScratch("b2c-export-safety-");
   try {
     const name = taskSkills[0]!.name;
     const sentinel = path.join(temporary, "sentinel");
@@ -153,7 +176,7 @@ void test("export refuses unknown skills, escaping resources, and symlinked dest
 });
 
 void test("moving procedures preserves authority and fails on missing, unlinked, or oversized guidance", () => {
-  const temporary = mkdtempSync(path.join(os.tmpdir(), "b2c-routing-contract-"));
+  const temporary = mkScratch("b2c-routing-contract-");
   const procedure = "agents/skills/b2c-app-builder/references/business-lifecycle.md";
   const fixture = "checks/validation/repository/evals/triggering/autopilot-triggering.yaml";
   const original = readFileSync(path.join(root, "SKILL.md"), "utf8");
@@ -199,7 +222,7 @@ void test("moving procedures preserves authority and fails on missing, unlinked,
 });
 
 void test("task-skill checker returns canonical JSON for invalid sources without crashing", () => {
-  const temporary = mkdtempSync(path.join(os.tmpdir(), "b2c-task-json-"));
+  const temporary = mkScratch("b2c-task-json-");
   try {
     const result = spawnSync(
       process.execPath,

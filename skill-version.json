@@ -4,6 +4,7 @@
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Refresh the evidence-schema fingerprint after rendering the authority-matrix projections.",
     "Reject denied founder mandates before a full-launch dispatch can reach the execution frontier.",
     "Adopt Brigade as the human-facing product name while preserving stable technical identities.",
     "Keep the hosted wrong-surface matrix complete for every CLI-only public operation.",

@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.29",
+  "version": "0.220.30",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Reject denied founder mandates before a full-launch dispatch can reach the execution frontier.",
     "Adopt Brigade as the human-facing product name while preserving stable technical identities.",
     "Keep the hosted wrong-surface matrix complete for every CLI-only public operation.",
     "Route local planning capability through the canonical connection-surface selector before exposing it to MCP callers.",

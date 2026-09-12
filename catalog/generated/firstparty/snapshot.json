@@ -2,7 +2,7 @@
   "extension": {
     "apiVersion": "b2c.extension/v1",
     "id": "b2c/consumer-business",
-    "version": "0.220.29",
+    "version": "0.220.30",
     "hostApiVersion": "b2c/v1",
     "title": "Consumer business",
     "dependencies": [],
@@ -15764,8 +15764,8 @@
     ]
   },
   "files": {
-    "extension.yaml": "bcbe1fbf20f0ef8851f13b744543a3c448347d32b055ac5add3bec5ec4d63eb5",
-    "catalog-pack.yaml": "eca95384caa5a9616a39a1969c6b2aaf08a364c76bdc9bb091aede002431feee",
+    "extension.yaml": "2ea4309a4851ee4583dae699dd9628d60cacee16ed7c148b18a54e851f268974",
+    "catalog-pack.yaml": "62d1c28854d3a4265d47aaf876f0525dab8a20308544865b5490e71d2e78ef4c",
     "knowledge/data/analytics-attribution.md": "0bba4685b2188b9e80b7fcc14fdac9472c6c4aeac5bc59703188eaa5e26f234a",
     "knowledge/data/posthog-agent-tooling.md": "61ffdbc79a985a41a11fbe6e1c7c5663050104208baa9d05b8ebe33186ab93cc",
     "knowledge/design/audience-derived-identity.md": "04c90b39c9d41cf00257c70b4e579f3e29684254d444917b9a5690d48be74f5f",
@@ -15912,7 +15912,7 @@
     "knowledge/words/conversion-copy.md": "68739b91f0f977f28718f48dd2368bb8c59a03a3f3d44a30efa08d12eb2956ab",
     "knowledge/words/no-slop-writing.md": "4dcb9d8a78fcee18daa5b46ced399f8b41992853141ff3a9e9b1906d263a98cb",
     "checks/validation/repository/audit-skill-links.ts": "781b1715e075b59ce673fbefad9bacab29eceb93e9f96ef60944bfda884eaf5c",
-    "package.json": "f7a9a606bc96975001402f53474989c5c4fd9ad15d004e427ba2e3314623d990",
+    "package.json": "e8c5c46ea6c5d831d0213df070566533ef1c8218a3b6f4d66acfaa0d8742036f",
     "tooling/catalog-scaffold.ts": "6a54386c9259c97834599249115b0dd82308c16e2c9bb35c02f3058280467077",
     "catalog/render-routing.ts": "938e29aaed5cf37c03afe8a2cf755af35b8921ad5ca86fd54968095291c2898c",
     "checks/validation/repository/check-agent-entrypoints.ts": "2a28cd19506f7f27d8f489ba1aaa607d807d6b1d5872c4f13fb3fab702e75a4e",
@@ -16225,5 +16225,5 @@
     "catalog/upstreams/notices/parth-app-store-screenshots.txt": "a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a"
   },
   "dependencies": [],
-  "digest": "sha256:6e1337cd05180c05a9cf551aa6b03f545bd24cf76440145d78da127e73d5f992"
+  "digest": "sha256:5acc37c4a6afc12f3677fda6f5ce12f232df39b72a5cdb78d5925576ed6b11e8"
 }

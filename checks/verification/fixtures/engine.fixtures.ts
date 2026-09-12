@@ -848,6 +848,10 @@ export function register(harness: Harness): void {
     state.status = "pending";
     assert(!computeFrontier(plan, run, businessState, evaluator).ready.includes(fullLaunch!.id), "missing mandate approval must remain held");
     assert(getStatus(run, fullLaunch!.id) === "waiting_founder", "missing mandate approval must be visible as a founder hold");
+    run.approvals[fullLaunch!.approvals[0]!.id] = "rejected";
+    state.status = "pending";
+    assert(!computeFrontier(plan, run, businessState, evaluator).ready.includes(fullLaunch!.id), "rejected mandate approval must not reach the frontier");
+    assert(getStatus(run, fullLaunch!.id) === "blocked", "rejected mandate approval must be visible as a settled block");
     run.approvals[fullLaunch!.approvals[0]!.id] = "approved";
     state.status = "pending";
     assert(computeFrontier(plan, run, businessState, evaluator).ready.includes(fullLaunch!.id), "approved local mandate must reach the frontier");

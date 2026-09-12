@@ -90,6 +90,11 @@ export function crontabSignature(options: Pick<ScheduleOptions, "workspaceSlug" 
   return `b2c:${options.workspaceSlug}:${options.runtime}`;
 }
 
+/** Read-only state check for the managed entry; foreign crontab lines are ignored. */
+export function crontabHasSignature(existingContent: string, signature: string): boolean {
+  return existingContent.split(/\r?\n/u).some((line) => line.includes(`# ${signature}`));
+}
+
 export function renderCrontabLine(options: ScheduleOptions): string {
   return `${options.schedule} /usr/bin/env tsx ${options.wrapperPath} >> ${options.logPath} 2>&1 # ${crontabSignature(options)}`;
 }
@@ -302,7 +307,11 @@ function runMain(): void {
     const result = uninstall ? applyCrontabUninstall(current, options) : applyCrontabInstall(current, options);
     if (!uninstall) writeFileSync(options.wrapperPath, renderWrapperScript(options), { mode: 0o755 });
     writeCrontab(result.nextContent);
-    console.log(`install-schedule: ${uninstall ? "removed" : "installed"} the cron entry for ${options.workspaceSlug}/${options.runtime}.${sandboxSuffix}`);
+    const readBack = crontabHasSignature(readCrontab(), crontabSignature(options));
+    if (uninstall ? readBack : !readBack) {
+      fail(`cron readback did not confirm the requested ${uninstall ? "removal" : "installation"} for ${options.workspaceSlug}/${options.runtime}`);
+    }
+    console.log(`install-schedule: ${uninstall ? "removed" : "installed"} and verified the cron entry for ${options.workspaceSlug}/${options.runtime}.${sandboxSuffix}`);
     return;
   }
 

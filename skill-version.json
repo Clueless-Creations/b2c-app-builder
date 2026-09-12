@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.71",
+  "version": "0.220.72",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Expose the enforced research artifact contract through a bounded read-only explanation without initializing or certifying research.",
     "Bind worker knowledge receipts to the dispatcher engine version and reject stale worker protocol results.",
     "Keep unresolved scheduling intent at the founder boundary while independent design work remains available for dispatch.",
     "Report configured cross-client engine-version mismatches without changing capability-based local versus hosted routing.",

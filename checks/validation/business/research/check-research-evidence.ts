@@ -490,6 +490,10 @@ if (text) {
             `The Go, Pivot, Or Kill table has ${malformedRows.length} row(s) with a mistyped date (ISO YYYY-MM-DD required) or verdict ` +
               `(Go/Pivot/Kill required). Fix the row — a malformed later decision must never silently lose to an older one.`,
             "strategy/RESEARCH.md",
+            {
+              line: malformedRows[0]?.sourceLine,
+              fixHint: "Repair the named Go, Pivot, Or Kill row's date and verdict fields before relying on an older checkpoint.",
+            },
           ),
         );
       }
@@ -521,6 +525,10 @@ if (text) {
               'The latest Go, Pivot, Or Kill row lacks an authorized "Decided by" value. Use Founder opening mandate exactly, founder or owner, ' +
                 "or the recorded owner name. An arbitrary agent label cannot authorize the build.",
               "strategy/RESEARCH.md",
+              {
+                line: latest.sourceLine,
+                fixHint: "Set the named Go, Pivot, Or Kill row's Decided by field to an authorized founder or owner value.",
+              },
             ),
           );
         }
@@ -533,6 +541,10 @@ if (text) {
               "The latest Go, Pivot, Or Kill row carries empty or placeholder evidence cells. A verdict decided over " +
                 '"unverified" is a mood, not a decision — fill category revenue, wedge, demand, distribution, and offer evidence before recording it.',
               "strategy/RESEARCH.md",
+              {
+                line: latest.sourceLine,
+                fixHint: "Fill the named Go, Pivot, Or Kill row's missing evidence cells or record the applicable checkpoint hold.",
+              },
             ),
           );
           evidenceCells.forEach((cell, index) => {
@@ -940,8 +952,7 @@ function validateSignalCorpus(value: string | undefined, target: ReturnType<type
     );
   } else {
     const invalidDerivedRow =
-      !rowsMatchTableWidth(derived) ||
-      derived.rows.some((row) => {
+      derived.rows.find((row) => {
         const cells = derivedColumnIndexes.map((column) => (row.cells[column] ?? "").trim());
         const signalIds = parsePrefixedIdList(cells[0] ?? "", "SIG");
         return !(
@@ -952,7 +963,7 @@ function validateSignalCorpus(value: string | undefined, target: ReturnType<type
           /\bTRACE-[A-Z0-9][A-Z0-9-]*\b/i.test(cells[3] ?? "") &&
           !placeholder.test(cells[3] ?? "")
         );
-      });
+      }) ?? (!rowsMatchTableWidth(derived) || derived.rows.length === 0 ? { sourceLine: derived.headingLine } : undefined);
     if (invalidDerivedRow) {
       target.push(
         issue(
@@ -961,6 +972,10 @@ function validateSignalCorpus(value: string | undefined, target: ReturnType<type
           "Every Derived Outputs row must cite only current or dated Signal IDs. It must also name a real output, changed decision, and TRACE ID. " +
             "Keep unverified, rejected, and superseded signals in the corpus, but do not use them to support an output.",
           "strategy/SIGNAL_CORPUS.md",
+          {
+            line: invalidDerivedRow.sourceLine,
+            fixHint: "Repair the named Derived Outputs row's first failing Signal ID, output, decision, or TRACE ID field.",
+          },
         ),
       );
     }

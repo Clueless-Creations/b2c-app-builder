@@ -297,15 +297,9 @@ test("leftover-name client matrix covers Claude, Cursor, and Codex without silen
     assert.match(hostedReadme, /leftover CLI-only public names/, "hosted README omitted leftover CLI-only public wrong-surface names");
     assert.match(hostedReadme, /fail as `cli_only`/, "hosted README omitted leftover CLI-only public local cli_only names");
     assert(skill.includes("Leftover CLI-only public MCP names stay CLI-only"), "skill omitted leftover CLI-only public local names");
-    assert(
-      skill.includes("Leftover write-gated MCP names stay CLI-only"),
-      "skill omitted leftover write-gated local names",
-    );
+    assert(skill.includes("Leftover write-gated MCP names stay CLI-only"), "skill omitted leftover write-gated local names");
     assert(skill.includes("Hosted leftover names stay wrong-surface"), "skill omitted hosted leftover wrong-surface names");
-    assert(
-      packageGuide.includes("Leftover write-gated names"),
-      "package guide omitted leftover write-gated local cli_only names",
-    );
+    assert(packageGuide.includes("Leftover write-gated names"), "package guide omitted leftover write-gated local cli_only names");
     assert.match(hostedReadme, /Leftover write-gated names stay hosted/, "hosted README omitted leftover write-gated hosted names");
   } finally {
     rmSync(temp, { recursive: true, force: true });
@@ -463,6 +457,29 @@ test("both-configured sets select a surface and refuse duplicate names", () => {
   assert.equal(none.status, "unavailable");
   if (none.status !== "unavailable") return;
   assert.match(none.guidance, /Connect the local builder as b2c-local/);
+});
+
+test("surface selection reports a cross-client engine-version mismatch without changing capability routing", () => {
+  const local = connectionReceipt({ mode: "local_execution", engineVersion: "0.220.68" });
+  const hosted = connectionReceipt({ mode: "hosted_knowledge", engineVersion: "0.220.67" });
+  const entries = [
+    { clientName: "b2c-local", receipt: local },
+    { clientName: "b2c-hosted", receipt: hosted },
+  ];
+  const set = configuredConnectionSet(entries);
+  assert.deepEqual(set.engineVersions, ["0.220.68", "0.220.67"]);
+  assert.equal(set.versionMismatch, true);
+
+  const execution = selectConfiguredSurface({ entries, need: "workspace_execution" });
+  const knowledge = selectConfiguredSurface({ entries, need: "knowledge" });
+  assert.equal(execution.status, "selected");
+  assert.equal(knowledge.status, "selected");
+  if (execution.status !== "selected" || knowledge.status !== "selected") return;
+  assert.equal(execution.connection.clientName, "b2c-local");
+  assert.equal(knowledge.connection.clientName, "b2c-hosted");
+  assert.match(execution.guidance, /different engine versions/);
+  assert.match(knowledge.guidance, /refresh the stale client or runtime/);
+  assert.match(knowledge.guidance, /not provider proof/);
 });
 
 test("hosted API discovery includes interpretConfiguredConnection reading", async () => {

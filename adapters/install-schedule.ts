@@ -94,9 +94,13 @@ function workspaceCrontabSignature(workspaceSlug: string): string {
   return `b2c:${workspaceSlug}:`;
 }
 
+function crontabTag(line: string): string | undefined {
+  return /(?:^|\s)#\s+(b2c:[^\s#]+)\s*$/u.exec(line)?.[1];
+}
+
 /** Read-only state check for the managed entry; foreign crontab lines are ignored. */
 export function crontabHasSignature(existingContent: string, signature: string): boolean {
-  return existingContent.split(/\r?\n/u).some((line) => line.includes(`# ${signature}`));
+  return existingContent.split(/\r?\n/u).some((line) => crontabTag(line) === signature);
 }
 
 /** Exact managed-line readback; a matching workspace/runtime tag alone is not enough after a concurrent edit. */
@@ -106,7 +110,11 @@ export function crontabHasExactLine(existingContent: string, expectedLine: strin
 
 /** Readback for every runtime variant owned by one workspace. */
 export function crontabHasWorkspaceSignature(existingContent: string, workspaceSlug: string): boolean {
-  return existingContent.split(/\r?\n/u).some((line) => line.includes(`# ${workspaceCrontabSignature(workspaceSlug)}`));
+  const prefix = workspaceCrontabSignature(workspaceSlug);
+  return existingContent.split(/\r?\n/u).some((line) => {
+    const tag = crontabTag(line);
+    return tag !== undefined && tag.startsWith(prefix) && tag.length > prefix.length;
+  });
 }
 
 export function renderCrontabLine(options: ScheduleOptions): string {
@@ -115,12 +123,16 @@ export function renderCrontabLine(options: ScheduleOptions): string {
 
 /** Removes only lines tagged with this workspace+runtime's signature; every other line (including a foreign crontab's own entries) is untouched. */
 export function filterCrontabLines(existingLines: readonly string[], signature: string): string[] {
-  return existingLines.filter((line) => !line.includes(`# ${signature}`));
+  return existingLines.filter((line) => crontabTag(line) !== signature);
 }
 
 export function applyCrontabInstall(existingContent: string, options: ScheduleOptions): { nextContent: string; line: string } {
   const lines = existingContent.split("\n").filter((line) => line.length > 0);
-  const withoutOurs = lines.filter((line) => !line.includes(`# ${workspaceCrontabSignature(options.workspaceSlug)}`));
+  const prefix = workspaceCrontabSignature(options.workspaceSlug);
+  const withoutOurs = lines.filter((line) => {
+    const tag = crontabTag(line);
+    return tag === undefined || !tag.startsWith(prefix) || tag.length === prefix.length;
+  });
   const line = renderCrontabLine(options);
   return { nextContent: `${[...withoutOurs, line].join("\n")}\n`, line };
 }
@@ -129,8 +141,11 @@ export function applyCrontabInstall(existingContent: string, options: ScheduleOp
 export function applyCrontabUninstall(existingContent: string, options: ScheduleOptions): { nextContent: string; removed: string[] } {
   const lines = existingContent.split("\n").filter((line) => line.length > 0);
   const signature = workspaceCrontabSignature(options.workspaceSlug);
-  const removed = lines.filter((line) => line.includes(`# ${signature}`));
-  const kept = lines.filter((line) => !line.includes(`# ${signature}`));
+  const removed = lines.filter((line) => {
+    const tag = crontabTag(line);
+    return tag !== undefined && tag.startsWith(signature) && tag.length > signature.length;
+  });
+  const kept = lines.filter((line) => !removed.includes(line));
   return { nextContent: kept.length > 0 ? `${kept.join("\n")}\n` : "", removed };
 }
 

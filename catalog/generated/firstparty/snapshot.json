@@ -2,7 +2,7 @@
   "extension": {
     "apiVersion": "b2c.extension/v1",
     "id": "b2c/consumer-business",
-    "version": "0.220.4",
+    "version": "0.220.5",
     "hostApiVersion": "b2c/v1",
     "title": "Consumer business",
     "dependencies": [],
@@ -15764,8 +15764,8 @@
     ]
   },
   "files": {
-    "extension.yaml": "452189b0f238cf19df8a9173bbb3a614bf78a7a9c26032f739e51cd5f5636a08",
-    "catalog-pack.yaml": "9520da88bb6f925b32854c5a25e117111d388e0490e77fc0ef6589c51ab3a1be",
+    "extension.yaml": "1bd8293469809ac827c0dbd4dd9b0094ab2bb9b80b1d23bfd25172a4a2182c33",
+    "catalog-pack.yaml": "1fe3a43244e801116d44cda3bbdb28edf9f76c42ffb54ecd0fd57bc6be7f0742",
     "knowledge/data/analytics-attribution.md": "0bba4685b2188b9e80b7fcc14fdac9472c6c4aeac5bc59703188eaa5e26f234a",
     "knowledge/data/posthog-agent-tooling.md": "61ffdbc79a985a41a11fbe6e1c7c5663050104208baa9d05b8ebe33186ab93cc",
     "knowledge/design/audience-derived-identity.md": "04c90b39c9d41cf00257c70b4e579f3e29684254d444917b9a5690d48be74f5f",
@@ -16225,5 +16225,5 @@
     "catalog/upstreams/notices/parth-app-store-screenshots.txt": "a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a"
   },
   "dependencies": [],
-  "digest": "sha256:026bcac99541665e29d09fca140c60cbe5dde0e68d71867fae7eb50a6f17f3ef"
+  "digest": "sha256:89114da6b07eb27c5c1858986fa307fc59d68e75fbed5337e219f843a69e19e5"
 }

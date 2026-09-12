@@ -21,7 +21,14 @@ For an existing managed business, read business-status then business-plan and us
 
 For a review, assess the existing evidence against this method and return findings; do not execute its authoring or mutation instructions. For requested creation or implementation, follow the method only within the accepted scope and authority.
 
-Determine whether this onboarding pass is greenfield, replacement, audit-only, or a founder-scoped incremental change, and record the affected product surfaces, freshness date, responsible owner, the durable user value at stake, and whether the mode requires a hard cutover with only the target runtime. Write the decision into product/onboarding/graph/ONB-00-resume-scope.md's Execution Mode fields — check:onboarding-evidence-onb-00 rejects a stub or templated packet, and every downstream node through ONB-21 blocks on this classification.
+| Mode          | Use when                                             | Cutover rule                             |
+| ------------- | ---------------------------------------------------- | ---------------------------------------- |
+| `greenfield`  | No production onboarding exists                      | Build only the target system             |
+| `replacement` | Existing onboarding is rebuilt from first principles | Hard cutover; no permanent coexistence   |
+| `audit_only`  | Findings are requested without implementation        | Produce evidence, target graph, and plan |
+| `incremental` | The founder explicitly limits scope                  | Preserve only the named boundary         |
+
+Rebuild, replace, standardize, and rethink requests default to `replacement`. Preserve durable user value through an isolated, rehearsed, one-time transformation, then delete the transformation and every obsolete route, state, event, provider object, test, and document.
 
 ## Load only what the task needs
 

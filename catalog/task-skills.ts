@@ -26,6 +26,7 @@ export const taskSkills: readonly TaskSkill[] = [
     workflowId: "workflow.research.research-backed-spec",
     publicArea: "opportunity",
     routeCue: "Validate an app opportunity",
+    method: { referenceId: "reference.research.go-pivot-or-kill", heading: "1. The Category Revenue Reality Bar" },
   },
   {
     name: "b2c-design-onboarding",
@@ -36,6 +37,7 @@ export const taskSkills: readonly TaskSkill[] = [
     groupId: "onboarding-system",
     publicArea: "experience",
     routeCue: "Design or review onboarding",
+    method: { referenceId: "reference.experience.onboarding-conversion", heading: "Execution modes" },
   },
   {
     name: "b2c-review-monetization",
@@ -45,6 +47,7 @@ export const taskSkills: readonly TaskSkill[] = [
     workflowId: "workflow.money.revenue-monetization",
     publicArea: "revenue-and-growth",
     routeCue: "Review monetization",
+    method: { referenceId: "reference.money.revenue-monetization", heading: "1. Monetization Decision Matrix" },
   },
   {
     name: "b2c-define-product",

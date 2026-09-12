@@ -156,7 +156,7 @@ export const HELP_SECTIONS = [
         label: "Business lifecycle (normal supported path)",
         commands: ["business-create", "business-initialize", "business-plan", "business-run", "business-status", "business-recover"],
       },
-      { label: "Research and operations", commands: ["research-lookup", "research-record", "operate", "market-report", "render-product"] },
+      { label: "Research and operations", commands: ["research-lookup", "research-record", "research-decision", "operate", "market-report", "render-product"] },
       {
         label: "Advanced session controls (supported; not aliases of business-* commands)",
         commands: ["new", "bootstrap", "status", "plan", "run", "schedule"],

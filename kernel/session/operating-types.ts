@@ -31,6 +31,8 @@ export interface OperateLoopLinks {
 }
 
 export interface OperateWorld {
+  /** Registry identity used to keep workspace-bound authority from crossing businesses. */
+  workspaceId?: string;
   businessRevision: string;
   compositionPin: string;
   /** Raw execution contract. Registered callers bind this from disk; missing evidence refuses. */

@@ -12,6 +12,7 @@ export interface OperationEnvelope {
   trustAnchor: string;
   agreementRevision: string;
   mandateId: string;
+  workspaceId?: string;
   expectedBusinessRevision: string;
   idempotencyKey: string;
   recordedAt: string;
@@ -35,6 +36,7 @@ export interface AuthorizeInput {
   agreement: OperatingAgreement;
   mandate?: Mandate;
   envelope: OperationEnvelope;
+  workspaceId?: string;
   now: string;
   grantOptions?: GrantCeilingOptions;
   grant?: Grant;
@@ -65,6 +67,15 @@ export function authorizeResponsibility(input: AuthorizeInput): AuthorizationSna
   }
   if (input.mandate.agreementRevision !== input.agreement.revision) {
     return refuse("authority.agreement_revision_mismatch", "Mandate agreement revision does not match the pinned operating agreement.", {
+      mandate: input.mandate,
+    });
+  }
+  if (
+    (input.mandate.workspaceId !== undefined && input.workspaceId !== input.mandate.workspaceId) ||
+    (input.envelope.workspaceId !== undefined && input.workspaceId !== input.envelope.workspaceId) ||
+    (input.mandate.workspaceId !== undefined && input.envelope.workspaceId !== input.mandate.workspaceId)
+  ) {
+    return refuse("authority.workspace_mismatch", "Operation envelope and mandate do not bind the same workspace context.", {
       mandate: input.mandate,
     });
   }

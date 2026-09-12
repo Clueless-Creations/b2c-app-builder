@@ -183,6 +183,27 @@ export function register(harness: Harness): void {
     );
   });
 
+  harness.check("authority: a workspace-bound mandate cannot authorize another workspace", () => {
+    const grants = makeGrants([["domain.engineering", "full"]]);
+    const agreement = standingFounderAgreement(NOW);
+    const mandate = {
+      ...standingFounderMandate(agreement, "domain.engineering", "mutate", NOW),
+      workspaceId: "business-alpha",
+    };
+    const result = authorizeResponsibility({
+      grants,
+      domainId: "domain.engineering",
+      actionClass: "mutate",
+      agreement,
+      mandate,
+      workspaceId: "business-beta",
+      envelope: envelopeFor(mandate.id, agreement.revision, { workspaceId: "business-beta" }),
+      now: NOW,
+    });
+    assert(!result.ok, "a workspace-bound mandate must not cross workspace context");
+    assert(result.reasonCode === "authority.workspace_mismatch", `expected workspace_mismatch, got ${result.reasonCode}`);
+  });
+
   harness.check("authority: a current mandate cannot cross its domain, action, or draft agreement scope", () => {
     const grants = makeGrants([["domain.engineering", "full"]]);
     const agreement = standingFounderAgreement(NOW);

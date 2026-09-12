@@ -22,6 +22,7 @@
     "trustAnchor": { "type": "string", "minLength": 1 },
     "agreementRevision": { "type": "string", "minLength": 1 },
     "mandateId": { "type": "string", "minLength": 1 },
+    "workspaceId": { "type": "string", "minLength": 1 },
     "expectedBusinessRevision": { "type": "string", "minLength": 1 },
     "idempotencyKey": { "type": "string", "minLength": 1 },
     "recordedAt": { "type": "string", "format": "date-time" },

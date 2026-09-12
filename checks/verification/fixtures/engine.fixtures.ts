@@ -1965,7 +1965,22 @@ export function register(harness: Harness): void {
   });
 
   harness.check("frontier: approval / evaluator gate sequence on one node", () => {
-    const plan = compilePlan(testCatalog(), now);
+    const catalog = testCatalog();
+    catalog.artifacts.push({ id: "artifact.independent-observation", path: "observations/independent.md" });
+    catalog.workflows.push({
+      id: "workflow.independent-observation",
+      title: "Independent observation",
+      domainId: "domain.process",
+      actionClass: "observe",
+      dependencies: [],
+      outputPaths: ["observations/independent.md"],
+      providerIds: [],
+      laneIds: [],
+      founderOnlyActions: [],
+      gateCommands: [],
+      idempotent: true,
+    });
+    const plan = compilePlan(catalog, now);
     const { businessState, run } = seedFor(["research", "product", "engineering"], plan);
     const revenueId = nodeId("revenue-report");
     assert(getStatus(run, revenueId) === "pending", "revenue-report should still be pending after seeding");
@@ -2001,6 +2016,22 @@ export function register(harness: Harness): void {
     assert(
       result.parked.some((entry) => entry.nodeId === revenueId && entry.reason.includes("grant level insufficient")),
       "parked list should record the reason",
+    );
+
+    // A protected hold must not become a global pause: an unrelated route that the current
+    // evaluator permits remains visible on the same frontier pass.
+    setStatus(run, revenueId, "pending");
+    const independentId = nodeId("independent-observation");
+    setStatus(run, independentId, "pending");
+    run.nodes[independentId]!.blocker = undefined;
+    const selectiveEvaluator: AutonomyEvaluator = {
+      evaluate: (node) => (node.id === revenueId ? { allowed: false, parkReason: "revenue authority is still held" } : { allowed: true }),
+    };
+    result = computeFrontier(plan, run, businessState, selectiveEvaluator);
+    assert(getStatus(run, revenueId) === "blocked", "the held protected route must remain blocked");
+    assert(
+      result.ready.includes(independentId),
+      `independent permitted work must remain visible while protected work is held (ready=${result.ready.join(",")}, status=${getStatus(run, independentId)}, blocker=${run.nodes[independentId]!.blocker ?? ""})`,
     );
 
     // 5. evaluator throws -> fail closed, never crash the frontier computation.

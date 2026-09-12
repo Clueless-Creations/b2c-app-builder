@@ -1,6 +1,6 @@
 {
   "name": "b2c-app-builder",
-  "version": "0.220.3",
+  "version": "0.220.4",
   "description": "Consumer-business primitives for AI agents: capabilities, providers, recipes, and evidence through a CLI, MCP, and skill.",
   "keywords": [
     "mcp",
@@ -50,6 +50,15 @@
     "surfaces/starters",
     "surfaces/ui-library",
     "surfaces/workspace-template",
+    "agents/skills/b2c-research-opportunity",
+    "agents/skills/b2c-design-onboarding",
+    "agents/skills/b2c-review-monetization",
+    "agents/skills/b2c-define-product",
+    "agents/skills/b2c-plan-implementation",
+    "agents/skills/b2c-review-business-performance",
+    "agents/skills/b2c-review-experience",
+    "agents/skills/b2c-plan-launch",
+    "agents/skills/b2c-verify-release-readiness",
     "surfaces/studio/seed/schema/business.empty.json",
     "surfaces/studio/seed/schema/business.schema.json",
     "!surfaces/studio/README.md",

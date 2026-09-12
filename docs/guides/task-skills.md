@@ -4,7 +4,7 @@ There are two ways to use the builder. Use a task skill for focused expertise, o
 
 ## Choose a task
 
-The [knowledge landing page](../../knowledge/README.md) uses the same six areas as the main README. The [skill index](../../agents/skills/README.md) lists the shipped task skills. The initial set covers opportunity research, onboarding design/review, and monetization review. Other areas retain their existing workflows and knowledge; dedicated task skills for them are not yet shipped.
+The [knowledge landing page](../../knowledge/README.md) uses the same six areas as the main README. The [skill index](../../agents/skills/README.md) lists nine shipped task skills across all six areas. The expanded jobs cover product definition, implementation planning, business-performance review, broader experience review, launch planning, and target-specific release-readiness inspection.
 
 A request to review onboarding is not a request to rebuild it. A request to evaluate pricing is not permission to change a live price. A narrow code fix should follow the application's own instructions, not start the complete-business graph.
 

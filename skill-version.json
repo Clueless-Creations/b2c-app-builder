@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.3",
+  "version": "0.220.4",
   "updatedAt": "2026-09-11",
   "sourcePath": ".",
   "releaseNotes": [
-    "Pin the independent ASC screenshots-download response envelope from CLI 5.1.0.",
+    "Expand catalog-backed task skills with bounded method bindings across all six public areas.",
     "Keep Apple JSON:API out of that decoder path. No live asc. Slot 89."
   ]
 }

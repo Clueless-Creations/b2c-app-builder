@@ -13,9 +13,15 @@ Use the main business entrypoint by default. Focused task skills are optional, g
 <!-- catalog-generated:start task-skills -->
 | Task | Use when |
 | --- | --- |
-| [Research an opportunity](b2c-research-opportunity/SKILL.md) | Research whether a consumer-app idea is worth building. Compare demand, competitors, distribution, offer evidence, and product scope; recommend Go, Pivot, or Kill. Use for opportunity validation or delegated idea selection, not a narrow code fix or execution of an entire launch. |
-| [Design or review onboarding](b2c-design-onboarding/SKILL.md) | Design, review, or improve a consumer app's onboarding and first-value journey. Classify a focused audit, incremental change, or full redesign before selecting the relevant research, flow, state, accessibility, and verification guidance. Do not start a full rebuild for a small signup fix. |
-| [Review monetization](b2c-review-monetization/SKILL.md) | Review a consumer app's offer, pricing proposal, paywall, purchases, entitlements, restore behavior, and billing evidence. Use for a monetization audit or explicitly requested implementation. A review does not authorize live product changes, pricing changes, payments, or provider selection. |
+| [Research an opportunity](b2c-research-opportunity/SKILL.md) | Validate an app opportunity |
+| [Design or review onboarding](b2c-design-onboarding/SKILL.md) | Design or review onboarding |
+| [Review monetization](b2c-review-monetization/SKILL.md) | Review monetization |
+| [Define or refine a product](b2c-define-product/SKILL.md) | Define product scope |
+| [Plan implementation](b2c-plan-implementation/SKILL.md) | Plan implementation |
+| [Review business performance](b2c-review-business-performance/SKILL.md) | Review business performance |
+| [Review the app experience](b2c-review-experience/SKILL.md) | Review the app experience |
+| [Plan a launch](b2c-plan-launch/SKILL.md) | Plan a launch |
+| [Verify release readiness](b2c-verify-release-readiness/SKILL.md) | Verify release readiness |
 <!-- catalog-generated:end task-skills -->
 
 These three task entrypoints are the initial set. [Browse all six business areas](../../knowledge/README.md) for the remaining workflows and references. Internal onboarding stages remain behind one task skill, not 23 installations.

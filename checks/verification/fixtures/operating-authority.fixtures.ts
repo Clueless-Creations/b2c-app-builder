@@ -105,6 +105,26 @@ export function register(harness: Harness): void {
     assert(result.reasonCode === "authority.mandate_required", `expected mandate_required, got ${result.reasonCode}`);
   });
 
+  harness.check("authority: an expired mandate cannot authorize after its deadline", () => {
+    const grants = makeGrants([["domain.engineering", "full"]]);
+    const agreement = standingFounderAgreement(NOW);
+    const mandate = {
+      ...standingFounderMandate(agreement, "domain.engineering", "mutate", NOW),
+      expiresAt: "2026-08-22T20:30:00.000Z",
+    };
+    const result = authorizeResponsibility({
+      grants,
+      domainId: "domain.engineering",
+      actionClass: "mutate",
+      agreement,
+      mandate,
+      envelope: envelopeFor(mandate.id, agreement.revision, { recordedAt: "2026-08-22T20:31:00.000Z" }),
+      now: "2026-08-22T20:31:00.000Z",
+    });
+    assert(!result.ok, "an expired mandate must not authorize");
+    assert(result.reasonCode === "authority.mandate_stale", `expected mandate_stale, got ${result.reasonCode}`);
+  });
+
   harness.check("authority: a revokedAt stamp is compared as an instant", () => {
     const grants = makeGrants([["domain.engineering", "full"]]);
     const agreement = standingFounderAgreement("2026-08-23T00:00:00.000Z");

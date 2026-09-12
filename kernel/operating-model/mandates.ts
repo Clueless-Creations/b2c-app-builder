@@ -14,6 +14,8 @@ export interface Mandate {
   actionClass: string;
   status: MandateStatus;
   issuedAt: string;
+  /** Optional hard expiry for a bounded delegation; checked again at effect time. */
+  expiresAt?: string;
   revokedAt?: string;
 }
 
@@ -44,6 +46,7 @@ export function isMandateCurrent(mandate: Mandate | undefined, now: string): man
   if (!mandate) return false;
   if (mandate.status === "revoked") return false;
   if (mandate.revokedAt && isStampNotAfter(mandate.revokedAt, now)) return false;
+  if (mandate.expiresAt && isStampNotAfter(mandate.expiresAt, now)) return false;
   if (now) {
     const issuedAtMs = Date.parse(mandate.issuedAt);
     const nowMs = Date.parse(now);

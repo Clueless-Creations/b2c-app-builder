@@ -58,6 +58,8 @@ export function authorizeResponsibility(input: AuthorizeInput): AuthorizationSna
     const reasonCode =
       input.mandate?.status === "revoked" || (input.mandate?.revokedAt && isStampNotAfter(input.mandate.revokedAt, input.now))
         ? "authority.mandate_revoked"
+        : input.mandate?.expiresAt && isStampNotAfter(input.mandate.expiresAt, input.now)
+          ? "authority.mandate_stale"
         : "authority.mandate_required";
     return refuse(reasonCode, "Action requires a current mandate bound to the operating agreement.", { grant: ceiling.grant });
   }

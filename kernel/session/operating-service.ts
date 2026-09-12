@@ -28,7 +28,7 @@ import type { OperateGates, OperateInput, OperateReceipt, OperateSource, Operate
  * catalog/workflow lookup for domainId+actionClass, so it cannot resolve one — a real, documented
  * gap versus the full protectedCategory set (see operate.fixtures.ts's "mutate" case).
  */
-const MANDATE_REFUSAL_REASON_CODES: ReadonlySet<string> = new Set(["authority.mandate_required", "authority.mandate_revoked"]);
+const MANDATE_REFUSAL_REASON_CODES: ReadonlySet<string> = new Set(["authority.mandate_required", "authority.mandate_revoked", "authority.mandate_stale"]);
 
 const FOUNDER_QUESTION_CLASS_BY_CATEGORY: Record<"spend" | "release" | "destructive", FounderQuestionClass> = {
   spend: "confirm-spend-cap",

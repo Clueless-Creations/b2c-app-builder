@@ -1,9 +1,11 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.33",
+  "version": "0.220.34",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Verify Pivot checkpoints hold initialization until an explicit Go continuation is accepted.",
+    "Exercise the complete research-decision handoff from planning hold through accepted initialization.",
     "Align the post-Brigade public API start-path regression with the shipped agent guide heading.",
     "Keep the lifecycle audit green after the product-facing Brigade terminology update.",
     "Reject distinct completed knowledge receipts across transport envelopes while allowing an echoed prompt skeleton.",

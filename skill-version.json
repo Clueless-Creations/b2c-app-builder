@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.48",
+  "version": "0.220.49",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Add authored row locations and bounded repair hints for Transformation Demo and Distribution-First Niche failures.",
     "Match managed cron entries by their terminal ownership tag so foreign commands cannot be removed by substring collision.",
     "Bind workspace-scoped operating mandates and envelopes so authority cannot cross business contexts.",
     "Reject expired operating mandates at effect time with an explicit stale-authority outcome.",

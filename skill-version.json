@@ -4,6 +4,8 @@
   "updatedAt": "2026-09-13",
   "sourcePath": ".",
   "releaseNotes": [
+    "Locate the first invalid research field and conflicting duplicate signal identity without hiding authored uncertainty.",
+    "Reject labeled placeholder instructions and align golden evidence and design fixtures with current acceptance contracts.",
     "Preserve authored offer-test uncertainty while rejecting placeholder-only contract, decision, measurement, and waiver fields.",
     "Require current scheduled-autonomy founder approval before any schedule host mutation.",
     "Add authored row locations and bounded repair hints for offer-test contract, decision, and measurement failures.",

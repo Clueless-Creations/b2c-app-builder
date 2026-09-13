@@ -560,6 +560,7 @@ export function register(harness: Harness): void {
     assert(result.code === 0, `expected exit 0, got ${result.code}: ${result.output}`);
     assert(result.output.includes("DRY RUN"), `expected a DRY RUN banner, got:\n${result.output}`);
     assert(result.output.includes("*/20 * * * *"), `expected the crontab line preview, got:\n${result.output}`);
+    assert(!existsSync(path.join(dir, "schedule")), "cron install dry-run must not create the workspace schedule directory");
 
     const uninstallResult = runCli("adapters/install-schedule.ts", [
       "--workspace",
@@ -574,6 +575,7 @@ export function register(harness: Harness): void {
     ]);
     assert(uninstallResult.code === 0, `expected exit 0, got ${uninstallResult.code}: ${uninstallResult.output}`);
     assert(uninstallResult.output.includes("DRY RUN"), `expected a DRY RUN banner on uninstall too, got:\n${uninstallResult.output}`);
+    assert(!existsSync(path.join(dir, "schedule")), "cron uninstall dry-run must not create the workspace schedule directory");
 
     const launchdDir = harness.makeTempDir("schedule-cli-launchd");
     writeFileSync(path.join(launchdDir, "catalog.json"), JSON.stringify(twoNodeCatalog()));
@@ -591,6 +593,7 @@ export function register(harness: Harness): void {
     ]);
     assert(launchdResult.code === 0, `expected exit 0, got ${launchdResult.code}: ${launchdResult.output}`);
     assert(launchdResult.output.includes("launchd"), `expected launchd content in the preview, got:\n${launchdResult.output}`);
+    assert(!existsSync(path.join(launchdDir, "schedule")), "launchd install dry-run must not create the workspace schedule directory");
 
     const missingArgs = runCli("adapters/install-schedule.ts", ["--runtime", "claude"]);
     assert(missingArgs.code === 1, `expected exit 1 with a missing --workspace, got ${missingArgs.code}: ${missingArgs.output}`);

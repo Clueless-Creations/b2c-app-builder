@@ -6,6 +6,7 @@
   "releaseNotes": [
     "Fail closed on unverified crontab reads before schedule mutation and during installed-state readback.",
     "Preserve unrelated scheduled jobs and refuse to certify removal when the host crontab cannot be read back.",
+    "Keep explicit replacement/fill instructions incomplete, including polite forms, while preserving quoted TBD evidence.",
     "Apply whole-cell placeholder semantics to offer labels and cover contract, decision, measurement, and waiver validators.",
     "Locate the first invalid research field and conflicting duplicate signal identity without hiding authored uncertainty.",
     "Reject labeled placeholder instructions and align golden evidence and design fixtures with current acceptance contracts.",

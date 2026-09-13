@@ -270,7 +270,23 @@ export function validateOfferTest(value: string | undefined, target: ReturnType<
 
 /** Narrative uncertainty is evidence, not a template. Identity and typed fields retain their own checks. */
 function isAuthoredOfferNarrative(value: string): boolean {
-  return value.trim().length > 0 && !isPlaceholderOnly(value) && !/^(?:required|replace with(?:\s.*)?)$/i.test(normalizeEvidenceScalar(value));
+  // Preserve real sentences, but do not turn a labeled blank or authoring instruction into evidence.
+  // Strip labels before scalar normalization, which intentionally removes colons.
+  let authored = value.trim().replace(/[`*_~]/gu, "");
+  const label = /^[`*_\s]*([a-z][a-z0-9 _/()*-]{0,63}):[`*_\s]*/iu;
+  for (let pass = 0; pass < 4; pass += 1) {
+    const match = authored.match(label);
+    if (!match) break;
+    if (/^(?:todo|tbd|placeholder|replace with)$/i.test(normalizeEvidenceScalar(match[1]!))) return false;
+    authored = authored.slice(match[0].length);
+  }
+  return (
+    !label.test(authored) &&
+    !isEmptyEquivalentEvidenceValue(authored) &&
+    !/<[^>]+>/u.test(authored) &&
+    !isPlaceholderOnly(authored) &&
+    !/^(?:required|todo(?:\s.*)?|tbd(?:\s.*)?|placeholder(?:\s.*)?|replace with(?:\s.*)?|to be filled(?:\s.*)?)$/i.test(normalizeEvidenceScalar(authored))
+  );
 }
 
 export function isAbsentOwnedRelationship(value: string): boolean {

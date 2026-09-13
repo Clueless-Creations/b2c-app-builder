@@ -895,6 +895,27 @@ export function register(h: Harness): void {
     "Corpus Inputs row's Date range field",
   );
 
+  for (const [name, heading, prefix, field] of [
+    ["input", "Corpus Inputs", "| INPUT-001 |", "Input ID"],
+    ["signal", "Signal Records", "| SIG-001 | customer language |", "Signal ID"],
+  ] as const) {
+    const root = makeCompletedResearch(`research-duplicate-${name}-diagnostic`);
+    const signalPath = path.join(root, "strategy/SIGNAL_CORPUS.md");
+    const lines = readFileSync(signalPath, "utf8").split("\n");
+    const originalIndex = lines.findIndex((line) => line.startsWith(prefix));
+    if (originalIndex < 0) throw new Error(`Missing duplicate ${name} fixture row`);
+    lines.splice(originalIndex + 1, 0, lines[originalIndex]!);
+    writeFileSync(signalPath, lines.join("\n"), "utf8");
+    runFixture(`duplicate ${name} diagnostics name the conflicting ID field`, root, "check-research-evidence.ts", 1, `${heading} row's ${field} field`);
+    h.runScriptArgs(
+      `duplicate ${name} diagnostics locate the second row rather than the accepted first row`,
+      "check-research-evidence.ts",
+      ["--root", root, "--json"],
+      1,
+      `"location":"${originalIndex + 2}"`,
+    );
+  }
+
   const researchSignalInputReversedRange = makeCompletedResearch("research-signal-input-reversed-range");
   {
     const signalPath = path.join(researchSignalInputReversedRange, "strategy/SIGNAL_CORPUS.md");
@@ -1058,6 +1079,15 @@ export function register(h: Harness): void {
     signalRecord("SIG-002", "superseded", "SIG-003"),
     signalRecord("SIG-003", "current", "none"),
   ]);
+  // A valid chain does not make its superseded heads eligible output evidence.
+  // Bind this positive fixture to the actual current terminal rather than an empty output table.
+  {
+    const signalPath = path.join(researchSupersessionValidMultiHop, "strategy/SIGNAL_CORPUS.md");
+    const emptyTable = "## Derived Outputs\n| Signal IDs | Output | Decision changed | Trace ID |\n| --- | --- | --- | --- |";
+    const signal = readFileSync(signalPath, "utf8");
+    if (!signal.includes(emptyTable)) throw new Error("Missing supersession output fixture table");
+    writeFileSync(signalPath, signal.replace(emptyTable, `${emptyTable}\n| SIG-003 | PRODUCT.md | add streak recovery | TRACE-002 |`), "utf8");
+  }
   runFixture(
     "signal supersession accepts an acyclic multi-hop chain ending at a usable signal",
     researchSupersessionValidMultiHop,
@@ -1503,6 +1533,11 @@ export function register(h: Harness): void {
     ["required", "required!"],
     ["template", "<audience>"],
     ["instruction", "replace with the specific audience"],
+    ["labeled-angle", "Audience: <specific audience>"],
+    ["labeled-token", "Audience: TBD"],
+    ["nested-label", "Audience: segment: **TBD**"],
+    ["embedded-angle", "people who need <describe the problem>"],
+    ["todo-instruction", "TODO: identify the paying audience"],
   ] as const) {
     const root = makeCompletedResearch(`research-offer-placeholder-contract-${name}`);
     const offerPath = path.join(root, "strategy/OFFER_TEST.md");
@@ -1518,6 +1553,7 @@ export function register(h: Harness): void {
 
   for (const [name, current, placeholder, code] of [
     ["decision-evidence", "840 visits and 31 signups in TRACE-003", "**TBD.**", "research.offer_test_decision_incomplete"],
+    ["labeled-evidence", "840 visits and 31 signups in TRACE-003", "Evidence: TBD", "research.offer_test_decision_incomplete"],
     ["decision-text", "use the recovery offer", "`pending`", "research.offer_test_decision_incomplete"],
     ["measurement-source", "PostHog test cohort TRACE-003", "**unverified**", "research.offer_test_measurement_missing"],
   ] as const) {
@@ -1532,6 +1568,9 @@ export function register(h: Harness): void {
     ["placeholder-reason", "**pending**", "Demand remains unverified beyond the measured cohort", 1],
     ["placeholder-risk", "The founder tests organic demand first", "`TBD`", 1],
     ["empty-risk", "The founder tests organic demand first", "**none**", 1],
+    ["labeled-risk", "The founder tests organic demand first", "Risk: <describe risk>", 1],
+    ["labeled-empty-risk", "The founder tests organic demand first", "Risk: **none**", 1],
+    ["labeled-authored-risk", "Reason: paid acquisition is pending until organic testing", "Risk: demand remains unverified beyond the measured cohort", 0],
   ] as const) {
     const root = makeCompletedResearch(`research-offer-waiver-narrative-${name}`);
     const offerPath = path.join(root, "strategy/OFFER_TEST.md");
@@ -2422,7 +2461,7 @@ export function register(h: Harness): void {
     "check-research-evidence.ts",
     ["--root", researchSignalNotApplicableBare, "--require-workflow-outputs", "--json"],
     1,
-    '"line":2',
+    '"location":"2"',
   );
 
   for (const [name, reason] of [

@@ -762,52 +762,36 @@ function validateSignalCorpus(value: string | undefined, target: ReturnType<type
   } else {
     const inputRows = inputs.rows;
     let inputRowsValid = inputRows.length > 0 && rowsMatchTableWidth(inputs);
+    let inputFailure: { row: RequiredTableSection["rows"][number]; field: string } | undefined;
     for (const row of inputRows) {
       const cells = inputColumnIndexes.map((column) => (row.cells[column] ?? "").trim());
       const inputId = (cells[0] ?? "").toUpperCase();
-      const complete =
-        /^INPUT-[A-Z0-9][A-Z0-9-]*$/.test(inputId) &&
-        cells.slice(1).every((cell) => cell.length > 0 && !isPlaceholderOnly(cell)) &&
-        isValidPastIsoDateRange(cells[4] ?? "") &&
-        !declaredInputIds.has(inputId);
-      if (!complete) {
+      const fields = [
+        ["row shape", row.rawCellCount === inputs.header.rawCellCount],
+        ["Input ID", /^INPUT-[A-Z0-9][A-Z0-9-]*$/.test(inputId) && !declaredInputIds.has(inputId)],
+        ["Source type", cells[1]!.length > 0 && !isPlaceholderOnly(cells[1]!)],
+        ["Owner or creator", cells[2]!.length > 0 && !isPlaceholderOnly(cells[2]!)],
+        ["Scope", cells[3]!.length > 0 && !isPlaceholderOnly(cells[3]!)],
+        ["Date range", isValidPastIsoDateRange(cells[4]!)],
+        ["Collection route", cells[5]!.length > 0 && !isPlaceholderOnly(cells[5]!)],
+        ["Permission or public basis", cells[6]!.length > 0 && !isPlaceholderOnly(cells[6]!)],
+        ["Limits", cells[7]!.length > 0 && !isPlaceholderOnly(cells[7]!)],
+      ] as const;
+      if (fields.some(([, valid]) => !valid)) {
         inputRowsValid = false;
+        inputFailure ??= { row, field: firstInvalidField(fields) };
         continue;
       }
       declaredInputIds.add(inputId);
     }
     if (!inputRowsValid) {
-      const invalidRow = inputRows.find((row) => {
-        const cells = inputColumnIndexes.map((column) => (row.cells[column] ?? "").trim());
-        const inputId = (cells[0] ?? "").toUpperCase();
-        return !(
-          /^INPUT-[A-Z0-9][A-Z0-9-]*$/.test(inputId) &&
-          cells.slice(1).every((cell) => cell.length > 0 && !isPlaceholderOnly(cell)) &&
-          isValidPastIsoDateRange(cells[4] ?? "") &&
-          !declaredInputIds.has(inputId)
-        );
-      });
-      const invalidField = invalidRow
-        ? (() => {
-            const cells = inputColumnIndexes.map((column) => (invalidRow.cells[column] ?? "").trim());
-            const inputId = (cells[0] ?? "").toUpperCase();
-            return firstInvalidField([
-              ["Input ID", /^INPUT-[A-Z0-9][A-Z0-9-]*$/.test(inputId) && !declaredInputIds.has(inputId)],
-              ["Source type", cells[1]!.length > 0 && !isPlaceholderOnly(cells[1]!)],
-              ["Owner or creator", cells[2]!.length > 0 && !isPlaceholderOnly(cells[2]!)],
-              ["Scope", cells[3]!.length > 0 && !isPlaceholderOnly(cells[3]!)],
-              ["Date range", isValidPastIsoDateRange(cells[4]!)],
-              ["Collection route", cells[5]!.length > 0 && !isPlaceholderOnly(cells[5]!)],
-              ["Permission or public basis", cells[6]!.length > 0 && !isPlaceholderOnly(cells[6]!)],
-              ["Limits", cells[7]!.length > 0 && !isPlaceholderOnly(cells[7]!)],
-            ]);
-          })()
-        : "row shape";
+      const invalidRow = inputFailure?.row;
+      const invalidField = inputFailure?.field ?? "row shape";
       target.push(
         issue(
           "error",
           "research.signal_corpus_input_row_invalid",
-          "Every Corpus Inputs row needs a unique stable INPUT ID and an ISO-dated range. " +
+          `Corpus Inputs row's ${invalidField} field is invalid. Every Corpus Inputs row needs a unique stable INPUT ID and an ISO-dated range. ` +
             "It also needs real source, ownership, collection route, permission or public basis, and limits values.",
           "strategy/SIGNAL_CORPUS.md",
           invalidRow
@@ -843,6 +827,7 @@ function validateSignalCorpus(value: string | undefined, target: ReturnType<type
     const invalidSupersessionIds = new Set(validateSignalSupersessionGraph(supersessionRecords).invalidSignalIds);
     const seenSignalIds = new Set<string>();
     let rowsComplete = signalRows.length > 0 && rowsMatchTableWidth(records);
+    let signalFailure: { row: RequiredTableSection["rows"][number]; field: string } | undefined;
     let unresolvedSource = false;
     for (const row of signalRows) {
       const cells = recordColumns.map((column) => (row.cells[column] ?? "").trim());
@@ -858,21 +843,20 @@ function validateSignalCorpus(value: string | undefined, target: ReturnType<type
       const sourceIds = parsePrefixedIdList(sources, "INPUT");
       const sourcesResolve = sourceIds.validSyntax && sourceIds.ids.length > 0 && sourceIds.ids.every((sourceId) => declaredInputIds.has(sourceId));
       const supersessionValid = lifecycle !== "superseded" || !invalidSupersessionIds.has(id);
-      const rowComplete =
-        /^SIG-[A-Z0-9][A-Z0-9-]*$/.test(id) &&
-        type.length > 0 &&
-        !isPlaceholderOnly(type) &&
-        claim.length > 0 &&
-        !isPlaceholderOnly(claim) &&
-        appliesTo.length > 0 &&
-        !isPlaceholderOnly(appliesTo) &&
-        trace.length > 0 &&
-        !isPlaceholderOnly(trace) &&
-        isValidPastIsoDate(observedAt) &&
-        /^(low|medium|high)$/i.test(confidence) &&
-        /^(current|dated|superseded|rejected|unverified)$/.test(lifecycle) &&
-        supersessionValid &&
-        !seenSignalIds.has(id);
+      const fields = [
+        ["row shape", row.rawCellCount === records.header.rawCellCount],
+        ["Signal ID", /^SIG-[A-Z0-9][A-Z0-9-]*$/.test(id) && !seenSignalIds.has(id)],
+        ["Type", type.length > 0 && !isPlaceholderOnly(type)],
+        ["Claim or phrase", claim.length > 0 && !isPlaceholderOnly(claim)],
+        ["Source IDs", sourcesResolve],
+        ["Observed at", isValidPastIsoDate(observedAt)],
+        ["Applies to", appliesTo.length > 0 && !isPlaceholderOnly(appliesTo)],
+        ["Confidence", /^(low|medium|high)$/i.test(confidence)],
+        ["Status", /^(current|dated|superseded|rejected|unverified)$/.test(lifecycle)],
+        ["Supersedes", supersessionValid],
+        ["Artifact or trace", trace.length > 0 && !isPlaceholderOnly(trace)],
+      ] as const;
+      const rowComplete = fields.every(([, valid]) => valid);
       if (!sourcesResolve) unresolvedSource = true;
       if (!sourcesResolve) {
         const sourceMessage = !sourceIds.validSyntax
@@ -901,6 +885,7 @@ function validateSignalCorpus(value: string | undefined, target: ReturnType<type
       }
       if (!rowComplete || !sourcesResolve) {
         rowsComplete = false;
+        signalFailure ??= { row, field: firstInvalidField(fields) };
         continue;
       }
       seenSignalIds.add(id);
@@ -908,48 +893,13 @@ function validateSignalCorpus(value: string | undefined, target: ReturnType<type
       if (lifecycle === "current" || lifecycle === "dated") index.eligibleSignalIds.add(id);
     }
     if (!rowsComplete) {
-      const invalidRow = signalRows.find((row) => {
-        const cells = recordColumns.map((column) => (row.cells[column] ?? "").trim());
-        const id = (cells[0] ?? "").toUpperCase();
-        const claim = cells[2] ?? "";
-        const sourceIds = parsePrefixedIdList(cells[3] ?? "", "INPUT");
-        return !(
-          /^SIG-[A-Z0-9][A-Z0-9-]*$/.test(id) &&
-          claim.length > 0 &&
-          !isPlaceholderOnly(claim) &&
-          isValidPastIsoDate(cells[4] ?? "") &&
-          /^(low|medium|high)$/i.test(cells[6] ?? "") &&
-          /^(current|dated|superseded|rejected|unverified)$/.test((cells[7] ?? "").toLowerCase()) &&
-          sourceIds.validSyntax &&
-          sourceIds.ids.length > 0 &&
-          sourceIds.ids.every((sourceId) => declaredInputIds.has(sourceId)) &&
-          [cells[1] ?? "", cells[5] ?? "", cells[9] ?? ""].every((cell) => cell.length > 0 && !isPlaceholderOnly(cell))
-        );
-      });
-      const invalidField = invalidRow
-        ? (() => {
-            const cells = recordColumns.map((column) => (invalidRow.cells[column] ?? "").trim());
-            const id = (cells[0] ?? "").toUpperCase();
-            const sourceIds = parsePrefixedIdList(cells[3] ?? "", "INPUT");
-            return firstInvalidField([
-              ["Signal ID", /^SIG-[A-Z0-9][A-Z0-9-]*$/.test(id) && !seenSignalIds.has(id)],
-              ["Type", cells[1]!.length > 0 && !isPlaceholderOnly(cells[1]!)],
-              ["Claim or phrase", cells[2]!.length > 0 && !isPlaceholderOnly(cells[2]!)],
-              ["Source IDs", sourceIds.validSyntax && sourceIds.ids.length > 0 && sourceIds.ids.every((sourceId) => declaredInputIds.has(sourceId))],
-              ["Observed at", isValidPastIsoDate(cells[4]!)],
-              ["Applies to", cells[5]!.length > 0 && !isPlaceholderOnly(cells[5]!)],
-              ["Confidence", /^(low|medium|high)$/i.test(cells[6]!)],
-              ["Status", /^(current|dated|superseded|rejected|unverified)$/.test(cells[7]!.toLowerCase())],
-              ["Supersedes", cells[7]!.toLowerCase() !== "superseded" || !invalidSupersessionIds.has(id)],
-              ["Artifact or trace", cells[9]!.length > 0 && !isPlaceholderOnly(cells[9]!)],
-            ]);
-          })()
-        : "row shape";
+      const invalidRow = signalFailure?.row;
+      const invalidField = signalFailure?.field ?? "row shape";
       target.push(
         issue(
           "error",
           "research.signal_corpus_row_missing",
-          "Every declared Signal Records row needs a unique stable ID, dated provenance, applicability, confidence, a documented lifecycle, valid supersession data, and a trace pointer. " +
+          `Signal Records row's ${invalidField} field is invalid. Every declared Signal Records row needs a unique stable ID, dated provenance, applicability, confidence, a documented lifecycle, valid supersession data, and a trace pointer. ` +
             "A supersession chain must be acyclic and end at a current or dated replacement." +
             (invalidRow
               ? ` First invalid row: line ${invalidRow.sourceLine}; inspect its ID, claim, date, confidence, lifecycle, source IDs, and trace fields.`

@@ -1,0 +1,125 @@
+name: Isolated offer fix verification
+on:
+  push:
+    branches: [agent/session-397-verification-20260913]
+    paths: [.github/workflows/session-implement.yml]
+permissions:
+  contents: read
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    outputs:
+      sha: ${{ steps.commit.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply exact reviewed source patch on isolated branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo 'cc3705dfd65f75013d30283051a2bc3076709e6e056f03a6fbf3c120d21de166  .maintenance/offer-narratives.patch' | sha256sum -c -
+          cp .maintenance/offer-narratives.patch "$RUNNER_TEMP/offer.patch"
+          if git ls-remote --exit-code --heads origin agent/397-offer-narratives; then
+            echo 'Target branch exists; refuse to replace another revision.' >&2
+            exit 1
+          fi
+          git switch -c agent/397-offer-narratives e290c4e3316c897696a259a212d64fafacc9a0e3
+          git apply --check "$RUNNER_TEMP/offer.patch"
+          git apply "$RUNNER_TEMP/offer.patch"
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - run: npm run render:all && npm run render:evidence-schema-version
+      - run: npm run typecheck && git diff --check
+      - id: commit
+        name: Commit authored changes and generated projections only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e .maintenance
+          test ! -e .github/workflows/session-implement.yml
+          git add --update
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'fix(research): preserve authored offer-test uncertainty'
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          git push origin HEAD:refs/heads/agent/397-offer-narratives
+  focused:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - run: npm ci
+      - name: Run actual core-artifacts shard and reject missing or failing results
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run test:validators -- --shard core-artifacts > "$RUNNER_TEMP/core-artifacts.log" 2>&1
+          node --input-type=module - <<'JS'
+          import fs from 'node:fs';
+          const marker = 'B2C_SHARD_RESULTS_V1:';
+          const line = fs.readFileSync(`${process.env.RUNNER_TEMP}/core-artifacts.log`, 'utf8').split('\n').find(line => line.startsWith(marker));
+          if (!line) throw new Error('Missing core-artifacts result marker');
+          const rows = JSON.parse(line.slice(marker.length));
+          if (!rows.length || rows.some(row => !row.ok)) {
+            console.error(rows.filter(row => !row.ok));
+            throw new Error('Core-artifacts fixture failure');
+          }
+          console.log(`${rows.length} core-artifacts checks passed on ${process.env.GITHUB_SHA}`);
+          JS
+      - name: Check renderer idempotence
+        run: npm run render:all && npm run render:evidence-schema-version && git diff --exit-code
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: offer-core-artifacts
+          path: ${{ runner.temp }}/core-artifacts.log
+          retention-days: 3
+  full:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        lane: [fast, heavy-1, heavy-2]
+    env:
+      B2C_REQUIRE_GIT_HISTORY: '1'
+      GITHUB_BASE_SHA: e290c4e3316c897696a259a212d64fafacc9a0e3
+      B2C_FIXTURE_CONCURRENCY: '2'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - name: Run full checkpoint audit lane
+        env:
+          LANE: ${{ matrix.lane }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "$LANE" in
+            fast) npm run audit:ci -- --lane fast ;;
+            heavy-1) npm run audit:ci -- --lane heavy --shard 1/2 ;;
+            heavy-2) npm run audit:ci -- --lane heavy --shard 2/2 ;;
+          esac

@@ -127,6 +127,25 @@ test("research decision previews, applies once, and replays without duplicating 
       /research_decision_id_reused/,
     );
 
+    const renderedBoundaryInput = { ...input, decisionId: "pivot-004", expectedRevision: recovered.revision, apply: true };
+    assert.throws(
+      () =>
+        recordResearchDecision({
+          ...renderedBoundaryInput,
+          afterWrite: (boundary) => {
+            if (boundary === "rendered") throw new Error("fixture rendered interruption");
+          },
+        }),
+      /fixture rendered interruption/,
+    );
+    const journalPath = path.join(env.directory, "strategy/.b2c-research-decision-journal.json");
+    assert(existsSync(journalPath), "rendered-boundary interruption must leave the recovery journal");
+    const recoveredRenderedBoundary = recordResearchDecision({ ...renderedBoundaryInput, expectedRevision: workspaceRevision(env.directory) });
+    assert.equal(recoveredRenderedBoundary.replayed, true);
+    assert.equal(recoveredRenderedBoundary.applied, false);
+    assert(!existsSync(journalPath), "recovery must remove the completed journal");
+    assert(readFileSync(path.join(env.directory, "PRODUCT.md"), "utf8").includes("pivot-004"));
+
     assert.throws(() => recordResearchDecision({ ...input, expectedRevision: applied.data.revision, apply: true }), /stale_revision/);
 
     writeFileSync(path.join(env.directory, "product.yaml"), `${productBefore}\nmeta: {}\n`);

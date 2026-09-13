@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.74",
+  "version": "0.220.75",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Reject an explicitly unrun offer test as incomplete instead of allowing it to satisfy the run-or-waived decision contract.",
     "Prove an activated provider binding reopens only its affected obligations while pinned and unrelated proof remain current.",
     "Reject cosmetic design variants that reuse one underlying mechanic instead of proving distinct directions.",
     "Expose the enforced research artifact contract through a bounded read-only explanation without initializing or certifying research.",

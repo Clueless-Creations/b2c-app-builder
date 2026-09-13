@@ -1890,6 +1890,23 @@ export function register(h: Harness): void {
   }
   runFixture("dated founder offer-test waiver passes", researchOfferWaived, "check-research-evidence.ts", 0);
 
+  const researchOfferNotRun = makeCompletedResearch("research-offer-test-not-run");
+  {
+    const offerPath = path.join(researchOfferNotRun, "strategy/OFFER_TEST.md");
+    const offer = readFileSync(offerPath, "utf8").replace(
+      "| run | 2026-07-21 | 840 visits and 31 signups in TRACE-003 | use the recovery offer | founder |",
+      "| not_run | 2026-07-21 | no exposure recorded | collect evidence before deciding | founder |",
+    );
+    writeFileSync(offerPath, offer, "utf8");
+  }
+  runFixture(
+    "an explicitly unrun offer test cannot satisfy the run-or-waived decision contract",
+    researchOfferNotRun,
+    "check-research-evidence.ts",
+    1,
+    "research.offer_test_decision_incomplete",
+  );
+
   const makeWaivedOfferFixture = (name: string, decisionRows: readonly string[], waiverRows: readonly string[]): string => {
     const root = makeCompletedResearch(name);
     const offerPath = path.join(root, "strategy/OFFER_TEST.md");

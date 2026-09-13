@@ -1,0 +1,119 @@
+name: Isolated reviewed research verification
+on:
+  push:
+    branches: [agent/session-397-verification-20260913]
+    paths: [.github/workflows/session-revise.yml]
+permissions:
+  contents: read
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    outputs:
+      sha: ${{ steps.commit.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply exact source revision without replacing the PR branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 -d .maintenance/offer-revision.patch.gz.b64 | gzip -d > "$RUNNER_TEMP/revision.patch"
+          echo "90a9aea59e6eb20fcc19263c1c57ca04ccf54782e39991b83f36eb5445276b4e  $RUNNER_TEMP/revision.patch" | sha256sum -c -
+          test "$(git rev-parse origin/agent/397-offer-narratives)" = b747885cb532d6ff95bc6d5a7424a4f48bf3da50
+          if git ls-remote --exit-code --heads origin agent/397-reviewed-source; then exit 1; fi
+          git switch -c agent/397-reviewed-source b747885cb532d6ff95bc6d5a7424a4f48bf3da50
+          git apply --check "$RUNNER_TEMP/revision.patch"
+          git apply "$RUNNER_TEMP/revision.patch"
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - run: npm ci
+      - run: npm run render:all && npm run render:evidence-schema-version
+      - run: npm run typecheck && git diff --check
+      - id: commit
+        name: Commit and stage for coordinator fast-forward
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e .maintenance
+          test ! -e .github/workflows/session-revise.yml
+          git add --update
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'fix(research): reject labeled templates and retain first-invalid-row diagnostics'
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          git push origin HEAD:refs/heads/agent/397-reviewed-source
+  focused:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - run: npm ci
+      - name: Verify complete core-artifacts results
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD
+          npm run test:validators -- --shard core-artifacts > "$RUNNER_TEMP/core-artifacts.log" 2>&1
+          node --input-type=module - <<'JS'
+          import fs from 'node:fs';
+          const marker = 'B2C_SHARD_RESULTS_V1:';
+          const line = fs.readFileSync(`${process.env.RUNNER_TEMP}/core-artifacts.log`, 'utf8').split('\n').find(line => line.startsWith(marker));
+          if (!line) throw new Error('Missing fixture results');
+          const rows = JSON.parse(line.slice(marker.length));
+          console.log(`${rows.filter(row => row.ok).length}/${rows.length} checks passed`);
+          if (!rows.length || rows.some(row => !row.ok)) { console.error(rows.filter(row => !row.ok)); throw new Error('Fixture failure'); }
+          JS
+      - run: npm run render:all && npm run render:evidence-schema-version && git diff --exit-code
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reviewed-research-core-artifacts
+          path: ${{ runner.temp }}/core-artifacts.log
+          retention-days: 3
+  full:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        lane: [fast, heavy-1, heavy-2]
+    env:
+      B2C_REQUIRE_GIT_HISTORY: '1'
+      GITHUB_BASE_SHA: e290c4e3316c897696a259a212d64fafacc9a0e3
+      B2C_FIXTURE_CONCURRENCY: '2'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - run: npm ci
+      - name: Full checkpoint lane
+        env:
+          LANE: ${{ matrix.lane }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD
+          case "$LANE" in
+            fast) npm run audit:ci -- --lane fast ;;
+            heavy-1) npm run audit:ci -- --lane heavy --shard 1/2 ;;
+            heavy-2) npm run audit:ci -- --lane heavy --shard 2/2 ;;
+          esac

@@ -73,11 +73,30 @@ test("research decision previews, applies once, and replays without duplicating 
     assert.equal(readFileSync(path.join(env.directory, "product.yaml"), "utf8"), productBefore);
     assert.equal(readFileSync(path.join(env.directory, "PRODUCT.md"), "utf8"), renderedBefore);
 
-    const currentInput = { ...input, expectedRevision: workspaceRevision(env.directory) };
+    assert.throws(
+      () =>
+        recordResearchDecision({
+          ...input,
+          expectedRevision: workspaceRevision(env.directory),
+          apply: true,
+          afterWrite: (boundary) => {
+            if (boundary === "journal") throw new Error("fixture journal interruption");
+          },
+        }),
+      /fixture journal interruption/,
+    );
+    const journalPath = path.join(env.directory, "strategy/.b2c-research-decision-journal.json");
+    assert(existsSync(journalPath), "journal-boundary interruption must leave the recovery journal");
+    assert.equal(readFileSync(path.join(env.directory, "product.yaml"), "utf8"), productBefore);
+    assert.equal(readFileSync(path.join(env.directory, "PRODUCT.md"), "utf8"), renderedBefore);
+
+    const currentRevision = workspaceRevision(env.directory);
+    const currentInput = { ...input, expectedRevision: currentRevision };
     const applied = callPublicOperation("business.research.decision", { ...currentInput, apply: true });
     assert(applied.ok, JSON.stringify(applied));
-    assert.equal(applied.data.applied, true);
-    assert.equal(applied.data.replayed, false);
+    assert.equal(applied.data.applied, false);
+    assert.equal(applied.data.replayed, true);
+    assert(!existsSync(journalPath), "journal recovery must clear the completed journal");
     const changedProduct = readFileSync(path.join(env.directory, "product.yaml"), "utf8");
     const renderedApplied = readFileSync(path.join(env.directory, "PRODUCT.md"), "utf8");
     assert(changedProduct.includes("b2c-research-decision:v1:pivot-001:"));
@@ -138,7 +157,6 @@ test("research decision previews, applies once, and replays without duplicating 
         }),
       /fixture rendered interruption/,
     );
-    const journalPath = path.join(env.directory, "strategy/.b2c-research-decision-journal.json");
     assert(existsSync(journalPath), "rendered-boundary interruption must leave the recovery journal");
     const recoveredRenderedBoundary = recordResearchDecision({ ...renderedBoundaryInput, expectedRevision: workspaceRevision(env.directory) });
     assert.equal(recoveredRenderedBoundary.replayed, true);

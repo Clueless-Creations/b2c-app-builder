@@ -22,7 +22,7 @@ type DecisionInput = {
   rationale: string;
   findingIds: string[];
   apply: boolean;
-  afterWrite?: (boundary: "product" | "rendered") => void;
+  afterWrite?: (boundary: "journal" | "product" | "rendered") => void;
 };
 
 type Proposal = {
@@ -153,9 +153,9 @@ function prepare(root: string, input: DecisionInput): Proposal {
   };
 }
 
-function recover(root: string): void {
+function recover(root: string): boolean {
   const journalPath = safeFile(root, JOURNAL);
-  if (!existsSync(journalPath)) return;
+  if (!existsSync(journalPath)) return false;
   const journal = JSON.parse(readFileSync(journalPath, "utf8")) as Journal;
   const productPath = safeFile(root, "product.yaml");
   const renderedPath = safeFile(root, "PRODUCT.md");
@@ -168,11 +168,12 @@ function recover(root: string): void {
   if (!before && !after && !productCommitted && !renderedCommitted) throw new Error("business.research_decision_recovery_required");
   if (after) {
     durableUnlink(journalPath);
-    return;
+    return true;
   }
   if (!productCommitted) atomicFile(productPath, journal.productAfter);
   if (!renderedCommitted) atomicFile(renderedPath, journal.renderedAfter);
   durableUnlink(journalPath);
+  return true;
 }
 
 export function recordResearchDecision(input: DecisionInput) {
@@ -182,7 +183,8 @@ export function recordResearchDecision(input: DecisionInput) {
   const lease = acquireLock(lockPath, { ownerSessionId: owner, retries: 0 });
   if (!lease.ok) throw new Error("business.session_lock_unavailable");
   try {
-    recover(root);
+    const recoveryRevision = workspaceRevision(root);
+    const recovered = recover(root);
     let planning: boolean;
     try {
       planning = isPlanningWorkspace(root);
@@ -190,7 +192,8 @@ export function recordResearchDecision(input: DecisionInput) {
       throw new Error(`business.research_decision_product_invalid:${error instanceof Error ? error.message : String(error)}`);
     }
     if (!planning) throw new Error("business.research_decision_requires_planning");
-    if (workspaceRevision(root) !== input.expectedRevision) throw new Error("business.stale_revision");
+    if (workspaceRevision(root) !== input.expectedRevision && !(recovered && recoveryRevision === input.expectedRevision))
+      throw new Error("business.stale_revision");
     const proposal = prepare(root, input);
     const response = {
       workspaceId: input.workspaceId,
@@ -218,6 +221,7 @@ export function recordResearchDecision(input: DecisionInput) {
       renderedAfter: proposal.renderedAfter,
     };
     atomicFile(safeFile(root, JOURNAL), JSON.stringify(journal));
+    input.afterWrite?.("journal");
     atomicFile(safeFile(root, "product.yaml"), proposal.productAfter);
     input.afterWrite?.("product");
     atomicFile(safeFile(root, "PRODUCT.md"), proposal.renderedAfter);

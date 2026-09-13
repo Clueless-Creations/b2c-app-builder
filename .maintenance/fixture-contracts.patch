@@ -1,0 +1,67 @@
+diff --git a/checks/validation/repository/fixtures/engineering.fixtures.ts b/checks/validation/repository/fixtures/engineering.fixtures.ts
+index f1d8a3b..50af649 100644
+--- a/checks/validation/repository/fixtures/engineering.fixtures.ts
++++ b/checks/validation/repository/fixtures/engineering.fixtures.ts
+@@ -709,6 +709,15 @@ function writeValidDesignExploration(root: string): void {
+   const exploration = `exploration:
+   schemaVersion: 1
+   selectedConceptId: focus-canvas
++  process:
++    referenceAccess: structured-source
++    referenceAccessNote: The supplied reference pack was available as structured source; no unavailable Figma edit was represented as complete.
++    referenceInspection: The reference pack was inspected for object geometry, hierarchy, motion cues, and responsive composition before drafting.
++    tangibleDraft: A low-hierarchy packing canvas draft was rendered with the three surface treatments and a first onboarding path.
++    critique: The draft review found that narrow-screen omissions and the onboarding empty-state cue were difficult to identify.
++    revision: The selected canvas direction clarified object status, the primary action, and the shared object model through onboarding.
++    chosenTarget: The chosen target is a calm, direct packing canvas whose object geometry remains recognizable across native and web surfaces.
++    runtimeComparison: The implementation was compared with the chosen target on the first viewport, onboarding path, and responsive desktop composition; drift was repaired before acceptance.
+   concepts:
+     - id: focus-canvas
+       name: Focus canvas
+ diff --git a/checks/validation/repository/fixtures/evidence-schema.fixtures.ts b/checks/validation/repository/fixtures/evidence-schema.fixtures.ts
+index 44cb428..587ff3f 100644
+--- a/checks/validation/repository/fixtures/evidence-schema.fixtures.ts
++++ b/checks/validation/repository/fixtures/evidence-schema.fixtures.ts
+@@ -153,7 +153,14 @@ function goldenSignalCorpusDoc(): Extract<SignalCorpusDocument, { applicable: tr
+         reason: "no conflicting signal collected yet",
+       },
+     ],
+-    derivedOutputs: [],
++    derivedOutputs: [
++      {
++        signalIds: ["SIG-001"],
++        output: "Monetization posture",
++        decisionChanged: "Test a first-session paywall against the recovery promise before adopting it.",
++        traceId: "TRACE-002",
++      },
++    ],
+   };
+ }
+ 
+@@ -267,6 +274,26 @@ export function register(h: Harness): void {
+   writeEvidenceFiles(positiveRoot, goldenOfferTestDoc());
+   runFixture("schema round trip: rendered golden documents pass check-research-evidence.ts", positiveRoot, "check-research-evidence.ts", 0);
+ 
++  const emptyOutputsRoot = makeFixture("evidence-schema-empty-derived-outputs-canary");
++  seedResearchLane(emptyOutputsRoot);
++  writeEvidenceFiles(emptyOutputsRoot, goldenOfferTestDoc());
++  const emptyOutputsDoc = { ...goldenSignalCorpusDoc(), derivedOutputs: [] };
++  const emptyOutputsValidation = validateSignalCorpusDoc(emptyOutputsDoc);
++  expect(
++    h,
++    "drift canary: structurally valid empty derived outputs do not imply supported research",
++    emptyOutputsValidation.valid,
++    JSON.stringify(emptyOutputsValidation.issues),
++  );
++  writeFileSync(path.join(emptyOutputsRoot, "strategy/SIGNAL_CORPUS.md"), renderSignalCorpusMarkdown(emptyOutputsDoc), "utf8");
++  runFixture(
++    "schema round trip: empty derived outputs still fail the research content gate",
++    emptyOutputsRoot,
++    "check-research-evidence.ts",
++    1,
++    "research.signal_output_unsupported",
++  );
++
+   const negativeRoot = makeFixture("evidence-schema-round-trip-negative-canary");
+   seedResearchLane(negativeRoot);
+   const forbiddenOfferDoc: OfferTestDocument = {

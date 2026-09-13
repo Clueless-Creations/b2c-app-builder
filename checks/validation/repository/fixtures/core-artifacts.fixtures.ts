@@ -1549,6 +1549,10 @@ export function register(h: Harness): void {
     ["quoted-placeholder", "PostHog test cohort TRACE-003", 'PostHog cohort TRACE-003; one optional survey answer was "TBD"'],
     ["signup-form-action", "| Primary response | waitlist signup |", "| Primary response | fill out the signup form to join the owned email waitlist |"],
     ["measured-form-action", "PostHog test cohort TRACE-003", "PostHog cohort TRACE-003 recorded 31 people who filled in the signup form"],
+    ["compound-risk-offer", "| Offer | join the streak-recovery beta |", "| Offer | provide a risk-free recovery trial |"],
+    ["compound-evidence-offer", "| Offer | join the streak-recovery beta |", "| Offer | provide evidence-based coaching |"],
+    ["compound-unicode-offer", "| Offer | join the streak-recovery beta |", "| Offer | provide a risk‑free recovery trial |"],
+    ["compound-source-offer", "| Offer | join the streak-recovery beta |", "| Offer | provide source-code templates for the recovery workflow |"],
   ] as const) {
     const root = makeCompletedResearch(`research-offer-narrative-${name}`);
     const offerPath = path.join(root, "strategy/OFFER_TEST.md");
@@ -1585,6 +1589,8 @@ export function register(h: Harness): void {
     ["enter-audience", "Audience: enter the actual target audience"],
     ["describe-audience", "Audience: describe the specific audience here"],
     ["insert-evidence", "Audience: insert relevant evidence here"],
+    ["compound-fill-in", "Audience: please fill-in the specific audience"],
+    ["compound-unicode-fill-in", "Audience: please fill‑in the specific audience"],
   ] as const) {
     const root = makeCompletedResearch(`research-offer-placeholder-contract-${name}`);
     const offerPath = path.join(root, "strategy/OFFER_TEST.md");

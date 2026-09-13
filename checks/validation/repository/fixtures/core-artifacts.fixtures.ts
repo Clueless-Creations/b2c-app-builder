@@ -1546,6 +1546,7 @@ export function register(h: Harness): void {
     ["evidence", "840 visits and 31 signups in TRACE-003", "840 visits and 31 signups in TRACE-003; longer-term demand remains unverified"],
     ["decision", "use the recovery offer", "use the recovery offer while paid-channel validation is pending"],
     ["measurement-source", "PostHog test cohort TRACE-003", "PostHog test cohort TRACE-003, excluding pending purchase events"],
+    ["quoted-placeholder", "PostHog test cohort TRACE-003", 'PostHog cohort TRACE-003; one optional survey answer was "TBD"'],
   ] as const) {
     const root = makeCompletedResearch(`research-offer-narrative-${name}`);
     const offerPath = path.join(root, "strategy/OFFER_TEST.md");
@@ -1573,6 +1574,10 @@ export function register(h: Harness): void {
     ["pending-label", "Pending: collect audience evidence"],
     ["unverified-label", "Unverified: collect audience evidence"],
     ["nested-pending-label", "Audience: Pending: collect audience evidence"],
+    ["polite-instruction", "Audience: Please replace with the specific audience"],
+    ["polite-token", "Audience: Kindly mark this field to be filled later"],
+    ["polite-todo", "Audience: Please TODO, identify buyers"],
+    ["embedded-instruction", "Audience: The author should replace with the specific audience"],
   ] as const) {
     const root = makeCompletedResearch(`research-offer-placeholder-contract-${name}`);
     const offerPath = path.join(root, "strategy/OFFER_TEST.md");
@@ -1593,6 +1598,8 @@ export function register(h: Harness): void {
     ["measurement-source", "PostHog test cohort TRACE-003", "**unverified**", "research.offer_test_measurement_missing"],
     ["pending-evidence-label", "840 visits and 31 signups in TRACE-003", "Pending: collect evidence", "research.offer_test_decision_incomplete"],
     ["unverified-source-label", "PostHog test cohort TRACE-003", "Unverified: obtain measurement source", "research.offer_test_measurement_missing"],
+    ["polite-evidence", "840 visits and 31 signups in TRACE-003", "Please replace with experiment evidence", "research.offer_test_decision_incomplete"],
+    ["polite-source", "PostHog test cohort TRACE-003", "Please replace with the analytics export", "research.offer_test_measurement_missing"],
   ] as const) {
     const root = makeCompletedResearch(`research-offer-placeholder-${name}`);
     const offerPath = path.join(root, "strategy/OFFER_TEST.md");
@@ -1612,6 +1619,9 @@ export function register(h: Harness): void {
     ["pending-risk-label", "The founder tests organic demand first", "Pending: document residual risk", 1],
     ["unverified-risk-label", "The founder tests organic demand first", "Risk: Unverified: document residual risk", 1],
     ["unverified-reason-label", "Unverified: collect audience evidence", "Demand remains unverified beyond the measured cohort", 1],
+    ["polite-risk", "The founder tests organic demand first", "Risk: Please replace with the accepted residual risk", 1],
+    ["polite-reason", "Kindly replace with a founder-authored reason", "Demand remains unverified beyond the measured cohort", 1],
+    ["embedded-risk-instruction", "The founder tests organic demand first", "Risk: This field is to be filled after review", 1],
     [
       "leading-authored-uncertainty",
       "Pending paid acquisition is deferred until organic testing completes",

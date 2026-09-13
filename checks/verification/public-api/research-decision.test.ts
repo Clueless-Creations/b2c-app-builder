@@ -107,10 +107,14 @@ test("research decision previews, applies once, and replays without duplicating 
         }),
       /fixture interruption/,
     );
+    const thirdPartyPath = path.join(env.directory, "strategy/third-party-note.md");
+    const thirdPartyEdit = "# Independent note\n\nThis edit must survive decision recovery.\n";
+    writeFileSync(thirdPartyPath, thirdPartyEdit);
     assert.throws(() => recordResearchDecision(interruptedInput), /stale_revision/);
     const recovered = recordResearchDecision({ ...interruptedInput, expectedRevision: workspaceRevision(env.directory) });
     assert.equal(recovered.replayed, true);
     assert(readFileSync(path.join(env.directory, "PRODUCT.md"), "utf8").includes("pivot-003"));
+    assert.equal(readFileSync(thirdPartyPath, "utf8"), thirdPartyEdit, "recovery must preserve an unrelated third-party edit");
 
     assert.throws(
       () =>

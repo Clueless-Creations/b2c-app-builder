@@ -1479,6 +1479,78 @@ export function register(h: Harness): void {
     "research.distribution_proof_row_invalid",
   );
 
+  // Offer narrative records can describe uncertainty without becoming blank templates.
+  // Exercise the actual validator, not just the shared scalar helper.
+  for (const [name, current, replacement] of [
+    ["audience", "people who repeatedly abandon habit streaks", "people with pending habit reminders who repeatedly abandon streaks"],
+    ["owned-route", "| Owned relationship | email waitlist |", "| Owned relationship | confirmed email required for the owned waitlist |"],
+    ["response", "| Primary response | waitlist signup |", "| Primary response | waitlist signup with required email confirmation |"],
+    ["evidence", "840 visits and 31 signups in TRACE-003", "840 visits and 31 signups in TRACE-003; longer-term demand remains unverified"],
+    ["decision", "use the recovery offer", "use the recovery offer while paid-channel validation is pending"],
+    ["measurement-source", "PostHog test cohort TRACE-003", "PostHog test cohort TRACE-003, excluding pending purchase events"],
+  ] as const) {
+    const root = makeCompletedResearch(`research-offer-narrative-${name}`);
+    const offerPath = path.join(root, "strategy/OFFER_TEST.md");
+    const offer = readFileSync(offerPath, "utf8");
+    if (!offer.includes(current)) throw new Error(`Missing offer narrative fixture anchor: ${name}`);
+    writeFileSync(offerPath, offer.replace(current, replacement), "utf8");
+    runFixture(`offer ${name} accepts authored uncertainty, not just keyword-free prose`, root, "check-research-evidence.ts", 0);
+  }
+
+  for (const [name, value] of [
+    ["tbd", "**TBD.**"],
+    ["pending", "`pending`"],
+    ["required", "required!"],
+    ["template", "<audience>"],
+    ["instruction", "replace with the specific audience"],
+  ] as const) {
+    const root = makeCompletedResearch(`research-offer-placeholder-contract-${name}`);
+    const offerPath = path.join(root, "strategy/OFFER_TEST.md");
+    writeFileSync(offerPath, readFileSync(offerPath, "utf8").replace("people who repeatedly abandon habit streaks", value), "utf8");
+    runFixture(
+      `offer contract still rejects ${name} placeholder-only values`,
+      root,
+      "check-research-evidence.ts",
+      1,
+      "research.offer_test_contract_incomplete",
+    );
+  }
+
+  for (const [name, current, placeholder, code] of [
+    ["decision-evidence", "840 visits and 31 signups in TRACE-003", "**TBD.**", "research.offer_test_decision_incomplete"],
+    ["decision-text", "use the recovery offer", "`pending`", "research.offer_test_decision_incomplete"],
+    ["measurement-source", "PostHog test cohort TRACE-003", "**unverified**", "research.offer_test_measurement_missing"],
+  ] as const) {
+    const root = makeCompletedResearch(`research-offer-placeholder-${name}`);
+    const offerPath = path.join(root, "strategy/OFFER_TEST.md");
+    writeFileSync(offerPath, readFileSync(offerPath, "utf8").replace(current, placeholder), "utf8");
+    runFixture(`offer ${name} still rejects decorated placeholder-only values`, root, "check-research-evidence.ts", 1, code);
+  }
+
+  for (const [name, reason, risk, exitCode] of [
+    ["authored-uncertainty", "Paid acquisition is pending while the founder tests organic demand", "Demand remains unverified beyond the measured cohort", 0],
+    ["placeholder-reason", "**pending**", "Demand remains unverified beyond the measured cohort", 1],
+    ["placeholder-risk", "The founder tests organic demand first", "`TBD`", 1],
+    ["empty-risk", "The founder tests organic demand first", "**none**", 1],
+  ] as const) {
+    const root = makeCompletedResearch(`research-offer-waiver-narrative-${name}`);
+    const offerPath = path.join(root, "strategy/OFFER_TEST.md");
+    const offer = readFileSync(offerPath, "utf8")
+      .replace(
+        "| run | 2026-07-21 | 840 visits and 31 signups in TRACE-003 | use the recovery offer | founder |",
+        "| waived | 2026-07-21 | founder waiver WAIVER-001 | proceed with explicit acquisition risk | founder |",
+      )
+      .concat(`\n| 2026-07-21 | founder | ${reason} | ${risk} |`);
+    writeFileSync(offerPath, offer, "utf8");
+    runFixture(
+      `offer waiver ${name} preserves authored uncertainty and rejects empty risk`,
+      root,
+      "check-research-evidence.ts",
+      exitCode,
+      exitCode === 1 ? "research.offer_test_waiver_missing" : undefined,
+    );
+  }
+
   const researchOfferNoMeasurement = makeCompletedResearch("research-offer-test-no-measurement");
   {
     const offerPath = path.join(researchOfferNoMeasurement, "strategy/OFFER_TEST.md");

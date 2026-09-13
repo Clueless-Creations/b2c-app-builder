@@ -1,7 +1,7 @@
 import { issue } from "../../../../tooling/lib/launch-state.js";
-import { isEmptyEquivalentEvidenceValue } from "../../../../kernel/lib/empty-equivalent-evidence.js";
+import { isEmptyEquivalentEvidenceValue, normalizeEvidenceScalar } from "../../../../kernel/lib/empty-equivalent-evidence.js";
 import { parseRequiredTableSection, type RequiredTableSection } from "../../../../kernel/lib/required-table-section.js";
-import { isValidPastIsoDate, parseOfferMeasurement } from "./research-evidence-helpers.js";
+import { isPlaceholderOnly, isValidPastIsoDate, parseOfferMeasurement } from "./research-evidence-helpers.js";
 
 export const OFFER_TEST_HEADERS = {
   contract: ["Field", "Value"],
@@ -66,7 +66,7 @@ export function validateOfferTest(value: string | undefined, target: ReturnType<
     !contractStructureValid ||
     requiredContractFields.some((field) => {
       const value = contractFields.get(field) ?? "";
-      if (value.length === 0 || /\b(todo|tbd|placeholder|replace with|pending|unverified|required)\b|<[^>]+>/i.test(value)) return true;
+      if (!isAuthoredOfferNarrative(value)) return true;
       if (field === "owned relationship" && isAbsentOwnedRelationship(value)) return true;
       if (field === "primary response" && isForbiddenPrimaryResponse(value)) return true;
       if (isGenericOfferOptionMenu(field, value)) return true;
@@ -78,8 +78,7 @@ export function validateOfferTest(value: string | undefined, target: ReturnType<
     const invalidField = requiredContractFields.find((field) => {
       const value = contractFields.get(field) ?? "";
       return (
-        value.length === 0 ||
-        /\b(todo|tbd|placeholder|replace with|pending|unverified|required)\b|<[^>]+>/i.test(value) ||
+        !isAuthoredOfferNarrative(value) ||
         (field === "owned relationship" && isAbsentOwnedRelationship(value)) ||
         (field === "primary response" && isForbiddenPrimaryResponse(value)) ||
         isGenericOfferOptionMenu(field, value) ||
@@ -138,7 +137,9 @@ export function validateOfferTest(value: string | undefined, target: ReturnType<
         return (
           /^(run|waived)$/.test(rowStatus) &&
           isValidPastIsoDate((row.cells[dateColumn] ?? "").trim()) &&
-          [row.cells[evidenceColumn] ?? "", row.cells[decisionColumn] ?? "", decider].every((cell) => cell.trim().length > 0 && !placeholder.test(cell)) &&
+          [row.cells[evidenceColumn] ?? "", row.cells[decisionColumn] ?? ""].every(isAuthoredOfferNarrative) &&
+          decider.length > 0 &&
+          !placeholder.test(decider) &&
           isFounderDecider(decider)
         );
       };
@@ -179,8 +180,7 @@ export function validateOfferTest(value: string | undefined, target: ReturnType<
       return (
         isValidPastIsoDate((row.cells[dateColumn] ?? "").trim()) &&
         parseOfferMeasurement((row.cells[exposureColumn] ?? "").trim(), (row.cells[conversionsColumn] ?? "").trim()) !== undefined &&
-        source.length > 0 &&
-        !placeholder.test(source)
+        isAuthoredOfferNarrative(source)
       );
     };
     const rowsValid = rowsMatchTableWidth(exposureResult.section) && exposureResult.section.rows.every(rowValid);
@@ -228,9 +228,7 @@ export function validateOfferTest(value: string | undefined, target: ReturnType<
         return (
           isValidPastIsoDate((row.cells[waiverDateColumn] ?? "").trim()) &&
           isFounderDecider(founder) &&
-          [row.cells[reasonColumn] ?? "", row.cells[riskColumn] ?? ""].every(
-            (cell) => cell.trim().length > 0 && !placeholder.test(cell) && !isEmptyEquivalentEvidenceValue(cell),
-          )
+          [row.cells[reasonColumn] ?? "", row.cells[riskColumn] ?? ""].every((cell) => isAuthoredOfferNarrative(cell) && !isEmptyEquivalentEvidenceValue(cell))
         );
       };
       const rowsValid = rowsMatchTableWidth(waiverResult.section) && waiverResult.section.rows.length > 0 && waiverResult.section.rows.every(waiverRowValid);
@@ -268,6 +266,11 @@ export function validateOfferTest(value: string | undefined, target: ReturnType<
       );
     }
   }
+}
+
+/** Narrative uncertainty is evidence, not a template. Identity and typed fields retain their own checks. */
+function isAuthoredOfferNarrative(value: string): boolean {
+  return value.trim().length > 0 && !isPlaceholderOnly(value) && !/^(?:required|replace with(?:\s.*)?)$/i.test(normalizeEvidenceScalar(value));
 }
 
 export function isAbsentOwnedRelationship(value: string): boolean {

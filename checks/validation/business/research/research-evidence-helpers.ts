@@ -5,3 +5,17 @@
  * grammar; the validator owns the content-quality judgment that sits on top of it.
  */
 export * from "../../../../kernel/schema/evidence-grammar.js";
+
+/**
+ * A narrative field is incomplete when it is itself a template marker, not
+ * merely because it describes an unresolved or future action. This keeps
+ * evidence uncertainty visible without treating ordinary prose as a blank.
+ */
+export function isPlaceholderOnly(value: string): boolean {
+  const normalized = value
+    .trim()
+    .replace(/^[`*_\s]+|[`*_\s]+$/gu, "")
+    .replace(/[.!?:;]+$/gu, "")
+    .trim();
+  return /^(?:todo|tbd|pending|unverified|placeholder|replace with|to be filled|yyyy-mm-dd|<[^>]+>)$/i.test(normalized);
+}

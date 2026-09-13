@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.90",
+  "version": "0.220.91",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Recover a research decision cleanly when interruption occurs after the rendered product artifact is written.",
     "Protect the canonical writing guidance in pull-request review surfaces.",
     "Reject malformed and conflicting Superwall-to-RevenueCat amount observations without claiming live provider proof.",
     "Exercise runtime synchronization across Claude, Codex, Agents, and Cursor client roots.",

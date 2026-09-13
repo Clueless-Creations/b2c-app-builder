@@ -1154,7 +1154,7 @@ function validateTransformationDemo(text: string, target: ReturnType<typeof issu
         "strategy/RESEARCH.md",
         {
           line: invalidRow?.sourceLine ?? demoSection.headingLine,
-          fixHint: `Repair the Transformation Demo row's ${invalidField} field first; use a real screenshot path, a concrete 15s script, a before-to-after transformation, and a painkiller reason.`,
+          fixHint: `Repair the named Transformation Demo row's ${invalidField} field first; use a real screenshot path, a concrete 15s script, a before-to-after transformation, and a painkiller reason.`,
         },
       ),
     );
@@ -1236,7 +1236,7 @@ function validateDistributionFirstNiche(text: string, target: ReturnType<typeof 
         "strategy/RESEARCH.md",
         {
           line: invalidRow?.sourceLine ?? nicheSection.headingLine,
-          fixHint: `Repair the Distribution-First Niche row's ${invalidField} field first; name a paying audience, a specific channel, and purchase or revenue validation.`,
+          fixHint: `Repair the named Distribution-First Niche row's ${invalidField} field first; name a paying audience, a specific channel, and purchase or revenue validation.`,
         },
       ),
     );

@@ -187,6 +187,81 @@ export function register(h: Harness): void {
       }
     }
   });
+  h.check("Porchwatch F6: offer-test diagnostics identify the authored contract, decision, and measurement rows", () => {
+    const cases = [
+      {
+        name: "research-offer-contract-diagnostic",
+        offer: [
+          "# Traffic-Backed Offer Test",
+          "## Test Contract",
+          "| Field | Value |",
+          "| --- | --- |",
+          "| Audience | one evidence-backed segment |",
+          "| Exact discovery location | r/habits |",
+          "| Native format | case-study post |",
+          "| Offer | join the beta |",
+          "| Owned relationship | email waitlist |",
+          "| Primary response | waitlist signup |",
+          "| Stop rule | an exposure, cost, or time limit |",
+        ].join("\n"),
+        code: "research.offer_test_contract_incomplete",
+        location: '"location":"5"',
+        hint: "one concrete, evidence-backed value",
+      },
+      {
+        name: "research-offer-decision-diagnostic",
+        offer: [
+          "# Traffic-Backed Offer Test",
+          "## Decision",
+          "| Status | Date | Evidence | Decision | Decided by |",
+          "| --- | --- | --- | --- | --- |",
+          "| maybe | 2026-07-21 | pending | choose one | automation |",
+        ].join("\n"),
+        code: "research.offer_test_decision_incomplete",
+        location: '"location":"5"',
+        hint: "Repair the named Decision row",
+      },
+      {
+        name: "research-offer-measurement-diagnostic",
+        offer: [
+          "# Traffic-Backed Offer Test",
+          "## Decision",
+          "| Status | Date | Evidence | Decision | Decided by |",
+          "| --- | --- | --- | --- | --- |",
+          "| run | 2026-07-21 | fixture result | continue | founder |",
+          "## Exposure And Conversion",
+          "| Date | Channel | Evidence source | Exposure type | Exposure | CTA conversions | Conversion rate | Cost | Result |",
+          "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+          "| 2026-07-21 | Reddit | pending | qualified visits | 0 | 1 | 0% | 0 | stop |",
+        ].join("\n"),
+        code: "research.offer_test_measurement_missing",
+        location: '"location":"9"',
+        hint: "Repair the named Exposure And Conversion row",
+      },
+    ];
+    for (const fixture of cases) {
+      const home = h.makeTempDir(`${fixture.name}-home`);
+      const root = path.join(h.makeTempDir(`${fixture.name}-business`), fixture.name);
+      const previous = process.env.B2C_APP_BUILDER_HOME;
+      process.env.B2C_APP_BUILDER_HOME = home;
+      try {
+        createBusiness({ workspaceId: fixture.name, directory: root, name: "Offer diagnostic fixture", hypothesis: "A consumer utility" });
+        writeFileSync(path.join(root, "strategy/OFFER_TEST.md"), fixture.offer, "utf8");
+        const result = spawnSync(
+          process.execPath,
+          ["--import", "tsx", "checks/validation/business/research/check-research-evidence.ts", "--root", root, "--require-workflow-outputs", "--json"],
+          { cwd: skillRoot, encoding: "utf8" },
+        );
+        const output = `${result.stdout}${result.stderr}`;
+        assert(output.includes(fixture.code), `${fixture.code} must remain stable`);
+        assert(output.includes(fixture.location), `${fixture.code} must preserve the authored row line`);
+        assert(output.includes(fixture.hint), `${fixture.code} must provide a bounded repair hint`);
+      } finally {
+        if (previous === undefined) delete process.env.B2C_APP_BUILDER_HOME;
+        else process.env.B2C_APP_BUILDER_HOME = previous;
+      }
+    }
+  });
   h.check("Porchwatch: absent-directory creation preserves the founder brief losslessly", () => {
     const home = h.makeTempDir("porchwatch-brief-home"),
       root = path.join(h.makeTempDir("porchwatch-brief-business"), "after-credits");

@@ -39,6 +39,7 @@ export function validateOfferTest(value: string | undefined, target: ReturnType<
   }
 
   const contractFields = new Map<string, string>();
+  const contractRows = new Map<string, RequiredTableSection["rows"][number]>();
   let contractStructureValid = contractResult.ok && rowsMatchTableWidth(contractResult.section);
   if (contractResult.ok) {
     const fieldColumn = tableColumn(contractResult.section, "Field");
@@ -48,9 +49,19 @@ export function validateOfferTest(value: string | undefined, target: ReturnType<
       const fieldValue = (row.cells[valueColumn] ?? "").trim();
       if (field.length === 0 || contractFields.has(field)) contractStructureValid = false;
       contractFields.set(field, fieldValue);
+      contractRows.set(field, row);
     }
   }
   const requiredContractFields = ["audience", "exact discovery location", "native format", "offer", "owned relationship", "primary response", "stop rule"];
+  const contractFieldLabels = new Map([
+    ["audience", "Audience"],
+    ["exact discovery location", "Exact discovery location"],
+    ["native format", "Native format"],
+    ["offer", "Offer"],
+    ["owned relationship", "Owned relationship"],
+    ["primary response", "Primary response"],
+    ["stop rule", "Stop rule"],
+  ]);
   const contractIncomplete =
     !contractStructureValid ||
     requiredContractFields.some((field) => {
@@ -64,12 +75,34 @@ export function validateOfferTest(value: string | undefined, target: ReturnType<
       return false;
     });
   if (contractIncomplete) {
+    const invalidField = requiredContractFields.find((field) => {
+      const value = contractFields.get(field) ?? "";
+      return (
+        value.length === 0 ||
+        /\b(todo|tbd|placeholder|replace with|pending|unverified|required)\b|<[^>]+>/i.test(value) ||
+        (field === "owned relationship" && isAbsentOwnedRelationship(value)) ||
+        (field === "primary response" && isForbiddenPrimaryResponse(value)) ||
+        isGenericOfferOptionMenu(field, value) ||
+        (field === "exact discovery location" && /^(social media|online|internet|web|app store|community|creator audience)$/i.test(value)) ||
+        (field === "stop rule" && !/\d/.test(value))
+      );
+    });
+    const invalidRow = invalidField ? contractRows.get(invalidField) : undefined;
+    const invalidFieldLabel = invalidField ? (contractFieldLabels.get(invalidField) ?? invalidField) : undefined;
     target.push(
       issue(
         "error",
         "research.offer_test_contract_incomplete",
-        "The offer Test Contract needs an exact audience, discovery location, native format, offer, owned route, primary response, and measurable stop rule.",
+        invalidFieldLabel
+          ? `The offer Test Contract field \"${invalidFieldLabel}\" is incomplete or not specific enough; repair that authored row before relying on the offer decision.`
+          : "The offer Test Contract needs an exact audience, discovery location, native format, offer, owned route, primary response, and measurable stop rule.",
         "strategy/OFFER_TEST.md",
+        {
+          line: invalidRow?.sourceLine ?? (contractResult.ok ? contractResult.section.headingLine : undefined),
+          fixHint: invalidFieldLabel
+            ? `Fill the \"${invalidFieldLabel}\" Value cell with one concrete, evidence-backed value; do not leave a template, option menu, or empty-equivalent value.`
+            : "Use one simple Test Contract table with the required Field and Value rows.",
+        },
       ),
     );
   }
@@ -91,10 +124,15 @@ export function validateOfferTest(value: string | undefined, target: ReturnType<
           "research.offer_test_decision_missing",
           "The offer test needs a run or waived decision row with date, evidence, decision, and founder identity.",
           "strategy/OFFER_TEST.md",
+          {
+            line: decisionResult.section.headingLine,
+            fixHint:
+              "Add one Decision row with status run or waived, a past ISO date, concrete evidence and decision text, and the founder or owner as decider.",
+          },
         ),
       );
     } else {
-      const decisionComplete = decisionRows.every((row) => {
+      const decisionRowValid = (row: (typeof decisionRows)[number]): boolean => {
         const rowStatus = (row.cells[statusColumn] ?? "").trim().toLowerCase();
         const decider = (row.cells[deciderColumn] ?? "").trim();
         return (
@@ -103,14 +141,21 @@ export function validateOfferTest(value: string | undefined, target: ReturnType<
           [row.cells[evidenceColumn] ?? "", row.cells[decisionColumn] ?? "", decider].every((cell) => cell.trim().length > 0 && !placeholder.test(cell)) &&
           isFounderDecider(decider)
         );
-      });
+      };
+      const decisionComplete = decisionRows.every(decisionRowValid);
       if (!decisionComplete) {
+        const invalidRow = decisionRows.find((row) => !decisionRowValid(row));
         target.push(
           issue(
             "error",
             "research.offer_test_decision_incomplete",
             "The offer-test decision needs an ISO date, real evidence, a decision, and the founder or owner as decider.",
             "strategy/OFFER_TEST.md",
+            {
+              line: invalidRow?.sourceLine,
+              fixHint:
+                "Repair the named Decision row: use run or waived, a past ISO date, concrete evidence and decision text, and the founder or owner as decider.",
+            },
           ),
         );
       } else {
@@ -129,24 +174,29 @@ export function validateOfferTest(value: string | undefined, target: ReturnType<
     const exposureColumn = tableColumn(exposureResult.section, "Exposure");
     const conversionsColumn = tableColumn(exposureResult.section, "CTA conversions");
     const sourceColumn = tableColumn(exposureResult.section, "Evidence source");
-    const rowsValid =
-      rowsMatchTableWidth(exposureResult.section) &&
-      exposureResult.section.rows.every((row) => {
-        const source = (row.cells[sourceColumn] ?? "").trim();
-        return (
-          isValidPastIsoDate((row.cells[dateColumn] ?? "").trim()) &&
-          parseOfferMeasurement((row.cells[exposureColumn] ?? "").trim(), (row.cells[conversionsColumn] ?? "").trim()) !== undefined &&
-          source.length > 0 &&
-          !placeholder.test(source)
-        );
-      });
+    const rowValid = (row: (typeof exposureResult.section.rows)[number]): boolean => {
+      const source = (row.cells[sourceColumn] ?? "").trim();
+      return (
+        isValidPastIsoDate((row.cells[dateColumn] ?? "").trim()) &&
+        parseOfferMeasurement((row.cells[exposureColumn] ?? "").trim(), (row.cells[conversionsColumn] ?? "").trim()) !== undefined &&
+        source.length > 0 &&
+        !placeholder.test(source)
+      );
+    };
+    const rowsValid = rowsMatchTableWidth(exposureResult.section) && exposureResult.section.rows.every(rowValid);
     if (!rowsValid || (status === "run" && exposureResult.section.rows.length === 0)) {
+      const invalidRow = exposureResult.section.rows.find((row) => !rowValid(row));
       target.push(
         issue(
           "error",
           "research.offer_test_measurement_missing",
           "Every offer measurement row needs a real non-future ISO date and evidence source, positive whole-number exposure, and a whole-number CTA conversion count no larger than exposure.",
           "strategy/OFFER_TEST.md",
+          {
+            line: invalidRow?.sourceLine ?? exposureResult.section.headingLine,
+            fixHint:
+              "Repair the named Exposure And Conversion row with a past ISO date, evidence source, positive whole-number exposure, and CTA conversions no larger than exposure.",
+          },
         ),
       );
     }
@@ -157,6 +207,7 @@ export function validateOfferTest(value: string | undefined, target: ReturnType<
         "research.offer_test_measurement_missing",
         "Every offer measurement row needs a real non-future ISO date and evidence source, positive whole-number exposure, and a whole-number CTA conversion count no larger than exposure.",
         "strategy/OFFER_TEST.md",
+        { fixHint: "Add an Exposure And Conversion table with at least one measured row before marking the offer test run." },
       ),
     );
   }

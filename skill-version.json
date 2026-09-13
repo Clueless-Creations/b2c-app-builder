@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.89",
+  "version": "0.220.90",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Protect the canonical writing guidance in pull-request review surfaces.",
     "Reject malformed and conflicting Superwall-to-RevenueCat amount observations without claiming live provider proof.",
     "Exercise runtime synchronization across Claude, Codex, Agents, and Cursor client roots.",
     "Protect the three builder writing-owner routes in the agent entrypoint contract.",

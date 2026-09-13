@@ -9,6 +9,27 @@ export interface GuidanceFinding {
 }
 export type ReadGuidance = (relative: string) => string | undefined;
 
+const REVIEW_SURFACES = [
+  {
+    file: ".github/PULL_REQUEST_TEMPLATE.md",
+    required: "Changed prose follows the builder house style and kitchen-language boundary",
+  },
+  {
+    file: "knowledge/words/no-slop-writing.md",
+    required: "## 9. Original: Builder house style",
+  },
+] as const;
+
+/** Structural evidence that review and canonical writing surfaces still reach the existing owner. */
+export function checkWritingReviewSurfaces(read: ReadGuidance): GuidanceFinding[] {
+  return REVIEW_SURFACES.flatMap(({ file, required }) => {
+    const text = read(file);
+    return text?.includes(required)
+      ? []
+      : [{ code: "agent_entrypoints.review_writing_owner_missing", file, detail: `${file} must retain the canonical builder writing guidance: ${required}.` }];
+  });
+}
+
 const ROOT = "AGENTS.md";
 const SKILL = "SKILL.md";
 const SETUP = "agents/skills/b2c-app-builder/references/setup.md";

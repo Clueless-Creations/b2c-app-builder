@@ -29,7 +29,7 @@ import { spawnSync } from "node:child_process";
 import { flagString, issue, parseFlags, reportAndExit, type Issue } from "../../../tooling/lib/launch-state.js";
 import { resolveSkillRoot } from "../../../tooling/lib/skill-root.js";
 
-import { checkStandingGuidance, measureGuidancePackets, type GuidancePacket } from "./agent-guidance-contract.js";
+import { checkStandingGuidance, checkWritingReviewSurfaces, measureGuidancePackets, type GuidancePacket } from "./agent-guidance-contract.js";
 
 const defaultRepoRoot = resolveSkillRoot(import.meta.url);
 
@@ -210,6 +210,7 @@ for (const relative of WORKSPACE_FACING) {
 
 // Gate 4: standing obligations and portable projection. Structural evidence, not model proof.
 for (const finding of checkStandingGuidance(read)) issues.push(issue("error", finding.code, finding.detail, finding.file));
+for (const finding of checkWritingReviewSurfaces(read)) issues.push(issue("error", finding.code, finding.detail, finding.file));
 
 // Explicit repository rehearsal only. Reports are create-only to protect the frozen A0 output.
 const baselinePath = flagString(flags, "guidanceBaseline");

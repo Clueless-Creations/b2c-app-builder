@@ -1,7 +1,14 @@
 import { cpSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { type Harness, skillRoot } from "./_harness.js";
-import { checkStandingGuidance, completionRule, localMarkdownLinks, measureGuidancePackets, STANDING_RULES } from "../agent-guidance-contract.js";
+import {
+  checkStandingGuidance,
+  checkWritingReviewSurfaces,
+  completionRule,
+  localMarkdownLinks,
+  measureGuidancePackets,
+  STANDING_RULES,
+} from "../agent-guidance-contract.js";
 
 const SCRIPT = "check-agent-entrypoints";
 const TEMPLATE = "surfaces/workspace-template/repo-agent-entrypoints";
@@ -14,6 +21,8 @@ const SHIPPED = [
   "agents/skills/b2c-contributor/SKILL.md",
   "agents/skills/b2c-maintainer/SKILL.md",
   SETUP,
+  ".github/PULL_REQUEST_TEMPLATE.md",
+  "knowledge/words/no-slop-writing.md",
   "agents/skills/b2c-app-builder/references/business-lifecycle.md",
   `${TEMPLATE}/AGENTS.md`,
   `${TEMPLATE}/CLAUDE.md`,
@@ -151,6 +160,12 @@ export function register(harness: Harness): void {
     const findings = checkStandingGuidance((relative) => (relative === file ? text : read(relative)));
     if (!findings.some((finding) => finding.code === code)) throw new Error(`Missing expected structural finding ${code}`);
   };
+  const requireWritingFinding = (overrides: Record<string, string | undefined>): void => {
+    const findings = checkWritingReviewSurfaces((relative) => (Object.hasOwn(overrides, relative) ? overrides[relative] : read(relative)));
+    if (!findings.some((finding) => finding.code === "agent_entrypoints.review_writing_owner_missing")) {
+      throw new Error("Missing expected review-writing structural finding");
+    }
+  };
   for (const rule of STANDING_RULES) {
     for (const term of rule.terms) {
       record(`standing contract detects removed ${rule.id}: ${term}`, () => {
@@ -175,6 +190,25 @@ export function register(harness: Harness): void {
   });
   record("root guidance rejects an unrelated procedure", () => {
     requireFinding("AGENTS.md", `${root}\nRun npm run audit:ci after every edit.\n`, "agent_entrypoints.root_procedure_leak");
+  });
+  record("review surfaces retain the canonical writing owner", () => {
+    const findings = checkWritingReviewSurfaces(read);
+    if (findings.length) throw new Error(JSON.stringify(findings));
+  });
+  record("review surface regression catches a missing PR writing reminder", () => {
+    const template = read(".github/PULL_REQUEST_TEMPLATE.md")!;
+    requireWritingFinding({
+      ".github/PULL_REQUEST_TEMPLATE.md": template.replace(
+        "Changed prose follows the builder house style and kitchen-language boundary",
+        "Changed prose follows the repository guidance",
+      ),
+    });
+  });
+  record("review surface regression catches a missing canonical house-style section", () => {
+    const noSlop = read("knowledge/words/no-slop-writing.md")!;
+    requireWritingFinding({
+      "knowledge/words/no-slop-writing.md": noSlop.replace("## 9. Original: Builder house style", "## 9. Writing"),
+    });
   });
   record("root guidance keeps each writing owner reachable", () => {
     requireFinding("AGENTS.md", root.replace("[technical documentation]", "technical rules"), "agent_entrypoints.standing_writing_owners_missing");

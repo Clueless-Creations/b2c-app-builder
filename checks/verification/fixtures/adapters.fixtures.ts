@@ -23,6 +23,7 @@ import {
   crontabHasWorkspaceSignature,
   crontabSignature,
   launchdLabel,
+  launchdPlistHasExactContent,
   launchdPlistHasLabel,
   launchdPlistPath,
   renderCrontabLine,
@@ -496,7 +497,12 @@ export function register(harness: Harness): void {
     if (plist.ok) {
       assert(plist.xml.includes(launchdLabel(options)), "expected the plist to carry its own Label");
       assert(launchdPlistHasLabel(plist.xml, launchdLabel(options)), "readback must recognize only the exact managed LaunchAgent label");
+      assert(launchdPlistHasExactContent(plist.xml, plist.xml), "readback must accept the exact rendered managed plist");
       assert(!launchdPlistHasLabel(plist.xml, launchdLabel({ ...options, runtime: "cursor" })), "readback must not mistake another runtime's job for ours");
+      const changedTarget = plist.xml.replace(options.wrapperPath, `${options.wrapperPath}.changed`);
+      assert(!launchdPlistHasExactContent(changedTarget, plist.xml), "readback must reject a concurrent wrapper-target change with the same managed label");
+      const changedCadence = plist.xml.replace("<integer>900</integer>", "<integer>1800</integer>");
+      assert(!launchdPlistHasExactContent(changedCadence, plist.xml), "readback must reject a concurrent cadence change with the same managed label");
       assert(plist.xml.includes("StartInterval") && plist.xml.includes("900"), "expected a 900-second StartInterval");
       assert(plist.xml.includes(options.wrapperPath), "expected ProgramArguments to reference the wrapper script");
     }

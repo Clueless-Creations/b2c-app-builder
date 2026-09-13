@@ -818,10 +818,14 @@ function validateSignalCorpus(value: string | undefined, target: ReturnType<type
     );
   } else {
     const signalRows = records.rows;
+    const rawSignalIds = new Set<string>();
+    const duplicateSignalRows = new Map<string, RequiredTableSection["rows"][number]>();
     const supersessionRecords = signalRows.flatMap((row): SignalSupersessionRecord[] => {
       const id = (row.cells[recordColumns[0]!] ?? "").trim().toUpperCase();
       const lifecycle = (row.cells[recordColumns[7]!] ?? "").trim().toLowerCase();
       if (!/^SIG-[A-Z0-9][A-Z0-9-]*$/.test(id) || !/^(current|dated|superseded|rejected|unverified)$/.test(lifecycle)) return [];
+      if (rawSignalIds.has(id) && !duplicateSignalRows.has(id)) duplicateSignalRows.set(id, row);
+      rawSignalIds.add(id);
       return [{ id, lifecycle: lifecycle as SignalLifecycle, replacementId: (row.cells[recordColumns[8]!] ?? "").trim().toUpperCase() }];
     });
     const invalidSupersessionIds = new Set(validateSignalSupersessionGraph(supersessionRecords).invalidSignalIds);
@@ -885,7 +889,11 @@ function validateSignalCorpus(value: string | undefined, target: ReturnType<type
       }
       if (!rowComplete || !sourcesResolve) {
         rowsComplete = false;
-        signalFailure ??= { row, field: firstInvalidField(fields) };
+        const field = firstInvalidField(fields);
+        // A duplicate identity poisons graph validation for both occurrences.
+        // Point that graph ambiguity at the later identity, not the earlier edge.
+        const duplicateRow = field === "Supersedes" ? duplicateSignalRows.get(id) : undefined;
+        signalFailure ??= duplicateRow ? { row: duplicateRow, field: "Signal ID" } : { row, field };
         continue;
       }
       seenSignalIds.add(id);

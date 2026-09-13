@@ -153,7 +153,14 @@ function goldenSignalCorpusDoc(): Extract<SignalCorpusDocument, { applicable: tr
         reason: "no conflicting signal collected yet",
       },
     ],
-    derivedOutputs: [],
+    derivedOutputs: [
+      {
+        signalIds: ["SIG-001"],
+        output: "Monetization posture",
+        decisionChanged: "Test a first-session paywall against the recovery promise before adopting it.",
+        traceId: "TRACE-002",
+      },
+    ],
   };
 }
 
@@ -266,6 +273,26 @@ export function register(h: Harness): void {
   seedResearchLane(positiveRoot);
   writeEvidenceFiles(positiveRoot, goldenOfferTestDoc());
   runFixture("schema round trip: rendered golden documents pass check-research-evidence.ts", positiveRoot, "check-research-evidence.ts", 0);
+
+  const emptyOutputsRoot = makeFixture("evidence-schema-empty-derived-outputs-canary");
+  seedResearchLane(emptyOutputsRoot);
+  writeEvidenceFiles(emptyOutputsRoot, goldenOfferTestDoc());
+  const emptyOutputsDoc = { ...goldenSignalCorpusDoc(), derivedOutputs: [] };
+  const emptyOutputsValidation = validateSignalCorpus(emptyOutputsDoc);
+  expect(
+    h,
+    "drift canary: structurally valid empty derived outputs do not imply supported research",
+    emptyOutputsValidation.valid,
+    JSON.stringify(emptyOutputsValidation.issues),
+  );
+  writeFileSync(path.join(emptyOutputsRoot, "strategy/SIGNAL_CORPUS.md"), renderSignalCorpusMarkdown(emptyOutputsDoc), "utf8");
+  runFixture(
+    "schema round trip: empty derived outputs still fail the research content gate",
+    emptyOutputsRoot,
+    "check-research-evidence.ts",
+    1,
+    "research.signal_output_unsupported",
+  );
 
   const negativeRoot = makeFixture("evidence-schema-round-trip-negative-canary");
   seedResearchLane(negativeRoot);

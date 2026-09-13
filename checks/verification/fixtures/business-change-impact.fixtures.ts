@@ -172,6 +172,47 @@ export function register(harness: Harness): void {
     assert(run.nodes[product.id]!.status === "succeeded" && run.nodes[onboarding.id]!.status === "succeeded", "idempotent recheck must not reopen repaired work");
   });
 
+  harness.check("business-change-impact: changed inputs hold a prior non-idempotent effect for readback", () => {
+    const externalCatalog = structuredClone(impactCatalog());
+    externalCatalog.workflows.find((workflow) => workflow.id === "workflow.product-import")!.idempotent = false;
+    const plan = compilePlan(externalCatalog, now);
+    const research = plan.nodes.find((node) => node.id === nodeId("research-import"))!;
+    const product = plan.nodes.find((node) => node.id === nodeId("product-import"))!;
+    const onboarding = plan.nodes.find((node) => node.id === nodeId("onboarding-import"))!;
+    const local = plan.nodes.find((node) => node.id === nodeId("local-feature"))!;
+    const run = seedRunState(plan, businessState(), { ownerSessionId: "session-impact-readback", ttlSeconds: 600, wallClockCapSeconds: 3600, now });
+    const productAttempt = beginAttempt(plan, run, product.id, "provider-effect", now);
+    productAttempt.status = "succeeded";
+    for (const [id, artifactId, fingerprint] of [
+      [research.id, "artifact.research-import-observation", "sha256:import-v1"],
+      [product.id, "artifact.product-import-promise", "sha256:promise-v1"],
+      [onboarding.id, "artifact.onboarding-import-claim", "sha256:onboarding-v1"],
+      [local.id, "artifact.local-feature-proof", "sha256:local-v1"],
+    ] as const) {
+      run.nodes[id]!.status = "succeeded";
+      run.nodes[id]!.acceptedOutputFingerprint = fingerprint;
+      const binding = run.artifactBindings.find((candidate) => candidate.artifactId === artifactId)!;
+      binding.accepted = true;
+      binding.fingerprint = fingerprint;
+      binding.producedBy = id;
+    }
+
+    const invalidated = invalidateDescendants(plan, run, ["artifact.research-import-observation"], "2026-09-09T12:00:07.000Z");
+    assert(invalidated.includes(product.id) && invalidated.includes(onboarding.id), "the changed import must reopen its dependent chain");
+    assert(run.nodes[product.id]!.status === "needs_readback", "a prior non-idempotent effect must require readback before repeat");
+    assert(run.nodes[product.id]!.blocker?.includes("confirm prior external effects"), "readback hold must explain the safe next step");
+    assert(run.nodes[onboarding.id]!.status === "stale", "downstream local work must reopen after the held producer changes");
+    assert(run.nodes[local.id]!.status === "succeeded", "unrelated local proof must remain current");
+    assert(!run.artifactBindings.find((binding) => binding.artifactId === "artifact.product-import-promise")!.accepted, "held producer output must not remain accepted");
+
+    const attemptsBeforeReplay = run.nodes[product.id]!.attempts.length;
+    const replayed = invalidateDescendants(plan, run, ["artifact.research-import-observation"], "2026-09-09T12:00:08.000Z");
+    assert(replayed.every((id) => id === product.id || id === onboarding.id), "repeating the change must not broaden the held effect's impact set");
+    assert(run.nodes[product.id]!.attempts.length === attemptsBeforeReplay, "repeating the change must not create a second external attempt");
+    assert(run.nodes[product.id]!.status === "needs_readback", "replay must preserve the readback hold");
+    assert(run.nodes[local.id]!.status === "succeeded", "replay must preserve unrelated proof");
+  });
+
   harness.check("business-change-impact: an activated provider binding reopens only its affected obligations", () => {
     const pinned = impactCatalog();
     const newerObservation = structuredClone(pinned);

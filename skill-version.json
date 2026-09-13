@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.83",
+  "version": "0.220.84",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Hold changed non-idempotent effects for explicit readback before repair and preserve unrelated proof on replay.",
     "Preserve unrelated third-party edits when recovering an interrupted research decision.",
     "Add a source-line location and bounded repair hint when a not-applicable Signal Corpus reason is missing.",
     "Refresh live-main task-skill host-discovery evidence while keeping Claude quota and integrated distribution holds explicit.",

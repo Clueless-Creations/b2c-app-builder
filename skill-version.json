@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.82",
+  "version": "0.220.83",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Preserve unrelated third-party edits when recovering an interrupted research decision.",
     "Add a source-line location and bounded repair hint when a not-applicable Signal Corpus reason is missing.",
     "Refresh live-main task-skill host-discovery evidence while keeping Claude quota and integrated distribution holds explicit.",
     "Keep research diagnostics bounded when invalid signal records contain hostile instruction-like or secret-like content.",

@@ -377,6 +377,17 @@ export function register(harness: Harness): void {
       !crontabHasExactLine(installed.nextContent, renderCrontabLine({ ...options, schedule: "*/15 * * * *" })),
       "a concurrent cadence change must not pass exact-line readback",
     );
+    assert(
+      !crontabHasExactLine(
+        installed.nextContent,
+        renderCrontabLine({
+          ...options,
+          wrapperPath: path.join(dir, "schedule", "run-claude-other-target.mts"),
+          logPath: path.join(dir, "schedule", "run-claude-other-target.log"),
+        }),
+      ),
+      "a changed wrapper or log target must not pass the prior exact-line readback",
+    );
     assert(crontabHasSignature(installed.nextContent, crontabSignature(otherWorkspaceOptions)), "readback must preserve another workspace's entry without treating it as ours");
 
     // Reinstalling with a different schedule replaces (never duplicates) our own line.

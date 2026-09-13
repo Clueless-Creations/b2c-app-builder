@@ -279,7 +279,7 @@ function isAuthoredOfferNarrative(value: string): boolean {
   // reject real product actions such as "fill out the signup form" or prose
   // describing what a measured cohort did.
   const fieldInstruction =
-    /^(?:(?:please|kindly)\s+)*(?:fill(?:[ -]+(?:in|out))?|complete|enter|insert|add|write|provide|describe|specify|document|record|identify)\s+(?:(?:a|an|the|your|actual|specific|accepted|observed|real|remaining|relevant|target|paying|residual|founder\s+authored)\s+)*(?:audience|risk|evidence|reason|decision|measurement|source|analytics export|field|details|value|text)\b/i;
+    /^(?:(?:please|kindly)\s+)*(?:fill(?:[ -]*(?:in|out))?|complete|enter|insert|add|write|provide|describe|specify|document|record|identify)\s+(?:(?:a|an|the|your|actual|specific|accepted|observed|real|remaining|relevant|target|paying|residual|founder\s*authored)\s+)*(?:audience|risk|evidence|reason|decision|measurement|source|analytics export|field|details|value|text)\b/i;
   for (let pass = 0; pass < 4; pass += 1) {
     const match = authored.match(label);
     if (!match) break;
@@ -292,7 +292,9 @@ function isAuthoredOfferNarrative(value: string): boolean {
     !/<[^>]+>/u.test(authored) &&
     !isPlaceholderOnly(authored) &&
     !directive.test(normalizeEvidenceScalar(authored)) &&
-    !fieldInstruction.test(normalizeEvidenceScalar(authored))
+    // Keep hyphenated compounds as one lexical word when the shared scalar
+    // normalizer removes punctuation: risk-free is not the bare field risk.
+    !fieldInstruction.test(normalizeEvidenceScalar(authored.replace(/(?<=\p{L})\p{Pd}(?=\p{L})/gu, "")))
   );
 }
 

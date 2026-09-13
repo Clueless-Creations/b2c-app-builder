@@ -1,0 +1,116 @@
+name: Isolated schedule read safety verification
+on:
+  push:
+    branches: [agent/session-397-verification-20260913]
+    paths: [.github/workflows/session-schedule.yml]
+permissions:
+  contents: read
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    outputs:
+      sha: ${{ steps.commit.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply hash-verified schedule patch on a new branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          sed 's/NHk+09fVv12a/NHk+09v12a/g' .maintenance/cron-read-safety.patch.gz.b64 | base64 -d | gzip -d > "$RUNNER_TEMP/schedule.patch"
+          echo "93e8bc25aa6df767112a1fa418496a234a0d6c542dffc1177860c5fa5fc2a567  $RUNNER_TEMP/schedule.patch" | sha256sum -c -
+          if git ls-remote --exit-code --heads origin agent/405-cron-read-safety; then exit 1; fi
+          git switch -c agent/405-cron-read-safety 515e0bb4b960b351c8b40faf673d51835d7f6102
+          git apply --check "$RUNNER_TEMP/schedule.patch"
+          git apply "$RUNNER_TEMP/schedule.patch"
+          node --input-type=module - <<'JS'
+          import fs from 'node:fs';
+          for (const file of ['package.json', 'package-lock.json', 'skill-version.json']) {
+            const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+            if (data.version !== '0.221.5') throw new Error(`Unexpected version in ${file}`);
+            data.version = '0.221.6';
+            if (file === 'package-lock.json') data.packages[''].version = data.version;
+            if (file === 'skill-version.json') {
+              data.updatedAt = '2026-09-13';
+              data.releaseNotes.unshift('Fail closed on unverified crontab reads before schedule mutation and during installed-state readback.');
+            }
+            fs.writeFileSync(file, JSON.stringify(data, null, 2) + '\n');
+          }
+          JS
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - run: npm ci
+      - run: npm run render:all && npm run render:evidence-schema-version
+      - run: npm run typecheck && npm run test:fixtures -- adapters && git diff --check
+      - id: commit
+        name: Commit authored changes and renderer output only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e .maintenance
+          test ! -e .github/workflows/session-schedule.yml
+          git add --update
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'fix(adapters): fail closed on unverified crontab reads'
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          git push origin HEAD:refs/heads/agent/405-cron-read-safety
+  focused:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      B2C_REQUIRE_GIT_HISTORY: '1'
+      GITHUB_BASE_SHA: 515e0bb4b960b351c8b40faf673d51835d7f6102
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - run: npm ci
+      - run: git rev-parse HEAD && npm run test:fixtures -- adapters
+      - run: npm run audit:ci -- --lane presubmit
+      - run: npm run render:all && npm run render:evidence-schema-version && git diff --exit-code
+  full:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        lane: [fast, heavy-1, heavy-2]
+    env:
+      B2C_REQUIRE_GIT_HISTORY: '1'
+      GITHUB_BASE_SHA: e290c4e3316c897696a259a212d64fafacc9a0e3
+      B2C_FIXTURE_CONCURRENCY: '2'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - run: npm ci
+      - name: Full checkpoint lane
+        env:
+          LANE: ${{ matrix.lane }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD
+          case "$LANE" in
+            fast) npm run audit:ci -- --lane fast ;;
+            heavy-1) npm run audit:ci -- --lane heavy --shard 1/2 ;;
+            heavy-2) npm run audit:ci -- --lane heavy --shard 2/2 ;;
+          esac

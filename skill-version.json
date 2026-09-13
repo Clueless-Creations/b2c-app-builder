@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.94",
+  "version": "0.220.95",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Refuse corrupt initialized catalogs without falling back to fresh planning.",
     "Exercise the public research explanation contract without mutating a planning workspace.",
     "Require exact launchd plist readback so concurrent target and cadence edits fail closed.",
     "Serialize launchd schedule apply and removal behind the shared host-mutation lock.",

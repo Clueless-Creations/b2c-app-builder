@@ -1,8 +1,15 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { compilePlan, type CatalogInput, type CatalogWorkflowId, type RunNodeId } from "../../../kernel/engine/compile.js";
-import { captureReviewEvidence, workspaceArtifactFingerprint } from "../../../kernel/engine/review-evidence.js";
-import { acceptVerification, beginAttempt, invalidateDescendants, invalidateStaleReviews, reconcilePatch, seedRunState } from "../../../kernel/engine/runstate.js";
+import { captureReviewEvidence, workflowContractFingerprint, workspaceArtifactFingerprint } from "../../../kernel/engine/review-evidence.js";
+import {
+  acceptVerification,
+  beginAttempt,
+  invalidateDescendants,
+  invalidateStaleReviews,
+  reconcilePatch,
+  seedRunState,
+} from "../../../kernel/engine/runstate.js";
 import { laneKeys, type BusinessStateV2, type DomainId, type LaneKey } from "../../../kernel/schema/types.js";
 import { assert, type Harness } from "./_harness.js";
 
@@ -17,6 +24,7 @@ function impactCatalog(): CatalogInput {
     outputPaths: string[],
     dependencies: CatalogWorkflowId[],
     reads: string[] = [],
+    providerIds: string[] = [],
   ): CatalogInput["workflows"][number] => ({
     id,
     title: id,
@@ -25,7 +33,7 @@ function impactCatalog(): CatalogInput {
     dependencies,
     outputPaths,
     reads,
-    providerIds: [],
+    providerIds,
     laneIds: [laneId],
     founderOnlyActions: [],
     gateCommands: [],
@@ -41,7 +49,15 @@ function impactCatalog(): CatalogInput {
     ],
     workflows: [
       workflow("workflow.research-import", "domain.research", "research", ["strategy/RESEARCH.md"], []),
-      workflow("workflow.product-import", "domain.product", "product", ["product.yaml"], ["workflow.research-import"], ["strategy/RESEARCH.md"]),
+      workflow(
+        "workflow.product-import",
+        "domain.product",
+        "product",
+        ["product.yaml"],
+        ["workflow.research-import"],
+        ["strategy/RESEARCH.md"],
+        ["provider.import-permission-v1"],
+      ),
       workflow("workflow.onboarding-import", "domain.experience", "onboarding", ["product/ONBOARDING.md"], ["workflow.product-import"], ["product.yaml"]),
       workflow("workflow.local-feature", "domain.product", "product", ["product/LOCAL_FEATURE.md"], []),
     ],
@@ -144,6 +160,46 @@ export function register(harness: Harness): void {
     assert(!stale.includes(local.id), "unrelated local review must stay out of the stale set");
     assert(run.nodes[local.id]!.status === "succeeded", "unrelated local proof must stay accepted");
     assert(run.artifactBindings.find((binding) => binding.artifactId === "artifact.local-feature-proof")!.accepted, "unrelated local binding must remain accepted");
+  });
+
+  harness.check("business-change-impact: an activated provider binding reopens only its affected obligations", () => {
+    const pinned = impactCatalog();
+    const newerObservation = structuredClone(pinned);
+    const changedProduct = newerObservation.workflows.find((workflow) => workflow.id === "workflow.product-import")!;
+    changedProduct.providerIds = ["provider.import-permission-v2"];
+    const first = compilePlan(pinned, now);
+    const activated = compilePlan(newerObservation, now);
+    const state = businessState();
+    const options = { ownerSessionId: "session-provider-impact", ttlSeconds: 600, wallClockCapSeconds: 3600, now };
+    const run = seedRunState(first, state, options);
+    for (const node of first.nodes) {
+      beginAttempt(first, run, node.id, "fixture", now);
+      run.nodes[node.id]!.status = "succeeded";
+      for (const binding of run.artifactBindings.filter((entry) => node.outputs.includes(entry.artifactId as never))) binding.accepted = true;
+    }
+    assert(
+      workflowContractFingerprint(first.nodes.find((node) => node.id === nodeId("product-import"))!) !==
+        workflowContractFingerprint(activated.nodes.find((node) => node.id === nodeId("product-import"))!),
+      "the activated provider binding must change the affected contract identity",
+    );
+    assert(
+      workflowContractFingerprint(first.nodes.find((node) => node.id === nodeId("research-import"))!) ===
+        workflowContractFingerprint(activated.nodes.find((node) => node.id === nodeId("research-import"))!),
+      "observing a newer upstream release must not change the pinned producer contract",
+    );
+    assert(run.nodes[nodeId("product-import")]!.status === "succeeded", "the pinned business must remain current before activation");
+    run.nodes[nodeId("product-import")]!.status = "stale";
+    run.artifactBindings.find((binding) => binding.artifactId === "artifact.product-import-promise")!.accepted = false;
+    const invalidated = invalidateDescendants(first, run, ["artifact.product-import-promise"], "2026-09-09T12:00:01.000Z");
+    assert(invalidated.includes(nodeId("onboarding-import")), "the activated binding must reopen its dependent obligation");
+    assert(run.nodes[nodeId("research-import")]!.status === "succeeded", "the producer observation must remain historical");
+    assert(run.nodes[nodeId("product-import")]!.status === "stale", "the activated binding must reopen its direct obligation");
+    assert(run.nodes[nodeId("local-feature")]!.status === "succeeded", "unrelated local proof must remain current");
+    assert(
+      workflowContractFingerprint(first.nodes.find((node) => node.id === nodeId("local-feature"))!) ===
+        workflowContractFingerprint(activated.nodes.find((node) => node.id === nodeId("local-feature"))!),
+      "the activated provider binding must not rewrite unrelated contract identity",
+    );
   });
 }
 

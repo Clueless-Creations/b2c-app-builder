@@ -278,7 +278,7 @@ function isAuthoredOfferNarrative(value: string): boolean {
   for (let pass = 0; pass < 4; pass += 1) {
     const match = authored.match(label);
     if (!match) break;
-    if (directive.test(normalizeEvidenceScalar(match[1]!))) return false;
+    if (isPlaceholderOnly(match[1]!) || directive.test(normalizeEvidenceScalar(match[1]!))) return false;
     authored = authored.slice(match[0].length);
   }
   return (

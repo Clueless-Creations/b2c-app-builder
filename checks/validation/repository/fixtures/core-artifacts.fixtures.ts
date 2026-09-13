@@ -1570,6 +1570,9 @@ export function register(h: Harness): void {
     ["tbd-dash", "Audience: TBD - identify buyers"],
     ["required-directive", "Audience: required specific buyers"],
     ["required-label", "Required: identify buyers"],
+    ["pending-label", "Pending: collect audience evidence"],
+    ["unverified-label", "Unverified: collect audience evidence"],
+    ["nested-pending-label", "Audience: Pending: collect audience evidence"],
   ] as const) {
     const root = makeCompletedResearch(`research-offer-placeholder-contract-${name}`);
     const offerPath = path.join(root, "strategy/OFFER_TEST.md");
@@ -1588,6 +1591,8 @@ export function register(h: Harness): void {
     ["labeled-evidence", "840 visits and 31 signups in TRACE-003", "Evidence: TBD", "research.offer_test_decision_incomplete"],
     ["decision-text", "use the recovery offer", "`pending`", "research.offer_test_decision_incomplete"],
     ["measurement-source", "PostHog test cohort TRACE-003", "**unverified**", "research.offer_test_measurement_missing"],
+    ["pending-evidence-label", "840 visits and 31 signups in TRACE-003", "Pending: collect evidence", "research.offer_test_decision_incomplete"],
+    ["unverified-source-label", "PostHog test cohort TRACE-003", "Unverified: obtain measurement source", "research.offer_test_measurement_missing"],
   ] as const) {
     const root = makeCompletedResearch(`research-offer-placeholder-${name}`);
     const offerPath = path.join(root, "strategy/OFFER_TEST.md");
@@ -1604,6 +1609,10 @@ export function register(h: Harness): void {
     ["labeled-empty-risk", "The founder tests organic demand first", "Risk: **none**", 1],
     ["required-risk", "The founder tests organic demand first", "Risk: required residual risk", 1],
     ["todo-comma-risk", "The founder tests organic demand first", "Risk: TODO, document residual uncertainty", 1],
+    ["pending-risk-label", "The founder tests organic demand first", "Pending: document residual risk", 1],
+    ["unverified-risk-label", "The founder tests organic demand first", "Risk: Unverified: document residual risk", 1],
+    ["unverified-reason-label", "Unverified: collect audience evidence", "Demand remains unverified beyond the measured cohort", 1],
+    ["leading-authored-uncertainty", "Pending paid acquisition is deferred until organic testing completes", "Unverified demand beyond the measured cohort is an accepted risk", 0],
     ["labeled-authored-risk", "Reason: paid acquisition is pending until organic testing", "Risk: demand remains unverified beyond the measured cohort", 0],
   ] as const) {
     const root = makeCompletedResearch(`research-offer-waiver-narrative-${name}`);

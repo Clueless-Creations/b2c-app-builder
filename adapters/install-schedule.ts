@@ -189,6 +189,11 @@ export function launchdPlistHasLabel(xml: string, label: string): boolean {
   return xml.includes(`<key>Label</key><string>${label}</string>`);
 }
 
+/** Exact rendered readback; a matching label alone is insufficient after a concurrent target or cadence edit. */
+export function launchdPlistHasExactContent(xml: string, expectedXml: string): boolean {
+  return xml === expectedXml;
+}
+
 export type LaunchdPlistResult = { ok: true; xml: string } | { ok: false; error: string };
 
 export function renderLaunchdPlist(options: ScheduleOptions): LaunchdPlistResult {
@@ -416,8 +421,8 @@ function runMain(): void {
       const loaded = spawnSync("launchctl", ["load", plistPath], { encoding: "utf8" });
       if (loaded.status !== 0) throw new Error(`launchctl load failed: ${loaded.stderr || loaded.stdout || `exit ${String(loaded.status)}`}`);
       const installedXml = readFileSync(plistPath, "utf8");
-      if (!launchdPlistHasLabel(installedXml, launchdLabel(options))) {
-        throw new Error(`launchd readback did not confirm the managed label for ${options.workspaceSlug}/${options.runtime}`);
+      if (!launchdPlistHasExactContent(installedXml, plist.xml)) {
+        throw new Error(`launchd readback did not confirm the exact managed plist for ${options.workspaceSlug}/${options.runtime}`);
       }
     });
   } catch (error) {

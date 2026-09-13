@@ -275,6 +275,11 @@ function isAuthoredOfferNarrative(value: string): boolean {
   let authored = value.trim().replace(/[`*_~]/gu, "");
   const label = /^[`*_\s]*([a-z][a-z0-9 _/()*-]{0,63}):[`*_\s]*/iu;
   const directive = /(?:^(?:(?:please|kindly)\s+)*(?:required|todo|tbd|placeholder)\b|\b(?:replace with|to be filled)\b)/i;
+  // Direct requests to fill evidence fields are authoring instructions. Do not
+  // reject real product actions such as "fill out the signup form" or prose
+  // describing what a measured cohort did.
+  const fieldInstruction =
+    /^(?:(?:please|kindly)\s+)*(?:fill(?:[ -]+(?:in|out))?|complete|enter|insert|add|write|provide|describe|specify|document|record|identify)\s+(?:(?:a|an|the|your|actual|specific|accepted|observed|real|remaining|relevant|target|paying|residual|founder\s+authored)\s+)*(?:audience|risk|evidence|reason|decision|measurement|source|analytics export|field|details|value|text)\b/i;
   for (let pass = 0; pass < 4; pass += 1) {
     const match = authored.match(label);
     if (!match) break;
@@ -286,7 +291,8 @@ function isAuthoredOfferNarrative(value: string): boolean {
     !isEmptyEquivalentEvidenceValue(authored) &&
     !/<[^>]+>/u.test(authored) &&
     !isPlaceholderOnly(authored) &&
-    !directive.test(normalizeEvidenceScalar(authored))
+    !directive.test(normalizeEvidenceScalar(authored)) &&
+    !fieldInstruction.test(normalizeEvidenceScalar(authored))
   );
 }
 

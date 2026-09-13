@@ -4,6 +4,7 @@
   "updatedAt": "2026-09-13",
   "sourcePath": ".",
   "releaseNotes": [
+    "Reject direct instructions to fill evidence fields while retaining genuine signup actions and measured form-completion prose.",
     "Assert the canonical derived-output diagnostic when a schema-valid empty corpus output is rendered as a template.",
     "Keep explicit replacement/fill instructions incomplete, including polite forms, while preserving quoted TBD evidence.",
     "Apply whole-cell placeholder semantics to offer labels and cover contract, decision, measurement, and waiver validators.",

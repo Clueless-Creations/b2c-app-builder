@@ -38,6 +38,35 @@ export function register(h: Harness): void {
       else process.env.B2C_APP_BUILDER_HOME = oldHome;
     }
   };
+  h.check("Porchwatch F7: research --explain is a read-only public contract", () =>
+    business((root) => {
+      const before = workspaceRevision(root);
+      const result = spawnSync(
+        process.execPath,
+        [
+          path.join(skillRoot, "node_modules/tsx/dist/cli.mjs"),
+          path.join(skillRoot, "checks/validation/business/research/check-research-evidence.ts"),
+          "--root",
+          root,
+          "--explain",
+        ],
+        { cwd: skillRoot, encoding: "utf8", env: process.env },
+      );
+      assert(result.status === 0, `research explanation failed: ${result.stderr} ${result.stdout}`);
+      const explanation = JSON.parse(result.stdout) as {
+        check?: string;
+        artifacts?: { research?: { requiredSections?: string[] }; signalCorpus?: { ids?: string } };
+        lifecycle?: string;
+        limits?: string;
+      };
+      assert(explanation.check === "research-workflow-output", "explanation must identify the research workflow contract");
+      assert(explanation.artifacts?.research?.requiredSections?.includes("Go, Pivot, Or Kill"), "explanation must name the authored verdict checkpoint");
+      assert(explanation.artifacts?.signalCorpus?.ids?.includes("INPUT-"), "explanation must name the signal identifier contract");
+      assert(explanation.lifecycle?.includes("does not initialize"), "explanation must remain explicit about lifecycle limits");
+      assert(explanation.limits?.includes("does not replace validation"), "explanation must remain explicit about proof limits");
+      assert(workspaceRevision(root) === before, "explanation must not mutate the planning workspace");
+    }),
+  );
   h.check("Porchwatch F6: uncertain requests require readback and saved observations survive a fresh process", () =>
     business((root, id) => {
       const missing = lookupResearch({ workspaceId: id, query, maxAgeSeconds: 3600 });

@@ -100,3 +100,13 @@ sources:
       auditor checklist.
     last_review_date: 2026-09-03
     reviewer: b2c-maintainers
+  - id: amir-brand-system-builder
+    name: github.com
+    source_type: skill_pack
+    url: https://github.com/amirmushichge/brand-system-skill
+    review_cadence_days: 30
+    claim_scope: CC BY 4.0 source method adapted as provider-neutral Anchor Brand Kit and reference-role guidance; no executable source, assets, runtime support, or empirical quality uplift claimed.
+    last_review_date: 2026-09-07
+    reviewer: b2c-maintainers
+    revision: 30f6084ddf6adf4173cf882fce266015f8872c17
+    upstream_id: amir-brand-system

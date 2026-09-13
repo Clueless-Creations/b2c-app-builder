@@ -1,6 +1,6 @@
 {
   "schemaVersion": "2.0.0",
-  "skillVersion": "0.220.77",
+  "skillVersion": "0.220.78",
   "areas": [
     {
       "id": "area.operating-system",
@@ -4077,12 +4077,24 @@
           "claimScope": "Layers product-method skill pack. Basis for the layer-by-layer producer method and the layers-surface auditor checklist.",
           "lastReviewDate": "2026-09-03",
           "reviewer": "b2c-maintainers"
+        },
+        {
+          "id": "amir-brand-system-builder",
+          "name": "github.com",
+          "sourceType": "skill_pack",
+          "url": "https://github.com/amirmushichge/brand-system-skill",
+          "reviewCadenceDays": 30,
+          "claimScope": "CC BY 4.0 source method adapted as provider-neutral Anchor Brand Kit and reference-role guidance; no executable source, assets, runtime support, or empirical quality uplift claimed.",
+          "lastReviewDate": "2026-09-07",
+          "reviewer": "b2c-maintainers",
+          "revision": "30f6084ddf6adf4173cf882fce266015f8872c17",
+          "upstreamId": "amir-brand-system"
         }
       ],
       "replacementIds": [],
       "resource": {
         "path": "catalog/generated/firstparty/knowledge/engineering/external-skill-packs.md",
-        "sha256": "sha256:84cd559560ab95e737cce7421106e8fd39fbe8eb6e38a880ce2e3fcb5f1584b1",
+        "sha256": "sha256:6246b7c129c521c88867f32c3f1a326898116258405341d9db5833174658de2a",
         "origin": "skill"
       }
     },
@@ -18854,14 +18866,14 @@
   ],
   "bindings": [],
   "composition": {
-    "fingerprint": "1432ec41047eb1f40c73947e69ad27b04b02f16d2194117b642a86bcb1c35e53",
+    "fingerprint": "2a20e98281315d1427aecce4e532f5d4b07a86f78c119bc5d815905810246bbf",
     "packs": [
       {
         "id": "business-pack.consumer-business",
         "kind": "business-pack",
-        "version": "0.220.77",
-        "revision": "0.220.77",
-        "contentDigest": "b6041ef1edd1021d3fc8f151094af1539b864fd25433accc442f23a248d606e1"
+        "version": "0.220.78",
+        "revision": "0.220.78",
+        "contentDigest": "28c7f4d470ee3637050b1ce57c22d6ce7f2820f33aa2967c14546dd7e4790f18"
       }
     ],
     "base": {

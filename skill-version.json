@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.97",
+  "version": "0.220.98",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Preserve initialized catalog refusals through the local MCP business-plan route.",
     "Refuse missing initialized catalogs without falling back to fresh planning.",
     "Keep explicit Kill research checkpoints held without silently restarting or becoming Go.",
     "Refuse corrupt initialized catalogs without falling back to fresh planning.",

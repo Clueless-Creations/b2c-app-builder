@@ -660,3 +660,44 @@ test("public initialized planning refuses a missing catalog without falling back
     rmSync(env.temp, { recursive: true, force: true });
   }
 });
+
+test("local MCP preserves the initialized catalog refusal envelope", async () => {
+  const prior = process.env.B2C_APP_BUILDER_HOME;
+  for (const [label, removeCatalog] of [
+    ["corrupt", false],
+    ["missing", true],
+  ] as const) {
+    const env = setup();
+    process.env.B2C_APP_BUILDER_HOME = env.home;
+    const client = new Client({ name: `catalog-refusal-${label}`, version: "1.0.0" });
+    try {
+      data("business.create", { workspaceId: "app", directory: env.directory, name: "Useful Habit", hypothesis: "A specific consumer need" });
+      acceptProduct(env.directory);
+      data("business.initialize", { workspaceId: "app", expectedRevision: workspaceRevision(env.directory) });
+      const catalogPath = path.join(env.directory, "catalog.json");
+      if (removeCatalog) rmSync(catalogPath);
+      else writeFileSync(catalogPath, JSON.stringify({ schemaVersion: "fixture-corrupt" }));
+
+      await client.connect(
+        new StdioClientTransport({
+          command: process.execPath,
+          args: ["--import", "tsx", path.join(root, "entrypoints/mcp/server.ts")],
+          cwd: root,
+          env: { ...process.env, B2C_APP_BUILDER_MCP_READONLY: "1" },
+          stderr: "pipe",
+        }),
+      );
+      const mcp = await client.callTool({ name: "b2c_business_plan", arguments: { workspaceId: "app" } });
+      assert.equal(mcp.isError, true, JSON.stringify(mcp));
+      const result = mcp.structuredContent as { ok?: boolean; error?: { code?: string; message?: string } };
+      assert.equal(result.ok, false, JSON.stringify(mcp));
+      assert.equal(result.error?.code, "LOCAL_OPERATION_REFUSED");
+      assert.equal(result.error?.message, "business.catalog_unavailable");
+    } finally {
+      await client.close();
+      if (prior === undefined) delete process.env.B2C_APP_BUILDER_HOME;
+      else process.env.B2C_APP_BUILDER_HOME = prior;
+      rmSync(env.temp, { recursive: true, force: true });
+    }
+  }
+});

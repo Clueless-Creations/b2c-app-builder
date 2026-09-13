@@ -895,6 +895,55 @@ export function register(h: Harness): void {
     "Corpus Inputs row's Date range field",
   );
 
+  for (const [name, heading, prefix, field] of [
+    ["input", "Corpus Inputs", "| INPUT-001 |", "Input ID"],
+    ["signal", "Signal Records", "| SIG-001 | customer language |", "Signal ID"],
+  ] as const) {
+    const root = makeCompletedResearch(`research-duplicate-${name}-diagnostic`);
+    const signalPath = path.join(root, "strategy/SIGNAL_CORPUS.md");
+    const lines = readFileSync(signalPath, "utf8").split("\n");
+    const originalIndex = lines.findIndex((line) => line.startsWith(prefix));
+    if (originalIndex < 0) throw new Error(`Missing duplicate ${name} fixture row`);
+    lines.splice(originalIndex + 1, 0, lines[originalIndex]!);
+    writeFileSync(signalPath, lines.join("\n"), "utf8");
+    runFixture(`duplicate ${name} diagnostics name the conflicting ID field`, root, "check-research-evidence.ts", 1, `${heading} row's ${field} field`);
+    h.runScriptArgs(
+      `duplicate ${name} diagnostics locate the second row rather than the accepted first row`,
+      "check-research-evidence.ts",
+      ["--root", root, "--json"],
+      1,
+      `"location":"${originalIndex + 2}"`,
+    );
+  }
+
+  for (const duplicateLifecycle of ["superseded", "current"] as const) {
+    const root = makeCompletedResearch(`research-duplicate-superseded-${duplicateLifecycle}`);
+    const signalPath = path.join(root, "strategy/SIGNAL_CORPUS.md");
+    const lines = readFileSync(signalPath, "utf8").split("\n");
+    const firstIndex = lines.findIndex((line) => line.startsWith("| SIG-001 | customer language |"));
+    if (firstIndex < 0) throw new Error("Missing superseded duplicate fixture row");
+    const original = lines[firstIndex]!;
+    const superseded = original.replace("| current | none |", "| superseded | SIG-002 |");
+    if (superseded === original) throw new Error("Missing supersession fixture anchor");
+    lines[firstIndex] = superseded;
+    lines.splice(firstIndex + 1, 0, duplicateLifecycle === "current" ? original : superseded, original.replace("SIG-001", "SIG-002"));
+    writeFileSync(signalPath, lines.join("\n"), "utf8");
+    runFixture(
+      `duplicate superseded signal with ${duplicateLifecycle} repeat names the conflicting ID field`,
+      root,
+      "check-research-evidence.ts",
+      1,
+      "Signal Records row's Signal ID field",
+    );
+    h.runScriptArgs(
+      `duplicate superseded signal with ${duplicateLifecycle} repeat locates the second row`,
+      "check-research-evidence.ts",
+      ["--root", root, "--json"],
+      1,
+      `"location":"${firstIndex + 2}"`,
+    );
+  }
+
   const researchSignalInputReversedRange = makeCompletedResearch("research-signal-input-reversed-range");
   {
     const signalPath = path.join(researchSignalInputReversedRange, "strategy/SIGNAL_CORPUS.md");
@@ -1058,6 +1107,15 @@ export function register(h: Harness): void {
     signalRecord("SIG-002", "superseded", "SIG-003"),
     signalRecord("SIG-003", "current", "none"),
   ]);
+  // A valid chain does not make its superseded heads eligible output evidence.
+  // Bind this positive fixture to the actual current terminal rather than an empty output table.
+  {
+    const signalPath = path.join(researchSupersessionValidMultiHop, "strategy/SIGNAL_CORPUS.md");
+    const emptyTable = "## Derived Outputs\n| Signal IDs | Output | Decision changed | Trace ID |\n| --- | --- | --- | --- |";
+    const signal = readFileSync(signalPath, "utf8");
+    if (!signal.includes(emptyTable)) throw new Error("Missing supersession output fixture table");
+    writeFileSync(signalPath, signal.replace(emptyTable, `${emptyTable}\n| SIG-003 | PRODUCT.md | add streak recovery | TRACE-002 |`), "utf8");
+  }
   runFixture(
     "signal supersession accepts an acyclic multi-hop chain ending at a usable signal",
     researchSupersessionValidMultiHop,
@@ -1478,6 +1536,135 @@ export function register(h: Harness): void {
     1,
     "research.distribution_proof_row_invalid",
   );
+
+  // Offer narrative records can describe uncertainty without becoming blank templates.
+  // Exercise the actual validator, not just the shared scalar helper.
+  for (const [name, current, replacement] of [
+    ["audience", "people who repeatedly abandon habit streaks", "people with pending habit reminders who repeatedly abandon streaks"],
+    ["owned-route", "| Owned relationship | email waitlist |", "| Owned relationship | confirmed email required for the owned waitlist |"],
+    ["response", "| Primary response | waitlist signup |", "| Primary response | waitlist signup with required email confirmation |"],
+    ["evidence", "840 visits and 31 signups in TRACE-003", "840 visits and 31 signups in TRACE-003; longer-term demand remains unverified"],
+    ["decision", "use the recovery offer", "use the recovery offer while paid-channel validation is pending"],
+    ["measurement-source", "PostHog test cohort TRACE-003", "PostHog test cohort TRACE-003, excluding pending purchase events"],
+    ["quoted-placeholder", "PostHog test cohort TRACE-003", 'PostHog cohort TRACE-003; one optional survey answer was "TBD"'],
+    ["signup-form-action", "| Primary response | waitlist signup |", "| Primary response | fill out the signup form to join the owned email waitlist |"],
+    ["measured-form-action", "PostHog test cohort TRACE-003", "PostHog cohort TRACE-003 recorded 31 people who filled in the signup form"],
+    ["compound-risk-offer", "| Offer | join the streak-recovery beta |", "| Offer | provide a risk-free recovery trial |"],
+    ["compound-evidence-offer", "| Offer | join the streak-recovery beta |", "| Offer | provide evidence-based coaching |"],
+    ["compound-unicode-offer", "| Offer | join the streak-recovery beta |", "| Offer | provide a risk‑free recovery trial |"],
+    ["compound-source-offer", "| Offer | join the streak-recovery beta |", "| Offer | provide source-code templates for the recovery workflow |"],
+  ] as const) {
+    const root = makeCompletedResearch(`research-offer-narrative-${name}`);
+    const offerPath = path.join(root, "strategy/OFFER_TEST.md");
+    const offer = readFileSync(offerPath, "utf8");
+    if (!offer.includes(current)) throw new Error(`Missing offer narrative fixture anchor: ${name}`);
+    writeFileSync(offerPath, offer.replace(current, replacement), "utf8");
+    runFixture(`offer ${name} accepts authored uncertainty, not just keyword-free prose`, root, "check-research-evidence.ts", 0);
+  }
+
+  for (const [name, value] of [
+    ["tbd", "**TBD.**"],
+    ["pending", "`pending`"],
+    ["required", "required!"],
+    ["template", "<audience>"],
+    ["instruction", "replace with the specific audience"],
+    ["labeled-angle", "Audience: <specific audience>"],
+    ["labeled-token", "Audience: TBD"],
+    ["nested-label", "Audience: segment: **TBD**"],
+    ["embedded-angle", "people who need <describe the problem>"],
+    ["todo-instruction", "TODO: identify the paying audience"],
+    ["todo-comma", "Audience: TODO, identify buyers"],
+    ["tbd-dash", "Audience: TBD - identify buyers"],
+    ["required-directive", "Audience: required specific buyers"],
+    ["required-label", "Required: identify buyers"],
+    ["pending-label", "Pending: collect audience evidence"],
+    ["unverified-label", "Unverified: collect audience evidence"],
+    ["nested-pending-label", "Audience: Pending: collect audience evidence"],
+    ["polite-instruction", "Audience: Please replace with the specific audience"],
+    ["polite-token", "Audience: Kindly mark this field to be filled later"],
+    ["polite-todo", "Audience: Please TODO, identify buyers"],
+    ["embedded-instruction", "Audience: The author should replace with the specific audience"],
+    ["fill-in-audience", "Audience: please fill in the specific audience"],
+    ["fill-out-field", "Audience: kindly fill out your audience field"],
+    ["enter-audience", "Audience: enter the actual target audience"],
+    ["describe-audience", "Audience: describe the specific audience here"],
+    ["insert-evidence", "Audience: insert relevant evidence here"],
+    ["compound-fill-in", "Audience: please fill-in the specific audience"],
+    ["compound-unicode-fill-in", "Audience: please fill‑in the specific audience"],
+  ] as const) {
+    const root = makeCompletedResearch(`research-offer-placeholder-contract-${name}`);
+    const offerPath = path.join(root, "strategy/OFFER_TEST.md");
+    writeFileSync(offerPath, readFileSync(offerPath, "utf8").replace("people who repeatedly abandon habit streaks", value), "utf8");
+    runFixture(
+      `offer contract still rejects ${name} placeholder-only values`,
+      root,
+      "check-research-evidence.ts",
+      1,
+      "research.offer_test_contract_incomplete",
+    );
+  }
+
+  for (const [name, current, placeholder, code] of [
+    ["decision-evidence", "840 visits and 31 signups in TRACE-003", "**TBD.**", "research.offer_test_decision_incomplete"],
+    ["labeled-evidence", "840 visits and 31 signups in TRACE-003", "Evidence: TBD", "research.offer_test_decision_incomplete"],
+    ["decision-text", "use the recovery offer", "`pending`", "research.offer_test_decision_incomplete"],
+    ["measurement-source", "PostHog test cohort TRACE-003", "**unverified**", "research.offer_test_measurement_missing"],
+    ["pending-evidence-label", "840 visits and 31 signups in TRACE-003", "Pending: collect evidence", "research.offer_test_decision_incomplete"],
+    ["unverified-source-label", "PostHog test cohort TRACE-003", "Unverified: obtain measurement source", "research.offer_test_measurement_missing"],
+    ["polite-evidence", "840 visits and 31 signups in TRACE-003", "Please replace with experiment evidence", "research.offer_test_decision_incomplete"],
+    ["polite-source", "PostHog test cohort TRACE-003", "Please replace with the analytics export", "research.offer_test_measurement_missing"],
+    ["fill-in-evidence", "840 visits and 31 signups in TRACE-003", "Please fill in the observed evidence", "research.offer_test_decision_incomplete"],
+    ["provide-source", "PostHog test cohort TRACE-003", "Please provide the analytics export", "research.offer_test_measurement_missing"],
+  ] as const) {
+    const root = makeCompletedResearch(`research-offer-placeholder-${name}`);
+    const offerPath = path.join(root, "strategy/OFFER_TEST.md");
+    writeFileSync(offerPath, readFileSync(offerPath, "utf8").replace(current, placeholder), "utf8");
+    runFixture(`offer ${name} still rejects decorated placeholder-only values`, root, "check-research-evidence.ts", 1, code);
+  }
+
+  for (const [name, reason, risk, exitCode] of [
+    ["authored-uncertainty", "Paid acquisition is pending while the founder tests organic demand", "Demand remains unverified beyond the measured cohort", 0],
+    ["placeholder-reason", "**pending**", "Demand remains unverified beyond the measured cohort", 1],
+    ["placeholder-risk", "The founder tests organic demand first", "`TBD`", 1],
+    ["empty-risk", "The founder tests organic demand first", "**none**", 1],
+    ["labeled-risk", "The founder tests organic demand first", "Risk: <describe risk>", 1],
+    ["labeled-empty-risk", "The founder tests organic demand first", "Risk: **none**", 1],
+    ["required-risk", "The founder tests organic demand first", "Risk: required residual risk", 1],
+    ["todo-comma-risk", "The founder tests organic demand first", "Risk: TODO, document residual uncertainty", 1],
+    ["pending-risk-label", "The founder tests organic demand first", "Pending: document residual risk", 1],
+    ["unverified-risk-label", "The founder tests organic demand first", "Risk: Unverified: document residual risk", 1],
+    ["unverified-reason-label", "Unverified: collect audience evidence", "Demand remains unverified beyond the measured cohort", 1],
+    ["polite-risk", "The founder tests organic demand first", "Risk: Please replace with the accepted residual risk", 1],
+    ["polite-reason", "Kindly replace with a founder-authored reason", "Demand remains unverified beyond the measured cohort", 1],
+    ["embedded-risk-instruction", "The founder tests organic demand first", "Risk: This field is to be filled after review", 1],
+    ["fill-in-risk", "The founder tests organic demand first", "Risk: fill in the accepted residual risk", 1],
+    ["document-risk", "The founder tests organic demand first", "Risk: please document the actual residual risk", 1],
+    ["write-reason", "Kindly write the founder-authored reason", "Demand remains unverified beyond the measured cohort", 1],
+    [
+      "leading-authored-uncertainty",
+      "Pending paid acquisition is deferred until organic testing completes",
+      "Unverified demand beyond the measured cohort is an accepted risk",
+      0,
+    ],
+    ["labeled-authored-risk", "Reason: paid acquisition is pending until organic testing", "Risk: demand remains unverified beyond the measured cohort", 0],
+  ] as const) {
+    const root = makeCompletedResearch(`research-offer-waiver-narrative-${name}`);
+    const offerPath = path.join(root, "strategy/OFFER_TEST.md");
+    const offer = readFileSync(offerPath, "utf8")
+      .replace(
+        "| run | 2026-07-21 | 840 visits and 31 signups in TRACE-003 | use the recovery offer | founder |",
+        "| waived | 2026-07-21 | founder waiver WAIVER-001 | proceed with explicit acquisition risk | founder |",
+      )
+      .concat(`\n| 2026-07-21 | founder | ${reason} | ${risk} |`);
+    writeFileSync(offerPath, offer, "utf8");
+    runFixture(
+      `offer waiver ${name} preserves authored uncertainty and rejects empty risk`,
+      root,
+      "check-research-evidence.ts",
+      exitCode,
+      exitCode === 1 ? "research.offer_test_waiver_missing" : undefined,
+    );
+  }
 
   const researchOfferNoMeasurement = makeCompletedResearch("research-offer-test-no-measurement");
   {
@@ -2350,7 +2537,7 @@ export function register(h: Harness): void {
     "check-research-evidence.ts",
     ["--root", researchSignalNotApplicableBare, "--require-workflow-outputs", "--json"],
     1,
-    '"line":2',
+    '"location":"2"',
   );
 
   for (const [name, reason] of [

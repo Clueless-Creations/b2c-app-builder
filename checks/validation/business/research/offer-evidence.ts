@@ -1,7 +1,7 @@
 import { issue } from "../../../../tooling/lib/launch-state.js";
-import { isEmptyEquivalentEvidenceValue } from "../../../../kernel/lib/empty-equivalent-evidence.js";
+import { isEmptyEquivalentEvidenceValue, normalizeEvidenceScalar } from "../../../../kernel/lib/empty-equivalent-evidence.js";
 import { parseRequiredTableSection, type RequiredTableSection } from "../../../../kernel/lib/required-table-section.js";
-import { isValidPastIsoDate, parseOfferMeasurement } from "./research-evidence-helpers.js";
+import { isPlaceholderOnly, isValidPastIsoDate, parseOfferMeasurement } from "./research-evidence-helpers.js";
 
 export const OFFER_TEST_HEADERS = {
   contract: ["Field", "Value"],
@@ -66,7 +66,7 @@ export function validateOfferTest(value: string | undefined, target: ReturnType<
     !contractStructureValid ||
     requiredContractFields.some((field) => {
       const value = contractFields.get(field) ?? "";
-      if (value.length === 0 || /\b(todo|tbd|placeholder|replace with|pending|unverified|required)\b|<[^>]+>/i.test(value)) return true;
+      if (!isAuthoredOfferNarrative(value)) return true;
       if (field === "owned relationship" && isAbsentOwnedRelationship(value)) return true;
       if (field === "primary response" && isForbiddenPrimaryResponse(value)) return true;
       if (isGenericOfferOptionMenu(field, value)) return true;
@@ -78,8 +78,7 @@ export function validateOfferTest(value: string | undefined, target: ReturnType<
     const invalidField = requiredContractFields.find((field) => {
       const value = contractFields.get(field) ?? "";
       return (
-        value.length === 0 ||
-        /\b(todo|tbd|placeholder|replace with|pending|unverified|required)\b|<[^>]+>/i.test(value) ||
+        !isAuthoredOfferNarrative(value) ||
         (field === "owned relationship" && isAbsentOwnedRelationship(value)) ||
         (field === "primary response" && isForbiddenPrimaryResponse(value)) ||
         isGenericOfferOptionMenu(field, value) ||
@@ -138,7 +137,9 @@ export function validateOfferTest(value: string | undefined, target: ReturnType<
         return (
           /^(run|waived)$/.test(rowStatus) &&
           isValidPastIsoDate((row.cells[dateColumn] ?? "").trim()) &&
-          [row.cells[evidenceColumn] ?? "", row.cells[decisionColumn] ?? "", decider].every((cell) => cell.trim().length > 0 && !placeholder.test(cell)) &&
+          [row.cells[evidenceColumn] ?? "", row.cells[decisionColumn] ?? ""].every(isAuthoredOfferNarrative) &&
+          decider.length > 0 &&
+          !placeholder.test(decider) &&
           isFounderDecider(decider)
         );
       };
@@ -179,8 +180,7 @@ export function validateOfferTest(value: string | undefined, target: ReturnType<
       return (
         isValidPastIsoDate((row.cells[dateColumn] ?? "").trim()) &&
         parseOfferMeasurement((row.cells[exposureColumn] ?? "").trim(), (row.cells[conversionsColumn] ?? "").trim()) !== undefined &&
-        source.length > 0 &&
-        !placeholder.test(source)
+        isAuthoredOfferNarrative(source)
       );
     };
     const rowsValid = rowsMatchTableWidth(exposureResult.section) && exposureResult.section.rows.every(rowValid);
@@ -228,9 +228,7 @@ export function validateOfferTest(value: string | undefined, target: ReturnType<
         return (
           isValidPastIsoDate((row.cells[waiverDateColumn] ?? "").trim()) &&
           isFounderDecider(founder) &&
-          [row.cells[reasonColumn] ?? "", row.cells[riskColumn] ?? ""].every(
-            (cell) => cell.trim().length > 0 && !placeholder.test(cell) && !isEmptyEquivalentEvidenceValue(cell),
-          )
+          [row.cells[reasonColumn] ?? "", row.cells[riskColumn] ?? ""].every((cell) => isAuthoredOfferNarrative(cell) && !isEmptyEquivalentEvidenceValue(cell))
         );
       };
       const rowsValid = rowsMatchTableWidth(waiverResult.section) && waiverResult.section.rows.length > 0 && waiverResult.section.rows.every(waiverRowValid);
@@ -268,6 +266,36 @@ export function validateOfferTest(value: string | undefined, target: ReturnType<
       );
     }
   }
+}
+
+/** Narrative uncertainty is evidence, not a template. Identity and typed fields retain their own checks. */
+function isAuthoredOfferNarrative(value: string): boolean {
+  // Preserve real sentences, but do not turn a labeled blank or authoring instruction into evidence.
+  // Strip labels before scalar normalization, which intentionally removes colons.
+  let authored = value.trim().replace(/[`*_~]/gu, "");
+  const label = /^[`*_\s]*([a-z][a-z0-9 _/()*-]{0,63}):[`*_\s]*/iu;
+  const directive = /(?:^(?:(?:please|kindly)\s+)*(?:required|todo|tbd|placeholder)\b|\b(?:replace with|to be filled)\b)/i;
+  // Direct requests to fill evidence fields are authoring instructions. Do not
+  // reject real product actions such as "fill out the signup form" or prose
+  // describing what a measured cohort did.
+  const fieldInstruction =
+    /^(?:(?:please|kindly)\s+)*(?:fill(?:[ -]*(?:in|out))?|complete|enter|insert|add|write|provide|describe|specify|document|record|identify)\s+(?:(?:a|an|the|your|actual|specific|accepted|observed|real|remaining|relevant|target|paying|residual|founder\s*authored)\s+)*(?:audience|risk|evidence|reason|decision|measurement|source|analytics export|field|details|value|text)\b/i;
+  for (let pass = 0; pass < 4; pass += 1) {
+    const match = authored.match(label);
+    if (!match) break;
+    if (isPlaceholderOnly(match[1]!) || directive.test(normalizeEvidenceScalar(match[1]!))) return false;
+    authored = authored.slice(match[0].length);
+  }
+  return (
+    !label.test(authored) &&
+    !isEmptyEquivalentEvidenceValue(authored) &&
+    !/<[^>]+>/u.test(authored) &&
+    !isPlaceholderOnly(authored) &&
+    !directive.test(normalizeEvidenceScalar(authored)) &&
+    // Keep hyphenated compounds as one lexical word when the shared scalar
+    // normalizer removes punctuation: risk-free is not the bare field risk.
+    !fieldInstruction.test(normalizeEvidenceScalar(authored.replace(/(?<=\p{L})\p{Pd}(?=\p{L})/gu, "")))
+  );
 }
 
 export function isAbsentOwnedRelationship(value: string): boolean {

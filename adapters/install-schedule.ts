@@ -22,7 +22,7 @@ import { pathToFileURL } from "node:url";
 import { expandHome, flagBoolean, flagNumber, flagString, parseFlags } from "../tooling/lib/launch-state.js";
 import { resolveSkillRoot } from "../tooling/lib/skill-root.js";
 import { isMainModule } from "../kernel/lib/cli.js";
-import { founderFacingRuntimeIds, type RuntimeId } from "./profile.js";
+import { founderFacingRuntimeIds, type RuntimeId, type SpawnResult } from "./profile.js";
 import { loadWorkspaceCatalog, renderCatalogRefusal } from "../kernel/session/catalog-contract.js";
 import { acquireLock, releaseLock } from "../kernel/reducer/lock.js";
 import { loadRunState } from "../kernel/engine/runstate.js";
@@ -336,18 +336,27 @@ export function assertScheduleApproval(workspaceDir: string, approvalId: string 
   try {
     run = loadRunState(runStatePath);
   } catch {
-    throw new Error("install-schedule.schedule_authority_unavailable: the workspace has no readable current run state; complete the scheduled-autonomy approval first");
+    throw new Error(
+      "install-schedule.schedule_authority_unavailable: the workspace has no readable current run state; complete the scheduled-autonomy approval first",
+    );
   }
   if (run.approvals[scheduledAutonomyApprovalId] !== "approved") {
     throw new Error("install-schedule.schedule_authority_pending: the current scheduled-autonomy founder approval is not approved");
   }
 }
 
-function readCrontab(): string {
-  const result = spawnSync("crontab", ["-l"], { encoding: "utf8" });
-  // An empty/never-configured crontab exits nonzero on most platforms — that's "no crontab yet", not an error.
-  if (result.status !== 0) return "";
-  return result.stdout ?? "";
+/** Failed reads never authorize replacing an unknown crontab or claiming verified removal. */
+export function readCrontab(
+  read: () => SpawnResult = () => {
+    const result = spawnSync("crontab", ["-l"], { encoding: "utf8", env: { ...process.env, LC_ALL: "C" } });
+    return { status: result.status, stdout: result.stdout ?? "", stderr: result.stderr ?? "", error: result.error };
+  },
+): string {
+  const result = read();
+  if (!result.error && result.status === 0) return result.stdout;
+  // Vixie/Cronie distinguish ENOENT from read/permission errors in stderr, not the exit code.
+  if (!result.error && result.status === 1 && result.stdout === "" && /^(?:crontab: )?no crontab for [^\r\n]+$/u.test(result.stderr.trim())) return "";
+  throw new Error("install-schedule.crontab_read_failed: cannot verify the current user crontab; refusing to treat a failed read as an empty schedule");
 }
 
 function writeCrontab(content: string): void {
@@ -405,8 +414,8 @@ function runMain(): void {
     }
     try {
       withScheduleMutationLock(() => {
-        mkdirSync(path.dirname(options.wrapperPath), { recursive: true });
         const current = readCrontab();
+        mkdirSync(path.dirname(options.wrapperPath), { recursive: true });
         const result = uninstall ? applyCrontabUninstall(current, options) : applyCrontabInstall(current, options);
         if (!uninstall) writeFileSync(options.wrapperPath, renderWrapperScript(options), { mode: 0o755 });
         writeCrontab(result.nextContent);

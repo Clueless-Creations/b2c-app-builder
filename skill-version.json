@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.221.5",
+  "version": "0.221.6",
   "updatedAt": "2026-09-13",
   "sourcePath": ".",
   "releaseNotes": [
+    "Fail closed on unverified crontab reads before schedule mutation and during installed-state readback.",
     "Preserve authored offer-test uncertainty while rejecting placeholder-only contract, decision, measurement, and waiver fields.",
     "Require current scheduled-autonomy founder approval before any schedule host mutation.",
     "Add authored row locations and bounded repair hints for offer-test contract, decision, and measurement failures.",

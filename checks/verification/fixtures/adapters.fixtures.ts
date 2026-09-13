@@ -26,6 +26,7 @@ import {
   launchdPlistHasExactContent,
   launchdPlistHasLabel,
   launchdPlistPath,
+  readCrontab,
   renderCrontabLine,
   renderLaunchdPlist,
   renderWrapperScript,
@@ -51,8 +52,8 @@ import type { RuntimeCapabilityProfile } from "../../../adapters/profile.js";
  * installer, and the entrypoint installer. NO fixture here ever invokes a real vendor CLI
  * (claude/codex/cursor-agent) or the real `crontab`/`launchctl` system services — every
  * availability/smoke probe below injects a fake spawn function, and every install-schedule
- * assertion works against the pure render/apply functions or against install-schedule.ts run in
- * (default) --dry-run mode. The one real probe pass lives entirely in adapters/probe.ts, run
+ * assertion uses injected read results, pure render/apply functions, a temporary fake crontab
+ * executable, or install-schedule.ts in (default) --dry-run mode. The one real probe pass lives entirely in adapters/probe.ts, run
  * once by hand outside this suite.
  */
 
@@ -62,8 +63,12 @@ function resolveTsxBin(): string {
 }
 const tsxBin = resolveTsxBin();
 
-function runCli(scriptRelative: string, args: string[]): { code: number; output: string } {
-  const result = spawnSync(tsxBin, [path.join(skillRoot, scriptRelative), ...args], { cwd: skillRoot, encoding: "utf8" });
+function runCli(scriptRelative: string, args: string[], env?: NodeJS.ProcessEnv): { code: number; output: string } {
+  const result = spawnSync(tsxBin, [path.join(skillRoot, scriptRelative), ...args], {
+    cwd: skillRoot,
+    encoding: "utf8",
+    env: env ? { ...process.env, ...env } : undefined,
+  });
   return { code: result.status ?? -1, output: `${result.stdout ?? ""}\n${result.stderr ?? ""}` };
 }
 
@@ -345,6 +350,102 @@ export function register(harness: Harness): void {
 
   // --- install-schedule: dry-run content, uninstall-exactly-reverses ---------------------------
 
+  harness.check("adapters/install-schedule: crontab reads distinguish confirmed absence from unknown or failed observations", () => {
+    const foreign = "0 4 * * * /bin/echo foreign-job\n";
+    assert(readCrontab(fakeSpawn(0, foreign, "")) === foreign, "a successful read must preserve every byte of existing jobs");
+    assert(readCrontab(fakeSpawn(0, "", "")) === "", "a successful empty read is an empty crontab");
+    for (const absent of ["no crontab for fixture-user\n", "crontab: no crontab for fixture-user\n"]) {
+      assert(readCrontab(fakeSpawn(1, "", absent)) === "", "the exact absent-crontab observation must allow first installation");
+    }
+    for (const read of [
+      fakeSpawn(1, "", "permission denied"),
+      fakeSpawn(2, "", "no crontab for fixture-user"),
+      fakeSpawn(null, "", "", enoent()),
+      fakeSpawn(null, "", "interrupted"),
+      fakeSpawn(1, foreign, "no crontab for fixture-user"),
+      fakeSpawn(1, "", "no crontab for fixture-user\npermission denied"),
+      fakeSpawn(1, "", ""),
+      fakeSpawn(0, foreign, "", enoent()),
+    ]) {
+      let message = "";
+      try {
+        readCrontab(read);
+      } catch (error) {
+        message = error instanceof Error ? error.message : String(error);
+      }
+      assert(message.includes("crontab_read_failed"), "an unconfirmed read must fail closed instead of erasing or verifying an unknown schedule");
+      assert(!message.includes(foreign.trim()), "read failures must not echo job contents");
+    }
+  });
+
+  harness.check("adapters/install-schedule CLI: read failures prevent writes and failed post-write reads cannot certify removal", () => {
+    for (const mode of ["initial-install", "initial-uninstall", "readback-uninstall"] as const) {
+      const dir = harness.makeTempDir(`schedule-read-${mode}`);
+      const home = harness.makeTempDir(`schedule-home-${mode}`);
+      const bin = path.join(dir, "fake-bin");
+      mkdirSync(bin);
+      const calls = path.join(dir, "calls.txt");
+      const written = path.join(dir, "written.txt");
+      const catalog = twoNodeCatalog();
+      writeFileSync(path.join(dir, "catalog.json"), JSON.stringify(catalog));
+      const run = seedRunState(compilePlan(catalog), minimalBusinessState("cron-read-fixture"), {
+        ownerSessionId: "schedule-read-fixture",
+        ttlSeconds: 300,
+        wallClockCapSeconds: 1800,
+      });
+      run.approvals[scheduledAutonomyApprovalId] = "approved";
+      mkdirSync(path.join(dir, "run"));
+      writeFileSync(path.join(dir, "run/run-state.json"), JSON.stringify(run));
+      writeFileSync(
+        path.join(bin, "crontab"),
+        [
+          `#!${process.execPath}`,
+          "const fs = require('node:fs');",
+          `const calls = ${JSON.stringify(calls)}; const written = ${JSON.stringify(written)};`,
+          "const previous = fs.existsSync(calls) ? fs.readFileSync(calls, 'utf8') : '';",
+          "fs.appendFileSync(calls, process.argv.slice(2).join(' ') + '\\n');",
+          `if (process.argv[2] === '-l' && ${JSON.stringify(mode)} === 'readback-uninstall' && !previous) {`,
+          "  process.stdout.write('0 4 * * * /bin/echo foreign-job\\n'); process.exit(0);",
+          "}",
+          "if (process.argv[2] === '-l') { console.error('permission denied'); process.exit(1); }",
+          "fs.writeFileSync(written, fs.readFileSync(0, 'utf8'));",
+        ].join("\n"),
+        { mode: 0o755 },
+      );
+      const result = runCli(
+        "adapters/install-schedule.ts",
+        [
+          "--workspace",
+          dir,
+          "--runtime",
+          "codex",
+          "--schedule",
+          "*/20 * * * *",
+          "--brief",
+          path.join(dir, "brief.json"),
+          "--apply",
+          "--approval",
+          scheduledAutonomyApprovalId,
+          ...(mode === "initial-install" ? [] : ["--uninstall"]),
+        ],
+        { HOME: home, PATH: `${bin}${path.delimiter}${process.env.PATH ?? ""}` },
+      );
+      assert(result.code === 1 && result.output.includes("crontab_read_failed"), `expected an explicit read refusal, got ${result.output}`);
+      assert(
+        !result.output.includes("installed and verified") && !result.output.includes("removed and verified"),
+        "failed reads must never certify host state",
+      );
+      const observedCalls = readFileSync(calls, "utf8").trim().split("\n");
+      if (mode === "readback-uninstall") {
+        assert(observedCalls.join(",") === "-l,-,-l", "failed readback must not cause a blind second write");
+        assert(readFileSync(written, "utf8").includes("foreign-job"), "the attempted removal must preserve unrelated jobs");
+      } else {
+        assert(observedCalls.join(",") === "-l", "an initial read failure must prevent crontab writes");
+        assert(!existsSync(written) && !existsSync(path.join(dir, "schedule")), "an initial read failure must not write a wrapper or schedule");
+      }
+    }
+  });
+
   harness.check("adapters/install-schedule: renders a correct crontab line, and uninstall exactly reverses install (foreign lines survive both)", () => {
     const dir = harness.makeTempDir("schedule-cron");
     const options: ScheduleOptions = {
@@ -390,7 +491,10 @@ export function register(harness: Harness): void {
       ),
       "a changed wrapper or log target must not pass the prior exact-line readback",
     );
-    assert(crontabHasSignature(installed.nextContent, crontabSignature(otherWorkspaceOptions)), "readback must preserve another workspace's entry without treating it as ours");
+    assert(
+      crontabHasSignature(installed.nextContent, crontabSignature(otherWorkspaceOptions)),
+      "readback must preserve another workspace's entry without treating it as ours",
+    );
 
     // Reinstalling with a different schedule replaces (never duplicates) our own line.
     const changedOptions: ScheduleOptions = { ...options, schedule: "0 * * * *" };
@@ -539,7 +643,10 @@ export function register(harness: Harness): void {
       assert(script.includes("adapters/cursor.ts"), "expected the wrapper to import from the cursor adapter module, not a duplicated copy");
       assert(script.includes("wrapWithWallClock"), "expected the wrapper to reuse the shared wall-clock wrapper, not reimplement timeout logic");
       assert(script.includes("kernel/session/catalog-contract.ts"), "expected the wrapper to use the canonical workspace catalog compatibility owner");
-      assert(script.indexOf("const compatible") < script.indexOf("const result = spawnSync"), "expected catalog compatibility to be checked before the scheduled worker is spawned");
+      assert(
+        script.indexOf("const compatible") < script.indexOf("const result = spawnSync"),
+        "expected catalog compatibility to be checked before the scheduled worker is spawned",
+      );
       assert(script.includes(JSON.stringify(options.workspaceDir)), "expected the workspace dir to be baked into the wrapper");
       assert(script.includes(String(options.wallClockSeconds)), "expected the wall-clock cap to be baked into the wrapper");
     },
@@ -610,9 +717,18 @@ export function register(harness: Harness): void {
       path.join(dir, "brief.json"),
       "--apply",
     ]);
-    assert(unauthorizedApply.code === 1, `expected --apply without founder authority to fail before host mutation, got ${unauthorizedApply.code}: ${unauthorizedApply.output}`);
-    assert(unauthorizedApply.output.includes("schedule_authority_required"), `expected the refusal to name the schedule authority gate, got: ${unauthorizedApply.output}`);
-    assert(unauthorizedApply.output.includes(scheduledAutonomyApprovalId), `expected the refusal to name the canonical approval id, got: ${unauthorizedApply.output}`);
+    assert(
+      unauthorizedApply.code === 1,
+      `expected --apply without founder authority to fail before host mutation, got ${unauthorizedApply.code}: ${unauthorizedApply.output}`,
+    );
+    assert(
+      unauthorizedApply.output.includes("schedule_authority_required"),
+      `expected the refusal to name the schedule authority gate, got: ${unauthorizedApply.output}`,
+    );
+    assert(
+      unauthorizedApply.output.includes(scheduledAutonomyApprovalId),
+      `expected the refusal to name the canonical approval id, got: ${unauthorizedApply.output}`,
+    );
     assert(!existsSync(path.join(dir, "schedule")), "unauthorized apply must not create the workspace schedule directory");
   });
 

@@ -251,26 +251,36 @@ export function register(harness: Harness): void {
     const home = path.join(root, "home");
     const claude = path.join(home, ".claude", "skills", "b2c-app-builder");
     const codex = path.join(home, ".codex", "skills", "b2c-app-builder");
-    mkdirSync(claude, { recursive: true });
+    const agents = path.join(home, ".agents", "skills", "b2c-app-builder");
+    const cursor = path.join(home, ".cursor", "skills", "b2c-app-builder");
+    for (const client of [claude, agents, cursor]) mkdirSync(client, { recursive: true });
 
     run("runtime-sync bootstraps Claude at v1", syncArgs(source, claude, "--adopt"), 0);
+    run("runtime-sync bootstraps Agents at v1", syncArgs(source, agents, "--adopt"), 0);
+    run("runtime-sync bootstraps Cursor at v1", syncArgs(source, cursor, "--adopt"), 0);
     writeFileSync(path.join(source, "a.txt"), "alpha v2\n");
     writeFileSync(path.join(source, "skill-version.json"), JSON.stringify({ version: "0.0.2-fixture" }));
     git(source, ["add", "-A"]);
     git(source, ["commit", "-qm", "bump"]);
     mkdirSync(codex, { recursive: true });
     run("runtime-sync writes Codex only without --all-clients", syncArgs(source, codex, "--adopt"), 0);
-
     const allClientsArgs = ["--source", source, "--installed", codex, "--all-clients", "--runtimes-root", home];
-    run("runtime-sync check --all-clients fails while Claude is behind", ["check", ...allClientsArgs], 1, "behind");
-    run("runtime-sync sync --all-clients updates Claude", ["sync", ...allClientsArgs, "--no-verify"], 0);
+    run("runtime-sync check --all-clients fails while Claude, Agents, and Cursor are behind", ["check", ...allClientsArgs], 1, "behind");
+    run("runtime-sync sync --all-clients updates every configured client", ["sync", ...allClientsArgs, "--no-verify"], 0);
     run("runtime-sync check --all-clients passes after sync", ["check", ...allClientsArgs], 0);
-    const claudeVersion = JSON.parse(readFileSync(path.join(claude, "skill-version.json"), "utf8")) as { version?: string };
-    if (claudeVersion.version !== "0.0.2-fixture") {
-      throw new Error(`Claude runtime stayed at ${claudeVersion.version ?? "unknown"} after --all-clients sync`);
-    }
-    if (readFileSync(path.join(claude, "a.txt"), "utf8") !== "alpha v2\n") {
-      throw new Error("Claude runtime files stayed stale after --all-clients sync");
+    for (const [id, client] of [
+      ["Claude", claude],
+      ["Codex", codex],
+      ["Agents", agents],
+      ["Cursor", cursor],
+    ] as const) {
+      const clientVersion = JSON.parse(readFileSync(path.join(client, "skill-version.json"), "utf8")) as { version?: string };
+      if (clientVersion.version !== "0.0.2-fixture") {
+        throw new Error(`${id} runtime stayed at ${clientVersion.version ?? "unknown"} after --all-clients sync`);
+      }
+      if (readFileSync(path.join(client, "a.txt"), "utf8") !== "alpha v2\n") {
+        throw new Error(`${id} runtime files stayed stale after --all-clients sync`);
+      }
     }
   }
 }

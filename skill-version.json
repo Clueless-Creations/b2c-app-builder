@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.87",
+  "version": "0.220.88",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Exercise runtime synchronization across Claude, Codex, Agents, and Cursor client roots.",
     "Protect the three builder writing-owner routes in the agent entrypoint contract.",
     "Regenerate package projections after keeping quoted research-source placeholder language as evidence narrative.",
     "Hold changed non-idempotent effects for explicit readback before repair and preserve unrelated proof on replay.",

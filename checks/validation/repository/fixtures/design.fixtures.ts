@@ -31,6 +31,7 @@ import {
 } from "../../../../kernel/engine/founder-decision-receipt.js";
 import { captureDesignAuthorityEvaluation } from "../../../../kernel/engine/design-taste-authority.js";
 import { validateDesignWorthiness } from "../../business/design/check-design-worthiness.js";
+import { parseDesignExploration } from "../../../../tooling/lib/design-exploration.js";
 import { laneKeys, type BusinessStateV2, type FounderDecision, type FounderDecisionReceipt, type RunStateDocument } from "../../../../kernel/schema/types.js";
 
 function writeValidDesignExploration(root: string): void {
@@ -130,6 +131,41 @@ const WRONG_FOUNDER_FIXTURE_KEY = trustedFounderKeyFromBase64Url(WRONG_FOUNDER_F
 
 export function register(h: Harness): void {
   const { makeFixture, makeEmptyFixture, runFixture, results } = h;
+
+  {
+    const concept = (id: string, decision: "selected" | "rejected") => ({
+      id,
+      name: id,
+      premise: "A product-specific direction gives the user a clear way to recover the next important action.",
+      referenceMappings: [{ referenceId: "reference.design.craft", principle: "Keep the primary decision visible." }],
+      treatments: {
+        native: "The native surface keeps the primary action visible with a tactile transition and undo.",
+        mobileWeb: "The mobile web surface keeps the same action visible in a narrow responsive composition.",
+        desktopWeb: "The desktop web surface places the action beside its supporting context and recovery.",
+      },
+      distinguishingMechanic: "One shared canvas keeps every item visible and exposes missing work as empty silhouettes.",
+      decision,
+      rationale: "This direction is compared against the same user job and preserves an explicit rejection or selection reason.",
+    });
+    const parsed = parseDesignExploration(
+      {
+        exploration: {
+          schemaVersion: 1,
+          selectedConceptId: "warm-canvas",
+          concepts: [concept("warm-canvas", "selected"), concept("cool-canvas", "rejected"), concept("mono-canvas", "rejected")],
+        },
+      },
+      true,
+    );
+    const ok = parsed.issues.some((entry) => entry.code === "design_exploration.concepts_not_distinct");
+    results.push({
+      label: "design exploration rejects cosmetic variants that preserve one underlying mechanic",
+      ok,
+      expectedCode: 0,
+      actualCode: ok ? 0 : 1,
+      output: ok ? "" : "three palette variants with one underlying mechanic must fail distinct-concept acceptance",
+    });
+  }
 
   const zeroCardDecision = `
 \`\`\`yaml

@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.72",
+  "version": "0.220.73",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Reject cosmetic design variants that reuse one underlying mechanic instead of proving distinct directions.",
     "Expose the enforced research artifact contract through a bounded read-only explanation without initializing or certifying research.",
     "Bind worker knowledge receipts to the dispatcher engine version and reject stale worker protocol results.",
     "Keep unresolved scheduling intent at the founder boundary while independent design work remains available for dispatch.",

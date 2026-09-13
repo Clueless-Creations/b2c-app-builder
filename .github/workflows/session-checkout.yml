@@ -1,0 +1,40 @@
+name: Isolated maintenance checkout
+on:
+  push:
+    branches: [agent/session-397-verification-20260913]
+    paths: [.github/workflows/session-checkout.yml]
+permissions:
+  contents: read
+jobs:
+  prepare:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: e290c4e3316c897696a259a212d64fafacc9a0e3
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - run: npm ci
+      - name: Package public source and isolated test dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          stage="$RUNNER_TEMP/maintenance-checkout"
+          mkdir -p "$stage/source" "$stage/toolchain"
+          git archive HEAD | tar -x -C "$stage/source"
+          cp -a node_modules "$stage/source/node_modules"
+          cp "$(command -v node)" "$stage/toolchain/node"
+          git bundle create "$stage/history.bundle" HEAD refs/remotes/origin/main
+          git rev-parse HEAD > "$stage/BASELINE.txt"
+          node --version > "$stage/NODE_VERSION.txt"
+          tar -czf "$RUNNER_TEMP/maintenance-checkout.tar.gz" -C "$stage" .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: maintenance-checkout-e290c4e
+          path: ${{ runner.temp }}/maintenance-checkout.tar.gz
+          retention-days: 1
+          compression-level: 0

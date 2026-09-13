@@ -1,10 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.85",
+  "version": "0.220.86",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
-    "Keep quoted research-source placeholder language as evidence narrative while rejecting placeholder-only required fields.",
+    "Regenerate package projections after keeping quoted research-source placeholder language as evidence narrative.",
     "Hold changed non-idempotent effects for explicit readback before repair and preserve unrelated proof on replay.",
     "Preserve unrelated third-party edits when recovering an interrupted research decision.",
     "Add a source-line location and bounded repair hint when a not-applicable Signal Corpus reason is missing.",

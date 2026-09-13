@@ -2337,6 +2337,13 @@ export function register(h: Harness): void {
     1,
     "research.signal_corpus_not_applicable_reason_missing",
   );
+  h.runScriptArgs(
+    "not-applicable signal corpus explains the status-line repair location in JSON",
+    "check-research-evidence.ts",
+    ["--root", researchSignalNotApplicableBare, "--require-workflow-outputs", "--json"],
+    1,
+    '"line":2',
+  );
 
   for (const [name, reason] of [
     ["none", "none"],

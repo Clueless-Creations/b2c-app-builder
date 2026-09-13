@@ -687,6 +687,13 @@ function validateSignalCorpus(value: string | undefined, target: ReturnType<type
           "research.signal_corpus_not_applicable_reason_missing",
           "A not-applicable signal corpus needs an authored reason. Do not fabricate signal rows when no reusable source material exists.",
           "strategy/SIGNAL_CORPUS.md",
+          renderedStatus.ok
+            ? {
+                line: renderedStatus.status.sourceLine,
+                fixHint:
+                  "Replace the not-applicable status reason with a specific authored explanation, or remove the exemption and provide the required Signal Corpus tables.",
+              }
+            : undefined,
         ),
       );
     }

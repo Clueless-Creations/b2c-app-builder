@@ -270,7 +270,7 @@ export function register(harness: Harness): void {
     );
     writeFileSync(
       path.join(root, "growth/landing/privacy.html"),
-      "<!doctype html><html lang=\"en\"><body><h1>Privacy</h1><p>Static disclosures. No scene hooks.</p></body></html>\n",
+      '<!doctype html><html lang="en"><body><h1>Privacy</h1><p>Static disclosures. No scene hooks.</p></body></html>\n',
       "utf8",
     );
     writeFileSync(
@@ -361,18 +361,9 @@ export function register(harness: Harness): void {
     assert(!byId.privacy?.implementedScrollytelling, "privacy must not inherit cinematic hooks");
     assert(!byId.conversion?.implementedScrollytelling, "waitlist must not inherit cinematic hooks");
     assert(!projected.implementedScrollytellingUnattributed, "cinematic.html is attributed by file stem");
-    assert(
-      !surfaceRequiresMotionInteractionEvidence("privacy", "landing", projected),
-      "privacy must not inherit workspace motion evidence",
-    );
-    assert(
-      !surfaceRequiresMotionInteractionEvidence("conversion", "landing", projected),
-      "conventional conversion must not inherit cinematic motion evidence",
-    );
-    assert(
-      surfaceRequiresMotionInteractionEvidence("cinematic", "landing", projected),
-      "cinematic must keep motion interaction evidence",
-    );
+    assert(!surfaceRequiresMotionInteractionEvidence("privacy", "landing", projected), "privacy must not inherit workspace motion evidence");
+    assert(!surfaceRequiresMotionInteractionEvidence("conversion", "landing", projected), "conventional conversion must not inherit cinematic motion evidence");
+    assert(surfaceRequiresMotionInteractionEvidence("cinematic", "landing", projected), "cinematic must keep motion interaction evidence");
     assert(projected.scrollytelling === "selected", `rollup scrolly ${projected.scrollytelling}`);
     assert(projected.conversionExperiments === "selected", `rollup conversion ${projected.conversionExperiments}`);
     assert(projected.sixtyFpsRegister === "selected", `60fps ${projected.sixtyFpsRegister}`);
@@ -474,7 +465,7 @@ export function register(harness: Harness): void {
     );
     writeFileSync(
       path.join(root, "growth/landing/privacy.html"),
-      "<!doctype html><html lang=\"en\"><body><h1>Privacy</h1><section data-scene-track data-scene-id=\"legal\"></section></body></html>\n",
+      '<!doctype html><html lang="en"><body><h1>Privacy</h1><section data-scene-track data-scene-id="legal"></section></body></html>\n',
       "utf8",
     );
     writeFileSync(
@@ -502,7 +493,7 @@ export function register(harness: Harness): void {
     );
     writeFileSync(
       path.join(root, "growth/landing/privacy.html"),
-      "<!doctype html><html lang=\"en\"><body><h1>Privacy</h1><p>Static disclosures.</p></body></html>\n",
+      '<!doctype html><html lang="en"><body><h1>Privacy</h1><p>Static disclosures.</p></body></html>\n',
       "utf8",
     );
     writeFileSync(
@@ -519,19 +510,13 @@ export function register(harness: Harness): void {
     assert(projected.implementedScrollytellingUnattributed, "the unrelated file is an inspection signal");
     assert(projected.surfaces[0]?.scrollytelling === "not_required", "privacy technique stays not_required");
     assert(!projected.surfaces[0]?.implementedScrollytelling, "privacy is not attributed");
-    assert(
-      !surfaceRequiresMotionInteractionEvidence("privacy", "landing", projected),
-      "unrelated keyword cannot impose motion evidence on privacy",
-    );
+    assert(!surfaceRequiresMotionInteractionEvidence("privacy", "landing", projected), "unrelated keyword cannot impose motion evidence on privacy");
     const issues = validateFrozenPageTechniqueGates(root, "page_gates");
     assert(
       issues.some((entry) => entry.code === "page_gates.implemented_motion_unattributed"),
       JSON.stringify(issues),
     );
-    assert(
-      !issues.some((entry) => entry.code === "page_gates.static_document_implemented_motion"),
-      JSON.stringify(issues),
-    );
+    assert(!issues.some((entry) => entry.code === "page_gates.static_document_implemented_motion"), JSON.stringify(issues));
   });
 
   harness.check("residual guidance does not restore universal 60fps or scrollytelling procedure", () => {
@@ -556,5 +541,16 @@ export function register(harness: Harness): void {
     const onboarding = readFileSync(path.join(skillRoot, "examples/workspace/business/product/ONBOARDING.md"), "utf8");
     assert(!/Record the shot ID/.test(onboarding), "example ONBOARDING must not restore a shot-ID placeholder row");
     assert(/Do not invent a shot ID/.test(onboarding), "example ONBOARDING must refuse invented shot IDs");
+  });
+
+  harness.check("design-surface-applicability: technique exclusions retain the quality bar", () => {
+    const landingProducer = readFileSync(path.join(skillRoot, "catalog/workflows/growth-revenue.ts"), "utf8");
+    const landingNode = landingProducer.split('id: "workflow.growth.pre-launch-funnel-landing-waitlist"')[1] ?? "";
+    assert(
+      /static-document and conventional conversion surfaces, keep the quality bar on semantic content, legibility, accessibility, responsive behavior, and truthful claims/s.test(
+        landingNode,
+      ),
+      "static surfaces must retain substantive quality obligations when motion is not applicable",
+    );
   });
 }

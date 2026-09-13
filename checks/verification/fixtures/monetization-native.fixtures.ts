@@ -76,6 +76,36 @@ export function register(harness: Harness): void {
         normalizeSuperwallRevenueCatObservation({ ...base, identifiedSubject: from, identityJoin: { ...base.identityJoin, to: from, lifecycle: "deleted" } }),
       /identity_join/,
     );
+    assert.equal(normalizeSuperwallRevenueCatObservation({ ...base, amountEvents: [] }).amounts.status, "unknown");
+    assert.equal(
+      normalizeSuperwallRevenueCatObservation({
+        ...base,
+        amountEvents: [{ ...purchase, amount: -1 }],
+      }).amounts.reasonCodes[0],
+      "invalid_amount_event",
+    );
+    assert.deepEqual(
+      normalizeSuperwallRevenueCatObservation({
+        ...base,
+        amountEvents: [purchase, { ...purchase, currency: "EUR" }],
+      }).amounts.reasonCodes,
+      ["refused", "currency_mismatch"],
+    );
+    assert.deepEqual(
+      normalizeSuperwallRevenueCatObservation({
+        ...base,
+        amountEvents: [
+          purchase,
+          { ...purchase, kind: "refund", eventId: "refund-1", amount: 100 },
+          { ...purchase, kind: "refund", eventId: "refund-1", amount: 200 },
+        ],
+      }).amounts.reasonCodes,
+      ["refused", "conflicting_refund"],
+    );
+    assert.throws(
+      () => normalizeSuperwallRevenueCatObservation({ ...base, assignmentOwner: "revenuecat" } as never),
+      /competing_authority/,
+    );
     assert.equal(value.providerProof, "not_observed");
   });
 }

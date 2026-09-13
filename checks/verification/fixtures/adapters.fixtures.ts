@@ -427,7 +427,7 @@ export function register(harness: Harness): void {
     assert(cleanUninstall.nextContent === "", `expected uninstall to exactly reverse a clean install, got: ${JSON.stringify(cleanUninstall.nextContent)}`);
   });
 
-  harness.check("adapters/install-schedule: concurrent cron mutation is refused by the user-level schedule lock", () => {
+  harness.check("adapters/install-schedule: concurrent schedule mutation is refused by the shared user-level lock", () => {
     const home = harness.makeTempDir("schedule-lock");
     const lockPath = scheduleMutationLockPath(home);
     const holder = acquireLock(lockPath, { ownerSessionId: "other-schedule-installer", retries: 0, ttlSeconds: 120 });
@@ -452,6 +452,21 @@ export function register(harness: Harness): void {
       completed = true;
     }, home);
     assert(completed, "the schedule lock must be released after the competing owner exits");
+
+    let failureMessage = "";
+    try {
+      withScheduleMutationLock(() => {
+        throw new Error("fixture mutation failure");
+      }, home);
+    } catch (error) {
+      failureMessage = error instanceof Error ? error.message : String(error);
+    }
+    assert(failureMessage === "fixture mutation failure", `expected the mutation error to surface, got ${failureMessage}`);
+    let recovered = false;
+    withScheduleMutationLock(() => {
+      recovered = true;
+    }, home);
+    assert(recovered, "the shared schedule lock must be released when a mutation fails");
   });
 
   harness.check("adapters/install-schedule: translates the two supported cron shapes into launchd content and cleanly reports what it cannot translate", () => {

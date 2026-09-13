@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.91",
+  "version": "0.220.92",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Serialize launchd schedule apply and removal behind the shared host-mutation lock.",
     "Recover a research decision cleanly when interruption occurs after the rendered product artifact is written.",
     "Protect the canonical writing guidance in pull-request review surfaces.",
     "Reject malformed and conflicting Superwall-to-RevenueCat amount observations without claiming live provider proof.",

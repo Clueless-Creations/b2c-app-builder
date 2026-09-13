@@ -396,27 +396,36 @@ function runMain(): void {
     if (sandboxCheck) console.log(`  sandboxed: ${String(sandboxCheck.sandboxed)}`);
     return;
   }
-  if (uninstall) {
-    for (const target of [plistPath]) {
-      if (existsSync(target)) {
-        const unloaded = spawnSync("launchctl", ["unload", target], { encoding: "utf8" });
-        if (unloaded.status !== 0) fail(`launchctl unload failed: ${unloaded.stderr || unloaded.stdout || `exit ${String(unloaded.status)}`}`);
-        unlinkSync(target);
+  try {
+    withScheduleMutationLock(() => {
+      if (uninstall) {
+        for (const target of [plistPath]) {
+          if (existsSync(target)) {
+            const unloaded = spawnSync("launchctl", ["unload", target], { encoding: "utf8" });
+            if (unloaded.status !== 0) throw new Error(`launchctl unload failed: ${unloaded.stderr || unloaded.stdout || `exit ${String(unloaded.status)}`}`);
+            unlinkSync(target);
+          }
+        }
+        if (existsSync(plistPath)) throw new Error(`launchd readback did not confirm removal for ${options.workspaceSlug}/${options.runtime}`);
+        return;
       }
-    }
-    if (existsSync(plistPath)) fail(`launchd readback did not confirm removal for ${options.workspaceSlug}/${options.runtime}`);
+      mkdirSync(path.dirname(options.wrapperPath), { recursive: true });
+      writeFileSync(options.wrapperPath, renderWrapperScript(options), { mode: 0o755 });
+      mkdirSync(path.dirname(plistPath), { recursive: true });
+      writeFileSync(plistPath, plist.xml);
+      const loaded = spawnSync("launchctl", ["load", plistPath], { encoding: "utf8" });
+      if (loaded.status !== 0) throw new Error(`launchctl load failed: ${loaded.stderr || loaded.stdout || `exit ${String(loaded.status)}`}`);
+      const installedXml = readFileSync(plistPath, "utf8");
+      if (!launchdPlistHasLabel(installedXml, launchdLabel(options))) {
+        throw new Error(`launchd readback did not confirm the managed label for ${options.workspaceSlug}/${options.runtime}`);
+      }
+    });
+  } catch (error) {
+    fail(error instanceof Error ? error.message : String(error));
+  }
+  if (uninstall) {
     console.log(`install-schedule: removed and verified the launchd job for ${options.workspaceSlug}/${options.runtime}.`);
     return;
-  }
-  mkdirSync(path.dirname(options.wrapperPath), { recursive: true });
-  writeFileSync(options.wrapperPath, renderWrapperScript(options), { mode: 0o755 });
-  mkdirSync(path.dirname(plistPath), { recursive: true });
-  writeFileSync(plistPath, plist.xml);
-  const loaded = spawnSync("launchctl", ["load", plistPath], { encoding: "utf8" });
-  if (loaded.status !== 0) fail(`launchctl load failed: ${loaded.stderr || loaded.stdout || `exit ${String(loaded.status)}`}`);
-  const installedXml = readFileSync(plistPath, "utf8");
-  if (!launchdPlistHasLabel(installedXml, launchdLabel(options))) {
-    fail(`launchd readback did not confirm the managed label for ${options.workspaceSlug}/${options.runtime}`);
   }
   console.log(`install-schedule: installed and verified the launchd job for ${options.workspaceSlug}/${options.runtime}.${sandboxSuffix}`);
 }

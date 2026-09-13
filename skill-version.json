@@ -1,9 +1,11 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.221.5",
+  "version": "0.221.6",
   "updatedAt": "2026-09-13",
   "sourcePath": ".",
   "releaseNotes": [
+    "Fail closed on unverified crontab reads before schedule mutation and during installed-state readback.",
+    "Preserve unrelated scheduled jobs and refuse to certify removal when the host crontab cannot be read back.",
     "Preserve hyphenated product-offer compounds without accepting hyphenated evidence-field instructions.",
     "Reject direct instructions to fill evidence fields while retaining genuine signup actions and measured form-completion prose.",
     "Assert the canonical derived-output diagnostic when a schema-valid empty corpus output is rendered as a template.",

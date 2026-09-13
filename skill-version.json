@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.73",
+  "version": "0.220.74",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Prove an activated provider binding reopens only its affected obligations while pinned and unrelated proof remain current.",
     "Reject cosmetic design variants that reuse one underlying mechanic instead of proving distinct directions.",
     "Expose the enforced research artifact contract through a bounded read-only explanation without initializing or certifying research.",
     "Bind worker knowledge receipts to the dispatcher engine version and reject stale worker protocol results.",

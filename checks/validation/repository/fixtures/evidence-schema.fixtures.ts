@@ -291,7 +291,7 @@ export function register(h: Harness): void {
     emptyOutputsRoot,
     "check-research-evidence.ts",
     1,
-    "research.signal_output_unsupported",
+    "research.signal_corpus_derived_output_invalid",
   );
 
   const negativeRoot = makeFixture("evidence-schema-round-trip-negative-canary");

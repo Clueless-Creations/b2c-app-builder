@@ -15992,7 +15992,7 @@
     "checks/validation/repository/check-reference-size.ts": "534bc5a83694fb293c01d3a17dfa71272dc11ceb1591e189f56da31a223d78e1",
     "checks/validation/repository/check-repository-boundary.ts": "21ade161af68b0262d9b8b3c94efc9068cbd8bdaff38290f91e9dca4f9b64123",
     "checks/validation/business/process/check-repository-profile.ts": "4db81e9d23547a75c858eaa34327b6dd6418cad1dec40ec9a16c80a653457eaa",
-    "checks/validation/business/research/check-research-evidence.ts": "e5637eb1fffd83974b8cad4118518f8c0086cfedcf8f93654fe0f4499018052b",
+    "checks/validation/business/research/check-research-evidence.ts": "f9e5ecb666f9dce9fdab060a4c582168d6fe4ee893a39b267c784173ce3a21fb",
     "checks/validation/business/money/check-revenue.ts": "a7b186ca2624d4a92809ee8115217fbed546b37e446f2eebaa0e9d1048a4c39b",
     "checks/validation/business/design/check-scrollytelling-contract.ts": "dbe5b54d90921976bc1876eb3c5483797fe6c0b67b6287845c7b46863edb977b",
     "checks/validation/business/trust/check-secret-routing.ts": "8270bf3dccd1c7f8ca4a48ecf476bd5c61a3eb34191101cd29092823e99d8fd6",
@@ -16225,5 +16225,5 @@
     "catalog/upstreams/notices/parth-app-store-screenshots.txt": "a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a"
   },
   "dependencies": [],
-  "digest": "sha256:6df2981fab511bf611288d6eceaa18dc9f78c177b626415ac30bfaad032f6873"
+  "digest": "sha256:1b2c1c615dcf4965e1bffe8105561db7129a1b0d0235e7f8349ab21156960436"
 }

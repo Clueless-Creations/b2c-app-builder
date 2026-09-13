@@ -274,10 +274,11 @@ function isAuthoredOfferNarrative(value: string): boolean {
   // Strip labels before scalar normalization, which intentionally removes colons.
   let authored = value.trim().replace(/[`*_~]/gu, "");
   const label = /^[`*_\s]*([a-z][a-z0-9 _/()*-]{0,63}):[`*_\s]*/iu;
+  const directive = /^(?:required|todo|tbd|placeholder|replace with|to be filled)\b/i;
   for (let pass = 0; pass < 4; pass += 1) {
     const match = authored.match(label);
     if (!match) break;
-    if (/^(?:todo|tbd|placeholder|replace with)$/i.test(normalizeEvidenceScalar(match[1]!))) return false;
+    if (directive.test(normalizeEvidenceScalar(match[1]!))) return false;
     authored = authored.slice(match[0].length);
   }
   return (
@@ -285,7 +286,7 @@ function isAuthoredOfferNarrative(value: string): boolean {
     !isEmptyEquivalentEvidenceValue(authored) &&
     !/<[^>]+>/u.test(authored) &&
     !isPlaceholderOnly(authored) &&
-    !/^(?:required|todo(?:\s.*)?|tbd(?:\s.*)?|placeholder(?:\s.*)?|replace with(?:\s.*)?|to be filled(?:\s.*)?)$/i.test(normalizeEvidenceScalar(authored))
+    !directive.test(normalizeEvidenceScalar(authored))
   );
 }
 

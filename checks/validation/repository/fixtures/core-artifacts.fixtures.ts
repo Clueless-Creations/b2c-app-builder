@@ -916,6 +916,34 @@ export function register(h: Harness): void {
     );
   }
 
+  for (const duplicateLifecycle of ["superseded", "current"] as const) {
+    const root = makeCompletedResearch(`research-duplicate-superseded-${duplicateLifecycle}`);
+    const signalPath = path.join(root, "strategy/SIGNAL_CORPUS.md");
+    const lines = readFileSync(signalPath, "utf8").split("\n");
+    const firstIndex = lines.findIndex((line) => line.startsWith("| SIG-001 | customer language |"));
+    if (firstIndex < 0) throw new Error("Missing superseded duplicate fixture row");
+    const original = lines[firstIndex]!;
+    const superseded = original.replace("| current | none |", "| superseded | SIG-002 |");
+    if (superseded === original) throw new Error("Missing supersession fixture anchor");
+    lines[firstIndex] = superseded;
+    lines.splice(firstIndex + 1, 0, duplicateLifecycle === "current" ? original : superseded, original.replace("SIG-001", "SIG-002"));
+    writeFileSync(signalPath, lines.join("\n"), "utf8");
+    runFixture(
+      `duplicate superseded signal with ${duplicateLifecycle} repeat names the conflicting ID field`,
+      root,
+      "check-research-evidence.ts",
+      1,
+      "Signal Records row's Signal ID field",
+    );
+    h.runScriptArgs(
+      `duplicate superseded signal with ${duplicateLifecycle} repeat locates the second row`,
+      "check-research-evidence.ts",
+      ["--root", root, "--json"],
+      1,
+      `"location":"${firstIndex + 2}"`,
+    );
+  }
+
   const researchSignalInputReversedRange = makeCompletedResearch("research-signal-input-reversed-range");
   {
     const signalPath = path.join(researchSignalInputReversedRange, "strategy/SIGNAL_CORPUS.md");
@@ -1538,6 +1566,10 @@ export function register(h: Harness): void {
     ["nested-label", "Audience: segment: **TBD**"],
     ["embedded-angle", "people who need <describe the problem>"],
     ["todo-instruction", "TODO: identify the paying audience"],
+    ["todo-comma", "Audience: TODO, identify buyers"],
+    ["tbd-dash", "Audience: TBD - identify buyers"],
+    ["required-directive", "Audience: required specific buyers"],
+    ["required-label", "Required: identify buyers"],
   ] as const) {
     const root = makeCompletedResearch(`research-offer-placeholder-contract-${name}`);
     const offerPath = path.join(root, "strategy/OFFER_TEST.md");
@@ -1570,6 +1602,8 @@ export function register(h: Harness): void {
     ["empty-risk", "The founder tests organic demand first", "**none**", 1],
     ["labeled-risk", "The founder tests organic demand first", "Risk: <describe risk>", 1],
     ["labeled-empty-risk", "The founder tests organic demand first", "Risk: **none**", 1],
+    ["required-risk", "The founder tests organic demand first", "Risk: required residual risk", 1],
+    ["todo-comma-risk", "The founder tests organic demand first", "Risk: TODO, document residual uncertainty", 1],
     ["labeled-authored-risk", "Reason: paid acquisition is pending until organic testing", "Risk: demand remains unverified beyond the measured cohort", 0],
   ] as const) {
     const root = makeCompletedResearch(`research-offer-waiver-narrative-${name}`);

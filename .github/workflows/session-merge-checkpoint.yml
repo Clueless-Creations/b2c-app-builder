@@ -1,0 +1,173 @@
+name: Maintenance merge checkpoint
+on:
+  push:
+    branches: [agent/session-397-verification-20260913]
+    paths: [.github/workflows/session-merge-checkpoint.yml]
+permissions:
+  contents: read
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    env:
+      B2C_REQUIRE_GIT_HISTORY: '1'
+      GITHUB_BASE_SHA: e290c4e3316c897696a259a212d64fafacc9a0e3
+    outputs:
+      research: ${{ steps.commit.outputs.research }}
+      schedule: ${{ steps.commit.outputs.schedule }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: d2cbf43964779091051f23a5194edd43e211652e
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - run: npm ci
+      - id: commit
+        name: Normalize reviewed fixture and verify each candidate before publishing its branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          for branch in agent/397-merge-ready agent/405-merge-ready; do
+            if git ls-remote --exit-code --heads origin "$branch"; then exit 1; fi
+          done
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch -c agent/397-merge-ready
+          node node_modules/prettier/bin/prettier.cjs --write checks/validation/repository/fixtures/core-artifacts.fixtures.ts
+          node --input-type=module - <<'JS'
+          import fs from 'node:fs';
+          const data = JSON.parse(fs.readFileSync('skill-version.json', 'utf8'));
+          if (data.version !== '0.221.5') throw new Error('Unexpected research version');
+          data.releaseNotes[0] = 'Apply whole-cell placeholder semantics to offer labels and cover contract, decision, measurement, and waiver validators.';
+          fs.writeFileSync('skill-version.json', JSON.stringify(data, null, 2) + '\n');
+          JS
+          npm run render:all
+          npm run check:evidence-schema-drift
+          git add --update
+          git diff --cached --check
+          test ! -e .maintenance
+          git commit -m 'style(research): format the authored uncertainty regression and align release notes'
+          npm run audit:ci -- --lane presubmit
+          git diff --exit-code
+          research=$(git rev-parse HEAD)
+          git push origin HEAD:refs/heads/agent/397-merge-ready
+          echo "research=$research" >> "$GITHUB_OUTPUT"
+          git show "$research:skill-version.json" > "$RUNNER_TEMP/research-version.json"
+          git switch -c agent/405-merge-ready 20853c1b06de6d3b848c1a1baa7d501ec472f2e2
+          cp skill-version.json "$RUNNER_TEMP/schedule-version.json"
+          if ! git merge --no-commit --no-ff "$research"; then
+            test -f .git/MERGE_HEAD
+            conflicts=$(git diff --name-only --diff-filter=U)
+            test -n "$conflicts"
+            while IFS= read -r file; do
+              case "$file" in
+                skill-version.json|kernel/schema/evidence-schema-version.json|catalog/generated/firstparty-pin.json|catalog/generated/firstparty/snapshot.json|catalog/generated/firstparty/skill-version.json|catalog/generated/firstparty/kernel/schema/evidence-schema-version.json) ;;
+                *) echo "Unexpected conflict: $file" >&2; exit 1 ;;
+              esac
+            done <<< "$conflicts"
+          fi
+          node --input-type=module - <<'JS'
+          import fs from 'node:fs';
+          const dir = process.env.RUNNER_TEMP;
+          const research = JSON.parse(fs.readFileSync(`${dir}/research-version.json`, 'utf8'));
+          const schedule = JSON.parse(fs.readFileSync(`${dir}/schedule-version.json`, 'utf8'));
+          if (schedule.version !== '0.221.6' || research.version !== '0.221.5') throw new Error('Unexpected integrated versions');
+          schedule.releaseNotes = [...new Set([...schedule.releaseNotes.slice(0, 2), ...research.releaseNotes])];
+          fs.writeFileSync('skill-version.json', JSON.stringify(schedule, null, 2) + '\n');
+          JS
+          npm run render:all
+          npm run check:evidence-schema-drift
+          git add --update
+          test -z "$(git diff --name-only --diff-filter=U)"
+          git diff --cached --check
+          test ! -e .maintenance
+          git commit -m 'Integrate the formatted research regression and current release manifest'
+          npm run audit:ci -- --lane presubmit
+          git diff --exit-code
+          git push origin HEAD:refs/heads/agent/405-merge-ready
+          echo "schedule=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+  research:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.research }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - run: npm ci
+      - name: Verify real affected fixture shards
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD
+          for shard in core-artifacts evidence-schema engineering; do
+            npm run test:validators -- --shard "$shard" > "$RUNNER_TEMP/$shard.log" 2>&1
+            SHARD="$shard" node --input-type=module - <<'JS'
+          import fs from 'node:fs';
+          const marker = 'B2C_SHARD_RESULTS_V1:';
+          const line = fs.readFileSync(`${process.env.RUNNER_TEMP}/${process.env.SHARD}.log`, 'utf8').split('\n').find(line => line.startsWith(marker));
+          if (!line) throw new Error('Missing fixture results');
+          const rows = JSON.parse(line.slice(marker.length));
+          console.log(`${process.env.SHARD}: ${rows.filter(row => row.ok).length}/${rows.length} passed`);
+          if (!rows.length || rows.some(row => !row.ok)) { console.error(rows.filter(row => !row.ok)); throw new Error('Fixture failure'); }
+          JS
+          done
+      - run: npm run render:all && npm run check:evidence-schema-drift && git diff --exit-code
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: merge-research-fixtures
+          path: ${{ runner.temp }}/*.log
+          retention-days: 3
+  integration:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        lane: [presubmit, fast, heavy-1, heavy-2, hosted, app]
+    env:
+      B2C_REQUIRE_GIT_HISTORY: '1'
+      GITHUB_BASE_SHA: e290c4e3316c897696a259a212d64fafacc9a0e3
+      B2C_FIXTURE_CONCURRENCY: '6'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.schedule }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - name: Verify exact integrated checkpoint
+        env:
+          LANE: ${{ matrix.lane }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD
+          case "$LANE" in
+            presubmit)
+              npm run audit:ci -- --lane presubmit
+              npm run test:fixtures -- adapters
+              npm run render:all
+              npm run check:evidence-schema-drift
+              git diff --exit-code ;;
+            fast) npm run audit:ci -- --lane fast ;;
+            heavy-1) npm run audit:ci -- --lane heavy --shard 1/2 ;;
+            heavy-2) npm run audit:ci -- --lane heavy --shard 2/2 ;;
+            hosted) npm ci --prefix hosted/knowledge-mcp && npm run hosted:check ;;
+            app) npm ci --prefix hosted/builder-console && npm run app:check ;;
+          esac

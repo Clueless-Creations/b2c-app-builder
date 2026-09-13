@@ -1,0 +1,150 @@
+name: Maintenance final integration checkpoint
+on:
+  push:
+    branches: [agent/session-397-verification-20260913]
+    paths: [.github/workflows/session-final.yml]
+permissions:
+  contents: read
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    outputs:
+      research_sha: ${{ steps.commit.outputs.research_sha }}
+      schedule_sha: ${{ steps.commit.outputs.schedule_sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify source patches before applying
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp .maintenance/research-review2.patch "$RUNNER_TEMP/review.patch"
+          sed -e 's/^ diff --git/diff --git/' -e 's/validateSignalCorpusDoc(emptyOutputsDoc)/validateSignalCorpus(emptyOutputsDoc)/' .maintenance/fixture-contracts.patch > "$RUNNER_TEMP/fixtures.patch"
+          echo "f8af7872ab194b09c41eb08356b834b8057fbc9f55cfca462dbf225ff1c2e49d  $RUNNER_TEMP/review.patch" | sha256sum -c -
+          echo "88ea43ef64f51f7afa717a90060e5848dea95c1fbeab6460259a355be255c117  $RUNNER_TEMP/fixtures.patch" | sha256sum -c -
+          test "$(git rev-parse origin/agent/397-offer-narratives)" = 515e0bb4b960b351c8b40faf673d51835d7f6102
+          test "$(git rev-parse origin/agent/405-cron-read-safety)" = 99c549ae067cab0be0db0ef5f294b766a2519586
+          if git ls-remote --exit-code --heads origin agent/397-final-source; then exit 1; fi
+          if git ls-remote --exit-code --heads origin agent/405-final-source; then exit 1; fi
+          git switch -c agent/397-final-source 515e0bb4b960b351c8b40faf673d51835d7f6102
+          git apply --check "$RUNNER_TEMP/review.patch"
+          git apply "$RUNNER_TEMP/review.patch"
+          git apply --check "$RUNNER_TEMP/fixtures.patch"
+          git apply "$RUNNER_TEMP/fixtures.patch"
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - run: npm run render:all && npm run render:evidence-schema-version
+      - run: npm run typecheck && git diff --check
+      - id: commit
+        name: Commit reviewed source and preserve stacked ancestry
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e .maintenance
+          test ! -e .github/workflows/session-final.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add --update
+          git commit -m 'fix(research): close reviewed placeholder and diagnostic edge cases' -m 'Align golden evidence and Design Room fixture inputs with the current canonical contracts; retain an empty-output negative canary.'
+          research_sha=$(git rev-parse HEAD)
+          git push origin HEAD:refs/heads/agent/397-final-source
+          echo "research_sha=$research_sha" >> "$GITHUB_OUTPUT"
+          git switch -c agent/405-final-source 99c549ae067cab0be0db0ef5f294b766a2519586
+          git merge --no-ff --no-edit "$research_sha"
+          npm run render:all
+          npm run render:evidence-schema-version -- --check
+          git diff --exit-code
+          git push origin HEAD:refs/heads/agent/405-final-source
+          echo "schedule_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+  research-focused:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      B2C_REQUIRE_GIT_HISTORY: '1'
+      GITHUB_BASE_SHA: e290c4e3316c897696a259a212d64fafacc9a0e3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.research_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - run: npm ci
+      - run: git rev-parse HEAD && npm run audit:ci -- --lane presubmit
+      - name: Verify actual research and repaired fixture shards
+        shell: bash
+        run: |
+          set -euo pipefail
+          for shard in core-artifacts evidence-schema engineering; do
+            npm run test:validators -- --shard "$shard" > "$RUNNER_TEMP/$shard.log" 2>&1
+            SHARD="$shard" node --input-type=module - <<'JS'
+          import fs from 'node:fs';
+          const marker = 'B2C_SHARD_RESULTS_V1:';
+          const text = fs.readFileSync(`${process.env.RUNNER_TEMP}/${process.env.SHARD}.log`, 'utf8');
+          const line = text.split('\n').find(line => line.startsWith(marker));
+          if (!line) throw new Error('Missing shard results');
+          const rows = JSON.parse(line.slice(marker.length));
+          console.log(`${process.env.SHARD}: ${rows.filter(row => row.ok).length}/${rows.length} passed`);
+          if (!rows.length || rows.some(row => !row.ok)) { console.error(rows.filter(row => !row.ok)); throw new Error('Fixture failure'); }
+          JS
+          done
+      - run: npm run render:all && npm run render:evidence-schema-version -- --check && git diff --exit-code
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: final-research-focused
+          path: ${{ runner.temp }}/*.log
+          retention-days: 3
+  integration:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        lane: [presubmit, fast, heavy-1, heavy-2, hosted, app]
+    env:
+      B2C_REQUIRE_GIT_HISTORY: '1'
+      GITHUB_BASE_SHA: e290c4e3316c897696a259a212d64fafacc9a0e3
+      B2C_FIXTURE_CONCURRENCY: '6'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.schedule_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - name: Run final integration lane
+        env:
+          LANE: ${{ matrix.lane }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD
+          case "$LANE" in
+            presubmit)
+              npm run audit:ci -- --lane presubmit
+              npm run test:fixtures -- adapters
+              npm run render:all
+              npm run render:evidence-schema-version -- --check
+              git diff --exit-code ;;
+            fast) npm run audit:ci -- --lane fast ;;
+            heavy-1) npm run audit:ci -- --lane heavy --shard 1/2 ;;
+            heavy-2) npm run audit:ci -- --lane heavy --shard 2/2 ;;
+            hosted) npm ci --prefix hosted/knowledge-mcp && npm run hosted:check ;;
+            app) npm ci --prefix hosted/builder-console && npm run app:check ;;
+          esac

@@ -248,7 +248,26 @@ if (text) {
         );
       }
     }
-    if (/\bYYYY-MM-DD\b|\breplace with\b|\b(TODO|TBD|placeholder)\b/i.test(text)) {
+    const sourceLedgerHasTemplatePlaceholder = sourceLedgerSection?.rows.some((row) => {
+      const cells = row.cells;
+      const requiredIdentityFields = [
+        cells[sourceLedgerEvidence.columns.source],
+        cells[sourceLedgerEvidence.columns.platform],
+        cells[sourceLedgerEvidence.columns.identity],
+        cells[sourceLedgerEvidence.columns.backendQuery],
+        cells[sourceLedgerEvidence.columns.artifactTrace],
+      ];
+      const narrativeFields = [
+        cells[sourceLedgerEvidence.columns.transcriptVisual],
+        cells[sourceLedgerEvidence.columns.observation],
+        cells[sourceLedgerEvidence.columns.inference],
+      ];
+      return (
+        requiredIdentityFields.some((cell) => /\bYYYY-MM-DD\b|\breplace with\b|\b(TODO|TBD|placeholder)\b/i.test(cell ?? "")) ||
+        narrativeFields.some((cell) => isPlaceholderOnly(cell ?? ""))
+      );
+    });
+    if (sourceLedgerHasTemplatePlaceholder) {
       issues.push(
         issue(
           "error",

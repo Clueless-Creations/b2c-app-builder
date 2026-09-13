@@ -262,6 +262,14 @@ export function register(h: Harness): void {
   }
   runFixture("research narrative may describe pending work without becoming a placeholder", researchNarrativeMentionsPending, "check-research-evidence.ts", 0);
 
+  const researchQuotedPlaceholder = makeCompletedResearch("research-quoted-placeholder");
+  {
+    const researchPath = path.join(researchQuotedPlaceholder, "strategy/RESEARCH.md");
+    const research = readFileSync(researchPath, "utf8").replace("structured rows / top 10", 'structured rows / top 10; source quotation includes "TBD"');
+    writeFileSync(researchPath, research, "utf8");
+  }
+  runFixture("quoted source placeholder language remains narrative evidence", researchQuotedPlaceholder, "check-research-evidence.ts", 0);
+
   for (const status of ["pending", "running"] as const) {
     const root = makeCompletedResearch(`research-workflow-complete-${status}`);
     const state = readState(root);

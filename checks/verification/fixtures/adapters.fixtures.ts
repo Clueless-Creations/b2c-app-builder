@@ -29,6 +29,7 @@ import {
   renderCrontabLine,
   renderLaunchdPlist,
   renderWrapperScript,
+  scheduledAutonomyApprovalId,
   scheduleMutationLockPath,
   translateCronToLaunchd,
   withScheduleMutationLock,
@@ -597,6 +598,22 @@ export function register(harness: Harness): void {
 
     const missingArgs = runCli("adapters/install-schedule.ts", ["--runtime", "claude"]);
     assert(missingArgs.code === 1, `expected exit 1 with a missing --workspace, got ${missingArgs.code}: ${missingArgs.output}`);
+
+    const unauthorizedApply = runCli("adapters/install-schedule.ts", [
+      "--workspace",
+      dir,
+      "--runtime",
+      "codex",
+      "--schedule",
+      "*/20 * * * *",
+      "--brief",
+      path.join(dir, "brief.json"),
+      "--apply",
+    ]);
+    assert(unauthorizedApply.code === 1, `expected --apply without founder authority to fail before host mutation, got ${unauthorizedApply.code}: ${unauthorizedApply.output}`);
+    assert(unauthorizedApply.output.includes("schedule_authority_required"), `expected the refusal to name the schedule authority gate, got: ${unauthorizedApply.output}`);
+    assert(unauthorizedApply.output.includes(scheduledAutonomyApprovalId), `expected the refusal to name the canonical approval id, got: ${unauthorizedApply.output}`);
+    assert(!existsSync(path.join(dir, "schedule")), "unauthorized apply must not create the workspace schedule directory");
   });
 
   harness.check("adapters/install-schedule: checkClaudeSandboxSetting warns and reports sandboxed:false unless sandbox.enabled is true", () => {

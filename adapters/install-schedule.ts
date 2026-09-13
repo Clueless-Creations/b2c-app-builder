@@ -11,7 +11,7 @@
  * Usage:
  *   tsx adapters/install-schedule.ts --workspace <dir> --runtime claude|codex|cursor \
  *       --schedule "(every 30 min, 5-field cron)" --brief <path/to/brief.json> [--mechanism cron|launchd] \
- *       [--wall-clock-seconds 1800] [--skill-root <path>] [--apply] [--uninstall]
+ *       [--wall-clock-seconds 1800] [--skill-root <path>] [--apply --approval <scheduled-autonomy-approval-id>] [--uninstall]
  */
 import { randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
@@ -25,10 +25,14 @@ import { isMainModule } from "../kernel/lib/cli.js";
 import { founderFacingRuntimeIds, type RuntimeId } from "./profile.js";
 import { loadWorkspaceCatalog, renderCatalogRefusal } from "../kernel/session/catalog-contract.js";
 import { acquireLock, releaseLock } from "../kernel/reducer/lock.js";
+import { loadRunState } from "../kernel/engine/runstate.js";
 
 const defaultSkillRoot = resolveSkillRoot(import.meta.url);
 
 export type ScheduleMechanism = "cron" | "launchd";
+
+export const scheduledAutonomyWorkflowId = "workflow.operations.scheduled-autonomy-installation";
+export const scheduledAutonomyApprovalId = `${scheduledAutonomyWorkflowId}.approval.1`;
 
 export interface ScheduleOptions {
   readonly workspaceDir: string;
@@ -269,7 +273,13 @@ function fail(message: string): never {
   process.exit(1);
 }
 
-function buildOptions(argv: string[]): { options: ScheduleOptions; mechanism: ScheduleMechanism; apply: boolean; uninstall: boolean } {
+function buildOptions(argv: string[]): {
+  options: ScheduleOptions;
+  mechanism: ScheduleMechanism;
+  apply: boolean;
+  uninstall: boolean;
+  approvalId?: string;
+} {
   const flags = parseFlags(argv, [
     { flags: ["--workspace", "--target"], key: "workspace" },
     { flags: ["--runtime"], key: "runtime", kind: "string" },
@@ -281,6 +291,7 @@ function buildOptions(argv: string[]): { options: ScheduleOptions; mechanism: Sc
     { flags: ["--log"], key: "log" },
     { flags: ["--apply"], key: "apply", kind: "boolean" },
     { flags: ["--uninstall"], key: "uninstall", kind: "boolean" },
+    { flags: ["--approval"], key: "approval", kind: "string" },
   ]);
 
   const workspaceDir = flagString(flags, "workspace")
@@ -307,7 +318,29 @@ function buildOptions(argv: string[]): { options: ScheduleOptions; mechanism: Sc
     mechanism,
     apply: flagBoolean(flags, "apply"),
     uninstall: flagBoolean(flags, "uninstall"),
+    approvalId: flagString(flags, "approval"),
   };
+}
+
+/**
+ * Host mutation is a founder-only schedule effect. The CLI flag is not itself authority: an
+ * apply must name the canonical scheduled-autonomy approval and that approval must be currently
+ * approved in the workspace run state. Dry runs intentionally do not require it.
+ */
+export function assertScheduleApproval(workspaceDir: string, approvalId: string | undefined): void {
+  if (approvalId !== scheduledAutonomyApprovalId) {
+    throw new Error(`install-schedule.schedule_authority_required: --apply requires --approval ${scheduledAutonomyApprovalId}`);
+  }
+  const runStatePath = path.join(workspaceDir, "run", "run-state.json");
+  let run: ReturnType<typeof loadRunState>;
+  try {
+    run = loadRunState(runStatePath);
+  } catch {
+    throw new Error("install-schedule.schedule_authority_unavailable: the workspace has no readable current run state; complete the scheduled-autonomy approval first");
+  }
+  if (run.approvals[scheduledAutonomyApprovalId] !== "approved") {
+    throw new Error("install-schedule.schedule_authority_pending: the current scheduled-autonomy founder approval is not approved");
+  }
 }
 
 function readCrontab(): string {
@@ -341,10 +374,18 @@ export function withScheduleMutationLock<T>(operation: () => T, homeDir = os.hom
 }
 
 function runMain(): void {
-  const { options, mechanism, apply, uninstall } = buildOptions(process.argv.slice(2));
+  const { options, mechanism, apply, uninstall, approvalId } = buildOptions(process.argv.slice(2));
   if (!uninstall) {
     const compatible = loadWorkspaceCatalog(options.workspaceDir);
     if (!compatible.ok) fail(renderCatalogRefusal(compatible.refusal));
+  }
+
+  if (apply) {
+    try {
+      assertScheduleApproval(options.workspaceDir, approvalId);
+    } catch (error) {
+      fail(error instanceof Error ? error.message : String(error));
+    }
   }
 
   const sandboxCheck = !uninstall && options.runtime === "claude" ? readClaudeSandboxSetting(options.workspaceDir) : undefined;
@@ -358,6 +399,7 @@ function runMain(): void {
       if (!uninstall) console.log(`  crontab line: ${renderCrontabLine(options)}`);
       console.log(`  would remove any crontab line tagged "# ${crontabSignature(options)}"`);
       console.log(`  verify after --apply with: crontab -l | grep ${JSON.stringify(crontabSignature(options))}`);
+      console.log(`  approval required for --apply: ${scheduledAutonomyApprovalId}`);
       if (sandboxCheck) console.log(`  sandboxed: ${String(sandboxCheck.sandboxed)}`);
       return;
     }

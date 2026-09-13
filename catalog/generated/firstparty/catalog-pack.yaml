@@ -1,8 +1,8 @@
 id: business-pack.consumer-business
 title: Consumer business
 kind: business-pack
-version: 0.221.3
-revision: 0.221.3
+version: 0.221.4
+revision: 0.221.4
 depends_on: []
 creates_provider_spend: false
 domains:
@@ -984,7 +984,7 @@ workflows:
       - set up a schedule so this runs on its own
       - install a recurring job without me starting it by hand
       - automate the operating rhythm going forward
-    instructions: "Install the OS-level trigger that keeps the operating loop alive: run `adapters/install-schedule.ts` in its default dry-run first and show the founder the exact crontab line (or launchd plist) it would install — mechanism, cadence, runtime, wrapper path, and log path — then run it with `--apply` only after the founder's approval, because a standing schedule on their machine is their call, every time. Verify the installation with the command the dry-run prints (`crontab -l | grep b2c:<slug>` or `launchctl list`), and record the whole arrangement in `operations/SCHEDULE.md`: mechanism, cadence, runtime, brief path, wall-clock cap, the verify command, the exact uninstall command (`--uninstall --apply`), and the note that the kill switch in `control/control.json` stops every scheduled session cold even while the OS keeps firing the trigger. The scheduled session itself reopens recurring work (the weekly ops review, the growth iteration loop) on its own calendar — this node installs the heartbeat, it does not do the week's work."
+    instructions: "Install the OS-level trigger that keeps the operating loop alive: run `adapters/install-schedule.ts` in its default dry-run first and show the founder the exact crontab line (or launchd plist) it would install — mechanism, cadence, runtime, wrapper path, and log path — then run it with `--apply --approval workflow.operations.scheduled-autonomy-installation.approval.1` only after the current scheduled-autonomy founder approval is approved, because a standing schedule on their machine is their call, every time. Verify the installation with the command the dry-run prints (`crontab -l | grep b2c:<slug>` or `launchctl list`), and record the whole arrangement in `operations/SCHEDULE.md`: mechanism, cadence, runtime, brief path, wall-clock cap, the verify command, the exact uninstall command (`--uninstall --apply --approval workflow.operations.scheduled-autonomy-installation.approval.1`), and the note that the kill switch in `control/control.json` stops every scheduled session cold even while the OS keeps firing the trigger. The scheduled session itself reopens recurring work (the weekly ops review, the growth iteration loop) on its own calendar — this node installs the heartbeat, it does not do the week's work."
     reads:
       - state/business-state.json
     consults:

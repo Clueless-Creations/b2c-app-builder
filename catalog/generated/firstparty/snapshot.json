@@ -2,7 +2,7 @@
   "extension": {
     "apiVersion": "b2c.extension/v1",
     "id": "b2c/consumer-business",
-    "version": "0.221.3",
+    "version": "0.221.4",
     "hostApiVersion": "b2c/v1",
     "title": "Consumer business",
     "dependencies": [],
@@ -5448,9 +5448,9 @@
       {
         "workerContext": {
           "workflowId": "workflow.operations.scheduled-autonomy-installation",
-          "instructions": "Install the OS-level trigger that keeps the operating loop alive: run `adapters/install-schedule.ts` in its default dry-run first and show the founder the exact crontab line (or launchd plist) it would install — mechanism, cadence, runtime, wrapper path, and log path — then run it with `--apply` only after the founder's approval, because a standing schedule on their machine is their call, every time. Verify the installation with the command the dry-run prints (`crontab -l | grep b2c:<slug>` or `launchctl list`), and record the whole arrangement in `operations/SCHEDULE.md`: mechanism, cadence, runtime, brief path, wall-clock cap, the verify command, the exact uninstall command (`--uninstall --apply`), and the note that the kill switch in `control/control.json` stops every scheduled session cold even while the OS keeps firing the trigger. The scheduled session itself reopens recurring work (the weekly ops review, the growth iteration loop) on its own calendar — this node installs the heartbeat, it does not do the week's work.",
+          "instructions": "Install the OS-level trigger that keeps the operating loop alive: run `adapters/install-schedule.ts` in its default dry-run first and show the founder the exact crontab line (or launchd plist) it would install — mechanism, cadence, runtime, wrapper path, and log path — then run it with `--apply --approval workflow.operations.scheduled-autonomy-installation.approval.1` only after the current scheduled-autonomy founder approval is approved, because a standing schedule on their machine is their call, every time. Verify the installation with the command the dry-run prints (`crontab -l | grep b2c:<slug>` or `launchctl list`), and record the whole arrangement in `operations/SCHEDULE.md`: mechanism, cadence, runtime, brief path, wall-clock cap, the verify command, the exact uninstall command (`--uninstall --apply --approval workflow.operations.scheduled-autonomy-installation.approval.1`), and the note that the kill switch in `control/control.json` stops every scheduled session cold even while the OS keeps firing the trigger. The scheduled session itself reopens recurring work (the weekly ops review, the growth iteration loop) on its own calendar — this node installs the heartbeat, it does not do the week's work.",
           "providerIds": [],
-          "contextFingerprint": "sha256:9b4d8c6d9fd70f1749f04a5c2e3efa83fb94fe1f30993802179012621adefd45"
+          "contextFingerprint": "sha256:a2584472c7e77663ef50af101bf85eb641bb289d732466da0ce120b983083655"
         },
         "provider": "b2c/consumer-business-worker",
         "description": "Business live and the founder wants the operating rhythm to run without anyone starting sessions by hand; changing or removing that schedule",
@@ -15764,8 +15764,8 @@
     ]
   },
   "files": {
-    "extension.yaml": "880ca32a27358dc9ca65ed962f03abad287c82f103bb3ab8cd060dc2fab29a3d",
-    "catalog-pack.yaml": "08cada43f139cbb3a07a5f40a1e2a7798864c1f9f34c983c27be6d154a0f1a72",
+    "extension.yaml": "82e2adb4903e3cf86ad092e7a706e40d4b7cfac392f86b9e0f7a4a1b361d60e5",
+    "catalog-pack.yaml": "99abdcd255db22dedf80c1ed1fe51deffba34f7d57cbb773c0ac4d58f4e61493",
     "knowledge/data/analytics-attribution.md": "0bba4685b2188b9e80b7fcc14fdac9472c6c4aeac5bc59703188eaa5e26f234a",
     "knowledge/data/posthog-agent-tooling.md": "61ffdbc79a985a41a11fbe6e1c7c5663050104208baa9d05b8ebe33186ab93cc",
     "knowledge/design/audience-derived-identity.md": "04c90b39c9d41cf00257c70b4e579f3e29684254d444917b9a5690d48be74f5f",
@@ -15912,7 +15912,7 @@
     "knowledge/words/conversion-copy.md": "68739b91f0f977f28718f48dd2368bb8c59a03a3f3d44a30efa08d12eb2956ab",
     "knowledge/words/no-slop-writing.md": "4dcb9d8a78fcee18daa5b46ced399f8b41992853141ff3a9e9b1906d263a98cb",
     "checks/validation/repository/audit-skill-links.ts": "781b1715e075b59ce673fbefad9bacab29eceb93e9f96ef60944bfda884eaf5c",
-    "package.json": "2c86fc27599aada3228b338739135a92ac693a71813584cbedb0a4cc453e1421",
+    "package.json": "987232177f9eb6a629886db710b89bcbfb98feb2078b358f266928ac496cd221",
     "tooling/catalog-scaffold.ts": "6a54386c9259c97834599249115b0dd82308c16e2c9bb35c02f3058280467077",
     "catalog/render-routing.ts": "938e29aaed5cf37c03afe8a2cf755af35b8921ad5ca86fd54968095291c2898c",
     "checks/validation/repository/check-agent-entrypoints.ts": "474ed5197defaa52cd71a47484e1e5cd80d1caeb6bc8f75ea053953bacff2071",
@@ -16225,5 +16225,5 @@
     "catalog/upstreams/notices/parth-app-store-screenshots.txt": "a6fd8faa7da6c22671b89888940275aca8be6c56bd65c0f13801a1b8e4e3bb1a"
   },
   "dependencies": [],
-  "digest": "sha256:d817dd7a1b222d8ec6684b6eefad1d8614ac1d1b4003fb91741f6fcdaedbecea"
+  "digest": "sha256:701ca539bd8466e2677746e66da7f90b2fd2a29573792be8abffccc82110826e"
 }

@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.221.1",
+  "version": "0.221.2",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Preserve mismatched catalog refusals across CLI and local MCP business-plan routes.",
     "Prove schedule install and uninstall dry-runs leave the workspace untouched.",
     "Recover a research decision cleanly when interruption occurs after its journal is written.",
     "Refuse initialized catalogs whose version disagrees with the installed runtime pin.",

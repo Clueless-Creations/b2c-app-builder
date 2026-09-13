@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.221.2",
+  "version": "0.221.3",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Add authored row locations and bounded repair hints for offer-test contract, decision, and measurement failures.",
     "Preserve mismatched catalog refusals across CLI and local MCP business-plan routes.",
     "Prove schedule install and uninstall dry-runs leave the workspace untouched.",
     "Recover a research decision cleanly when interruption occurs after its journal is written.",

@@ -616,3 +616,47 @@ test("public initialized planning refuses a corrupt catalog without falling back
     rmSync(env.temp, { recursive: true, force: true });
   }
 });
+
+test("public initialized planning refuses a missing catalog without falling back to fresh planning", () => {
+  const env = setup();
+  const prior = process.env.B2C_APP_BUILDER_HOME;
+  process.env.B2C_APP_BUILDER_HOME = env.home;
+  try {
+    data("business.create", { workspaceId: "app", directory: env.directory, name: "Useful Habit", hypothesis: "A specific consumer need" });
+    acceptProduct(env.directory);
+    data("business.initialize", { workspaceId: "app", expectedRevision: workspaceRevision(env.directory) });
+    const statePath = path.join(env.directory, "state/business-state.json");
+    const controlPath = path.join(env.directory, "control/control.json");
+    const runPath = path.join(env.directory, "run/run-state.json");
+    const catalogPath = path.join(env.directory, "catalog.json");
+    const before = {
+      state: readFileSync(statePath, "utf8"),
+      control: readFileSync(controlPath, "utf8"),
+      run: existsSync(runPath) ? readFileSync(runPath, "utf8") : undefined,
+    };
+    rmSync(catalogPath);
+
+    const refused = callPublicOperation("business.plan", { workspaceId: "app" });
+    assert(!refused.ok, JSON.stringify(refused));
+    assert.equal(refused.error.code, "LOCAL_OPERATION_REFUSED");
+    assert.equal(refused.error.message, "business.catalog_unavailable");
+    assert.equal(readFileSync(statePath, "utf8"), before.state, "catalog refusal must not turn the initialized workspace into planning state");
+    assert.equal(readFileSync(controlPath, "utf8"), before.control, "catalog refusal must not mutate authority state");
+    assert.equal(existsSync(runPath) ? readFileSync(runPath, "utf8") : undefined, before.run, "catalog refusal must not write runtime state");
+
+    const cli = spawnSync(process.execPath, [path.join(root, "entrypoints/cli/b2c.mjs"), "business-plan", "--workspace", "app", "--json"], {
+      cwd: root,
+      encoding: "utf8",
+      env: process.env,
+    });
+    assert.equal(cli.status, 1, cli.stderr);
+    const cliResult = JSON.parse(cli.stdout) as { ok?: boolean; error?: { code?: string; message?: string } };
+    assert.equal(cliResult.ok, false, cli.stdout);
+    assert.equal(cliResult.error?.code, "LOCAL_OPERATION_REFUSED");
+    assert.equal(cliResult.error?.message, "business.catalog_unavailable");
+  } finally {
+    if (prior === undefined) delete process.env.B2C_APP_BUILDER_HOME;
+    else process.env.B2C_APP_BUILDER_HOME = prior;
+    rmSync(env.temp, { recursive: true, force: true });
+  }
+});

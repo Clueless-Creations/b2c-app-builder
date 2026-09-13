@@ -226,3 +226,50 @@ test("a Pivot checkpoint holds initialization until an explicit Go continuation 
     rmSync(env.temp, { recursive: true, force: true });
   }
 });
+
+test("an explicit Kill checkpoint remains held without silently restarting or becoming Go", () => {
+  const env = setup();
+  const previousHome = process.env.B2C_APP_BUILDER_HOME;
+  process.env.B2C_APP_BUILDER_HOME = env.home;
+  try {
+    const created = callPublicOperation("business.create", {
+      workspaceId: "app",
+      directory: env.directory,
+      name: "Useful Habit",
+      hypothesis: "A repeated consumer need",
+    });
+    assert(created.ok, JSON.stringify(created));
+
+    const killed = callPublicOperation("business.research.decision", {
+      workspaceId: "app",
+      expectedRevision: workspaceRevision(env.directory),
+      decisionId: "kill-checkpoint",
+      verdict: "Kill",
+      rationale: "The tested wedge does not justify continuing this business direction.",
+      findingIds: [],
+      apply: true,
+    });
+    assert(killed.ok, JSON.stringify(killed));
+
+    const planned = callPublicOperation("business.plan", { workspaceId: "app" });
+    assert(planned.ok, JSON.stringify(planned));
+    assert.equal(planned.data.status, "not_initialized");
+    assert.equal(planned.data.completion.deliveryAccepted, false);
+    assert(!callPublicOperation("business.initialize", { workspaceId: "app", expectedRevision: planned.data.revision }).ok);
+
+    const product = readFileSync(path.join(env.directory, "product.yaml"), "utf8");
+    const decisionLog = parse(product).copy.decision_log as string;
+    assert.match(decisionLog, /\| Kill \|/);
+    assert.doesNotMatch(decisionLog, /\| Go \|/);
+    assert.equal((decisionLog.match(/b2c-research-decision:v1:kill-checkpoint:/g) ?? []).length, 1);
+
+    const replayPlan = callPublicOperation("business.plan", { workspaceId: "app" });
+    assert(replayPlan.ok, JSON.stringify(replayPlan));
+    assert.equal(replayPlan.data.status, "not_initialized");
+    assert.equal(replayPlan.data.completion.deliveryAccepted, false);
+  } finally {
+    if (previousHome === undefined) delete process.env.B2C_APP_BUILDER_HOME;
+    else process.env.B2C_APP_BUILDER_HOME = previousHome;
+    rmSync(env.temp, { recursive: true, force: true });
+  }
+});

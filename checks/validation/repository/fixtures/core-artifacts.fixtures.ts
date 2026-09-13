@@ -1612,7 +1612,12 @@ export function register(h: Harness): void {
     ["pending-risk-label", "The founder tests organic demand first", "Pending: document residual risk", 1],
     ["unverified-risk-label", "The founder tests organic demand first", "Risk: Unverified: document residual risk", 1],
     ["unverified-reason-label", "Unverified: collect audience evidence", "Demand remains unverified beyond the measured cohort", 1],
-    ["leading-authored-uncertainty", "Pending paid acquisition is deferred until organic testing completes", "Unverified demand beyond the measured cohort is an accepted risk", 0],
+    [
+      "leading-authored-uncertainty",
+      "Pending paid acquisition is deferred until organic testing completes",
+      "Unverified demand beyond the measured cohort is an accepted risk",
+      0,
+    ],
     ["labeled-authored-risk", "Reason: paid acquisition is pending until organic testing", "Risk: demand remains unverified beyond the measured cohort", 0],
   ] as const) {
     const root = makeCompletedResearch(`research-offer-waiver-narrative-${name}`);

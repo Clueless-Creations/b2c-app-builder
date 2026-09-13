@@ -160,6 +160,16 @@ export function register(harness: Harness): void {
     assert(!stale.includes(local.id), "unrelated local review must stay out of the stale set");
     assert(run.nodes[local.id]!.status === "succeeded", "unrelated local proof must stay accepted");
     assert(run.artifactBindings.find((binding) => binding.artifactId === "artifact.local-feature-proof")!.accepted, "unrelated local binding must remain accepted");
+
+    // The affected chain can be repaired without broadening the impact set.
+    acceptWorkspaceNode(plan, run, root, product.id, "artifact.product-import-promise", "product.yaml", "2026-09-09T12:00:04.000Z");
+    acceptWorkspaceNode(plan, run, root, onboarding.id, "artifact.onboarding-import-claim", "product/ONBOARDING.md", "2026-09-09T12:00:05.000Z");
+    assert(run.nodes[product.id]!.status === "succeeded", "the changed direct obligation must be repairable");
+    assert(run.nodes[onboarding.id]!.status === "succeeded", "the dependent obligation must be repairable after its producer");
+    assert(run.artifactBindings.find((binding) => binding.artifactId === "artifact.local-feature-proof")!.accepted, "repair must preserve unrelated proof");
+    const repeated = invalidateStaleReviews(plan, run, root, "2026-09-09T12:00:06.000Z");
+    assert(repeated.length === 0, "rechecking unchanged repaired inputs must be idempotent");
+    assert(run.nodes[product.id]!.status === "succeeded" && run.nodes[onboarding.id]!.status === "succeeded", "idempotent recheck must not reopen repaired work");
   });
 
   harness.check("business-change-impact: an activated provider binding reopens only its affected obligations", () => {

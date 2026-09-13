@@ -2,7 +2,7 @@
 
 Generated from active, bound knowledge source declarations and catalog/upstreams. This is a maintainer review queue, not a second registry. A cited repository may be an example, optional tool, adapted method or runtime dependency; the report does not infer adoption or permission from a URL. Only an explicit reviewed contribution changes support or acknowledgments.
 
-Scope: 39 referenced repositories, 91 source bindings, 65 bindings needing review or linkage.
+Scope: 39 referenced repositories, 92 source bindings, 65 bindings needing review or linkage.
 
 The scan excludes inactive/unbound knowledge, self-references, non-GitHub sources, undeclared prose URLs, package-manager dependencies and resources outside knowledge manifests. An empty queue is not proof that every dependency is tracked. Inspect those other surfaces during contribution review. Repository aliases are matched only when declared in an upstream manifest.
 
@@ -84,6 +84,7 @@ Use b2c contribute plan for an untracked source. For a maintained project, inspe
 | --- | --- | --- | --- | --- | --- |
 | amirmushichge/brand-system-skill | `knowledge/design/design-visual-system.md` | amir-brand-system-builder | amir-brand-system | tracked | Source identity and reviewed commit are linked. This does not certify executable compatibility or live results. |
 | amirmushichge/brand-system-skill | `knowledge/design/remotion-content-assets.md` | amir-brand-system-builder | amir-brand-system | tracked | Source identity and reviewed commit are linked. This does not certify executable compatibility or live results. |
+| amirmushichge/brand-system-skill | `knowledge/engineering/external-skill-packs.md` | amir-brand-system-builder | amir-brand-system | tracked | Source identity and reviewed commit are linked. This does not certify executable compatibility or live results. |
 | amirmushichge/cinematic-scroll-prompt-kit | `knowledge/design/editorial-scrollytelling.md` | amir-cinematic-scroll-prompt-kit | amir-cinematic-scroll | tracked | Source identity and reviewed commit are linked. This does not certify executable compatibility or live results. |
 | amirmushichge/cinematic-scroll-prompt-kit | `knowledge/design/remotion-content-assets.md` | amir-cinematic-scroll-prompt-kit | amir-cinematic-scroll | tracked | Source identity and reviewed commit are linked. This does not certify executable compatibility or live results. |
 | appllama/appllama-skills | `knowledge/design/mobile-flow-craft.md` | appllama-app-design-skill | appllama-skills | tracked | Source identity and reviewed commit are linked. This does not certify executable compatibility or live results. |

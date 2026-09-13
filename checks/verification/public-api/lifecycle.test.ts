@@ -701,3 +701,38 @@ test("local MCP preserves the initialized catalog refusal envelope", async () =>
     }
   }
 });
+
+test("public initialized planning refuses a catalog whose version disagrees with the runtime pin", () => {
+  const env = setup();
+  const prior = process.env.B2C_APP_BUILDER_HOME;
+  process.env.B2C_APP_BUILDER_HOME = env.home;
+  try {
+    data("business.create", { workspaceId: "app", directory: env.directory, name: "Useful Habit", hypothesis: "A specific consumer need" });
+    acceptProduct(env.directory);
+    data("business.initialize", { workspaceId: "app", expectedRevision: workspaceRevision(env.directory) });
+    const statePath = path.join(env.directory, "state/business-state.json");
+    const controlPath = path.join(env.directory, "control/control.json");
+    const runPath = path.join(env.directory, "run/run-state.json");
+    const catalogPath = path.join(env.directory, "catalog.json");
+    const catalog = JSON.parse(readFileSync(catalogPath, "utf8")) as { version?: string };
+    const before = {
+      state: readFileSync(statePath, "utf8"),
+      control: readFileSync(controlPath, "utf8"),
+      run: existsSync(runPath) ? readFileSync(runPath, "utf8") : undefined,
+    };
+    catalog.version = "catalog.fixture-mismatched";
+    writeFileSync(catalogPath, JSON.stringify(catalog));
+
+    const refused = callPublicOperation("business.plan", { workspaceId: "app" });
+    assert(!refused.ok, JSON.stringify(refused));
+    assert.equal(refused.error.code, "LOCAL_OPERATION_REFUSED");
+    assert.equal(refused.error.message, "business.catalog_unavailable");
+    assert.equal(readFileSync(statePath, "utf8"), before.state, "pin refusal must not turn the initialized workspace into planning state");
+    assert.equal(readFileSync(controlPath, "utf8"), before.control, "pin refusal must not mutate authority state");
+    assert.equal(existsSync(runPath) ? readFileSync(runPath, "utf8") : undefined, before.run, "pin refusal must not write runtime state");
+  } finally {
+    if (prior === undefined) delete process.env.B2C_APP_BUILDER_HOME;
+    else process.env.B2C_APP_BUILDER_HOME = prior;
+    rmSync(env.temp, { recursive: true, force: true });
+  }
+});

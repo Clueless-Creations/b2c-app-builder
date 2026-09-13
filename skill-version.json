@@ -1,9 +1,10 @@
 {
   "skill": "b2c-app-builder",
-  "version": "0.220.98",
+  "version": "0.220.99",
   "updatedAt": "2026-09-12",
   "sourcePath": ".",
   "releaseNotes": [
+    "Refuse initialized catalogs whose version disagrees with the installed runtime pin.",
     "Preserve initialized catalog refusals through the local MCP business-plan route.",
     "Refuse missing initialized catalogs without falling back to fresh planning.",
     "Keep explicit Kill research checkpoints held without silently restarting or becoming Go.",

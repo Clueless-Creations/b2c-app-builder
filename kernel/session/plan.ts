@@ -25,7 +25,14 @@ import { createBudgetFundedVerifier } from "../autonomy/probes/budget.js";
 import { effectiveProtectedCategory } from "../autonomy/waivers.js";
 import { resolveRegisteredWorkspace } from "../../adapters/registry.js";
 import type { BusinessStateV2, ControlFile, ProtectedCategory, RunStateDocument } from "../schema/types.js";
-import { loadBusinessStateFile, loadControlFile, loadLedgerFile, resolveWorkspacePaths } from "./run.js";
+import {
+  assertCatalogCompatibility,
+  loadBusinessStateFile,
+  loadControlFile,
+  loadLedgerFile,
+  resolveWorkspacePaths,
+  runtimeCatalogVersion,
+} from "./run.js";
 import { loadWorkspaceCatalog, renderCatalogRefusal } from "./catalog-contract.js";
 import { translateParkReason } from "./digest.js";
 import { buildGoNoGoQuestion, buildSoftQuestion, validateFounderQuestion, type FounderQuestion, type FounderQuestionClass } from "./founder-gate.js";
@@ -462,6 +469,11 @@ export function planWorkspace(
   const compatible = loadWorkspaceCatalog(workspace);
   if (!compatible.ok) {
     throw new Error(`business.catalog_unavailable: ${renderCatalogRefusal(compatible.refusal)}`);
+  }
+  try {
+    assertCatalogCompatibility(compatible.catalog, runtimeCatalogVersion(workspace));
+  } catch {
+    throw new Error("business.catalog_unavailable");
   }
   const now = options.now ?? new Date().toISOString();
   const maxConcurrency = options.maxConcurrency ?? 4;

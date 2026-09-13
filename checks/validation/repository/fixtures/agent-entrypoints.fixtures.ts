@@ -176,6 +176,9 @@ export function register(harness: Harness): void {
   record("root guidance rejects an unrelated procedure", () => {
     requireFinding("AGENTS.md", `${root}\nRun npm run audit:ci after every edit.\n`, "agent_entrypoints.root_procedure_leak");
   });
+  record("root guidance keeps each writing owner reachable", () => {
+    requireFinding("AGENTS.md", root.replace("[technical documentation]", "technical rules"), "agent_entrypoints.standing_writing_owners_missing");
+  });
   record("root setup diagnostics remain conditional", () => {
     requireFinding("SKILL.md", `${skill}\nDegraded execution still selects b2c-local.\n`, "agent_entrypoints.root_setup_diagnostics");
   });

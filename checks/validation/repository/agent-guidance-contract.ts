@@ -71,6 +71,10 @@ export const STANDING_RULES: ReadonlyArray<{ id: string; terms: readonly string[
   },
   { id: "workspace_boundary", terms: ["Workspace-facing guidance", "never maintainer ARCH rules", "contributor machinery"] },
   {
+    id: "writing_owners",
+    terms: ["[no-slop writing]", "[technical documentation]", "[kitchen-language boundary]"],
+  },
+  {
     id: "completion",
     terms: [
       "An implementation request authorizes",
